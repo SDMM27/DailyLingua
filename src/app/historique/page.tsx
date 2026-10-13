@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: "Historique" };
 
 export default async function HistoryPage() {
   await connection();
-  const history = await getRepository().getHistory();
+  const history = await (await getRepository()).getHistory();
 
   return (
     <>

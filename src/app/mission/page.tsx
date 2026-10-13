@@ -12,7 +12,7 @@ export const metadata: Metadata = { title: "Mission du jour" };
 export default async function MissionPage() {
   await connection();
   const today = await getToday();
-  const mission = await getRepository().getMission(today);
+  const mission = await (await getRepository()).getMission(today);
 
   if (!mission) {
     return (
