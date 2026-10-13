@@ -7,7 +7,7 @@ import { PlusIcon } from "@/components/icons";
 import { languageStyle } from "@/components/ui/language-style";
 import { Card, Eyebrow, LanguageTag } from "@/components/ui/primitives";
 import { CONTENT_TYPE_LABELS, DIFFICULTY_LABELS } from "@/lib/domain/labels";
-import { LANGUAGE_CODES, languageInfo } from "@/lib/domain/languages";
+import { languageInfo } from "@/lib/domain/languages";
 import { splitBudget } from "@/lib/domain/time-budget";
 import { CEFR_LEVELS, CONTENT_TYPES, type CefrLevel, type Language } from "@/lib/schemas/common";
 import {
@@ -38,13 +38,16 @@ function toggleIn<T>(list: readonly T[], value: T): T[] {
  * Editable preferences, validated with the shared schema, then saved by a server action.
  * `onboarding` is the first-run screen of a new account: no language yet, and the time zone is
  * taken from the device. `persist` is false in the demo, where nothing can be saved.
+ * `languages` are the ones that can be added (they have content sources).
  */
 export function PreferencesForm({
   initial,
+  languages,
   mode = "settings",
   persist,
 }: {
   initial: Preferences;
+  languages: readonly Language[];
   mode?: "settings" | "onboarding";
   persist: boolean;
 }) {
@@ -69,7 +72,9 @@ export function PreferencesForm({
   const split = prefs.goals.length > 0 ? splitBudget(prefs.dailyMinutes, prefs.goals) : [];
   const minutesFor = (language: Language) => split.find((s) => s.language === language)?.minutes ?? 0;
   const maxWeight = Math.max(...prefs.goals.map((g) => g.weight));
-  const available = LANGUAGE_CODES.filter((code) => !prefs.goals.some((g) => g.language === code));
+  const available = languages.filter((code) => !prefs.goals.some((g) => g.language === code)).sort((a, b) =>
+    languageInfo(a).nameFr.localeCompare(languageInfo(b).nameFr, "fr"),
+  );
 
   async function handleSave() {
     const result = preferencesSchema.safeParse({ ...prefs, timeZone });
@@ -138,6 +143,12 @@ export function PreferencesForm({
                   onChange={(targetLevel) => setGoal(goal.language, { targetLevel })}
                 />
               </div>
+              {!languages.includes(goal.language) && (
+                <p className="mt-2 rounded-xl bg-surface-sunk px-3 py-2 text-xs leading-relaxed text-ink-soft">
+                  Plus aucune source de contenus n’est disponible pour cette langue : les missions ne pourront
+                  pas en proposer. Tu peux la garder ou la retirer.
+                </p>
+              )}
               <label className="mt-3 block">
                 <span className="mb-1 block text-xs font-medium text-ink-soft">Ce que je veux travailler</span>
                 <input

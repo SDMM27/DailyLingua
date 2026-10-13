@@ -3,7 +3,17 @@ import { z } from "zod";
 import { toDateKey } from "@/lib/domain/dates";
 import { applyReview, initialReviewState } from "@/lib/domain/spaced-repetition";
 import type { Database } from "@/lib/supabase/database.types";
-import { dateKeySchema, type DateKey } from "@/lib/schemas/common";
+import { availableLanguages } from "@/lib/content/availability";
+import { SOURCE_CATALOG } from "@/lib/content/catalog";
+import { readContentLicensePolicy } from "@/lib/content/policy";
+import { dateKeySchema, type DateKey, type Language } from "@/lib/schemas/common";
+import {
+  contentListItemSchema,
+  sourceInfoSchema,
+  type ContentLicensePolicy,
+  type ContentListItem,
+  type SourceInfo,
+} from "@/lib/schemas/content";
 import {
   expressionSchema,
   missionHistoryEntrySchema,
@@ -28,6 +38,44 @@ const HISTORY_LIMIT = 30;
 
 type Client = SupabaseClient<Database>;
 type VocabularyRow = Database["public"]["Tables"]["vocabulary_items"]["Row"];
+type SourceRow = Database["public"]["Tables"]["sources"]["Row"];
+
+/** Columns of a source needed to show it with its licence. */
+const SOURCE_COLUMNS =
+  "key, name, language, homepage_url, content_type, access, license_kind, license_name, license_url, terms_url, last_fetched_at";
+
+function toSourceInfo(
+  row: Pick<
+    SourceRow,
+    | "key"
+    | "name"
+    | "language"
+    | "homepage_url"
+    | "content_type"
+    | "access"
+    | "license_kind"
+    | "license_name"
+    | "license_url"
+    | "terms_url"
+    | "last_fetched_at"
+  >,
+): SourceInfo {
+  return sourceInfoSchema.parse({
+    key: row.key,
+    name: row.name,
+    language: row.language,
+    homepage: row.homepage_url,
+    contentType: row.content_type,
+    access: row.access,
+    license: {
+      kind: row.license_kind,
+      name: row.license_name,
+      url: row.license_url ?? undefined,
+      termsUrl: row.terms_url,
+    },
+    lastFetchedAt: row.last_fetched_at,
+  });
+}
 
 const UNIQUE_VIOLATION = "23505";
 
@@ -64,7 +112,13 @@ function unwrap<T>(result: { data: T; error: { message: string } | null }, what:
  * Every payload is mapped to the domain types and validated with the Zod schemas.
  * Calendar days written to the database always come from `getToday()` (the user's time zone).
  */
-export function createSupabaseRepository(client: Client, userId: string): DailyLinguaRepository {
+export function createSupabaseRepository(
+  client: Client,
+  userId: string,
+  options: { contentPolicy?: ContentLicensePolicy } = {},
+): DailyLinguaRepository {
+  const contentPolicy = options.contentPolicy ?? readContentLicensePolicy();
+
   async function getPreferences(): Promise<Preferences | null> {
     const [profile, goals] = await Promise.all([
       client.from("profiles").select("*").eq("id", userId).single(),
@@ -438,6 +492,54 @@ export function createSupabaseRepository(client: Client, userId: string): DailyL
     if (error) throw new Error(`Supabase (suppression du mot) : ${error.message}`);
   }
 
+  async function listContents(languages: Language[], perLanguage: number): Promise<ContentListItem[]> {
+    const lists = await Promise.all(
+      languages.map(async (language) => {
+        let query = client
+          .from("contents")
+          .select(
+            `id, language, content_type, title, url, difficulty, duration_minutes, summary, author, published_at,
+             sources!inner ( ${SOURCE_COLUMNS} )`,
+          )
+          .eq("language", language)
+          .neq("url_status", "broken")
+          // Only feed sources still in the catalogue: the demo seed's hand-made rows are not shown.
+          .eq("sources.active", true)
+          .not("sources.key", "is", null);
+        if (contentPolicy === "commercial") query = query.eq("sources.commercial_use", true);
+        const { data, error } = await query
+          .order("published_at", { ascending: false, nullsFirst: false })
+          .limit(perLanguage);
+        if (error) throw new Error(`Supabase (contenus) : ${error.message}`);
+        return data;
+      }),
+    );
+    return lists.flat().map((row) => {
+      const source = toSourceInfo(row.sources);
+      return contentListItemSchema.parse({
+        id: row.id,
+        language: row.language,
+        type: row.content_type,
+        title: row.title,
+        url: row.url,
+        difficulty: row.difficulty,
+        durationMinutes: row.duration_minutes,
+        summary: row.summary,
+        author: row.author ?? undefined,
+        publishedAt: row.published_at,
+        source: { name: source.name, homepage: source.homepage, access: source.access, license: source.license },
+      });
+    });
+  }
+
+  async function listSources(): Promise<SourceInfo[]> {
+    let query = client.from("sources").select(SOURCE_COLUMNS).eq("active", true).not("key", "is", null);
+    if (contentPolicy === "commercial") query = query.eq("commercial_use", true);
+    const { data, error } = await query.order("language").order("name");
+    if (error) throw new Error(`Supabase (sources) : ${error.message}`);
+    return data.map(toSourceInfo);
+  }
+
   return {
     isDemo: false,
     getAccountEmail,
@@ -457,5 +559,9 @@ export function createSupabaseRepository(client: Client, userId: string): DailyL
     reviewVocabulary,
     setVocabularyStatus,
     deleteVocabulary,
+    listContents,
+    listSources,
+    // From the catalogue, not the database: a language is offered even before the first ingestion.
+    listAvailableLanguages: async () => availableLanguages(SOURCE_CATALOG, contentPolicy),
   };
 }

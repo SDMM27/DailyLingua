@@ -1,0 +1,181 @@
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { createSupabaseRepository } from "@/lib/data/supabase-repository";
+import type { SourceDefinition } from "@/lib/schemas/content";
+import type { Database } from "@/lib/supabase/database.types";
+import { SOURCE_CATALOG } from "./catalog";
+import { isSourceAllowed, parseCatalog } from "./ingest";
+import type { ContentDraft } from "./normalize";
+import { createSupabaseContentStore } from "./supabase-store";
+
+/**
+ * Ingestion → reading list, against the LOCAL Supabase stack. Uses its own source (removed
+ * afterwards with its contents) and a throw-away user. Skipped when the local stack is down.
+ */
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+async function localStackIsUp(): Promise<boolean> {
+  if (!url || !anonKey || !serviceKey) return false;
+  if (!["127.0.0.1", "localhost", "[::1]"].includes(new URL(url).hostname)) return false;
+  try {
+    const res = await fetch(`${url}/auth/v1/health`, { headers: { apikey: anonKey }, signal: AbortSignal.timeout(1500) });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+const stackIsUp = await localStackIsUp();
+const RUN = Date.now().toString(36);
+const HOST = `run-${RUN}.example.org`;
+
+const TEST_SOURCE: SourceDefinition = {
+  key: `integration-${RUN}`,
+  name: "Fonte di prova",
+  language: "it",
+  homepageUrl: `https://${HOST}/`,
+  feedUrl: `https://${HOST}/feed`,
+  contentType: "article",
+  difficulty: "B1",
+  defaultMinutes: 4,
+  hosts: [HOST],
+  license: {
+    kind: "all-rights-reserved",
+    name: "Tous droits réservés",
+    termsUrl: `https://${HOST}/termini`,
+    commercialUse: false,
+    verifiedOn: "2026-10-13",
+    note: "integration test",
+  },
+};
+
+function draft(path: string, minutesAgo: number): ContentDraft {
+  return {
+    sourceKey: TEST_SOURCE.key,
+    language: "it",
+    contentType: "article",
+    title: `Articolo di prova ${path}`,
+    url: `https://${HOST}/${path}`,
+    difficulty: "B1",
+    durationMinutes: 4,
+    summary: "Una breve presentazione.",
+    author: "Redazione",
+    categories: ["Prova"],
+    publishedAt: new Date(Date.now() - minutesAgo * 60_000),
+  };
+}
+
+describe.skipIf(!stackIsUp)("content ingestion on Supabase (local database)", () => {
+  let admin: SupabaseClient<Database>;
+  let userClient: SupabaseClient<Database>;
+  let userId: string;
+  let sourceId: string;
+  const store = () => createSupabaseContentStore(admin);
+  // The whole catalogue plus the test source: syncing a partial list would retire real sources.
+  const catalog = parseCatalog([...SOURCE_CATALOG, TEST_SOURCE]);
+
+  beforeAll(async () => {
+    admin = createClient<Database>(url!, serviceKey!, { auth: { persistSession: false } });
+    const email = `content-${RUN}@test.invalid`;
+    const password = `pw-${Math.random().toString(36).slice(2)}-${RUN}`;
+    const created = await admin.auth.admin.createUser({ email, password, email_confirm: true });
+    if (created.error) throw created.error;
+    userId = created.data.user.id;
+    userClient = createClient<Database>(url!, anonKey!, { auth: { persistSession: false } });
+    const signedIn = await userClient.auth.signInWithPassword({ email, password });
+    if (signedIn.error) throw signedIn.error;
+
+    const ids = await store().syncSources(catalog, (s) => isSourceAllowed(s, "all"));
+    sourceId = ids.get(TEST_SOURCE.key)!;
+  });
+
+  afterAll(async () => {
+    if (!admin) return;
+    if (sourceId) {
+      await admin.from("contents").delete().eq("source_id", sourceId);
+      await admin.from("sources").delete().eq("id", sourceId);
+    }
+    if (userId) await admin.auth.admin.deleteUser(userId);
+  });
+
+  it("stores the source with its licence", async () => {
+    const { data } = await admin.from("sources").select("*").eq("id", sourceId).single();
+    expect(data).toMatchObject({
+      key: TEST_SOURCE.key,
+      language: "it",
+      feed_url: `https://${HOST}/feed`,
+      license_kind: "all-rights-reserved",
+      commercial_use: false,
+      license_verified_on: "2026-10-13",
+      active: true,
+    });
+  });
+
+  it("inserts new contents once, whatever tracking parameters the link carries", async () => {
+    expect(await store().insertContents(sourceId, [draft("a", 5), draft("b", 10)])).toBe(2);
+    const again = { ...draft("a", 5), url: `https://${HOST}/a?utm_source=rss` };
+    expect(await store().insertContents(sourceId, [again, draft("b", 10)])).toBe(0);
+  });
+
+  it("records the fetch result on the source", async () => {
+    await store().recordFetch(sourceId, { ok: false, error: "HTTP 500" });
+    await store().recordFetch(sourceId, { ok: true, itemCount: 2 });
+    const { data } = await admin.from("sources").select("last_fetch_status, last_fetch_error, last_item_count").eq("id", sourceId).single();
+    expect(data).toEqual({ last_fetch_status: "ok", last_fetch_error: null, last_item_count: 2 });
+  });
+
+  it("shows the contents to a signed-in user, newest first, with the source's licence", async () => {
+    const repo = createSupabaseRepository(userClient, userId, { contentPolicy: "all" });
+    const mine = (await repo.listContents(["it"], 200)).filter((c) => c.url.includes(HOST));
+    expect(mine.map((c) => c.title)).toEqual(["Articolo di prova a", "Articolo di prova b"]);
+    expect(mine[0]).toMatchObject({
+      language: "it",
+      author: "Redazione",
+      source: { name: "Fonte di prova", access: "free", license: { kind: "all-rights-reserved" } },
+    });
+    expect((await repo.listSources()).some((s) => s.key === TEST_SOURCE.key)).toBe(true);
+  });
+
+  it("hides contents whose link is broken", async () => {
+    const pending = await store().listUncheckedLinks(1000);
+    const b = pending.find((p) => p.url === `https://${HOST}/b`);
+    expect(b?.sourceKey).toBe(TEST_SOURCE.key);
+    await store().setLinkStatus(b!.id, "broken");
+    const repo = createSupabaseRepository(userClient, userId, { contentPolicy: "all" });
+    const urls = (await repo.listContents(["it"], 200)).map((c) => c.url);
+    expect(urls).toContain(`https://${HOST}/a`);
+    expect(urls).not.toContain(`https://${HOST}/b`);
+  });
+
+  it("an inconclusive check waits a day before being retried", async () => {
+    const a = (await store().listUncheckedLinks(1000)).find((p) => p.url === `https://${HOST}/a`);
+    await store().setLinkStatus(a!.id, null);
+    const after = await store().listUncheckedLinks(1000);
+    expect(after.some((p) => p.id === a!.id)).toBe(false);
+    const { data } = await admin.from("contents").select("url_status").eq("id", a!.id).single();
+    expect(data?.url_status).toBe("unchecked");
+  });
+
+  it("under the commercial policy, hides sources that do not allow it", async () => {
+    const repo = createSupabaseRepository(userClient, userId, { contentPolicy: "commercial" });
+    expect((await repo.listContents(["it"], 200)).some((c) => c.url.includes(HOST))).toBe(false);
+    const sources = await repo.listSources();
+    expect(sources.some((s) => s.key === TEST_SOURCE.key)).toBe(false);
+    expect(sources.length).toBeGreaterThan(0);
+  });
+
+  it("retires a source that leaves the catalogue", async () => {
+    await store().syncSources(parseCatalog(SOURCE_CATALOG), () => true);
+    const { data } = await admin.from("sources").select("active").eq("id", sourceId).single();
+    expect(data?.active).toBe(false);
+    const repo = createSupabaseRepository(userClient, userId, { contentPolicy: "all" });
+    expect((await repo.listContents(["it"], 200)).some((c) => c.url.includes(HOST))).toBe(false);
+  });
+
+  it("does not let a signed-in user write the shared catalogue", async () => {
+    const { error } = await userClient.from("sources").update({ active: false }).eq("id", sourceId);
+    expect(error?.code).toBe("42501");
+  });
+});

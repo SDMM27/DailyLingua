@@ -35,6 +35,14 @@ export const BookIcon = (p: IconProps) => (
   </Icon>
 );
 
+export const NewspaperIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h10A1.5 1.5 0 0 1 17 5.5V19a1.5 1.5 0 0 0 1.5 1.5H6A2 2 0 0 1 4 18.5Z" />
+    <path d="M17 9h2.5a.5.5 0 0 1 .5.5V19a1.5 1.5 0 0 1-3 0" />
+    <path d="M7.5 8h6M7.5 11.5h6M7.5 15h4" />
+  </Icon>
+);
+
 export const CardsIcon = (p: IconProps) => (
   <Icon {...p}>
     <rect x="3" y="6" width="14" height="15" rx="2.5" />

@@ -12,7 +12,7 @@ export const metadata: Metadata = { title: "Préférences" };
 export default async function PreferencesPage() {
   const repo = await getRepository();
   const preferences = await requirePreferences();
-  const email = await repo.getAccountEmail();
+  const [email, languages] = await Promise.all([repo.getAccountEmail(), repo.listAvailableLanguages()]);
   return (
     <>
       <PageHeader eyebrow="Réglages" title="Préférences">
@@ -34,7 +34,7 @@ export default async function PreferencesPage() {
         <span className="flex-1 font-semibold">Installer sur l’écran d’accueil</span>
         <ArrowRightIcon width={16} height={16} className="text-muted" />
       </Link>
-      <PreferencesForm initial={preferences} persist={!repo.isDemo} />
+      <PreferencesForm initial={preferences} languages={languages} persist={!repo.isDemo} />
       {email && (
         <Card className="mt-6 flex items-center justify-between gap-4">
           <div className="min-w-0">

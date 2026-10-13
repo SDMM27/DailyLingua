@@ -45,14 +45,14 @@ isOneToOne: false
                   ]
                 },"contents": {
                   Row: {
-                    "content_type": string,"created_at": string,"difficulty": string,"duration_minutes": number,"excerpt": string | null,"fetched_at": string,"id": string,"language": string,"published_at": string | null,"source_id": string,"summary": string,"title": string,"transcript_available": boolean,"updated_at": string,"url": string,"url_checked_at": string | null,"url_normalized": string | null,"url_status": string
+                    "author": string | null,"categories": (string)[],"content_type": string,"created_at": string,"difficulty": string,"duration_minutes": number,"excerpt": string | null,"fetched_at": string,"id": string,"language": string,"published_at": string | null,"source_id": string,"summary": string,"title": string,"transcript_available": boolean,"updated_at": string,"url": string,"url_checked_at": string | null,"url_normalized": string | null,"url_status": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "content_type": string,"created_at"?: string,"difficulty": string,"duration_minutes": number,"excerpt"?: string | null,"fetched_at"?: string,"id"?: string,"language": string,"published_at"?: string | null,"source_id": string,"summary": string,"title": string,"transcript_available"?: boolean,"updated_at"?: string,"url": string,"url_checked_at"?: string | null,"url_normalized"?: never,"url_status"?: string
+                    "author"?: string | null,"categories"?: (string)[],"content_type": string,"created_at"?: string,"difficulty": string,"duration_minutes": number,"excerpt"?: string | null,"fetched_at"?: string,"id"?: string,"language": string,"published_at"?: string | null,"source_id": string,"summary": string,"title": string,"transcript_available"?: boolean,"updated_at"?: string,"url": string,"url_checked_at"?: string | null,"url_normalized"?: never,"url_status"?: string
                   }
                   Update: {
-                    "content_type"?: string,"created_at"?: string,"difficulty"?: string,"duration_minutes"?: number,"excerpt"?: string | null,"fetched_at"?: string,"id"?: string,"language"?: string,"published_at"?: string | null,"source_id"?: string,"summary"?: string,"title"?: string,"transcript_available"?: boolean,"updated_at"?: string,"url"?: string,"url_checked_at"?: string | null,"url_normalized"?: never,"url_status"?: string
+                    "author"?: string | null,"categories"?: (string)[],"content_type"?: string,"created_at"?: string,"difficulty"?: string,"duration_minutes"?: number,"excerpt"?: string | null,"fetched_at"?: string,"id"?: string,"language"?: string,"published_at"?: string | null,"source_id"?: string,"summary"?: string,"title"?: string,"transcript_available"?: boolean,"updated_at"?: string,"url"?: string,"url_checked_at"?: string | null,"url_normalized"?: never,"url_status"?: string
                   }
                   Relationships: [
                     {
@@ -217,17 +217,23 @@ isOneToOne: false
                   ]
                 },"sources": {
                   Row: {
-                    "created_at": string,"homepage_url": string,"homepage_url_normalized": string | null,"id": string,"name": string
+                    "access": string,"active": boolean,"attribution": string | null,"commercial_use": boolean,"content_type": string | null,"created_at": string,"feed_url": string | null,"homepage_url": string,"homepage_url_normalized": string | null,"id": string,"key": string | null,"language": string | null,"last_fetch_error": string | null,"last_fetch_status": string | null,"last_fetched_at": string | null,"last_item_count": number | null,"license_kind": string | null,"license_name": string | null,"license_url": string | null,"license_verified_on": string | null,"name": string,"terms_url": string | null,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"homepage_url": string,"homepage_url_normalized"?: never,"id"?: string,"name": string
+                    "access"?: string,"active"?: boolean,"attribution"?: string | null,"commercial_use"?: boolean,"content_type"?: string | null,"created_at"?: string,"feed_url"?: string | null,"homepage_url": string,"homepage_url_normalized"?: never,"id"?: string,"key"?: string | null,"language"?: string | null,"last_fetch_error"?: string | null,"last_fetch_status"?: string | null,"last_fetched_at"?: string | null,"last_item_count"?: number | null,"license_kind"?: string | null,"license_name"?: string | null,"license_url"?: string | null,"license_verified_on"?: string | null,"name": string,"terms_url"?: string | null,"updated_at"?: string
                   }
                   Update: {
-                    "created_at"?: string,"homepage_url"?: string,"homepage_url_normalized"?: never,"id"?: string,"name"?: string
+                    "access"?: string,"active"?: boolean,"attribution"?: string | null,"commercial_use"?: boolean,"content_type"?: string | null,"created_at"?: string,"feed_url"?: string | null,"homepage_url"?: string,"homepage_url_normalized"?: never,"id"?: string,"key"?: string | null,"language"?: string | null,"last_fetch_error"?: string | null,"last_fetch_status"?: string | null,"last_fetched_at"?: string | null,"last_item_count"?: number | null,"license_kind"?: string | null,"license_name"?: string | null,"license_url"?: string | null,"license_verified_on"?: string | null,"name"?: string,"terms_url"?: string | null,"updated_at"?: string
                   }
                   Relationships: [
-                    
+                    {
+      foreignKeyName: "sources_language_fkey"
+      columns: ["language"]
+isOneToOne: false
+      referencedRelation: "languages"
+      referencedColumns: ["code"]
+    }
                   ]
                 },"user_languages": {
                   Row: {
