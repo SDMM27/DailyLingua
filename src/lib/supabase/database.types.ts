@@ -143,14 +143,14 @@ isOneToOne: false
                   ]
                 },"missions": {
                   Row: {
-                    "budget_minutes": number,"completed_at": string | null,"created_at": string,"generated_at": string | null,"generation_meta": NonNullable<Json>,"id": string,"mission_date": string,"started_at": string | null,"status": string,"updated_at": string,"user_id": string
+                    "budget_minutes": number,"completed_at": string | null,"created_at": string,"generated_at": string | null,"generation_attempts": number,"generation_error": string | null,"generation_meta": NonNullable<Json>,"id": string,"mission_date": string,"started_at": string | null,"status": string,"updated_at": string,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "budget_minutes": number,"completed_at"?: string | null,"created_at"?: string,"generated_at"?: string | null,"generation_meta"?: NonNullable<Json>,"id"?: string,"mission_date": string,"started_at"?: string | null,"status"?: string,"updated_at"?: string,"user_id": string
+                    "budget_minutes": number,"completed_at"?: string | null,"created_at"?: string,"generated_at"?: string | null,"generation_attempts"?: number,"generation_error"?: string | null,"generation_meta"?: NonNullable<Json>,"id"?: string,"mission_date": string,"started_at"?: string | null,"status"?: string,"updated_at"?: string,"user_id": string
                   }
                   Update: {
-                    "budget_minutes"?: number,"completed_at"?: string | null,"created_at"?: string,"generated_at"?: string | null,"generation_meta"?: NonNullable<Json>,"id"?: string,"mission_date"?: string,"started_at"?: string | null,"status"?: string,"updated_at"?: string,"user_id"?: string
+                    "budget_minutes"?: number,"completed_at"?: string | null,"created_at"?: string,"generated_at"?: string | null,"generation_attempts"?: number,"generation_error"?: string | null,"generation_meta"?: NonNullable<Json>,"id"?: string,"mission_date"?: string,"started_at"?: string | null,"status"?: string,"updated_at"?: string,"user_id"?: string
                   }
                   Relationships: [
                     {
@@ -333,7 +333,18 @@ isOneToOne: false
                 }
           }
           Functions: {
-            "normalize_url":
+            "claim_mission_generation":
+{ Args: { "p_budget_minutes": number,"p_max_attempts"?: number,"p_mission_date": string,"p_stale_after"?: string,"p_user_id": string }; Returns: {
+              "claimed": boolean,"mission_id": string,"status": string
+            }[]
+                           },
+"complete_mission_generation":
+{ Args: { "p_meta": Json,"p_mission_id": string,"p_sessions": Json }; Returns: undefined
+                           },
+"fail_mission_generation":
+{ Args: { "p_error": string,"p_mission_id": string }; Returns: undefined
+                           },
+"normalize_url":
 { Args: { "url": string }; Returns: string
                            },
 "record_vocabulary_review":

@@ -86,11 +86,18 @@ export const languageSessionSchema = z.object({
 });
 export type LanguageSession = z.infer<typeof languageSessionSchema>;
 
+export const EXERCISE_SOURCES = ["ai", "template"] as const;
+/** "ai": written by the language model. "template": the deterministic fallback (no model). */
+export const exerciseSourceSchema = z.enum(EXERCISE_SOURCES);
+export type ExerciseSource = z.infer<typeof exerciseSourceSchema>;
+
 export const missionSchema = z.object({
   id: z.string().min(1),
   date: dateKeySchema,
   budgetMinutes: z.number().int().positive(),
   sessions: z.array(languageSessionSchema).min(1),
+  /** How the exercises were written; absent for hand-made missions (demo, seed). */
+  exerciseSource: exerciseSourceSchema.optional(),
 });
 export type Mission = z.infer<typeof missionSchema>;
 

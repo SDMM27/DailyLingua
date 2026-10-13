@@ -34,8 +34,8 @@ export function ContentCard({ content }: { content: Content }) {
         <p className="mt-4 flex gap-2 rounded-2xl border border-line bg-surface px-3.5 py-3 text-[13px] leading-relaxed text-ink-soft">
           <InfoIcon width={16} height={16} className="mt-0.5 shrink-0 text-muted" />
           <span>
-            Pas de transcription accessible pour ce contenu : pas de quiz détaillé. Les exercices
-            s’appuient uniquement sur la description publique de l’épisode.
+            Pas de transcription accessible : les questions portent uniquement sur le titre et l’accroche
+            publiés par la source.
           </span>
         </p>
       )}

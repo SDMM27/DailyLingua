@@ -68,6 +68,15 @@ export default async function DashboardPage() {
         <Card>
           <Eyebrow>Mission du jour</Eyebrow>
           <p className="mt-2 font-serif text-lg">La mission de ce matin n’est pas encore prête.</p>
+          {!repo.isDemo && (
+            <Link
+              href="/mission"
+              className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full bg-ink px-5 text-sm font-semibold text-paper"
+            >
+              Préparer ma mission
+              <ArrowRightIcon width={14} height={14} />
+            </Link>
+          )}
         </Card>
       )}
 
