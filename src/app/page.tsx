@@ -7,23 +7,25 @@ import { WeekCard } from "@/components/dashboard/week-card";
 import { languageStyle } from "@/components/ui/language-style";
 import { ArrowRightIcon, HistoryIcon, SlidersIcon } from "@/components/icons";
 import { Card, DemoNotice, Eyebrow } from "@/components/ui/primitives";
-import { getRepository, getToday } from "@/lib/data/repository";
+import { getRepository, getToday, requirePreferences } from "@/lib/data/repository";
 import { addDays, diffInDays, formatLongDate } from "@/lib/domain/dates";
 import { languageInfo } from "@/lib/domain/languages";
 import { dueToday, upcomingReviews } from "@/lib/domain/spaced-repetition";
 import { computeStreak, recentDays } from "@/lib/domain/stats";
+import { completedMinutes } from "@/lib/domain/time-budget";
 
 export default async function DashboardPage() {
   await connection(); // depends on today's date
   const repo = await getRepository();
+  const preferences = await requirePreferences();
   const today = await getToday();
-  const [preferences, mission, history, studyDates, vocabulary] = await Promise.all([
-    repo.getPreferences(),
+  const [mission, history, studyDates, vocabulary] = await Promise.all([
     repo.getMission(today),
     repo.getHistory(),
     repo.getStudyDates(),
     repo.listVocabulary(),
   ]);
+  const progress = mission ? await repo.getMissionProgress(mission) : null;
 
   const weekStart = addDays(today, -6);
   const stats = {
@@ -58,7 +60,10 @@ export default async function DashboardPage() {
       )}
 
       {mission ? (
-        <MissionSummaryCard mission={mission} doneMinutes={0} />
+        <MissionSummaryCard
+          mission={mission}
+          doneMinutes={completedMinutes(mission, new Set(progress?.completedActivityIds))}
+        />
       ) : (
         <Card>
           <Eyebrow>Mission du jour</Eyebrow>

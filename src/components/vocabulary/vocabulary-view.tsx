@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { addWord, deleteWord, reviewWord, setWordStatus } from "@/app/actions/vocabulary";
 import { PlusIcon } from "@/components/icons";
 import { languageStyle } from "@/components/ui/language-style";
 import { Card, SectionTitle } from "@/components/ui/primitives";
@@ -24,15 +25,21 @@ const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
   { value: "all", label: "Tous" },
 ];
 
-/** Vocabulary list and review. Changes stay in memory until persistence (phase 3). */
+/**
+ * Vocabulary list and review. Changes are applied on screen at once and saved by server actions;
+ * a change the server refuses is rolled back and reported. `persist` is false in the demo, where
+ * changes only live in memory.
+ */
 export function VocabularyView({
   initialItems,
   languages,
   today,
+  persist,
 }: {
   initialItems: VocabularyItem[];
   languages: Language[];
   today: DateKey;
+  persist: boolean;
 }) {
   const [items, setItems] = useState(initialItems);
   // The review queue is fixed at load so grading a word doesn't reshuffle the session.
@@ -40,29 +47,70 @@ export function VocabularyView({
   const [languageFilter, setLanguageFilter] = useState<Language | "all">("all");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("learning");
   const [adding, setAdding] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const update = (id: string, change: (item: VocabularyItem) => VocabularyItem) =>
     setItems((list) => list.map((item) => (item.id === id ? change(item) : item)));
 
-  const handleReviewed = (reviewed: VocabularyItem, grade: ReviewGrade) =>
+  const handleReviewed = async (reviewed: VocabularyItem, grade: ReviewGrade) => {
+    const before = reviewed.review;
     update(reviewed.id, (item) => ({ ...item, review: applyReview(item.review, grade, today) }));
+    if (!persist) return;
+    const result = await reviewWord({ id: reviewed.id, grade, expectedReviewCount: before.reviewCount });
+    if (result.ok) {
+      update(reviewed.id, (item) => ({ ...item, review: result.data.review }));
+      setError(null);
+    } else {
+      update(reviewed.id, (item) => ({ ...item, review: before }));
+      setError(`« ${reviewed.term} » n’a pas été enregistré : ${result.error}`);
+    }
+  };
 
-  const handleAdd = (input: NewVocabularyInput) => {
-    const item: VocabularyItem = {
-      id: `local-${Date.now().toString(36)}`,
-      language: input.language,
-      term: input.term,
-      translation: input.translation,
-      definition: input.definition,
-      example: input.example,
-      source: input.sourceName ? { name: input.sourceName } : undefined,
-      status: "learning",
-      review: initialReviewState(today),
-      addedOn: today,
-    };
+  /** Resolves to an error message for the form, or null once the word is added. */
+  const handleAdd = async (input: NewVocabularyInput): Promise<string | null> => {
+    let item: VocabularyItem;
+    if (persist) {
+      const result = await addWord(input);
+      if (!result.ok) return result.error;
+      item = result.data;
+    } else {
+      item = {
+        id: `local-${Date.now().toString(36)}`,
+        language: input.language,
+        term: input.term,
+        translation: input.translation,
+        definition: input.definition,
+        example: input.example,
+        source: input.sourceName ? { name: input.sourceName } : undefined,
+        status: "learning",
+        review: initialReviewState(today),
+        addedOn: today,
+      };
+    }
     setItems((list) => [item, ...list]);
     setAdding(false);
     setStatusFilter("learning");
+    setError(null);
+    return null;
+  };
+
+  const handleToggleKnown = async (item: VocabularyItem) => {
+    const status = item.status === "known" ? "learning" : "known";
+    update(item.id, (i) => ({ ...i, status }));
+    if (!persist) return;
+    const result = await setWordStatus({ id: item.id, status });
+    if (result.ok) return setError(null);
+    update(item.id, (i) => ({ ...i, status: item.status }));
+    setError(result.error);
+  };
+
+  const handleDelete = async (item: VocabularyItem) => {
+    if (persist) {
+      const result = await deleteWord({ id: item.id });
+      if (!result.ok) return setError(result.error);
+    }
+    setItems((list) => list.filter((i) => i.id !== item.id));
+    setError(null);
   };
 
   const visible = items
@@ -72,6 +120,12 @@ export function VocabularyView({
 
   return (
     <div className="space-y-10">
+      {error && (
+        <p role="alert" className="rounded-2xl bg-danger-soft px-4 py-3 text-sm text-danger">
+          {error}
+        </p>
+      )}
+
       <ReviewSession queue={reviewQueue} today={today} onReviewed={handleReviewed} />
 
       <section>
@@ -120,9 +174,8 @@ export function VocabularyView({
                 key={item.id}
                 item={item}
                 today={today}
-                onToggleKnown={() =>
-                  update(item.id, (i) => ({ ...i, status: i.status === "known" ? "learning" : "known" }))
-                }
+                onToggleKnown={() => handleToggleKnown(item)}
+                onDelete={() => handleDelete(item)}
               />
             ))}
           </ul>
@@ -166,13 +219,16 @@ function WordCard({
   item,
   today,
   onToggleKnown,
+  onDelete,
 }: {
   item: VocabularyItem;
   today: DateKey;
   onToggleKnown: () => void;
+  onDelete: () => void;
 }) {
   const style = languageStyle(item.language);
   const known = item.status === "known";
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
   return (
     <li className="rounded-3xl border border-line bg-surface p-4 sm:p-5">
       <div className="flex items-start gap-3">
@@ -208,6 +264,27 @@ function WordCard({
         >
           {known ? "Connu" : "Marquer connu"}
         </button>
+      </div>
+      <div className="mt-2 flex justify-end gap-3 text-xs font-medium">
+        {confirmingDelete ? (
+          <>
+            <button type="button" onClick={() => setConfirmingDelete(false)} className="text-muted">
+              Annuler
+            </button>
+            <button type="button" onClick={onDelete} className="text-danger">
+              Confirmer la suppression
+            </button>
+          </>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setConfirmingDelete(true)}
+            aria-label={`Supprimer « ${item.term} »`}
+            className="text-muted hover:text-danger"
+          >
+            Supprimer
+          </button>
+        )}
       </div>
     </li>
   );

@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { NAV_ITEMS, isActive } from "./nav-items";
+import { NAV_ITEMS, hidesNavigation, isActive } from "./nav-items";
 
 /** Bottom navigation on phones, sits above the iOS home indicator. */
 export function TabBar() {
   const pathname = usePathname();
+  if (hidesNavigation(pathname)) return null;
   return (
     <nav
       aria-label="Navigation principale"

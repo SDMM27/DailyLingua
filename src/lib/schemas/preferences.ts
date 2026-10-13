@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isValidTimeZone } from "@/lib/domain/dates";
 import { cefrLevelSchema, contentTypeSchema, languageSchema } from "./common";
 
 export const TOPICS = [
@@ -46,6 +47,6 @@ export const preferencesSchema = z.object({
   difficulty: difficultyModeSchema,
   /** HH:mm, local time in `timeZone`. */
   generationTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Format HH:mm attendu"),
-  timeZone: z.string().min(1),
+  timeZone: z.string().min(1).refine(isValidTimeZone, "Fuseau horaire inconnu"),
 });
 export type Preferences = z.infer<typeof preferencesSchema>;

@@ -14,6 +14,11 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/preferences", label: "Réglages", icon: SlidersIcon },
 ];
 
+/** Screens shown before the app proper (sign-in, first run): no navigation. */
+export function hidesNavigation(pathname: string): boolean {
+  return pathname === "/connexion" || pathname === "/bienvenue";
+}
+
 export function isActive(pathname: string, href: string): boolean {
   return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 }

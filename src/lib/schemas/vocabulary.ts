@@ -40,3 +40,14 @@ export const newVocabularyInputSchema = z.object({
   sourceName: z.string().trim().max(120).optional(),
 });
 export type NewVocabularyInput = z.infer<typeof newVocabularyInputSchema>;
+
+export const reviewInputSchema = z.object({
+  id: z.string().min(1),
+  grade: reviewGradeSchema,
+  /** The review count the user saw; the review is refused if the word changed since. */
+  expectedReviewCount: z.number().int().nonnegative(),
+});
+export type ReviewInput = z.infer<typeof reviewInputSchema>;
+
+export const wordStatusInputSchema = z.object({ id: z.string().min(1), status: z.enum(["learning", "known"]) });
+export const wordIdInputSchema = z.object({ id: z.string().min(1) });

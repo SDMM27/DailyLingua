@@ -8,12 +8,13 @@ export function ExpressionList({
   language,
   expressions,
   saved,
-  onToggleSave,
+  onSave,
 }: {
   language: Language;
   expressions: Expression[];
   saved: ReadonlySet<string>;
-  onToggleSave: (expressionId: string) => void;
+  /** Adds the expression to the vocabulary. A saved expression stays there: it is managed in "Mots". */
+  onSave: (expressionId: string) => void;
 }) {
   return (
     <ul className="divide-y divide-line">
@@ -33,10 +34,10 @@ export function ExpressionList({
             </div>
             <button
               type="button"
-              onClick={() => onToggleSave(e.id)}
-              aria-pressed={isSaved}
-              aria-label={isSaved ? `Retirer « ${e.text} » des mots` : `Ajouter « ${e.text} » aux mots`}
-              className={`grid size-9 shrink-0 place-items-center rounded-full border transition-colors ${
+              onClick={() => onSave(e.id)}
+              disabled={isSaved}
+              aria-label={isSaved ? `« ${e.text} » est dans tes mots` : `Ajouter « ${e.text} » aux mots`}
+              className={`grid size-9 shrink-0 place-items-center rounded-full border transition-colors disabled:cursor-default ${
                 isSaved ? "border-ink bg-ink text-paper" : "border-line text-ink-soft hover:border-ink-soft"
               }`}
             >

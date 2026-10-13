@@ -4,6 +4,16 @@ export const DEFAULT_TIME_ZONE = "Europe/Paris";
 
 const MS_PER_DAY = 86_400_000;
 
+/** Whether `timeZone` is an IANA zone name the runtime can format dates in. */
+export function isValidTimeZone(timeZone: string): boolean {
+  try {
+    new Intl.DateTimeFormat("en", { timeZone });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /** Calendar day (YYYY-MM-DD) of `instant` as seen in `timeZone`. */
 export function toDateKey(instant: Date, timeZone: string = DEFAULT_TIME_ZONE): DateKey {
   // en-CA formats as YYYY-MM-DD.

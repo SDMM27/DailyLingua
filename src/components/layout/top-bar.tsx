@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { NAV_ITEMS, isActive } from "./nav-items";
+import { NAV_ITEMS, hidesNavigation, isActive } from "./nav-items";
 
 /** Header navigation on tablet / desktop widths; hidden on phones in favour of the tab bar. */
 export function TopBar() {
   const pathname = usePathname();
+  if (hidesNavigation(pathname)) return null;
   return (
     <header className="sticky top-0 z-30 hidden border-b border-line bg-paper/85 backdrop-blur-xl md:block">
       <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-3">

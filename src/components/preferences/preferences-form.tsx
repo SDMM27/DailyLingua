@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { useState, useSyncExternalStore, type ReactNode } from "react";
+import { savePreferences } from "@/app/actions/preferences";
 import { PlusIcon } from "@/components/icons";
 import { languageStyle } from "@/components/ui/language-style";
 import { Card, Eyebrow, LanguageTag } from "@/components/ui/primitives";
@@ -18,16 +20,41 @@ import {
 
 const MAX_LANGUAGES = 4;
 
-type SaveState = { kind: "idle" } | { kind: "ok" } | { kind: "error"; messages: string[] };
+type SaveState =
+  | { kind: "idle" }
+  | { kind: "saving" }
+  | { kind: "ok"; message: string }
+  | { kind: "error"; messages: string[] };
+
+const subscribeNever = () => () => {};
+/** The time zone of this device; null on the server, where it is unknown. */
+const deviceTimeZone = () => Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 function toggleIn<T>(list: readonly T[], value: T): T[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
 }
 
-/** Editable preferences. Validated with the shared schema; saving is wired in phase 3. */
-export function PreferencesForm({ initial }: { initial: Preferences }) {
+/**
+ * Editable preferences, validated with the shared schema, then saved by a server action.
+ * `onboarding` is the first-run screen of a new account: no language yet, and the time zone is
+ * taken from the device. `persist` is false in the demo, where nothing can be saved.
+ */
+export function PreferencesForm({
+  initial,
+  mode = "settings",
+  persist,
+}: {
+  initial: Preferences;
+  mode?: "settings" | "onboarding";
+  persist: boolean;
+}) {
+  const router = useRouter();
   const [prefs, setPrefs] = useState(initial);
   const [saveState, setSaveState] = useState<SaveState>({ kind: "idle" });
+  const onboarding = mode === "onboarding";
+  const device = useSyncExternalStore(subscribeNever, deviceTimeZone, () => null);
+  // On first run the device decides; afterwards the saved zone does, unless the user switches.
+  const timeZone = onboarding && device ? device : prefs.timeZone;
 
   const set = <K extends keyof Preferences>(key: K, value: Preferences[K]) => {
     setPrefs((p) => ({ ...p, [key]: value }));
@@ -39,23 +66,46 @@ export function PreferencesForm({ initial }: { initial: Preferences }) {
       prefs.goals.map((g) => (g.language === language ? { ...g, ...change } : g)),
     );
 
-  const split = splitBudget(prefs.dailyMinutes, prefs.goals);
+  const split = prefs.goals.length > 0 ? splitBudget(prefs.dailyMinutes, prefs.goals) : [];
   const minutesFor = (language: Language) => split.find((s) => s.language === language)?.minutes ?? 0;
   const maxWeight = Math.max(...prefs.goals.map((g) => g.weight));
   const available = LANGUAGE_CODES.filter((code) => !prefs.goals.some((g) => g.language === code));
 
-  function handleSave() {
-    const result = preferencesSchema.safeParse(prefs);
-    setSaveState(
-      result.success
-        ? { kind: "ok" }
-        : { kind: "error", messages: [...new Set(result.error.issues.map((i) => i.message))] },
-    );
+  async function handleSave() {
+    const result = preferencesSchema.safeParse({ ...prefs, timeZone });
+    if (!result.success) {
+      setSaveState({ kind: "error", messages: [...new Set(result.error.issues.map((i) => i.message))] });
+      return;
+    }
+    if (!persist) {
+      setSaveState({ kind: "ok", message: "Préférences valides. Mode démonstration : rien n’est enregistré." });
+      return;
+    }
+    setSaveState({ kind: "saving" });
+    const outcome = await savePreferences(result.data);
+    if (!outcome.ok) {
+      setSaveState({ kind: "error", messages: [outcome.error] });
+      return;
+    }
+    if (onboarding) {
+      // Stay on "saving" while the dashboard loads.
+      router.replace("/");
+      return;
+    }
+    setSaveState({ kind: "ok", message: "Préférences enregistrées." });
+    router.refresh();
   }
 
   return (
     <div className="space-y-6">
-      <Section title="Langues" hint="Le poids détermine la part du temps quotidien.">
+      <Section
+        title="Langues"
+        hint={
+          onboarding && prefs.goals.length === 0
+            ? "Commence par choisir au moins une langue."
+            : "Le poids détermine la part du temps quotidien."
+        }
+      >
         <ul className="space-y-4">
           {prefs.goals.map((goal) => (
             <li key={goal.language} className="rounded-2xl border border-line p-4">
@@ -224,21 +274,36 @@ export function PreferencesForm({ initial }: { initial: Preferences }) {
             className="rounded-xl border border-line bg-surface px-3 py-2 font-semibold focus:border-ink-soft focus:outline-none"
           />
         </div>
-        <p className="mt-2 text-xs text-muted">Fuseau horaire : {prefs.timeZone}</p>
+        <p className="mt-2 text-xs text-muted">
+          Fuseau horaire : {timeZone}
+          {!onboarding && device && device !== prefs.timeZone && (
+            <>
+              {" "}
+              <button
+                type="button"
+                onClick={() => set("timeZone", device)}
+                className="font-medium text-ink underline underline-offset-4"
+              >
+                Utiliser {device}
+              </button>
+            </>
+          )}
+        </p>
       </Section>
 
       <div className="space-y-3">
         <button
           type="button"
           onClick={handleSave}
-          className="w-full rounded-2xl bg-ink px-5 py-3.5 text-[15px] font-semibold text-paper transition-transform active:scale-[0.98]"
+          disabled={saveState.kind === "saving"}
+          className="w-full rounded-2xl bg-ink px-5 py-3.5 text-[15px] font-semibold text-paper transition-transform active:scale-[0.98] disabled:opacity-60"
         >
-          Enregistrer
+          {saveState.kind === "saving" ? "Enregistrement…" : onboarding ? "Commencer" : "Enregistrer"}
         </button>
         <div aria-live="polite">
           {saveState.kind === "ok" && (
             <p className="rounded-2xl bg-success-soft px-4 py-3 text-sm text-success">
-              Préférences valides. L’enregistrement réel arrive avec la base de données (phase 3).
+              {saveState.message}
             </p>
           )}
           {saveState.kind === "error" && (

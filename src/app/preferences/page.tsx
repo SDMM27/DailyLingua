@@ -2,13 +2,17 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRightIcon, HistoryIcon, PhoneIcon } from "@/components/icons";
 import { PreferencesForm } from "@/components/preferences/preferences-form";
-import { PageHeader } from "@/components/ui/primitives";
-import { getRepository } from "@/lib/data/repository";
+import { Card, Eyebrow, PageHeader } from "@/components/ui/primitives";
+import { signOut } from "@/app/actions/auth";
+import { DeleteAccount } from "@/components/auth/delete-account";
+import { getRepository, requirePreferences } from "@/lib/data/repository";
 
 export const metadata: Metadata = { title: "Préférences" };
 
 export default async function PreferencesPage() {
-  const preferences = await (await getRepository()).getPreferences();
+  const repo = await getRepository();
+  const preferences = await requirePreferences();
+  const email = await repo.getAccountEmail();
   return (
     <>
       <PageHeader eyebrow="Réglages" title="Préférences">
@@ -30,7 +34,24 @@ export default async function PreferencesPage() {
         <span className="flex-1 font-semibold">Installer sur l’écran d’accueil</span>
         <ArrowRightIcon width={16} height={16} className="text-muted" />
       </Link>
-      <PreferencesForm initial={preferences} />
+      <PreferencesForm initial={preferences} persist={!repo.isDemo} />
+      {email && (
+        <Card className="mt-6 flex items-center justify-between gap-4">
+          <div className="min-w-0">
+            <Eyebrow>Compte</Eyebrow>
+            <p className="mt-1 truncate text-sm">{email}</p>
+          </div>
+          <form action={signOut}>
+            <button
+              type="submit"
+              className="shrink-0 rounded-full border border-line px-4 py-2 text-sm font-semibold text-ink-soft hover:bg-surface-sunk"
+            >
+              Se déconnecter
+            </button>
+          </form>
+        </Card>
+      )}
+      {email && <DeleteAccount email={email} />}
     </>
   );
 }

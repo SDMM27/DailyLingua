@@ -4,7 +4,7 @@ Une mission linguistique quotidienne construite à partir de contenus authentiqu
 
 Pensée d’abord pour le téléphone : web app installable sur l’écran d’accueil (PWA), avec une app native envisagée plus tard pour l’App Store et le Play Store.
 
-> **État actuel : phase 2.** L’interface fonctionne sur des **données de démonstration** tant qu’aucun utilisateur n’est connecté (c’est le cas de la version déployée). La base de données (Supabase / PostgreSQL, RLS) et son implémentation en lecture seule sont prêtes ; connexion et écritures arrivent en phase 3.
+> **État actuel : phase 3.** Sans variables Supabase (c’est le cas de la version déployée), l’app est la **démo publique** sur données fictives, rien n’est enregistré. Avec Supabase configuré, il faut un compte : connexion e-mail + mot de passe, écran d’accueil pour choisir ses langues, puis vocabulaire, révisions espacées, suivi de mission, historique et préférences sont enregistrés par utilisateur (RLS).
 
 ## Démarrer
 
@@ -79,7 +79,9 @@ supabase/
 - **Langues extensibles.** Toutes les langues sont décrites dans `src/lib/domain/languages.ts`. Ajouter une langue = ajouter une entrée. L’utilisateur choisit 1 à 4 langues, chacune avec un poids ; le temps quotidien est réparti proportionnellement.
 - **Fuseau horaire.** Les jours sont des clés `YYYY-MM-DD` calculées dans le fuseau de l’utilisateur (Europe/Paris par défaut), ce qui évite les décalages autour de minuit et des changements d’heure.
 - **Honnêteté sur les contenus.** Quand un contenu n’a pas de transcription accessible, l’app le signale et ne propose pas de quiz détaillé.
-- **Accès aux données derrière une interface** (`DailyLinguaRepository`) : `getRepository()` renvoie l’implémentation Supabase pour un utilisateur connecté, et **l’implémentation de démo dans tous les autres cas** (variables absentes, pas de session, Supabase injoignable). Rien ne casse sans configuration.
+- **Accès aux données derrière une interface** (`DailyLinguaRepository`) : `getRepository()` renvoie l’implémentation de démo si Supabase n’est pas configuré, l’implémentation Supabase pour un utilisateur connecté, et redirige vers `/connexion` sinon (le `proxy.ts` le fait déjà en amont et rafraîchit la session).
+- **Dates** : tous les jours calendaires sont calculés dans le fuseau de l’utilisateur et transmis explicitement ; la base n’a plus de `current_date` par défaut (migration 7), car celle du serveur est en UTC.
+- **Écritures** : server actions (`src/app/actions`) qui revalident l’entrée avec Zod puis passent par le dépôt ; les écritures multiples (préférences, révision d’un mot) sont atomiques via des fonctions SQL `security invoker`.
 
 ## Base de données locale (Supabase)
 
@@ -97,7 +99,7 @@ npm run db:status     # affiche les URL et les clés locales
 2. Les remplir avec les valeurs de `npm run db:status` : `API_URL` → `NEXT_PUBLIC_SUPABASE_URL`, `PUBLISHABLE_KEY` (ou `ANON_KEY`) → `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SECRET_KEY` (ou `SERVICE_ROLE_KEY`) → `SUPABASE_SERVICE_ROLE_KEY`.
 3. Redémarrer `npm run dev`.
 
-**Tant qu’il n’y a pas d’écran de connexion (phase 3), l’app reste en mode démo même avec ces variables** : aucun utilisateur n’a de session. Les données Supabase sont lues par les tests d’intégration (`npm test`), qui se connectent comme l’utilisateur de démo. Sans `.env.local`, ou si la base est arrêtée, ces tests sont ignorés.
+**Avec ces variables, l’app exige un compte** (`/connexion`). En local, la confirmation d’e-mail est désactivée : crée un compte ou utilise le compte de démo ci-dessous. Les tests d’intégration (`npm test`) lisent la base comme l’utilisateur de démo et écrivent avec un utilisateur jetable (supprimé ensuite). Sans `.env.local`, ou si la base est arrêtée, ils sont ignorés.
 
 Si le port 3000 est occupé (Docker, par exemple), `npm run dev` choisit un autre port et l’affiche ; l’URL d’authentification locale attend le port 3001 (`supabase/config.toml`).
 
@@ -134,3 +136,12 @@ auth.users 1─1 profiles 1─* user_languages *─1 languages
 1. Créer le projet sur supabase.com, puis `npx supabase login` et `npx supabase link --project-ref <ref>`.
 2. `npx supabase db push` applique les migrations. **Ne jamais exécuter `seed.sql` sur un projet réel** (il crée un compte au mot de passe public).
 3. Renseigner les trois variables dans Vercel (Project Settings → Environment Variables) ; `SUPABASE_SERVICE_ROLE_KEY` en variable **non exposée**. Tant que ce n’est pas fait, Vercel reste en mode démo.
+4. **Authentification** (Dashboard → Authentication) :
+   - *URL Configuration* : `Site URL` = l’URL de production (ex. `https://daily-lingua.vercel.app`) et, dans `Redirect URLs`, `https://<domaine>/auth/confirm`. Sans cela, le lien de l’e-mail de confirmation pointe vers `localhost`.
+   - *Sign In / Providers → Email* : laisser **Confirm email** activé (c’est le défaut hébergé ; seul le local le désactive).
+   - Fixer une longueur de mot de passe minimale d’au moins 8 (l’app l’exige à l’inscription).
+   - Brancher un **SMTP** réel (Authentication → SMTP Settings) : le service d’e-mails par défaut de Supabase est très limité et réservé aux tests.
+5. **Suppression de compte** : elle utilise `SUPABASE_SERVICE_ROLE_KEY` côté serveur. Sans cette variable, le bouton échoue proprement sans rien supprimer.
+6. Vérifier de bout en bout : inscription → e-mail → lien → écran d’accueil → ajout d’un mot → suppression du compte.
+
+> La suppression efface le compte et toutes ses données personnelles (cascade SQL, testée). Le contenu partagé (`sources`, `contents`) reste.

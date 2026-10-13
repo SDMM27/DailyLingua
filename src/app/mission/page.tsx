@@ -3,7 +3,7 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { MissionView } from "@/components/mission/mission-view";
 import { Card, PageHeader } from "@/components/ui/primitives";
-import { getRepository, getToday } from "@/lib/data/repository";
+import { getRepository, getToday, requirePreferences } from "@/lib/data/repository";
 import { formatLongDate } from "@/lib/domain/dates";
 import { checkBudget } from "@/lib/domain/time-budget";
 
@@ -11,8 +11,10 @@ export const metadata: Metadata = { title: "Mission du jour" };
 
 export default async function MissionPage() {
   await connection();
+  const repo = await getRepository();
+  await requirePreferences();
   const today = await getToday();
-  const mission = await (await getRepository()).getMission(today);
+  const mission = await repo.getMission(today);
 
   if (!mission) {
     return (
@@ -44,7 +46,7 @@ export default async function MissionPage() {
           </span>
         )}
       </PageHeader>
-      <MissionView mission={mission} />
+      <MissionView mission={mission} progress={await repo.getMissionProgress(mission)} persist={!repo.isDemo} />
     </>
   );
 }

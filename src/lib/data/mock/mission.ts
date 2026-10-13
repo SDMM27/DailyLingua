@@ -13,6 +13,7 @@ export function buildMockMission(today: DateKey): Mission {
     budgetMinutes: 30,
     sessions: [
       {
+        id: "ru-session",
         language: "ru",
         content: {
           title: "Городская акустика: как шум меняет пение птиц",
@@ -112,6 +113,7 @@ export function buildMockMission(today: DateKey): Mission {
         },
       },
       {
+        id: "it-session",
         language: "it",
         content: {
           title: "La pausa caffè, un rito che cambia",
