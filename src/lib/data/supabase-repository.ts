@@ -133,7 +133,7 @@ export function createSupabaseRepository(client: Client, userId: string): DailyL
     const missions = unwrap(
       await client
         .from("mission_stats")
-        .select("mission_id, mission_date, budget_minutes, spent_seconds")
+        .select("mission_id, mission_date, budget_minutes, completed_minutes")
         .eq("user_id", userId)
         .eq("status", "ready")
         .gt("completed_activities", 0)
@@ -166,7 +166,8 @@ export function createSupabaseRepository(client: Client, userId: string): DailyL
         id: m.mission_id,
         date: m.mission_date,
         budgetMinutes: m.budget_minutes,
-        completedMinutes: Math.round((m.spent_seconds ?? 0) / 60),
+        // Estimated minutes of completed activities, like the mission screen (not measured time).
+        completedMinutes: m.completed_minutes ?? 0,
         sessions: sessions
           .filter((s) => s.mission_id === m.mission_id)
           .map((s) => ({

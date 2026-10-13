@@ -292,7 +292,7 @@ isOneToOne: false
           Views: {
             "mission_stats": {
                   Row: {
-                    "budget_minutes": number | null,"completed_activities": number | null,"completed_at": string | null,"mission_date": string | null,"mission_id": string | null,"spent_seconds": number | null,"started_at": string | null,"status": string | null,"user_id": string | null
+                    "budget_minutes": number | null,"completed_activities": number | null,"completed_at": string | null,"completed_minutes": number | null,"mission_date": string | null,"mission_id": string | null,"spent_seconds": number | null,"started_at": string | null,"status": string | null,"user_id": string | null
                   }
                   ComputedFields: never
                   Relationships: [

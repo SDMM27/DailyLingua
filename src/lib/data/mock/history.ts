@@ -64,7 +64,7 @@ const PAST_SESSIONS: MissionHistoryEntry["sessions"][] = [
   ],
 ];
 
-const COMPLETED_MINUTES = [30, 26, 30, 22, 30, 18];
+const COMPLETED_MINUTES = [30, 25, 30, 20, 30, 15];
 
 export function buildMockStudyDates(today: DateKey): DateKey[] {
   return STUDIED_DAYS_AGO.map((n) => addDays(today, -n));

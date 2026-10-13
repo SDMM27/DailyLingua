@@ -13,8 +13,9 @@ declare
   today constant date := (now() at time zone 'Europe/Paris')::date;
   -- Days before today on which the demo user studied.
   studied constant int[] := array[1, 2, 3, 4, 5, 7, 8, 9, 11, 12, 13, 14, 16, 17, 19, 20, 21, 22, 24, 26, 27, 28, 30, 31];
-  -- Minutes actually spent on the first six past missions (cycled afterwards).
-  spent constant int[] := array[30, 26, 30, 22, 30, 18];
+  -- Completed minutes of the first six past missions (cycled afterwards). Each mission has
+  -- 10 + 5 min per language; anything below 30 leaves Italian steps unfinished (see below).
+  spent constant int[] := array[30, 25, 30, 20, 30, 15];
 
   -- Three past mission "templates" (ru + it), cycled over the studied days.
   past constant jsonb := $json$
@@ -314,7 +315,8 @@ begin
     end loop;
   end loop;
 
-  -- Past missions: all activities completed, time split evenly over the 4 activities.
+  -- Past missions. Missing minutes (30 - mins) are Italian steps left unfinished:
+  -- 5 = vocabulary (5 min), 10 = discovery (10 min), 15 = both.
   for n in 1..array_length(studied, 1) loop
     tpl := (n - 1) % 3;
     mins := spent[(n - 1) % 6 + 1];
@@ -359,8 +361,13 @@ begin
           case when k = 1 then 'Expressions à retenir' else 'Découvrir le contenu' end,
           case when k = 1 then 5 else 10 end
         ) returning id into aid;
-        insert into public.activity_progress (activity_id, user_id, completed_at, spent_seconds)
-        values (aid, demo_id, gen + interval '90 minutes', mins * 15);
+        if i = 1 and ((k = 1 and 30 - mins in (5, 15)) or (k = 0 and 30 - mins in (10, 15))) then
+          insert into public.activity_progress (activity_id, user_id, completed_at)
+          values (aid, demo_id, null);
+        else
+          insert into public.activity_progress (activity_id, user_id, completed_at, spent_seconds)
+          values (aid, demo_id, gen + interval '90 minutes', (case when k = 1 then 5 else 10 end) * 60);
+        end if;
       end loop;
 
       -- Graded by the quiz_answers trigger: the first `correct` answers pick option 0.
