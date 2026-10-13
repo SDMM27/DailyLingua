@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens. Warm "paper and ink" palette with a small set of accents
+ * assigned to languages in the registry. Dark mode follows the system.
+ */
+:root {
+  --paper: #f5f1e8;
+  --surface: #fffcf6;
+  --surface-sunk: #ede7da;
+  --ink: #1d1b17;
+  --ink-soft: #4f4a42;
+  --muted: #857e72;
+  --line: #e2dbcc;
+  /* Language accents: each language in the registry picks one. */
+  --indigo: #33478c;
+  --indigo-soft: #e5e9f4;
+  --terracotta: #b0502b;
+  --terracotta-soft: #f6e6dc;
+  --olive: #5b6b2c;
+  --olive-soft: #e9ecd9;
+  --plum: #7a3b69;
+  --plum-soft: #f1e3ec;
+  --teal: #1f6a6a;
+  --teal-soft: #dcecea;
+  --ochre: #9a6a12;
+  --ochre-soft: #f4e9d2;
+  --success: #2f6b4f;
+  --success-soft: #e0eee5;
+  --danger: #a33a32;
+  --danger-soft: #f6e1de;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #141311;
+    --surface: #1d1b18;
+    --surface-sunk: #26231f;
+    --ink: #f1ece2;
+    --ink-soft: #cbc4b7;
+    --muted: #8f887c;
+    --line: #34302a;
+    --indigo: #9eb0ea;
+    --indigo-soft: #222a42;
+    --terracotta: #e99c78;
+    --terracotta-soft: #3b261c;
+    --olive: #b9c97f;
+    --olive-soft: #2a2f1a;
+    --plum: #dc9ccb;
+    --plum-soft: #35202f;
+    --teal: #84cdc8;
+    --teal-soft: #17302f;
+    --ochre: #e4bb6a;
+    --ochre-soft: #352a14;
+    --success: #7fc29d;
+    --success-soft: #1b3326;
+    --danger: #ec8f86;
+    --danger-soft: #3e1f1c;
+  }
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-surface-sunk: var(--surface-sunk);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-indigo: var(--indigo);
+  --color-indigo-soft: var(--indigo-soft);
+  --color-terracotta: var(--terracotta);
+  --color-terracotta-soft: var(--terracotta-soft);
+  --color-olive: var(--olive);
+  --color-olive-soft: var(--olive-soft);
+  --color-plum: var(--plum);
+  --color-plum-soft: var(--plum-soft);
+  --color-teal: var(--teal);
+  --color-teal-soft: var(--teal-soft);
+  --color-ochre: var(--ochre);
+  --color-ochre-soft: var(--ochre-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-literata);
+  --font-serif-italic: var(--font-literata-italic);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans), system-ui, sans-serif;
+    font-feature-settings: "cv11", "ss01";
+    overscroll-behavior-y: none;
+  }
+
+  /* iOS zooms on focus when inputs are under 16px. */
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1em);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+}
+
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
+}

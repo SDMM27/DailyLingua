@@ -1,0 +1,354 @@
+"use client";
+
+import { useState, type ReactNode } from "react";
+import { PlusIcon } from "@/components/icons";
+import { languageStyle } from "@/components/ui/language-style";
+import { Card, Eyebrow, LanguageTag } from "@/components/ui/primitives";
+import { CONTENT_TYPE_LABELS, DIFFICULTY_LABELS } from "@/lib/domain/labels";
+import { LANGUAGE_CODES, languageInfo } from "@/lib/domain/languages";
+import { splitBudget } from "@/lib/domain/time-budget";
+import { CEFR_LEVELS, CONTENT_TYPES, type CefrLevel, type Language } from "@/lib/schemas/common";
+import {
+  DIFFICULTY_MODES,
+  TOPICS,
+  preferencesSchema,
+  type LanguageGoal,
+  type Preferences,
+} from "@/lib/schemas/preferences";
+
+const MAX_LANGUAGES = 4;
+
+type SaveState = { kind: "idle" } | { kind: "ok" } | { kind: "error"; messages: string[] };
+
+function toggleIn<T>(list: readonly T[], value: T): T[] {
+  return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
+}
+
+/** Editable preferences. Validated with the shared schema; saving is wired in phase 3. */
+export function PreferencesForm({ initial }: { initial: Preferences }) {
+  const [prefs, setPrefs] = useState(initial);
+  const [saveState, setSaveState] = useState<SaveState>({ kind: "idle" });
+
+  const set = <K extends keyof Preferences>(key: K, value: Preferences[K]) => {
+    setPrefs((p) => ({ ...p, [key]: value }));
+    setSaveState({ kind: "idle" });
+  };
+  const setGoal = (language: Language, change: Partial<LanguageGoal>) =>
+    set(
+      "goals",
+      prefs.goals.map((g) => (g.language === language ? { ...g, ...change } : g)),
+    );
+
+  const split = splitBudget(prefs.dailyMinutes, prefs.goals);
+  const minutesFor = (language: Language) => split.find((s) => s.language === language)?.minutes ?? 0;
+  const maxWeight = Math.max(...prefs.goals.map((g) => g.weight));
+  const available = LANGUAGE_CODES.filter((code) => !prefs.goals.some((g) => g.language === code));
+
+  function handleSave() {
+    const result = preferencesSchema.safeParse(prefs);
+    setSaveState(
+      result.success
+        ? { kind: "ok" }
+        : { kind: "error", messages: [...new Set(result.error.issues.map((i) => i.message))] },
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <Section title="Langues" hint="Le poids détermine la part du temps quotidien.">
+        <ul className="space-y-4">
+          {prefs.goals.map((goal) => (
+            <li key={goal.language} className="rounded-2xl border border-line p-4">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <LanguageTag language={goal.language} />
+                  {goal.weight === maxWeight && prefs.goals.length > 1 && (
+                    <span className="text-[11px] font-semibold text-muted uppercase">prioritaire</span>
+                  )}
+                </div>
+                {prefs.goals.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => set("goals", prefs.goals.filter((g) => g.language !== goal.language))}
+                    className="text-xs font-medium text-muted hover:text-danger"
+                  >
+                    Retirer
+                  </button>
+                )}
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <LevelSelect
+                  label="Niveau actuel"
+                  value={goal.level}
+                  onChange={(level) => setGoal(goal.language, { level })}
+                />
+                <LevelSelect
+                  label="Objectif"
+                  value={goal.targetLevel}
+                  onChange={(targetLevel) => setGoal(goal.language, { targetLevel })}
+                />
+              </div>
+              <label className="mt-3 block">
+                <span className="mb-1 block text-xs font-medium text-ink-soft">Ce que je veux travailler</span>
+                <input
+                  value={goal.focus}
+                  onChange={(e) => setGoal(goal.language, { focus: e.target.value })}
+                  className="w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 focus:border-ink-soft focus:outline-none"
+                />
+              </label>
+              <div className="mt-3 flex items-center justify-between">
+                <span className="text-xs font-medium text-ink-soft">Poids</span>
+                <div className="flex items-center gap-3">
+                  <Stepper
+                    value={goal.weight}
+                    min={1}
+                    max={5}
+                    label={`Poids ${languageInfo(goal.language).nameFr}`}
+                    onChange={(weight) => setGoal(goal.language, { weight })}
+                  />
+                  <span className="w-14 text-right text-sm font-semibold">{minutesFor(goal.language)} min</span>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+        {available.length > 0 && prefs.goals.length < MAX_LANGUAGES && (
+          <div className="mt-4">
+            <p className="mb-2 text-xs font-medium text-ink-soft">Ajouter une langue</p>
+            <div className="flex flex-wrap gap-2">
+              {available.map((code) => (
+                <button
+                  key={code}
+                  type="button"
+                  onClick={() =>
+                    set("goals", [
+                      ...prefs.goals,
+                      { language: code, level: "A2", targetLevel: "B1", focus: "", weight: 1 },
+                    ])
+                  }
+                  className="inline-flex items-center gap-1 rounded-full border border-dashed border-line px-3 py-1.5 text-sm text-ink-soft hover:border-ink-soft"
+                >
+                  <PlusIcon width={14} height={14} />
+                  {languageInfo(code).nameFr}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </Section>
+
+      <Section title="Temps quotidien">
+        <div className="flex items-baseline justify-between">
+          <label htmlFor="daily-minutes" className="text-sm text-ink-soft">
+            Durée de la mission
+          </label>
+          <span className="font-serif text-2xl font-semibold">{prefs.dailyMinutes} min</span>
+        </div>
+        <input
+          id="daily-minutes"
+          type="range"
+          min={10}
+          max={90}
+          step={5}
+          value={prefs.dailyMinutes}
+          onChange={(e) => set("dailyMinutes", Number(e.target.value))}
+          className="mt-3 w-full accent-[var(--ink)]"
+        />
+        <div className="mt-3 flex h-2 overflow-hidden rounded-full" aria-hidden="true">
+          {split.map((s) => (
+            <div
+              key={s.language}
+              className={languageStyle(s.language).bg}
+              style={{ width: `${(s.minutes / prefs.dailyMinutes) * 100}%` }}
+            />
+          ))}
+        </div>
+        <p className="mt-2 text-xs text-muted">
+          {split.map((s) => `${languageInfo(s.language).nameFr} ${s.minutes} min`).join(" · ")}
+        </p>
+      </Section>
+
+      <Section title="Sujets favoris">
+        <ChipGroup
+          label="Sujets favoris"
+          options={TOPICS.map((t) => ({ value: t, label: t }))}
+          selected={prefs.topics}
+          onToggle={(t) => set("topics", toggleIn(prefs.topics, t))}
+        />
+      </Section>
+
+      <Section title="Types de contenus">
+        <ChipGroup
+          label="Types de contenus"
+          options={CONTENT_TYPES.map((t) => ({ value: t, label: CONTENT_TYPE_LABELS[t] }))}
+          selected={prefs.contentTypes}
+          onToggle={(t) => set("contentTypes", toggleIn(prefs.contentTypes, t))}
+        />
+      </Section>
+
+      <Section title="Difficulté souhaitée">
+        <div role="radiogroup" aria-label="Difficulté souhaitée" className="grid gap-2 sm:grid-cols-3">
+          {DIFFICULTY_MODES.map((mode) => {
+            const active = prefs.difficulty === mode;
+            return (
+              <button
+                key={mode}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                onClick={() => set("difficulty", mode)}
+                className={`rounded-2xl border px-4 py-3 text-left transition-colors ${
+                  active ? "border-ink bg-ink text-paper" : "border-line hover:bg-surface-sunk"
+                }`}
+              >
+                <span className="block font-semibold">{DIFFICULTY_LABELS[mode].title}</span>
+                <span className={`text-xs ${active ? "text-paper/75" : "text-muted"}`}>
+                  {DIFFICULTY_LABELS[mode].hint}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </Section>
+
+      <Section title="Mission du matin" hint="Heure de préparation de la mission quotidienne.">
+        <div className="flex items-center justify-between gap-4">
+          <label htmlFor="generation-time" className="text-sm text-ink-soft">
+            Prête chaque jour à
+          </label>
+          <input
+            id="generation-time"
+            type="time"
+            value={prefs.generationTime}
+            onChange={(e) => set("generationTime", e.target.value)}
+            className="rounded-xl border border-line bg-surface px-3 py-2 font-semibold focus:border-ink-soft focus:outline-none"
+          />
+        </div>
+        <p className="mt-2 text-xs text-muted">Fuseau horaire : {prefs.timeZone}</p>
+      </Section>
+
+      <div className="space-y-3">
+        <button
+          type="button"
+          onClick={handleSave}
+          className="w-full rounded-2xl bg-ink px-5 py-3.5 text-[15px] font-semibold text-paper transition-transform active:scale-[0.98]"
+        >
+          Enregistrer
+        </button>
+        <div aria-live="polite">
+          {saveState.kind === "ok" && (
+            <p className="rounded-2xl bg-success-soft px-4 py-3 text-sm text-success">
+              Préférences valides. L’enregistrement réel arrive avec la base de données (phase 3).
+            </p>
+          )}
+          {saveState.kind === "error" && (
+            <ul className="space-y-1 rounded-2xl bg-danger-soft px-4 py-3 text-sm text-danger">
+              {saveState.messages.map((m) => (
+                <li key={m}>{m}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Section({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
+  return (
+    <Card>
+      <Eyebrow>{title}</Eyebrow>
+      {hint && <p className="mt-1 text-xs text-muted">{hint}</p>}
+      <div className="mt-4">{children}</div>
+    </Card>
+  );
+}
+
+function LevelSelect({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: CefrLevel;
+  onChange: (level: CefrLevel) => void;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-xs font-medium text-ink-soft">{label}</span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value as CefrLevel)}
+        className="w-full appearance-none rounded-xl border border-line bg-surface px-3.5 py-2.5 font-semibold focus:border-ink-soft focus:outline-none"
+      >
+        {CEFR_LEVELS.map((level) => (
+          <option key={level} value={level}>
+            {level}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function Stepper({
+  value,
+  min,
+  max,
+  label,
+  onChange,
+}: {
+  value: number;
+  min: number;
+  max: number;
+  label: string;
+  onChange: (value: number) => void;
+}) {
+  const button = "grid size-8 place-items-center rounded-full border border-line text-lg leading-none disabled:opacity-30";
+  return (
+    <div className="flex items-center gap-2" role="group" aria-label={label}>
+      <button type="button" className={button} disabled={value <= min} onClick={() => onChange(value - 1)} aria-label="Diminuer">
+        −
+      </button>
+      <span className="w-4 text-center font-semibold tabular-nums" aria-live="polite">
+        {value}
+      </span>
+      <button type="button" className={button} disabled={value >= max} onClick={() => onChange(value + 1)} aria-label="Augmenter">
+        +
+      </button>
+    </div>
+  );
+}
+
+function ChipGroup<T extends string>({
+  label,
+  options,
+  selected,
+  onToggle,
+}: {
+  label: string;
+  options: { value: T; label: string }[];
+  selected: readonly T[];
+  onToggle: (value: T) => void;
+}) {
+  return (
+    <div role="group" aria-label={label} className="flex flex-wrap gap-2">
+      {options.map((o) => {
+        const active = selected.includes(o.value);
+        return (
+          <button
+            key={o.value}
+            type="button"
+            aria-pressed={active}
+            onClick={() => onToggle(o.value)}
+            className={`rounded-full border px-3.5 py-1.5 text-sm capitalize transition-colors ${
+              active ? "border-ink bg-ink text-paper" : "border-line text-ink-soft hover:bg-surface-sunk"
+            }`}
+          >
+            {o.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
