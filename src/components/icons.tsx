@@ -129,3 +129,24 @@ export const InfoIcon = (p: IconProps) => (
     <path d="M12 11v5M12 8h.01" />
   </Icon>
 );
+
+export const ShareIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M12 15V3.5M8 7l4-4 4 4" />
+    <path d="M8 10H7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-1" />
+  </Icon>
+);
+
+export const AddSquareIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <rect x="3.5" y="3.5" width="17" height="17" rx="4" />
+    <path d="M12 8v8M8 12h8" />
+  </Icon>
+);
+
+export const PhoneIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <rect x="6.5" y="2.5" width="11" height="19" rx="3" />
+    <path d="M10.5 18.5h3" />
+  </Icon>
+);

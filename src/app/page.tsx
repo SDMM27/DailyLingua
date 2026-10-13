@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { connection } from "next/server";
+import { InstallBanner } from "@/components/install/install-banner";
 import { MissionSummaryCard } from "@/components/dashboard/mission-summary-card";
 import { ReviewPreview } from "@/components/dashboard/review-preview";
 import { WeekCard } from "@/components/dashboard/week-card";
@@ -46,6 +47,8 @@ export default async function DashboardPage() {
           ))}
         </h1>
       </header>
+
+      <InstallBanner />
 
       {repo.isDemo && (
         <DemoNotice>
