@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addDays, diffInDays, formatLongDate, toDateKey } from "./dates";
+import { addDays, diffInDays, formatLongDate, formatTimeAgo, toDateKey } from "./dates";
 
 describe("toDateKey", () => {
   it("uses the Paris calendar day, not UTC", () => {
@@ -34,5 +34,26 @@ describe("addDays / diffInDays", () => {
 describe("formatLongDate", () => {
   it("formats in French", () => {
     expect(formatLongDate("2026-10-13")).toBe("mardi 13 octobre");
+  });
+});
+
+describe("formatTimeAgo", () => {
+  const now = new Date("2026-10-13T10:00:00Z"); // 12:00 in Paris
+
+  it("counts minutes and hours within a day", () => {
+    expect(formatTimeAgo(new Date("2026-10-13T09:59:40Z"), now)).toBe("à l’instant");
+    expect(formatTimeAgo(new Date("2026-10-13T09:55:00Z"), now)).toBe("il y a 5 minutes");
+    expect(formatTimeAgo(new Date("2026-10-13T07:00:00Z"), now)).toBe("il y a 3 heures");
+  });
+
+  it("counts calendar days in the user's time zone", () => {
+    // 10:00 the day before in Paris (26 hours ago): "hier" (yesterday).
+    expect(formatTimeAgo(new Date("2026-10-12T08:00:00Z"), now)).toBe("hier");
+    expect(formatTimeAgo(new Date("2026-10-09T10:00:00Z"), now)).toBe("il y a 4 jours");
+  });
+
+  it("shows the date beyond a week, and never a time in the future", () => {
+    expect(formatTimeAgo(new Date("2026-09-30T10:00:00Z"), now)).toBe("30 sept.");
+    expect(formatTimeAgo(new Date("2026-10-13T11:00:00Z"), now)).toBe("à l’instant");
   });
 });

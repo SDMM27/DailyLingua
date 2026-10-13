@@ -1,8 +1,8 @@
 import type { ComponentType, SVGProps } from "react";
-import { BookIcon, CardsIcon, SlidersIcon, SunIcon } from "@/components/icons";
+import { BookIcon, CardsIcon, NewspaperIcon, SlidersIcon, SunIcon } from "@/components/icons";
 
 export interface NavItem {
-  href: "/" | "/mission" | "/vocabulaire" | "/preferences";
+  href: "/" | "/mission" | "/lire" | "/vocabulaire" | "/preferences";
   label: string;
   icon: ComponentType<SVGProps<SVGSVGElement>>;
 }
@@ -10,6 +10,7 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { href: "/", label: "Aujourd'hui", icon: SunIcon },
   { href: "/mission", label: "Mission", icon: BookIcon },
+  { href: "/lire", label: "Lire", icon: NewspaperIcon },
   { href: "/vocabulaire", label: "Mots", icon: CardsIcon },
   { href: "/preferences", label: "Réglages", icon: SlidersIcon },
 ];

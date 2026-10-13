@@ -11,6 +11,7 @@ export const metadata: Metadata = { title: "Bienvenue" };
 export default async function WelcomePage() {
   const repo = await getRepository();
   if (await repo.getPreferences()) redirect("/");
+  const languages = await repo.listAvailableLanguages();
 
   return (
     <>
@@ -18,7 +19,7 @@ export default async function WelcomePage() {
         Choisis une à quatre langues, ton niveau et le temps dont tu disposes chaque jour. Tu pourras tout
         modifier plus tard dans les réglages.
       </PageHeader>
-      <PreferencesForm initial={ONBOARDING_DEFAULTS} mode="onboarding" persist />
+      <PreferencesForm initial={ONBOARDING_DEFAULTS} languages={languages} mode="onboarding" persist />
     </>
   );
 }

@@ -17,11 +17,14 @@
     "db:status": "supabase status",
     "db:reset": "supabase db reset",
     "db:types": "supabase gen types --lang typescript --local > src/lib/supabase/database.types.ts",
-    "db:test": "supabase test db"
+    "db:test": "supabase test db",
+    "content:check": "tsx --env-file-if-exists=.env.local scripts/content-check.mts",
+    "content:ingest": "tsx --env-file-if-exists=.env.local scripts/content-ingest.mts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.117.3",
+    "fast-xml-parser": "^5.11.2",
     "next": "16.3.8",
     "react": "19.2.8",
     "react-dom": "19.2.8",
@@ -41,6 +44,7 @@
     "jsdom": "^26.1.0",
     "supabase": "^2.120.0",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5",
     "vitest": "^4.1.11"
   },

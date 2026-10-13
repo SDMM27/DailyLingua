@@ -64,3 +64,17 @@ export function weekdayInitial(key: DateKey, locale = "fr-FR"): string {
     new Date(keyToUtcMs(key)),
   );
 }
+
+/**
+ * How long ago an instant was, for publication dates: "il y a 5 min", "il y a 3 h", "hier",
+ * "il y a 4 jours", then the calendar date in `timeZone` beyond a week.
+ */
+export function formatTimeAgo(instant: Date, now: Date, timeZone: string = DEFAULT_TIME_ZONE, locale = "fr-FR"): string {
+  const minutes = Math.max(0, Math.floor((now.getTime() - instant.getTime()) / 60_000));
+  const relative = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+  if (minutes < 60) return minutes < 1 ? "à l’instant" : relative.format(-minutes, "minute");
+  if (minutes < 24 * 60) return relative.format(-Math.floor(minutes / 60), "hour");
+  const days = diffInDays(toDateKey(instant, timeZone), toDateKey(now, timeZone));
+  if (days < 7) return relative.format(-days, "day");
+  return formatShortDate(toDateKey(instant, timeZone), locale);
+}

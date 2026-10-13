@@ -4,7 +4,7 @@ Une mission linguistique quotidienne construite à partir de contenus authentiqu
 
 Pensée d’abord pour le téléphone : web app installable sur l’écran d’accueil (PWA), avec une app native envisagée plus tard pour l’App Store et le Play Store.
 
-> **État actuel : phase 3.** Sans variables Supabase (c’est le cas de la version déployée), l’app est la **démo publique** sur données fictives, rien n’est enregistré. Avec Supabase configuré, il faut un compte : connexion e-mail + mot de passe, écran d’accueil pour choisir ses langues, puis vocabulaire, révisions espacées, suivi de mission, historique et préférences sont enregistrés par utilisateur (RLS).
+> **État actuel : phase 4.** Sans variables Supabase (c’est le cas de la version déployée), l’app est la **démo publique** sur données fictives, rien n’est enregistré. Avec Supabase configuré, il faut un compte : connexion e-mail + mot de passe, écran d’accueil pour choisir ses langues (19 disponibles), puis vocabulaire, révisions espacées, suivi de mission, historique et préférences sont enregistrés par utilisateur (RLS). L’onglet **Lire** liste les dernières parutions de 40 sources authentiques (flux RSS / Atom) dans les langues de l’utilisateur.
 
 ## Démarrer
 
@@ -40,6 +40,8 @@ Si la page ne s’ouvre pas, autoriser Node.js dans le pare-feu Windows (réseau
 | `npm run db:reset` | Recrée la base : migrations + données de démo (`supabase/seed.sql`) |
 | `npm run db:test` | Tests SQL pgTAP (RLS, contraintes) |
 | `npm run db:types` | Régénère `src/lib/supabase/database.types.ts` depuis la base locale |
+| `npm run content:check` | Vérifie le catalogue de sources sans toucher la base : flux, items, liens, pages de conditions et de licence (`-- --source <clé> --verbose`) |
+| `npm run content:ingest` | Relève les flux et enregistre les nouveaux contenus dans Supabase, puis vérifie les liens (`-- --source <clé>`, `-- --no-links`) |
 
 ## Stack
 
@@ -48,6 +50,7 @@ Si la page ne s’ouvre pas, autoriser Node.js dans le pare-feu Windows (réseau
 - **Zod 4** : validation aux frontières (données, formulaires)
 - **Vitest** + Testing Library : tests de la logique métier et des composants
 - **Supabase** (PostgreSQL, Auth, RLS) : migrations SQL versionnées, CLI en dépendance de dev, stack locale via Docker
+- **fast-xml-parser** (flux RSS / Atom) ; **tsx** pour les scripts de `scripts/`
 - À venir : un fournisseur de LLM derrière une interface, une tâche planifiée quotidienne
 
 ## Structure
@@ -60,11 +63,14 @@ src/
     layout/             Barre d’onglets (mobile) et barre du haut (desktop)
     dashboard/ mission/ vocabulary/ preferences/
   lib/
+    content/            Contenus authentiques : catalogue des sources (licences), lecture des flux,
+                        normalisation, vérification des liens, ingestion (sans Next.js ni React)
     domain/             Logique métier pure : dates et fuseaux, budget temps,
                         répétition espacée, statistiques, registre des langues
     schemas/            Schémas Zod et types dérivés
     data/               Accès aux données : interface, implémentation de démo, implémentation Supabase
     supabase/           Intégration Supabase : variables d’env (Zod), clients serveur / admin, types générés
+scripts/                Scripts en ligne de commande (content:check, content:ingest)
 supabase/
   config.toml           Configuration de la stack locale
   migrations/           Schéma, contraintes, index, RLS et privilèges
@@ -76,7 +82,7 @@ supabase/
 
 ## Choix importants
 
-- **Langues extensibles.** Toutes les langues sont décrites dans `src/lib/domain/languages.ts`. Ajouter une langue = ajouter une entrée. L’utilisateur choisit 1 à 4 langues, chacune avec un poids ; le temps quotidien est réparti proportionnellement.
+- **Langues extensibles.** Toutes les langues sont décrites dans `src/lib/domain/languages.ts` (19 aujourd’hui, avec sens d’écriture et écritures « denses » CJK). Ajouter une langue = une entrée dans le registre, une ligne de migration (`public.languages`) et au moins une source dans le catalogue (un test l’exige). L’utilisateur choisit 1 à 4 langues, chacune avec un poids ; le temps quotidien est réparti proportionnellement.
 - **Fuseau horaire.** Les jours sont des clés `YYYY-MM-DD` calculées dans le fuseau de l’utilisateur (Europe/Paris par défaut), ce qui évite les décalages autour de minuit et des changements d’heure.
 - **Honnêteté sur les contenus.** Quand un contenu n’a pas de transcription accessible, l’app le signale et ne propose pas de quiz détaillé.
 - **Accès aux données derrière une interface** (`DailyLinguaRepository`) : `getRepository()` renvoie l’implémentation de démo si Supabase n’est pas configuré, l’implémentation Supabase pour un utilisateur connecté, et redirige vers `/connexion` sinon (le `proxy.ts` le fait déjà en amont et rafraîchit la session).
@@ -111,6 +117,25 @@ Si le port 3000 est occupé (Docker, par exemple), `npm run dev` choisit un autr
 | Mot de passe | `demo-password-123` |
 
 Il est créé par `supabase/seed.sql` avec : préférences (russe poids 2, italien poids 1), la mission du jour (celle de la phase 1), 24 jours d’historique, 10 mots avec leur journal de révisions. Les dates sont relatives au jour du `db:reset` : relancer `npm run db:reset` le lendemain pour avoir une mission « du jour ».
+
+## Contenus authentiques (phase 4)
+
+**Principe : uniquement des flux RSS / Atom publics, jamais de scraping, jamais le texte intégral.** Pour chaque article, l’app conserve le titre, le lien, la date, l’auteur, les catégories, la durée (podcasts) et une accroche courte tirée du flux (280 caractères au plus, 120 pour le chinois, le japonais et le coréen), puis renvoie vers l’éditeur. Chaque contenu affiché est crédité (source + licence).
+
+- **Catalogue** : `src/lib/content/catalog.ts`, relu comme du code. Chaque source indique sa licence (`cc-by`, `cc-by-sa`, `cc-by-nd`, `public-domain`, `all-rights-reserved`), la page de conditions, l’usage commercial autorisé ou non, la date de vérification et une note sur ce qui a été vérifié. Dans le doute : `all-rights-reserved` et pas d’usage commercial.
+- **Sources écartées** (et pourquoi) : en tête du catalogue. Notamment Il Post (flux refusé aux clients non navigateurs, conditions interdisant la redistribution) et Rai Radio 3 (plus de flux officiel depuis RaiPlay Sound).
+- **Sécurité** : les liens d’un flux doivent pointer vers les domaines de la source (sinon l’item est écarté), seuls http(s) sont acceptés, les paramètres de suivi (`utm_*`…) sont retirés, les documents XML avec DTD sont refusés, les flux sont limités à 5 Mo et 20 s.
+- **Vérification des liens** : requête HEAD (confirmée par GET si elle échoue), sans lire la page ; redirections suivies seulement dans les domaines de la source. Statuts `ok`, `redirected`, `broken` (masqué dans l’app) ; un résultat incertain (403 d’un filtre anti-robots, 5xx, délai) est retenté le lendemain.
+- **Politique de licence** : `CONTENT_LICENSE_POLICY=all` (défaut, usage personnel) ou `commercial`, qui ne garde que les sources dont les conditions autorisent un produit payant (CC BY, CC BY-SA, CC BY-ND aujourd’hui). **À activer avant toute commercialisation**, et à revalider source par source.
+- **Pas de source, pas de langue** : seules les langues ayant au moins une source autorisée par la politique sont proposées (accueil, réglages), et le serveur refuse l’ajout d’une autre. En mode `commercial`, le suédois, le polonais, le tchèque, le turc, le chinois et le coréen ne sont donc plus proposés. Une langue déjà choisie qui perd ses sources est conservée, avec un avertissement : la retirer reste le choix de l’utilisateur.
+- **Ajouter une source** : trouver le flux officiel, lire les conditions, remplir `license` honnêtement, puis `npm run content:check -- --source <clé> --verbose`.
+
+```bash
+npm run content:check     # vérifie le catalogue (réseau, pas de base)
+npm run content:ingest    # remplit la base locale (Supabase lancé, .env.local avec la clé service)
+```
+
+La relève automatique (plusieurs fois par jour) viendra avec la tâche planifiée de la phase 6, qui appellera la même fonction `ingest()`.
 
 ### Schéma
 

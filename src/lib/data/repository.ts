@@ -2,8 +2,17 @@ import "server-only";
 import { cache } from "react";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { availableLanguages } from "@/lib/content/availability";
+import { SOURCE_CATALOG } from "@/lib/content/catalog";
+import { readContentLicensePolicy } from "@/lib/content/policy";
 import { toDateKey } from "@/lib/domain/dates";
-import { dateKeySchema, type DateKey } from "@/lib/schemas/common";
+import { dateKeySchema, type DateKey, type Language } from "@/lib/schemas/common";
+import {
+  contentListItemSchema,
+  sourceInfoSchema,
+  type ContentListItem,
+  type SourceInfo,
+} from "@/lib/schemas/content";
 import {
   EMPTY_MISSION_PROGRESS,
   missionHistoryEntrySchema,
@@ -22,6 +31,7 @@ import {
 import { getSupabaseEnv } from "@/lib/supabase/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { UserFacingError } from "./errors";
+import { buildMockContents, buildMockSources } from "./mock/contents";
 import { buildMockHistory, buildMockStudyDates } from "./mock/history";
 import { buildMockMission } from "./mock/mission";
 import { MOCK_PREFERENCES } from "./mock/preferences";
@@ -65,6 +75,16 @@ export interface DailyLinguaRepository {
   reviewVocabulary(input: ReviewInput): Promise<VocabularyItem>;
   setVocabularyStatus(id: string, status: VocabularyItem["status"]): Promise<void>;
   deleteVocabulary(id: string): Promise<void>;
+
+  /**
+   * Latest authentic contents of `languages` (at most `perLanguage` each, newest first), from the
+   * active sources allowed by the licence policy. Broken links are left out.
+   */
+  listContents(languages: Language[], perLanguage: number): Promise<ContentListItem[]>;
+  /** Sources of the catalogue allowed by the licence policy, with their licence. */
+  listSources(): Promise<SourceInfo[]>;
+  /** Languages that can be chosen: at least one source allowed by the licence policy. */
+  listAvailableLanguages(): Promise<Language[]>;
 }
 
 function createMockRepository(): DailyLinguaRepository {
@@ -108,6 +128,17 @@ function createMockRepository(): DailyLinguaRepository {
     reviewVocabulary: readOnly,
     setVocabularyStatus: readOnly,
     deleteVocabulary: readOnly,
+    async listContents(languages, perLanguage) {
+      const items = buildMockContents(new Date()).filter((c) => languages.includes(c.language));
+      const kept = languages.flatMap((l) => items.filter((c) => c.language === l).slice(0, perLanguage));
+      return z.array(contentListItemSchema).parse(kept);
+    },
+    async listSources() {
+      return z.array(sourceInfoSchema).parse(buildMockSources());
+    },
+    async listAvailableLanguages() {
+      return availableLanguages(SOURCE_CATALOG, readContentLicensePolicy());
+    },
   };
 }
 

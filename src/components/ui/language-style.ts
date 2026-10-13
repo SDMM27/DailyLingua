@@ -15,6 +15,10 @@ const ACCENT_STYLE: Record<Accent, AccentStyle> = {
   plum: { text: "text-plum", bg: "bg-plum", softBg: "bg-plum-soft" },
   teal: { text: "text-teal", bg: "bg-teal", softBg: "bg-teal-soft" },
   ochre: { text: "text-ochre", bg: "bg-ochre", softBg: "bg-ochre-soft" },
+  berry: { text: "text-berry", bg: "bg-berry", softBg: "bg-berry-soft" },
+  azure: { text: "text-azure", bg: "bg-azure", softBg: "bg-azure-soft" },
+  fern: { text: "text-fern", bg: "bg-fern", softBg: "bg-fern-soft" },
+  graphite: { text: "text-graphite", bg: "bg-graphite", softBg: "bg-graphite-soft" },
 };
 
 export function languageStyle(language: Language): AccentStyle {
