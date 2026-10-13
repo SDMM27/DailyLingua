@@ -15,7 +15,7 @@ import { computeStreak, recentDays } from "@/lib/domain/stats";
 
 export default async function DashboardPage() {
   await connection(); // depends on today's date
-  const repo = getRepository();
+  const repo = await getRepository();
   const today = await getToday();
   const [preferences, mission, history, studyDates, vocabulary] = await Promise.all([
     repo.getPreferences(),

@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Vocabulaire" };
 
 export default async function VocabularyPage() {
   await connection();
-  const repo = getRepository();
+  const repo = await getRepository();
   const today = await getToday();
   const [items, preferences] = await Promise.all([repo.listVocabulary(), repo.getPreferences()]);
   const learning = items.filter((i) => i.status === "learning").length;

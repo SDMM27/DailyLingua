@@ -8,7 +8,7 @@ import { getRepository } from "@/lib/data/repository";
 export const metadata: Metadata = { title: "Préférences" };
 
 export default async function PreferencesPage() {
-  const preferences = await getRepository().getPreferences();
+  const preferences = await (await getRepository()).getPreferences();
   return (
     <>
       <PageHeader eyebrow="Réglages" title="Préférences">
