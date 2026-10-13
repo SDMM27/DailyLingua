@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { answerQuestion, saveExpression, saveProduction, setActivityDone } from "@/app/actions/mission";
 import { CheckIcon } from "@/components/icons";
 import { languageStyle } from "@/components/ui/language-style";
 import { Card, Eyebrow, LanguageTag, ProgressBar } from "@/components/ui/primitives";
 import { ACTIVITY_LABELS } from "@/lib/domain/labels";
 import { completedMinutes, missionMinutes, sessionMinutes } from "@/lib/domain/time-budget";
-import type { LanguageSession, Mission } from "@/lib/schemas/mission";
+import type { LanguageSession, Mission, MissionProgress } from "@/lib/schemas/mission";
 import { ContentCard } from "./content-card";
 import { ExpressionList } from "./expression-list";
 import { ProductionTask } from "./production-task";
@@ -19,14 +20,78 @@ function toggle(set: ReadonlySet<string>, id: string): Set<string> {
   return next;
 }
 
+type Answers = Readonly<Record<string, Readonly<Record<string, number>>>>;
+
 /**
- * Interactive mission. Progress is local state only for now;
- * persistence arrives with the database in phase 3.
+ * Interactive mission. Ticks, quiz answers and saved expressions are shown at once and saved by
+ * server actions; a change the server refuses is rolled back and reported. `persist` is false in
+ * the demo, where progress only lives in memory.
  */
-export function MissionView({ mission }: { mission: Mission }) {
-  const [done, setDone] = useState<ReadonlySet<string>>(new Set());
-  const [answers, setAnswers] = useState<Readonly<Record<string, number>>>({});
-  const [savedExpressions, setSavedExpressions] = useState<ReadonlySet<string>>(new Set());
+export function MissionView({
+  mission,
+  progress,
+  persist,
+}: {
+  mission: Mission;
+  progress: MissionProgress;
+  persist: boolean;
+}) {
+  const [done, setDone] = useState<ReadonlySet<string>>(() => new Set(progress.completedActivityIds));
+  const [answers, setAnswers] = useState<Answers>(progress.answers);
+  const [savedExpressions, setSavedExpressions] = useState<ReadonlySet<string>>(
+    () => new Set(progress.savedExpressionIds),
+  );
+  const [error, setError] = useState<string | null>(null);
+
+  /** Saves a change, rolling it back on screen if the server refuses it. */
+  async function save(request: () => Promise<{ ok: boolean; error?: string }>, rollback: () => void) {
+    if (!persist) return;
+    const result = await request();
+    if (result.ok) return setError(null);
+    rollback();
+    setError(`Ce changement n’a pas été enregistré : ${result.error}`);
+  }
+
+  function handleToggleActivity(activityId: string) {
+    const checked = !done.has(activityId);
+    setDone((d) => toggle(d, activityId));
+    void save(
+      () => setActivityDone({ activityId, done: checked }),
+      () => setDone((d) => toggle(d, activityId)),
+    );
+  }
+
+  function handleAnswer(sessionId: string, questionId: string, selectedIndex: number) {
+    setAnswers((a) => ({ ...a, [sessionId]: { ...a[sessionId], [questionId]: selectedIndex } }));
+    void save(
+      () => answerQuestion({ sessionId, questionId, selectedIndex }),
+      () =>
+        setAnswers((a) => {
+          const rest = Object.fromEntries(Object.entries(a[sessionId] ?? {}).filter(([id]) => id !== questionId));
+          return { ...a, [sessionId]: rest };
+        }),
+    );
+  }
+
+  async function handleSaveProduction(sessionId: string, body: string): Promise<boolean> {
+    const result = await saveProduction({ sessionId, body });
+    if (result.ok) setError(null);
+    else setError(`Ton texte n’a pas été enregistré : ${result.error}`);
+    return result.ok;
+  }
+
+  function handleSaveExpression(sessionId: string, expressionId: string) {
+    setSavedExpressions((s) => new Set(s).add(expressionId));
+    void save(
+      () => saveExpression({ sessionId, expressionId }),
+      () =>
+        setSavedExpressions((s) => {
+          const next = new Set(s);
+          next.delete(expressionId);
+          return next;
+        }),
+    );
+  }
 
   const total = missionMinutes(mission);
   const doneMinutes = completedMinutes(mission, done);
@@ -45,17 +110,25 @@ export function MissionView({ mission }: { mission: Mission }) {
         <ProgressBar value={doneMinutes / total} label="Progression de la mission" className="mt-2" />
       </div>
 
+      {error && (
+        <p role="alert" className="mb-6 rounded-2xl bg-danger-soft px-4 py-3 text-sm text-danger">
+          {error}
+        </p>
+      )}
+
       <div className="space-y-12">
         {mission.sessions.map((session) => (
           <SessionSection
-            key={session.language}
+            key={session.id}
             session={session}
             done={done}
-            onToggleActivity={(id) => setDone((d) => toggle(d, id))}
-            answers={answers}
-            onAnswer={(qid, oi) => setAnswers((a) => ({ ...a, [qid]: oi }))}
+            onToggleActivity={handleToggleActivity}
+            answers={answers[session.id] ?? {}}
+            onAnswer={(questionId, optionIndex) => handleAnswer(session.id, questionId, optionIndex)}
             savedExpressions={savedExpressions}
-            onToggleExpression={(id) => setSavedExpressions((s) => toggle(s, id))}
+            onSaveExpression={(expressionId) => handleSaveExpression(session.id, expressionId)}
+            draft={progress.drafts[session.id] ?? ""}
+            onSaveProduction={persist ? (body) => handleSaveProduction(session.id, body) : undefined}
           />
         ))}
 
@@ -79,7 +152,9 @@ function SessionSection({
   answers,
   onAnswer,
   savedExpressions,
-  onToggleExpression,
+  onSaveExpression,
+  draft,
+  onSaveProduction,
 }: {
   session: LanguageSession;
   done: ReadonlySet<string>;
@@ -87,7 +162,9 @@ function SessionSection({
   answers: Readonly<Record<string, number>>;
   onAnswer: (questionId: string, optionIndex: number) => void;
   savedExpressions: ReadonlySet<string>;
-  onToggleExpression: (id: string) => void;
+  onSaveExpression: (expressionId: string) => void;
+  draft: string;
+  onSaveProduction?: (body: string) => Promise<boolean>;
 }) {
   const { language } = session;
   const style = languageStyle(language);
@@ -152,13 +229,18 @@ function SessionSection({
             language={language}
             expressions={session.expressions}
             saved={savedExpressions}
-            onToggleSave={onToggleExpression}
+            onSave={onSaveExpression}
           />
         </Card>
       )}
 
       <Card>
-        <ProductionTask language={language} task={session.production} />
+        <ProductionTask
+          language={language}
+          task={session.production}
+          initialText={draft}
+          onSave={onSaveProduction}
+        />
       </Card>
     </section>
   );

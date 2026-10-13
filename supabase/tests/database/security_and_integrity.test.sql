@@ -47,9 +47,9 @@ values ('f0000000-0000-4000-8000-000000000002', 'b0000000-0000-4000-8000-0000000
 insert into public.quiz_answers (session_id, user_id, question_id, selected_index)
 values ('e0000000-0000-4000-8000-000000000002', 'b0000000-0000-4000-8000-000000000002', 'q1', 1);
 
-insert into public.vocabulary_items (id, user_id, language, term, translation) values
-  ('10000000-0000-4000-8000-000000000001', 'a0000000-0000-4000-8000-000000000001', 'ru', 'мир', 'monde'),
-  ('10000000-0000-4000-8000-000000000002', 'b0000000-0000-4000-8000-000000000002', 'ru', 'мир', 'monde');
+insert into public.vocabulary_items (id, user_id, language, term, translation, due_on, added_on) values
+  ('10000000-0000-4000-8000-000000000001', 'a0000000-0000-4000-8000-000000000001', 'ru', 'мир', 'monde', '2030-01-01', '2030-01-01'),
+  ('10000000-0000-4000-8000-000000000002', 'b0000000-0000-4000-8000-000000000002', 'ru', 'мир', 'monde', '2030-01-01', '2030-01-01');
 
 insert into public.vocabulary_reviews (user_id, item_id, reviewed_on, grade, box_before, box_after, due_on_after)
 values ('b0000000-0000-4000-8000-000000000002', '10000000-0000-4000-8000-000000000002', '2030-01-01', 'good', 0, 1, '2030-01-02');
@@ -262,8 +262,8 @@ select is(
   0, 'A cannot delete the vocabulary of B');
 
 select throws_ok(
-  $$insert into public.vocabulary_items (user_id, language, term, translation)
-    values ('b0000000-0000-4000-8000-000000000002', 'ru', 'новый', 'nouveau')$$,
+  $$insert into public.vocabulary_items (user_id, language, term, translation, due_on, added_on)
+    values ('b0000000-0000-4000-8000-000000000002', 'ru', 'новый', 'nouveau', '2030-01-01', '2030-01-01')$$,
   '42501', null, 'A cannot insert vocabulary on behalf of B');
 select throws_ok(
   $$insert into public.activity_progress (activity_id, user_id)

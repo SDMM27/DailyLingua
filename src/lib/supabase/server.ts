@@ -20,8 +20,7 @@ export async function createSupabaseServerClient() {
         try {
           for (const { name, value, options } of toSet) cookieStore.set(name, value, options);
         } catch {
-          // Server Components cannot set cookies; refreshing the session is the job of the
-          // proxy added with the sign-in screen (phase 3).
+          // Server Components cannot set cookies; the proxy (src/proxy.ts) refreshes the session.
         }
       },
     },

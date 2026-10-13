@@ -161,6 +161,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"production_entries": {
+                  Row: {
+                    "body": string,"created_at": string,"session_id": string,"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "body": string,"created_at"?: string,"session_id": string,"updated_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "body"?: string,"created_at"?: string,"session_id"?: string,"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "production_entries_session_id_user_id_fkey"
+      columns: ["session_id","user_id"]
+isOneToOne: false
+      referencedRelation: "mission_sessions"
+      referencedColumns: ["id","user_id"]
+    }
+                  ]
                 },"profiles": {
                   Row: {
                     "content_types": (string)[],"created_at": string,"daily_minutes": number,"difficulty": string,"generation_time": string,"id": string,"time_zone": string,"topics": (string)[],"updated_at": string
@@ -241,7 +261,7 @@ isOneToOne: false
                   }
                   ComputedFields: never
                   Insert: {
-                    "added_on"?: string,"box"?: number,"content_id"?: string | null,"created_at"?: string,"definition"?: string | null,"due_on"?: string,"example"?: string | null,"id"?: string,"language": string,"last_reviewed_on"?: string | null,"review_count"?: number,"source_name"?: string | null,"source_url"?: string | null,"status"?: string,"term": string,"translation": string,"updated_at"?: string,"user_id": string
+                    "added_on": string,"box"?: number,"content_id"?: string | null,"created_at"?: string,"definition"?: string | null,"due_on": string,"example"?: string | null,"id"?: string,"language": string,"last_reviewed_on"?: string | null,"review_count"?: number,"source_name"?: string | null,"source_url"?: string | null,"status"?: string,"term": string,"translation": string,"updated_at"?: string,"user_id": string
                   }
                   Update: {
                     "added_on"?: string,"box"?: number,"content_id"?: string | null,"created_at"?: string,"definition"?: string | null,"due_on"?: string,"example"?: string | null,"id"?: string,"language"?: string,"last_reviewed_on"?: string | null,"review_count"?: number,"source_name"?: string | null,"source_url"?: string | null,"status"?: string,"term"?: string,"translation"?: string,"updated_at"?: string,"user_id"?: string
@@ -309,6 +329,12 @@ isOneToOne: false
           Functions: {
             "normalize_url":
 { Args: { "url": string }; Returns: string
+                           },
+"record_vocabulary_review":
+{ Args: { "p_box_after": number,"p_due_on_after": string,"p_expected_review_count": number,"p_grade": string,"p_item_id": string,"p_reviewed_on": string }; Returns: boolean
+                           },
+"save_preferences":
+{ Args: { "p_content_types": (string)[],"p_daily_minutes": number,"p_difficulty": string,"p_generation_time": string,"p_goals": Json,"p_time_zone": string,"p_topics": (string)[] }; Returns: undefined
                            }
           }
           Enums: {

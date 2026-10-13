@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 import { PageHeader } from "@/components/ui/primitives";
 import { VocabularyView } from "@/components/vocabulary/vocabulary-view";
-import { getRepository, getToday } from "@/lib/data/repository";
+import { getRepository, getToday, requirePreferences } from "@/lib/data/repository";
 import { dueToday } from "@/lib/domain/spaced-repetition";
 
 export const metadata: Metadata = { title: "Vocabulaire" };
@@ -10,8 +10,9 @@ export const metadata: Metadata = { title: "Vocabulaire" };
 export default async function VocabularyPage() {
   await connection();
   const repo = await getRepository();
+  const preferences = await requirePreferences();
   const today = await getToday();
-  const [items, preferences] = await Promise.all([repo.listVocabulary(), repo.getPreferences()]);
+  const items = await repo.listVocabulary();
   const learning = items.filter((i) => i.status === "learning").length;
 
   return (
@@ -24,6 +25,7 @@ export default async function VocabularyPage() {
         initialItems={items}
         languages={preferences.goals.map((g) => g.language)}
         today={today}
+        persist={!repo.isDemo}
       />
     </>
   );

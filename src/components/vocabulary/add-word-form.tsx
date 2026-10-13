@@ -16,14 +16,18 @@ export function AddWordForm({
   onCancel,
 }: {
   languages: Language[];
-  onAdd: (input: NewVocabularyInput) => void;
+  /** Resolves to an error message to show in the form, or null when the word was added. */
+  onAdd: (input: NewVocabularyInput) => Promise<string | null>;
   onCancel: () => void;
 }) {
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [formError, setFormError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
+    const form = event.currentTarget; // not available after the first await
+    const data = new FormData(form);
     const optional = (key: string) => {
       const value = String(data.get(key) ?? "").trim();
       return value === "" ? undefined : value;
@@ -46,8 +50,12 @@ export function AddWordForm({
       return;
     }
     setErrors({});
-    onAdd(result.data);
-    event.currentTarget.reset();
+    setFormError(null);
+    setPending(true);
+    const error = await onAdd(result.data);
+    setPending(false);
+    if (error) setFormError(error);
+    else form.reset();
   }
 
   return (
@@ -77,11 +85,20 @@ export function AddWordForm({
       <Field label="Source (facultatif)" error={errors.sourceName}>
         <input name="sourceName" autoComplete="off" placeholder="ex. Meduza, Il Post…" className={inputClass} />
       </Field>
+      {formError && (
+        <p role="alert" className="rounded-2xl bg-danger-soft px-4 py-3 text-sm text-danger">
+          {formError}
+        </p>
+      )}
       <div className="flex gap-2 pt-1">
         <button type="button" onClick={onCancel} className="flex-1 rounded-2xl border border-line py-3 font-semibold text-ink-soft">
           Annuler
         </button>
-        <button type="submit" className="flex-1 rounded-2xl bg-ink py-3 font-semibold text-paper">
+        <button
+          type="submit"
+          disabled={pending}
+          className="flex-1 rounded-2xl bg-ink py-3 font-semibold text-paper disabled:opacity-60"
+        >
           Ajouter
         </button>
       </div>

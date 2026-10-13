@@ -1,17 +1,30 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { buildMockVocabulary } from "@/lib/data/mock/vocabulary";
 import { VocabularyView } from "./vocabulary-view";
 
-afterEach(cleanup);
+const actions = vi.hoisted(() => ({
+  addWord: vi.fn(),
+  reviewWord: vi.fn(),
+  setWordStatus: vi.fn(),
+  deleteWord: vi.fn(),
+}));
+vi.mock("@/app/actions/vocabulary", () => actions);
+
+afterEach(() => {
+  cleanup();
+  vi.clearAllMocks();
+});
 
 const TODAY = "2026-10-13";
 
-function setup() {
+function setup(persist = false) {
   const user = userEvent.setup();
-  render(<VocabularyView initialItems={buildMockVocabulary(TODAY)} languages={["ru", "it"]} today={TODAY} />);
+  render(
+    <VocabularyView initialItems={buildMockVocabulary(TODAY)} languages={["ru", "it"]} today={TODAY} persist={persist} />,
+  );
   return user;
 }
 
@@ -63,5 +76,58 @@ describe("VocabularyView", () => {
     await user.click(screen.getByRole("button", { name: "Connus" }));
     expect(list().getByText("in bocca al lupo")).toBeTruthy();
     expect(list().queryByText("darsi da fare")).toBeNull();
+  });
+
+  describe("with persistence", () => {
+    it("saves each review with the review count the user saw", async () => {
+      actions.reviewWord.mockImplementation(async ({ id }) => ({ ok: false, error: `x${id}` }));
+      const user = setup(true);
+      await user.click(screen.getByRole("button", { name: "Afficher la réponse" }));
+      await user.click(screen.getByRole("button", { name: /^Bien/ }));
+      expect(actions.reviewWord).toHaveBeenCalledWith(
+        expect.objectContaining({ grade: "good", expectedReviewCount: expect.any(Number) }),
+      );
+    });
+
+    it("reports a review the server refused", async () => {
+      actions.reviewWord.mockResolvedValue({ ok: false, error: "déjà révisé" });
+      const user = setup(true);
+      await user.click(screen.getByRole("button", { name: "Afficher la réponse" }));
+      await user.click(screen.getByRole("button", { name: /^Bien/ }));
+      expect((await screen.findByRole("alert")).textContent).toMatch(/déjà révisé/);
+    });
+
+    it("keeps the form open with the server message when a word already exists", async () => {
+      actions.addWord.mockResolvedValue({ ok: false, error: "Ce mot est déjà dans ta liste." });
+      const user = setup(true);
+      await user.click(screen.getByRole("button", { name: "Ajouter" }));
+      await user.type(screen.getByLabelText("Mot ou expression"), "впрочем");
+      await user.type(screen.getByLabelText("Traduction"), "cependant");
+      await user.click(screen.getAllByRole("button", { name: "Ajouter" }).at(-1)!);
+      expect(await screen.findByText("Ce mot est déjà dans ta liste.")).toBeTruthy();
+      expect(screen.getByLabelText("Mot ou expression")).toBeTruthy();
+    });
+
+    it("rolls back 'known' when saving fails", async () => {
+      actions.setWordStatus.mockResolvedValue({ ok: false, error: "Ce mot n’existe plus." });
+      const user = setup(true);
+      const first = within(screen.getByRole("list")).getAllByRole("button", { name: "Marquer connu" })[0];
+      await user.click(first);
+      expect(await screen.findByText("Ce mot n’existe plus.")).toBeTruthy();
+      expect(within(screen.getByRole("list")).getAllByRole("button", { name: "Marquer connu" })).toHaveLength(
+        within(screen.getByRole("list")).getAllByRole("listitem").length,
+      );
+    });
+
+    it("deletes a word after confirmation", async () => {
+      actions.deleteWord.mockResolvedValue({ ok: true, data: undefined });
+      const user = setup(true);
+      const list = within(screen.getByRole("list"));
+      const before = list.getAllByRole("listitem").length;
+      await user.click(list.getAllByRole("button", { name: /^Supprimer/ })[0]);
+      await user.click(screen.getByRole("button", { name: "Confirmer la suppression" }));
+      expect(actions.deleteWord).toHaveBeenCalledTimes(1);
+      expect(within(screen.getByRole("list")).getAllByRole("listitem")).toHaveLength(before - 1);
+    });
   });
 });

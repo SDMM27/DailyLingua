@@ -75,6 +75,8 @@ export const productionTaskSchema = z.object({
 export type ProductionTask = z.infer<typeof productionTaskSchema>;
 
 export const languageSessionSchema = z.object({
+  /** Identifies the session when saving progress (quiz answers, saved expressions). */
+  id: z.string().min(1),
   language: languageSchema,
   content: contentSchema,
   activities: z.array(activitySchema).min(1),
@@ -104,6 +106,8 @@ export const missionHistoryEntrySchema = z.object({
       sourceName: z.string().min(1),
       url: z.url(),
       type: contentTypeSchema,
+      /** What the user wrote for the written production, if anything. */
+      writing: z.string().optional(),
       /** Correct answers / total questions, null if the quiz was skipped. */
       score: z
         .object({ correct: z.number().int().nonnegative(), total: z.number().int().positive() })
@@ -112,3 +116,38 @@ export const missionHistoryEntrySchema = z.object({
   ),
 });
 export type MissionHistoryEntry = z.infer<typeof missionHistoryEntrySchema>;
+
+/** What the user already did on a mission: ticked activities, quiz answers, saved expressions. */
+export const missionProgressSchema = z.object({
+  completedActivityIds: z.array(z.string()),
+  /** Chosen option index, by session id then question id. */
+  answers: z.record(z.string(), z.record(z.string(), z.number().int().nonnegative())),
+  savedExpressionIds: z.array(z.string()),
+  /** Text written for the production task, by session id. */
+  drafts: z.record(z.string(), z.string()),
+});
+export type MissionProgress = z.infer<typeof missionProgressSchema>;
+
+export const EMPTY_MISSION_PROGRESS: MissionProgress = {
+  completedActivityIds: [],
+  answers: {},
+  savedExpressionIds: [],
+  drafts: {},
+};
+
+/** Inputs of the mission server actions (validated again on the server). */
+export const setActivityDoneInputSchema = z.object({ activityId: z.string().min(1), done: z.boolean() });
+export const answerQuestionInputSchema = z.object({
+  sessionId: z.string().min(1),
+  questionId: z.string().min(1),
+  selectedIndex: z.number().int().nonnegative(),
+});
+export const MAX_PRODUCTION_LENGTH = 10_000;
+export const saveProductionInputSchema = z.object({
+  sessionId: z.string().min(1),
+  body: z.string().max(MAX_PRODUCTION_LENGTH, "Le texte est trop long"),
+});
+export const saveExpressionInputSchema = z.object({
+  sessionId: z.string().min(1),
+  expressionId: z.string().min(1),
+});

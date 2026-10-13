@@ -3,7 +3,7 @@ import { connection } from "next/server";
 import { ExternalIcon } from "@/components/icons";
 import { languageStyle } from "@/components/ui/language-style";
 import { Card, PageHeader, ProgressBar } from "@/components/ui/primitives";
-import { getRepository } from "@/lib/data/repository";
+import { getRepository, requirePreferences } from "@/lib/data/repository";
 import { formatLongDate } from "@/lib/domain/dates";
 import { CONTENT_TYPE_LABELS } from "@/lib/domain/labels";
 
@@ -11,6 +11,7 @@ export const metadata: Metadata = { title: "Historique" };
 
 export default async function HistoryPage() {
   await connection();
+  await requirePreferences();
   const history = await (await getRepository()).getHistory();
 
   return (
@@ -60,6 +61,16 @@ export default async function HistoryPage() {
                           {CONTENT_TYPE_LABELS[s.type]} · {s.sourceName}
                           {s.score && ` · quiz ${s.score.correct}/${s.score.total}`}
                         </p>
+                        {s.writing && (
+                          <details className="mt-2 text-sm">
+                            <summary className="cursor-pointer text-xs font-medium text-ink-soft">
+                              Mon texte
+                            </summary>
+                            <p lang={s.language} className="mt-2 font-serif leading-relaxed whitespace-pre-wrap">
+                              {s.writing}
+                            </p>
+                          </details>
+                        )}
                       </div>
                     </li>
                   ))}
