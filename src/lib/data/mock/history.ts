@@ -16,6 +16,24 @@ const PAST_SESSIONS: MissionHistoryEntry["sessions"][] = [
       url: "https://arzamas.academy",
       type: "podcast",
       score: { correct: 3, total: 3 },
+      writing:
+        "Платонов пишет очень странным языком. Мне понравилось, что он используют простые слова, но предложения звучат необычно. Я хочу прочитать его роман «Котлован» на следующей неделе.",
+      feedback: {
+        scores: {
+          grammar: { score: 3, comment: "Quelques erreurs d’accord, mais les phrases restent claires." },
+          vocabulary: { score: 4, comment: "Un vocabulaire simple et bien choisi pour parler de littérature." },
+          register: { score: 4, comment: "Le ton neutre convient bien à un petit avis de lecture." },
+          coherence: { score: 4, comment: "Ton avis, ton exemple et ton projet s’enchaînent naturellement." },
+        },
+        corrections: [
+          {
+            original: "он используют",
+            corrected: "он использует",
+            explanation: "Le verbe s’accorde avec « он » : troisième personne du singulier, « использует ».",
+          },
+        ],
+        strength: "Tu relies ton avis à un projet concret de lecture, ce qui rend le texte vivant.",
+      },
     },
     {
       language: "it",

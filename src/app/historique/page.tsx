@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { ExternalIcon } from "@/components/icons";
+import { WritingFeedbackCard } from "@/components/mission/writing-feedback-card";
 import { languageStyle } from "@/components/ui/language-style";
 import { Card, PageHeader, ProgressBar } from "@/components/ui/primitives";
 import { getRepository, requirePreferences } from "@/lib/data/repository";
@@ -69,6 +70,16 @@ export default async function HistoryPage() {
                             <p lang={s.language} className="mt-2 font-serif leading-relaxed whitespace-pre-wrap">
                               {s.writing}
                             </p>
+                          </details>
+                        )}
+                        {s.feedback && (
+                          <details className="mt-2 text-sm">
+                            <summary className="cursor-pointer text-xs font-medium text-ink-soft">
+                              Correction
+                            </summary>
+                            <div className="mt-2">
+                              <WritingFeedbackCard language={s.language} feedback={s.feedback} />
+                            </div>
                           </details>
                         )}
                       </div>

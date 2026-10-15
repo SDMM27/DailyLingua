@@ -19,3 +19,21 @@ export function readGenerationConfig(
   if (!apiKey) throw new Error("MISSION_GENERATOR=claude demande ANTHROPIC_API_KEY (voir .env.example).");
   return { provider: "claude", apiKey, model: source.MISSION_MODEL?.trim() || DEFAULT_MISSION_MODEL };
 }
+
+export type WritingFeedbackConfig = { enabled: true; apiKey: string; model: string } | { enabled: false };
+
+/**
+ * Review of written productions: on as soon as ANTHROPIC_API_KEY is set, unless
+ * WRITING_FEEDBACK=off. WRITING_FEEDBACK_MODEL picks the model (default: the mission model).
+ */
+export function readWritingFeedbackConfig(
+  source: Record<string, string | undefined> = process.env,
+): WritingFeedbackConfig {
+  const apiKey = source.ANTHROPIC_API_KEY?.trim() ?? "";
+  const setting = source.WRITING_FEEDBACK?.trim() || "on";
+  if (setting !== "on" && setting !== "off") {
+    throw new Error(`WRITING_FEEDBACK invalide : « ${setting} » (valeurs : on, off).`);
+  }
+  if (setting === "off" || !apiKey) return { enabled: false };
+  return { enabled: true, apiKey, model: source.WRITING_FEEDBACK_MODEL?.trim() || DEFAULT_MISSION_MODEL };
+}

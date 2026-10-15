@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { buildMockMission } from "@/lib/data/mock/mission";
 import { EMPTY_MISSION_PROGRESS } from "@/lib/schemas/mission";
+import type { WritingFeedback } from "@/lib/schemas/writing-feedback";
 import { MissionView } from "./mission-view";
 
 const actions = vi.hoisted(() => ({
@@ -11,6 +12,7 @@ const actions = vi.hoisted(() => ({
   answerQuestion: vi.fn(),
   saveExpression: vi.fn(),
   saveProduction: vi.fn(),
+  requestWritingFeedback: vi.fn(),
 }));
 vi.mock("@/app/actions/mission", () => actions);
 
@@ -18,6 +20,18 @@ afterEach(() => {
   cleanup();
   vi.clearAllMocks();
 });
+
+const FEEDBACK: WritingFeedback = {
+  scores: {
+    grammar: { score: 4, comment: "Solide." },
+    vocabulary: { score: 3, comment: "Correct." },
+    register: { score: 5, comment: "Très bien." },
+    coherence: { score: 2, comment: "À structurer." },
+  },
+  corrections: [{ original: "Шум мешают", corrected: "Шум мешает", explanation: "Accord du verbe." }],
+  strength: "Phrases claires.",
+};
+const LONG_TEXT = "Шум в городе мешает мне спать по ночам";
 
 const progress = () => screen.getByRole("progressbar", { name: "Progression de la mission" });
 
@@ -84,6 +98,7 @@ describe("MissionView", () => {
       answers: { "ru-session": { "ru-q1": 0 } },
       savedExpressionIds: ["ru-e1"],
       drafts: { "ru-session": "Bonjour" },
+      writingReviews: {},
     };
     render(<MissionView mission={mission} progress={progress} persist={false} />);
     expect(screen.getByText("8 / 30 min")).toBeTruthy();
@@ -143,6 +158,89 @@ describe("MissionView", () => {
       mount();
       await user.type(screen.getByLabelText("Ton texte"), "abc");
       expect(await screen.findByText("Non enregistré")).toBeTruthy();
+      expect((await screen.findByRole("alert")).textContent).toMatch(/Hors ligne/);
+    });
+  });
+
+  describe("writing feedback", () => {
+    const mission = buildMockMission("2026-10-13");
+    const mount = (props: { canReviewWriting?: boolean; text?: string } = {}) =>
+      render(
+        <MissionView
+          mission={mission}
+          progress={{ ...EMPTY_MISSION_PROGRESS, drafts: { "ru-session": props.text ?? "" } }}
+          persist
+          canReviewWriting={props.canReviewWriting ?? true}
+        />,
+      );
+    const button = () => screen.getByRole("button", { name: /Terminer et obtenir une correction/ }) as HTMLButtonElement;
+
+    it("has no review button when reviews are unavailable", () => {
+      mount({ canReviewWriting: false });
+      expect(screen.queryByRole("button", { name: /Terminer et obtenir une correction/ })).toBeNull();
+    });
+
+    it("disables the button below the minimum", () => {
+      mount({ text: "Шум" });
+      expect(button().disabled).toBe(true);
+      expect(screen.getByText(/Écris au moins quelques phrases/)).toBeTruthy();
+    });
+
+    it("asks for the review and shows it", async () => {
+      actions.requestWritingFeedback.mockResolvedValue({
+        ok: true,
+        data: { status: "ready", feedback: FEEDBACK, reviewedText: LONG_TEXT, attemptsLeft: 2 },
+      });
+      const user = userEvent.setup();
+      mount({ text: LONG_TEXT });
+      expect(button().disabled).toBe(false);
+      await user.click(button());
+      expect(actions.requestWritingFeedback).toHaveBeenCalledWith({ sessionId: "ru-session", body: LONG_TEXT });
+      expect(await screen.findByLabelText("Grammaire : 4 sur 5")).toBeTruthy();
+      expect(screen.getByRole("checkbox", { name: /Écrire un court paragraphe/ }).getAttribute("aria-checked")).toBe("true");
+      // Already reviewed: nothing more to ask until the text changes.
+      expect(button().disabled).toBe(true);
+      expect(screen.queryByText(/version précédente/)).toBeNull();
+    });
+
+    it("says the review is about an older version once the text changed", async () => {
+      actions.requestWritingFeedback.mockResolvedValue({
+        ok: true,
+        data: { status: "ready", feedback: FEEDBACK, reviewedText: LONG_TEXT, attemptsLeft: 2 },
+      });
+      const user = userEvent.setup();
+      mount({ text: LONG_TEXT });
+      await user.click(button());
+      await screen.findByLabelText("Grammaire : 4 sur 5");
+      await user.type(screen.getByLabelText("Ton texte"), " !");
+      expect(screen.getByText("Cette correction porte sur une version précédente de ton texte.")).toBeTruthy();
+      expect(screen.getByRole("button", { name: "Corriger à nouveau (2 restantes)" })).toBeTruthy();
+    });
+
+    it("keeps the step ticked and stays neutral when the review is unavailable", async () => {
+      actions.requestWritingFeedback.mockResolvedValue({ ok: true, data: { status: "unavailable", attemptsLeft: 2 } });
+      const user = userEvent.setup();
+      mount({ text: LONG_TEXT });
+      await user.click(button());
+      expect(await screen.findByText(/La correction n’est pas disponible pour l’instant/)).toBeTruthy();
+      expect(screen.getByRole("checkbox", { name: /Écrire un court paragraphe/ }).getAttribute("aria-checked")).toBe("true");
+      expect(button().disabled).toBe(false);
+    });
+
+    it("reports the attempts limit and blocks further requests", async () => {
+      actions.requestWritingFeedback.mockResolvedValue({ ok: true, data: { status: "limit" } });
+      const user = userEvent.setup();
+      mount({ text: LONG_TEXT });
+      await user.click(button());
+      expect(await screen.findByText("Tu as utilisé les 3 corrections de ce texte.")).toBeTruthy();
+      expect(button().disabled).toBe(true);
+    });
+
+    it("shows the error when the action fails", async () => {
+      actions.requestWritingFeedback.mockResolvedValue({ ok: false, error: "Hors ligne" });
+      const user = userEvent.setup();
+      mount({ text: LONG_TEXT });
+      await user.click(button());
       expect((await screen.findByRole("alert")).textContent).toMatch(/Hors ligne/);
     });
   });
