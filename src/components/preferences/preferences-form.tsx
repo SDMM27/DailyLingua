@@ -95,8 +95,8 @@ export function PreferencesForm({
       return;
     }
     if (onboarding) {
-      // Stay on "saving" while the dashboard loads.
-      router.replace("/");
+      // Stay on "saving" while the next screen loads: the placement test is the last onboarding step.
+      router.replace("/niveau?bienvenue=1");
       return;
     }
     setSaveState({ kind: "ok", message: "Préférences enregistrées." });

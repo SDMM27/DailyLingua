@@ -6,7 +6,7 @@ import { availableLanguages } from "@/lib/content/availability";
 import { SOURCE_CATALOG } from "@/lib/content/catalog";
 import { readContentLicensePolicy } from "@/lib/content/policy";
 import { prepareMission, writingFeedbackReviewer } from "@/lib/generation/server";
-import { toDateKey } from "@/lib/domain/dates";
+import { addDays, toDateKey } from "@/lib/domain/dates";
 import { dateKeySchema, type DateKey, type Language } from "@/lib/schemas/common";
 import {
   contentListItemSchema,
@@ -23,6 +23,7 @@ import {
   type MissionProgress,
 } from "@/lib/schemas/mission";
 import type { FeedbackInput } from "@/lib/schemas/feedback";
+import { placementSummarySchema, type PlacementRecord, type PlacementSummary } from "@/lib/schemas/placement";
 import { preferencesSchema, type Preferences } from "@/lib/schemas/preferences";
 import {
   vocabularyItemSchema,
@@ -97,6 +98,14 @@ export interface DailyLinguaRepository {
   setVocabularyStatus(id: string, status: VocabularyItem["status"]): Promise<void>;
   deleteVocabulary(id: string): Promise<void>;
 
+  /** Latest placement test (completed or skipped) of each of the user's languages that has one. */
+  listPlacementTests(): Promise<PlacementSummary[]>;
+  /**
+   * Stores a test. A completed one also sets the current level of its language to the chosen
+   * level, atomically.
+   */
+  recordPlacementTest(record: PlacementRecord): Promise<void>;
+
   /** Sends a feedback to the editor (write-only: the user cannot read it back). */
   sendFeedback(input: FeedbackInput): Promise<void>;
 
@@ -157,6 +166,22 @@ function createMockRepository(): DailyLinguaRepository {
     reviewVocabulary: readOnly,
     setVocabularyStatus: readOnly,
     deleteVocabulary: readOnly,
+    async listPlacementTests() {
+      // One completed test, to show the screen as it looks once a level was assessed.
+      const language = MOCK_PREFERENCES.goals[0];
+      return z.array(placementSummarySchema).parse([
+        {
+          status: "completed",
+          language: language.language,
+          variant: "everyday",
+          estimatedLevel: language.level,
+          confidence: "medium",
+          chosenLevel: language.level,
+          takenAt: new Date(`${addDays(today(), -12)}T09:00:00Z`).toISOString(),
+        },
+      ]);
+    },
+    recordPlacementTest: readOnly,
     sendFeedback: readOnly,
     async listContents(languages, perLanguage) {
       const items = buildMockContents(new Date()).filter((c) => languages.includes(c.language));

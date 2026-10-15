@@ -113,7 +113,7 @@ describe("PreferencesForm", () => {
       expect(savePreferences).not.toHaveBeenCalled();
     });
 
-    it("saves the chosen language and goes to the dashboard", async () => {
+    it("saves the chosen language and goes to the level test", async () => {
       savePreferences.mockResolvedValue({ ok: true, data: undefined });
       const user = userEvent.setup();
       render(<PreferencesForm initial={ONBOARDING_DEFAULTS} languages={LANGUAGE_CODES} mode="onboarding" persist />);
@@ -122,7 +122,7 @@ describe("PreferencesForm", () => {
       expect(savePreferences).toHaveBeenCalledWith(
         expect.objectContaining({ goals: [expect.objectContaining({ language: "it" })] }),
       );
-      expect(replace).toHaveBeenCalledWith("/");
+      expect(replace).toHaveBeenCalledWith("/niveau?bienvenue=1");
     });
   });
 });

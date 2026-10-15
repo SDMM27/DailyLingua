@@ -84,6 +84,10 @@ test("a new user signs up, studies, adds a word and deletes the account", async 
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Quelles langues");
   await page.getByRole("button", { name: "Italien" }).click();
   await page.getByRole("button", { name: "Commencer" }).click();
+  // Last onboarding step: the level test, which can be left for later.
+  await expect(page).toHaveURL(/\/niveau\?bienvenue=1$/);
+  await expect(page.getByText("Pas encore évalué")).toBeVisible();
+  await page.getByRole("link", { name: "Continuer vers ma mission" }).click();
   await expect(page).toHaveURL(/\/$/);
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 
