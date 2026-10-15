@@ -271,14 +271,14 @@ isOneToOne: false
                   ]
                 },"user_languages": {
                   Row: {
-                    "created_at": string,"focus": string,"id": string,"language": string,"level": string,"target_level": string,"updated_at": string,"user_id": string,"weight": number
+                    "created_at": string,"focus": string,"id": string,"language": string,"level": string,"purpose": string,"target_level": string,"updated_at": string,"user_id": string,"weight": number
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"focus"?: string,"id"?: string,"language": string,"level": string,"target_level": string,"updated_at"?: string,"user_id": string,"weight"?: number
+                    "created_at"?: string,"focus"?: string,"id"?: string,"language": string,"level": string,"purpose"?: string,"target_level": string,"updated_at"?: string,"user_id": string,"weight"?: number
                   }
                   Update: {
-                    "created_at"?: string,"focus"?: string,"id"?: string,"language"?: string,"level"?: string,"target_level"?: string,"updated_at"?: string,"user_id"?: string,"weight"?: number
+                    "created_at"?: string,"focus"?: string,"id"?: string,"language"?: string,"level"?: string,"purpose"?: string,"target_level"?: string,"updated_at"?: string,"user_id"?: string,"weight"?: number
                   }
                   Relationships: [
                     {

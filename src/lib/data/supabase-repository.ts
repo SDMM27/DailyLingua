@@ -134,6 +134,7 @@ export async function fetchPreferences(client: Client, userId: string): Promise<
       level: row.level,
       targetLevel: row.target_level,
       focus: row.focus,
+      purpose: row.purpose,
       weight: row.weight,
     })),
     dailyMinutes: p.daily_minutes,
@@ -354,6 +355,7 @@ export function createSupabaseRepository(
         level: g.level,
         target_level: g.targetLevel,
         focus: g.focus,
+        purpose: g.purpose,
         weight: g.weight,
       })),
     });

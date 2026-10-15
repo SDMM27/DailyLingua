@@ -30,6 +30,7 @@ function sessionRequest(language: SessionRequest["language"] = "it"): SessionReq
     level: "B1",
     targetLevel: "B2",
     focus: "",
+    purpose: "general",
     minutes: 20,
     productionMode: "speaking",
     productionMinutes: 6,

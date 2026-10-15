@@ -23,11 +23,17 @@ export const DIFFICULTY_MODES = ["comfortable", "matched", "challenge"] as const
 export const difficultyModeSchema = z.enum(DIFFICULTY_MODES);
 export type DifficultyMode = z.infer<typeof difficultyModeSchema>;
 
+export const LANGUAGE_PURPOSES = ["general", "conversational", "professional", "travel", "exam"] as const;
+export const languagePurposeSchema = z.enum(LANGUAGE_PURPOSES);
+export type LanguagePurpose = z.infer<typeof languagePurposeSchema>;
+
 export const languageGoalSchema = z.object({
   language: languageSchema,
   level: cefrLevelSchema,
   targetLevel: cefrLevelSchema,
   focus: z.string().trim().max(200),
+  /** Why the learner studies this language; missing = general, so rows/payloads from before the field still parse. */
+  purpose: languagePurposeSchema.default("general"),
   /** Relative share of the daily time; weights are normalised across languages. */
   weight: z.number().int().min(1).max(10),
 });

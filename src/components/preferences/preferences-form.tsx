@@ -6,15 +6,17 @@ import { savePreferences } from "@/app/actions/preferences";
 import { PlusIcon } from "@/components/icons";
 import { languageStyle } from "@/components/ui/language-style";
 import { Card, Eyebrow, LanguageTag } from "@/components/ui/primitives";
-import { CONTENT_TYPE_LABELS, DIFFICULTY_LABELS } from "@/lib/domain/labels";
+import { CONTENT_TYPE_LABELS, DIFFICULTY_LABELS, LANGUAGE_PURPOSE_LABELS } from "@/lib/domain/labels";
 import { languageInfo } from "@/lib/domain/languages";
 import { splitBudget } from "@/lib/domain/time-budget";
 import { CEFR_LEVELS, CONTENT_TYPES, type CefrLevel, type Language } from "@/lib/schemas/common";
 import {
   DIFFICULTY_MODES,
+  LANGUAGE_PURPOSES,
   TOPICS,
   preferencesSchema,
   type LanguageGoal,
+  type LanguagePurpose,
   type Preferences,
 } from "@/lib/schemas/preferences";
 
@@ -143,6 +145,20 @@ export function PreferencesForm({
                   onChange={(targetLevel) => setGoal(goal.language, { targetLevel })}
                 />
               </div>
+              <label className="mt-3 block">
+                <span className="mb-1 block text-xs font-medium text-ink-soft">Usage</span>
+                <select
+                  value={goal.purpose}
+                  onChange={(e) => setGoal(goal.language, { purpose: e.target.value as LanguagePurpose })}
+                  className="w-full appearance-none rounded-xl border border-line bg-surface px-3.5 py-2.5 font-semibold focus:border-ink-soft focus:outline-none"
+                >
+                  {LANGUAGE_PURPOSES.map((purpose) => (
+                    <option key={purpose} value={purpose}>
+                      {LANGUAGE_PURPOSE_LABELS[purpose].title} — {LANGUAGE_PURPOSE_LABELS[purpose].hint}
+                    </option>
+                  ))}
+                </select>
+              </label>
               {!languages.includes(goal.language) && (
                 <p className="mt-2 rounded-xl bg-surface-sunk px-3 py-2 text-xs leading-relaxed text-ink-soft">
                   Plus aucune source de contenus n’est disponible pour cette langue : les missions ne pourront
@@ -184,7 +200,7 @@ export function PreferencesForm({
                   onClick={() =>
                     set("goals", [
                       ...prefs.goals,
-                      { language: code, level: "A2", targetLevel: "B1", focus: "", weight: 1 },
+                      { language: code, level: "A2", targetLevel: "B1", focus: "", purpose: "general", weight: 1 },
                     ])
                   }
                   className="inline-flex items-center gap-1 rounded-full border border-dashed border-line px-3 py-1.5 text-sm text-ink-soft hover:border-ink-soft"

@@ -13,6 +13,7 @@ function request(): GenerationRequest {
       level: "B1",
       targetLevel: "B2",
       focus: "",
+      purpose: "general",
       minutes: 10,
       productionMode: i % 2 === 0 ? "writing" : "speaking",
       productionMinutes: 4,

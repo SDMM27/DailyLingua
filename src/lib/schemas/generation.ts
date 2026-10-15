@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { cefrLevelSchema, contentTypeSchema, dateKeySchema, languageSchema } from "./common";
+import { languagePurposeSchema } from "./preferences";
 import { ACTIVITY_KINDS, exerciseSourceSchema, type ExerciseSource } from "./mission";
 
 /**
@@ -48,6 +49,8 @@ export const sessionRequestSchema = z.object({
   targetLevel: cefrLevelSchema,
   /** Free text from the preferences, e.g. "oral, vocabulaire actif". Untrusted user input. */
   focus: z.string(),
+  /** Why the learner studies this language: sets the register and the kind of exercises. */
+  purpose: languagePurposeSchema,
   minutes: z.number().int().positive(),
   productionMode: productionModeSchema,
   /** Minutes planned for the production task (estimate: the final plan depends on the exercises). */

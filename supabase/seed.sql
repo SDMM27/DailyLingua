@@ -288,9 +288,9 @@ begin
     time_zone = 'Europe/Paris'
   where id = demo_id;
 
-  insert into public.user_languages (user_id, language, level, target_level, focus, weight) values
-    (demo_id, 'ru', 'B2', 'C1', 'Compréhension fine, registre soutenu, connecteurs écrits', 2),
-    (demo_id, 'it', 'B1', 'B2', 'Vocabulaire actif, expression orale, spontanéité', 1);
+  insert into public.user_languages (user_id, language, level, target_level, focus, weight, purpose) values
+    (demo_id, 'ru', 'B2', 'C1', 'Compréhension fine, registre soutenu, connecteurs écrits', 2, 'general'),
+    (demo_id, 'it', 'B1', 'B2', 'Vocabulaire actif, expression orale, spontanéité', 1, 'conversational');
 
   insert into public.sources (name, homepage_url) values
     ('Arzamas', 'https://arzamas.academy'),

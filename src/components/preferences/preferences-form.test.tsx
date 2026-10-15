@@ -79,6 +79,22 @@ describe("PreferencesForm", () => {
     expect(await screen.findByText("Préférences enregistrées.")).toBeTruthy();
   });
 
+  it("saves the chosen usage of a language", async () => {
+    savePreferences.mockResolvedValue({ ok: true, data: undefined });
+    const user = userEvent.setup();
+    render(<PreferencesForm initial={MOCK_PREFERENCES} languages={LANGUAGE_CODES} persist />);
+    await user.selectOptions(screen.getAllByLabelText("Usage")[0], "professional");
+    await user.click(screen.getByRole("button", { name: "Enregistrer" }));
+    expect(savePreferences).toHaveBeenCalledWith(
+      expect.objectContaining({
+        goals: [
+          expect.objectContaining({ language: "ru", purpose: "professional" }),
+          expect.objectContaining({ language: "it", purpose: "conversational" }),
+        ],
+      }),
+    );
+  });
+
   it("shows the server error when saving fails", async () => {
     savePreferences.mockResolvedValue({ ok: false, error: "Boom" });
     const user = userEvent.setup();
