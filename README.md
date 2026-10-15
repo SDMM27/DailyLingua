@@ -4,7 +4,7 @@ Une mission linguistique quotidienne construite à partir de contenus authentiqu
 
 Pensée d’abord pour le téléphone : web app installable sur l’écran d’accueil (PWA), avec une app native envisagée plus tard pour l’App Store et le Play Store.
 
-> **État actuel : phase 5.** Sans variables Supabase (c’est le cas de la version déployée), l’app est la **démo publique** sur données fictives, rien n’est enregistré. Avec Supabase configuré, il faut un compte : connexion e-mail + mot de passe, écran d’accueil pour choisir ses langues (19 disponibles), puis vocabulaire, révisions espacées, suivi de mission, historique et préférences sont enregistrés par utilisateur (RLS). L’onglet **Lire** liste les dernières parutions de 40 sources authentiques (flux RSS / Atom) dans les langues de l’utilisateur. À la première ouverture du jour, la **mission est préparée** à partir de ces contenus : choix d’un contenu par langue, exercices rédigés par Claude (ou par un modèle de secours sans IA).
+> **État actuel : phase 6.** Sans variables Supabase (c’est le cas de la version déployée), l’app est la **démo publique** sur données fictives, rien n’est enregistré. Avec Supabase configuré, il faut un compte : connexion e-mail + mot de passe, écran d’accueil pour choisir ses langues (19 disponibles), puis vocabulaire, révisions espacées, suivi de mission, historique et préférences sont enregistrés par utilisateur (RLS). L’onglet **Lire** liste les dernières parutions de 40 sources authentiques (flux RSS / Atom) dans les langues de l’utilisateur. À la première ouverture du jour, la **mission est préparée** à partir de ces contenus : choix d’un contenu par langue, exercices rédigés par Claude (ou par un modèle de secours sans IA). Deux tâches planifiées (GitHub Actions) relèvent les flux toutes les 6 heures et préparent chaque heure la mission des utilisateurs actifs dont l’heure de génération est passée.
 
 ## Démarrer
 
@@ -43,6 +43,7 @@ Si la page ne s’ouvre pas, autoriser Node.js dans le pare-feu Windows (réseau
 | `npm run content:check` | Vérifie le catalogue de sources sans toucher la base : flux, items, liens, pages de conditions et de licence (`-- --source <clé> --verbose`) |
 | `npm run content:ingest` | Relève les flux et enregistre les nouveaux contenus dans Supabase, puis vérifie les liens (`-- --source <clé>`, `-- --no-links`) |
 | `npm run mission:generate` | Prépare la mission d’un utilisateur (`-- --email <adresse>`, `--date AAAA-MM-JJ`, `--template` sans IA, `--replace` en local seulement) et affiche la trace (modèle, tokens, durée) |
+| `npm run cron:run` | Lance une tâche planifiée en local, sans HTTP (`-- ingest` ou `-- missions`) et affiche son rapport |
 
 ## Stack
 
@@ -53,7 +54,7 @@ Si la page ne s’ouvre pas, autoriser Node.js dans le pare-feu Windows (réseau
 - **Supabase** (PostgreSQL, Auth, RLS) : migrations SQL versionnées, CLI en dépendance de dev, stack locale via Docker
 - **fast-xml-parser** (flux RSS / Atom) ; **tsx** pour les scripts de `scripts/`
 - **Claude** (`@anthropic-ai/sdk`, modèle `claude-haiku-5-5`) derrière l’interface `ExerciseGenerator`, avec un générateur de secours déterministe
-- À venir : une tâche planifiée quotidienne (phase 6)
+- **GitHub Actions** (planification) : appelle deux routes protégées par `CRON_SECRET` (`/api/cron/ingest`, `/api/cron/missions`)
 
 ## Structure
 
@@ -72,7 +73,9 @@ src/
     schemas/            Schémas Zod et types dérivés
     data/               Accès aux données : interface, implémentation de démo, implémentation Supabase
     supabase/           Intégration Supabase : variables d’env (Zod), clients serveur / admin, types générés
-scripts/                Scripts en ligne de commande (content:check, content:ingest)
+    generation/         Mission du jour : choix des contenus, rédaction (Claude ou secours), écriture
+    jobs/               Tâches planifiées : relève des flux, missions du jour, journal des exécutions
+scripts/                Scripts en ligne de commande (content:check, content:ingest, mission:generate, cron:run)
 supabase/
   config.toml           Configuration de la stack locale
   migrations/           Schéma, contraintes, index, RLS et privilèges
@@ -137,7 +140,7 @@ npm run content:check     # vérifie le catalogue (réseau, pas de base)
 npm run content:ingest    # remplit la base locale (Supabase lancé, .env.local avec la clé service)
 ```
 
-La relève automatique (plusieurs fois par jour) viendra avec la tâche planifiée de la phase 6, qui appellera la même fonction `ingest()`.
+La relève automatique est faite toutes les 6 heures par la tâche planifiée de la phase 6, qui appelle la même fonction `ingest()`.
 
 ### Schéma
 
@@ -190,4 +193,33 @@ Côté écran, `/mission` affiche « Préparation de ta mission… » et appelle
 ```bash
 npm run mission:generate -- --email demo@dailylingua.test --date 2026-10-14             # Claude si une clé est configurée
 npm run mission:generate -- --email demo@dailylingua.test --date 2026-10-14 --template  # sans IA
+```
+
+## Tâches planifiées (phase 6)
+
+- **Principe** : deux routes `GET`, appelées par un workflow GitHub Actions (`.github/workflows/scheduled-jobs.yml`) avec l’en-tête `Authorization: Bearer <CRON_SECRET>`. Sans `CRON_SECRET` (au moins 32 caractères), elles répondent 503 ; avec un mauvais secret, 401. Elles ne sont pas soumises à la connexion (exclues du `proxy.ts`). En mode démo (sans Supabase), elles ne font rien.
+- **Horaires** (UTC) :
+
+| Route | Planning | Rôle |
+| --- | --- | --- |
+| `/api/cron/ingest` | toutes les 6 h, à la minute 37 | Relève de tous les flux + vérification de liens |
+| `/api/cron/missions` | toutes les heures, à la minute 7 | Prépare les missions des utilisateurs dont l’heure de génération est passée |
+
+- **Qui reçoit une mission** : les utilisateurs dont l’heure de génération (réglages) est passée dans leur fuseau, qui ont au moins une langue, sans mission prête ce jour-là, avec des tentatives restantes (3 par jour), et **actifs** : compte créé il y a moins de 14 jours ou mission commencée dans les 14 derniers jours. Les autres ont toujours leur mission à l’ouverture de l’app (phase 5) : on ne paie pas le modèle pour des comptes abandonnés.
+- **Pourquoi GitHub Actions** : Vercel Cron, sur l’offre Hobby, ne tourne qu’une fois par jour ; GitHub Actions permet un passage horaire, donc une mission prête à l’heure choisie par chacun (à l’heure près). Le travail reste fait par Vercel (limite de 300 s par appel). Coût : environ 840 minutes d’Actions par mois (chaque appel compte pour une minute), sous les 2 000 minutes gratuites d’un dépôt privé. Inutile de rendre le dépôt public (et dans un dépôt public, GitHub désactive les plannings après 60 jours sans activité).
+- **Retards** : GitHub démarre parfois les plannings avec retard, ou en saute un aux heures chargées. Sans conséquence : un passage manqué est rattrapé au suivant, ou à l’ouverture de l’app.
+- **Robustesse** : le verrou de la phase 5 (`claim_mission_generation`) empêche toute double génération. Trois missions sont préparées en parallèle ; les nouvelles préparations s’arrêtent vers 240 s (limite de la fonction : 300 s), et les restantes sont servies à l’ouverture de l’app.
+- **Suivi** : chaque exécution est notée dans la table `cron_runs` (tâche, début, fin, statut `ok` / `partial` / `error`, compteurs, erreur), lisible seulement par le rôle service (Supabase Studio).
+- **Mise en production** :
+  - générer le secret : `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` ;
+  - l’ajouter dans Vercel (Settings → Environment Variables, environnement Production) sous `CRON_SECRET`, avec `SUPABASE_SERVICE_ROLE_KEY` et `ANTHROPIC_API_KEY`, puis redéployer ;
+  - dans GitHub (Settings → Secrets and variables → Actions), créer les secrets `CRON_SECRET` (même valeur) et `APP_URL` (URL de production, sans slash final) ;
+  - lancer le workflow à la main (Actions → Tâches planifiées → Run workflow) et vérifier sa sortie, puis la table `cron_runs`. Un appel en échec fait échouer le workflow, et GitHub prévient par e-mail.
+
+Exemples en local :
+
+```bash
+npm run cron:run -- ingest
+npm run cron:run -- missions
+curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/missions
 ```

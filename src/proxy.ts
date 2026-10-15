@@ -3,8 +3,11 @@ import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/lib/supabase/database.types";
 import { getSupabaseEnv } from "@/lib/supabase/env";
 
-/** Reachable without an account. Everything else needs a session when Supabase is configured. */
-const PUBLIC_PATHS = ["/connexion", "/auth/confirm", "/installer"];
+/**
+ * Reachable without an account. Everything else needs a session when Supabase is configured.
+ * The scheduled job routes check their own secret (CRON_SECRET) and must not be redirected.
+ */
+const PUBLIC_PATHS = ["/connexion", "/auth/confirm", "/installer", "/api/cron"];
 
 function isPublic(pathname: string): boolean {
   return PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));

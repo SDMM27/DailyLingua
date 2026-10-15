@@ -69,6 +69,20 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"cron_runs": {
+                  Row: {
+                    "error": string | null,"finished_at": string | null,"id": string,"job": string,"started_at": string,"stats": NonNullable<Json>,"status": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "error"?: string | null,"finished_at"?: string | null,"id"?: string,"job": string,"started_at"?: string,"stats"?: NonNullable<Json>,"status"?: string
+                  }
+                  Update: {
+                    "error"?: string | null,"finished_at"?: string | null,"id"?: string,"job"?: string,"started_at"?: string,"stats"?: NonNullable<Json>,"status"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"languages": {
                   Row: {
                     "code": string,"created_at": string
@@ -343,6 +357,11 @@ isOneToOne: false
                            },
 "fail_mission_generation":
 { Args: { "p_error": string,"p_mission_id": string }; Returns: undefined
+                           },
+"list_due_mission_users":
+{ Args: { "p_active_within"?: string,"p_limit"?: number,"p_max_attempts"?: number,"p_now"?: string }; Returns: {
+              "mission_date": string,"user_id": string
+            }[]
                            },
 "normalize_url":
 { Args: { "url": string }; Returns: string

@@ -1,0 +1,48 @@
+# Scheduled jobs (phase 6): calls the protected job routes of the production app.
+# The work runs on Vercel; this workflow only triggers it. Schedules run from the default branch
+# and GitHub may start them late or skip one under load: both jobs are safe to run late or twice.
+#
+# Repository secrets (Settings -> Secrets and variables -> Actions):
+#   APP_URL       production URL, without trailing slash (e.g. https://daily-lingua.vercel.app)
+#   CRON_SECRET   same value as the CRON_SECRET variable of the Vercel project
+name: Tâches planifiées
+
+on:
+  schedule:
+    - cron: "7 * * * *" # missions, every hour (off the top of the hour, when GitHub is busiest)
+    - cron: "37 */6 * * *" # ingestion, every 6 hours
+  workflow_dispatch:
+    inputs:
+      job:
+        description: Tâche à lancer
+        type: choice
+        options: [missions, ingest]
+        default: missions
+
+permissions: {}
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    env:
+      JOB: ${{ github.event_name == 'workflow_dispatch' && inputs.job || (github.event.schedule == '37 */6 * * *' && 'ingest' || 'missions') }}
+    concurrency:
+      group: scheduled-job-${{ github.event_name == 'workflow_dispatch' && inputs.job || (github.event.schedule == '37 */6 * * *' && 'ingest' || 'missions') }}
+      cancel-in-progress: false
+    steps:
+      - name: Appel de la route
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$APP_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "::error::Secrets APP_URL et CRON_SECRET requis (Settings -> Secrets and variables -> Actions)."
+            exit 1
+          fi
+          case "$JOB" in ingest|missions) ;; *) echo "::error::Tâche inconnue : $JOB"; exit 1 ;; esac
+          # The route may run up to 300 s (maxDuration): wait a little longer than that.
+          curl --fail-with-body --silent --show-error --max-time 330 \
+            --header "Authorization: Bearer $CRON_SECRET" \
+            "${APP_URL%/}/api/cron/$JOB"
+          echo

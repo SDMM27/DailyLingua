@@ -6,7 +6,7 @@
  *   npm run content:ingest -- --no-links        skip link checks
  *
  * Needs NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (read from .env.local).
- * Phase 6 will run the same `ingest()` from a scheduled job.
+ * The daily job (/api/cron/ingest, phase 6) runs the same `ingest()`.
  */
 import { parseArgs } from "node:util";
 import { createClient } from "@supabase/supabase-js";

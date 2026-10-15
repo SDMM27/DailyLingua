@@ -12,12 +12,8 @@
  */
 import { parseArgs } from "node:util";
 import { createClient } from "@supabase/supabase-js";
-import { readContentLicensePolicy } from "@/lib/content/policy";
 import { toDateKey } from "@/lib/domain/dates";
-import { createClaudeGenerator } from "@/lib/generation/claude-generator";
-import { readGenerationConfig } from "@/lib/generation/config";
-import { generateMission } from "@/lib/generation/generate-mission";
-import { createSupabaseMissionStore } from "@/lib/generation/supabase-store";
+import { createMissionPreparer } from "@/lib/generation/preparer";
 import { createTemplateGenerator } from "@/lib/generation/template-generator";
 import { dateKeySchema } from "@/lib/schemas/common";
 import type { Database } from "@/lib/supabase/database.types";
@@ -78,15 +74,11 @@ if (values.replace) {
   console.log(`Mission du ${date} supprimée.`);
 }
 
-const config = values.template ? ({ provider: "template" } as const) : readGenerationConfig();
-const generator =
-  config.provider === "claude"
-    ? createClaudeGenerator({ apiKey: config.apiKey, model: config.model })
-    : createTemplateGenerator();
-const store = createSupabaseMissionStore(client, { policy: readContentLicensePolicy() });
+const generator = values.template ? createTemplateGenerator() : undefined;
+const prepare = createMissionPreparer(client, { generator, log: console.warn });
 
-console.log(`Mission du ${date} pour ${email} (générateur : ${generator.name})…`);
-const outcome = await generateMission({ userId, date, store, generator, log: console.warn });
+console.log(`Mission du ${date} pour ${email} (générateur : ${values.template ? "template" : "selon la configuration"})…`);
+const outcome = await prepare(userId, date);
 console.log("Résultat :", outcome);
 if (outcome.status !== "ready") process.exit(1);
 
