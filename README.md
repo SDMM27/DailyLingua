@@ -165,9 +165,9 @@ auth.users 1─1 profiles 1─* user_languages *─1 languages
 
 1. Créer le projet sur supabase.com, puis `npx supabase login` et `npx supabase link --project-ref <ref>`.
 2. `npx supabase db push` applique les migrations. **Ne jamais exécuter `seed.sql` sur un projet réel** (il crée un compte au mot de passe public).
-3. Renseigner les trois variables dans Vercel (Project Settings → Environment Variables) ; `SUPABASE_SERVICE_ROLE_KEY` en variable **non exposée**. Tant que ce n’est pas fait, Vercel reste en mode démo.
+3. Renseigner les trois variables dans Vercel (Project Settings → Environment Variables), **toutes du même projet** (Project Settings → API Keys) : `NEXT_PUBLIC_SUPABASE_URL` (`https://<ref>.supabase.co`), `NEXT_PUBLIC_SUPABASE_ANON_KEY` (clé publique `anon` ou `sb_publishable_…`) et `SUPABASE_SERVICE_ROLE_KEY` (clé secrète `service_role` ou `sb_secret_…`, en variable **non exposée**). Jamais les clés locales de `npm run db:status`. Tant qu’aucune n’est définie, Vercel reste en mode démo ; un jeu incomplet fait échouer le serveur, une clé d’un autre projet donne « Invalid API key » dans les logs. Redéployer après chaque modification.
 4. **Authentification** (Dashboard → Authentication) :
-   - *URL Configuration* : `Site URL` = l’URL de production (ex. `https://daily-lingua.vercel.app`) et, dans `Redirect URLs`, `https://<domaine>/auth/confirm`. Sans cela, le lien de l’e-mail de confirmation pointe vers `localhost`.
+   - *URL Configuration* : `Site URL` = l’URL de production (ex. `https://<projet>.vercel.app`) et, dans `Redirect URLs`, `https://<domaine>/auth/confirm`. Sans cela, le lien de l’e-mail de confirmation pointe vers `localhost`.
    - *Sign In / Providers → Email* : laisser **Confirm email** activé (c’est le défaut hébergé ; seul le local le désactive).
    - Fixer une longueur de mot de passe minimale d’au moins 8 (l’app l’exige à l’inscription).
    - Brancher un **SMTP** réel (Authentication → SMTP Settings) : le service d’e-mails par défaut de Supabase est très limité et réservé aux tests.
@@ -212,8 +212,9 @@ npm run mission:generate -- --email demo@dailylingua.test --date 2026-10-14 --te
 - **Suivi** : chaque exécution est notée dans la table `cron_runs` (tâche, début, fin, statut `ok` / `partial` / `error`, compteurs, erreur), lisible seulement par le rôle service (Supabase Studio).
 - **Mise en production** :
   - générer le secret : `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` ;
-  - l’ajouter dans Vercel (Settings → Environment Variables, environnement Production) sous `CRON_SECRET`, avec `SUPABASE_SERVICE_ROLE_KEY` et `ANTHROPIC_API_KEY`, puis redéployer ;
-  - dans GitHub (Settings → Secrets and variables → Actions), créer les secrets `CRON_SECRET` (même valeur) et `APP_URL` (URL de production, sans slash final) ;
+  - l’ajouter dans Vercel (Settings → Environment Variables, environnement Production) sous `CRON_SECRET`, à côté des trois variables Supabase (voir « Déploiement sur un vrai projet Supabase ») et de `ANTHROPIC_API_KEY`, puis redéployer ;
+  - appliquer les migrations sur le projet de production : `npx supabase db push --linked` (sans quoi les tâches échouent en 500) ;
+  - dans GitHub (Settings → Secrets and variables → Actions), créer les secrets `CRON_SECRET` (même valeur) et `APP_URL` (URL de production affichée dans Vercel → Domains, sans slash final) ;
   - lancer le workflow à la main (Actions → Tâches planifiées → Run workflow) et vérifier sa sortie, puis la table `cron_runs`. Un appel en échec fait échouer le workflow, et GitHub prévient par e-mail.
 
 Exemples en local :

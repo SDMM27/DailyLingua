@@ -3,7 +3,7 @@
 # and GitHub may start them late or skip one under load: both jobs are safe to run late or twice.
 #
 # Repository secrets (Settings -> Secrets and variables -> Actions):
-#   APP_URL       production URL, without trailing slash (e.g. https://daily-lingua.vercel.app)
+#   APP_URL       production URL, without trailing slash (Vercel -> Domains)
 #   CRON_SECRET   same value as the CRON_SECRET variable of the Vercel project
 name: Tâches planifiées
 
