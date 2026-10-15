@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect } from "react";
 
 export default function ErrorPage({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
@@ -21,6 +22,11 @@ export default function ErrorPage({ error, reset }: { error: Error & { digest?: 
       >
         Réessayer
       </button>
+      <p className="mt-5 text-sm">
+        <Link href="/retour" className="text-ink-soft underline">
+          Envoyer un retour
+        </Link>
+      </p>
     </div>
   );
 }

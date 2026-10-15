@@ -172,7 +172,7 @@ auth.users 1─1 profiles 1─* user_languages *─1 languages
 4. **Authentification** (Dashboard → Authentication) :
    - *URL Configuration* : `Site URL` = l’URL de production (ex. `https://<projet>.vercel.app`) et, dans `Redirect URLs`, `https://<domaine>/auth/confirm`. Sans cela, le lien de l’e-mail de confirmation pointe vers `localhost`.
    - *Sign In / Providers → Email* : laisser **Confirm email** activé (c’est le défaut hébergé ; seul le local le désactive).
-   - *Emails → Templates → Confirm signup* : remplacer le lien `{{ .ConfirmationURL }}` par `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`. La route `/auth/confirm` attend `token_hash` ; avec le modèle par défaut, le lien arrive avec un `code` et l’utilisateur voit « lien invalide ». Idem pour *Reset password* (`type=recovery`) si la réinitialisation est ajoutée.
+   - *Emails → Templates* (demande un SMTP personnalisé) : coller les modèles versionnés dans `supabase/templates/` (sans le commentaire de tête, qui donne le sujet) : `confirmation.html` dans *Confirm signup*, `recovery.html` dans *Reset password*. Leurs liens utilisent `token_hash` et marchent quel que soit le navigateur qui ouvre le mail. Avec les modèles par défaut, l’app fonctionne aussi (lien `code`), mais si le mail est ouvert dans Safari après une inscription dans l’app installée, l’utilisateur doit se reconnecter (« Adresse confirmée. Connecte-toi. »).
    - Fixer une longueur de mot de passe minimale d’au moins 8 (l’app l’exige à l’inscription).
    - Brancher un **SMTP** réel (Authentication → SMTP Settings) : le service d’e-mails par défaut de Supabase est très limité et réservé aux tests.
 5. **Suppression de compte** : elle utilise `SUPABASE_SERVICE_ROLE_KEY` côté serveur. Sans cette variable, le bouton échoue proprement sans rien supprimer.
@@ -267,6 +267,12 @@ Un nouveau commit annule le run en cours sur la même branche. Compter environ 1
 
 1. Variables Vercel (Production) : les trois variables Supabase, `ANTHROPIC_API_KEY`, `CRON_SECRET` ; `CONTENT_LICENSE_POLICY=commercial` avant toute vente.
 2. Migrations : `npx supabase db push --linked` après chaque nouvelle migration, **avant** de fusionner le code qui en dépend.
-3. Supabase Auth : *Site URL* et *Redirect URLs* (`https://<domaine>/auth/confirm`), modèle d’e-mail de confirmation (`token_hash`), confirmation d’e-mail activée, mot de passe d’au moins 8 caractères, SMTP réel (voir « Déploiement sur un vrai projet Supabase »).
+3. Supabase Auth : *Site URL* et *Redirect URLs* (`https://<domaine>/auth/confirm`), modèles d’e-mail de `supabase/templates/`, confirmation d’e-mail activée, mot de passe d’au moins 8 caractères, SMTP réel (voir « Déploiement sur un vrai projet Supabase »).
 4. Secrets GitHub : `APP_URL`, `CRON_SECRET`.
 5. Après déploiement : le smoke test doit être vert ; vérifier une fois à la main sur iPhone l’inscription (e-mail reçu, lien vers le bon domaine), l’ajout à l’écran d’accueil et la mission du jour.
+
+## Bêta privée : compte, confidentialité, retours
+
+- **Mot de passe oublié** : `/connexion` → `/mot-de-passe-oublie` (même message que le compte existe ou non, pour ne pas révéler les adresses inscrites) → e-mail → `/auth/confirm` → `/nouveau-mot-de-passe`. Le paramètre `next` des liens n’accepte que des chemins internes (`src/lib/security/safe-next-path.ts`). En local, les mails arrivent dans Mailpit (http://127.0.0.1:54324).
+- **Confidentialité** : `/confidentialite`, publique, décrit ce que l’app stocke et ce qui est envoyé au modèle (jamais l’e-mail, les productions écrites ni le vocabulaire). À relire et à mettre à jour à chaque nouvelle donnée collectée ou nouveau sous-traitant. `CONTACT_EMAIL` (facultatif, lu au build) y affiche une adresse de contact.
+- **Retours** : `/retour` (lien depuis Préférences et la page d’erreur). Table `feedback` en écriture seule pour l’utilisateur (lecture dans Supabase Studio), 20 retours par 24 h au plus, effacés avec le compte. **Pousser la migration en production (`npx supabase db push --linked`) avant de fusionner.**

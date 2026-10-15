@@ -4,6 +4,7 @@ import { collectErrors, expectNoHorizontalOverflow, requireLocalSupabase } from 
 
 const EMAIL = `e2e-${Date.now()}@dailylingua.test`;
 const PASSWORD = "e2e-password-123";
+const FEEDBACK_MESSAGE = `Test E2E ${Date.now()} : une idée pour l’app`;
 
 // The local database has no ingested feed (the seed's Italian contents have no feed source), so the
 // mission of the new user is built from a throw-away Italian source and article created here.
@@ -101,12 +102,32 @@ test("a new user signs up, studies, adds a word and deletes the account", async 
   await expect(page.getByText("arrivederci")).toBeVisible();
   await expectNoHorizontalOverflow(page);
 
+  // Feedback, from the settings.
+  await page.goto("/preferences");
+  await page.getByRole("link", { name: "Envoyer un retour" }).click();
+  await expect(page).toHaveURL(/\/retour\?depuis=(%2F|\/)preferences$/);
+  await page.getByRole("radio", { name: "Idée" }).check({ force: true });
+  await page.getByLabel("Ton message").fill(FEEDBACK_MESSAGE);
+  await expectNoHorizontalOverflow(page);
+  await page.getByRole("button", { name: "Envoyer" }).click();
+  await expect(page.getByText("Merci !")).toBeVisible();
+  const admin = adminClient();
+  const sent = await admin.from("feedback").select("user_id, category, page").eq("message", FEEDBACK_MESSAGE);
+  expect(sent.data).toHaveLength(1);
+  expect(sent.data?.[0]).toMatchObject({ category: "idee", page: "/preferences" });
+  const feedbackUserId = sent.data![0].user_id;
+
   // Settings: delete the account.
   await page.goto("/preferences");
   await page.getByRole("button", { name: "Supprimer mon compte…" }).click();
   await page.getByLabel("Ton adresse e-mail pour confirmer").fill(EMAIL);
   await page.getByRole("button", { name: "Supprimer définitivement" }).click();
   await expect(page).toHaveURL(/\/connexion/);
+
+  // The feedback went with the account.
+  const left = await admin.from("feedback").select("id", { count: "exact", head: true }).eq("user_id", feedbackUserId);
+  expect(left.error).toBeNull();
+  expect(left.count).toBe(0);
 
   expect(errors).toEqual([]);
 });

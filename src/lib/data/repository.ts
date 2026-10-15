@@ -22,6 +22,7 @@ import {
   type MissionHistoryEntry,
   type MissionProgress,
 } from "@/lib/schemas/mission";
+import type { FeedbackInput } from "@/lib/schemas/feedback";
 import { preferencesSchema, type Preferences } from "@/lib/schemas/preferences";
 import {
   vocabularyItemSchema,
@@ -88,6 +89,9 @@ export interface DailyLinguaRepository {
   setVocabularyStatus(id: string, status: VocabularyItem["status"]): Promise<void>;
   deleteVocabulary(id: string): Promise<void>;
 
+  /** Sends a feedback to the editor (write-only: the user cannot read it back). */
+  sendFeedback(input: FeedbackInput): Promise<void>;
+
   /**
    * Latest authentic contents of `languages` (at most `perLanguage` each, newest first), from the
    * active sources allowed by the licence policy. Broken links are left out.
@@ -143,6 +147,7 @@ function createMockRepository(): DailyLinguaRepository {
     reviewVocabulary: readOnly,
     setVocabularyStatus: readOnly,
     deleteVocabulary: readOnly,
+    sendFeedback: readOnly,
     async listContents(languages, perLanguage) {
       const items = buildMockContents(new Date()).filter((c) => languages.includes(c.language));
       const kept = languages.flatMap((l) => items.filter((c) => c.language === l).slice(0, perLanguage));

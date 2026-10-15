@@ -129,6 +129,20 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
     });
   });
 
+  describe("feedback", () => {
+    it("stores a feedback for the user, with its page", async () => {
+      await repo.sendFeedback({ category: "bug", message: "Ça ne marche pas", page: "/mission" });
+      const { data } = await admin.from("feedback").select("category, message, page, user_id").eq("user_id", userId);
+      expect(data).toEqual([{ category: "bug", message: "Ça ne marche pas", page: "/mission", user_id: userId }]);
+    });
+
+    it("refuses the 21st feedback of the day with a message for the user", async () => {
+      const { count } = await admin.from("feedback").select("*", { count: "exact", head: true }).eq("user_id", userId);
+      for (let i = count ?? 0; i < 20; i++) await repo.sendFeedback({ category: "idee", message: `Idée ${i}` });
+      await expect(repo.sendFeedback({ category: "idee", message: "De trop" })).rejects.toBeInstanceOf(UserFacingError);
+    });
+  });
+
   describe("mission progress", () => {
     async function seedMission() {
       const { data: content } = await admin.from("contents").select("id, language").eq("language", "ru").limit(1).single();
