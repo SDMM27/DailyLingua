@@ -38,6 +38,11 @@ export async function signIn(page: Page, email: string, password: string) {
   await expect(page).toHaveURL(/\/$/);
 }
 
+/** The app's alerts, without Next's route announcer (also role="alert", filled after a client navigation). */
+export function appAlert(page: Page) {
+  return page.getByRole("alert").and(page.locator(":not(#__next-route-announcer__)"));
+}
+
 /** Collects console errors and uncaught page exceptions; assert on `.errors` at the end of a test. */
 export function collectErrors(page: Page) {
   const errors: string[] = [];

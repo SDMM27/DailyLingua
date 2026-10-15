@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { DEMO_EMAIL, requireLocalSupabase } from "./helpers";
+import { DEMO_EMAIL, appAlert, requireLocalSupabase } from "./helpers";
 
 test.beforeAll(() => {
   requireLocalSupabase();
@@ -27,7 +27,7 @@ test("the reset answer is the same for an unknown address and for an existing ac
 
 test("an expired reset link explains what to do", async ({ page }) => {
   await page.goto("/mot-de-passe-oublie?lien=invalide");
-  await expect(page.getByRole("alert")).toContainText("Ce lien a expiré ou a déjà servi");
+  await expect(appAlert(page)).toContainText("Ce lien a expiré ou a déjà servi");
 });
 
 test("the new password page needs a session", async ({ page }) => {
