@@ -2,6 +2,7 @@ import { addDays } from "@/lib/domain/dates";
 import { splitBudget } from "@/lib/domain/time-budget";
 import type { ContentType, DateKey, Language } from "@/lib/schemas/common";
 import {
+  GENERATION_LIMITS,
   generationMetaSchema,
   generationRequestSchema,
   plannedActivitySchema,
@@ -11,6 +12,7 @@ import {
   type GenerationRequest,
   type GenerationResult,
   type PlannedActivity,
+  type ProductionMode,
 } from "@/lib/schemas/generation";
 import type {
   ComprehensionQuestion,
@@ -20,7 +22,7 @@ import type {
 } from "@/lib/schemas/mission";
 import type { Preferences } from "@/lib/schemas/preferences";
 import { GenerationError } from "./errors";
-import { chooseProductionMode, planActivities } from "./plan-activities";
+import { chooseProductionMode, planActivities, productionTargetLength } from "./plan-activities";
 import { rankCandidates } from "./select-contents";
 import { createTemplateGenerator } from "./template-generator";
 import { validateGeneratedMission, type ValidatedSession } from "./validate";
@@ -137,22 +139,37 @@ export async function generateMission(input: GenerateMissionInput): Promise<Gene
     const request: GenerationRequest = generationRequestSchema.parse({
       date,
       topics: preferences.topics,
-      sessions: goals.map((goal, index) => ({
-        language: goal.language,
-        level: goal.level,
-        targetLevel: goal.targetLevel,
-        focus: goal.focus,
-        minutes: shares[index].minutes,
-        productionMode: chooseProductionMode(date, index),
-        candidates: rankCandidates(pools.get(goal.language) ?? [], {
+      sessions: goals.map((goal, index) => {
+        const minutes = shares[index].minutes;
+        const productionMode = chooseProductionMode(date, index);
+        const candidates = rankCandidates(pools.get(goal.language) ?? [], {
           level: goal.level,
           difficulty: preferences.difficulty,
           contentTypes: preferences.contentTypes,
-          minutes: shares[index].minutes,
+          minutes,
           excludeIds,
           now: startedAt,
-        }),
-      })),
+        });
+        // Told to the model so it sizes the task; the final plan is made once the exercises exist.
+        const estimate = planActivities({
+          type: candidates[0].type,
+          durationMinutes: candidates[0].durationMinutes,
+          minutes,
+          questionCount: GENERATION_LIMITS.questions.max,
+          expressionCount: GENERATION_LIMITS.expressions.max,
+          productionMode,
+        });
+        return {
+          language: goal.language,
+          level: goal.level,
+          targetLevel: goal.targetLevel,
+          focus: goal.focus,
+          minutes,
+          productionMode,
+          productionMinutes: estimate.at(-1)!.estimatedMinutes,
+          candidates,
+        };
+      }),
     });
 
     let result: GenerationResult;
@@ -170,21 +187,28 @@ export async function generateMission(input: GenerateMissionInput): Promise<Gene
       sessions = validateGeneratedMission(result, request);
     }
 
-    const planned: PlannedSession[] = sessions.map((session, index) => ({
-      language: session.language,
-      contentId: session.content.id,
-      questions: session.questions,
-      expressions: session.expressions,
-      production: session.production,
-      activities: planActivities({
+    const planned: PlannedSession[] = sessions.map((session, index) => {
+      const activities = planActivities({
         type: session.content.type,
         durationMinutes: session.content.durationMinutes,
         minutes: shares[index].minutes,
         questionCount: session.questions.length,
         expressionCount: session.expressions.length,
         productionMode: session.production.mode,
-      }).map((activity) => plannedActivitySchema.parse(activity)),
-    }));
+      }).map((activity) => plannedActivitySchema.parse(activity));
+      const production = activities.find((a) => a.kind === session.production.mode);
+      return {
+        language: session.language,
+        contentId: session.content.id,
+        questions: session.questions,
+        expressions: session.expressions,
+        // The length asked follows the minutes actually planned (none when there is no room).
+        production: production
+          ? { ...session.production, targetLength: productionTargetLength(production.kind as ProductionMode, production.estimatedMinutes) }
+          : session.production,
+        activities,
+      };
+    });
 
     const meta = generationMetaSchema.parse({
       source: result.source,

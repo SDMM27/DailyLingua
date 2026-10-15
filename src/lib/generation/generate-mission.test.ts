@@ -8,6 +8,7 @@ import type {
 } from "@/lib/schemas/generation";
 import type { Preferences } from "@/lib/schemas/preferences";
 import { GenerationError } from "./errors";
+import { productionTargetLength } from "./plan-activities";
 import { generateMission, type MissionStore, type PlannedSession } from "./generate-mission";
 import { createTemplateGenerator } from "./template-generator";
 
@@ -101,9 +102,9 @@ function aiGenerator(): ExerciseGenerator & { requests: GenerationRequest[] } {
         sessions: request.sessions.map((s) => ({
           language: s.language,
           candidateIndex: 0,
-          questions: [{ prompt: "Domanda?", options: ["a", "b", "c"], answerIndex: 0, explanation: "Perché." }],
-          expressions: ["uno", "due", "tre"].map((text) => ({ text, translation: "t", example: "e", note: "" })),
-          production: { prompt: "Scrivi.", hints: ["x", "y"], targetLength: "100 parole" },
+          questions: [{ prompt: "Domanda?", options: ["a", "b", "c"], answerIndex: 0, explanation_fr: "Perché." }],
+          expressions: ["uno", "due", "tre"].map((text) => ({ text, translation_fr: "t", example: "e", note_fr: "" })),
+          production: { prompt: "Scrivi.", hints_fr: ["x", "y"] },
         })),
       };
     },
@@ -145,6 +146,21 @@ describe("generateMission", () => {
     expect(generator.requests[0].sessions.map((s) => s.productionMode)).not.toContain(undefined);
     expect(calls.failed).toEqual([]);
     expect(calls.usedSince).toEqual(["2026-09-13"]);
+  });
+
+  it("tells the model the production time and sizes the task from the final plan", async () => {
+    const { store, calls } = memoryStore();
+    const generator = aiGenerator();
+    await run(store, generator);
+    for (const [i, request] of generator.requests[0].sessions.entries()) {
+      const session = calls.completed[0].sessions[i];
+      const production = session.activities.at(-1)!;
+      expect(request.productionMinutes).toBeGreaterThan(0);
+      expect(request.productionMinutes).toBeLessThanOrEqual(request.minutes);
+      expect(session.production.targetLength).toBe(
+        productionTargetLength(session.production.mode, production.estimatedMinutes),
+      );
+    }
   });
 
   it("falls back to the template when the generator throws", async () => {

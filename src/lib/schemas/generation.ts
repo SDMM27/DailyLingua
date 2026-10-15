@@ -50,6 +50,8 @@ export const sessionRequestSchema = z.object({
   focus: z.string(),
   minutes: z.number().int().positive(),
   productionMode: productionModeSchema,
+  /** Minutes planned for the production task (estimate: the final plan depends on the exercises). */
+  productionMinutes: z.number().int().positive(),
   /** Best first; at least one. */
   candidates: z.array(candidateContentSchema).min(1),
 });
@@ -68,34 +70,28 @@ export type GenerationRequest = z.infer<typeof generationRequestSchema>;
 // Kept to plain types (no refinements, no length bounds) so it converts to the JSON schema of the
 // API's structured outputs; the bounds are enforced afterwards by `validateGeneratedSession`.
 
+// Fields written in French end in `_fr` and say so in their description: both reach the model
+// through the JSON schema, which keeps it from answering in the studied language.
+const STUDIED = "In the studied language.";
+const FRENCH = "In French (the learner's language), addressing the learner with « tu ».";
+
 export const wireQuestionSchema = z.object({
-  /** In the studied language. */
-  prompt: z.string(),
-  /** In the studied language. */
-  options: z.array(z.string()),
+  prompt: z.string().describe(STUDIED),
+  options: z.array(z.string().describe(STUDIED)),
   answerIndex: z.number().int(),
-  /** In French: why the answer is right, quoting the teaser. */
-  explanation: z.string(),
+  explanation_fr: z.string().describe(`${FRENCH} Why the answer is right, quoting the teaser.`),
 });
 
 export const wireExpressionSchema = z.object({
-  /** In the studied language, dictionary form. */
-  text: z.string(),
-  /** In French. */
-  translation: z.string(),
-  /** In the studied language. */
-  example: z.string(),
-  /** In French, optional usage note (aspect, register, government...). Empty string when none. */
-  note: z.string(),
+  text: z.string().describe(`${STUDIED} Dictionary form.`),
+  translation_fr: z.string().describe(FRENCH),
+  example: z.string().describe(`${STUDIED} A sentence written for the learner.`),
+  note_fr: z.string().describe(`${FRENCH} Short usage note (aspect, register, government...), or an empty string.`),
 });
 
 export const wireProductionSchema = z.object({
-  /** In the studied language. */
-  prompt: z.string(),
-  /** In French. */
-  hints: z.array(z.string()),
-  /** E.g. "120–150 слов" or "2 minuti". */
-  targetLength: z.string(),
+  prompt: z.string().describe(STUDIED),
+  hints_fr: z.array(z.string().describe(`${FRENCH} Short tip; connectors may be quoted in the studied language.`)),
 });
 
 export const wireSessionSchema = z.object({

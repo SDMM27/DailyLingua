@@ -32,12 +32,13 @@ function sessionRequest(language: SessionRequest["language"] = "it"): SessionReq
     focus: "",
     minutes: 20,
     productionMode: "speaking",
+    productionMinutes: 6,
     candidates: [candidate("c0"), candidate("c1")],
   };
 }
 
-const goodQuestion = { prompt: "Chi parla?", options: ["Marco", "Anna", "Luca"], answerIndex: 1, explanation: "Anna parle." };
-const goodExpression = { text: "andare avanti", translation: "continuer", example: "Dobbiamo andare avanti.", note: "" };
+const goodQuestion = { prompt: "Chi parla?", options: ["Marco", "Anna", "Luca"], answerIndex: 1, explanation_fr: "Anna parle." };
+const goodExpression = { text: "andare avanti", translation_fr: "continuer", example: "Dobbiamo andare avanti.", note_fr: "" };
 
 function wire(overrides: Partial<WireSession> = {}): WireSession {
   return {
@@ -45,7 +46,7 @@ function wire(overrides: Partial<WireSession> = {}): WireSession {
     candidateIndex: 1,
     questions: [goodQuestion],
     expressions: [goodExpression],
-    production: { prompt: "Che ne pensi?", hints: ["Un conseil", "Un autre"], targetLength: "2 minuti" },
+    production: { prompt: "Che ne pensi?", hints_fr: ["Un conseil", "Un autre"] },
     ...overrides,
   };
 }
@@ -62,7 +63,7 @@ function reason(fn: () => unknown): string | undefined {
 describe("validateGeneratedSession", () => {
   it("maps a good session, assigning ids and taking the mode from the request", () => {
     const result = validateGeneratedSession(
-      wire({ questions: [goodQuestion, goodQuestion], expressions: [goodExpression, { ...goodExpression, text: "tirare avanti", note: " usage " }] }),
+      wire({ questions: [goodQuestion, goodQuestion], expressions: [goodExpression, { ...goodExpression, text: "tirare avanti", note_fr: " usage " }] }),
       sessionRequest(),
       "ai",
     );
@@ -75,7 +76,6 @@ describe("validateGeneratedSession", () => {
       mode: "speaking",
       prompt: "Che ne pensi?",
       hints: ["Un conseil", "Un autre"],
-      targetLength: "2 minuti",
     });
   });
 
@@ -91,14 +91,14 @@ describe("validateGeneratedSession", () => {
 
   it.each([
     ["empty prompt", { ...goodQuestion, prompt: "  " }],
-    ["empty explanation", { ...goodQuestion, explanation: "" }],
+    ["empty explanation", { ...goodQuestion, explanation_fr: "" }],
     ["too few options", { ...goodQuestion, options: ["A", "B"], answerIndex: 0 }],
     ["too many options", { ...goodQuestion, options: ["A", "B", "C", "D", "E"] }],
     ["empty option", { ...goodQuestion, options: ["A", " ", "C"] }],
     ["duplicate option", { ...goodQuestion, options: ["A", "a", "C"] }],
     ["answer out of range", { ...goodQuestion, answerIndex: 3 }],
     ["negative answer", { ...goodQuestion, answerIndex: -1 }],
-    ["too long", { ...goodQuestion, explanation: "x".repeat(GENERATION_LIMITS.longText + 1) }],
+    ["too long", { ...goodQuestion, explanation_fr: "x".repeat(GENERATION_LIMITS.longText + 1) }],
   ])("drops a question with %s", (_name, bad) => {
     const result = validateGeneratedSession(wire({ questions: [bad, goodQuestion] }), sessionRequest(), "ai");
     expect(result.questions).toHaveLength(1);
@@ -121,7 +121,7 @@ describe("validateGeneratedSession", () => {
       wire({
         expressions: [
           { ...goodExpression, text: "" },
-          { ...goodExpression, translation: " " },
+          { ...goodExpression, translation_fr: " " },
           { ...goodExpression, example: "" },
           { ...goodExpression, example: "x".repeat(GENERATION_LIMITS.longText + 1) },
           goodExpression,
@@ -135,13 +135,12 @@ describe("validateGeneratedSession", () => {
     expect(result.expressions.map((e) => e.text)).toEqual(["andare avanti", "altro"]);
   });
 
-  it("cleans hints and target length", () => {
+  it("cleans hints and leaves the target length to the app", () => {
     const result = validateGeneratedSession(
       wire({
         production: {
           prompt: "Che ne pensi?",
-          hints: [" ", "a", "b", "c", "d", "e"],
-          targetLength: "  ",
+          hints_fr: [" ", "a", "b", "c", "d", "e"],
         },
       }),
       sessionRequest(),
@@ -152,7 +151,7 @@ describe("validateGeneratedSession", () => {
   });
 
   it("throws on an empty or over-long production prompt", () => {
-    const production = { prompt: " ", hints: [], targetLength: "" };
+    const production = { prompt: " ", hints_fr: [] };
     expect(reason(() => validateGeneratedSession(wire({ production }), sessionRequest(), "ai"))).toBe("invalid_output");
     const long = { ...production, prompt: "x".repeat(GENERATION_LIMITS.longText + 1) };
     expect(reason(() => validateGeneratedSession(wire({ production: long }), sessionRequest(), "ai"))).toBe("invalid_output");

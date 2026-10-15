@@ -131,15 +131,15 @@ describe.skipIf(!stackIsUp)("Supabase mission store (local database, throw-away 
             prompt: `Question sur ${s.candidates[0].title} ?`,
             options: ["Option A", "Option B", "Option C"],
             answerIndex: 1,
-            explanation: "Parce que l’accroche le dit.",
+            explanation_fr: "Parce que l’accroche le dit.",
           },
         ],
         expressions: [
-          { text: "expression un", translation: "expression un (fr)", example: "Exemple un.", note: "" },
-          { text: "expression deux", translation: "expression deux (fr)", example: "Exemple deux.", note: "" },
-          { text: "expression trois", translation: "expression trois (fr)", example: "Exemple trois.", note: "usage" },
+          { text: "expression un", translation_fr: "expression un (fr)", example: "Exemple un.", note_fr: "" },
+          { text: "expression deux", translation_fr: "expression deux (fr)", example: "Exemple deux.", note_fr: "" },
+          { text: "expression trois", translation_fr: "expression trois (fr)", example: "Exemple trois.", note_fr: "usage" },
         ],
-        production: { prompt: "Écris quelques phrases.", hints: ["Un", "Deux"], targetLength: "80 mots" },
+        production: { prompt: "Écris quelques phrases.", hints_fr: ["Un", "Deux"] },
       }));
       return {
         source: "ai",

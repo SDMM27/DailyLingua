@@ -60,7 +60,7 @@ export function validateGeneratedSession(
   for (const q of wire.questions) {
     if (questions.length >= L.questions.max) break;
     const prompt = q.prompt.trim();
-    const explanation = q.explanation.trim();
+    const explanation = q.explanation_fr.trim();
     const options = q.options.map((o) => o.trim());
     const distinct = new Set(options.map((o) => o.toLowerCase()));
     if (!usable(prompt, explanation, ...options)) continue;
@@ -83,9 +83,9 @@ export function validateGeneratedSession(
   for (const e of wire.expressions) {
     if (expressions.length >= L.expressions.max) break;
     const text = e.text.trim();
-    const translation = e.translation.trim();
+    const translation = e.translation_fr.trim();
     const example = e.example.trim();
-    const note = e.note.trim();
+    const note = e.note_fr.trim();
     if (!usable(text, translation, example) || note.length > L.longText) continue;
     if (seen.has(text.toLowerCase())) continue;
     seen.add(text.toLowerCase());
@@ -103,17 +103,12 @@ export function validateGeneratedSession(
 
   const prompt = wire.production.prompt.trim();
   if (!usable(prompt)) throw invalid(`consigne de production inexploitable (${language})`);
-  const hints = wire.production.hints
+  const hints = wire.production.hints_fr
     .map((h) => h.trim())
     .filter((h) => usable(h))
     .slice(0, L.hints.max);
-  const targetLength = wire.production.targetLength.trim();
-  const production = productionTaskSchema.parse({
-    mode: request.productionMode,
-    prompt,
-    hints,
-    targetLength: targetLength && targetLength.length <= L.shortText ? targetLength : undefined,
-  });
+  // targetLength is set by the app once the minutes are planned (see productionTargetLength).
+  const production = productionTaskSchema.parse({ mode: request.productionMode, prompt, hints });
 
   return { language, content, questions, expressions, production };
 }

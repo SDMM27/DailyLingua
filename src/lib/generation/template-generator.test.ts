@@ -15,6 +15,7 @@ function request(): GenerationRequest {
       focus: "",
       minutes: 10,
       productionMode: i % 2 === 0 ? "writing" : "speaking",
+      productionMinutes: 4,
       candidates: [
         {
           id: `c-${language}`,
@@ -54,8 +55,8 @@ describe("createTemplateGenerator", () => {
     const result = await generator.generate(request());
     const [ru, it_] = result.sessions;
     expect(ru.production.prompt).toContain("En russe");
-    expect(ru.production.targetLength).toBe("80–120 mots");
+    expect(ru.production.prompt).toContain("résume");
     expect(it_.production.prompt).toContain("« Un titre »");
-    expect(it_.production.targetLength).toBe("2 minutes");
+    expect(it_.production.prompt).toContain("à voix haute");
   });
 });

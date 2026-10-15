@@ -40,6 +40,28 @@ export interface PlanInput {
   productionMode: ProductionMode;
 }
 
+/** Writing pace assumed for a learner, words per minute of the activity (thinking included). */
+const WORDS_PER_MINUTE = { min: 8, max: 12 };
+/** Speaking: about a third of the activity is talking, the rest is preparing and listening back. */
+const SPEAKING_SHARE = 1 / 3;
+
+const roundTo5 = (n: number) => Math.max(5, Math.round(n / 5) * 5);
+
+/**
+ * Length asked for the production task, derived from the minutes it was given so the request is
+ * doable: "25–35 mots" for 3 minutes of writing, "3 minutes" of talk for 8 minutes of speaking.
+ * Set by the app, in French like the rest of the interface, never by the model.
+ */
+export function productionTargetLength(mode: ProductionMode, minutes: number): string {
+  if (mode === "writing") {
+    const low = roundTo5(Math.max(20, minutes * WORDS_PER_MINUTE.min));
+    const high = Math.max(low + 10, roundTo5(minutes * WORDS_PER_MINUTE.max));
+    return `${low}–${high} mots`;
+  }
+  const talk = Math.max(1, Math.round(minutes * SPEAKING_SHARE));
+  return talk === 1 ? "1 minute" : `${talk} minutes`;
+}
+
 /** Integer split of `total` in proportion to `weights` (largest remainder), ties to the first. */
 function proportional(total: number, weights: number[]): number[] {
   const weightSum = weights.reduce((a, b) => a + b, 0);

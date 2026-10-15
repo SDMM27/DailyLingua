@@ -19,6 +19,7 @@ const request: GenerationRequest = {
       focus: "",
       minutes: 20,
       productionMode: "writing",
+      productionMinutes: 6,
       candidates: [
         {
           id: "c0",
@@ -43,7 +44,7 @@ const parsed: WireMission = {
       candidateIndex: 0,
       questions: [],
       expressions: [],
-      production: { prompt: "p", hints: [], targetLength: "" },
+      production: { prompt: "p", hints_fr: [] },
     },
   ],
 };

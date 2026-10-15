@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { addDays } from "@/lib/domain/dates";
 import { CONTENT_TYPES } from "@/lib/schemas/common";
-import { chooseProductionMode, planActivities } from "./plan-activities";
+import { chooseProductionMode, planActivities, productionTargetLength } from "./plan-activities";
 
 const CAPS: Record<string, (questions: number, expressions: number) => number> = {
   comprehension: (questions) => 2 + questions,
@@ -9,6 +9,16 @@ const CAPS: Record<string, (questions: number, expressions: number) => number> =
   writing: () => 15,
   speaking: () => 8,
 };
+
+describe("productionTargetLength", () => {
+  it("asks for what fits in the planned minutes", () => {
+    expect(productionTargetLength("writing", 3)).toBe("25–35 mots");
+    expect(productionTargetLength("writing", 15)).toBe("120–180 mots");
+    expect(productionTargetLength("writing", 1)).toBe("20–30 mots");
+    expect(productionTargetLength("speaking", 8)).toBe("3 minutes");
+    expect(productionTargetLength("speaking", 2)).toBe("1 minute");
+  });
+});
 
 describe("chooseProductionMode", () => {
   it("alternates from one day to the next", () => {

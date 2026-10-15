@@ -15,7 +15,7 @@ function templateSession(request: SessionRequest): WireSession {
       prompt: writing
         ? `En ${language}, résume en quelques phrases ce que tu as compris de « ${title} », puis donne ton avis.`
         : `En ${language}, raconte à voix haute ce que tu as compris de « ${title} », puis donne ton avis.`,
-      hints: writing
+      hints_fr: writing
         ? [
             "Commence par l’idée principale en une phrase.",
             "Ajoute un détail ou un exemple qui t’a marqué.",
@@ -26,7 +26,6 @@ function templateSession(request: SessionRequest): WireSession {
             "Parle sans t’arrêter, même si tu cherches un mot.",
             "Réécoute-toi si possible et note ce qui a manqué.",
           ],
-      targetLength: writing ? "80–120 mots" : "2 minutes",
     },
   };
 }
