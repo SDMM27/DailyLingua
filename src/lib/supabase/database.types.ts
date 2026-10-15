@@ -83,6 +83,26 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"feedback": {
+                  Row: {
+                    "app_version": string | null,"category": string,"created_at": string,"id": string,"message": string,"page": string | null,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "app_version"?: string | null,"category": string,"created_at"?: string,"id"?: string,"message": string,"page"?: string | null,"user_id": string
+                  }
+                  Update: {
+                    "app_version"?: string | null,"category"?: string,"created_at"?: string,"id"?: string,"message"?: string,"page"?: string | null,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "feedback_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"languages": {
                   Row: {
                     "code": string,"created_at": string

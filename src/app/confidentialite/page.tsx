@@ -1,0 +1,140 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import type { ReactNode } from "react";
+import { Card, PageHeader } from "@/components/ui/primitives";
+
+export const metadata: Metadata = { title: "Politique de confidentialité" };
+
+/** Update this date whenever the policy changes. */
+const LAST_UPDATED = "15 octobre 2026";
+
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <Card className="space-y-3 text-[15px] leading-relaxed text-ink-soft">
+      <h2 className="font-serif text-xl font-semibold text-ink">{title}</h2>
+      {children}
+    </Card>
+  );
+}
+
+const list = "list-disc space-y-1.5 pl-5";
+
+export default function PrivacyPage() {
+  // Optional, server side: no address is written in the code.
+  const contactEmail = process.env.CONTACT_EMAIL?.trim();
+
+  return (
+    <div className="space-y-4">
+      <PageHeader eyebrow="Version bêta" title="Politique de confidentialité">
+        Daily Lingua est en bêta privée. Voici, simplement, ce que l’app fait de tes données. Dernière mise à jour :{" "}
+        {LAST_UPDATED}.
+      </PageHeader>
+
+      <Section title="Qui est responsable ?">
+        <p>
+          Le responsable du traitement est l’éditeur de Daily Lingua.{" "}
+          {contactEmail ? (
+            <>
+              Pour toute question ou demande, écris à{" "}
+              <a href={`mailto:${contactEmail}`} className="font-semibold text-ink underline">
+                {contactEmail}
+              </a>
+              , ou utilise la page « Envoyer un retour » de l’app.
+            </>
+          ) : (
+            <>Pour toute question ou demande, utilise la page « Envoyer un retour » de l’app.</>
+          )}
+        </p>
+      </Section>
+
+      <Section title="Les données que nous collectons">
+        <ul className={list}>
+          <li>Ton adresse e-mail et ton mot de passe (géré par Supabase Auth, qui ne le stocke que haché).</li>
+          <li>
+            Tes préférences : langues, niveaux, objectifs, centres d’intérêt, temps quotidien, fuseau horaire et
+            heure de la mission.
+          </li>
+          <li>Tes missions, ta progression et tes réponses aux quiz.</li>
+          <li>Les textes que tu écris pour les productions écrites.</li>
+          <li>Ton vocabulaire et tes révisions.</li>
+          <li>Les retours que tu envoies depuis l’app.</li>
+        </ul>
+        <p>
+          Il n’y a ni publicité, ni traceur, ni outil de mesure d’audience, et tes données ne sont jamais revendues.
+          Le seul cookie est celui de ta session de connexion : il est strictement nécessaire au fonctionnement du
+          service, c’est pourquoi aucun bandeau de consentement n’est affiché.
+        </p>
+      </Section>
+
+      <Section title="Pourquoi, et sur quelle base légale ?">
+        <p>
+          Tes données servent uniquement à fournir le service : te connecter, choisir les contenus de ta mission,
+          suivre ta progression et gérer ton vocabulaire. La base légale est l’exécution du contrat (RGPD, art. 6.1.b).
+        </p>
+      </Section>
+
+      <Section title="Qui traite tes données ?">
+        <ul className={list}>
+          <li>
+            <strong>Supabase</strong> : base de données et authentification.
+          </li>
+          <li>
+            <strong>Vercel</strong> : hébergement de l’application.
+          </li>
+          <li>
+            <strong>Anthropic</strong> : rédaction des exercices de la mission. Le modèle reçoit le titre, l’accroche,
+            le média, le type, le niveau habituel et la durée des contenus proposés, ainsi que ton niveau, ton niveau
+            visé, ton objectif libre s’il est renseigné, tes centres d’intérêt, le temps prévu et la date. Il ne reçoit
+            jamais ton adresse e-mail, ni tes productions écrites, ni ton vocabulaire, ni tes réponses aux quiz.
+          </li>
+          <li>
+            <strong>Le service d’envoi d’e-mails</strong> configuré dans Supabase, pour les messages de confirmation et
+            de réinitialisation du mot de passe.
+          </li>
+        </ul>
+        <p>
+          Certains de ces prestataires peuvent traiter des données en dehors de l’Union européenne. Les transferts sont
+          alors encadrés par les clauses contractuelles types de la Commission européenne.
+        </p>
+      </Section>
+
+      <Section title="Combien de temps ?">
+        <p>
+          Tes données sont conservées tant que ton compte existe. Tu peux les supprimer à tout moment, immédiatement et
+          définitivement, depuis{" "}
+          <Link href="/preferences" className="font-semibold text-ink underline">
+            Préférences
+          </Link>{" "}
+          → « Supprimer mon compte » : toutes tes données personnelles sont effacées, y compris les retours que tu as
+          envoyés.
+        </p>
+      </Section>
+
+      <Section title="Tes droits">
+        <p>
+          Tu disposes des droits d’accès, de rectification, d’effacement, de portabilité et d’opposition sur tes
+          données. Tu peux modifier tes préférences et supprimer ton compte toi-même dans l’app ; pour les autres
+          demandes, contacte-nous comme indiqué plus haut. Si tu estimes que tes droits ne sont pas respectés, tu peux
+          adresser une réclamation à la CNIL (
+          <a href="https://www.cnil.fr" className="font-semibold text-ink underline" rel="noreferrer">
+            cnil.fr
+          </a>
+          ).
+        </p>
+      </Section>
+
+      <Section title="Les contenus des médias">
+        <p>
+          Les articles, podcasts et vidéos appartiennent à leurs éditeurs. L’app n’affiche que le titre, l’accroche et
+          un lien vers l’éditeur : le contenu lui-même se lit ou s’écoute sur son site.
+        </p>
+      </Section>
+
+      <p className="px-1 pb-2 text-[13px] text-muted">
+        <Link href="/" className="underline">
+          Retour à l’accueil
+        </Link>
+      </p>
+    </div>
+  );
+}

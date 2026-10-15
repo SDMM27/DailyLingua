@@ -2,7 +2,12 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { signInSchema, signUpSchema } from "@/lib/schemas/auth";
+import {
+  requestPasswordResetSchema,
+  signInSchema,
+  signUpSchema,
+  updatePasswordSchema,
+} from "@/lib/schemas/auth";
 import { deleteUserAccount } from "@/lib/supabase/delete-account";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -48,6 +53,63 @@ export async function signUp(_previous: AuthFormState, formData: FormData): Prom
     return { email, notice: "Compte créé. Ouvre le lien reçu par e-mail pour confirmer ton adresse." };
   }
   redirect("/");
+}
+
+const RESET_NOTICE =
+  "Si un compte existe pour cette adresse, un e-mail vient d’être envoyé avec un lien pour choisir un nouveau mot de passe. Pense à regarder dans les spams.";
+
+/**
+ * Sends the password reset e-mail. The answer is the same whether the account exists or not
+ * (and even if Supabase fails: the error is only logged), so the form cannot be used to find out
+ * who has an account. Only a rate limit is reported, since it does not depend on the address.
+ */
+export async function requestPasswordReset(_previous: AuthFormState, formData: FormData): Promise<AuthFormState> {
+  const email = String(formData.get("email") ?? "").trim();
+  const parsed = requestPasswordResetSchema.safeParse({ email });
+  if (!parsed.success) return { email, error: parsed.error.issues[0].message };
+
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return { email, error: "La réinitialisation du mot de passe n’est pas disponible dans la démo." };
+
+  const origin = await requestOrigin();
+  const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
+    redirectTo: `${origin}/auth/confirm?next=/nouveau-mot-de-passe`,
+  });
+  if (error) {
+    if (error.status === 429 || error.code === "over_email_send_rate_limit") {
+      return { email, error: "Trop de demandes, réessaie dans quelques minutes." };
+    }
+    console.error("resetPasswordForEmail failed", error);
+  }
+  return { email, notice: RESET_NOTICE };
+}
+
+export type UpdatePasswordState = AuthFormState & { done?: boolean; expired?: boolean };
+
+/** Sets the new password of the user whose session comes from the reset link. */
+export async function updatePassword(_previous: UpdatePasswordState, formData: FormData): Promise<UpdatePasswordState> {
+  const parsed = updatePasswordSchema.safeParse({
+    password: formData.get("password"),
+    confirmation: formData.get("confirmation"),
+  });
+  if (!parsed.success) return { error: parsed.error.issues[0].message };
+
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return { error: "Le changement de mot de passe n’est pas disponible dans la démo." };
+
+  const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
+  if (error) {
+    if (error.code === "same_password") return { error: "Choisis un mot de passe différent de l’ancien." };
+    if (error.code === "weak_password") {
+      return { error: "Ce mot de passe est trop faible. Choisis-en un plus long ou plus varié." };
+    }
+    if (error.name === "AuthSessionMissingError" || error.status === 401 || error.code === "session_not_found") {
+      return { expired: true, error: "Ce lien a expiré ou a déjà servi." };
+    }
+    console.error("updateUser failed", error);
+    return { error: "Impossible de changer le mot de passe pour le moment. Réessaie dans un instant." };
+  }
+  return { done: true };
 }
 
 export async function signOut(): Promise<void> {

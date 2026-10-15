@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { DEMO_EMAIL, requireLocalSupabase } from "./helpers";
+import { DEMO_EMAIL, expectNoHorizontalOverflow, requireLocalSupabase } from "./helpers";
 
 test.beforeAll(() => {
   requireLocalSupabase();
@@ -15,6 +15,13 @@ test("the install tutorial is reachable without an account", async ({ page }) =>
   await page.goto("/installer");
   await expect(page).toHaveURL(/\/installer$/);
   await expect(page.getByRole("heading", { level: 1 })).toContainText("écran d’accueil");
+});
+
+test("the privacy policy is reachable without an account", async ({ page }) => {
+  await page.goto("/confidentialite");
+  await expect(page).toHaveURL(/\/confidentialite$/);
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Politique de confidentialité");
+  await expectNoHorizontalOverflow(page);
 });
 
 test("a wrong password shows an error", async ({ page }) => {

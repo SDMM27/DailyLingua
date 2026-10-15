@@ -22,7 +22,12 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
       <PageHeader eyebrow="Daily Lingua" title="Une mission de langues chaque matin">
         Connecte-toi pour retrouver tes mots, ta progression et la mission du jour.
       </PageHeader>
-      <AuthForm initialError={lien === "invalide" ? "Ce lien de confirmation n’est plus valide. Connecte-toi ou recrée un compte." : undefined} />
+      <AuthForm
+        initialError={
+          lien === "invalide" ? "Ce lien de confirmation n’est plus valide. Connecte-toi ou recrée un compte." : undefined
+        }
+        initialNotice={lien === "confirme" ? "Adresse confirmée. Connecte-toi." : undefined}
+      />
     </div>
   );
 }

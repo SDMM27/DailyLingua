@@ -23,6 +23,11 @@ import {
   type MissionHistoryEntry,
   type MissionProgress,
 } from "@/lib/schemas/mission";
+import {
+  FEEDBACK_RATE_LIMIT_MESSAGE,
+  FEEDBACK_RATE_LIMIT_SQLSTATE,
+  type FeedbackInput,
+} from "@/lib/schemas/feedback";
 import { preferencesSchema, type Preferences } from "@/lib/schemas/preferences";
 import {
   vocabularyItemSchema,
@@ -522,6 +527,18 @@ export function createSupabaseRepository(
     if (error) throw new Error(`Supabase (suppression du mot) : ${error.message}`);
   }
 
+  async function sendFeedback(input: FeedbackInput): Promise<void> {
+    const { error } = await client.from("feedback").insert({
+      user_id: userId,
+      category: input.category,
+      message: input.message,
+      page: input.page ?? null,
+      app_version: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? null,
+    });
+    if (error?.code === FEEDBACK_RATE_LIMIT_SQLSTATE) throw new UserFacingError(FEEDBACK_RATE_LIMIT_MESSAGE);
+    if (error) throw new Error(`Supabase (retour) : ${error.message}`);
+  }
+
   async function listContents(languages: Language[], perLanguage: number): Promise<ContentListItem[]> {
     const lists = await Promise.all(
       languages.map(async (language) => {
@@ -590,6 +607,7 @@ export function createSupabaseRepository(
     reviewVocabulary,
     setVocabularyStatus,
     deleteVocabulary,
+    sendFeedback,
     listContents,
     listSources,
     // From the catalogue, not the database: a language is offered even before the first ingestion.

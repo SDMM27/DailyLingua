@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRightIcon, HistoryIcon, PhoneIcon } from "@/components/icons";
+import { ArrowRightIcon, HistoryIcon, InfoIcon, PenIcon, PhoneIcon } from "@/components/icons";
 import { PreferencesForm } from "@/components/preferences/preferences-form";
 import { Card, Eyebrow, PageHeader } from "@/components/ui/primitives";
 import { signOut } from "@/app/actions/auth";
@@ -52,6 +52,24 @@ export default async function PreferencesPage() {
         </Card>
       )}
       {email && <DeleteAccount email={email} />}
+      <div className="mt-6 space-y-3">
+      <Link
+        href="/retour?depuis=/preferences"
+        className="flex items-center gap-3 rounded-3xl border border-line bg-surface px-5 py-4 transition-colors hover:bg-surface-sunk"
+      >
+        <PenIcon className="text-ink-soft" />
+        <span className="flex-1 font-semibold">Envoyer un retour</span>
+        <ArrowRightIcon width={16} height={16} className="text-muted" />
+      </Link>
+      <Link
+        href="/confidentialite"
+        className="flex items-center gap-3 rounded-3xl border border-line bg-surface px-5 py-4 transition-colors hover:bg-surface-sunk"
+      >
+        <InfoIcon className="text-ink-soft" />
+        <span className="flex-1 font-semibold">Confidentialité</span>
+        <ArrowRightIcon width={16} height={16} className="text-muted" />
+      </Link>
+      </div>
     </>
   );
 }

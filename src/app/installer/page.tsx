@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { AddSquareIcon, CheckIcon, PhoneIcon, ShareIcon } from "@/components/icons";
 import { Card, Eyebrow, PageHeader } from "@/components/ui/primitives";
@@ -93,6 +94,12 @@ export default function InstallPage() {
           intégrée à une autre app) et que ton iPhone est à jour.
         </p>
       </Card>
+
+      <p className="mt-6 text-center text-[13px] text-muted">
+        <Link href="/confidentialite" className="underline">
+          Politique de confidentialité
+        </Link>
+      </p>
     </>
   );
 }
