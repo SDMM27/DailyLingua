@@ -172,6 +172,7 @@ auth.users 1─1 profiles 1─* user_languages *─1 languages
 4. **Authentification** (Dashboard → Authentication) :
    - *URL Configuration* : `Site URL` = l’URL de production (ex. `https://<projet>.vercel.app`) et, dans `Redirect URLs`, `https://<domaine>/auth/confirm`. Sans cela, le lien de l’e-mail de confirmation pointe vers `localhost`.
    - *Sign In / Providers → Email* : laisser **Confirm email** activé (c’est le défaut hébergé ; seul le local le désactive).
+   - *Emails → Templates → Confirm signup* : remplacer le lien `{{ .ConfirmationURL }}` par `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`. La route `/auth/confirm` attend `token_hash` ; avec le modèle par défaut, le lien arrive avec un `code` et l’utilisateur voit « lien invalide ». Idem pour *Reset password* (`type=recovery`) si la réinitialisation est ajoutée.
    - Fixer une longueur de mot de passe minimale d’au moins 8 (l’app l’exige à l’inscription).
    - Brancher un **SMTP** réel (Authentication → SMTP Settings) : le service d’e-mails par défaut de Supabase est très limité et réservé aux tests.
 5. **Suppression de compte** : elle utilise `SUPABASE_SERVICE_ROLE_KEY` côté serveur. Sans cette variable, le bouton échoue proprement sans rien supprimer.
@@ -266,6 +267,6 @@ Un nouveau commit annule le run en cours sur la même branche. Compter environ 1
 
 1. Variables Vercel (Production) : les trois variables Supabase, `ANTHROPIC_API_KEY`, `CRON_SECRET` ; `CONTENT_LICENSE_POLICY=commercial` avant toute vente.
 2. Migrations : `npx supabase db push --linked` après chaque nouvelle migration, **avant** de fusionner le code qui en dépend.
-3. Supabase Auth : *Site URL* et *Redirect URLs* (`https://<domaine>/auth/confirm`), confirmation d’e-mail activée, mot de passe d’au moins 8 caractères, SMTP réel (voir « Déploiement sur un vrai projet Supabase »).
+3. Supabase Auth : *Site URL* et *Redirect URLs* (`https://<domaine>/auth/confirm`), modèle d’e-mail de confirmation (`token_hash`), confirmation d’e-mail activée, mot de passe d’au moins 8 caractères, SMTP réel (voir « Déploiement sur un vrai projet Supabase »).
 4. Secrets GitHub : `APP_URL`, `CRON_SECRET`.
 5. Après déploiement : le smoke test doit être vert ; vérifier une fois à la main sur iPhone l’inscription (e-mail reçu, lien vers le bon domaine), l’ajout à l’écran d’accueil et la mission du jour.
