@@ -20,7 +20,8 @@
     "db:test": "supabase test db",
     "content:check": "tsx --env-file-if-exists=.env.local scripts/content-check.mts",
     "content:ingest": "tsx --env-file-if-exists=.env.local scripts/content-ingest.mts",
-    "mission:generate": "tsx --env-file-if-exists=.env.local scripts/mission-generate.mts"
+    "mission:generate": "tsx --env-file-if-exists=.env.local scripts/mission-generate.mts",
+    "cron:run": "tsx --env-file-if-exists=.env.local scripts/cron-run.mts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",
