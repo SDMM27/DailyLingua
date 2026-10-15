@@ -55,6 +55,7 @@ function memoryStore(
     prefs?: Preferences | null;
     pools?: Partial<Record<Language, CandidateContent[]>>;
     used?: string[];
+    refused?: string[];
     claim?: { status: "generating" | "ready" | "failed"; claimed: boolean };
     completeError?: Error;
     /** Access level of the source of a content, by content id (default: free). */
@@ -74,6 +75,9 @@ function memoryStore(
     async listUsedContentIds(_userId, since) {
       calls.usedSince.push(since);
       return options.used ?? [];
+    },
+    async listRefusedContentIds() {
+      return options.refused ?? [];
     },
     async claim() {
       return { missionId: "m1", ...(options.claim ?? { status: "generating", claimed: true }) };
@@ -314,6 +318,17 @@ describe("generateMission", () => {
 
     const allUsed = memoryStore({ used: ["it-1", "it-2", "es-1"] });
     expect(await run(allUsed.store, aiGenerator())).toEqual({ status: "no-content" });
+  });
+
+  it("never proposes a content the user declared unreadable", async () => {
+    const { store, calls } = memoryStore({ refused: ["it-1"] });
+    const generator = aiGenerator();
+    await run(store, generator);
+    expect(generator.requests[0].sessions[0].candidates.map((c) => c.id)).toEqual(["it-2"]);
+    expect(calls.completed[0].sessions[0].contentId).toBe("it-2");
+
+    const allRefused = memoryStore({ refused: ["it-1", "it-2", "es-1"] });
+    expect(await run(allRefused.store, aiGenerator())).toEqual({ status: "no-content" });
   });
 
   it("marks the mission failed when saving throws", async () => {

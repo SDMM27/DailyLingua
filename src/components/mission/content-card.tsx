@@ -4,6 +4,7 @@ import { Pill } from "@/components/ui/primitives";
 import { CONTENT_TYPE_LABELS } from "@/lib/domain/labels";
 import type { ContentType } from "@/lib/schemas/common";
 import type { Content } from "@/lib/schemas/mission";
+import { NoAccessButton } from "./no-access-button";
 
 const TYPE_ICONS: Record<ContentType, ComponentType<SVGProps<SVGSVGElement>>> = {
   article: BookIcon,
@@ -12,7 +13,8 @@ const TYPE_ICONS: Record<ContentType, ComponentType<SVGProps<SVGSVGElement>>> = 
   interview: MicIcon,
 };
 
-export function ContentCard({ content }: { content: Content }) {
+/** `sessionId` set: the learner can say they cannot read this content (see NoAccessButton). */
+export function ContentCard({ content, sessionId }: { content: Content; sessionId?: string }) {
   const Icon = TYPE_ICONS[content.type];
   return (
     <article className="rounded-3xl bg-surface-sunk/60 p-5">
@@ -49,6 +51,8 @@ export function ContentCard({ content }: { content: Content }) {
         Ouvrir sur {content.source.name}
         <ExternalIcon width={15} height={15} />
       </a>
+
+      {sessionId && <NoAccessButton sessionId={sessionId} />}
     </article>
   );
 }

@@ -1,6 +1,6 @@
 # Plan : accès aux contenus par utilisateur
 
-Statut : plan, non implémenté. Branche : `dev`.
+Statut : étapes 1 et 2 réalisées, étapes 3 et 4 à faire. Branche : `dev`.
 
 ## Problème
 
@@ -30,11 +30,22 @@ L'utilisateur reçoit une mission dont l'article est payant et qu'il ne peut pas
 
 Tests unitaires : `select-contents.test.ts` (source `metered` exclue sans accès, incluse avec accès), `generate-mission.test.ts` (clé de cache par ensemble d'accès), `availability.test.ts`.
 
-### Étape 2 — Bouton « Je n'ai pas accès » sur la mission
+### Étape 2 — Bouton « Je n'ai pas accès » sur la mission (réalisée)
 
-- `src/components/mission/mission-view.tsx` : bouton qui appelle une action serveur `src/app/actions/mission.ts`.
-- L'action marque le contenu comme refusé pour cet utilisateur (ajouter son id à `excludeIds`, déjà présent dans `rankCandidates`) et régénère une mission avec un autre contenu lisible.
-- Test : `mission-view.test.tsx` (le bouton apparaît, l'action est appelée, la mission change).
+Les missions sont **par utilisateur** (une ligne `missions` par utilisateur et par jour) : le refus d'un contenu ne concerne que lui, et il n'y a pas de clé de cache à faire dépendre de l'accès.
+
+Ce qui a été construit :
+
+- Migration `20261015000600_content_refusals.sql` :
+  - table `content_refusals` (`user_id`, `content_id`, `reason` = `no_access`, `created_at`), clé primaire `(user_id, content_id)` : un refus par contenu et par utilisateur, définitif. RLS : le propriétaire lit et insère, sans modifier ni supprimer. Les lignes servent aussi de signal pour corriger le catalogue ;
+  - colonne `missions.session_replacements` : nombre de remplacements faits sur la mission du jour ;
+  - fonction `replace_mission_session` (service role uniquement) : dans une transaction, verrouille la mission, vérifie qu'elle est `ready` et que la limite n'est pas atteinte, supprime l'ancienne session (progression, réponses, production et correction partent en cascade), insère la nouvelle à la même position et dans la même langue, incrémente le compteur et ajoute la trace de génération sous `generation_meta.replacements`. Erreurs : `P0002` session introuvable ou à un autre utilisateur, `55000` mission non prête, `DL001` limite atteinte.
+- Limite : **3 remplacements par jour** (`MAX_SESSION_REPLACEMENTS_PER_DAY`), appliquée par l'application avant tout appel au modèle, et par la base en dernier recours.
+- `generateMission` exclut aussi les contenus refusés (`MissionStore.listRefusedContentIds`).
+- `replaceMissionSession` (`src/lib/generation/replace-session.ts`) réutilise les briques de `generateMission` (candidats lisibles, requête d'une session, génération avec repli sur le gabarit, planification) pour une seule langue, avec les minutes de l'ancienne session. Résultats : `ready`, `no-content`, `limit`, `not-found`, `failed`.
+- Dépôt : `replaceInaccessibleContent(sessionId)` lit la session avec le client de l'utilisateur (RLS, preuve de propriété), enregistre le refus **même si rien ne peut remplacer le contenu**, puis appelle le remplaçant (service role). Action serveur `reportNoAccess`, qui rafraîchit la page quand le contenu est remplacé.
+- Interface : `NoAccessButton` sous le lien « Ouvrir sur … » de chaque contenu, avec confirmation (la progression de cette langue est effacée) ; masqué en démonstration.
+- Tests : `replace-session.test.ts`, `generate-mission.test.ts`, `no-access-button.test.tsx`, `actions/mission.test.ts`, et le test d'intégration d'écriture (base locale).
 
 ### Étape 3 — Accès déclaré par utilisateur
 
@@ -68,6 +79,6 @@ Pour chaque étape : `npm run check` et `npm run build`, comme demandé dans `CL
 
 ## Questions ouvertes
 
-- Faut-il une mission partagée par ensemble d'accès, ou une mission par utilisateur ? La première est plus économique ; la seconde est plus simple à raisonner.
+- ~~Mission partagée par ensemble d'accès ou par utilisateur ?~~ Sans objet : les missions sont par utilisateur.
 - Les sources `metered` (abonnement possible) doivent-elles être proposées par défaut à l'utilisateur, ou seulement sur demande ?
 - Politique de licence : `CONTENT_LICENSE_POLICY=commercial` doit-il aussi exclure les sources `paywalled` ?

@@ -1,9 +1,11 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { toDateKey } from "@/lib/domain/dates";
+import { addDays, toDateKey } from "@/lib/domain/dates";
+import { createSessionReplacer } from "@/lib/generation/preparer";
+import { createTemplateGenerator } from "@/lib/generation/template-generator";
 import type { PlacementRecord } from "@/lib/schemas/placement";
 import type { Preferences } from "@/lib/schemas/preferences";
-import type { Database } from "@/lib/supabase/database.types";
+import type { Database, Json } from "@/lib/supabase/database.types";
 import { deleteUserAccount } from "@/lib/supabase/delete-account";
 import { UserFacingError } from "./errors";
 import { createSupabaseRepository } from "./supabase-repository";
@@ -71,7 +73,9 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
     const client = createClient<Database>(url!, anonKey!, { auth: { persistSession: false } });
     const signedIn = await client.auth.signInWithPassword({ email, password });
     if (signedIn.error) throw signedIn.error;
-    repo = createSupabaseRepository(client, userId);
+    repo = createSupabaseRepository(client, userId, {
+      replaceSession: createSessionReplacer(admin, { generator: createTemplateGenerator() }),
+    });
   });
 
   afterAll(async () => {
@@ -285,6 +289,96 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
       await repo.saveProduction(seeded.sessionId, "  ");
       expect((await repo.getMissionProgress(mission)).drafts).toEqual({});
       expect(await repo.getStudyDates()).toEqual([today()]);
+    });
+  });
+
+  describe("content refusals and session replacement", () => {
+    // Needs at least two readable (free, active) Russian contents in the seed.
+    async function seedSession(date: string) {
+      const { data: contents, error: contentsError } = await admin
+        .from("contents")
+        .select("id, sources!inner ( access, active )")
+        .eq("language", "ru")
+        .eq("sources.access", "free")
+        .eq("sources.active", true)
+        .limit(1);
+      if (contentsError) throw contentsError;
+      const { data: mission, error } = await admin
+        .from("missions")
+        .insert({ user_id: userId, mission_date: date, budget_minutes: 12, status: "ready", generated_at: new Date().toISOString() })
+        .select("id")
+        .single();
+      if (error) throw error;
+      const { data: session, error: sessionError } = await admin
+        .from("mission_sessions")
+        .insert({
+          mission_id: mission!.id,
+          user_id: userId,
+          position: 0,
+          language: "ru",
+          content_id: contents![0].id,
+          production: { mode: "writing", prompt: "p", hints: [] },
+        })
+        .select("id")
+        .single();
+      if (sessionError) throw sessionError;
+      const inserted = await admin.from("mission_activities").insert([
+        { session_id: session!.id, user_id: userId, position: 0, kind: "reading", title: "Lire", estimated_minutes: 8 },
+        { session_id: session!.id, user_id: userId, position: 1, kind: "writing", title: "Écrire", estimated_minutes: 4 },
+      ]);
+      if (inserted.error) throw inserted.error;
+      return { missionId: mission!.id, sessionId: session!.id, contentId: contents![0].id };
+    }
+
+    it("records the refusal, swaps the session and counts the replacement", async () => {
+      await repo.savePreferences(PREFERENCES);
+      const seeded = await seedSession(addDays(today(), -9));
+
+      expect(await repo.replaceInaccessibleContent(seeded.sessionId)).toEqual({ status: "ready" });
+
+      const { data: refusals } = await admin.from("content_refusals").select("content_id, reason").eq("user_id", userId);
+      expect(refusals).toEqual([{ content_id: seeded.contentId, reason: "no_access" }]);
+
+      const { data: sessions } = await admin
+        .from("mission_sessions")
+        .select("id, position, language, content_id, mission_activities ( id )")
+        .eq("mission_id", seeded.missionId);
+      expect(sessions).toHaveLength(1);
+      expect(sessions![0].id).not.toBe(seeded.sessionId);
+      expect(sessions![0]).toMatchObject({ position: 0, language: "ru" });
+      expect(sessions![0].content_id).not.toBe(seeded.contentId);
+      expect(sessions![0].mission_activities.length).toBeGreaterThan(0);
+
+      const { data: mission } = await admin.from("missions").select("session_replacements, generation_meta").eq("id", seeded.missionId).single();
+      expect(mission!.session_replacements).toBe(1);
+      expect((mission!.generation_meta as { replacements: unknown[] }).replacements).toHaveLength(1);
+
+      // The old session is gone: asking again for it is a message for the user.
+      await expect(repo.replaceInaccessibleContent(seeded.sessionId)).rejects.toBeInstanceOf(UserFacingError);
+    });
+
+    it("refuses the replacement of a session that is not the user's, and past the limit", async () => {
+      const seeded = await seedSession(addDays(today(), -10));
+      const session: Json = {
+        language: "ru",
+        contentId: seeded.contentId,
+        questions: [],
+        expressions: [],
+        production: { mode: "writing", prompt: "p", hints: [] },
+        activities: [{ kind: "reading", title: "Lire", estimatedMinutes: 5 }],
+      };
+      const call = (overrides: { p_user_id?: string; p_max_per_day?: number; p_session?: Json }) =>
+        admin.rpc("replace_mission_session", {
+          p_session_id: seeded.sessionId,
+          p_user_id: userId,
+          p_session: session,
+          p_meta: {},
+          ...overrides,
+        });
+
+      expect((await call({ p_user_id: crypto.randomUUID() })).error?.code).toBe("P0002");
+      expect((await call({ p_max_per_day: 0 })).error?.code).toBe("DL001");
+      expect((await call({ p_session: { ...(session as object), language: "it" } })).error?.code).toBe("23514");
     });
   });
 });

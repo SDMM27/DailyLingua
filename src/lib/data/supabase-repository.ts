@@ -37,6 +37,7 @@ import {
   type VocabularyItem,
 } from "@/lib/schemas/vocabulary";
 import type { GenerateMissionOutcome } from "@/lib/generation/generate-mission";
+import type { ReplaceSessionOutcome } from "@/lib/generation/replace-session";
 import { generationMetaSchema } from "@/lib/schemas/generation";
 import {
   WRITING_FEEDBACK_LIMITS,
@@ -50,7 +51,7 @@ import type {
   WritingFeedbackOutcome,
 } from "@/lib/generation/writing-feedback-service";
 import { UserFacingError } from "./errors";
-import type { DailyLinguaRepository, PrepareMissionResult } from "./repository";
+import type { DailyLinguaRepository, PrepareMissionResult, ReplaceContentResult } from "./repository";
 
 /** How many past missions the history screen loads. */
 const HISTORY_LIMIT = 30;
@@ -180,6 +181,8 @@ export function createSupabaseRepository(
     contentPolicy?: ContentLicensePolicy;
     /** Writes the mission of a day (service role, server only). Absent: preparing is not configured. */
     prepareMission?: (userId: string, date: DateKey) => Promise<GenerateMissionOutcome>;
+    /** Swaps the content of a session for another readable one (service role, server only). Absent: not configured. */
+    replaceSession?: (userId: string, sessionId: string) => Promise<ReplaceSessionOutcome>;
     /** Reviews a written production (service role, server only). Absent: reviews are off. */
     reviewWriting?: ((input: RequestWritingFeedbackInput) => Promise<WritingFeedbackOutcome>) | null;
   } = {},
@@ -271,6 +274,46 @@ export function createSupabaseRepository(
         return { status: outcome.status };
       case "no-preferences":
         throw new UserFacingError("Choisis d’abord tes langues.");
+    }
+  }
+
+  async function replaceInaccessibleContent(sessionId: string): Promise<ReplaceContentResult> {
+    if (!options.replaceSession) {
+      throw new UserFacingError("Le remplacement de contenu n’est pas configuré sur ce serveur.");
+    }
+    // Read through RLS: this proves the session is the user’s before the service role acts on it.
+    const { data: session, error: readError } = await client
+      .from("mission_sessions")
+      .select("content_id, missions!inner ( mission_date )")
+      .eq("id", sessionId)
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (readError) throw new Error(`Supabase (session) : ${readError.message}`);
+    if (!session) throw new UserFacingError("Cette session est introuvable.");
+    // Only today's mission: the daily limit is per mission, so past ones would make it unbounded.
+    if (session.missions.mission_date !== (await getToday())) {
+      throw new UserFacingError("Seul le contenu de la mission du jour peut être remplacé.");
+    }
+    // Recorded first and kept whatever the outcome: the content is not proposed again, and the
+    // rows tell the editor which contents cannot be read.
+    const { error } = await client
+      .from("content_refusals")
+      .upsert(
+        { user_id: userId, content_id: session.content_id, reason: "no_access" },
+        { onConflict: "user_id,content_id", ignoreDuplicates: true },
+      );
+    if (error) throw new Error(`Supabase (contenu refusé) : ${error.message}`);
+
+    const outcome = await options.replaceSession(userId, sessionId);
+    switch (outcome.status) {
+      case "ready":
+      case "no-content":
+      case "limit":
+        return { status: outcome.status };
+      case "not-found":
+        throw new UserFacingError("Cette session est introuvable.");
+      case "failed":
+        throw new UserFacingError("Impossible de remplacer ce contenu pour le moment. Réessaie dans un instant.");
     }
   }
 
@@ -726,6 +769,7 @@ export function createSupabaseRepository(
     getMission,
     getMissionProgress,
     prepareTodayMission,
+    replaceInaccessibleContent,
     setActivityDone,
     answerQuestion,
     saveProduction,

@@ -1,9 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { fetchPreferences } from "@/lib/data/supabase-repository";
 import type { ContentLicensePolicy } from "@/lib/schemas/content";
+import { dateKeySchema, languageSchema } from "@/lib/schemas/common";
 import { candidateContentSchema } from "@/lib/schemas/generation";
 import type { Database, Json } from "@/lib/supabase/database.types";
+import { SessionNotFoundError, SessionReplacementLimitError } from "./errors";
 import type { MissionStore } from "./generate-mission";
+import { MAX_SESSION_REPLACEMENTS_PER_DAY, type SessionReplacementStore } from "./replace-session";
 
 type Client = SupabaseClient<Database>;
 
@@ -15,7 +18,10 @@ function fail(what: string, error: { message: string }): never {
  * Mission store on Supabase. `client` must use the service role key: the claim / complete / fail
  * functions are not callable by signed-in users, and the mission is written on their behalf.
  */
-export function createSupabaseMissionStore(client: Client, options: { policy: ContentLicensePolicy }): MissionStore {
+export function createSupabaseMissionStore(
+  client: Client,
+  options: { policy: ContentLicensePolicy },
+): MissionStore & SessionReplacementStore {
   return {
     getPreferences: (userId) => fetchPreferences(client, userId),
 
@@ -61,6 +67,46 @@ export function createSupabaseMissionStore(client: Client, options: { policy: Co
         .gte("missions.mission_date", since);
       if (error) fail("contenus déjà utilisés", error);
       return [...new Set(data.map((row) => row.content_id))];
+    },
+
+    async listRefusedContentIds(userId) {
+      const { data, error } = await client.from("content_refusals").select("content_id").eq("user_id", userId);
+      if (error) fail("contenus refusés", error);
+      return data.map((row) => row.content_id);
+    },
+
+    async getSessionForReplacement(userId, sessionId) {
+      const { data, error } = await client
+        .from("mission_sessions")
+        .select(
+          "mission_id, position, language, missions!inner ( mission_date, session_replacements ), mission_activities ( estimated_minutes )",
+        )
+        .eq("id", sessionId)
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (error) fail("session à remplacer", error);
+      if (!data) return null;
+      return {
+        missionId: data.mission_id,
+        missionDate: dateKeySchema.parse(data.missions.mission_date),
+        language: languageSchema.parse(data.language),
+        position: data.position,
+        minutes: data.mission_activities.reduce((sum, a) => sum + a.estimated_minutes, 0),
+        replacements: data.missions.session_replacements,
+      };
+    },
+
+    async replaceSession(sessionId, userId, session, meta) {
+      const { error } = await client.rpc("replace_mission_session", {
+        p_session_id: sessionId,
+        p_user_id: userId,
+        p_session: session as unknown as Json,
+        p_meta: meta,
+        p_max_per_day: MAX_SESSION_REPLACEMENTS_PER_DAY,
+      });
+      if (error?.code === "DL001") throw new SessionReplacementLimitError();
+      if (error?.code === "P0002") throw new SessionNotFoundError();
+      if (error) fail("remplacement de la session", error);
     },
 
     async claim(userId, date, budgetMinutes) {

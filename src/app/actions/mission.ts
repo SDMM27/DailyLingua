@@ -2,9 +2,10 @@
 
 import { refresh } from "next/cache";
 import { z } from "zod";
-import type { PrepareMissionResult } from "@/lib/data/repository";
+import type { PrepareMissionResult, ReplaceContentResult } from "@/lib/data/repository";
 import {
   answerQuestionInputSchema,
+  reportNoAccessInputSchema,
   saveExpressionInputSchema,
   saveProductionInputSchema,
   setActivityDoneInputSchema,
@@ -54,4 +55,13 @@ export async function requestWritingFeedback(input: unknown): Promise<ActionResu
   return runAction(requestWritingFeedbackInputSchema, input, (repo, { sessionId, body }) =>
     repo.requestWritingFeedback(sessionId, body),
   );
+}
+
+/** The user cannot read the content of a session: remember it and replace it with another one. */
+export async function reportNoAccess(input: unknown): Promise<ActionResult<ReplaceContentResult>> {
+  const result = await runAction(reportNoAccessInputSchema, input, (repo, { sessionId }) =>
+    repo.replaceInaccessibleContent(sessionId),
+  );
+  if (result.ok && result.data.status === "ready") refresh();
+  return result;
 }
