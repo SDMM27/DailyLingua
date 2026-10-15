@@ -31,6 +31,11 @@ export interface LanguageInfo {
    */
   denseScript?: boolean;
   /**
+   * Stress is not written in everyday text and is not predictable (Russian, Ukrainian): the
+   * dictionary form of generated expressions carries a combining acute accent (see `stress.ts`).
+   */
+  markStress?: boolean;
+  /**
    * Colour of the language in the UI. There are fewer accents than languages: the languages
    * people are most likely to study together get distinct accents.
    */
@@ -38,7 +43,7 @@ export interface LanguageInfo {
 }
 
 export const LANGUAGE_REGISTRY = {
-  ru: { code: "ru", nameFr: "Russe", nativeName: "Русский", greeting: "Доброе утро", dir: "ltr", accent: "indigo" },
+  ru: { code: "ru", nameFr: "Russe", nativeName: "Русский", greeting: "Доброе утро", dir: "ltr", markStress: true, accent: "indigo" },
   it: { code: "it", nameFr: "Italien", nativeName: "Italiano", greeting: "Buongiorno", dir: "ltr", accent: "terracotta" },
   es: { code: "es", nameFr: "Espagnol", nativeName: "Español", greeting: "Buenos días", dir: "ltr", accent: "ochre" },
   de: { code: "de", nameFr: "Allemand", nativeName: "Deutsch", greeting: "Guten Morgen", dir: "ltr", accent: "teal" },
@@ -48,7 +53,7 @@ export const LANGUAGE_REGISTRY = {
   sv: { code: "sv", nameFr: "Suédois", nativeName: "Svenska", greeting: "God morgon", dir: "ltr", accent: "fern" },
   pl: { code: "pl", nameFr: "Polonais", nativeName: "Polski", greeting: "Dzień dobry", dir: "ltr", accent: "berry" },
   cs: { code: "cs", nameFr: "Tchèque", nativeName: "Čeština", greeting: "Dobré ráno", dir: "ltr", accent: "graphite" },
-  uk: { code: "uk", nameFr: "Ukrainien", nativeName: "Українська", greeting: "Доброго ранку", dir: "ltr", accent: "azure" },
+  uk: { code: "uk", nameFr: "Ukrainien", nativeName: "Українська", greeting: "Доброго ранку", dir: "ltr", markStress: true, accent: "azure" },
   ro: { code: "ro", nameFr: "Roumain", nativeName: "Română", greeting: "Bună dimineața", dir: "ltr", accent: "fern" },
   el: { code: "el", nameFr: "Grec", nativeName: "Ελληνικά", greeting: "Καλημέρα", dir: "ltr", accent: "azure" },
   tr: { code: "tr", nameFr: "Turc", nativeName: "Türkçe", greeting: "Günaydın", dir: "ltr", accent: "berry" },

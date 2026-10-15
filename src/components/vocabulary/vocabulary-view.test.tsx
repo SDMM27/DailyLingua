@@ -67,10 +67,10 @@ describe("VocabularyView", () => {
     const user = setup();
     // The flashcard above also shows words, so look inside the word list only.
     const list = () => within(screen.getByRole("list"));
-    expect(list().getByText("впрочем")).toBeTruthy();
+    expect(list().getByText("впро́чем")).toBeTruthy();
 
     await user.click(screen.getByRole("button", { name: "Italien" }));
-    expect(list().queryByText("впрочем")).toBeNull();
+    expect(list().queryByText("впро́чем")).toBeNull();
     expect(list().getByText("darsi da fare")).toBeTruthy();
 
     await user.click(screen.getByRole("button", { name: "Connus" }));

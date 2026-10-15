@@ -130,32 +130,32 @@ declare
       "expressions": [
         {
           "id": "ru-e1",
-          "text": "приспосабливаться к чему-либо",
+          "text": "приспоса́бливаться к чему́-либо",
           "translation": "s'adapter à qqch",
           "example": "Птицы приспосабливаются к городскому шуму быстрее, чем считалось.",
           "note": "Perfectif : приспособиться"
         },
         {
           "id": "ru-e2",
-          "text": "в разы",
+          "text": "в ра́зы",
           "translation": "plusieurs fois (plus / moins)",
           "example": "Ночью уровень шума в разы ниже."
         },
         {
           "id": "ru-e3",
-          "text": "сводиться к чему-либо",
+          "text": "своди́ться к чему́-либо",
           "translation": "se résumer à, se ramener à",
           "example": "Проблема не сводится к одному только шуму."
         },
         {
           "id": "ru-e4",
-          "text": "не в последнюю очередь",
+          "text": "не в после́днюю о́чередь",
           "translation": "notamment, en bonne partie",
           "example": "Это произошло не в последнюю очередь благодаря локдауну."
         },
         {
           "id": "ru-e5",
-          "text": "бить тревогу",
+          "text": "бить трево́гу",
           "translation": "tirer la sonnette d'alarme",
           "example": "Орнитологи бьют тревогу уже не первый год."
         }
@@ -410,16 +410,16 @@ begin
   -- Vocabulary, with a review journal whose last entry matches the current state.
   for v in
     select * from (values
-      ('ru', 'впрочем', 'd''ailleurs, du reste', 'Вводное слово, уточняющее или слегка опровергающее сказанное.', 'Впрочем, это уже совсем другая история.', 'Arzamas', 'https://arzamas.academy', 'learning', 2, -1, 12, 4),
-      ('ru', 'закономерность', 'régularité, loi (tendance)', 'Устойчивая, повторяющаяся связь между явлениями.', 'Исследователи выявили любопытную закономерность.', 'ПостНаука', 'https://postnauka.org', 'learning', 1, 0, 3, 2),
+      ('ru', 'впро́чем', 'd''ailleurs, du reste', 'Вводное слово, уточняющее или слегка опровергающее сказанное.', 'Впрочем, это уже совсем другая история.', 'Arzamas', 'https://arzamas.academy', 'learning', 2, -1, 12, 4),
+      ('ru', 'закономе́рность', 'régularité, loi (tendance)', 'Устойчивая, повторяющаяся связь между явлениями.', 'Исследователи выявили любопытную закономерность.', 'ПостНаука', 'https://postnauka.org', 'learning', 1, 0, 3, 2),
       ('it', 'sbrigarsi', 'se dépêcher', null, 'Sbrigati, il treno parte tra cinque minuti!', 'Rai Radio 3', 'https://www.raiplaysound.it', 'learning', 1, 0, 4, 1),
-      ('ru', 'из ряда вон выходящий', 'hors du commun', null, 'Случай, конечно, из ряда вон выходящий.', null, null, 'learning', 0, 0, 1, 0),
+      ('ru', 'из ря́да вон выходя́щий', 'hors du commun', null, 'Случай, конечно, из ряда вон выходящий.', null, null, 'learning', 0, 0, 1, 0),
       ('it', 'darsi da fare', 'se démener, se donner du mal', null, 'Si è data da fare per organizzare tutto.', 'Il Post', 'https://www.ilpost.it', 'learning', 2, 1, 9, 3),
-      ('ru', 'сплошь и рядом', 'à tout bout de champ, très souvent', null, 'Такие ошибки встречаются сплошь и рядом.', 'Медуза', 'https://meduza.io', 'learning', 3, 3, 20, 5),
+      ('ru', 'сплошь и ря́дом', 'à tout bout de champ, très souvent', null, 'Такие ошибки встречаются сплошь и рядом.', 'Медуза', 'https://meduza.io', 'learning', 3, 3, 20, 5),
       ('it', 'a malapena', 'à peine', null, 'Lo conosco a malapena.', null, null, 'learning', 3, 6, 18, 4),
-      ('ru', 'тем не менее', 'néanmoins', null, 'Тем не менее, проект решили продолжить.', null, null, 'known', 5, 25, 40, 8),
+      ('ru', 'тем не ме́нее', 'néanmoins', null, 'Тем не менее, проект решили продолжить.', null, null, 'known', 5, 25, 40, 8),
       ('it', 'in bocca al lupo', 'bonne chance (« merde »)', null, 'Domani hai l''esame? In bocca al lupo!', null, null, 'known', 6, 50, 60, 9),
-      ('ru', 'по большому счёту', 'au fond, globalement', null, 'По большому счёту, ничего не изменилось.', null, null, 'known', 5, 14, 35, 7)
+      ('ru', 'по большо́му счёту', 'au fond, globalement', null, 'По большому счёту, ничего не изменилось.', null, null, 'known', 5, 14, 35, 7)
     ) as t(language, term, translation, definition, example, source_name, source_url, status, box, due_in, added_ago, review_count)
   loop
     insert into public.vocabulary_items (

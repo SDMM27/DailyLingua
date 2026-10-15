@@ -70,32 +70,32 @@ export function buildMockMission(today: DateKey): Mission {
         expressions: [
           {
             id: "ru-e1",
-            text: "приспосабливаться к чему-либо",
+            text: "приспоса́бливаться к чему́-либо",
             translation: "s'adapter à qqch",
             example: "Птицы приспосабливаются к городскому шуму быстрее, чем считалось.",
             note: "Perfectif : приспособиться",
           },
           {
             id: "ru-e2",
-            text: "в разы",
+            text: "в ра́зы",
             translation: "plusieurs fois (plus / moins)",
             example: "Ночью уровень шума в разы ниже.",
           },
           {
             id: "ru-e3",
-            text: "сводиться к чему-либо",
+            text: "своди́ться к чему́-либо",
             translation: "se résumer à, se ramener à",
             example: "Проблема не сводится к одному только шуму.",
           },
           {
             id: "ru-e4",
-            text: "не в последнюю очередь",
+            text: "не в после́днюю о́чередь",
             translation: "notamment, en bonne partie",
             example: "Это произошло не в последнюю очередь благодаря локдауну.",
           },
           {
             id: "ru-e5",
-            text: "бить тревогу",
+            text: "бить трево́гу",
             translation: "tirer la sonnette d'alarme",
             example: "Орнитологи бьют тревогу уже не первый год.",
           },

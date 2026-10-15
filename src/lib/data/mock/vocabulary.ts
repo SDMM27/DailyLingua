@@ -13,7 +13,7 @@ const SEEDS: Seed[] = [
   {
     id: "v1",
     language: "ru",
-    term: "впрочем",
+    term: "впро́чем",
     translation: "d'ailleurs, du reste",
     definition: "Вводное слово, уточняющее или слегка опровергающее сказанное.",
     example: "Впрочем, это уже совсем другая история.",
@@ -27,7 +27,7 @@ const SEEDS: Seed[] = [
   {
     id: "v2",
     language: "ru",
-    term: "закономерность",
+    term: "закономе́рность",
     translation: "régularité, loi (tendance)",
     definition: "Устойчивая, повторяющаяся связь между явлениями.",
     example: "Исследователи выявили любопытную закономерность.",
@@ -54,7 +54,7 @@ const SEEDS: Seed[] = [
   {
     id: "v4",
     language: "ru",
-    term: "из ряда вон выходящий",
+    term: "из ря́да вон выходя́щий",
     translation: "hors du commun",
     example: "Случай, конечно, из ряда вон выходящий.",
     status: "learning",
@@ -79,7 +79,7 @@ const SEEDS: Seed[] = [
   {
     id: "v6",
     language: "ru",
-    term: "сплошь и рядом",
+    term: "сплошь и ря́дом",
     translation: "à tout bout de champ, très souvent",
     example: "Такие ошибки встречаются сплошь и рядом.",
     source: { name: "Медуза", url: "https://meduza.io" },
@@ -104,7 +104,7 @@ const SEEDS: Seed[] = [
   {
     id: "v8",
     language: "ru",
-    term: "тем не менее",
+    term: "тем не ме́нее",
     translation: "néanmoins",
     example: "Тем не менее, проект решили продолжить.",
     status: "known",
@@ -128,7 +128,7 @@ const SEEDS: Seed[] = [
   {
     id: "v10",
     language: "ru",
-    term: "по большому счёту",
+    term: "по большо́му счёту",
     translation: "au fond, globalement",
     example: "По большому счёту, ничего не изменилось.",
     status: "known",
