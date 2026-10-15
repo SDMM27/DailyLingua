@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22 # supabase-js needs the native WebSocket of Node 22+
           cache: npm
       - run: npm ci
       # Typecheck + lint + unit tests. The integration tests skip themselves without a database
@@ -42,7 +42,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22 # supabase-js needs the native WebSocket of Node 22+
           cache: npm
       - run: npm ci
 
