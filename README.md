@@ -4,7 +4,7 @@ Une mission linguistique quotidienne construite à partir de contenus authentiqu
 
 Pensée d’abord pour le téléphone : web app installable sur l’écran d’accueil (PWA), avec une app native envisagée plus tard pour l’App Store et le Play Store.
 
-> **État actuel : phase 6.** Sans variables Supabase (c’est le cas de la version déployée), l’app est la **démo publique** sur données fictives, rien n’est enregistré. Avec Supabase configuré, il faut un compte : connexion e-mail + mot de passe, écran d’accueil pour choisir ses langues (19 disponibles), puis vocabulaire, révisions espacées, suivi de mission, historique et préférences sont enregistrés par utilisateur (RLS). L’onglet **Lire** liste les dernières parutions de 40 sources authentiques (flux RSS / Atom) dans les langues de l’utilisateur. À la première ouverture du jour, la **mission est préparée** à partir de ces contenus : choix d’un contenu par langue, exercices rédigés par Claude (ou par un modèle de secours sans IA). Deux tâches planifiées (GitHub Actions) relèvent les flux toutes les 6 heures et préparent chaque heure la mission des utilisateurs actifs dont l’heure de génération est passée.
+> **État actuel : phase 7.** La version déployée sur Vercel est branchée sur Supabase (compte obligatoire). Sans variables Supabase (en local par exemple), l’app est la **démo** sur données fictives, rien n’est enregistré. Avec Supabase configuré, il faut un compte : connexion e-mail + mot de passe, écran d’accueil pour choisir ses langues (19 disponibles), puis vocabulaire, révisions espacées, suivi de mission, historique et préférences sont enregistrés par utilisateur (RLS). L’onglet **Lire** liste les dernières parutions de 40 sources authentiques (flux RSS / Atom) dans les langues de l’utilisateur. À la première ouverture du jour, la **mission est préparée** à partir de ces contenus : choix d’un contenu par langue, exercices rédigés par Claude (ou par un modèle de secours sans IA). Deux tâches planifiées (GitHub Actions) relèvent les flux toutes les 6 heures et préparent chaque heure la mission des utilisateurs actifs dont l’heure de génération est passée. Chaque pull request passe une CI (typecheck, lint, tests unitaires, d’intégration, pgTAP et parcours de bout en bout sur iPhone simulé) et chaque déploiement en production est vérifié automatiquement.
 
 ## Démarrer
 
@@ -44,6 +44,8 @@ Si la page ne s’ouvre pas, autoriser Node.js dans le pare-feu Windows (réseau
 | `npm run content:ingest` | Relève les flux et enregistre les nouveaux contenus dans Supabase, puis vérifie les liens (`-- --source <clé>`, `-- --no-links`) |
 | `npm run mission:generate` | Prépare la mission d’un utilisateur (`-- --email <adresse>`, `--date AAAA-MM-JJ`, `--template` sans IA, `--replace` en local seulement) et affiche la trace (modèle, tokens, durée) |
 | `npm run cron:run` | Lance une tâche planifiée en local, sans HTTP (`-- ingest` ou `-- missions`) et affiche son rapport |
+| `npm run e2e` | Tests de bout en bout (Playwright, WebKit en iPhone 13) contre la base locale ; build + serveur sur le port 3100 |
+| `npm run e2e:install` | Installe le navigateur WebKit de Playwright (une fois) |
 
 ## Stack
 
@@ -51,10 +53,11 @@ Si la page ne s’ouvre pas, autoriser Node.js dans le pare-feu Windows (réseau
 - **Tailwind CSS 4** (tokens de design dans `src/app/globals.css`)
 - **Zod 4** : validation aux frontières (données, formulaires)
 - **Vitest** + Testing Library : tests de la logique métier et des composants
+- **Playwright** (WebKit, iPhone 13) : parcours de bout en bout
 - **Supabase** (PostgreSQL, Auth, RLS) : migrations SQL versionnées, CLI en dépendance de dev, stack locale via Docker
 - **fast-xml-parser** (flux RSS / Atom) ; **tsx** pour les scripts de `scripts/`
 - **Claude** (`@anthropic-ai/sdk`, modèle `claude-haiku-5-5`) derrière l’interface `ExerciseGenerator`, avec un générateur de secours déterministe
-- **GitHub Actions** (planification) : appelle deux routes protégées par `CRON_SECRET` (`/api/cron/ingest`, `/api/cron/missions`)
+- **GitHub Actions** (CI, smoke test après déploiement, planification) : appelle deux routes protégées par `CRON_SECRET` (`/api/cron/ingest`, `/api/cron/missions`)
 
 ## Structure
 
@@ -161,7 +164,7 @@ auth.users 1─1 profiles 1─* user_languages *─1 languages
 - **Contenus** : seules des métadonnées, un résumé (≤ 1000 caractères) et un extrait optionnel (≤ 500) sont stockés, jamais le texte intégral. L’URL est dédoublonnée après normalisation (casse, fragment, paramètres `utm_*`, slash final).
 - **Nouvelle table** : les privilèges par défaut sont retirés à `anon` et `authenticated` ; une migration doit donc `grant` explicitement et créer ses politiques RLS.
 
-### Déploiement sur un vrai projet Supabase (plus tard)
+### Déploiement sur un vrai projet Supabase
 
 1. Créer le projet sur supabase.com, puis `npx supabase login` et `npx supabase link --project-ref <ref>`.
 2. `npx supabase db push` applique les migrations. **Ne jamais exécuter `seed.sql` sur un projet réel** (il crée un compte au mot de passe public).
@@ -169,6 +172,7 @@ auth.users 1─1 profiles 1─* user_languages *─1 languages
 4. **Authentification** (Dashboard → Authentication) :
    - *URL Configuration* : `Site URL` = l’URL de production (ex. `https://<projet>.vercel.app`) et, dans `Redirect URLs`, `https://<domaine>/auth/confirm`. Sans cela, le lien de l’e-mail de confirmation pointe vers `localhost`.
    - *Sign In / Providers → Email* : laisser **Confirm email** activé (c’est le défaut hébergé ; seul le local le désactive).
+   - *Emails → Templates → Confirm signup* : remplacer le lien `{{ .ConfirmationURL }}` par `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`. La route `/auth/confirm` attend `token_hash` ; avec le modèle par défaut, le lien arrive avec un `code` et l’utilisateur voit « lien invalide ». Idem pour *Reset password* (`type=recovery`) si la réinitialisation est ajoutée.
    - Fixer une longueur de mot de passe minimale d’au moins 8 (l’app l’exige à l’inscription).
    - Brancher un **SMTP** réel (Authentication → SMTP Settings) : le service d’e-mails par défaut de Supabase est très limité et réservé aux tests.
 5. **Suppression de compte** : elle utilise `SUPABASE_SERVICE_ROLE_KEY` côté serveur. Sans cette variable, le bouton échoue proprement sans rien supprimer.
@@ -224,3 +228,45 @@ npm run cron:run -- ingest
 npm run cron:run -- missions
 curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/missions
 ```
+
+## Tests et déploiement (phase 7)
+
+### Les niveaux de test
+
+| Niveau | Outil | Où | Ce qui est couvert |
+| --- | --- | --- | --- |
+| Unitaires et composants | Vitest + Testing Library | `src/**/*.test.ts(x)` | Logique métier, génération, flux, tâches planifiées, en-têtes, `/api/health`, composants |
+| Intégration | Vitest | `src/**/*.integration.test.ts` | Dépôt Supabase, ingestion, génération, journal des tâches (base locale ; ignorés sans base) |
+| Base de données | pgTAP | `supabase/tests/database` | RLS, contraintes, fonctions SQL |
+| Bout en bout | Playwright (WebKit, iPhone 13) | `e2e/` | Redirection sans compte, connexion, les cinq onglets sans erreur console ni défilement horizontal, inscription → accueil → mission → mot → suppression du compte |
+
+Les tests de bout en bout tournent sur un build de production (`next start`, port 3100), contre la **base locale uniquement** : ils refusent de démarrer si `NEXT_PUBLIC_SUPABASE_URL` ne pointe pas vers `127.0.0.1` ou `localhost`, puisqu’ils créent et suppriment des comptes. La mission est préparée avec le générateur de secours (`MISSION_GENERATOR=template`) : aucun appel payant. Le test d’inscription crée une source et un article jetables (le seed n’a pas de source relevable), puis efface tout, compte compris, même en cas d’échec.
+
+```bash
+npm run db:start && npm run db:reset   # base locale + compte de démo
+npm run e2e:install                    # une fois
+npm run e2e                            # rapport HTML : npx playwright show-report
+```
+
+### Intégration continue (`.github/workflows/ci.yml`)
+
+À chaque pull request et à chaque push sur `main`, deux jobs en parallèle :
+
+- **check** : `npm run check` puis `npm run build` (sans Supabase, donc le build de démo) ;
+- **database** : stack Supabase locale réduite (Postgres, Auth, PostgREST, passerelle), `db reset`, tests pgTAP, tests Vitest avec la base, puis tests Playwright. En cas d’échec, le rapport Playwright est joint au run (7 jours).
+
+Un nouveau commit annule le run en cours sur la même branche. Compter environ 10 minutes d’Actions par run, en plus des ~840 minutes mensuelles des tâches planifiées (2 000 gratuites pour un dépôt privé). Pour rendre la CI obligatoire avant fusion : Settings → Branches → règle sur `main` → « Require status checks » avec les deux jobs.
+
+### Production
+
+- **En-têtes de sécurité** (`src/lib/security/headers.ts`, appliqués par `next.config.ts`) : `nosniff`, `Referrer-Policy`, interdiction d’affichage dans un cadre, `Permissions-Policy`, et une CSP minimale (`frame-ancestors`, `base-uri`, `form-action`, `object-src`). Pas de `script-src` : une politique à nonce imposerait le rendu dynamique de toutes les pages. HSTS est déjà ajouté par Vercel.
+- **`/api/health`** (publique, jamais en cache) : `{ ok, mode, commit, time }`. Avec `Authorization: Bearer <CRON_SECRET>`, elle interroge aussi la base (5 s au plus) et ajoute `database` ; en erreur, elle répond 503. Sans le secret, elle ne touche jamais la base.
+- **Smoke test après déploiement** (`.github/workflows/deploy-smoke.yml`) : l’intégration GitHub de Vercel signale chaque déploiement ; pour la production réussie, le workflow vérifie avec `curl` que le domaine de production (`APP_URL`) sert bien le nouveau commit, que la base répond, que `/connexion` et le manifeste répondent, que `/` sans session redirige vers `/connexion`, que les en-têtes de sécurité sont présents et que `/api/cron/missions` refuse un appel sans secret. Il réutilise les secrets `APP_URL` et `CRON_SECRET` de la phase 6. On peut aussi le lancer à la main (Actions → Smoke test du déploiement → Run workflow).
+
+### Check-list de mise en production
+
+1. Variables Vercel (Production) : les trois variables Supabase, `ANTHROPIC_API_KEY`, `CRON_SECRET` ; `CONTENT_LICENSE_POLICY=commercial` avant toute vente.
+2. Migrations : `npx supabase db push --linked` après chaque nouvelle migration, **avant** de fusionner le code qui en dépend.
+3. Supabase Auth : *Site URL* et *Redirect URLs* (`https://<domaine>/auth/confirm`), modèle d’e-mail de confirmation (`token_hash`), confirmation d’e-mail activée, mot de passe d’au moins 8 caractères, SMTP réel (voir « Déploiement sur un vrai projet Supabase »).
+4. Secrets GitHub : `APP_URL`, `CRON_SECRET`.
+5. Après déploiement : le smoke test doit être vert ; vérifier une fois à la main sur iPhone l’inscription (e-mail reçu, lien vers le bon domaine), l’ajout à l’écran d’accueil et la mission du jour.

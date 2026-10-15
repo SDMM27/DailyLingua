@@ -1,0 +1,105 @@
+# Post-deployment smoke test (phase 7): checks the live production app with curl only.
+# Triggered by the GitHub integration of Vercel (deployment_status) or by hand.
+# No checkout and no npm on purpose: it saves Actions minutes on a private repository.
+#
+# Repository secrets (Settings -> Secrets and variables -> Actions):
+#   APP_URL       production URL (the public domain), without trailing slash. Always used for
+#                 deployment events: the per-deployment URL Vercel reports (environment_url) sits
+#                 behind Vercel's Deployment Protection and would answer 401.
+#   CRON_SECRET   same value as the CRON_SECRET variable of the Vercel project
+name: Smoke test du déploiement
+
+on:
+  deployment_status:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: URL à tester (défaut, le secret APP_URL)
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.deployment_status.state == 'success' &&
+       github.event.deployment_status.environment == 'Production')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Vérifications
+        env:
+          TARGET_URL: ${{ inputs.url || secrets.APP_URL }}
+          EXPECTED_SHA: ${{ github.event.deployment.sha }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          set -euo pipefail
+
+          BASE="${TARGET_URL%/}"
+          if [ -z "$BASE" ] || [ -z "$CRON_SECRET" ]; then
+            echo "::error::URL (entrée url ou secret APP_URL) et secret CRON_SECRET requis."
+            exit 1
+          fi
+          case "$BASE" in https://*|http://localhost*|http://127.0.0.1*) ;; *) echo "::error::URL invalide : $BASE"; exit 1 ;; esac
+
+          CURL=(curl --silent --show-error --fail-with-body --max-time 20 --retry 3 --retry-all-errors)
+          {
+            echo "## Smoke test"
+            echo
+            echo "Cible : \`$BASE\`"
+            echo
+            echo "| Vérification | Résultat |"
+            echo "| --- | --- |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          pass() { echo "OK   $1"; echo "| $1 | OK |" >> "$GITHUB_STEP_SUMMARY"; }
+          fail() {
+            echo "::error::$1"
+            echo "| $1 | ECHEC |" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          }
+
+          # Status code and headers of a request that must not follow redirects.
+          status_of() { curl --silent --output /dev/null --max-time 20 --retry 3 --retry-all-errors --write-out '%{http_code}' "$@"; }
+
+          # 1. Health, with the database check (needs the secret). After a deployment event, the
+          # production domain must serve that very commit (retried: the alias can lag a little).
+          for attempt in 1 2 3 4 5 6; do
+            HEALTH=$("${CURL[@]}" --header "Authorization: Bearer $CRON_SECRET" "$BASE/api/health")               || fail "/api/health injoignable ou en erreur : $HEALTH"
+            COMMIT=$(echo "$HEALTH" | jq -r '.commit // "inconnu"')
+            if [ -z "${EXPECTED_SHA:-}" ] || [ "$COMMIT" = "${EXPECTED_SHA:0:7}" ]; then break; fi
+            [ "$attempt" = 6 ] && fail "/api/health sert le commit $COMMIT au lieu de ${EXPECTED_SHA:0:7}"
+            sleep 10
+          done
+          echo "$HEALTH" | jq -e '.ok == true and .mode == "supabase" and .database == "ok"' > /dev/null             || fail "/api/health inattendu : $HEALTH"
+          pass "/api/health : ok, supabase, base ok (commit $COMMIT)"
+
+          # 2. Public pages
+          "${CURL[@]}" --output /dev/null "$BASE/connexion" || fail "/connexion ne répond pas 200"
+          pass "/connexion : 200"
+          "${CURL[@]}" --output /dev/null "$BASE/manifest.webmanifest" || fail "/manifest.webmanifest ne répond pas 200"
+          pass "/manifest.webmanifest : 200"
+
+          # 3. Signed-out visitor is sent to the sign-in screen
+          HEADERS=$(curl --silent --output /dev/null --dump-header - --max-time 20 --retry 3 --retry-all-errors "$BASE/")
+          CODE=$(echo "$HEADERS" | head -n 1 | awk '{print $2}')
+          LOCATION=$(echo "$HEADERS" | tr -d '\r' | awk 'tolower($1) == "location:" {print $2}')
+          case "$CODE" in 30[1-8]) ;; *) fail "/ sans session : code $CODE au lieu d'une redirection" ;; esac
+          case "$LOCATION" in */connexion|*/connexion\?*) ;; *) fail "/ redirige vers $LOCATION au lieu de /connexion" ;; esac
+          pass "/ sans session : redirection vers /connexion"
+
+          # 4. Security headers
+          echo "$HEADERS" | tr -d '\r' | grep -qi '^x-content-type-options: nosniff$' \
+            || fail "En-tête x-content-type-options: nosniff absent"
+          pass "En-tête x-content-type-options: nosniff présent"
+
+          # 5. Job routes are closed without the secret
+          CODE=$(status_of "$BASE/api/cron/missions")
+          [ "$CODE" = "401" ] || fail "/api/cron/missions sans secret : code $CODE au lieu de 401"
+          pass "/api/cron/missions sans secret : 401"
+
+          echo >> "$GITHUB_STEP_SUMMARY"
+          echo "Commit déployé : \`$COMMIT\`" >> "$GITHUB_STEP_SUMMARY"
