@@ -16,6 +16,7 @@ import {
   type SessionRequest,
   type WireSession,
 } from "@/lib/schemas/generation";
+import { stripStress } from "@/lib/domain/stress";
 import { GenerationError } from "./errors";
 
 export interface ValidatedSession {
@@ -87,8 +88,9 @@ export function validateGeneratedSession(
     const example = e.example.trim();
     const note = e.note_fr.trim();
     if (!usable(text, translation, example) || note.length > L.longText) continue;
-    if (seen.has(text.toLowerCase())) continue;
-    seen.add(text.toLowerCase());
+    const key = stripStress(text).toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
     expressions.push(
       expressionSchema.parse({
         id: `${language}-e${expressions.length + 1}`,

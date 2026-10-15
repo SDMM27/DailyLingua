@@ -1,4 +1,4 @@
-import { languageInfo } from "@/lib/domain/languages";
+import { LANGUAGE_REGISTRY, languageInfo } from "@/lib/domain/languages";
 import { GENERATION_LIMITS, type GenerationRequest, type SessionRequest } from "@/lib/schemas/generation";
 import { productionTargetLength } from "./plan-activities";
 
@@ -10,9 +10,14 @@ import { productionTargetLength } from "./plan-activities";
  * that varies goes in the user message. Feed titles and teasers come from third-party publishers:
  * they are wrapped in <content> tags and the model is told to treat them as data only.
  */
-export const PROMPT_VERSION = "2026-10-15.4";
+export const PROMPT_VERSION = "2026-10-15.5";
 
 const L = GENERATION_LIMITS;
+
+const STRESS_LANGUAGES = Object.values(LANGUAGE_REGISTRY)
+  .filter((info) => "markStress" in info)
+  .map((info) => `${info.code} (${info.nameFr})`)
+  .join(", ");
 
 export const SYSTEM_PROMPT = `You write the daily exercises of Daily Lingua, a language-learning app for French speakers who study foreign languages with authentic content (press articles, podcasts, videos published by real outlets).
 
@@ -35,7 +40,8 @@ For each language, return one session:
 
 3. expressions (${L.expressions.min} to ${L.expressions.max}): useful words or phrases for this content, taken from the title or the teaser when possible, otherwise expressions the learner is likely to meet in it or need to talk about its topic.
    - Choose them for the learner's target level: not words they surely know already.
-   - text: dictionary form (for Russian, give the imperfective/perfective pair or the case it governs in note when useful; mark stress only if you are certain).
+   - text: dictionary form (for Russian, give the imperfective/perfective pair or the case it governs in note when useful).
+   - Stress: ${STRESS_LANGUAGES}. For these languages, write the stress of every word of "text" that has two or more syllables, as a combining acute accent (U+0301) right after the stressed vowel, e.g. "сло́во", "в пе́рвую о́чередь".Do not put a mark on "ё" (always stressed) nor on one-syllable words. For a phrase, mark each word. Mark only the stress you are sure of; a missing mark is better than a wrong one. Leave "example" without marks.
    - translation_fr. example: a natural sentence written by you, not copied from the teaser. note_fr: short usage note in French (register, government, false friend...) or an empty string.
 
 4. production: a writing or speaking task, as requested for that language, linked to the topic of the chosen content and doable without having read it in full.

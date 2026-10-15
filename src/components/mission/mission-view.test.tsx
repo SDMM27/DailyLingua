@@ -72,8 +72,8 @@ describe("MissionView", () => {
   it("saves an expression once, and shows it as already in the words", async () => {
     const user = userEvent.setup();
     render(<MissionView mission={buildMockMission("2026-10-13")} progress={EMPTY_MISSION_PROGRESS} persist={false} />);
-    await user.click(screen.getByRole("button", { name: "Ajouter « в разы » aux mots" }));
-    const saved = screen.getByRole("button", { name: "« в разы » est dans tes mots" });
+    await user.click(screen.getByRole("button", { name: "Ajouter « в ра́зы » aux mots" }));
+    const saved = screen.getByRole("button", { name: "« в ра́зы » est dans tes mots" });
     expect((saved as HTMLButtonElement).disabled).toBe(true);
   });
 
@@ -112,7 +112,7 @@ describe("MissionView", () => {
         selectedIndex: 1,
       });
 
-      await user.click(screen.getByRole("button", { name: "Ajouter « в разы » aux mots" }));
+      await user.click(screen.getByRole("button", { name: "Ajouter « в ра́зы » aux mots" }));
       expect(actions.saveExpression).toHaveBeenCalledWith({ sessionId: "ru-session", expressionId: "ru-e2" });
     });
 
