@@ -5,9 +5,10 @@ import { getSupabaseEnv } from "@/lib/supabase/env";
 
 /**
  * Reachable without an account. Everything else needs a session when Supabase is configured.
- * The scheduled job routes check their own secret (CRON_SECRET) and must not be redirected.
+ * The scheduled job routes check their own secret (CRON_SECRET) and must not be redirected;
+ * /api/health is the public liveness probe (it checks the database only with that same secret).
  */
-const PUBLIC_PATHS = ["/connexion", "/auth/confirm", "/installer", "/api/cron"];
+const PUBLIC_PATHS = ["/connexion", "/auth/confirm", "/installer", "/api/cron", "/api/health"];
 
 function isPublic(pathname: string): boolean {
   return PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
