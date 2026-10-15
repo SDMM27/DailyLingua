@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRightIcon, HistoryIcon, InfoIcon, PenIcon, PhoneIcon } from "@/components/icons";
+import { ArrowRightIcon, CheckIcon, HistoryIcon, InfoIcon, PenIcon, PhoneIcon } from "@/components/icons";
 import { PreferencesForm } from "@/components/preferences/preferences-form";
 import { Card, Eyebrow, PageHeader } from "@/components/ui/primitives";
 import { signOut } from "@/app/actions/auth";
@@ -24,6 +24,14 @@ export default async function PreferencesPage() {
       >
         <HistoryIcon className="text-ink-soft" />
         <span className="flex-1 font-semibold">Historique des missions</span>
+        <ArrowRightIcon width={16} height={16} className="text-muted" />
+      </Link>
+      <Link
+        href="/niveau"
+        className="mb-6 flex items-center gap-3 rounded-3xl border border-line bg-surface px-5 py-4 transition-colors hover:bg-surface-sunk"
+      >
+        <CheckIcon className="text-ink-soft" />
+        <span className="flex-1 font-semibold">Test de niveau</span>
         <ArrowRightIcon width={16} height={16} className="text-muted" />
       </Link>
       <Link

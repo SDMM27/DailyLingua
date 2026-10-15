@@ -28,6 +28,7 @@ import {
   FEEDBACK_RATE_LIMIT_SQLSTATE,
   type FeedbackInput,
 } from "@/lib/schemas/feedback";
+import { placementSummarySchema, type PlacementRecord, type PlacementSummary } from "@/lib/schemas/placement";
 import { preferencesSchema, type Preferences } from "@/lib/schemas/preferences";
 import {
   vocabularyItemSchema,
@@ -103,6 +104,8 @@ function toSourceInfo(
 }
 
 const UNIQUE_VIOLATION = "23505";
+/** Raised by record_placement_test when the language is not one of the user's. */
+const NO_DATA_FOUND = "P0002";
 
 function toVocabularyItem(row: VocabularyRow): VocabularyItem {
   return vocabularyItemSchema.parse({
@@ -618,6 +621,54 @@ export function createSupabaseRepository(
     if (error) throw new Error(`Supabase (retour) : ${error.message}`);
   }
 
+  async function listPlacementTests(): Promise<PlacementSummary[]> {
+    // Newest first: the first row met for a language is its latest test.
+    const rows = unwrap(
+      await client
+        .from("placement_tests")
+        .select("language, status, variant, estimated_level, confidence, chosen_level, taken_at")
+        .eq("user_id", userId)
+        .order("taken_at", { ascending: false }),
+      "tests de niveau",
+    );
+    const studied = unwrap(await client.from("user_languages").select("language").eq("user_id", userId), "langues");
+    const languages = new Set(studied.map((l) => l.language));
+    const latest = new Map<string, (typeof rows)[number]>();
+    for (const row of rows) if (languages.has(row.language) && !latest.has(row.language)) latest.set(row.language, row);
+    return [...latest.values()].map((row) =>
+      placementSummarySchema.parse({
+        status: row.status,
+        language: row.language,
+        variant: row.variant ?? undefined,
+        estimatedLevel: row.estimated_level ?? undefined,
+        confidence: row.confidence ?? undefined,
+        chosenLevel: row.chosen_level ?? undefined,
+        takenAt: row.taken_at,
+      }),
+    );
+  }
+
+  async function recordPlacementTest(record: PlacementRecord): Promise<void> {
+    const { error } = await client.rpc(
+      "record_placement_test",
+      record.status === "completed"
+        ? {
+            p_language: record.language,
+            p_status: record.status,
+            p_variant: record.variant,
+            p_start_level: record.startLevel,
+            p_estimated_level: record.estimatedLevel,
+            p_confidence: record.confidence,
+            p_chosen_level: record.chosenLevel,
+            p_answers: record.answers,
+            p_bank_version: record.bankVersion,
+          }
+        : { p_language: record.language, p_status: record.status },
+    );
+    if (error?.code === NO_DATA_FOUND) throw new UserFacingError("Cette langue ne fait pas partie de tes langues.");
+    if (error) throw new Error(`Supabase (test de niveau) : ${error.message}`);
+  }
+
   async function listContents(languages: Language[], perLanguage: number): Promise<ContentListItem[]> {
     const lists = await Promise.all(
       languages.map(async (language) => {
@@ -688,6 +739,8 @@ export function createSupabaseRepository(
     reviewVocabulary,
     setVocabularyStatus,
     deleteVocabulary,
+    listPlacementTests,
+    recordPlacementTest,
     sendFeedback,
     listContents,
     listSources,

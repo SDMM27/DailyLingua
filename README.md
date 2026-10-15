@@ -44,6 +44,7 @@ Si la page ne s’ouvre pas, autoriser Node.js dans le pare-feu Windows (réseau
 | `npm run content:ingest` | Relève les flux et enregistre les nouveaux contenus dans Supabase, puis vérifie les liens (`-- --source <clé>`, `-- --no-links`) |
 | `npm run mission:generate` | Prépare la mission d’un utilisateur (`-- --email <adresse>`, `--date AAAA-MM-JJ`, `--template` sans IA, `--replace` en local seulement) et affiche la trace (modèle, tokens, durée) |
 | `npm run cron:run` | Lance une tâche planifiée en local, sans HTTP (`-- ingest` ou `-- missions`) et affiche son rapport |
+| `npm run placement:check` | Vérifie les banques de questions du test de niveau (`-- <code>` pour une seule langue) : structure, consignes d’écriture contrôlables automatiquement |
 | `npm run e2e` | Tests de bout en bout (Playwright, WebKit en iPhone 13) contre la base locale ; build + serveur sur le port 3100 |
 | `npm run e2e:install` | Installe le navigateur WebKit de Playwright (une fois) |
 
@@ -276,3 +277,12 @@ Un nouveau commit annule le run en cours sur la même branche. Compter environ 1
 - **Mot de passe oublié** : `/connexion` → `/mot-de-passe-oublie` (même message que le compte existe ou non, pour ne pas révéler les adresses inscrites) → e-mail → `/auth/confirm` → `/nouveau-mot-de-passe`. Le paramètre `next` des liens n’accepte que des chemins internes (`src/lib/security/safe-next-path.ts`). En local, les mails arrivent dans Mailpit (http://127.0.0.1:54324).
 - **Confidentialité** : `/confidentialite`, publique, décrit ce que l’app stocke et ce qui est envoyé au modèle (jamais l’e-mail, les productions écrites ni le vocabulaire). À relire et à mettre à jour à chaque nouvelle donnée collectée ou nouveau sous-traitant. `CONTACT_EMAIL` (facultatif, lu au build) y affiche une adresse de contact.
 - **Retours** : `/retour` (lien depuis Préférences et la page d’erreur). Table `feedback` en écriture seule pour l’utilisateur (lecture dans Supabase Studio), 20 retours par 24 h au plus, effacés avec le compte. **Pousser la migration en production (`npx supabase db push --linked`) avant de fusionner.**
+
+## Test de niveau
+
+Un test adaptatif par langue (`/niveau`, lien depuis Préférences, dernière étape de l’accueil et carte du tableau de bord tant qu’une langue n’a pas été évaluée), à choix multiple, tiré de banques de questions rédigées à la main : `src/lib/placement/banks/<code>.ts`, 18 questions par variante, deux variantes selon l’usage (**Courant** et **Pro**, proposée d’après l’usage de la langue). Règles d’écriture : `src/lib/placement/banks/AUTHORING.md`.
+
+- **Algorithme** (`src/lib/domain/placement.ts`) : le test part du niveau déclaré, pose 2 questions par niveau (une troisième si elles se partagent), monte tant que le niveau est réussi et descend tant qu’il est raté, et s’arrête à la première frontière réussi / raté. Résultat : un niveau CECR et une confiance (élevée, moyenne, faible selon le nombre de niveaux de la frontière qu’il a fallu départager). « Je ne sais pas » compte comme faux.
+- **Enregistrement** : le client n’envoie que ses réponses ; le serveur les rejoue sur la banque et calcule lui-même l’estimation (`src/app/actions/placement.ts`). L’apprenant peut modifier le niveau avant d’enregistrer ; le niveau retenu devient son niveau actuel pour cette langue (RPC `record_placement_test`, atomique). Le test peut être passé : seule la date est enregistrée. L’estimation n’est qu’une aide à l’auto-évaluation, la table `placement_tests` ne la protège pas davantage.
+- **Banques** : `npm run placement:check` (ou `-- ru it`) vérifie leur structure ; un test unitaire exige une banque valide pour chaque langue du registre. Changer une question : mettre à jour `version` de la banque.
+

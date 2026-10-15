@@ -19,12 +19,14 @@ export default async function DashboardPage() {
   const repo = await getRepository();
   const preferences = await requirePreferences();
   const today = await getToday();
-  const [mission, history, studyDates, vocabulary] = await Promise.all([
+  const [mission, history, studyDates, vocabulary, placements] = await Promise.all([
     repo.getMission(today),
     repo.getHistory(),
     repo.getStudyDates(),
     repo.listVocabulary(),
+    repo.listPlacementTests(),
   ]);
+  const unassessed = !repo.isDemo && preferences.goals.some((g) => !placements.some((p) => p.language === g.language));
   const progress = mission ? await repo.getMissionProgress(mission) : null;
 
   const weekStart = addDays(today, -6);
@@ -78,6 +80,20 @@ export default async function DashboardPage() {
             </Link>
           )}
         </Card>
+      )}
+
+      {unassessed && (
+        <Link
+          href="/niveau"
+          className="flex items-center gap-3 rounded-3xl border border-line bg-surface px-5 py-4 transition-colors hover:bg-surface-sunk"
+        >
+          <span className="min-w-0 flex-1">
+            <Eyebrow>Niveau</Eyebrow>
+            <span className="mt-1 block font-semibold">Évalue ton niveau</span>
+            <span className="text-xs text-muted">Un test court par langue, pour des missions mieux ajustées.</span>
+          </span>
+          <ArrowRightIcon width={16} height={16} className="text-muted" />
+        </Link>
       )}
 
       <WeekCard days={recentDays(studyDates, today)} stats={stats} />

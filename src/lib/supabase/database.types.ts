@@ -195,6 +195,32 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"placement_tests": {
+                  Row: {
+                    "answers": Json | null,"bank_version": string | null,"chosen_level": string | null,"confidence": string | null,"estimated_level": string | null,"id": string,"language": string,"start_level": string | null,"status": string,"taken_at": string,"user_id": string,"variant": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "answers"?: Json | null,"bank_version"?: string | null,"chosen_level"?: string | null,"confidence"?: string | null,"estimated_level"?: string | null,"id"?: string,"language": string,"start_level"?: string | null,"status": string,"taken_at"?: string,"user_id": string,"variant"?: string | null
+                  }
+                  Update: {
+                    "answers"?: Json | null,"bank_version"?: string | null,"chosen_level"?: string | null,"confidence"?: string | null,"estimated_level"?: string | null,"id"?: string,"language"?: string,"start_level"?: string | null,"status"?: string,"taken_at"?: string,"user_id"?: string,"variant"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "placement_tests_language_fkey"
+      columns: ["language"]
+isOneToOne: false
+      referencedRelation: "languages"
+      referencedColumns: ["code"]
+    },{
+      foreignKeyName: "placement_tests_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"production_entries": {
                   Row: {
                     "body": string,"created_at": string,"session_id": string,"updated_at": string,"user_id": string
@@ -408,6 +434,9 @@ isOneToOne: false
                            },
 "normalize_url":
 { Args: { "url": string }; Returns: string
+                           },
+"record_placement_test":
+{ Args: { "p_answers"?: Json,"p_bank_version"?: string,"p_chosen_level"?: string,"p_confidence"?: string,"p_estimated_level"?: string,"p_language": string,"p_start_level"?: string,"p_status": string,"p_variant"?: string }; Returns: undefined
                            },
 "record_vocabulary_review":
 { Args: { "p_box_after": number,"p_due_on_after": string,"p_expected_review_count": number,"p_grade": string,"p_item_id": string,"p_reviewed_on": string }; Returns: boolean

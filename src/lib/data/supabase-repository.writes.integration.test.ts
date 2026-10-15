@@ -1,6 +1,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { toDateKey } from "@/lib/domain/dates";
+import type { PlacementRecord } from "@/lib/schemas/placement";
 import type { Preferences } from "@/lib/schemas/preferences";
 import type { Database } from "@/lib/supabase/database.types";
 import { deleteUserAccount } from "@/lib/supabase/delete-account";
@@ -149,6 +150,51 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
       const { count } = await admin.from("feedback").select("*", { count: "exact", head: true }).eq("user_id", userId);
       for (let i = count ?? 0; i < 20; i++) await repo.sendFeedback({ category: "idee", message: `Idée ${i}` });
       await expect(repo.sendFeedback({ category: "idee", message: "De trop" })).rejects.toBeInstanceOf(UserFacingError);
+    });
+  });
+
+  describe("placement tests", () => {
+    const completed: Extract<PlacementRecord, { status: "completed" }> = {
+      status: "completed",
+      language: "ru",
+      variant: "everyday",
+      startLevel: "B2",
+      estimatedLevel: "B1",
+      confidence: "medium",
+      chosenLevel: "C1",
+      answers: [{ itemId: "ru-e-b2-1", choice: null, correct: false }],
+      bankVersion: "2026-10-15",
+    };
+
+    it("lists nothing before the first test", async () => {
+      expect(await repo.listPlacementTests()).toEqual([]);
+    });
+
+    it("stores a completed test, sets the level to the chosen one and lists the latest per language", async () => {
+      await repo.recordPlacementTest({ ...completed, chosenLevel: "B1" });
+      await repo.recordPlacementTest(completed);
+      await repo.recordPlacementTest({ status: "skipped", language: "it" });
+
+      const goals = (await repo.getPreferences())!.goals;
+      expect(goals.find((g) => g.language === "ru")!.level).toBe("C1");
+      expect(goals.find((g) => g.language === "it")!.level).toBe("B1");
+
+      const tests = await repo.listPlacementTests();
+      expect(tests).toHaveLength(2);
+      expect(tests.find((t) => t.language === "ru")).toMatchObject({
+        status: "completed",
+        variant: "everyday",
+        estimatedLevel: "B1",
+        confidence: "medium",
+        chosenLevel: "C1",
+      });
+      expect(tests.find((t) => t.language === "it")).toMatchObject({ status: "skipped" });
+    });
+
+    it("refuses a language the user does not study with a message for the user", async () => {
+      await expect(repo.recordPlacementTest({ status: "skipped", language: "ko" })).rejects.toBeInstanceOf(
+        UserFacingError,
+      );
     });
   });
 
