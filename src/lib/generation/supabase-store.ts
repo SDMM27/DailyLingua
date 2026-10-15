@@ -19,7 +19,7 @@ export function createSupabaseMissionStore(client: Client, options: { policy: Co
   return {
     getPreferences: (userId) => fetchPreferences(client, userId),
 
-    async listCandidates(language, { contentTypes, limit }) {
+    async listCandidates(language, { contentTypes, access, limit }) {
       let query = client
         .from("contents")
         .select(
@@ -30,6 +30,7 @@ export function createSupabaseMissionStore(client: Client, options: { policy: Co
         .neq("url_status", "broken")
         // Same filters as the content list: active feed sources only, licence policy applied.
         .eq("sources.active", true)
+        .in("sources.access", [...access])
         .not("sources.key", "is", null);
       if (options.policy === "commercial") query = query.eq("sources.commercial_use", true);
       if (contentTypes && contentTypes.length > 0) query = query.in("content_type", contentTypes);

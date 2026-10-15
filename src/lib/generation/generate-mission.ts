@@ -1,6 +1,8 @@
 import { addDays } from "@/lib/domain/dates";
 import { splitBudget } from "@/lib/domain/time-budget";
+import { DEFAULT_READABLE_ACCESS } from "@/lib/content/policy";
 import type { ContentType, DateKey, Language } from "@/lib/schemas/common";
+import type { SourceAccess } from "@/lib/schemas/content";
 import {
   GENERATION_LIMITS,
   generationMetaSchema,
@@ -35,8 +37,8 @@ const MAX_REASON_LENGTH = 300;
 /** Storage used by the orchestrator; implemented on Supabase by the app, in memory by the tests. */
 export interface MissionStore {
   getPreferences(userId: string): Promise<Preferences | null>;
-  /** Recent usable contents of a language (licence policy, active sources, not broken), newest first. `contentTypes` undefined = any type. */
-  listCandidates(language: Language, options: { contentTypes?: ContentType[]; limit: number }): Promise<CandidateContent[]>;
+  /** Recent usable contents of a language (licence policy, active sources, not broken), newest first. `contentTypes` undefined = any type; `access` = the source access levels the user can read. */
+  listCandidates(language: Language, options: { contentTypes?: ContentType[]; access: readonly SourceAccess[]; limit: number }): Promise<CandidateContent[]>;
   /** Contents already used in this user's missions since `since` (inclusive). */
   listUsedContentIds(userId: string, since: DateKey): Promise<string[]>;
   claim(
@@ -71,6 +73,8 @@ export interface GenerateMissionInput {
   generator: ExerciseGenerator;
   /** Used when the generator fails or returns something unusable. Default: the template. */
   fallback?: ExerciseGenerator;
+  /** Source access levels the user can read. Default: free sources only. */
+  readableAccess?: readonly SourceAccess[];
   now?: () => Date;
   log?: (message: string) => void;
 }
@@ -91,6 +95,7 @@ export async function generateMission(input: GenerateMissionInput): Promise<Gene
   const fallback = input.fallback ?? createTemplateGenerator();
   const now = input.now ?? (() => new Date());
   const log = input.log ?? (() => {});
+  const access = input.readableAccess ?? DEFAULT_READABLE_ACCESS;
 
   const preferences = await store.getPreferences(userId);
   if (!preferences) return { status: "no-preferences" };
@@ -122,9 +127,10 @@ export async function generateMission(input: GenerateMissionInput): Promise<Gene
       // Preferred content types first; any type when none is left (all used, or none published).
       let pool = await store.listCandidates(goal.language, {
         contentTypes: preferences.contentTypes,
+        access,
         limit: CANDIDATE_POOL,
       });
-      if (!usable(pool)) pool = await store.listCandidates(goal.language, { limit: CANDIDATE_POOL });
+      if (!usable(pool)) pool = await store.listCandidates(goal.language, { access, limit: CANDIDATE_POOL });
       if (usable(pool)) pools.set(goal.language, pool);
     }
 
