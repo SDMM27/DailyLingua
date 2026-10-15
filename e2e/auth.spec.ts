@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { DEMO_EMAIL, expectNoHorizontalOverflow, requireLocalSupabase } from "./helpers";
+import { DEMO_EMAIL, appAlert, expectNoHorizontalOverflow, requireLocalSupabase } from "./helpers";
 
 test.beforeAll(() => {
   requireLocalSupabase();
@@ -29,6 +29,6 @@ test("a wrong password shows an error", async ({ page }) => {
   await page.getByLabel("Adresse e-mail").fill(DEMO_EMAIL);
   await page.getByLabel("Mot de passe").fill("not-the-password");
   await page.getByRole("button", { name: "Se connecter" }).click();
-  await expect(page.getByRole("alert")).toBeVisible();
+  await expect(appAlert(page)).toBeVisible();
   await expect(page).toHaveURL(/\/connexion$/);
 });

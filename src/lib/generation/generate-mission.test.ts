@@ -16,8 +16,8 @@ const NOW = new Date("2026-10-13T12:00:00Z");
 
 const preferences: Preferences = {
   goals: [
-    { language: "it", level: "B1", targetLevel: "B2", focus: "", weight: 1 },
-    { language: "es", level: "A2", targetLevel: "B1", focus: "oral", weight: 1 },
+    { language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 1 },
+    { language: "es", level: "A2", targetLevel: "B1", focus: "oral", purpose: "conversational", weight: 1 },
   ],
   dailyMinutes: 20,
   topics: ["société"],
@@ -146,6 +146,16 @@ describe("generateMission", () => {
     expect(generator.requests[0].sessions.map((s) => s.productionMode)).not.toContain(undefined);
     expect(calls.failed).toEqual([]);
     expect(calls.usedSince).toEqual(["2026-09-13"]);
+  });
+
+  it("passes each goal's purpose to the generator", async () => {
+    const { store } = memoryStore();
+    const generator = aiGenerator();
+    await run(store, generator);
+    expect(generator.requests[0].sessions.map((s) => [s.language, s.purpose])).toEqual([
+      ["it", "general"],
+      ["es", "conversational"],
+    ]);
   });
 
   it("tells the model the production time and sizes the task from the final plan", async () => {

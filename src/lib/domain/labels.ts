@@ -1,6 +1,6 @@
 import type { ContentType } from "@/lib/schemas/common";
 import type { ActivityKind } from "@/lib/schemas/mission";
-import type { DifficultyMode } from "@/lib/schemas/preferences";
+import type { DifficultyMode, LanguagePurpose } from "@/lib/schemas/preferences";
 
 export const CONTENT_TYPE_LABELS: Record<ContentType, string> = {
   article: "Article",
@@ -23,4 +23,12 @@ export const DIFFICULTY_LABELS: Record<DifficultyMode, { title: string; hint: st
   comfortable: { title: "Confort", hint: "Un cran sous ton niveau, pour lire vite" },
   matched: { title: "Adaptée", hint: "À ton niveau actuel" },
   challenge: { title: "Défi", hint: "Un cran au-dessus, pour progresser" },
+};
+
+export const LANGUAGE_PURPOSE_LABELS: Record<LanguagePurpose, { title: string; hint: string }> = {
+  general: { title: "Général", hint: "Un peu de tout" },
+  conversational: { title: "Conversation", hint: "Parler au quotidien, registre familier" },
+  professional: { title: "Professionnel", hint: "Réunions, e-mails, registre soutenu" },
+  travel: { title: "Voyage", hint: "Situations pratiques sur place" },
+  exam: { title: "Examen", hint: "Préparer une certification" },
 };

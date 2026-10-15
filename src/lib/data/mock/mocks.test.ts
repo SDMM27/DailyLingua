@@ -63,7 +63,7 @@ describe("preferences accept any number of distinct languages", () => {
   it("accepts three languages", () => {
     const goals = [
       ...MOCK_PREFERENCES.goals,
-      { language: "es" as const, level: "A2" as const, targetLevel: "B1" as const, focus: "", weight: 1 },
+      { language: "es" as const, level: "A2" as const, targetLevel: "B1" as const, focus: "", purpose: "general", weight: 1 },
     ];
     expect(preferencesSchema.safeParse({ ...MOCK_PREFERENCES, goals }).success).toBe(true);
   });

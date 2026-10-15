@@ -8,6 +8,7 @@ export const MOCK_PREFERENCES: Preferences = {
       level: "B2",
       targetLevel: "C1",
       focus: "Compréhension fine, registre soutenu, connecteurs écrits",
+      purpose: "general",
       weight: 2,
     },
     {
@@ -15,6 +16,7 @@ export const MOCK_PREFERENCES: Preferences = {
       level: "B1",
       targetLevel: "B2",
       focus: "Vocabulaire actif, expression orale, spontanéité",
+      purpose: "conversational",
       weight: 1,
     },
   ],

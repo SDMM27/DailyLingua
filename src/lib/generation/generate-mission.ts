@@ -164,6 +164,7 @@ export async function generateMission(input: GenerateMissionInput): Promise<Gene
           level: goal.level,
           targetLevel: goal.targetLevel,
           focus: goal.focus,
+          purpose: goal.purpose,
           minutes,
           productionMode,
           productionMinutes: estimate.at(-1)!.estimatedMinutes,

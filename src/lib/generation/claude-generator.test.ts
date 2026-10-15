@@ -17,6 +17,7 @@ const request: GenerationRequest = {
       level: "B1",
       targetLevel: "B2",
       focus: "",
+      purpose: "general",
       minutes: 20,
       productionMode: "writing",
       productionMinutes: 6,

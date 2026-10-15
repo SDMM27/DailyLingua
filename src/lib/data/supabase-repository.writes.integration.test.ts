@@ -40,8 +40,8 @@ const TIME_ZONE = "Pacific/Kiritimati";
 
 const PREFERENCES: Preferences = {
   goals: [
-    { language: "ru", level: "B2", targetLevel: "C1", focus: "", weight: 2 },
-    { language: "it", level: "B1", targetLevel: "B2", focus: "", weight: 1 },
+    { language: "ru", level: "B2", targetLevel: "C1", focus: "", purpose: "general", weight: 2 },
+    { language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 1 },
   ],
   dailyMinutes: 30,
   topics: ["société"],
@@ -81,6 +81,15 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
     expect(await repo.getPreferences()).toBeNull();
     await repo.savePreferences(PREFERENCES);
     expect(await repo.getPreferences()).toEqual(PREFERENCES);
+  });
+
+  it("round-trips the purpose of each language", async () => {
+    const goals = [
+      { ...PREFERENCES.goals[0], purpose: "professional" as const },
+      { ...PREFERENCES.goals[1], purpose: "exam" as const },
+    ];
+    await repo.savePreferences({ ...PREFERENCES, goals });
+    expect((await repo.getPreferences())!.goals.map((g) => g.purpose)).toEqual(["professional", "exam"]);
   });
 
   it("computes today in the user's time zone", async () => {
