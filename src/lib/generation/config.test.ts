@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_MISSION_MODEL, readGenerationConfig } from "./config";
+import { DEFAULT_MISSION_MODEL, readGenerationConfig, readWritingFeedbackConfig } from "./config";
 
 describe("readGenerationConfig", () => {
   it("uses the template without a key", () => {
@@ -33,5 +33,29 @@ describe("readGenerationConfig", () => {
     expect(
       readGenerationConfig({ ANTHROPIC_API_KEY: "sk-test", MISSION_MODEL: "claude-test-1" }),
     ).toMatchObject({ provider: "claude", model: "claude-test-1" });
+  });
+});
+
+describe("readWritingFeedbackConfig", () => {
+  it("is off without a key", () => {
+    expect(readWritingFeedbackConfig({})).toEqual({ enabled: false });
+  });
+
+  it("is on with a key, with the mission model by default", () => {
+    expect(readWritingFeedbackConfig({ ANTHROPIC_API_KEY: "sk-test" })).toEqual({
+      enabled: true,
+      apiKey: "sk-test",
+      model: DEFAULT_MISSION_MODEL,
+    });
+    expect(
+      readWritingFeedbackConfig({ ANTHROPIC_API_KEY: "sk-test", WRITING_FEEDBACK_MODEL: "claude-sonnet-5-5" }),
+    ).toMatchObject({ model: "claude-sonnet-5-5" });
+  });
+
+  it("can be switched off, and refuses an unknown value", () => {
+    expect(readWritingFeedbackConfig({ ANTHROPIC_API_KEY: "sk-test", WRITING_FEEDBACK: "off" })).toEqual({
+      enabled: false,
+    });
+    expect(() => readWritingFeedbackConfig({ WRITING_FEEDBACK: "maybe" })).toThrow(/WRITING_FEEDBACK invalide/);
   });
 });

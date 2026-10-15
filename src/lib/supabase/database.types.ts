@@ -347,6 +347,26 @@ isOneToOne: false
       referencedColumns: ["id","user_id"]
     }
                   ]
+                },"writing_feedback": {
+                  Row: {
+                    "attempts": number,"body": string | null,"created_at": string,"feedback": Json | null,"input_tokens": number | null,"model": string | null,"output_tokens": number | null,"prompt_version": string | null,"reviewed_at": string | null,"session_id": string,"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "attempts"?: number,"body"?: string | null,"created_at"?: string,"feedback"?: Json | null,"input_tokens"?: number | null,"model"?: string | null,"output_tokens"?: number | null,"prompt_version"?: string | null,"reviewed_at"?: string | null,"session_id": string,"updated_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "attempts"?: number,"body"?: string | null,"created_at"?: string,"feedback"?: Json | null,"input_tokens"?: number | null,"model"?: string | null,"output_tokens"?: number | null,"prompt_version"?: string | null,"reviewed_at"?: string | null,"session_id"?: string,"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "writing_feedback_session_id_user_id_fkey"
+      columns: ["session_id","user_id"]
+isOneToOne: false
+      referencedRelation: "mission_sessions"
+      referencedColumns: ["id","user_id"]
+    }
+                  ]
                 }
           }
           Views: {
@@ -371,6 +391,9 @@ isOneToOne: false
 { Args: { "p_budget_minutes": number,"p_max_attempts"?: number,"p_mission_date": string,"p_stale_after"?: string,"p_user_id": string }; Returns: {
               "claimed": boolean,"mission_id": string,"status": string
             }[]
+                           },
+"claim_writing_feedback_attempt":
+{ Args: { "p_session_id": string,"p_user_id": string }; Returns: number
                            },
 "complete_mission_generation":
 { Args: { "p_meta": Json,"p_mission_id": string,"p_sessions": Json }; Returns: undefined

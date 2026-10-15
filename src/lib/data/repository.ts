@@ -5,7 +5,7 @@ import { z } from "zod";
 import { availableLanguages } from "@/lib/content/availability";
 import { SOURCE_CATALOG } from "@/lib/content/catalog";
 import { readContentLicensePolicy } from "@/lib/content/policy";
-import { prepareMission } from "@/lib/generation/server";
+import { prepareMission, writingFeedbackReviewer } from "@/lib/generation/server";
 import { toDateKey } from "@/lib/domain/dates";
 import { dateKeySchema, type DateKey, type Language } from "@/lib/schemas/common";
 import {
@@ -39,6 +39,7 @@ import { buildMockMission } from "./mock/mission";
 import { MOCK_PREFERENCES } from "./mock/preferences";
 import { buildMockVocabulary } from "./mock/vocabulary";
 import { createSupabaseRepository } from "./supabase-repository";
+import type { WritingFeedbackResult } from "@/lib/schemas/writing-feedback";
 
 /** Outcome of asking for today's mission; internal reasons never leave the server. */
 export interface PrepareMissionResult {
@@ -76,6 +77,13 @@ export interface DailyLinguaRepository {
   answerQuestion(sessionId: string, questionId: string, selectedIndex: number): Promise<void>;
   /** Saves the text written for the production task of a session (empty text removes it). */
   saveProduction(sessionId: string, body: string): Promise<void>;
+  /** Whether written productions can be reviewed by the language model here. */
+  readonly canReviewWriting: boolean;
+  /**
+   * Saves the text, ticks the writing step, then asks the language model for a review. A failed
+   * or slow review comes back as `unavailable`: the step stays done.
+   */
+  requestWritingFeedback(sessionId: string, body: string): Promise<WritingFeedbackResult>;
   /** Adds an expression of the mission to the vocabulary. Idempotent. */
   saveExpression(sessionId: string, expressionId: string): Promise<void>;
 
@@ -133,6 +141,8 @@ function createMockRepository(): DailyLinguaRepository {
     setActivityDone: readOnly,
     answerQuestion: readOnly,
     saveProduction: readOnly,
+    canReviewWriting: false,
+    requestWritingFeedback: readOnly,
     saveExpression: readOnly,
     async getHistory() {
       return z.array(missionHistoryEntrySchema).parse(buildMockHistory(today()));
@@ -177,7 +187,10 @@ export const getRepository = cache(async (): Promise<DailyLinguaRepository> => {
   // getUser() validates the token with Supabase Auth; it resolves to null without a session.
   const { data } = await supabase.auth.getUser();
   if (!data.user) redirect("/connexion");
-  return createSupabaseRepository(supabase, data.user.id, { prepareMission });
+  return createSupabaseRepository(supabase, data.user.id, {
+    prepareMission,
+    reviewWriting: writingFeedbackReviewer(),
+  });
 });
 
 /** The preferences, or a redirect to the first-run screen while the user has no language yet. */

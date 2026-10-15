@@ -37,6 +37,17 @@ import {
 } from "@/lib/schemas/vocabulary";
 import type { GenerateMissionOutcome } from "@/lib/generation/generate-mission";
 import { generationMetaSchema } from "@/lib/schemas/generation";
+import {
+  WRITING_FEEDBACK_LIMITS,
+  writingFeedbackSchema,
+  type WritingFeedback,
+  type WritingFeedbackResult,
+  type WritingReviewState,
+} from "@/lib/schemas/writing-feedback";
+import type {
+  RequestWritingFeedbackInput,
+  WritingFeedbackOutcome,
+} from "@/lib/generation/writing-feedback-service";
 import { UserFacingError } from "./errors";
 import type { DailyLinguaRepository, PrepareMissionResult } from "./repository";
 
@@ -44,6 +55,13 @@ import type { DailyLinguaRepository, PrepareMissionResult } from "./repository";
 const HISTORY_LIMIT = 30;
 
 type Client = SupabaseClient<Database>;
+
+/** A stored review, or undefined when there is none or it no longer matches the contract. */
+function storedFeedback(value: unknown): WritingFeedback | undefined {
+  if (value === null || value === undefined) return undefined;
+  const parsed = writingFeedbackSchema.safeParse(value);
+  return parsed.success ? parsed.data : undefined;
+}
 type VocabularyRow = Database["public"]["Tables"]["vocabulary_items"]["Row"];
 type SourceRow = Database["public"]["Tables"]["sources"]["Row"];
 
@@ -159,6 +177,8 @@ export function createSupabaseRepository(
     contentPolicy?: ContentLicensePolicy;
     /** Writes the mission of a day (service role, server only). Absent: preparing is not configured. */
     prepareMission?: (userId: string, date: DateKey) => Promise<GenerateMissionOutcome>;
+    /** Reviews a written production (service role, server only). Absent: reviews are off. */
+    reviewWriting?: ((input: RequestWritingFeedbackInput) => Promise<WritingFeedbackOutcome>) | null;
   } = {},
 ): DailyLinguaRepository {
   const contentPolicy = options.contentPolicy ?? readContentLicensePolicy();
@@ -275,7 +295,8 @@ export function createSupabaseRepository(
           `mission_id, position, language, question_count,
            contents ( title, content_type, url, sources ( name ) ),
            quiz_answers ( is_correct ),
-           production_entries ( body )`,
+           production_entries ( body ),
+           writing_feedback ( feedback )`,
         )
         .eq("user_id", userId)
         .in(
@@ -302,6 +323,7 @@ export function createSupabaseRepository(
             url: s.contents?.url,
             type: s.contents?.content_type,
             writing: s.production_entries[0]?.body || undefined,
+            feedback: storedFeedback(s.writing_feedback[0]?.feedback),
             score:
               (s.question_count ?? 0) > 0 && s.quiz_answers.length > 0
                 ? { correct: s.quiz_answers.filter((a) => a.is_correct).length, total: s.question_count }
@@ -367,7 +389,7 @@ export function createSupabaseRepository(
     const sessionIds = mission.sessions.map((s) => s.id);
     const terms = mission.sessions.flatMap((s) => s.expressions.map((e) => e.text));
 
-    const [done, answers, words, entries] = await Promise.all([
+    const [done, answers, words, entries, reviews] = await Promise.all([
       client
         .from("activity_progress")
         .select("activity_id")
@@ -381,6 +403,11 @@ export function createSupabaseRepository(
         .in("session_id", sessionIds),
       client.from("vocabulary_items").select("language, term").eq("user_id", userId).in("term", terms),
       client.from("production_entries").select("session_id, body").eq("user_id", userId).in("session_id", sessionIds),
+      client
+        .from("writing_feedback")
+        .select("session_id, attempts, body, feedback")
+        .eq("user_id", userId)
+        .in("session_id", sessionIds),
     ]);
 
     const answersBySession: Record<string, Record<string, number>> = {};
@@ -394,6 +421,19 @@ export function createSupabaseRepository(
       completedActivityIds: unwrap(done, "progression").map((p) => p.activity_id),
       answers: answersBySession,
       drafts: Object.fromEntries(unwrap(entries, "textes écrits").map((e) => [e.session_id, e.body])),
+      writingReviews: Object.fromEntries(
+        unwrap(reviews, "corrections").map((r): [string, WritingReviewState] => {
+          const feedback = storedFeedback(r.feedback) ?? null;
+          return [
+            r.session_id,
+            {
+              feedback,
+              reviewedText: feedback ? r.body : null,
+              attemptsLeft: Math.max(0, WRITING_FEEDBACK_LIMITS.attemptsPerSession - r.attempts),
+            },
+          ];
+        }),
+      ),
       savedExpressionIds: mission.sessions.flatMap((s) =>
         s.expressions.filter((e) => known.has(wordKey(s.language, e.text))).map((e) => e.id),
       ),
@@ -426,6 +466,43 @@ export function createSupabaseRepository(
       ? await client.from("production_entries").upsert({ session_id: sessionId, user_id: userId, body }, { onConflict: "session_id" })
       : await client.from("production_entries").delete().eq("session_id", sessionId).eq("user_id", userId);
     if (error) throw new Error(`Supabase (production écrite) : ${error.message}`);
+  }
+
+  /**
+   * Finishes the written production and asks for its review. The text is saved and the writing
+   * step ticked first, so that a failed or slow review never leaves the task undone.
+   */
+  async function requestWritingFeedback(sessionId: string, body: string): Promise<WritingFeedbackResult> {
+    await saveProduction(sessionId, body);
+    const activities = unwrap(
+      await client
+        .from("mission_activities")
+        .select("id")
+        .eq("session_id", sessionId)
+        .eq("user_id", userId)
+        .eq("kind", "writing"),
+      "étape d’écriture",
+    );
+    await Promise.all(activities.map((a) => setActivityDone(a.id, true)));
+
+    if (!options.reviewWriting) return { status: "unavailable", attemptsLeft: 0 };
+    let outcome: WritingFeedbackOutcome;
+    try {
+      outcome = await options.reviewWriting({ userId, sessionId, body, today: await getToday() });
+    } catch (error) {
+      console.error(error);
+      return { status: "unavailable", attemptsLeft: 0 };
+    }
+    switch (outcome.status) {
+      case "not-found":
+        throw new UserFacingError("Cette session est introuvable.");
+      case "not-writing":
+        throw new UserFacingError("Seule la production écrite peut être corrigée.");
+      case "expired":
+        throw new UserFacingError("La correction n’est possible que le jour de la mission.");
+      default:
+        return outcome;
+    }
   }
 
   /** Review state and "added" day of a new word, all derived from the user's today. */
@@ -601,6 +678,8 @@ export function createSupabaseRepository(
     setActivityDone,
     answerQuestion,
     saveProduction,
+    canReviewWriting: Boolean(options.reviewWriting),
+    requestWritingFeedback,
     saveExpression,
     getHistory,
     getStudyDates,

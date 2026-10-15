@@ -22,6 +22,7 @@
     "content:ingest": "tsx --env-file-if-exists=.env.local scripts/content-ingest.mts",
     "mission:generate": "tsx --env-file-if-exists=.env.local scripts/mission-generate.mts",
     "cron:run": "tsx --env-file-if-exists=.env.local scripts/cron-run.mts",
+    "feedback:eval": "tsx --env-file-if-exists=.env.local scripts/writing-feedback-eval.mts",
     "e2e": "playwright test",
     "e2e:install": "playwright install webkit"
   },

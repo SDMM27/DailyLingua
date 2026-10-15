@@ -73,8 +73,8 @@ Rules:
 - Keep every text concise: prompts and examples under ${L.shortText} characters, explanations under ${L.longText}.
 - Use the language codes of the request unchanged and return exactly one session per requested language.`;
 
-function escapeData(text: string): string {
-  // Feed text cannot close our tags or open new ones.
+/** Neutralises angle brackets so third-party or learner text cannot close our tags or open new ones. */
+export function escapeData(text: string): string {
   return text.replace(/</g, "‹").replace(/>/g, "›");
 }
 

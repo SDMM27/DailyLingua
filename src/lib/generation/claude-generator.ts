@@ -34,7 +34,7 @@ export interface ClaudeGeneratorOptions {
  * Maps an SDK error to a GenerationError carrying only its status and type: the raw error holds
  * request headers (API key included) and must never reach logs or the database.
  */
-function toGenerationError(error: unknown): GenerationError {
+export function toGenerationError(error: unknown): GenerationError {
   if (error instanceof GenerationError) return error;
   if (error instanceof Anthropic.APIConnectionTimeoutError) return new GenerationError("timeout", "Claude : délai dépassé");
   if (error instanceof Anthropic.APIConnectionError) return new GenerationError("network", "Claude : erreur réseau");

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { cefrLevelSchema, contentTypeSchema, dateKeySchema, languageSchema } from "./common";
+import { WRITING_FEEDBACK_LIMITS, writingFeedbackSchema, writingReviewStateSchema } from "./writing-feedback";
 
 export const contentSourceSchema = z.object({
   name: z.string().min(1),
@@ -115,6 +116,8 @@ export const missionHistoryEntrySchema = z.object({
       type: contentTypeSchema,
       /** What the user wrote for the written production, if anything. */
       writing: z.string().optional(),
+      /** Review of that text by the language model, if one was made (absent on older entries). */
+      feedback: writingFeedbackSchema.optional(),
       /** Correct answers / total questions, null if the quiz was skipped. */
       score: z
         .object({ correct: z.number().int().nonnegative(), total: z.number().int().positive() })
@@ -132,6 +135,8 @@ export const missionProgressSchema = z.object({
   savedExpressionIds: z.array(z.string()),
   /** Text written for the production task, by session id. */
   drafts: z.record(z.string(), z.string()),
+  /** Reviews of the written production, by session id (only sessions with an attempt). */
+  writingReviews: z.record(z.string(), writingReviewStateSchema),
 });
 export type MissionProgress = z.infer<typeof missionProgressSchema>;
 
@@ -140,6 +145,7 @@ export const EMPTY_MISSION_PROGRESS: MissionProgress = {
   answers: {},
   savedExpressionIds: [],
   drafts: {},
+  writingReviews: {},
 };
 
 /** Inputs of the mission server actions (validated again on the server). */
@@ -149,10 +155,11 @@ export const answerQuestionInputSchema = z.object({
   questionId: z.string().min(1),
   selectedIndex: z.number().int().nonnegative(),
 });
-export const MAX_PRODUCTION_LENGTH = 10_000;
+/** Input limit of the textarea: what can be sent for review (the database allows more). */
+export const MAX_PRODUCTION_LENGTH = WRITING_FEEDBACK_LIMITS.maxChars;
 export const saveProductionInputSchema = z.object({
   sessionId: z.string().min(1),
-  body: z.string().max(MAX_PRODUCTION_LENGTH, "Le texte est trop long"),
+  body: z.string().max(MAX_PRODUCTION_LENGTH, `Le texte est trop long (${MAX_PRODUCTION_LENGTH} caractères maximum).`),
 });
 export const saveExpressionInputSchema = z.object({
   sessionId: z.string().min(1),

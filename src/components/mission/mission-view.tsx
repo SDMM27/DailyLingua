@@ -1,13 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { answerQuestion, saveExpression, saveProduction, setActivityDone } from "@/app/actions/mission";
+import {
+  answerQuestion,
+  requestWritingFeedback,
+  saveExpression,
+  saveProduction,
+  setActivityDone,
+} from "@/app/actions/mission";
 import { CheckIcon } from "@/components/icons";
 import { languageStyle } from "@/components/ui/language-style";
 import { Card, Eyebrow, LanguageTag, ProgressBar } from "@/components/ui/primitives";
 import { ACTIVITY_LABELS } from "@/lib/domain/labels";
 import { completedMinutes, missionMinutes, sessionMinutes } from "@/lib/domain/time-budget";
 import type { LanguageSession, Mission, MissionProgress } from "@/lib/schemas/mission";
+import type { WritingFeedbackResult, WritingReviewState } from "@/lib/schemas/writing-feedback";
 import { ContentCard } from "./content-card";
 import { ExpressionList } from "./expression-list";
 import { ProductionTask } from "./production-task";
@@ -31,10 +38,12 @@ export function MissionView({
   mission,
   progress,
   persist,
+  canReviewWriting = false,
 }: {
   mission: Mission;
   progress: MissionProgress;
   persist: boolean;
+  canReviewWriting?: boolean;
 }) {
   const [done, setDone] = useState<ReadonlySet<string>>(() => new Set(progress.completedActivityIds));
   const [answers, setAnswers] = useState<Answers>(progress.answers);
@@ -78,6 +87,19 @@ export function MissionView({
     if (result.ok) setError(null);
     else setError(`Ton texte n’a pas été enregistré : ${result.error}`);
     return result.ok;
+  }
+
+  /** Asks for the review; the server ticks the writing step whatever the outcome, so do the same here. */
+  async function handleRequestFeedback(session: LanguageSession, body: string): Promise<WritingFeedbackResult | null> {
+    const result = await requestWritingFeedback({ sessionId: session.id, body });
+    if (!result.ok) {
+      setError(`La correction n’a pas pu être demandée : ${result.error}`);
+      return null;
+    }
+    setError(null);
+    const writingIds = session.activities.filter((a) => a.kind === "writing").map((a) => a.id);
+    setDone((d) => new Set([...d, ...writingIds]));
+    return result.data;
   }
 
   function handleSaveExpression(sessionId: string, expressionId: string) {
@@ -129,6 +151,10 @@ export function MissionView({
             onSaveExpression={(expressionId) => handleSaveExpression(session.id, expressionId)}
             draft={progress.drafts[session.id] ?? ""}
             onSaveProduction={persist ? (body) => handleSaveProduction(session.id, body) : undefined}
+            onRequestFeedback={
+              persist && canReviewWriting ? (body) => handleRequestFeedback(session, body) : undefined
+            }
+            review={progress.writingReviews[session.id]}
           />
         ))}
 
@@ -155,6 +181,8 @@ function SessionSection({
   onSaveExpression,
   draft,
   onSaveProduction,
+  onRequestFeedback,
+  review,
 }: {
   session: LanguageSession;
   done: ReadonlySet<string>;
@@ -165,6 +193,8 @@ function SessionSection({
   onSaveExpression: (expressionId: string) => void;
   draft: string;
   onSaveProduction?: (body: string) => Promise<boolean>;
+  onRequestFeedback?: (body: string) => Promise<WritingFeedbackResult | null>;
+  review?: WritingReviewState;
 }) {
   const { language } = session;
   const style = languageStyle(language);
@@ -240,6 +270,8 @@ function SessionSection({
           task={session.production}
           initialText={draft}
           onSave={onSaveProduction}
+          onRequestFeedback={onRequestFeedback}
+          initialReview={review}
         />
       </Card>
     </section>

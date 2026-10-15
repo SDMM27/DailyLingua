@@ -65,7 +65,12 @@ export default async function MissionPage() {
           </span>
         )}
       </PageHeader>
-      <MissionView mission={mission} progress={await repo.getMissionProgress(mission)} persist={!repo.isDemo} />
+      <MissionView
+        mission={mission}
+        progress={await repo.getMissionProgress(mission)}
+        persist={!repo.isDemo}
+        canReviewWriting={repo.canReviewWriting}
+      />
     </>
   );
 }

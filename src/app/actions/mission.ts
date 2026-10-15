@@ -9,6 +9,10 @@ import {
   saveProductionInputSchema,
   setActivityDoneInputSchema,
 } from "@/lib/schemas/mission";
+import {
+  requestWritingFeedbackInputSchema,
+  type WritingFeedbackResult,
+} from "@/lib/schemas/writing-feedback";
 import type { ActionResult } from "./result";
 import { runAction } from "./shared";
 
@@ -43,4 +47,11 @@ export async function prepareTodayMission(input: unknown): Promise<ActionResult<
   // router.refresh() right after the action was not reliably applied).
   if (result.ok && result.data.status === "ready") refresh();
   return result;
+}
+
+/** Finishes the written production of a session and asks for its review (see the repository). */
+export async function requestWritingFeedback(input: unknown): Promise<ActionResult<WritingFeedbackResult>> {
+  return runAction(requestWritingFeedbackInputSchema, input, (repo, { sessionId, body }) =>
+    repo.requestWritingFeedback(sessionId, body),
+  );
 }
