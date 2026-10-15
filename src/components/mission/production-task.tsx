@@ -114,8 +114,8 @@ export function ProductionTask({
         </div>
       ) : (
         <p className="mt-4 rounded-2xl border border-dashed border-line px-4 py-3 text-[13px] leading-relaxed text-muted">
-          Enregistre-toi avec le dictaphone de ton téléphone pour l’instant. L’enregistrement et le retour
-          automatique dans l’app arriveront avec l’intégration IA.
+          Enregistre-toi avec le dictaphone de ton téléphone pour l’instant : l’enregistrement dans l’app
+          arrivera plus tard.
         </p>
       )}
     </div>

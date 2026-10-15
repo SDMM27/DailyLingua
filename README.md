@@ -4,7 +4,7 @@ Une mission linguistique quotidienne construite à partir de contenus authentiqu
 
 Pensée d’abord pour le téléphone : web app installable sur l’écran d’accueil (PWA), avec une app native envisagée plus tard pour l’App Store et le Play Store.
 
-> **État actuel : phase 4.** Sans variables Supabase (c’est le cas de la version déployée), l’app est la **démo publique** sur données fictives, rien n’est enregistré. Avec Supabase configuré, il faut un compte : connexion e-mail + mot de passe, écran d’accueil pour choisir ses langues (19 disponibles), puis vocabulaire, révisions espacées, suivi de mission, historique et préférences sont enregistrés par utilisateur (RLS). L’onglet **Lire** liste les dernières parutions de 40 sources authentiques (flux RSS / Atom) dans les langues de l’utilisateur.
+> **État actuel : phase 5.** Sans variables Supabase (c’est le cas de la version déployée), l’app est la **démo publique** sur données fictives, rien n’est enregistré. Avec Supabase configuré, il faut un compte : connexion e-mail + mot de passe, écran d’accueil pour choisir ses langues (19 disponibles), puis vocabulaire, révisions espacées, suivi de mission, historique et préférences sont enregistrés par utilisateur (RLS). L’onglet **Lire** liste les dernières parutions de 40 sources authentiques (flux RSS / Atom) dans les langues de l’utilisateur. À la première ouverture du jour, la **mission est préparée** à partir de ces contenus : choix d’un contenu par langue, exercices rédigés par Claude (ou par un modèle de secours sans IA).
 
 ## Démarrer
 
@@ -42,6 +42,7 @@ Si la page ne s’ouvre pas, autoriser Node.js dans le pare-feu Windows (réseau
 | `npm run db:types` | Régénère `src/lib/supabase/database.types.ts` depuis la base locale |
 | `npm run content:check` | Vérifie le catalogue de sources sans toucher la base : flux, items, liens, pages de conditions et de licence (`-- --source <clé> --verbose`) |
 | `npm run content:ingest` | Relève les flux et enregistre les nouveaux contenus dans Supabase, puis vérifie les liens (`-- --source <clé>`, `-- --no-links`) |
+| `npm run mission:generate` | Prépare la mission d’un utilisateur (`-- --email <adresse>`, `--date AAAA-MM-JJ`, `--template` sans IA, `--replace` en local seulement) et affiche la trace (modèle, tokens, durée) |
 
 ## Stack
 
@@ -51,7 +52,8 @@ Si la page ne s’ouvre pas, autoriser Node.js dans le pare-feu Windows (réseau
 - **Vitest** + Testing Library : tests de la logique métier et des composants
 - **Supabase** (PostgreSQL, Auth, RLS) : migrations SQL versionnées, CLI en dépendance de dev, stack locale via Docker
 - **fast-xml-parser** (flux RSS / Atom) ; **tsx** pour les scripts de `scripts/`
-- À venir : un fournisseur de LLM derrière une interface, une tâche planifiée quotidienne
+- **Claude** (`@anthropic-ai/sdk`, modèle `claude-haiku-5-5`) derrière l’interface `ExerciseGenerator`, avec un générateur de secours déterministe
+- À venir : une tâche planifiée quotidienne (phase 6)
 
 ## Structure
 
@@ -170,3 +172,22 @@ auth.users 1─1 profiles 1─* user_languages *─1 languages
 6. Vérifier de bout en bout : inscription → e-mail → lien → écran d’accueil → ajout d’un mot → suppression du compte.
 
 > La suppression efface le compte et toutes ses données personnelles (cascade SQL, testée). Le contenu partagé (`sources`, `contents`) reste.
+
+## Mission du jour générée (phase 5)
+
+**Principe : l’app décide, le modèle rédige.** Le code choisit les contenus candidats, les minutes, les activités et les identifiants ; le modèle ne fait que choisir un candidat par langue et écrire les exercices. Tout ce qu’il renvoie est revalidé (Zod) avant d’être enregistré.
+
+1. **Réservation** : `claim_mission_generation` crée la ligne (utilisateur, jour) en état `generating`. Une deuxième demande (autre onglet, future tâche planifiée) attend au lieu de payer une seconde génération ; une tentative ratée ou abandonnée est reprise, **3 fois au plus par jour**, ce qui plafonne aussi la dépense par utilisateur.
+2. **Candidats** (`src/lib/generation/select-contents.ts`) : contenus récents des sources actives autorisées par la politique de licence, liens non cassés, non utilisés depuis 30 jours ; classés par écart au niveau visé (confort / adapté / défi), type préféré, durée et fraîcheur. Cinq candidats par langue. Une langue sans contenu est sautée et son temps redonné aux autres.
+3. **Rédaction** (`claude-generator.ts`, prompt dans `prompt.ts`, versionné) : sorties structurées validées par un schéma. Le modèle ne voit que **le titre et l’accroche** (jamais le texte intégral) : les questions portent sur eux seuls, les expressions et la production sont liées au sujet. Les textes des flux sont des données de tiers : ils sont balisés et le modèle a pour consigne de ne jamais suivre d’instruction qui s’y trouverait.
+4. **Repli** : si Claude échoue (clé absente, refus, réponse invalide, délai), le **générateur de secours** (`template-generator.ts`) produit une mission honnête sans quiz ni expressions (une consigne de production en français). La page l’indique.
+5. **Écriture** : `complete_mission_generation` enregistre sessions et activités en une transaction ; la trace (`missions.generation_meta` : source, modèle, version du prompt, tokens, durée, raison du repli) permet de suivre le coût.
+
+Côté écran, `/mission` affiche « Préparation de ta mission… » et appelle l’action serveur `prepareTodayMission` ; le jour est toujours calculé sur le serveur, dans le fuseau de l’utilisateur. Ces fonctions SQL ne sont exécutables que par le rôle service : le serveur de l’app a donc besoin de `SUPABASE_SERVICE_ROLE_KEY`.
+
+**Configuration** (`.env.local`, jamais côté navigateur) : `ANTHROPIC_API_KEY` (sans clé, le générateur de secours est utilisé), `MISSION_GENERATOR=claude|template`, `MISSION_MODEL` (défaut `claude-haiku-5-5`). Coût estimé avec Claude Haiku 5.5 : environ 0,002 $ par mission, soit quelques centimes par utilisateur et par mois.
+
+```bash
+npm run mission:generate -- --email demo@dailylingua.test --date 2026-10-14             # Claude si une clé est configurée
+npm run mission:generate -- --email demo@dailylingua.test --date 2026-10-14 --template  # sans IA
+```

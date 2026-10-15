@@ -30,8 +30,10 @@ import {
   type ReviewInput,
   type VocabularyItem,
 } from "@/lib/schemas/vocabulary";
+import type { GenerateMissionOutcome } from "@/lib/generation/generate-mission";
+import { generationMetaSchema } from "@/lib/schemas/generation";
 import { UserFacingError } from "./errors";
-import type { DailyLinguaRepository } from "./repository";
+import type { DailyLinguaRepository, PrepareMissionResult } from "./repository";
 
 /** How many past missions the history screen loads. */
 const HISTORY_LIMIT = 30;
@@ -106,6 +108,38 @@ function unwrap<T>(result: { data: T; error: { message: string } | null }, what:
   return result.data;
 }
 
+/** The user's preferences, or null while they have no language yet. Shared with the generation store. */
+export async function fetchPreferences(client: Client, userId: string): Promise<Preferences | null> {
+  const [profile, goals] = await Promise.all([
+    client.from("profiles").select("*").eq("id", userId).single(),
+    client
+      .from("user_languages")
+      .select("*")
+      .eq("user_id", userId)
+      .order("weight", { ascending: false })
+      .order("language"),
+  ]);
+  const p = unwrap(profile, "profil");
+  const g = unwrap(goals, "langues");
+  // A new account has a profile (created by a trigger) but no language until the first-run screen.
+  if (g.length === 0) return null;
+  return preferencesSchema.parse({
+    goals: g.map((row) => ({
+      language: row.language,
+      level: row.level,
+      targetLevel: row.target_level,
+      focus: row.focus,
+      weight: row.weight,
+    })),
+    dailyMinutes: p.daily_minutes,
+    topics: p.topics,
+    contentTypes: p.content_types,
+    difficulty: p.difficulty,
+    generationTime: p.generation_time.slice(0, 5), // "HH:mm:ss" -> "HH:mm"
+    timeZone: p.time_zone,
+  });
+}
+
 /**
  * Repository backed by Supabase. `client` must act as `userId` (anon key + user
  * session), so Row Level Security applies on top of the explicit `user_id` filters below.
@@ -115,40 +149,15 @@ function unwrap<T>(result: { data: T; error: { message: string } | null }, what:
 export function createSupabaseRepository(
   client: Client,
   userId: string,
-  options: { contentPolicy?: ContentLicensePolicy } = {},
+  options: {
+    contentPolicy?: ContentLicensePolicy;
+    /** Writes the mission of a day (service role, server only). Absent: preparing is not configured. */
+    prepareMission?: (userId: string, date: DateKey) => Promise<GenerateMissionOutcome>;
+  } = {},
 ): DailyLinguaRepository {
   const contentPolicy = options.contentPolicy ?? readContentLicensePolicy();
 
-  async function getPreferences(): Promise<Preferences | null> {
-    const [profile, goals] = await Promise.all([
-      client.from("profiles").select("*").eq("id", userId).single(),
-      client
-        .from("user_languages")
-        .select("*")
-        .eq("user_id", userId)
-        .order("weight", { ascending: false })
-        .order("language"),
-    ]);
-    const p = unwrap(profile, "profil");
-    const g = unwrap(goals, "langues");
-    // A new account has a profile (created by a trigger) but no language until the first-run screen.
-    if (g.length === 0) return null;
-    return preferencesSchema.parse({
-      goals: g.map((row) => ({
-        language: row.language,
-        level: row.level,
-        targetLevel: row.target_level,
-        focus: row.focus,
-        weight: row.weight,
-      })),
-      dailyMinutes: p.daily_minutes,
-      topics: p.topics,
-      contentTypes: p.content_types,
-      difficulty: p.difficulty,
-      generationTime: p.generation_time.slice(0, 5), // "HH:mm:ss" -> "HH:mm"
-      timeZone: p.time_zone,
-    });
-  }
+  const getPreferences = () => fetchPreferences(client, userId);
 
   async function getToday(): Promise<DateKey> {
     const profile = unwrap(
@@ -162,7 +171,7 @@ export function createSupabaseRepository(
     const { data, error } = await client
       .from("missions")
       .select(
-        `id, mission_date, budget_minutes,
+        `id, mission_date, budget_minutes, generation_meta,
          mission_sessions (
            id, position, language, questions, expressions, production,
            contents ( title, content_type, language, url, difficulty, duration_minutes, summary,
@@ -179,10 +188,15 @@ export function createSupabaseRepository(
     if (error) throw new Error(`Supabase (mission) : ${error.message}`);
     if (!data) return null;
 
+    // The seed's missions have an empty trace: no source is shown for them.
+    const meta = data.generation_meta as { source?: unknown } | null;
+    const exerciseSource = generationMetaSchema.shape.source.safeParse(meta?.source);
+
     return missionSchema.parse({
       id: data.id,
       date: data.mission_date,
       budgetMinutes: data.budget_minutes,
+      exerciseSource: exerciseSource.success ? exerciseSource.data : undefined,
       sessions: data.mission_sessions.map((s) => {
         const content = s.contents;
         if (!content?.sources) throw new Error(`Supabase (mission) : contenu manquant pour la session ${s.position}`);
@@ -213,6 +227,22 @@ export function createSupabaseRepository(
         };
       }),
     });
+  }
+
+  async function prepareTodayMission(): Promise<PrepareMissionResult> {
+    if (!options.prepareMission) {
+      throw new UserFacingError("La préparation des missions n’est pas configurée sur ce serveur.");
+    }
+    const outcome = await options.prepareMission(userId, await getToday());
+    switch (outcome.status) {
+      case "ready":
+      case "pending":
+      case "failed":
+      case "no-content":
+        return { status: outcome.status };
+      case "no-preferences":
+        throw new UserFacingError("Choisis d’abord tes langues.");
+    }
   }
 
   async function getHistory(): Promise<MissionHistoryEntry[]> {
@@ -548,6 +578,7 @@ export function createSupabaseRepository(
     savePreferences,
     getMission,
     getMissionProgress,
+    prepareTodayMission,
     setActivityDone,
     answerQuestion,
     saveProduction,

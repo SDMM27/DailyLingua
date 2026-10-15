@@ -5,6 +5,7 @@ import { z } from "zod";
 import { availableLanguages } from "@/lib/content/availability";
 import { SOURCE_CATALOG } from "@/lib/content/catalog";
 import { readContentLicensePolicy } from "@/lib/content/policy";
+import { prepareMission } from "@/lib/generation/server";
 import { toDateKey } from "@/lib/domain/dates";
 import { dateKeySchema, type DateKey, type Language } from "@/lib/schemas/common";
 import {
@@ -38,6 +39,12 @@ import { MOCK_PREFERENCES } from "./mock/preferences";
 import { buildMockVocabulary } from "./mock/vocabulary";
 import { createSupabaseRepository } from "./supabase-repository";
 
+/** Outcome of asking for today's mission; internal reasons never leave the server. */
+export interface PrepareMissionResult {
+  /** pending: another request is writing it, ask again shortly. */
+  status: "ready" | "pending" | "failed" | "no-content";
+}
+
 /**
  * Single entry point for app data. Pages and server actions depend on this interface only,
  * so the demo implementation and the Supabase one are interchangeable.
@@ -58,6 +65,11 @@ export interface DailyLinguaRepository {
   savePreferences(preferences: Preferences): Promise<void>;
 
   getMission(date: DateKey): Promise<Mission | null>;
+  /**
+   * Writes today's mission if it does not exist yet (idempotent; today is the user's, computed
+   * server side). Can take several seconds: it calls the language model.
+   */
+  prepareTodayMission(): Promise<PrepareMissionResult>;
   getMissionProgress(mission: Mission): Promise<MissionProgress>;
   setActivityDone(activityId: string, done: boolean): Promise<void>;
   answerQuestion(sessionId: string, questionId: string, selectedIndex: number): Promise<void>;
@@ -111,6 +123,9 @@ function createMockRepository(): DailyLinguaRepository {
     async getMissionProgress() {
       return EMPTY_MISSION_PROGRESS;
     },
+    async prepareTodayMission() {
+      return { status: "ready" }; // the demo always has its mission
+    },
     setActivityDone: readOnly,
     answerQuestion: readOnly,
     saveProduction: readOnly,
@@ -157,7 +172,7 @@ export const getRepository = cache(async (): Promise<DailyLinguaRepository> => {
   // getUser() validates the token with Supabase Auth; it resolves to null without a session.
   const { data } = await supabase.auth.getUser();
   if (!data.user) redirect("/connexion");
-  return createSupabaseRepository(supabase, data.user.id);
+  return createSupabaseRepository(supabase, data.user.id, { prepareMission });
 });
 
 /** The preferences, or a redirect to the first-run screen while the user has no language yet. */

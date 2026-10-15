@@ -19,9 +19,11 @@
     "db:types": "supabase gen types --lang typescript --local > src/lib/supabase/database.types.ts",
     "db:test": "supabase test db",
     "content:check": "tsx --env-file-if-exists=.env.local scripts/content-check.mts",
-    "content:ingest": "tsx --env-file-if-exists=.env.local scripts/content-ingest.mts"
+    "content:ingest": "tsx --env-file-if-exists=.env.local scripts/content-ingest.mts",
+    "mission:generate": "tsx --env-file-if-exists=.env.local scripts/mission-generate.mts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.133.0",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.117.3",
     "fast-xml-parser": "^5.11.2",

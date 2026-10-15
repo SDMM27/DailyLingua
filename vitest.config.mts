@@ -12,6 +12,9 @@ export default defineConfig({
     },
   },
   test: {
+    // The integration tests share one local database, and the content one retires every keyed source
+    // it does not know (including other tests' throw-away sources): files must not overlap.
+    fileParallelism: false,
     environment: "node",
     include: ["src/**/*.test.{ts,tsx}"],
     setupFiles: [fromRoot("./src/test/setup-env.ts")],

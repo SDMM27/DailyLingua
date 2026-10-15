@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
+import { MissionPreparing } from "@/components/mission/mission-preparing";
 import { MissionView } from "@/components/mission/mission-view";
 import { Card, PageHeader } from "@/components/ui/primitives";
 import { getRepository, getToday, requirePreferences } from "@/lib/data/repository";
@@ -8,6 +9,8 @@ import { formatLongDate } from "@/lib/domain/dates";
 import { checkBudget } from "@/lib/domain/time-budget";
 
 export const metadata: Metadata = { title: "Mission du jour" };
+// Preparing the mission (server action called from this page) can wait for the language model.
+export const maxDuration = 120;
 
 export default async function MissionPage() {
   await connection();
@@ -15,6 +18,15 @@ export default async function MissionPage() {
   await requirePreferences();
   const today = await getToday();
   const mission = await repo.getMission(today);
+
+  if (!mission && !repo.isDemo) {
+    return (
+      <>
+        <PageHeader eyebrow={formatLongDate(today)} title="Mission du jour" />
+        <MissionPreparing />
+      </>
+    );
+  }
 
   if (!mission) {
     return (
@@ -43,6 +55,13 @@ export default async function MissionPage() {
         {!budget.withinBudget && (
           <span className="mt-1 block text-danger">
             Cette mission dépasse ton budget de {budget.overByMinutes} min.
+          </span>
+        )}
+        {mission.exerciseSource && (
+          <span className="mt-1 block text-[13px] text-muted">
+            {mission.exerciseSource === "ai"
+              ? "Exercices rédigés par une IA à partir du titre et de l’accroche : ils peuvent contenir des erreurs."
+              : "Exercices simplifiés : la rédaction par IA n’était pas disponible aujourd’hui."}
           </span>
         )}
       </PageHeader>
