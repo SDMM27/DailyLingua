@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Literata } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { TabBar } from "@/components/layout/tab-bar";
 import { TopBar } from "@/components/layout/top-bar";
 import "./globals.css";
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {children}
         </main>
         <TabBar />
+        <Analytics />
       </body>
     </html>
   );
