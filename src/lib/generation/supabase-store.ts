@@ -4,7 +4,7 @@ import type { ContentLicensePolicy } from "@/lib/schemas/content";
 import { dateKeySchema, languageSchema } from "@/lib/schemas/common";
 import { candidateContentSchema } from "@/lib/schemas/generation";
 import type { Database, Json } from "@/lib/supabase/database.types";
-import { SessionNotFoundError, SessionReplacementLimitError } from "./errors";
+import { SessionNotFoundError, SessionReplacementInProgressError, SessionReplacementLimitError } from "./errors";
 import type { MissionStore } from "./generate-mission";
 import { MAX_SESSION_REPLACEMENTS_PER_DAY, type SessionReplacementStore } from "./replace-session";
 
@@ -79,7 +79,7 @@ export function createSupabaseMissionStore(
       const { data, error } = await client
         .from("mission_sessions")
         .select(
-          "mission_id, position, language, missions!inner ( mission_date, session_replacements ), mission_activities ( estimated_minutes )",
+          "mission_id, position, language, missions!inner ( mission_date ), mission_activities ( estimated_minutes )",
         )
         .eq("id", sessionId)
         .eq("user_id", userId)
@@ -92,8 +92,24 @@ export function createSupabaseMissionStore(
         language: languageSchema.parse(data.language),
         position: data.position,
         minutes: data.mission_activities.reduce((sum, a) => sum + a.estimated_minutes, 0),
-        replacements: data.missions.session_replacements,
       };
+    },
+
+    async reserveReplacement(sessionId, userId) {
+      const { error } = await client.rpc("reserve_session_replacement", {
+        p_session_id: sessionId,
+        p_user_id: userId,
+        p_max_per_day: MAX_SESSION_REPLACEMENTS_PER_DAY,
+      });
+      if (error?.code === "DL001") throw new SessionReplacementLimitError();
+      if (error?.code === "DL002") throw new SessionReplacementInProgressError();
+      if (error?.code === "P0002") throw new SessionNotFoundError();
+      if (error) fail("réservation du remplacement", error);
+    },
+
+    async releaseReplacement(sessionId) {
+      const { error } = await client.rpc("release_session_replacement", { p_session_id: sessionId });
+      if (error) fail("libération du remplacement", error);
     },
 
     async replaceSession(sessionId, userId, session, meta) {
@@ -102,9 +118,7 @@ export function createSupabaseMissionStore(
         p_user_id: userId,
         p_session: session as unknown as Json,
         p_meta: meta,
-        p_max_per_day: MAX_SESSION_REPLACEMENTS_PER_DAY,
       });
-      if (error?.code === "DL001") throw new SessionReplacementLimitError();
       if (error?.code === "P0002") throw new SessionNotFoundError();
       if (error) fail("remplacement de la session", error);
     },

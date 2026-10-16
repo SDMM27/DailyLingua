@@ -357,7 +357,7 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
       await expect(repo.replaceInaccessibleContent(seeded.sessionId)).rejects.toBeInstanceOf(UserFacingError);
     });
 
-    it("refuses the replacement of a session that is not the user's, and past the limit", async () => {
+    it("reserves before replacing: not the user's, not reserved, in progress, past the limit", async () => {
       const seeded = await seedSession(addDays(today(), -10));
       const session: Json = {
         language: "ru",
@@ -367,7 +367,7 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
         production: { mode: "writing", prompt: "p", hints: [] },
         activities: [{ kind: "reading", title: "Lire", estimatedMinutes: 5 }],
       };
-      const call = (overrides: { p_user_id?: string; p_max_per_day?: number; p_session?: Json }) =>
+      const replace = (overrides: { p_user_id?: string; p_session?: Json } = {}) =>
         admin.rpc("replace_mission_session", {
           p_session_id: seeded.sessionId,
           p_user_id: userId,
@@ -375,10 +375,27 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
           p_meta: {},
           ...overrides,
         });
+      const reserve = (overrides: { p_user_id?: string; p_max_per_day?: number } = {}) =>
+        admin.rpc("reserve_session_replacement", { p_session_id: seeded.sessionId, p_user_id: userId, ...overrides });
 
-      expect((await call({ p_user_id: crypto.randomUUID() })).error?.code).toBe("P0002");
-      expect((await call({ p_max_per_day: 0 })).error?.code).toBe("DL001");
-      expect((await call({ p_session: { ...(session as object), language: "it" } })).error?.code).toBe("23514");
+      // Not the user's session.
+      expect((await reserve({ p_user_id: crypto.randomUUID() })).error?.code).toBe("P0002");
+      expect((await replace({ p_user_id: crypto.randomUUID() })).error?.code).toBe("P0002");
+      // Replacing without a reservation.
+      expect((await replace()).error?.code).toBe("55000");
+      // Limit reached: nothing is reserved.
+      expect((await reserve({ p_max_per_day: 0 })).error?.code).toBe("DL001");
+      // Reserved, then a second reservation of the same session is refused.
+      expect((await reserve()).error).toBeNull();
+      expect((await reserve()).error?.code).toBe("DL002");
+      // A released session can be reserved again; the slot stays consumed.
+      expect((await admin.rpc("release_session_replacement", { p_session_id: seeded.sessionId })).error).toBeNull();
+      expect((await reserve()).error).toBeNull();
+      const { data: mission } = await admin.from("missions").select("session_replacements").eq("id", seeded.missionId).single();
+      expect(mission!.session_replacements).toBe(2);
+      // Reserved: the replacement itself checks the content, then swaps.
+      expect((await replace({ p_session: { ...(session as object), language: "it" } })).error?.code).toBe("23514");
+      expect((await replace()).error).toBeNull();
     });
   });
 });

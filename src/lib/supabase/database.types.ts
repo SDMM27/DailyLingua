@@ -165,14 +165,14 @@ isOneToOne: false
                   ]
                 },"mission_sessions": {
                   Row: {
-                    "content_id": string,"created_at": string,"expressions": NonNullable<Json>,"id": string,"language": string,"mission_id": string,"position": number,"production": NonNullable<Json>,"question_count": number | null,"questions": NonNullable<Json>,"user_id": string
+                    "content_id": string,"created_at": string,"expressions": NonNullable<Json>,"id": string,"language": string,"mission_id": string,"position": number,"replacing_since": string | null,"production": NonNullable<Json>,"question_count": number | null,"questions": NonNullable<Json>,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "content_id": string,"created_at"?: string,"expressions"?: NonNullable<Json>,"id"?: string,"language": string,"mission_id": string,"position": number,"production": NonNullable<Json>,"question_count"?: never,"questions"?: NonNullable<Json>,"user_id": string
+                    "content_id": string,"created_at"?: string,"expressions"?: NonNullable<Json>,"id"?: string,"language": string,"mission_id": string,"position": number,"replacing_since"?: string | null,"production": NonNullable<Json>,"question_count"?: never,"questions"?: NonNullable<Json>,"user_id": string
                   }
                   Update: {
-                    "content_id"?: string,"created_at"?: string,"expressions"?: NonNullable<Json>,"id"?: string,"language"?: string,"mission_id"?: string,"position"?: number,"production"?: NonNullable<Json>,"question_count"?: never,"questions"?: NonNullable<Json>,"user_id"?: string
+                    "content_id"?: string,"created_at"?: string,"expressions"?: NonNullable<Json>,"id"?: string,"language"?: string,"mission_id"?: string,"position"?: number,"replacing_since"?: string | null,"production"?: NonNullable<Json>,"question_count"?: never,"questions"?: NonNullable<Json>,"user_id"?: string
                   }
                   Relationships: [
                     {
@@ -467,8 +467,14 @@ isOneToOne: false
 "record_vocabulary_review":
 { Args: { "p_box_after": number,"p_due_on_after": string,"p_expected_review_count": number,"p_grade": string,"p_item_id": string,"p_reviewed_on": string }; Returns: boolean
                            },
+"release_session_replacement":
+{ Args: { "p_session_id": string }; Returns: undefined
+                           },
 "replace_mission_session":
-{ Args: { "p_max_per_day"?: number,"p_meta": Json,"p_session": Json,"p_session_id": string,"p_user_id": string }; Returns: undefined
+{ Args: { "p_meta": Json,"p_session": Json,"p_session_id": string,"p_user_id": string }; Returns: undefined
+                           },
+"reserve_session_replacement":
+{ Args: { "p_max_per_day"?: number,"p_session_id": string,"p_stale_after"?: string,"p_user_id": string }; Returns: undefined
                            },
 "save_preferences":
 { Args: { "p_content_types": (string)[],"p_daily_minutes": number,"p_difficulty": string,"p_generation_time": string,"p_goals": Json,"p_time_zone": string,"p_topics": (string)[] }; Returns: undefined

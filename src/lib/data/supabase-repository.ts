@@ -310,6 +310,8 @@ export function createSupabaseRepository(
       case "no-content":
       case "limit":
         return { status: outcome.status };
+      case "in-progress":
+        throw new UserFacingError("Un remplacement de ce contenu est déjà en cours.");
       case "not-found":
         throw new UserFacingError("Cette session est introuvable.");
       case "failed":

@@ -23,6 +23,14 @@ export class SessionReplacementLimitError extends Error {
   }
 }
 
+/** A replacement of this session is already running (SQLSTATE DL002). */
+export class SessionReplacementInProgressError extends Error {
+  constructor() {
+    super("replacement_in_progress");
+    this.name = "SessionReplacementInProgressError";
+  }
+}
+
 /** The session to replace does not exist (any more) or is not the user's. */
 export class SessionNotFoundError extends Error {
   constructor() {
