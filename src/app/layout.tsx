@@ -55,7 +55,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {children}
         </main>
         <TabBar />
-        <Analytics />
+        {/* The script is served by Vercel only: elsewhere (local build, CI) it is a 404 in the console. */}
+        {process.env.VERCEL && <Analytics />}
       </body>
     </html>
   );
