@@ -43,12 +43,10 @@ const TIME_ZONE = "Pacific/Kiritimati";
 
 const PREFERENCES: Preferences = {
   goals: [
-    { language: "ru", level: "B2", targetLevel: "C1", focus: "", purpose: "general", weight: 2 },
-    { language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 1 },
+    { language: "ru", level: "B2", targetLevel: "C1", focus: "", purpose: "general", weight: 2, topics: ["société"], contentTypes: ["article"] },
+    { language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 1, topics: ["société"], contentTypes: ["article"] },
   ],
   dailyMinutes: 30,
-  topics: ["société"],
-  contentTypes: ["article"],
   difficulty: "matched",
   generationTime: "07:00",
   timeZone: TIME_ZONE,
@@ -60,6 +58,7 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
   let admin: SupabaseClient<Database>;
   let userId: string;
   let repo: ReturnType<typeof createSupabaseRepository>;
+  let userClient: SupabaseClient<Database>;
   const today = () => toDateKey(new Date(), TIME_ZONE);
 
   beforeAll(async () => {
@@ -71,6 +70,7 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
     userId = created.data.user.id;
 
     const client = createClient<Database>(url!, anonKey!, { auth: { persistSession: false } });
+    userClient = client;
     const signedIn = await client.auth.signInWithPassword({ email, password });
     if (signedIn.error) throw signedIn.error;
     repo = createSupabaseRepository(client, userId, {
@@ -95,6 +95,53 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
     ];
     await repo.savePreferences({ ...PREFERENCES, goals });
     expect((await repo.getPreferences())!.goals.map((g) => g.purpose)).toEqual(["professional", "exam"]);
+  });
+
+  it("round-trips the topics and content types of each language", async () => {
+    const goals = [
+      { ...PREFERENCES.goals[0], topics: ["économie" as const], contentTypes: ["article" as const] },
+      { ...PREFERENCES.goals[1], topics: ["cinéma" as const, "sport" as const], contentTypes: ["podcast" as const, "video" as const] },
+    ];
+    await repo.savePreferences({ ...PREFERENCES, goals });
+    const saved = (await repo.getPreferences())!.goals;
+    expect(saved.map((g) => [g.language, g.topics, g.contentTypes])).toEqual([
+      ["ru", ["économie"], ["article"]],
+      ["it", expect.arrayContaining(["cinéma", "sport"]), expect.arrayContaining(["podcast", "video"])],
+    ]);
+    // New clients send them per language only: the profile columns are left untouched.
+    const { data: profile } = await admin.from("profiles").select("topics, content_types").eq("id", userId).single();
+    expect(profile).toEqual({ topics: ["société", "culture"], content_types: ["article", "podcast"] });
+  });
+
+  it("still accepts an old-style payload with top-level topics and none per language", async () => {
+    await repo.savePreferences(PREFERENCES);
+    const goal = (language: string, weight: number) => ({
+      language, level: "B1", target_level: "B2", focus: "", purpose: "general", weight,
+    });
+    const { error } = await userClient.rpc("save_preferences", {
+      p_daily_minutes: 30,
+      p_topics: ["sciences"],
+      p_content_types: ["interview"],
+      p_difficulty: "matched",
+      p_generation_time: "07:00",
+      p_time_zone: TIME_ZONE,
+      p_goals: [goal("ru", 2), goal("it", 1), goal("es", 1)],
+    });
+    expect(error).toBeNull();
+    const byLanguage = Object.fromEntries((await repo.getPreferences())!.goals.map((g) => [g.language, g]));
+    // Existing languages keep their own values; the new one takes the profile's (the old client's).
+    expect(byLanguage.ru.topics).toEqual(PREFERENCES.goals[0].topics);
+    expect(byLanguage.it.contentTypes).toEqual(PREFERENCES.goals[1].contentTypes);
+    expect(byLanguage.es.topics).toEqual(["sciences"]);
+    expect(byLanguage.es.contentTypes).toEqual(["interview"]);
+    const { data: profile } = await admin.from("profiles").select("topics, content_types").eq("id", userId).single();
+    expect(profile).toEqual({ topics: ["sciences"], content_types: ["interview"] });
+    await repo.savePreferences(PREFERENCES);
+  });
+
+  it("refuses a language saved without topics", async () => {
+    const goals = [{ ...PREFERENCES.goals[0], topics: [] as never }];
+    await expect(repo.savePreferences({ ...PREFERENCES, goals })).rejects.toThrow();
   });
 
   it("computes today in the user's time zone", async () => {

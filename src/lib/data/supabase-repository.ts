@@ -161,10 +161,10 @@ export async function fetchPreferences(client: Client, userId: string): Promise<
       focus: row.focus,
       purpose: row.purpose,
       weight: row.weight,
+      topics: row.topics,
+      contentTypes: row.content_types,
     })),
     dailyMinutes: p.daily_minutes,
-    topics: p.topics,
-    contentTypes: p.content_types,
     difficulty: p.difficulty,
     generationTime: p.generation_time.slice(0, 5), // "HH:mm:ss" -> "HH:mm"
     timeZone: p.time_zone,
@@ -418,8 +418,9 @@ export function createSupabaseRepository(
   async function savePreferences(preferences: Preferences): Promise<void> {
     const { error } = await client.rpc("save_preferences", {
       p_daily_minutes: preferences.dailyMinutes,
-      p_topics: preferences.topics,
-      p_content_types: preferences.contentTypes,
+      // Topics and formats travel per language; the profile's own columns are left as they are.
+      p_topics: null,
+      p_content_types: null,
       p_difficulty: preferences.difficulty,
       p_generation_time: preferences.generationTime,
       p_time_zone: preferences.timeZone,
@@ -430,6 +431,8 @@ export function createSupabaseRepository(
         focus: g.focus,
         purpose: g.purpose,
         weight: g.weight,
+        topics: g.topics,
+        content_types: g.contentTypes,
       })),
     });
     if (error) throw new Error(`Supabase (préférences) : ${error.message}`);

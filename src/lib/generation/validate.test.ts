@@ -31,6 +31,7 @@ function sessionRequest(language: SessionRequest["language"] = "it"): SessionReq
     targetLevel: "B2",
     focus: "",
     purpose: "general",
+    topics: ["société"],
     minutes: 20,
     productionMode: "speaking",
     productionMinutes: 6,
@@ -175,7 +176,6 @@ describe("validateGeneratedSession", () => {
 describe("validateGeneratedMission", () => {
   const request: GenerationRequest = {
     date: "2026-10-13",
-    topics: [],
     sessions: [sessionRequest("it"), sessionRequest("es")],
   };
   const result = (sessions: WireSession[]): GenerationResult => ({

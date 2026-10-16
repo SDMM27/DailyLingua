@@ -21,6 +21,7 @@ const session = (language: SessionRequest["language"], purpose: SessionRequest["
   targetLevel: "B2",
   focus: "",
   purpose,
+  topics: [],
   minutes: 15,
   productionMode: "writing",
   productionMinutes: 5,
@@ -37,7 +38,6 @@ describe("buildUserMessage", () => {
   it("gives each language the register of its own purpose", () => {
     const request: GenerationRequest = {
       date: "2026-10-15",
-      topics: [],
       sessions: [session("en", "professional"), session("es", "conversational")],
     };
     const blocks = buildUserMessage(request).split("## Language").slice(1);
@@ -47,5 +47,29 @@ describe("buildUserMessage", () => {
     expect(en).not.toContain(PURPOSE_REGISTERS.conversational);
     expect(es).toContain(`conversational (${PURPOSE_REGISTERS.conversational})`);
     expect(es).not.toContain(PURPOSE_REGISTERS.professional);
+  });
+
+  it("lists the interests of each session, never those of another language", () => {
+    const request: GenerationRequest = {
+      date: "2026-10-16",
+      sessions: [
+        { ...session("en", "professional"), topics: ["économie", "technologie"] },
+        { ...session("es", "conversational"), topics: ["cinéma"] },
+      ],
+    };
+    const message = buildUserMessage(request);
+    expect(message).not.toContain("Learner's interests");
+    const blocks = message.split("## Language").slice(1);
+    const en = blocks.find((b) => b.startsWith(' "en"'))!;
+    const es = blocks.find((b) => b.startsWith(' "es"'))!;
+    expect(en).toContain("interests for this language (French labels): économie, technologie");
+    expect(en).not.toContain("cinéma");
+    expect(es).toContain("interests for this language (French labels): cinéma");
+    expect(es).not.toContain("économie");
+  });
+
+  it("says when a session has no particular interest", () => {
+    const message = buildUserMessage({ date: "2026-10-16", sessions: [session("en", "general")] });
+    expect(message).toContain("interests for this language (French labels): aucun en particulier");
   });
 });

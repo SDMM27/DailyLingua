@@ -18,12 +18,10 @@ const NOW = new Date("2026-10-13T12:00:00Z");
 
 const preferences: Preferences = {
   goals: [
-    { language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 1 },
-    { language: "es", level: "A2", targetLevel: "B1", focus: "oral", purpose: "conversational", weight: 1 },
+    { language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 1, topics: ["société"], contentTypes: ["article"] },
+    { language: "es", level: "A2", targetLevel: "B1", focus: "oral", purpose: "conversational", weight: 1, topics: ["société"], contentTypes: ["article"] },
   ],
   dailyMinutes: 20,
-  topics: ["société"],
-  contentTypes: ["article"],
   difficulty: "matched",
   generationTime: "07:00",
   timeZone: "Europe/Paris",
@@ -200,7 +198,7 @@ describe("generateMission", () => {
       outputTokens: 50,
       fallbackReason: null,
     });
-    expect(generator.requests[0].topics).toEqual(["société"]);
+    expect(generator.requests[0].sessions.map((s) => s.topics)).toEqual([["société"], ["société"]]);
     expect(generator.requests[0].sessions.map((s) => s.productionMode)).not.toContain(undefined);
     expect(calls.failed).toEqual([]);
     expect(calls.usedSince).toEqual(["2026-09-13"]);
@@ -213,6 +211,31 @@ describe("generateMission", () => {
     expect(generator.requests[0].sessions.map((s) => [s.language, s.purpose])).toEqual([
       ["it", "general"],
       ["es", "conversational"],
+    ]);
+  });
+
+  it("gives each language its own topics and content types", async () => {
+    const prefs: Preferences = {
+      ...preferences,
+      goals: [
+        { ...preferences.goals[0], topics: ["économie"], contentTypes: ["article"] },
+        { ...preferences.goals[1], topics: ["cinéma", "gastronomie"], contentTypes: ["podcast"] },
+      ],
+    };
+    const pools = {
+      it: [content("it", 1)],
+      es: [content("es", 1, { type: "podcast" })],
+    };
+    const { store, calls } = memoryStore({ prefs, pools });
+    const generator = aiGenerator();
+    await run(store, generator);
+    expect(generator.requests[0].sessions.map((s) => [s.language, s.topics])).toEqual([
+      ["it", ["économie"]],
+      ["es", ["cinéma", "gastronomie"]],
+    ]);
+    expect(calls.candidateQueries).toEqual([
+      { language: "it", contentTypes: ["article"] },
+      { language: "es", contentTypes: ["podcast"] },
     ]);
   });
 

@@ -45,12 +45,10 @@ const TIME_ZONE = "Pacific/Kiritimati";
 
 const PREFERENCES: Preferences = {
   goals: [
-    { language: "ru", level: "B2", targetLevel: "C1", focus: "", purpose: "general", weight: 2 },
-    { language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 1 },
+    { language: "ru", level: "B2", targetLevel: "C1", focus: "", purpose: "general", weight: 2, topics: ["société"], contentTypes: ["article"] },
+    { language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 1, topics: ["société"], contentTypes: ["article"] },
   ],
   dailyMinutes: 30,
-  topics: ["société"],
-  contentTypes: ["article"],
   difficulty: "matched",
   generationTime: "07:00",
   timeZone: TIME_ZONE,

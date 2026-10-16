@@ -94,14 +94,14 @@ export async function loadUsablePool(store: Pick<MissionStore, "listCandidates">
     rankCandidates(pool, {
       level: o.goal.level,
       difficulty: o.preferences.difficulty,
-      contentTypes: o.preferences.contentTypes,
+      contentTypes: o.goal.contentTypes,
       minutes: o.minutes,
       excludeIds: o.excludeIds,
       now: o.now,
     }).length > 0;
   // Preferred content types first; any type when none is left (all used, or none published).
   let pool = await store.listCandidates(o.goal.language, {
-    contentTypes: o.preferences.contentTypes,
+    contentTypes: o.goal.contentTypes,
     declaredSourceIds: o.declaredSourceIds,
     limit: CANDIDATE_POOL,
   });
@@ -116,7 +116,7 @@ export function buildSessionRequest(
   const candidates = rankCandidates(o.pool, {
     level: o.goal.level,
     difficulty: o.preferences.difficulty,
-    contentTypes: o.preferences.contentTypes,
+    contentTypes: o.goal.contentTypes,
     minutes: o.minutes,
     excludeIds: o.excludeIds,
     now: o.now,
@@ -136,6 +136,7 @@ export function buildSessionRequest(
     targetLevel: o.goal.targetLevel,
     focus: o.goal.focus,
     purpose: o.goal.purpose,
+    topics: o.goal.topics,
     minutes: o.minutes,
     productionMode: o.productionMode,
     productionMinutes: estimate.at(-1)!.estimatedMinutes,
@@ -260,7 +261,6 @@ export async function generateMission(input: GenerateMissionInput): Promise<Gene
     const shares = splitBudget(preferences.dailyMinutes, goals);
     const request: GenerationRequest = generationRequestSchema.parse({
       date,
-      topics: preferences.topics,
       sessions: goals.map((goal, index) =>
         buildSessionRequest({
           goal,

@@ -7,13 +7,13 @@ import { validateGeneratedMission } from "./validate";
 function request(): GenerationRequest {
   return {
     date: "2026-10-13",
-    topics: [],
     sessions: LANGUAGE_CODES.map((language, i) => ({
       language,
       level: "B1",
       targetLevel: "B2",
       focus: "",
       purpose: "general",
+      topics: ["société"],
       minutes: 10,
       productionMode: i % 2 === 0 ? "writing" : "speaking",
       productionMinutes: 4,

@@ -17,12 +17,10 @@ const NOW = new Date("2026-10-13T12:00:00Z");
 
 const preferences: Preferences = {
   goals: [
-    { language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 1 },
-    { language: "es", level: "A2", targetLevel: "B1", focus: "oral", purpose: "conversational", weight: 1 },
+    { language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 1, topics: ["société"], contentTypes: ["article"] },
+    { language: "es", level: "A2", targetLevel: "B1", focus: "oral", purpose: "conversational", weight: 1, topics: ["société"], contentTypes: ["article"] },
   ],
   dailyMinutes: 20,
-  topics: ["société"],
-  contentTypes: ["article"],
   difficulty: "matched",
   generationTime: "07:00",
   timeZone: "Europe/Paris",

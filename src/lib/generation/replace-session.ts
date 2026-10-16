@@ -149,7 +149,6 @@ export async function replaceMissionSession(input: ReplaceSessionInput): Promise
 
     const request = generationRequestSchema.parse({
       date: old.missionDate,
-      topics: preferences.topics,
       sessions: [
         buildSessionRequest({
           ...options,
