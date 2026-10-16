@@ -340,16 +340,64 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
   });
 
   describe("content refusals and session replacement", () => {
-    // Needs at least two readable (free, active) Russian contents in the seed.
-    async function seedSession(date: string) {
-      const { data: contents, error: contentsError } = await admin
+    // Its own feed source (the seed's sources have no key, so they are never candidates) with two
+    // free Russian contents: one for the session, one to replace it.
+    const runId = crypto.randomUUID().slice(0, 8);
+    let sourceId = "";
+    let contentIds: string[] = [];
+
+    beforeAll(async () => {
+      const source = await admin
+        .from("sources")
+        .insert({
+          key: `test-refusal-${runId}`,
+          name: "Source test refus",
+          language: "ru",
+          homepage_url: `https://test-refusal-${runId}.example.invalid/`,
+          feed_url: `https://test-refusal-${runId}.example.invalid/feed`,
+          access: "free",
+          content_type: "article",
+          license_kind: "all-rights-reserved",
+          license_name: "Tous droits réservés",
+          terms_url: "https://example.invalid/terms",
+          license_verified_on: "2026-10-01",
+          commercial_use: false,
+          active: true,
+        })
+        .select("id")
+        .single();
+      if (source.error) throw source.error;
+      sourceId = source.data.id;
+      const contents = await admin
         .from("contents")
-        .select("id, sources!inner ( access, active )")
-        .eq("language", "ru")
-        .eq("sources.access", "free")
-        .eq("sources.active", true)
-        .limit(1);
-      if (contentsError) throw contentsError;
+        .insert(
+          [1, 2].map((n) => ({
+            source_id: sourceId,
+            language: "ru",
+            content_type: "article",
+            title: `Titre test refus ${n} ${runId}`,
+            url: `https://test-refusal-${runId}.example.invalid/${n}`,
+            difficulty: "B2",
+            duration_minutes: 4,
+            summary: `Résumé de l’article ${n}, publié par une source de test.`,
+            // Newer than anything else, so these are the first candidates.
+            published_at: new Date(Date.now() + 3_600_000 - n * 60_000).toISOString(),
+          })),
+        )
+        .select("id");
+      if (contents.error) throw contents.error;
+      contentIds = contents.data.map((c) => c.id);
+    });
+
+    afterAll(async () => {
+      // Sessions reference the contents without cascade: the user's missions go first.
+      await admin.from("missions").delete().eq("user_id", userId);
+      await admin.from("contents").delete().in("id", contentIds);
+      await admin.from("sources").delete().eq("id", sourceId);
+    });
+
+    async function seedSession(date: string) {
+      const contents = [{ id: contentIds[0] }];
       const { data: mission, error } = await admin
         .from("missions")
         .insert({ user_id: userId, mission_date: date, budget_minutes: 12, status: "ready", generated_at: new Date().toISOString() })
