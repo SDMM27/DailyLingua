@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRightIcon, CheckIcon, HistoryIcon, InfoIcon, PenIcon, PhoneIcon } from "@/components/icons";
 import { PreferencesForm } from "@/components/preferences/preferences-form";
-import { Card, Eyebrow, PageHeader } from "@/components/ui/primitives";
+import { SourceAccessList } from "@/components/preferences/source-access-list";
+import { Card, Eyebrow, PageHeader, SectionTitle } from "@/components/ui/primitives";
 import { signOut } from "@/app/actions/auth";
 import { DeleteAccount } from "@/components/auth/delete-account";
 import { getRepository, requirePreferences } from "@/lib/data/repository";
@@ -12,7 +13,11 @@ export const metadata: Metadata = { title: "Préférences" };
 export default async function PreferencesPage() {
   const repo = await getRepository();
   const preferences = await requirePreferences();
-  const [email, languages] = await Promise.all([repo.getAccountEmail(), repo.listAvailableLanguages()]);
+  const [email, languages, paidSources] = await Promise.all([
+    repo.getAccountEmail(),
+    repo.listAvailableLanguages(),
+    repo.listPaidSources(),
+  ]);
   return (
     <>
       <PageHeader eyebrow="Réglages" title="Préférences">
@@ -43,6 +48,15 @@ export default async function PreferencesPage() {
         <ArrowRightIcon width={16} height={16} className="text-muted" />
       </Link>
       <PreferencesForm initial={preferences} languages={languages} persist={!repo.isDemo} />
+      {paidSources.length > 0 && (
+        <Card className="mt-6">
+          <SectionTitle>Mes abonnements</SectionTitle>
+          <p className="mb-3 text-sm leading-relaxed text-ink-soft">
+            Coche les sources payantes que tu peux lire : leurs contenus pourront entrer dans tes missions.
+          </p>
+          <SourceAccessList sources={paidSources} readOnly={repo.isDemo} />
+        </Card>
+      )}
       {email && (
         <Card className="mt-6 flex items-center justify-between gap-4">
           <div className="min-w-0">

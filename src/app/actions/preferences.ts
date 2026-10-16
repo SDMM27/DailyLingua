@@ -2,6 +2,7 @@
 
 import { UserFacingError } from "@/lib/data/errors";
 import { languageInfo } from "@/lib/domain/languages";
+import { sourceAccessInputSchema } from "@/lib/schemas/content";
 import { preferencesSchema } from "@/lib/schemas/preferences";
 import type { ActionResult } from "./result";
 import { runAction } from "./shared";
@@ -21,5 +22,12 @@ export async function savePreferences(input: unknown): Promise<ActionResult> {
       throw new UserFacingError(`Aucune source de contenus n’est disponible pour : ${names}.`);
     }
     await repo.savePreferences(preferences);
+  });
+}
+
+/** « J'y ai accès »: declares (or withdraws) access to a paid source; missions may then use it. */
+export async function setSourceAccess(input: unknown): Promise<ActionResult> {
+  return runAction(sourceAccessInputSchema, input, async (repo, { sourceId, hasAccess }) => {
+    await repo.setSourceAccess(sourceId, hasAccess);
   });
 }

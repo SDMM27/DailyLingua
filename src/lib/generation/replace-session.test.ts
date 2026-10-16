@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { isSourceReadable } from "@/lib/content/policy";
+import type { SourceAccess } from "@/lib/schemas/content";
 import type { Language } from "@/lib/schemas/common";
 import type { CandidateContent, ExerciseGenerator, GenerationMeta, GenerationRequest } from "@/lib/schemas/generation";
 import type { Preferences } from "@/lib/schemas/preferences";
@@ -54,6 +56,10 @@ function memoryStore(
     used?: string[];
     refused?: string[];
     replaceError?: Error;
+    /** Access level of the source of a content, by content id (default: free). The source id is `src-<content id>`. */
+    sourceAccess?: Record<string, SourceAccess>;
+    /** Paid sources the user declared (source ids). */
+    declared?: string[];
     /** Replacements already reserved on the mission. */
     reserved?: number;
     releaseError?: Error;
@@ -75,8 +81,15 @@ function memoryStore(
     async getPreferences() {
       return options.prefs === undefined ? preferences : options.prefs;
     },
-    async listCandidates(language) {
-      return language === "it" ? pool : [];
+    async listCandidates(language, { declaredSourceIds }) {
+      return language === "it"
+        ? pool.filter((c) =>
+            isSourceReadable({ id: `src-${c.id}`, access: options.sourceAccess?.[c.id] ?? "free" }, declaredSourceIds),
+          )
+        : [];
+    },
+    async listDeclaredSourceIds() {
+      return options.declared ?? [];
     },
     async listUsedContentIds(_userId, since) {
       calls.usedSince.push(since);
@@ -249,6 +262,17 @@ describe("replaceMissionSession", () => {
     expect(generator.requests).toHaveLength(0);
     expect(calls.replaced).toHaveLength(0);
     expect(calls.released).toBe(1);
+  });
+
+  it("only replaces with a paid content whose source the user declared", async () => {
+    const pool = [content("it", 1)];
+    const metered = { "it-1": "metered" as const };
+    const none = memoryStore({ pool, sourceAccess: metered });
+    expect(await run(none.store, aiGenerator())).toEqual({ status: "no-content" });
+
+    const declared = memoryStore({ pool, sourceAccess: metered, declared: ["src-it-1"] });
+    expect(await run(declared.store, aiGenerator())).toEqual({ status: "ready" });
+    expect(declared.calls.replaced[0].session.contentId).toBe("it-1");
   });
 
   it("falls back to the template when the generator fails", async () => {

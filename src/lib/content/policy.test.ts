@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_READABLE_ACCESS, isReadable } from "./policy";
+import { DEFAULT_READABLE_ACCESS, isReadable, isSourceReadable } from "./policy";
 
 describe("isReadable", () => {
   it("only reads free sources by default", () => {
@@ -14,5 +14,18 @@ describe("isReadable", () => {
     expect(isReadable("free", readable)).toBe(true);
     expect(isReadable("metered", readable)).toBe(true);
     expect(isReadable("paywalled", readable)).toBe(false);
+  });
+});
+
+describe("isSourceReadable", () => {
+  it("always reads a free source", () => {
+    expect(isSourceReadable({ id: "a", access: "free" }, [])).toBe(true);
+  });
+
+  it("reads a paid source only when the user declared that very source", () => {
+    expect(isSourceReadable({ id: "a", access: "metered" }, [])).toBe(false);
+    expect(isSourceReadable({ id: "a", access: "paywalled" }, ["b"])).toBe(false);
+    expect(isSourceReadable({ id: "a", access: "metered" }, ["b", "a"])).toBe(true);
+    expect(isSourceReadable({ id: "a", access: "paywalled" }, ["a"])).toBe(true);
   });
 });

@@ -332,7 +332,13 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
 
     it("records the refusal, swaps the session and counts the replacement", async () => {
       await repo.savePreferences(PREFERENCES);
-      const seeded = await seedSession(addDays(today(), -9));
+      // Only today's mission can be replaced (the daily limit is per mission).
+      const past = await seedSession(addDays(today(), -9));
+      await expect(repo.replaceInaccessibleContent(past.sessionId)).rejects.toBeInstanceOf(UserFacingError);
+      // The mission progress tests leave a mission for today: this one takes its place.
+      const cleared = await admin.from("missions").delete().eq("user_id", userId).eq("mission_date", today());
+      if (cleared.error) throw cleared.error;
+      const seeded = await seedSession(today());
 
       expect(await repo.replaceInaccessibleContent(seeded.sessionId)).toEqual({ status: "ready" });
 

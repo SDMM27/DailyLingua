@@ -1,7 +1,5 @@
 import { addDays } from "@/lib/domain/dates";
-import { DEFAULT_READABLE_ACCESS } from "@/lib/content/policy";
 import type { DateKey, Language } from "@/lib/schemas/common";
-import type { SourceAccess } from "@/lib/schemas/content";
 import {
   generationRequestSchema,
   type ExerciseGenerator,
@@ -43,7 +41,7 @@ export interface ReplaceableSession {
 }
 
 export interface SessionReplacementStore
-  extends Pick<MissionStore, "getPreferences" | "listCandidates" | "listUsedContentIds" | "listRefusedContentIds"> {
+  extends Pick<MissionStore, "getPreferences" | "listCandidates" | "listUsedContentIds" | "listRefusedContentIds" | "listDeclaredSourceIds"> {
   /** Null when the session does not exist or is not this user's. */
   getSessionForReplacement(userId: string, sessionId: string): Promise<ReplaceableSession | null>;
   /**
@@ -77,8 +75,6 @@ export interface ReplaceSessionInput {
   generator: ExerciseGenerator;
   /** Used when the generator fails or returns something unusable. Default: the template. */
   fallback?: ExerciseGenerator;
-  /** Source access levels the user can read. Default: free sources only. */
-  readableAccess?: readonly SourceAccess[];
   now?: () => Date;
   log?: (message: string) => void;
 }
@@ -94,7 +90,6 @@ export async function replaceMissionSession(input: ReplaceSessionInput): Promise
   const fallback = input.fallback ?? createTemplateGenerator();
   const now = input.now ?? (() => new Date());
   const log = input.log ?? (() => {});
-  const access = input.readableAccess ?? DEFAULT_READABLE_ACCESS;
 
   const describe = (error: unknown) => {
     const reason =
@@ -144,7 +139,8 @@ export async function replaceMissionSession(input: ReplaceSessionInput): Promise
       ...(await store.listUsedContentIds(userId, addDays(old.missionDate, -REUSE_WINDOW_DAYS))),
       ...(await store.listRefusedContentIds(userId)),
     ]);
-    const options = { goal, preferences, access, minutes: old.minutes, excludeIds, now: startedAt };
+    const declaredSourceIds = await store.listDeclaredSourceIds(userId);
+    const options = { goal, preferences, declaredSourceIds, minutes: old.minutes, excludeIds, now: startedAt };
     const pool = await loadUsablePool(store, options);
     if (!pool) {
       await release();

@@ -1,6 +1,6 @@
 # Plan : accès aux contenus par utilisateur
 
-Statut : étapes 1 et 2 réalisées, étapes 3 et 4 à faire. Branche : `dev`.
+Statut : étapes 1, 2 et 3 réalisées, étape 4 (facultative) à faire. Branche : `dev`.
 
 ## Problème
 
@@ -50,16 +50,20 @@ Ce qui a été construit :
 - Interface : `NoAccessButton` sous le lien « Ouvrir sur … » de chaque contenu, avec confirmation (la progression de cette langue est effacée) ; masqué en démonstration.
 - Tests : `replace-session.test.ts`, `generate-mission.test.ts`, `no-access-button.test.tsx`, `actions/mission.test.ts`, et le test d'intégration d'écriture (base locale).
 
-### Étape 3 — Accès déclaré par utilisateur
+### Étape 3 — Accès déclaré par utilisateur (réalisée)
 
-Schéma :
-- Table `user_source_access` (`user_id`, `source_id`, `created_at`), clé primaire composite.
-- Migration Supabase + mise à jour de `src/lib/supabase/database.types.ts`.
-- Règle par défaut : toutes les sources `free` sont lisibles ; `metered` et `paywalled` seulement si une ligne existe.
+L'accès est **par source** : une source est lisible par un utilisateur si elle est `free` ou s'il l'a déclarée. Le niveau d'accès (`metered` / `paywalled`) ne suffit plus à lui seul ; abonné à un éditeur, on ne l'est pas aux autres.
 
-Interface :
-- `src/app/preferences/page.tsx` et `src/components/preferences/preferences-form.tsx` : liste des sources `metered`/`paywalled`, case à cocher « J'y ai accès ».
-- Données lues via `getRepository()` uniquement (règle du projet).
+Ce qui a été construit :
+
+- Migration `20261016000100_user_source_access.sql` : table `user_source_access` (`user_id`, `source_id`, `created_at`), clé primaire `(user_id, source_id)`, index sur `source_id`, cascade à la suppression du profil ou de la source. RLS : le propriétaire lit, insère et supprime ses lignes (aucune mise à jour), les autres ne voient rien, `anon` n'a aucun droit. **Aucun identifiant d'éditeur n'est stocké**, ni cookie ni jeton : c'est une simple déclaration, jamais vérifiée. `database.types.ts` mis à jour.
+- `isSourceReadable(source, declaredSourceIds)` (`src/lib/content/policy.ts`). `DEFAULT_READABLE_ACCESS` / `isReadable` ne servent plus qu'à `availableLanguages` (une langue n'est proposée que si elle a une source gratuite).
+- `MissionStore.listCandidates(language, { contentTypes?, declaredSourceIds, limit })` remplace l'option `access`, et `MissionStore.listDeclaredSourceIds(userId)` (service role) lit les déclarations. `generateMission` et `replaceMissionSession` chargent ces identifiants eux-mêmes ; l'option `readableAccess` disparaît.
+- Implémentation Supabase de `listCandidates` : pas de filtre `or` à travers la table imbriquée. Une requête sur les sources `free`, plus, si l'utilisateur a déclaré des sources, une seconde sur `source_id in (...)` (mêmes autres filtres : langue, lien cassé, source active avec clé, licence, types) ; fusion, dédoublonnage par id, tri `published_at` décroissant (sans date en dernier), puis limite.
+- Dépôt : `listPaidSources()` (sources actives `metered` / `paywalled` des langues de l'utilisateur, avec `declared`, ordre du registre des langues puis nom ; en démonstration, issues du catalogue, jamais déclarées) et `setSourceAccess(sourceId, hasAccess)` (insertion idempotente ou suppression ; refuse une source gratuite, inactive ou inconnue ; lecture seule en démonstration). Schémas `paidSourceSchema` et `sourceAccessInputSchema` dans `src/lib/schemas/content.ts`.
+- Action serveur `setSourceAccess` (`src/app/actions/preferences.ts`).
+- Interface : section « Mes abonnements » de `/preferences` (composant `SourceAccessList`) : une ligne par source (langue, nom, « accès limité » ou « payant »), case « J'y ai accès » enregistrée immédiatement, état optimiste avec retour en arrière et message en cas d'échec ; masquée s'il n'y a aucune source payante, désactivée en démonstration. `preferences-form.tsx` n'est pas modifié.
+- Tests : `policy.test.ts`, `generate-mission.test.ts`, `replace-session.test.ts`, `source-access-list.test.tsx`, `actions/source-access.test.ts` et deux tests d'intégration (`user-source-access.integration.test.ts` pour la migration, la RLS et le dépôt ; `supabase-store.integration.test.ts` pour la fusion des sources déclarées).
 
 Sécurité :
 - Aucune donnée d'identifiant d'éditeur n'est stockée.

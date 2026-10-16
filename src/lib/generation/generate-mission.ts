@@ -1,8 +1,6 @@
 import { addDays } from "@/lib/domain/dates";
 import { splitBudget } from "@/lib/domain/time-budget";
-import { DEFAULT_READABLE_ACCESS } from "@/lib/content/policy";
 import type { ContentType, DateKey, Language } from "@/lib/schemas/common";
-import type { SourceAccess } from "@/lib/schemas/content";
 import {
   GENERATION_LIMITS,
   generationMetaSchema,
@@ -37,8 +35,10 @@ const MAX_REASON_LENGTH = 300;
 /** Storage used by the orchestrator; implemented on Supabase by the app, in memory by the tests. */
 export interface MissionStore {
   getPreferences(userId: string): Promise<Preferences | null>;
-  /** Recent usable contents of a language (licence policy, active sources, not broken), newest first. `contentTypes` undefined = any type; `access` = the source access levels the user can read. */
-  listCandidates(language: Language, options: { contentTypes?: ContentType[]; access: readonly SourceAccess[]; limit: number }): Promise<CandidateContent[]>;
+  /** Recent usable contents of a language (licence policy, active sources, not broken), newest first. `contentTypes` undefined = any type; `declaredSourceIds` = the paid sources the user declared they can read (free sources are always readable). */
+  listCandidates(language: Language, options: { contentTypes?: ContentType[]; declaredSourceIds: readonly string[]; limit: number }): Promise<CandidateContent[]>;
+  /** Paid sources this user declared they have access to (`user_source_access`). */
+  listDeclaredSourceIds(userId: string): Promise<string[]>;
   /** Contents already used in this user's missions since `since` (inclusive). */
   listUsedContentIds(userId: string, since: DateKey): Promise<string[]>;
   /** Contents this user declared unreadable (« Je n’ai pas accès »): never proposed to them again. */
@@ -75,8 +75,6 @@ export interface GenerateMissionInput {
   generator: ExerciseGenerator;
   /** Used when the generator fails or returns something unusable. Default: the template. */
   fallback?: ExerciseGenerator;
-  /** Source access levels the user can read. Default: free sources only. */
-  readableAccess?: readonly SourceAccess[];
   now?: () => Date;
   log?: (message: string) => void;
 }
@@ -84,7 +82,7 @@ export interface GenerateMissionInput {
 interface PoolOptions {
   goal: Preferences["goals"][number];
   preferences: Preferences;
-  access: readonly SourceAccess[];
+  declaredSourceIds: readonly string[];
   minutes: number;
   excludeIds: ReadonlySet<string>;
   now: Date;
@@ -104,10 +102,10 @@ export async function loadUsablePool(store: Pick<MissionStore, "listCandidates">
   // Preferred content types first; any type when none is left (all used, or none published).
   let pool = await store.listCandidates(o.goal.language, {
     contentTypes: o.preferences.contentTypes,
-    access: o.access,
+    declaredSourceIds: o.declaredSourceIds,
     limit: CANDIDATE_POOL,
   });
-  if (!usable(pool)) pool = await store.listCandidates(o.goal.language, { access: o.access, limit: CANDIDATE_POOL });
+  if (!usable(pool)) pool = await store.listCandidates(o.goal.language, { declaredSourceIds: o.declaredSourceIds, limit: CANDIDATE_POOL });
   return usable(pool) ? pool : null;
 }
 
@@ -218,7 +216,6 @@ export async function generateMission(input: GenerateMissionInput): Promise<Gene
   const fallback = input.fallback ?? createTemplateGenerator();
   const now = input.now ?? (() => new Date());
   const log = input.log ?? (() => {});
-  const access = input.readableAccess ?? DEFAULT_READABLE_ACCESS;
 
   const preferences = await store.getPreferences(userId);
   if (!preferences) return { status: "no-preferences" };
@@ -237,6 +234,7 @@ export async function generateMission(input: GenerateMissionInput): Promise<Gene
       ...(await store.listUsedContentIds(userId, addDays(date, -REUSE_WINDOW_DAYS))),
       ...(await store.listRefusedContentIds(userId)),
     ]);
+    const declaredSourceIds = await store.listDeclaredSourceIds(userId);
     const provisional = splitBudget(preferences.dailyMinutes, preferences.goals);
 
     const pools = new Map<Language, CandidateContent[]>();
@@ -244,7 +242,7 @@ export async function generateMission(input: GenerateMissionInput): Promise<Gene
       const pool = await loadUsablePool(store, {
         goal,
         preferences,
-        access,
+        declaredSourceIds,
         minutes: provisional[i].minutes,
         excludeIds,
         now: startedAt,
@@ -267,7 +265,7 @@ export async function generateMission(input: GenerateMissionInput): Promise<Gene
         buildSessionRequest({
           goal,
           preferences,
-          access,
+          declaredSourceIds,
           minutes: shares[index].minutes,
           excludeIds,
           now: startedAt,

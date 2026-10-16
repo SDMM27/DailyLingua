@@ -347,6 +347,32 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"user_source_access": {
+                  Row: {
+                    "created_at": string,"source_id": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"source_id": string,"user_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"source_id"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "user_source_access_source_id_fkey"
+      columns: ["source_id"]
+isOneToOne: false
+      referencedRelation: "sources"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "user_source_access_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"vocabulary_items": {
                   Row: {
                     "added_on": string,"box": number,"content_id": string | null,"created_at": string,"definition": string | null,"due_on": string,"example": string | null,"id": string,"language": string,"last_reviewed_on": string | null,"review_count": number,"source_name": string | null,"source_url": string | null,"status": string,"term": string,"translation": string,"updated_at": string,"user_id": string

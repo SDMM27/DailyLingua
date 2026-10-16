@@ -1,3 +1,4 @@
+import type { SourceAccess } from "@/lib/schemas/content";
 import type { ContentType } from "@/lib/schemas/common";
 import type { ActivityKind } from "@/lib/schemas/mission";
 import type { PlacementConfidence, PlacementVariant } from "@/lib/schemas/placement";
@@ -8,6 +9,12 @@ export const CONTENT_TYPE_LABELS: Record<ContentType, string> = {
   podcast: "Podcast",
   video: "Vidéo",
   interview: "Interview",
+};
+
+export const SOURCE_ACCESS_LABELS: Record<SourceAccess, string> = {
+  free: "gratuit",
+  metered: "accès limité",
+  paywalled: "payant",
 };
 
 export const ACTIVITY_LABELS: Record<ActivityKind, string> = {
