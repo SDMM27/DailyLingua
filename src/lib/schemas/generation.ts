@@ -51,6 +51,8 @@ export const sessionRequestSchema = z.object({
   focus: z.string(),
   /** Why the learner studies this language: sets the register and the kind of exercises. */
   purpose: languagePurposeSchema,
+  /** Interests chosen for this language (French labels); never mixed with another language's. */
+  topics: z.array(z.string()),
   minutes: z.number().int().positive(),
   productionMode: productionModeSchema,
   /** Minutes planned for the production task (estimate: the final plan depends on the exercises). */
@@ -62,8 +64,6 @@ export type SessionRequest = z.infer<typeof sessionRequestSchema>;
 
 export const generationRequestSchema = z.object({
   date: dateKeySchema,
-  /** Interests chosen in the preferences (French labels). */
-  topics: z.array(z.string()),
   sessions: z.array(sessionRequestSchema).min(1),
 });
 export type GenerationRequest = z.infer<typeof generationRequestSchema>;

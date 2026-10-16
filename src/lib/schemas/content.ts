@@ -105,3 +105,23 @@ export const contentListItemSchema = z.object({
   source: sourceInfoSchema.pick({ name: true, homepage: true, access: true, license: true }),
 });
 export type ContentListItem = z.infer<typeof contentListItemSchema>;
+
+/** A paid (metered / paywalled) source the user can declare they have access to. */
+export const paidSourceSchema = z.object({
+  /** Database id (the catalogue key in the demo). */
+  id: z.string().min(1),
+  name: z.string().min(1),
+  homepage: z.url(),
+  language: languageSchema,
+  access: z.enum(["metered", "paywalled"]),
+  /** Whether the user declared that they can read it. */
+  declared: z.boolean(),
+});
+export type PaidSource = z.infer<typeof paidSourceSchema>;
+
+/** Input of the « J'y ai accès » toggle. */
+export const sourceAccessInputSchema = z.object({
+  sourceId: z.uuid(),
+  hasAccess: z.boolean(),
+});
+export type SourceAccessInput = z.infer<typeof sourceAccessInputSchema>;

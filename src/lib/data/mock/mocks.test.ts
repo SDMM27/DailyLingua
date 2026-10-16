@@ -42,7 +42,7 @@ describe("schemas reject invalid data", () => {
   });
 
   it("an empty topic list", () => {
-    expect(preferencesSchema.safeParse({ ...MOCK_PREFERENCES, topics: [] }).success).toBe(false);
+    expect(preferencesSchema.safeParse({ ...MOCK_PREFERENCES, goals: [{ ...MOCK_PREFERENCES.goals[0], topics: [] }] }).success).toBe(false);
   });
 });
 
@@ -63,7 +63,7 @@ describe("preferences accept any number of distinct languages", () => {
   it("accepts three languages", () => {
     const goals = [
       ...MOCK_PREFERENCES.goals,
-      { language: "es" as const, level: "A2" as const, targetLevel: "B1" as const, focus: "", purpose: "general", weight: 1 },
+      { language: "es" as const, level: "A2" as const, targetLevel: "B1" as const, focus: "", purpose: "general", weight: 1, topics: ["société"], contentTypes: ["article"] },
     ];
     expect(preferencesSchema.safeParse({ ...MOCK_PREFERENCES, goals }).success).toBe(true);
   });

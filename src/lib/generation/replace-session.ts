@@ -1,13 +1,16 @@
 import { addDays } from "@/lib/domain/dates";
-import { DEFAULT_READABLE_ACCESS } from "@/lib/content/policy";
 import type { DateKey, Language } from "@/lib/schemas/common";
-import type { SourceAccess } from "@/lib/schemas/content";
 import {
   generationRequestSchema,
   type ExerciseGenerator,
   type GenerationMeta,
 } from "@/lib/schemas/generation";
-import { GenerationError, SessionNotFoundError, SessionReplacementLimitError } from "./errors";
+import {
+  GenerationError,
+  SessionNotFoundError,
+  SessionReplacementInProgressError,
+  SessionReplacementLimitError,
+} from "./errors";
 import {
   buildMeta,
   buildSessionRequest,
@@ -35,18 +38,24 @@ export interface ReplaceableSession {
   position: number;
   /** Sum of the estimated minutes of its activities: the new session gets the same share. */
   minutes: number;
-  /** Replacements already made on this mission. */
-  replacements: number;
 }
 
 export interface SessionReplacementStore
-  extends Pick<MissionStore, "getPreferences" | "listCandidates" | "listUsedContentIds" | "listRefusedContentIds"> {
+  extends Pick<MissionStore, "getPreferences" | "listCandidates" | "listUsedContentIds" | "listRefusedContentIds" | "listDeclaredSourceIds"> {
   /** Null when the session does not exist or is not this user's. */
   getSessionForReplacement(userId: string, sessionId: string): Promise<ReplaceableSession | null>;
   /**
-   * Swaps the session for `session` (same language and position), atomically. Throws
-   * SessionReplacementLimitError when the day's limit is reached, SessionNotFoundError when the
-   * session is gone.
+   * Takes one of the day's replacement slots and marks the session as being replaced, atomically.
+   * Throws SessionReplacementLimitError when the limit is reached, SessionReplacementInProgressError
+   * when a replacement of this session is already running, SessionNotFoundError when it is gone.
+   * The slot counts even if the generation fails afterwards.
+   */
+  reserveReplacement(sessionId: string, userId: string): Promise<void>;
+  /** Clears the mark of a reserved session after a failure, so that the user can retry. */
+  releaseReplacement(sessionId: string): Promise<void>;
+  /**
+   * Swaps the reserved session for `session` (same language and position), atomically. Throws
+   * SessionNotFoundError when the session is gone.
    */
   replaceSession(sessionId: string, userId: string, session: PlannedSession, meta: GenerationMeta): Promise<void>;
 }
@@ -55,6 +64,7 @@ export type ReplaceSessionOutcome =
   | { status: "ready" }
   | { status: "no-content" }
   | { status: "limit" }
+  | { status: "in-progress" }
   | { status: "not-found" }
   | { status: "failed"; reason: string };
 
@@ -65,8 +75,6 @@ export interface ReplaceSessionInput {
   generator: ExerciseGenerator;
   /** Used when the generator fails or returns something unusable. Default: the template. */
   fallback?: ExerciseGenerator;
-  /** Source access levels the user can read. Default: free sources only. */
-  readableAccess?: readonly SourceAccess[];
   now?: () => Date;
   log?: (message: string) => void;
 }
@@ -82,29 +90,65 @@ export async function replaceMissionSession(input: ReplaceSessionInput): Promise
   const fallback = input.fallback ?? createTemplateGenerator();
   const now = input.now ?? (() => new Date());
   const log = input.log ?? (() => {});
-  const access = input.readableAccess ?? DEFAULT_READABLE_ACCESS;
+
+  const describe = (error: unknown) => {
+    const reason =
+      error instanceof GenerationError
+        ? `${error.reason}: ${error.message}`
+        : error instanceof Error
+          ? error.message
+          : String(error);
+    return reason.slice(0, MAX_REASON_LENGTH);
+  };
+
+  let old: ReplaceableSession | null;
+  try {
+    old = await store.getSessionForReplacement(userId, sessionId);
+    if (!old) return { status: "not-found" };
+    // Reserved BEFORE any language-model work: the slot is taken under the mission's lock, so
+    // parallel requests cannot all reach the generator.
+    await store.reserveReplacement(sessionId, userId);
+  } catch (error) {
+    if (error instanceof SessionReplacementLimitError) return { status: "limit" };
+    if (error instanceof SessionReplacementInProgressError) return { status: "in-progress" };
+    if (error instanceof SessionNotFoundError) return { status: "not-found" };
+    const reason = describe(error);
+    log(`generation: replacement of session ${sessionId} failed: ${reason}`);
+    return { status: "failed", reason };
+  }
+
+  // The slot stays consumed, but the session is released so that the user can retry.
+  const release = async () => {
+    try {
+      await store.releaseReplacement(sessionId);
+    } catch (error) {
+      log(`generation: could not release session ${sessionId}: ${describe(error)}`);
+    }
+  };
 
   try {
-    const old = await store.getSessionForReplacement(userId, sessionId);
-    if (!old) return { status: "not-found" };
-    if (old.replacements >= MAX_SESSION_REPLACEMENTS_PER_DAY) return { status: "limit" };
-
     const preferences = await store.getPreferences(userId);
     const goal = preferences?.goals.find((g) => g.language === old.language);
-    if (!preferences || !goal) return { status: "not-found" };
+    if (!preferences || !goal) {
+      await release();
+      return { status: "not-found" };
+    }
 
     const startedAt = now();
     const excludeIds = new Set([
       ...(await store.listUsedContentIds(userId, addDays(old.missionDate, -REUSE_WINDOW_DAYS))),
       ...(await store.listRefusedContentIds(userId)),
     ]);
-    const options = { goal, preferences, access, minutes: old.minutes, excludeIds, now: startedAt };
+    const declaredSourceIds = await store.listDeclaredSourceIds(userId);
+    const options = { goal, preferences, declaredSourceIds, minutes: old.minutes, excludeIds, now: startedAt };
     const pool = await loadUsablePool(store, options);
-    if (!pool) return { status: "no-content" };
+    if (!pool) {
+      await release();
+      return { status: "no-content" };
+    }
 
     const request = generationRequestSchema.parse({
       date: old.missionDate,
-      topics: preferences.topics,
       sessions: [
         buildSessionRequest({
           ...options,
@@ -119,15 +163,11 @@ export async function replaceMissionSession(input: ReplaceSessionInput): Promise
     await store.replaceSession(sessionId, userId, planned, meta);
     return { status: "ready" };
   } catch (error) {
+    await release();
     if (error instanceof SessionReplacementLimitError) return { status: "limit" };
     if (error instanceof SessionNotFoundError) return { status: "not-found" };
-    const reason =
-      error instanceof GenerationError
-        ? `${error.reason}: ${error.message}`
-        : error instanceof Error
-          ? error.message
-          : String(error);
-    log(`generation: replacement of session ${sessionId} failed: ${reason.slice(0, MAX_REASON_LENGTH)}`);
-    return { status: "failed", reason: reason.slice(0, MAX_REASON_LENGTH) };
+    const reason = describe(error);
+    log(`generation: replacement of session ${sessionId} failed: ${reason}`);
+    return { status: "failed", reason };
   }
 }

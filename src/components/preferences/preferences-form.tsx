@@ -6,6 +6,7 @@ import { savePreferences } from "@/app/actions/preferences";
 import { PlusIcon } from "@/components/icons";
 import { languageStyle } from "@/components/ui/language-style";
 import { Card, Eyebrow, LanguageTag } from "@/components/ui/primitives";
+import { DEFAULT_LANGUAGE_TASTES } from "@/lib/domain/default-preferences";
 import { CONTENT_TYPE_LABELS, DIFFICULTY_LABELS, LANGUAGE_PURPOSE_LABELS } from "@/lib/domain/labels";
 import { languageInfo } from "@/lib/domain/languages";
 import { splitBudget } from "@/lib/domain/time-budget";
@@ -32,6 +33,15 @@ const subscribeNever = () => () => {};
 /** The time zone of this device; null on the server, where it is unknown. */
 const deviceTimeZone = () => Intl.DateTimeFormat().resolvedOptions().timeZone;
 
+function sameSet<T>(a: readonly T[], b: readonly T[]): boolean {
+  return a.length === b.length && a.every((v) => b.includes(v));
+}
+
+/** Whether a language has the same topics and formats as the first one (the shortcut starts checked then). */
+function sharesTastes(goal: LanguageGoal, first: LanguageGoal): boolean {
+  return sameSet(goal.topics, first.topics) && sameSet(goal.contentTypes, first.contentTypes);
+}
+
 function toggleIn<T>(list: readonly T[], value: T): T[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
 }
@@ -55,6 +65,11 @@ export function PreferencesForm({
 }) {
   const router = useRouter();
   const [prefs, setPrefs] = useState(initial);
+  // Languages (other than the first) that follow the first one's topics and formats. Their own
+  // pickers are hidden and their values are copied from the first language when saving.
+  const [shared, setShared] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(initial.goals.map((g) => [g.language, sharesTastes(g, initial.goals[0])])),
+  );
   const [saveState, setSaveState] = useState<SaveState>({ kind: "idle" });
   const onboarding = mode === "onboarding";
   const device = useSyncExternalStore(subscribeNever, deviceTimeZone, () => null);
@@ -71,6 +86,18 @@ export function PreferencesForm({
       prefs.goals.map((g) => (g.language === language ? { ...g, ...change } : g)),
     );
 
+  const first = prefs.goals[0];
+  const follows = (goal: LanguageGoal) => goal !== first && shared[goal.language] === true;
+
+  // Followers take their values from the first language now, so removing it does not change them.
+  const removeGoal = (language: Language) =>
+    set(
+      "goals",
+      prefs.goals
+        .map((g) => (follows(g) ? { ...g, topics: first.topics, contentTypes: first.contentTypes } : g))
+        .filter((g) => g.language !== language),
+    );
+
   const split = prefs.goals.length > 0 ? splitBudget(prefs.dailyMinutes, prefs.goals) : [];
   const minutesFor = (language: Language) => split.find((s) => s.language === language)?.minutes ?? 0;
   const maxWeight = Math.max(...prefs.goals.map((g) => g.weight));
@@ -79,7 +106,10 @@ export function PreferencesForm({
   );
 
   async function handleSave() {
-    const result = preferencesSchema.safeParse({ ...prefs, timeZone });
+    const goals = prefs.goals.map((g) =>
+      follows(g) ? { ...g, topics: first.topics, contentTypes: first.contentTypes } : g,
+    );
+    const result = preferencesSchema.safeParse({ ...prefs, goals, timeZone });
     if (!result.success) {
       setSaveState({ kind: "error", messages: [...new Set(result.error.issues.map((i) => i.message))] });
       return;
@@ -126,7 +156,7 @@ export function PreferencesForm({
                 {prefs.goals.length > 1 && (
                   <button
                     type="button"
-                    onClick={() => set("goals", prefs.goals.filter((g) => g.language !== goal.language))}
+                    onClick={() => removeGoal(goal.language)}
                     className="text-xs font-medium text-muted hover:text-danger"
                   >
                     Retirer
@@ -173,6 +203,44 @@ export function PreferencesForm({
                   className="w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 focus:border-ink-soft focus:outline-none"
                 />
               </label>
+              {goal !== first && (
+                <label className="mt-3 flex min-h-11 items-center gap-3 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={follows(goal)}
+                    onChange={(e) => {
+                      setShared((s) => ({ ...s, [goal.language]: e.target.checked }));
+                      // Unchecking starts from the first language's choices, which stay editable.
+                      if (!e.target.checked) setGoal(goal.language, { topics: first.topics, contentTypes: first.contentTypes });
+                      else setSaveState({ kind: "idle" });
+                    }}
+                    className="size-5 shrink-0 accent-[var(--ink)]"
+                  />
+                  <span>Mêmes sujets et formats que {languageInfo(first.language).nameFr}</span>
+                </label>
+              )}
+              {!follows(goal) && (
+                <div className="mt-3 space-y-3">
+                  <div>
+                    <span className="mb-2 block text-xs font-medium text-ink-soft">Sujets favoris</span>
+                    <ChipGroup
+                      label={`Sujets favoris ${languageInfo(goal.language).nameFr}`}
+                      options={TOPICS.map((t) => ({ value: t, label: t }))}
+                      selected={goal.topics}
+                      onToggle={(t) => setGoal(goal.language, { topics: toggleIn(goal.topics, t) })}
+                    />
+                  </div>
+                  <div>
+                    <span className="mb-2 block text-xs font-medium text-ink-soft">Types de contenus</span>
+                    <ChipGroup
+                      label={`Types de contenus ${languageInfo(goal.language).nameFr}`}
+                      options={CONTENT_TYPES.map((t) => ({ value: t, label: CONTENT_TYPE_LABELS[t] }))}
+                      selected={goal.contentTypes}
+                      onToggle={(t) => setGoal(goal.language, { contentTypes: toggleIn(goal.contentTypes, t) })}
+                    />
+                  </div>
+                </div>
+              )}
               <div className="mt-3 flex items-center justify-between">
                 <span className="text-xs font-medium text-ink-soft">Poids</span>
                 <div className="flex items-center gap-3">
@@ -197,12 +265,16 @@ export function PreferencesForm({
                 <button
                   key={code}
                   type="button"
-                  onClick={() =>
+                  onClick={() => {
+                    const tastes = first
+                      ? { topics: first.topics, contentTypes: first.contentTypes }
+                      : DEFAULT_LANGUAGE_TASTES;
+                    setShared((s) => ({ ...s, [code]: true }));
                     set("goals", [
                       ...prefs.goals,
-                      { language: code, level: "A2", targetLevel: "B1", focus: "", purpose: "general", weight: 1 },
-                    ])
-                  }
+                      { language: code, level: "A2", targetLevel: "B1", focus: "", purpose: "general", weight: 1, ...tastes },
+                    ]);
+                  }}
                   className="inline-flex items-center gap-1 rounded-full border border-dashed border-line px-3 py-1.5 text-sm text-ink-soft hover:border-ink-soft"
                 >
                   <PlusIcon width={14} height={14} />
@@ -243,24 +315,6 @@ export function PreferencesForm({
         <p className="mt-2 text-xs text-muted">
           {split.map((s) => `${languageInfo(s.language).nameFr} ${s.minutes} min`).join(" · ")}
         </p>
-      </Section>
-
-      <Section title="Sujets favoris">
-        <ChipGroup
-          label="Sujets favoris"
-          options={TOPICS.map((t) => ({ value: t, label: t }))}
-          selected={prefs.topics}
-          onToggle={(t) => set("topics", toggleIn(prefs.topics, t))}
-        />
-      </Section>
-
-      <Section title="Types de contenus">
-        <ChipGroup
-          label="Types de contenus"
-          options={CONTENT_TYPES.map((t) => ({ value: t, label: CONTENT_TYPE_LABELS[t] }))}
-          selected={prefs.contentTypes}
-          onToggle={(t) => set("contentTypes", toggleIn(prefs.contentTypes, t))}
-        />
       </Section>
 
       <Section title="Difficulté souhaitée">
@@ -433,7 +487,7 @@ function ChipGroup<T extends string>({
             type="button"
             aria-pressed={active}
             onClick={() => onToggle(o.value)}
-            className={`rounded-full border px-3.5 py-1.5 text-sm capitalize transition-colors ${
+            className={`min-h-11 rounded-full border px-3.5 py-1.5 text-sm capitalize transition-colors ${
               active ? "border-ink bg-ink text-paper" : "border-line text-ink-soft hover:bg-surface-sunk"
             }`}
           >

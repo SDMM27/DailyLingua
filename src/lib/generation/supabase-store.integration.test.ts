@@ -45,12 +45,10 @@ const TIME_ZONE = "Pacific/Kiritimati";
 
 const PREFERENCES: Preferences = {
   goals: [
-    { language: "ru", level: "B2", targetLevel: "C1", focus: "", purpose: "general", weight: 2 },
-    { language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 1 },
+    { language: "ru", level: "B2", targetLevel: "C1", focus: "", purpose: "general", weight: 2, topics: ["société"], contentTypes: ["article"] },
+    { language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 1, topics: ["société"], contentTypes: ["article"] },
   ],
   dailyMinutes: 30,
-  topics: ["société"],
-  contentTypes: ["article"],
   difficulty: "matched",
   generationTime: "07:00",
   timeZone: TIME_ZONE,
@@ -225,20 +223,21 @@ describe.skipIf(!stackIsUp)("Supabase mission store (local database, throw-away 
   });
 
   it("filters candidates by type and by licence policy", async () => {
-    const articles = await store().listCandidates("ru", { contentTypes: ["article"], access: ["free"], limit: 50 });
+    const articles = await store().listCandidates("ru", { contentTypes: ["article"], declaredSourceIds: [], limit: 50 });
     expect(mine(articles)).toHaveLength(3);
     expect(articles[0].publishedAt).not.toBeNull();
-    expect(mine(await store().listCandidates("ru", { contentTypes: ["podcast"], access: ["free"], limit: 50 }))).toEqual([]);
+    expect(mine(await store().listCandidates("ru", { contentTypes: ["podcast"], declaredSourceIds: [], limit: 50 }))).toEqual([]);
 
     // The test sources do not allow commercial use.
     const commercial = createSupabaseMissionStore(admin, { policy: "commercial" });
-    expect(mine(await commercial.listCandidates("ru", { access: ["free"], limit: 50 }))).toEqual([]);
+    expect(mine(await commercial.listCandidates("ru", { declaredSourceIds: [], limit: 50 }))).toEqual([]);
   });
 
-  it("filters candidates by the access level of their source", async () => {
+  it("merges the contents of declared paid sources with the free ones", async () => {
     const title = `Titre test ru metered ${runId}`;
     titles.add(title);
     const sourceId = await createSource("ru", "metered", "-metered");
+    const otherId = await createSource("ru", "paywalled", "-paywalled");
     const { data, error } = await admin
       .from("contents")
       .insert({
@@ -250,6 +249,7 @@ describe.skipIf(!stackIsUp)("Supabase mission store (local database, throw-away 
         difficulty: "B2",
         duration_minutes: 4,
         summary: "Résumé d’un article d’une source à compteur, publié par une source de test.",
+        // Newer than the free test contents: first once merged.
         published_at: new Date(Date.now() + 7_200_000).toISOString(),
       })
       .select("id")
@@ -257,7 +257,28 @@ describe.skipIf(!stackIsUp)("Supabase mission store (local database, throw-away 
     if (error) throw error;
     contentIds.push(data.id);
 
-    expect(mine(await store().listCandidates("ru", { access: ["free"], limit: 50 })).map((c) => c.title)).not.toContain(title);
-    expect(mine(await store().listCandidates("ru", { access: ["free", "metered"], limit: 50 })).map((c) => c.title)).toContain(title);
+    // Not declared, or another paid source declared: left out.
+    expect(mine(await store().listCandidates("ru", { declaredSourceIds: [], limit: 50 })).map((c) => c.title)).not.toContain(title);
+    expect(mine(await store().listCandidates("ru", { declaredSourceIds: [otherId], limit: 50 })).map((c) => c.title)).not.toContain(title);
+
+    // Declared: merged with the free ones, newest first, no duplicate, limit applied after the merge.
+    const merged = await store().listCandidates("ru", { declaredSourceIds: [sourceId], limit: 50 });
+    expect(mine(merged).map((c) => c.title)).toContain(title);
+    expect(new Set(merged.map((c) => c.id)).size).toBe(merged.length);
+    expect(mine(merged)[0].title).toBe(title);
+    const dates = merged.map((c) => (c.publishedAt === null ? -Infinity : Date.parse(c.publishedAt)));
+    expect(dates).toEqual([...dates].sort((x, y) => y - x));
+    const limited = await store().listCandidates("ru", { declaredSourceIds: [sourceId], limit: 2 });
+    expect(limited).toHaveLength(2);
+    expect(limited.map((c) => c.id)).toEqual(merged.slice(0, 2).map((c) => c.id));
+    expect(limited[0].title).toBe(merged[0].title);
+  });
+
+  it("lists the paid sources a user declared", async () => {
+    const sourceId = await createSource("it", "metered", "-declared");
+    expect(await store().listDeclaredSourceIds(userId)).not.toContain(sourceId);
+    const { error } = await admin.from("user_source_access").insert({ user_id: userId, source_id: sourceId });
+    if (error) throw error;
+    expect(await store().listDeclaredSourceIds(userId)).toContain(sourceId);
   });
 });

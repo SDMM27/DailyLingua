@@ -6,6 +6,7 @@ import type {
   GenerationMeta,
   GenerationRequest,
 } from "@/lib/schemas/generation";
+import { isSourceReadable } from "@/lib/content/policy";
 import type { SourceAccess } from "@/lib/schemas/content";
 import type { Preferences } from "@/lib/schemas/preferences";
 import { GenerationError } from "./errors";
@@ -17,12 +18,10 @@ const NOW = new Date("2026-10-13T12:00:00Z");
 
 const preferences: Preferences = {
   goals: [
-    { language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 1 },
-    { language: "es", level: "A2", targetLevel: "B1", focus: "oral", purpose: "conversational", weight: 1 },
+    { language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 1, topics: ["société"], contentTypes: ["article"] },
+    { language: "es", level: "A2", targetLevel: "B1", focus: "oral", purpose: "conversational", weight: 1, topics: ["société"], contentTypes: ["article"] },
   ],
   dailyMinutes: 20,
-  topics: ["société"],
-  contentTypes: ["article"],
   difficulty: "matched",
   generationTime: "07:00",
   timeZone: "Europe/Paris",
@@ -58,8 +57,10 @@ function memoryStore(
     refused?: string[];
     claim?: { status: "generating" | "ready" | "failed"; claimed: boolean };
     completeError?: Error;
-    /** Access level of the source of a content, by content id (default: free). */
+    /** Access level of the source of a content, by content id (default: free). The source id is `src-<content id>`. */
     sourceAccess?: Record<string, SourceAccess>;
+    /** Paid sources the user declared (source ids). */
+    declared?: string[];
   } = {},
 ) {
   const calls: Calls = { completed: [], failed: [], candidateQueries: [], usedSince: [] };
@@ -68,9 +69,14 @@ function memoryStore(
     async getPreferences() {
       return options.prefs === undefined ? preferences : options.prefs;
     },
-    async listCandidates(language, { contentTypes, access }) {
+    async listCandidates(language, { contentTypes, declaredSourceIds }) {
       calls.candidateQueries.push({ language, contentTypes });
-      return (pools[language] ?? []).filter((c) => access.includes(options.sourceAccess?.[c.id] ?? "free"));
+      return (pools[language] ?? []).filter((c) =>
+        isSourceReadable({ id: `src-${c.id}`, access: options.sourceAccess?.[c.id] ?? "free" }, declaredSourceIds),
+      );
+    },
+    async listDeclaredSourceIds() {
+      return options.declared ?? [];
     },
     async listUsedContentIds(_userId, since) {
       calls.usedSince.push(since);
@@ -128,7 +134,7 @@ const throwing = (error: unknown): ExerciseGenerator => ({
 const run = (
   store: MissionStore,
   generator: ExerciseGenerator,
-  extra: { fallback?: ExerciseGenerator; readableAccess?: readonly SourceAccess[] } = {},
+  extra: { fallback?: ExerciseGenerator } = {},
 ) =>
   generateMission({ userId: "u1", date: "2026-10-13", store, generator, now: () => NOW, ...extra });
 
@@ -146,10 +152,25 @@ describe("generateMission", () => {
       expect(calls.completed[0].sessions.map((s) => s.language)).toEqual(["es"]);
     });
 
-    it("selects it once the user can read that access level", async () => {
-      const { store, calls } = memoryStore({ pools, sourceAccess: { "it-1": "metered", "it-2": "metered" } });
-      await run(store, aiGenerator(), { readableAccess: ["free", "metered"] });
+    it("selects a paid content once the user declared its source", async () => {
+      const { store, calls } = memoryStore({
+        pools,
+        sourceAccess: { "it-1": "metered", "it-2": "paywalled" },
+        declared: ["src-it-1", "src-it-2"],
+      });
+      await run(store, aiGenerator());
       expect(calls.completed[0].sessions.map((s) => s.language)).toEqual(["it", "es"]);
+    });
+
+    it("declaring one source does not open the others", async () => {
+      const { store, calls } = memoryStore({
+        pools,
+        sourceAccess: { "it-1": "metered", "it-2": "metered" },
+        declared: ["src-it-1"],
+      });
+      await run(store, aiGenerator());
+      expect(calls.completed[0].sessions.map((s) => s.language)).toEqual(["it", "es"]);
+      expect(calls.completed[0].sessions[0].contentId).toBe("it-1");
     });
 
     it("yields no-content when the only content is metered", async () => {
@@ -177,7 +198,7 @@ describe("generateMission", () => {
       outputTokens: 50,
       fallbackReason: null,
     });
-    expect(generator.requests[0].topics).toEqual(["société"]);
+    expect(generator.requests[0].sessions.map((s) => s.topics)).toEqual([["société"], ["société"]]);
     expect(generator.requests[0].sessions.map((s) => s.productionMode)).not.toContain(undefined);
     expect(calls.failed).toEqual([]);
     expect(calls.usedSince).toEqual(["2026-09-13"]);
@@ -190,6 +211,31 @@ describe("generateMission", () => {
     expect(generator.requests[0].sessions.map((s) => [s.language, s.purpose])).toEqual([
       ["it", "general"],
       ["es", "conversational"],
+    ]);
+  });
+
+  it("gives each language its own topics and content types", async () => {
+    const prefs: Preferences = {
+      ...preferences,
+      goals: [
+        { ...preferences.goals[0], topics: ["économie"], contentTypes: ["article"] },
+        { ...preferences.goals[1], topics: ["cinéma", "gastronomie"], contentTypes: ["podcast"] },
+      ],
+    };
+    const pools = {
+      it: [content("it", 1)],
+      es: [content("es", 1, { type: "podcast" })],
+    };
+    const { store, calls } = memoryStore({ prefs, pools });
+    const generator = aiGenerator();
+    await run(store, generator);
+    expect(generator.requests[0].sessions.map((s) => [s.language, s.topics])).toEqual([
+      ["it", ["économie"]],
+      ["es", ["cinéma", "gastronomie"]],
+    ]);
+    expect(calls.candidateQueries).toEqual([
+      { language: "it", contentTypes: ["article"] },
+      { language: "es", contentTypes: ["podcast"] },
     ]);
   });
 

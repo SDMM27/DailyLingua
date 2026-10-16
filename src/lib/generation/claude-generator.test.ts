@@ -10,7 +10,6 @@ const API_KEY = "sk-ant-secret-key-123";
 
 const request: GenerationRequest = {
   date: "2026-10-13",
-  topics: ["société"],
   sessions: [
     {
       language: "it",
@@ -18,6 +17,7 @@ const request: GenerationRequest = {
       targetLevel: "B2",
       focus: "",
       purpose: "general",
+      topics: ["société"],
       minutes: 20,
       productionMode: "writing",
       productionMinutes: 6,

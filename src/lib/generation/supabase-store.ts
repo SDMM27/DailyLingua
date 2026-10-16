@@ -4,7 +4,7 @@ import type { ContentLicensePolicy } from "@/lib/schemas/content";
 import { dateKeySchema, languageSchema } from "@/lib/schemas/common";
 import { candidateContentSchema } from "@/lib/schemas/generation";
 import type { Database, Json } from "@/lib/supabase/database.types";
-import { SessionNotFoundError, SessionReplacementLimitError } from "./errors";
+import { SessionNotFoundError, SessionReplacementInProgressError, SessionReplacementLimitError } from "./errors";
 import type { MissionStore } from "./generate-mission";
 import { MAX_SESSION_REPLACEMENTS_PER_DAY, type SessionReplacementStore } from "./replace-session";
 
@@ -25,26 +25,38 @@ export function createSupabaseMissionStore(
   return {
     getPreferences: (userId) => fetchPreferences(client, userId),
 
-    async listCandidates(language, { contentTypes, access, limit }) {
-      let query = client
-        .from("contents")
-        .select(
-          `id, content_type, title, summary, difficulty, duration_minutes, categories, published_at,
-           sources!inner ( name )`,
-        )
-        .eq("language", language)
-        .neq("url_status", "broken")
-        // Same filters as the content list: active feed sources only, licence policy applied.
-        .eq("sources.active", true)
-        .in("sources.access", [...access])
-        .not("sources.key", "is", null);
-      if (options.policy === "commercial") query = query.eq("sources.commercial_use", true);
-      if (contentTypes && contentTypes.length > 0) query = query.in("content_type", contentTypes);
-      const { data, error } = await query
-        .order("published_at", { ascending: false, nullsFirst: false })
-        .limit(limit);
-      if (error) fail("candidats", error);
-      return data.map((row) =>
+    async listCandidates(language, { contentTypes, declaredSourceIds, limit }) {
+      // Every filter but the access one, shared by the two queries below.
+      const base = () => {
+        let query = client
+          .from("contents")
+          .select(
+            `id, content_type, title, summary, difficulty, duration_minutes, categories, published_at,
+             sources!inner ( name )`,
+          )
+          .eq("language", language)
+          .neq("url_status", "broken")
+          // Same filters as the content list: active feed sources only, licence policy applied.
+          .eq("sources.active", true)
+          .not("sources.key", "is", null);
+        if (options.policy === "commercial") query = query.eq("sources.commercial_use", true);
+        if (contentTypes && contentTypes.length > 0) query = query.in("content_type", contentTypes);
+        return query.order("published_at", { ascending: false, nullsFirst: false }).limit(limit);
+      };
+      // Readable = free sources, plus the paid ones the user declared. Two queries rather than an
+      // `or` across the embedded table, merged below.
+      const queries = [base().eq("sources.access", "free")];
+      if (declaredSourceIds.length > 0) queries.push(base().in("source_id", [...declaredSourceIds]));
+      const results = await Promise.all(queries);
+      const rows = new Map<string, NonNullable<(typeof results)[number]["data"]>[number]>();
+      for (const { data, error } of results) {
+        if (error) fail("candidats", error);
+        for (const row of data ?? []) rows.set(row.id, row);
+      }
+      // Newest first, undated last: the order of each query, kept across the merge.
+      const time = (value: string | null) => (value === null ? Number.NEGATIVE_INFINITY : Date.parse(value));
+      const merged = [...rows.values()].sort((x, y) => time(y.published_at) - time(x.published_at)).slice(0, limit);
+      return merged.map((row) =>
         candidateContentSchema.parse({
           id: row.id,
           type: row.content_type,
@@ -57,6 +69,12 @@ export function createSupabaseMissionStore(
           publishedAt: row.published_at,
         }),
       );
+    },
+
+    async listDeclaredSourceIds(userId) {
+      const { data, error } = await client.from("user_source_access").select("source_id").eq("user_id", userId);
+      if (error) fail("sources déclarées", error);
+      return data.map((row) => row.source_id);
     },
 
     async listUsedContentIds(userId, since) {
@@ -79,7 +97,7 @@ export function createSupabaseMissionStore(
       const { data, error } = await client
         .from("mission_sessions")
         .select(
-          "mission_id, position, language, missions!inner ( mission_date, session_replacements ), mission_activities ( estimated_minutes )",
+          "mission_id, position, language, missions!inner ( mission_date ), mission_activities ( estimated_minutes )",
         )
         .eq("id", sessionId)
         .eq("user_id", userId)
@@ -92,8 +110,24 @@ export function createSupabaseMissionStore(
         language: languageSchema.parse(data.language),
         position: data.position,
         minutes: data.mission_activities.reduce((sum, a) => sum + a.estimated_minutes, 0),
-        replacements: data.missions.session_replacements,
       };
+    },
+
+    async reserveReplacement(sessionId, userId) {
+      const { error } = await client.rpc("reserve_session_replacement", {
+        p_session_id: sessionId,
+        p_user_id: userId,
+        p_max_per_day: MAX_SESSION_REPLACEMENTS_PER_DAY,
+      });
+      if (error?.code === "DL001") throw new SessionReplacementLimitError();
+      if (error?.code === "DL002") throw new SessionReplacementInProgressError();
+      if (error?.code === "P0002") throw new SessionNotFoundError();
+      if (error) fail("réservation du remplacement", error);
+    },
+
+    async releaseReplacement(sessionId) {
+      const { error } = await client.rpc("release_session_replacement", { p_session_id: sessionId });
+      if (error) fail("libération du remplacement", error);
     },
 
     async replaceSession(sessionId, userId, session, meta) {
@@ -102,9 +136,7 @@ export function createSupabaseMissionStore(
         p_user_id: userId,
         p_session: session as unknown as Json,
         p_meta: meta,
-        p_max_per_day: MAX_SESSION_REPLACEMENTS_PER_DAY,
       });
-      if (error?.code === "DL001") throw new SessionReplacementLimitError();
       if (error?.code === "P0002") throw new SessionNotFoundError();
       if (error) fail("remplacement de la session", error);
     },

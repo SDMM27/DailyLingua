@@ -1,5 +1,11 @@
-import type { Preferences } from "@/lib/schemas/preferences";
+import type { LanguageGoal, Preferences } from "@/lib/schemas/preferences";
 import { DEFAULT_TIME_ZONE } from "./dates";
+
+/** Topics and content types given to a language added without a first language to copy from. */
+export const DEFAULT_LANGUAGE_TASTES: Pick<LanguageGoal, "topics" | "contentTypes"> = {
+  topics: ["société", "culture"],
+  contentTypes: ["article", "podcast"],
+};
 
 /**
  * Starting point of the first-run screen. `goals` is empty on purpose: the user has to choose
@@ -8,8 +14,6 @@ import { DEFAULT_TIME_ZONE } from "./dates";
 export const ONBOARDING_DEFAULTS: Preferences = {
   goals: [],
   dailyMinutes: 30,
-  topics: ["société", "culture"],
-  contentTypes: ["article", "podcast"],
   difficulty: "matched",
   generationTime: "07:00",
   timeZone: DEFAULT_TIME_ZONE,

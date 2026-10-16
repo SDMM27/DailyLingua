@@ -1,6 +1,6 @@
 # Plan : sujets et types de contenus par langue
 
-Statut : plan, non implémenté. Phase 4 de la feuille de route « objectifs et retour écrit » (les phases 2 et 3 sont commitées : `56a6b6e`, `45d56d7`).
+Statut : étapes 1 à 3 faites (non commitées au moment de l’écriture) ; étape 4 (nettoyage des colonnes de `profiles`) en attente. Phase 4 de la feuille de route « objectifs et retour écrit » (les phases 2 et 3 sont commitées : `56a6b6e`, `45d56d7`).
 
 ## Problème
 
@@ -43,8 +43,8 @@ Statut : plan, non implémenté. Phase 4 de la feuille de route « objectifs et 
 - `src/lib/generation/generate-mission.ts` : passer à la génération de chaque langue les sujets et formats de **cette** langue (`goal.topics`, `goal.contentTypes`), et non plus ceux du profil.
 - `src/lib/generation/prompt.ts` : la liste des centres d'intérêt vient de la langue concernée.
 - `src/lib/generation/supabase-store.ts` : `listCandidates` reçoit les formats de la langue.
-- **Point à trancher** : `docs/plans/source-access.md` indique que les missions sont générées par langue puis partagées. Si c'est le cas, la clé de cache doit inclure les sujets et les formats : `(langue, sujets, formats, ensemble d'accès)`. Sinon deux utilisateurs avec des sujets différents recevraient la même mission.
-- Si une langue n'a aucun contenu du format choisi, `availability.ts` le signale et propose les formats disponibles, au lieu de produire une mission vide.
+- **Point à trancher : sans objet.** Les missions sont par utilisateur (une mission par utilisateur et par jour), pas partagées : aucun changement de clé de cache.
+- Si une langue n'a aucun contenu du format choisi, le repli existant de `loadUsablePool` (n'importe quel format) suffit ; la suggestion d'`availability.ts` est abandonnée.
 
 ### Étape 4 — Nettoyage
 
@@ -64,3 +64,15 @@ Statut : plan, non implémenté. Phase 4 de la feuille de route « objectifs et 
 
 - Confirmer si les missions sont réellement partagées entre utilisateurs (voir étape 3).
 - Le raccourci « comme les autres langues » est-il souhaité, ou faut-il tout saisir à chaque langue ?
+
+## Réalisé (étapes 1 à 3)
+
+- **Schéma** : `languageGoalSchema` porte `topics` et `contentTypes` (au moins un chacun) ; `preferencesSchema` ne les a plus. `sessionRequestSchema` porte `topics` ; `generationRequestSchema` n'a plus de `topics` global.
+- **Base** : migration `20261016000200_language_topics.sql`. Colonnes `topics` et `content_types` sur `user_languages` (mêmes contrôles que `profiles`, remplies depuis le profil, puis `not null` et non vides, avec les valeurs par défaut du profil). Les colonnes de `profiles` restent et sont toujours acceptées. `save_preferences` (même signature) : chaque langue peut porter ses sujets et formats ; à défaut, la langue garde ses valeurs actuelles, sinon celles du profil (anciens clients). Les `p_topics` / `p_content_types` de premier niveau peuvent être `null` : le profil reste alors tel quel (c'est ce qu'envoie le nouveau client). Lecture : `fetchPreferences` lit les colonnes par langue.
+- **Génération** : `generate-mission.ts` et `replace-session.ts` utilisent `goal.topics` / `goal.contentTypes` (classement et `listCandidates`) ; chaque bloc de session du prompt liste ses propres centres d'intérêt ; `PROMPT_VERSION` = `2026-10-16.1`.
+- **Interface** : sujets et formats dans le bloc de chaque langue ; pour les langues autres que la première, case « Mêmes sujets et formats que <première langue> » (cochée à l'ajout, cochée au chargement si les valeurs sont égales, sélecteurs masqués et valeurs copiées de la première langue à l'enregistrement). Une nouvelle langue copie la première, ou `DEFAULT_LANGUAGE_TASTES` s'il n'y en a pas. L'onboarding utilise le même formulaire.
+- **Tests** : schéma, formulaire, génération, prompt, intégration `supabase-repository.writes` (aller-retour par langue, ancien payload).
+
+## Reste à faire (étape 4)
+
+- Migration de suppression de `profiles.topics` / `profiles.content_types` et de l'acceptation de `p_topics` / `p_content_types` dans `save_preferences`, après une semaine de production sans erreur.

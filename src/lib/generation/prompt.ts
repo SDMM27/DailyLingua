@@ -11,7 +11,7 @@ import { productionTargetLength } from "./plan-activities";
  * that varies goes in the user message. Feed titles and teasers come from third-party publishers:
  * they are wrapped in <content> tags and the model is told to treat them as data only.
  */
-export const PROMPT_VERSION = "2026-10-15.6";
+export const PROMPT_VERSION = "2026-10-16.1";
 
 const L = GENERATION_LIMITS;
 
@@ -96,10 +96,12 @@ teaser: ${escapeData(c.summary)}
 </content>`;
     })
     .join("\n");
+  const topics = session.topics.length > 0 ? session.topics.join(", ") : "aucun en particulier";
   const focus = session.focus.trim() ? `\nlearner's own goal: <focus>${escapeData(session.focus.trim())}</focus>` : "";
   return `## Language "${session.language}" (${info.nativeName}, written ${info.dir})
 learner level: ${session.level}, target: ${session.targetLevel}
 learner's purpose: ${session.purpose} (${PURPOSE_REGISTERS[session.purpose]})${focus}
+learner's interests for this language (French labels): ${topics}
 time for this language today: ${session.minutes} minutes
 production: ${session.productionMode}, expected length: ${productionTargetLength(session.productionMode, session.productionMinutes)}
 candidates:
@@ -108,9 +110,7 @@ ${candidates}`;
 
 /** User message: everything that changes from one user or day to the next. */
 export function buildUserMessage(request: GenerationRequest): string {
-  const topics = request.topics.length > 0 ? request.topics.join(", ") : "aucun en particulier";
   return `Date: ${request.date}
-Learner's interests (French labels): ${topics}
 
 ${request.sessions.map(describeSession).join("\n\n")}
 

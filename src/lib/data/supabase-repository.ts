@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { toDateKey } from "@/lib/domain/dates";
+import { LANGUAGE_CODES } from "@/lib/domain/languages";
 import { applyReview, initialReviewState } from "@/lib/domain/spaced-repetition";
 import type { Database } from "@/lib/supabase/database.types";
 import { availableLanguages } from "@/lib/content/availability";
@@ -9,9 +10,11 @@ import { readContentLicensePolicy } from "@/lib/content/policy";
 import { dateKeySchema, type DateKey, type Language } from "@/lib/schemas/common";
 import {
   contentListItemSchema,
+  paidSourceSchema,
   sourceInfoSchema,
   type ContentLicensePolicy,
   type ContentListItem,
+  type PaidSource,
   type SourceInfo,
 } from "@/lib/schemas/content";
 import {
@@ -158,10 +161,10 @@ export async function fetchPreferences(client: Client, userId: string): Promise<
       focus: row.focus,
       purpose: row.purpose,
       weight: row.weight,
+      topics: row.topics,
+      contentTypes: row.content_types,
     })),
     dailyMinutes: p.daily_minutes,
-    topics: p.topics,
-    contentTypes: p.content_types,
     difficulty: p.difficulty,
     generationTime: p.generation_time.slice(0, 5), // "HH:mm:ss" -> "HH:mm"
     timeZone: p.time_zone,
@@ -310,6 +313,8 @@ export function createSupabaseRepository(
       case "no-content":
       case "limit":
         return { status: outcome.status };
+      case "in-progress":
+        throw new UserFacingError("Un remplacement de ce contenu est déjà en cours.");
       case "not-found":
         throw new UserFacingError("Cette session est introuvable.");
       case "failed":
@@ -413,8 +418,9 @@ export function createSupabaseRepository(
   async function savePreferences(preferences: Preferences): Promise<void> {
     const { error } = await client.rpc("save_preferences", {
       p_daily_minutes: preferences.dailyMinutes,
-      p_topics: preferences.topics,
-      p_content_types: preferences.contentTypes,
+      // Topics and formats travel per language; the profile's own columns are left as they are.
+      p_topics: null,
+      p_content_types: null,
       p_difficulty: preferences.difficulty,
       p_generation_time: preferences.generationTime,
       p_time_zone: preferences.timeZone,
@@ -425,6 +431,8 @@ export function createSupabaseRepository(
         focus: g.focus,
         purpose: g.purpose,
         weight: g.weight,
+        topics: g.topics,
+        content_types: g.contentTypes,
       })),
     });
     if (error) throw new Error(`Supabase (préférences) : ${error.message}`);
@@ -760,6 +768,63 @@ export function createSupabaseRepository(
     return data.map(toSourceInfo);
   }
 
+  async function listPaidSources(): Promise<PaidSource[]> {
+    const preferences = await getPreferences();
+    const languages = preferences?.goals.map((g) => g.language) ?? [];
+    if (languages.length === 0) return [];
+    let query = client
+      .from("sources")
+      .select("id, name, homepage_url, language, access")
+      .eq("active", true)
+      .not("key", "is", null)
+      .in("access", ["metered", "paywalled"])
+      .in("language", languages);
+    if (contentPolicy === "commercial") query = query.eq("commercial_use", true);
+    const [sources, declared] = await Promise.all([
+      query,
+      client.from("user_source_access").select("source_id").eq("user_id", userId),
+    ]);
+    const rows = unwrap(sources, "sources payantes");
+    const declaredIds = new Set(unwrap(declared, "sources déclarées").map((r) => r.source_id));
+    const paid = rows.map((row) =>
+      paidSourceSchema.parse({
+        id: row.id,
+        name: row.name,
+        homepage: row.homepage_url,
+        language: row.language,
+        access: row.access,
+        declared: declaredIds.has(row.id),
+      }),
+    );
+    return paid.sort(
+      (a, b) => LANGUAGE_CODES.indexOf(a.language) - LANGUAGE_CODES.indexOf(b.language) || a.name.localeCompare(b.name),
+    );
+  }
+
+  async function setSourceAccess(sourceId: string, hasAccess: boolean): Promise<void> {
+    // Only an active paid source can be declared: free ones are readable by everyone.
+    const { data: source, error: lookupError } = await client
+      .from("sources")
+      .select("id")
+      .eq("id", sourceId)
+      .eq("active", true)
+      .in("access", ["metered", "paywalled"])
+      .maybeSingle();
+    if (lookupError) throw new Error(`Supabase (source) : ${lookupError.message}`);
+    if (!source) throw new UserFacingError("Cette source n’existe pas ou n’est pas payante.");
+    if (hasAccess) {
+      const { error } = await client.from("user_source_access").insert({ user_id: userId, source_id: sourceId });
+      if (error && error.code !== UNIQUE_VIOLATION) throw new Error(`Supabase (accès à la source) : ${error.message}`);
+      return;
+    }
+    const { error } = await client
+      .from("user_source_access")
+      .delete()
+      .eq("user_id", userId)
+      .eq("source_id", sourceId);
+    if (error) throw new Error(`Supabase (accès à la source) : ${error.message}`);
+  }
+
   return {
     isDemo: false,
     getAccountEmail,
@@ -788,6 +853,8 @@ export function createSupabaseRepository(
     sendFeedback,
     listContents,
     listSources,
+    listPaidSources,
+    setSourceAccess,
     // From the catalogue, not the database: a language is offered even before the first ingestion.
     listAvailableLanguages: async () => availableLanguages(SOURCE_CATALOG, contentPolicy),
   };

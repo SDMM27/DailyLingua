@@ -36,6 +36,10 @@ export const languageGoalSchema = z.object({
   purpose: languagePurposeSchema.default("general"),
   /** Relative share of the daily time; weights are normalised across languages. */
   weight: z.number().int().min(1).max(10),
+  /** Interests for this language (French labels); each language has its own. */
+  topics: z.array(topicSchema).min(1, "Choisis au moins un sujet"),
+  /** Formats of content wanted for this language. */
+  contentTypes: z.array(contentTypeSchema).min(1, "Choisis au moins un type de contenu"),
 });
 export type LanguageGoal = z.infer<typeof languageGoalSchema>;
 
@@ -48,8 +52,6 @@ export const preferencesSchema = z.object({
       message: "Chaque langue ne peut apparaître qu'une fois",
     }),
   dailyMinutes: z.number().int().min(10).max(120),
-  topics: z.array(topicSchema).min(1, "Choisis au moins un sujet"),
-  contentTypes: z.array(contentTypeSchema).min(1, "Choisis au moins un type de contenu"),
   difficulty: difficultyModeSchema,
   /** HH:mm, local time in `timeZone`. */
   generationTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Format HH:mm attendu"),

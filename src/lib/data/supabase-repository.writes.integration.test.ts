@@ -43,12 +43,10 @@ const TIME_ZONE = "Pacific/Kiritimati";
 
 const PREFERENCES: Preferences = {
   goals: [
-    { language: "ru", level: "B2", targetLevel: "C1", focus: "", purpose: "general", weight: 2 },
-    { language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 1 },
+    { language: "ru", level: "B2", targetLevel: "C1", focus: "", purpose: "general", weight: 2, topics: ["société"], contentTypes: ["article"] },
+    { language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 1, topics: ["société"], contentTypes: ["article"] },
   ],
   dailyMinutes: 30,
-  topics: ["société"],
-  contentTypes: ["article"],
   difficulty: "matched",
   generationTime: "07:00",
   timeZone: TIME_ZONE,
@@ -60,6 +58,7 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
   let admin: SupabaseClient<Database>;
   let userId: string;
   let repo: ReturnType<typeof createSupabaseRepository>;
+  let userClient: SupabaseClient<Database>;
   const today = () => toDateKey(new Date(), TIME_ZONE);
 
   beforeAll(async () => {
@@ -71,6 +70,7 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
     userId = created.data.user.id;
 
     const client = createClient<Database>(url!, anonKey!, { auth: { persistSession: false } });
+    userClient = client;
     const signedIn = await client.auth.signInWithPassword({ email, password });
     if (signedIn.error) throw signedIn.error;
     repo = createSupabaseRepository(client, userId, {
@@ -95,6 +95,53 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
     ];
     await repo.savePreferences({ ...PREFERENCES, goals });
     expect((await repo.getPreferences())!.goals.map((g) => g.purpose)).toEqual(["professional", "exam"]);
+  });
+
+  it("round-trips the topics and content types of each language", async () => {
+    const goals = [
+      { ...PREFERENCES.goals[0], topics: ["économie" as const], contentTypes: ["article" as const] },
+      { ...PREFERENCES.goals[1], topics: ["cinéma" as const, "sport" as const], contentTypes: ["podcast" as const, "video" as const] },
+    ];
+    await repo.savePreferences({ ...PREFERENCES, goals });
+    const saved = (await repo.getPreferences())!.goals;
+    expect(saved.map((g) => [g.language, g.topics, g.contentTypes])).toEqual([
+      ["ru", ["économie"], ["article"]],
+      ["it", expect.arrayContaining(["cinéma", "sport"]), expect.arrayContaining(["podcast", "video"])],
+    ]);
+    // New clients send them per language only: the profile columns are left untouched.
+    const { data: profile } = await admin.from("profiles").select("topics, content_types").eq("id", userId).single();
+    expect(profile).toEqual({ topics: ["société", "culture"], content_types: ["article", "podcast"] });
+  });
+
+  it("still accepts an old-style payload with top-level topics and none per language", async () => {
+    await repo.savePreferences(PREFERENCES);
+    const goal = (language: string, weight: number) => ({
+      language, level: "B1", target_level: "B2", focus: "", purpose: "general", weight,
+    });
+    const { error } = await userClient.rpc("save_preferences", {
+      p_daily_minutes: 30,
+      p_topics: ["sciences"],
+      p_content_types: ["interview"],
+      p_difficulty: "matched",
+      p_generation_time: "07:00",
+      p_time_zone: TIME_ZONE,
+      p_goals: [goal("ru", 2), goal("it", 1), goal("es", 1)],
+    });
+    expect(error).toBeNull();
+    const byLanguage = Object.fromEntries((await repo.getPreferences())!.goals.map((g) => [g.language, g]));
+    // Existing languages keep their own values; the new one takes the profile's (the old client's).
+    expect(byLanguage.ru.topics).toEqual(PREFERENCES.goals[0].topics);
+    expect(byLanguage.it.contentTypes).toEqual(PREFERENCES.goals[1].contentTypes);
+    expect(byLanguage.es.topics).toEqual(["sciences"]);
+    expect(byLanguage.es.contentTypes).toEqual(["interview"]);
+    const { data: profile } = await admin.from("profiles").select("topics, content_types").eq("id", userId).single();
+    expect(profile).toEqual({ topics: ["sciences"], content_types: ["interview"] });
+    await repo.savePreferences(PREFERENCES);
+  });
+
+  it("refuses a language saved without topics", async () => {
+    const goals = [{ ...PREFERENCES.goals[0], topics: [] as never }];
+    await expect(repo.savePreferences({ ...PREFERENCES, goals })).rejects.toThrow();
   });
 
   it("computes today in the user's time zone", async () => {
@@ -293,16 +340,64 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
   });
 
   describe("content refusals and session replacement", () => {
-    // Needs at least two readable (free, active) Russian contents in the seed.
-    async function seedSession(date: string) {
-      const { data: contents, error: contentsError } = await admin
+    // Its own feed source (the seed's sources have no key, so they are never candidates) with two
+    // free Russian contents: one for the session, one to replace it.
+    const runId = crypto.randomUUID().slice(0, 8);
+    let sourceId = "";
+    let contentIds: string[] = [];
+
+    beforeAll(async () => {
+      const source = await admin
+        .from("sources")
+        .insert({
+          key: `test-refusal-${runId}`,
+          name: "Source test refus",
+          language: "ru",
+          homepage_url: `https://test-refusal-${runId}.example.invalid/`,
+          feed_url: `https://test-refusal-${runId}.example.invalid/feed`,
+          access: "free",
+          content_type: "article",
+          license_kind: "all-rights-reserved",
+          license_name: "Tous droits réservés",
+          terms_url: "https://example.invalid/terms",
+          license_verified_on: "2026-10-01",
+          commercial_use: false,
+          active: true,
+        })
+        .select("id")
+        .single();
+      if (source.error) throw source.error;
+      sourceId = source.data.id;
+      const contents = await admin
         .from("contents")
-        .select("id, sources!inner ( access, active )")
-        .eq("language", "ru")
-        .eq("sources.access", "free")
-        .eq("sources.active", true)
-        .limit(1);
-      if (contentsError) throw contentsError;
+        .insert(
+          [1, 2].map((n) => ({
+            source_id: sourceId,
+            language: "ru",
+            content_type: "article",
+            title: `Titre test refus ${n} ${runId}`,
+            url: `https://test-refusal-${runId}.example.invalid/${n}`,
+            difficulty: "B2",
+            duration_minutes: 4,
+            summary: `Résumé de l’article ${n}, publié par une source de test.`,
+            // Newer than anything else, so these are the first candidates.
+            published_at: new Date(Date.now() + 3_600_000 - n * 60_000).toISOString(),
+          })),
+        )
+        .select("id");
+      if (contents.error) throw contents.error;
+      contentIds = contents.data.map((c) => c.id);
+    });
+
+    afterAll(async () => {
+      // Sessions reference the contents without cascade: the user's missions go first.
+      await admin.from("missions").delete().eq("user_id", userId);
+      await admin.from("contents").delete().in("id", contentIds);
+      await admin.from("sources").delete().eq("id", sourceId);
+    });
+
+    async function seedSession(date: string) {
+      const contents = [{ id: contentIds[0] }];
       const { data: mission, error } = await admin
         .from("missions")
         .insert({ user_id: userId, mission_date: date, budget_minutes: 12, status: "ready", generated_at: new Date().toISOString() })
@@ -332,7 +427,13 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
 
     it("records the refusal, swaps the session and counts the replacement", async () => {
       await repo.savePreferences(PREFERENCES);
-      const seeded = await seedSession(addDays(today(), -9));
+      // Only today's mission can be replaced (the daily limit is per mission).
+      const past = await seedSession(addDays(today(), -9));
+      await expect(repo.replaceInaccessibleContent(past.sessionId)).rejects.toBeInstanceOf(UserFacingError);
+      // The mission progress tests leave a mission for today: this one takes its place.
+      const cleared = await admin.from("missions").delete().eq("user_id", userId).eq("mission_date", today());
+      if (cleared.error) throw cleared.error;
+      const seeded = await seedSession(today());
 
       expect(await repo.replaceInaccessibleContent(seeded.sessionId)).toEqual({ status: "ready" });
 
@@ -357,7 +458,7 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
       await expect(repo.replaceInaccessibleContent(seeded.sessionId)).rejects.toBeInstanceOf(UserFacingError);
     });
 
-    it("refuses the replacement of a session that is not the user's, and past the limit", async () => {
+    it("reserves before replacing: not the user's, not reserved, in progress, past the limit", async () => {
       const seeded = await seedSession(addDays(today(), -10));
       const session: Json = {
         language: "ru",
@@ -367,7 +468,7 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
         production: { mode: "writing", prompt: "p", hints: [] },
         activities: [{ kind: "reading", title: "Lire", estimatedMinutes: 5 }],
       };
-      const call = (overrides: { p_user_id?: string; p_max_per_day?: number; p_session?: Json }) =>
+      const replace = (overrides: { p_user_id?: string; p_session?: Json } = {}) =>
         admin.rpc("replace_mission_session", {
           p_session_id: seeded.sessionId,
           p_user_id: userId,
@@ -375,10 +476,27 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
           p_meta: {},
           ...overrides,
         });
+      const reserve = (overrides: { p_user_id?: string; p_max_per_day?: number } = {}) =>
+        admin.rpc("reserve_session_replacement", { p_session_id: seeded.sessionId, p_user_id: userId, ...overrides });
 
-      expect((await call({ p_user_id: crypto.randomUUID() })).error?.code).toBe("P0002");
-      expect((await call({ p_max_per_day: 0 })).error?.code).toBe("DL001");
-      expect((await call({ p_session: { ...(session as object), language: "it" } })).error?.code).toBe("23514");
+      // Not the user's session.
+      expect((await reserve({ p_user_id: crypto.randomUUID() })).error?.code).toBe("P0002");
+      expect((await replace({ p_user_id: crypto.randomUUID() })).error?.code).toBe("P0002");
+      // Replacing without a reservation.
+      expect((await replace()).error?.code).toBe("55000");
+      // Limit reached: nothing is reserved.
+      expect((await reserve({ p_max_per_day: 0 })).error?.code).toBe("DL001");
+      // Reserved, then a second reservation of the same session is refused.
+      expect((await reserve()).error).toBeNull();
+      expect((await reserve()).error?.code).toBe("DL002");
+      // A released session can be reserved again; the slot stays consumed.
+      expect((await admin.rpc("release_session_replacement", { p_session_id: seeded.sessionId })).error).toBeNull();
+      expect((await reserve()).error).toBeNull();
+      const { data: mission } = await admin.from("missions").select("session_replacements").eq("id", seeded.missionId).single();
+      expect(mission!.session_replacements).toBe(2);
+      // Reserved: the replacement itself checks the content, then swaps.
+      expect((await replace({ p_session: { ...(session as object), language: "it" } })).error?.code).toBe("23514");
+      expect((await replace()).error).toBeNull();
     });
   });
 });

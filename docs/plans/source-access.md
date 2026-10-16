@@ -1,6 +1,6 @@
 # Plan : accès aux contenus par utilisateur
 
-Statut : étapes 1 et 2 réalisées, étapes 3 et 4 à faire. Branche : `dev`.
+Statut : étapes 1, 2 et 3 réalisées, étape 4 (facultative) à faire. Branche : `dev`.
 
 ## Problème
 
@@ -38,25 +38,32 @@ Ce qui a été construit :
 
 - Migration `20261015000600_content_refusals.sql` :
   - table `content_refusals` (`user_id`, `content_id`, `reason` = `no_access`, `created_at`), clé primaire `(user_id, content_id)` : un refus par contenu et par utilisateur, définitif. RLS : le propriétaire lit et insère, sans modifier ni supprimer. Les lignes servent aussi de signal pour corriger le catalogue ;
-  - colonne `missions.session_replacements` : nombre de remplacements faits sur la mission du jour ;
-  - fonction `replace_mission_session` (service role uniquement) : dans une transaction, verrouille la mission, vérifie qu'elle est `ready` et que la limite n'est pas atteinte, supprime l'ancienne session (progression, réponses, production et correction partent en cascade), insère la nouvelle à la même position et dans la même langue, incrémente le compteur et ajoute la trace de génération sous `generation_meta.replacements`. Erreurs : `P0002` session introuvable ou à un autre utilisateur, `55000` mission non prête, `DL001` limite atteinte.
-- Limite : **3 remplacements par jour** (`MAX_SESSION_REPLACEMENTS_PER_DAY`), appliquée par l'application avant tout appel au modèle, et par la base en dernier recours.
+  - colonne `missions.session_replacements` : nombre de remplacements **réservés** sur la mission du jour (une tentative réservée compte même si la génération échoue, comme `generation_attempts`) ;
+  - colonne `mission_sessions.replacing_since` : non nulle tant qu'un remplacement de la session est en cours (une réservation de plus de 3 minutes est considérée abandonnée) ;
+  - fonction `reserve_session_replacement` (service role uniquement), appelée **avant** le modèle : sous verrou de la mission, vérifie qu'elle est `ready`, qu'aucun remplacement de la session n'est en cours et que la limite n'est pas atteinte, puis marque la session et incrémente le compteur. Elle empêche N requêtes parallèles (ou des clics répétés) d'appeler toutes le modèle. Erreurs : `P0002` session introuvable ou à un autre utilisateur, `55000` mission non prête, `DL002` remplacement déjà en cours, `DL001` limite atteinte ;
+  - fonction `release_session_replacement` : lève la marque quand la génération échoue après réservation (l'utilisateur peut réessayer, le créneau reste consommé) ;
+  - fonction `replace_mission_session` (service role uniquement) : exige une session réservée (`55000` sinon), dans une transaction verrouille la mission, vérifie qu'elle est `ready`, supprime l'ancienne session (progression, réponses, production et correction partent en cascade), insère la nouvelle à la même position et dans la même langue et ajoute la trace de génération sous `generation_meta.replacements`. Erreurs : `P0002` session introuvable, `55000` mission non prête ou session non réservée.
+- Limite : **3 remplacements par jour** (`MAX_SESSION_REPLACEMENTS_PER_DAY`), appliquée de façon atomique par `reserve_session_replacement` avant tout appel au modèle (plus de pré-contrôle sans verrou côté application).
 - `generateMission` exclut aussi les contenus refusés (`MissionStore.listRefusedContentIds`).
 - `replaceMissionSession` (`src/lib/generation/replace-session.ts`) réutilise les briques de `generateMission` (candidats lisibles, requête d'une session, génération avec repli sur le gabarit, planification) pour une seule langue, avec les minutes de l'ancienne session. Résultats : `ready`, `no-content`, `limit`, `not-found`, `failed`.
 - Dépôt : `replaceInaccessibleContent(sessionId)` lit la session avec le client de l'utilisateur (RLS, preuve de propriété), enregistre le refus **même si rien ne peut remplacer le contenu**, puis appelle le remplaçant (service role). Action serveur `reportNoAccess`, qui rafraîchit la page quand le contenu est remplacé.
 - Interface : `NoAccessButton` sous le lien « Ouvrir sur … » de chaque contenu, avec confirmation (la progression de cette langue est effacée) ; masqué en démonstration.
 - Tests : `replace-session.test.ts`, `generate-mission.test.ts`, `no-access-button.test.tsx`, `actions/mission.test.ts`, et le test d'intégration d'écriture (base locale).
 
-### Étape 3 — Accès déclaré par utilisateur
+### Étape 3 — Accès déclaré par utilisateur (réalisée)
 
-Schéma :
-- Table `user_source_access` (`user_id`, `source_id`, `created_at`), clé primaire composite.
-- Migration Supabase + mise à jour de `src/lib/supabase/database.types.ts`.
-- Règle par défaut : toutes les sources `free` sont lisibles ; `metered` et `paywalled` seulement si une ligne existe.
+L'accès est **par source** : une source est lisible par un utilisateur si elle est `free` ou s'il l'a déclarée. Le niveau d'accès (`metered` / `paywalled`) ne suffit plus à lui seul ; abonné à un éditeur, on ne l'est pas aux autres.
 
-Interface :
-- `src/app/preferences/page.tsx` et `src/components/preferences/preferences-form.tsx` : liste des sources `metered`/`paywalled`, case à cocher « J'y ai accès ».
-- Données lues via `getRepository()` uniquement (règle du projet).
+Ce qui a été construit :
+
+- Migration `20261016000100_user_source_access.sql` : table `user_source_access` (`user_id`, `source_id`, `created_at`), clé primaire `(user_id, source_id)`, index sur `source_id`, cascade à la suppression du profil ou de la source. RLS : le propriétaire lit, insère et supprime ses lignes (aucune mise à jour), les autres ne voient rien, `anon` n'a aucun droit. **Aucun identifiant d'éditeur n'est stocké**, ni cookie ni jeton : c'est une simple déclaration, jamais vérifiée. `database.types.ts` mis à jour.
+- `isSourceReadable(source, declaredSourceIds)` (`src/lib/content/policy.ts`). `DEFAULT_READABLE_ACCESS` / `isReadable` ne servent plus qu'à `availableLanguages` (une langue n'est proposée que si elle a une source gratuite).
+- `MissionStore.listCandidates(language, { contentTypes?, declaredSourceIds, limit })` remplace l'option `access`, et `MissionStore.listDeclaredSourceIds(userId)` (service role) lit les déclarations. `generateMission` et `replaceMissionSession` chargent ces identifiants eux-mêmes ; l'option `readableAccess` disparaît.
+- Implémentation Supabase de `listCandidates` : pas de filtre `or` à travers la table imbriquée. Une requête sur les sources `free`, plus, si l'utilisateur a déclaré des sources, une seconde sur `source_id in (...)` (mêmes autres filtres : langue, lien cassé, source active avec clé, licence, types) ; fusion, dédoublonnage par id, tri `published_at` décroissant (sans date en dernier), puis limite.
+- Dépôt : `listPaidSources()` (sources actives `metered` / `paywalled` des langues de l'utilisateur, avec `declared`, ordre du registre des langues puis nom ; en démonstration, issues du catalogue, jamais déclarées) et `setSourceAccess(sourceId, hasAccess)` (insertion idempotente ou suppression ; refuse une source gratuite, inactive ou inconnue ; lecture seule en démonstration). Schémas `paidSourceSchema` et `sourceAccessInputSchema` dans `src/lib/schemas/content.ts`.
+- Action serveur `setSourceAccess` (`src/app/actions/preferences.ts`).
+- Interface : section « Mes abonnements » de `/preferences` (composant `SourceAccessList`) : une ligne par source (langue, nom, « accès limité » ou « payant »), case « J'y ai accès » enregistrée immédiatement, état optimiste avec retour en arrière et message en cas d'échec ; masquée s'il n'y a aucune source payante, désactivée en démonstration. `preferences-form.tsx` n'est pas modifié.
+- Tests : `policy.test.ts`, `generate-mission.test.ts`, `replace-session.test.ts`, `source-access-list.test.tsx`, `actions/source-access.test.ts` et deux tests d'intégration (`user-source-access.integration.test.ts` pour la migration, la RLS et le dépôt ; `supabase-store.integration.test.ts` pour la fusion des sources déclarées).
 
 Sécurité :
 - Aucune donnée d'identifiant d'éditeur n'est stockée.
