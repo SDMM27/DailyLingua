@@ -73,15 +73,16 @@ describe.skipIf(!stackIsUp)("Supabase mission store (local database, throw-away 
   const tomorrow = addDays(today, 1);
   const mine = <T extends { title: string }>(items: T[]) => items.filter((item) => titles.has(item.title));
 
-  async function createSource(language: Language) {
+  async function createSource(language: Language, access: "free" | "metered" | "paywalled" = "free", suffix = "") {
     const { data, error } = await admin
       .from("sources")
       .insert({
-        key: `test-${language}-${runId}`,
+        key: `test-${language}-${runId}${suffix}`,
         name: `Source test ${language}`,
         language,
-        homepage_url: `https://test-${language}-${runId}.example.invalid/`,
-        feed_url: `https://test-${language}-${runId}.example.invalid/feed`,
+        homepage_url: `https://test-${language}-${runId}${suffix}.example.invalid/`,
+        feed_url: `https://test-${language}-${runId}${suffix}.example.invalid/feed`,
+        access,
         content_type: "article",
         license_kind: "all-rights-reserved",
         license_name: "Tous droits réservés",
@@ -224,13 +225,39 @@ describe.skipIf(!stackIsUp)("Supabase mission store (local database, throw-away 
   });
 
   it("filters candidates by type and by licence policy", async () => {
-    const articles = await store().listCandidates("ru", { contentTypes: ["article"], limit: 50 });
+    const articles = await store().listCandidates("ru", { contentTypes: ["article"], access: ["free"], limit: 50 });
     expect(mine(articles)).toHaveLength(3);
     expect(articles[0].publishedAt).not.toBeNull();
-    expect(mine(await store().listCandidates("ru", { contentTypes: ["podcast"], limit: 50 }))).toEqual([]);
+    expect(mine(await store().listCandidates("ru", { contentTypes: ["podcast"], access: ["free"], limit: 50 }))).toEqual([]);
 
     // The test sources do not allow commercial use.
     const commercial = createSupabaseMissionStore(admin, { policy: "commercial" });
-    expect(mine(await commercial.listCandidates("ru", { limit: 50 }))).toEqual([]);
+    expect(mine(await commercial.listCandidates("ru", { access: ["free"], limit: 50 }))).toEqual([]);
+  });
+
+  it("filters candidates by the access level of their source", async () => {
+    const title = `Titre test ru metered ${runId}`;
+    titles.add(title);
+    const sourceId = await createSource("ru", "metered", "-metered");
+    const { data, error } = await admin
+      .from("contents")
+      .insert({
+        source_id: sourceId,
+        language: "ru",
+        content_type: "article",
+        title,
+        url: `https://test-ru-${runId}-metered.example.invalid/1`,
+        difficulty: "B2",
+        duration_minutes: 4,
+        summary: "Résumé d’un article d’une source à compteur, publié par une source de test.",
+        published_at: new Date(Date.now() + 7_200_000).toISOString(),
+      })
+      .select("id")
+      .single();
+    if (error) throw error;
+    contentIds.push(data.id);
+
+    expect(mine(await store().listCandidates("ru", { access: ["free"], limit: 50 })).map((c) => c.title)).not.toContain(title);
+    expect(mine(await store().listCandidates("ru", { access: ["free", "metered"], limit: 50 })).map((c) => c.title)).toContain(title);
   });
 });

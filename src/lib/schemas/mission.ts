@@ -165,3 +165,6 @@ export const saveExpressionInputSchema = z.object({
   sessionId: z.string().min(1),
   expressionId: z.string().min(1),
 });
+
+/** « Je n’ai pas accès »: the content of this session cannot be read, replace it. */
+export const reportNoAccessInputSchema = z.object({ sessionId: z.string().min(1) });

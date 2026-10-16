@@ -6,6 +6,7 @@ import type { Database } from "@/lib/supabase/database.types";
 import { createClaudeGenerator } from "./claude-generator";
 import { readGenerationConfig } from "./config";
 import { generateMission, type GenerateMissionOutcome } from "./generate-mission";
+import { replaceMissionSession, type ReplaceSessionOutcome } from "./replace-session";
 import { createSupabaseMissionStore } from "./supabase-store";
 import { createTemplateGenerator } from "./template-generator";
 
@@ -13,6 +14,14 @@ export interface MissionPreparerOptions {
   /** Default: Claude when configured, the template otherwise (see readGenerationConfig). */
   generator?: ExerciseGenerator;
   log?: (message: string) => void;
+}
+
+function resolveGenerator(options: MissionPreparerOptions): ExerciseGenerator {
+  if (options.generator) return options.generator;
+  const config = readGenerationConfig();
+  return config.provider === "claude"
+    ? createClaudeGenerator({ apiKey: config.apiKey, model: config.model })
+    : createTemplateGenerator();
 }
 
 /**
@@ -26,15 +35,24 @@ export function createMissionPreparer(
 ): (userId: string, date: DateKey) => Promise<GenerateMissionOutcome> {
   // Configuration errors surface when the preparer is built, not on the first user.
   const policy = readContentLicensePolicy();
-  let generator = options.generator;
-  if (!generator) {
-    const config = readGenerationConfig();
-    generator =
-      config.provider === "claude"
-        ? createClaudeGenerator({ apiKey: config.apiKey, model: config.model })
-        : createTemplateGenerator();
-  }
+  const generator = resolveGenerator(options);
   const store = createSupabaseMissionStore(client, { policy });
   const { log } = options;
   return (userId, date) => generateMission({ userId, date, store, generator, log });
+}
+
+/**
+ * Builds the function that replaces one session of a user's mission with another readable
+ * content, with the same generator, store and licence policy as the preparer. Same rules: `client`
+ * is the service role, and it must only be called for the signed-in user.
+ */
+export function createSessionReplacer(
+  client: SupabaseClient<Database>,
+  options: MissionPreparerOptions = {},
+): (userId: string, sessionId: string) => Promise<ReplaceSessionOutcome> {
+  const policy = readContentLicensePolicy();
+  const generator = resolveGenerator(options);
+  const store = createSupabaseMissionStore(client, { policy });
+  const { log } = options;
+  return (userId, sessionId) => replaceMissionSession({ userId, sessionId, store, generator, log });
 }

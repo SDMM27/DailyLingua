@@ -14,3 +14,19 @@ export class GenerationError extends Error {
     this.name = "GenerationError";
   }
 }
+
+/** The database refused a session replacement: the day's limit is reached (SQLSTATE DL001). */
+export class SessionReplacementLimitError extends Error {
+  constructor() {
+    super("replacement_limit");
+    this.name = "SessionReplacementLimitError";
+  }
+}
+
+/** The session to replace does not exist (any more) or is not the user's. */
+export class SessionNotFoundError extends Error {
+  constructor() {
+    super("session not found");
+    this.name = "SessionNotFoundError";
+  }
+}

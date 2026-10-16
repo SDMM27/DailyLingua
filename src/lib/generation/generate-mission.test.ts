@@ -6,6 +6,7 @@ import type {
   GenerationMeta,
   GenerationRequest,
 } from "@/lib/schemas/generation";
+import type { SourceAccess } from "@/lib/schemas/content";
 import type { Preferences } from "@/lib/schemas/preferences";
 import { GenerationError } from "./errors";
 import { productionTargetLength } from "./plan-activities";
@@ -54,8 +55,11 @@ function memoryStore(
     prefs?: Preferences | null;
     pools?: Partial<Record<Language, CandidateContent[]>>;
     used?: string[];
+    refused?: string[];
     claim?: { status: "generating" | "ready" | "failed"; claimed: boolean };
     completeError?: Error;
+    /** Access level of the source of a content, by content id (default: free). */
+    sourceAccess?: Record<string, SourceAccess>;
   } = {},
 ) {
   const calls: Calls = { completed: [], failed: [], candidateQueries: [], usedSince: [] };
@@ -64,13 +68,16 @@ function memoryStore(
     async getPreferences() {
       return options.prefs === undefined ? preferences : options.prefs;
     },
-    async listCandidates(language, { contentTypes }) {
+    async listCandidates(language, { contentTypes, access }) {
       calls.candidateQueries.push({ language, contentTypes });
-      return pools[language] ?? [];
+      return (pools[language] ?? []).filter((c) => access.includes(options.sourceAccess?.[c.id] ?? "free"));
     },
     async listUsedContentIds(_userId, since) {
       calls.usedSince.push(since);
       return options.used ?? [];
+    },
+    async listRefusedContentIds() {
+      return options.refused ?? [];
     },
     async claim() {
       return { missionId: "m1", ...(options.claim ?? { status: "generating", claimed: true }) };
@@ -118,12 +125,40 @@ const throwing = (error: unknown): ExerciseGenerator => ({
   },
 });
 
-const run = (store: MissionStore, generator: ExerciseGenerator, extra: { fallback?: ExerciseGenerator } = {}) =>
+const run = (
+  store: MissionStore,
+  generator: ExerciseGenerator,
+  extra: { fallback?: ExerciseGenerator; readableAccess?: readonly SourceAccess[] } = {},
+) =>
   generateMission({ userId: "u1", date: "2026-10-13", store, generator, now: () => NOW, ...extra });
 
 const total = (session: PlannedSession) => session.activities.reduce((sum, a) => sum + a.estimatedMinutes, 0);
 
 describe("generateMission", () => {
+  describe("source access", () => {
+    const pools = { it: [content("it", 1), content("it", 2)], es: [content("es", 1)] };
+
+    it("never selects a content from a source the user cannot read", async () => {
+      const { store, calls } = memoryStore({ pools, sourceAccess: { "it-1": "metered", "it-2": "paywalled" } });
+      const generator = aiGenerator();
+      // Italian has nothing readable left: only Spanish is proposed.
+      expect(await run(store, generator)).toMatchObject({ status: "ready" });
+      expect(calls.completed[0].sessions.map((s) => s.language)).toEqual(["es"]);
+    });
+
+    it("selects it once the user can read that access level", async () => {
+      const { store, calls } = memoryStore({ pools, sourceAccess: { "it-1": "metered", "it-2": "metered" } });
+      await run(store, aiGenerator(), { readableAccess: ["free", "metered"] });
+      expect(calls.completed[0].sessions.map((s) => s.language)).toEqual(["it", "es"]);
+    });
+
+    it("yields no-content when the only content is metered", async () => {
+      const { store, calls } = memoryStore({ pools: { it: [content("it", 1)] }, sourceAccess: { "it-1": "metered" } });
+      expect(await run(store, aiGenerator())).toEqual({ status: "no-content" });
+      expect(calls.failed).toHaveLength(1);
+    });
+  });
+
   it("writes the sessions in preference order, filling each share", async () => {
     const { store, calls } = memoryStore();
     const generator = aiGenerator();
@@ -283,6 +318,17 @@ describe("generateMission", () => {
 
     const allUsed = memoryStore({ used: ["it-1", "it-2", "es-1"] });
     expect(await run(allUsed.store, aiGenerator())).toEqual({ status: "no-content" });
+  });
+
+  it("never proposes a content the user declared unreadable", async () => {
+    const { store, calls } = memoryStore({ refused: ["it-1"] });
+    const generator = aiGenerator();
+    await run(store, generator);
+    expect(generator.requests[0].sessions[0].candidates.map((c) => c.id)).toEqual(["it-2"]);
+    expect(calls.completed[0].sessions[0].contentId).toBe("it-2");
+
+    const allRefused = memoryStore({ refused: ["it-1", "it-2", "es-1"] });
+    expect(await run(allRefused.store, aiGenerator())).toEqual({ status: "no-content" });
   });
 
   it("marks the mission failed when saving throws", async () => {

@@ -13,6 +13,7 @@ const actions = vi.hoisted(() => ({
   saveExpression: vi.fn(),
   saveProduction: vi.fn(),
   requestWritingFeedback: vi.fn(),
+  reportNoAccess: vi.fn(),
 }));
 vi.mock("@/app/actions/mission", () => actions);
 

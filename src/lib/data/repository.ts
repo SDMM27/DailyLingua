@@ -5,7 +5,7 @@ import { z } from "zod";
 import { availableLanguages } from "@/lib/content/availability";
 import { SOURCE_CATALOG } from "@/lib/content/catalog";
 import { readContentLicensePolicy } from "@/lib/content/policy";
-import { prepareMission, writingFeedbackReviewer } from "@/lib/generation/server";
+import { prepareMission, replaceSession, writingFeedbackReviewer } from "@/lib/generation/server";
 import { addDays, toDateKey } from "@/lib/domain/dates";
 import { dateKeySchema, type DateKey, type Language } from "@/lib/schemas/common";
 import {
@@ -48,6 +48,12 @@ export interface PrepareMissionResult {
   status: "ready" | "pending" | "failed" | "no-content";
 }
 
+/** Outcome of replacing the content of a session the user cannot read. */
+export interface ReplaceContentResult {
+  /** no-content: nothing else readable for that language today; limit: too many replacements today. */
+  status: "ready" | "no-content" | "limit";
+}
+
 /**
  * Single entry point for app data. Pages and server actions depend on this interface only,
  * so the demo implementation and the Supabase one are interchangeable.
@@ -73,6 +79,12 @@ export interface DailyLinguaRepository {
    * server side). Can take several seconds: it calls the language model.
    */
   prepareTodayMission(): Promise<PrepareMissionResult>;
+  /**
+   * « Je n’ai pas accès »: remembers that the user cannot read the content of this session (it is
+   * never proposed to them again, even when nothing can replace it) and swaps it for another
+   * readable content. The progress of that session is erased. Can take several seconds.
+   */
+  replaceInaccessibleContent(sessionId: string): Promise<ReplaceContentResult>;
   getMissionProgress(mission: Mission): Promise<MissionProgress>;
   setActivityDone(activityId: string, done: boolean): Promise<void>;
   answerQuestion(sessionId: string, questionId: string, selectedIndex: number): Promise<void>;
@@ -147,6 +159,7 @@ function createMockRepository(): DailyLinguaRepository {
     async prepareTodayMission() {
       return { status: "ready" }; // the demo always has its mission
     },
+    replaceInaccessibleContent: readOnly,
     setActivityDone: readOnly,
     answerQuestion: readOnly,
     saveProduction: readOnly,
@@ -214,6 +227,7 @@ export const getRepository = cache(async (): Promise<DailyLinguaRepository> => {
   if (!data.user) redirect("/connexion");
   return createSupabaseRepository(supabase, data.user.id, {
     prepareMission,
+    replaceSession,
     reviewWriting: writingFeedbackReviewer(),
   });
 });

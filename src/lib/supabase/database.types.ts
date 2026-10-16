@@ -43,6 +43,32 @@ isOneToOne: false
       referencedColumns: ["id","user_id"]
     }
                   ]
+                },"content_refusals": {
+                  Row: {
+                    "content_id": string,"created_at": string,"reason": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "content_id": string,"created_at"?: string,"reason"?: string,"user_id": string
+                  }
+                  Update: {
+                    "content_id"?: string,"created_at"?: string,"reason"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "content_refusals_content_id_fkey"
+      columns: ["content_id"]
+isOneToOne: false
+      referencedRelation: "contents"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "content_refusals_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"contents": {
                   Row: {
                     "author": string | null,"categories": (string)[],"content_type": string,"created_at": string,"difficulty": string,"duration_minutes": number,"excerpt": string | null,"fetched_at": string,"id": string,"language": string,"published_at": string | null,"source_id": string,"summary": string,"title": string,"transcript_available": boolean,"updated_at": string,"url": string,"url_checked_at": string | null,"url_normalized": string | null,"url_status": string
@@ -177,14 +203,14 @@ isOneToOne: false
                   ]
                 },"missions": {
                   Row: {
-                    "budget_minutes": number,"completed_at": string | null,"created_at": string,"generated_at": string | null,"generation_attempts": number,"generation_error": string | null,"generation_meta": NonNullable<Json>,"id": string,"mission_date": string,"started_at": string | null,"status": string,"updated_at": string,"user_id": string
+                    "budget_minutes": number,"completed_at": string | null,"created_at": string,"generated_at": string | null,"generation_attempts": number,"generation_error": string | null,"generation_meta": NonNullable<Json>,"id": string,"mission_date": string,"session_replacements": number,"started_at": string | null,"status": string,"updated_at": string,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "budget_minutes": number,"completed_at"?: string | null,"created_at"?: string,"generated_at"?: string | null,"generation_attempts"?: number,"generation_error"?: string | null,"generation_meta"?: NonNullable<Json>,"id"?: string,"mission_date": string,"started_at"?: string | null,"status"?: string,"updated_at"?: string,"user_id": string
+                    "budget_minutes": number,"completed_at"?: string | null,"created_at"?: string,"generated_at"?: string | null,"generation_attempts"?: number,"generation_error"?: string | null,"generation_meta"?: NonNullable<Json>,"id"?: string,"mission_date": string,"session_replacements"?: number,"started_at"?: string | null,"status"?: string,"updated_at"?: string,"user_id": string
                   }
                   Update: {
-                    "budget_minutes"?: number,"completed_at"?: string | null,"created_at"?: string,"generated_at"?: string | null,"generation_attempts"?: number,"generation_error"?: string | null,"generation_meta"?: NonNullable<Json>,"id"?: string,"mission_date"?: string,"started_at"?: string | null,"status"?: string,"updated_at"?: string,"user_id"?: string
+                    "budget_minutes"?: number,"completed_at"?: string | null,"created_at"?: string,"generated_at"?: string | null,"generation_attempts"?: number,"generation_error"?: string | null,"generation_meta"?: NonNullable<Json>,"id"?: string,"mission_date"?: string,"session_replacements"?: number,"started_at"?: string | null,"status"?: string,"updated_at"?: string,"user_id"?: string
                   }
                   Relationships: [
                     {
@@ -440,6 +466,9 @@ isOneToOne: false
                            },
 "record_vocabulary_review":
 { Args: { "p_box_after": number,"p_due_on_after": string,"p_expected_review_count": number,"p_grade": string,"p_item_id": string,"p_reviewed_on": string }; Returns: boolean
+                           },
+"replace_mission_session":
+{ Args: { "p_max_per_day"?: number,"p_meta": Json,"p_session": Json,"p_session_id": string,"p_user_id": string }; Returns: undefined
                            },
 "save_preferences":
 { Args: { "p_content_types": (string)[],"p_daily_minutes": number,"p_difficulty": string,"p_generation_time": string,"p_goals": Json,"p_time_zone": string,"p_topics": (string)[] }; Returns: undefined

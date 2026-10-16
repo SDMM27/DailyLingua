@@ -155,6 +155,7 @@ export function MissionView({
               persist && canReviewWriting ? (body) => handleRequestFeedback(session, body) : undefined
             }
             review={progress.writingReviews[session.id]}
+            canReportNoAccess={persist}
           />
         ))}
 
@@ -183,6 +184,7 @@ function SessionSection({
   onSaveProduction,
   onRequestFeedback,
   review,
+  canReportNoAccess,
 }: {
   session: LanguageSession;
   done: ReadonlySet<string>;
@@ -195,6 +197,8 @@ function SessionSection({
   onSaveProduction?: (body: string) => Promise<boolean>;
   onRequestFeedback?: (body: string) => Promise<WritingFeedbackResult | null>;
   review?: WritingReviewState;
+  /** Offers « Je n’ai pas accès »; false in the demo, where nothing can be replaced. */
+  canReportNoAccess: boolean;
 }) {
   const { language } = session;
   const style = languageStyle(language);
@@ -208,7 +212,7 @@ function SessionSection({
         <span className="text-sm font-medium text-ink-soft">{sessionMinutes(session)} min</span>
       </div>
 
-      <ContentCard content={session.content} />
+      <ContentCard content={session.content} sessionId={canReportNoAccess ? session.id : undefined} />
 
       <Card>
         <Eyebrow className="mb-3">Étapes</Eyebrow>

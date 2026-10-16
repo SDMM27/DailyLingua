@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { LANGUAGE_CODES } from "@/lib/domain/languages";
 import { availableLanguages } from "./availability";
+import type { SourceDefinition } from "@/lib/schemas/content";
 import { SOURCE_CATALOG } from "./catalog";
 
 describe("availableLanguages", () => {
@@ -22,5 +23,13 @@ describe("availableLanguages", () => {
   it("keeps the registry order and has no duplicates", () => {
     const languages = availableLanguages(SOURCE_CATALOG, "all");
     expect(new Set(languages).size).toBe(languages.length);
+  });
+
+  it("does not offer a language whose only source is not readable", () => {
+    const template = SOURCE_CATALOG.find((s) => s.language === "it")!;
+    const metered: SourceDefinition[] = [{ ...template, access: "metered" }];
+    expect(availableLanguages(metered, "all")).toEqual([]);
+    expect(availableLanguages(metered, "all", ["free", "metered"])).toEqual(["it"]);
+    expect(availableLanguages([{ ...template, access: "free" }, ...metered], "all")).toEqual(["it"]);
   });
 });

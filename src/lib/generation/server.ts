@@ -3,7 +3,8 @@ import type { DateKey } from "@/lib/schemas/common";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { readWritingFeedbackConfig } from "./config";
 import type { GenerateMissionOutcome } from "./generate-mission";
-import { createMissionPreparer } from "./preparer";
+import { createMissionPreparer, createSessionReplacer } from "./preparer";
+import type { ReplaceSessionOutcome } from "./replace-session";
 import { createClaudeWritingReviewer } from "./writing-feedback";
 import {
   createSupabaseWritingFeedbackStore,
@@ -18,6 +19,15 @@ import {
  */
 export async function prepareMission(userId: string, date: DateKey): Promise<GenerateMissionOutcome> {
   return createMissionPreparer(createSupabaseAdminClient(), { log: console.warn })(userId, date);
+}
+
+/**
+ * Replaces one session of the mission of `userId` with another readable content. Same rule as
+ * `prepareMission`: only with the signed-in user id (the repository first reads the session
+ * through RLS, which proves it is theirs).
+ */
+export async function replaceSession(userId: string, sessionId: string): Promise<ReplaceSessionOutcome> {
+  return createSessionReplacer(createSupabaseAdminClient(), { log: console.warn })(userId, sessionId);
 }
 
 /**
