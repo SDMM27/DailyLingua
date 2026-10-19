@@ -154,24 +154,21 @@ export async function upgradeGuestAccount(_previous: AuthFormState, formData: Fo
     { email: parsed.data.email },
     { emailRedirectTo: `${origin}/auth/confirm?next=/nouveau-mot-de-passe` },
   );
-  if (error) {
-    if (error.code === "email_exists" || (error.status === 422 && /already|registered/i.test(error.message ?? ""))) {
-      return {
-        email,
-        error: "Cette adresse a déjà un compte. Connecte-toi avec : ta progression d’essai ne sera pas reprise.",
-      };
-    }
+  // An address that already has an account gets the same answer as a free one, so the form cannot
+  // be used to find out who has an account (same rule as the password reset).
+  const taken = error?.code === "email_exists" || (error?.status === 422 && /already|registered/i.test(error.message ?? ""));
+  if (error && !taken) {
     if (error.status === 429 || error.code === "over_email_send_rate_limit") {
       return { email, error: "Trop de demandes, réessaie dans quelques minutes." };
     }
     console.error("updateUser (guest e-mail) failed", error);
     return { email, error: "Impossible de créer le compte pour le moment. Réessaie dans un instant." };
   }
-  return {
-    email,
-    notice: "Ouvre le lien reçu par e-mail pour confirmer ton adresse, puis choisis ton mot de passe. Ta progression est conservée.",
-  };
+  return { email, notice: UPGRADE_NOTICE };
 }
+
+const UPGRADE_NOTICE =
+  "Ouvre le lien reçu par e-mail pour confirmer ton adresse, puis choisis ton mot de passe. Ta progression est conservée. Rien reçu ? Pense aux spams ; si cette adresse a déjà un compte, connecte-toi avec (la progression de l’essai ne sera alors pas reprise).";
 
 export async function signOut(): Promise<void> {
   const supabase = await createSupabaseServerClient();

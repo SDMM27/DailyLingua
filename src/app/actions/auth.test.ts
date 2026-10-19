@@ -192,15 +192,16 @@ describe("upgradeGuestAccount", () => {
     await expect(upgradeGuestAccount({}, form({ email: "moi@example.com" }))).rejects.toThrow("redirect:/connexion");
   });
 
-  it("explains that an address with an account cannot take the trial progress", async () => {
+  it("answers a taken address exactly like a free one (no account enumeration)", async () => {
+    auth.updateUser.mockResolvedValue({ data: {}, error: null });
+    const free = await upgradeGuestAccount({}, form({ email: "moi@example.com" }));
     auth.updateUser.mockResolvedValue({ data: null, error: { status: 422, code: "email_exists" } });
-    const result = await upgradeGuestAccount({}, form({ email: "moi@example.com" }));
-    expect(result.error).toBe("Cette adresse a déjà un compte. Connecte-toi avec : ta progression d’essai ne sera pas reprise.");
-  });
-
-  it("recognises a taken address by its 422 message too", async () => {
+    const taken = await upgradeGuestAccount({}, form({ email: "moi@example.com" }));
     auth.updateUser.mockResolvedValue({ data: null, error: { status: 422, message: "A user with this email address has already been registered" } });
-    expect((await upgradeGuestAccount({}, form({ email: "moi@example.com" }))).error).toMatch(/déjà un compte/);
+    const takenByMessage = await upgradeGuestAccount({}, form({ email: "moi@example.com" }));
+    expect(taken).toEqual(free);
+    expect(takenByMessage).toEqual(free);
+    expect(free.error).toBeUndefined();
   });
 
   it("reports a rate limit", async () => {
