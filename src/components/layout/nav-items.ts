@@ -17,7 +17,7 @@ export const NAV_ITEMS: NavItem[] = [
 
 /** Screens shown before the app proper (sign-in, first run): no navigation. */
 export function hidesNavigation(pathname: string): boolean {
-  return pathname === "/connexion" || pathname === "/bienvenue";
+  return pathname === "/connexion" || pathname === "/bienvenue" || pathname === "/decouvrir";
 }
 
 export function isActive(pathname: string, href: string): boolean {

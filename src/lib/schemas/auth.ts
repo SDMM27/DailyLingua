@@ -16,6 +16,10 @@ export const requestPasswordResetSchema = z.object({
   email: z.email("Adresse e-mail invalide").trim(),
 });
 
+export const upgradeGuestSchema = z.object({
+  email: z.email("Adresse e-mail invalide").trim(),
+});
+
 export const updatePasswordSchema = z
   .object({
     password: signUpSchema.shape.password,

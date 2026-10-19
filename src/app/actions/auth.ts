@@ -7,11 +7,15 @@ import {
   signInSchema,
   signUpSchema,
   updatePasswordSchema,
+  upgradeGuestSchema,
 } from "@/lib/schemas/auth";
 import { deleteUserAccount } from "@/lib/supabase/delete-account";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export type AuthFormState = { error?: string; notice?: string; email?: string };
+
+/** What a guest types to confirm the deletion of their trial account (they have no e-mail). */
+const GUEST_DELETE_WORD = "supprimer";
 
 const UNAVAILABLE = "La connexion n’est pas disponible pour le moment.";
 
@@ -112,6 +116,63 @@ export async function updatePassword(_previous: UpdatePasswordState, formData: F
   return { done: true };
 }
 
+/** Starts the free trial: an anonymous account (no e-mail, no password), then the first-run screen. */
+export async function startGuestTrial(): Promise<AuthFormState> {
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return { error: "L’essai n’est pas disponible dans la démo." };
+
+  const { error } = await supabase.auth.signInAnonymously();
+  if (error) {
+    if (error.status === 429 || error.code === "over_request_rate_limit") {
+      return { error: "Trop d’essais depuis cette connexion, réessaie plus tard." };
+    }
+    console.error("signInAnonymously failed", error);
+    return { error: "L’essai sans compte n’est pas disponible pour le moment." };
+  }
+  redirect("/bienvenue");
+}
+
+/**
+ * Turns the guest into a real account: Supabase sends a confirmation to the new address; once it
+ * is confirmed the same user (same id, all data kept) chooses a password on /nouveau-mot-de-passe.
+ */
+export async function upgradeGuestAccount(_previous: AuthFormState, formData: FormData): Promise<AuthFormState> {
+  const email = String(formData.get("email") ?? "").trim();
+  const parsed = upgradeGuestSchema.safeParse({ email });
+  if (!parsed.success) return { email, error: parsed.error.issues[0].message };
+
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return { email, error: UNAVAILABLE };
+
+  // Validated with Supabase Auth: only a guest session can be converted.
+  const { data } = await supabase.auth.getUser();
+  if (!data.user) redirect("/connexion");
+  if (!data.user.is_anonymous) return { email, error: "Ton compte est déjà créé." };
+
+  const origin = await requestOrigin();
+  const { error } = await supabase.auth.updateUser(
+    { email: parsed.data.email },
+    { emailRedirectTo: `${origin}/auth/confirm?next=/nouveau-mot-de-passe` },
+  );
+  if (error) {
+    if (error.code === "email_exists" || (error.status === 422 && /already|registered/i.test(error.message ?? ""))) {
+      return {
+        email,
+        error: "Cette adresse a déjà un compte. Connecte-toi avec : ta progression d’essai ne sera pas reprise.",
+      };
+    }
+    if (error.status === 429 || error.code === "over_email_send_rate_limit") {
+      return { email, error: "Trop de demandes, réessaie dans quelques minutes." };
+    }
+    console.error("updateUser (guest e-mail) failed", error);
+    return { email, error: "Impossible de créer le compte pour le moment. Réessaie dans un instant." };
+  }
+  return {
+    email,
+    notice: "Ouvre le lien reçu par e-mail pour confirmer ton adresse, puis choisis ton mot de passe. Ta progression est conservée.",
+  };
+}
+
 export async function signOut(): Promise<void> {
   const supabase = await createSupabaseServerClient();
   await supabase?.auth.signOut();
@@ -128,7 +189,10 @@ async function requestOrigin(): Promise<string> {
 
 export type DeleteAccountState = { error?: string };
 
-/** Deletes the signed-in account for good. The user must type their e-mail address to confirm. */
+/**
+ * Deletes the signed-in account for good. The user must type their e-mail address to confirm;
+ * a guest has none, so they type « supprimer ».
+ */
 export async function deleteAccount(_previous: DeleteAccountState, formData: FormData): Promise<DeleteAccountState> {
   const supabase = await createSupabaseServerClient();
   if (!supabase) return { error: "Mode démonstration : il n’y a pas de compte à supprimer." };
@@ -138,7 +202,9 @@ export async function deleteAccount(_previous: DeleteAccountState, formData: For
   if (!data.user) redirect("/connexion");
 
   const typed = String(formData.get("confirmation") ?? "").trim().toLowerCase();
-  if (typed !== data.user.email?.toLowerCase()) {
+  if (data.user.is_anonymous) {
+    if (typed !== GUEST_DELETE_WORD) return { error: `Saisis « ${GUEST_DELETE_WORD} » pour confirmer.` };
+  } else if (typed !== data.user.email?.toLowerCase()) {
     return { error: "Saisis ton adresse e-mail exacte pour confirmer." };
   }
 

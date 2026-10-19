@@ -8,8 +8,9 @@ import { getSupabaseEnv } from "@/lib/supabase/env";
  * The scheduled job routes check their own secret (CRON_SECRET) and must not be redirected;
  * /api/health is the public liveness probe (it checks the database only with that same secret).
  */
-const PUBLIC_PATHS = [
+export const PUBLIC_PATHS = [
   "/connexion",
+  "/decouvrir",
   "/mot-de-passe-oublie",
   "/auth/confirm",
   "/installer",
@@ -18,13 +19,14 @@ const PUBLIC_PATHS = [
   "/api/health",
 ];
 
-function isPublic(pathname: string): boolean {
+export function isPublic(pathname: string): boolean {
   return PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
 }
 
 /**
  * Keeps the Supabase session fresh (refreshed cookies must be written on the response, which
- * Server Components cannot do) and sends signed-out visitors to the sign-in screen.
+ * Server Components cannot do) and sends signed-out visitors away from protected pages: the home
+ * page leads to the teaser (/decouvrir), every other page to the sign-in screen.
  * This is an optimistic check on the JWT only: authorisation is Row Level Security, and
  * `getRepository()` re-validates the user on every page.
  * Without Supabase configuration the app is the public demo and nothing is redirected.
@@ -50,7 +52,7 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (!signedIn && !isPublic(pathname)) {
-    return NextResponse.redirect(new URL("/connexion", request.url));
+    return NextResponse.redirect(new URL(pathname === "/" ? "/decouvrir" : "/connexion", request.url));
   }
   // A signed-in visitor of /connexion is sent home by the page itself, after validating the user:
   // the JWT alone can outlive its account (database reset, deleted account) and would loop here.

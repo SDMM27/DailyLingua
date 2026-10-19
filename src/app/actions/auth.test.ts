@@ -1,15 +1,20 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { requestPasswordReset, updatePassword } from "./auth";
+import { deleteAccount, requestPasswordReset, startGuestTrial, updatePassword, upgradeGuestAccount } from "./auth";
 
 const auth = vi.hoisted(() => ({
   resetPasswordForEmail: vi.fn(),
   updateUser: vi.fn(),
+  signInAnonymously: vi.fn(),
+  getUser: vi.fn(),
+  signOut: vi.fn(),
 }));
+const deleteUserAccount = vi.hoisted(() => vi.fn());
 const state = vi.hoisted(() => ({ demo: false }));
 
 vi.mock("@/lib/supabase/server", () => ({
   createSupabaseServerClient: async () => (state.demo ? null : { auth }),
 }));
+vi.mock("@/lib/supabase/delete-account", () => ({ deleteUserAccount }));
 vi.mock("next/headers", () => ({
   headers: async () => new Headers({ host: "localhost:3000" }),
 }));
@@ -31,6 +36,10 @@ beforeEach(() => {
   state.demo = false;
   auth.resetPasswordForEmail.mockResolvedValue({ data: {}, error: null });
   auth.updateUser.mockResolvedValue({ data: {}, error: null });
+  auth.signInAnonymously.mockResolvedValue({ data: {}, error: null });
+  auth.signOut.mockResolvedValue({ error: null });
+  auth.getUser.mockResolvedValue({ data: { user: { id: "u1", is_anonymous: true, email: undefined } } });
+  deleteUserAccount.mockResolvedValue(undefined);
 });
 
 describe("requestPasswordReset", () => {
@@ -129,5 +138,99 @@ describe("updatePassword", () => {
   it("is unavailable in the demo", async () => {
     state.demo = true;
     expect((await updatePassword({}, form(valid))).error).toMatch(/démo/);
+  });
+});
+
+describe("startGuestTrial", () => {
+  it("opens an anonymous session and goes to the first-run screen", async () => {
+    await expect(startGuestTrial()).rejects.toThrow("redirect:/bienvenue");
+    expect(auth.signInAnonymously).toHaveBeenCalledOnce();
+  });
+
+  it("reports a rate limit", async () => {
+    auth.signInAnonymously.mockResolvedValue({ data: null, error: { status: 429, code: "over_request_rate_limit" } });
+    const result = await startGuestTrial();
+    expect(result.error).toBe("Trop d’essais depuis cette connexion, réessaie plus tard.");
+  });
+
+  it("is unavailable when anonymous sign-ins are off", async () => {
+    auth.signInAnonymously.mockResolvedValue({ data: null, error: { status: 422, code: "anonymous_provider_disabled" } });
+    expect((await startGuestTrial()).error).toMatch(/pas disponible/);
+  });
+
+  it("is unavailable in the demo", async () => {
+    state.demo = true;
+    expect((await startGuestTrial()).error).toMatch(/démo/);
+  });
+});
+
+describe("upgradeGuestAccount", () => {
+  it("asks for an e-mail confirmation that leads to the password screen", async () => {
+    const result = await upgradeGuestAccount({}, form({ email: " moi@example.com " }));
+    expect(auth.updateUser).toHaveBeenCalledWith(
+      { email: "moi@example.com" },
+      { emailRedirectTo: "http://localhost:3000/auth/confirm?next=/nouveau-mot-de-passe" },
+    );
+    expect(result.notice).toMatch(/Ta progression est conservée/);
+    expect(result.error).toBeUndefined();
+  });
+
+  it("refuses an invalid address without calling Supabase", async () => {
+    expect((await upgradeGuestAccount({}, form({ email: "nope" }))).error).toBe("Adresse e-mail invalide");
+    expect(auth.updateUser).not.toHaveBeenCalled();
+  });
+
+  it("refuses a session that is not a guest", async () => {
+    auth.getUser.mockResolvedValue({ data: { user: { id: "u1", is_anonymous: false, email: "a@b.co" } } });
+    const result = await upgradeGuestAccount({}, form({ email: "moi@example.com" }));
+    expect(result.error).toBeDefined();
+    expect(auth.updateUser).not.toHaveBeenCalled();
+  });
+
+  it("sends a signed-out visitor to the sign-in screen", async () => {
+    auth.getUser.mockResolvedValue({ data: { user: null } });
+    await expect(upgradeGuestAccount({}, form({ email: "moi@example.com" }))).rejects.toThrow("redirect:/connexion");
+  });
+
+  it("explains that an address with an account cannot take the trial progress", async () => {
+    auth.updateUser.mockResolvedValue({ data: null, error: { status: 422, code: "email_exists" } });
+    const result = await upgradeGuestAccount({}, form({ email: "moi@example.com" }));
+    expect(result.error).toBe("Cette adresse a déjà un compte. Connecte-toi avec : ta progression d’essai ne sera pas reprise.");
+  });
+
+  it("recognises a taken address by its 422 message too", async () => {
+    auth.updateUser.mockResolvedValue({ data: null, error: { status: 422, message: "A user with this email address has already been registered" } });
+    expect((await upgradeGuestAccount({}, form({ email: "moi@example.com" }))).error).toMatch(/déjà un compte/);
+  });
+
+  it("reports a rate limit", async () => {
+    auth.updateUser.mockResolvedValue({ data: null, error: { status: 429, code: "over_email_send_rate_limit" } });
+    expect((await upgradeGuestAccount({}, form({ email: "moi@example.com" }))).error).toMatch(/Trop de demandes/);
+  });
+
+  it("hides unexpected errors", async () => {
+    auth.updateUser.mockResolvedValue({ data: null, error: { status: 500, message: "boom" } });
+    const result = await upgradeGuestAccount({}, form({ email: "moi@example.com" }));
+    expect(result.error).toMatch(/Impossible/);
+    expect(result.error).not.toMatch(/boom/);
+  });
+});
+
+describe("deleteAccount", () => {
+  it("asks a guest to type « supprimer », whatever the case", async () => {
+    expect((await deleteAccount({}, form({ confirmation: "oui" }))).error).toMatch(/supprimer/);
+    expect(deleteUserAccount).not.toHaveBeenCalled();
+
+    await expect(deleteAccount({}, form({ confirmation: " Supprimer " }))).rejects.toThrow("redirect:/connexion");
+    expect(deleteUserAccount).toHaveBeenCalledWith("u1");
+  });
+
+  it("still asks a member for their e-mail", async () => {
+    auth.getUser.mockResolvedValue({ data: { user: { id: "u2", is_anonymous: false, email: "Moi@Example.com" } } });
+    expect((await deleteAccount({}, form({ confirmation: "supprimer" }))).error).toMatch(/adresse e-mail/);
+    expect(deleteUserAccount).not.toHaveBeenCalled();
+
+    await expect(deleteAccount({}, form({ confirmation: "moi@example.com" }))).rejects.toThrow("redirect:/connexion");
+    expect(deleteUserAccount).toHaveBeenCalledWith("u2");
   });
 });

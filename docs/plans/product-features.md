@@ -1,6 +1,6 @@
 # Plan de fonctionnalités — six idées
 
-Statut : **en cours**. Phase 1 (C, tests de niveau) implémentée le 2026-10-19, en attente de validation : banques de 60 questions pour les 19 langues, blocs de 5 questions par niveau (30 au plus), tirage aléatoire équilibré entre compétences, plus de variante courant / pro. Reste à faire avant publication : relecture native des banques.
+Statut : **en cours**. Phase A (teaser et accès sans compte) implémentée le 2026-10-19, en attente de validation : page `/decouvrir`, comptes anonymes Supabase, essai de 3 jours de mission puis compte requis (`/creer-mon-compte`), nettoyage automatique des invités inactifs depuis 30 jours. À faire avant publication : activer les connexions anonymes (*Anonymous sign-ins*) dans le projet Supabase hébergé ; activer plus tard la protection CAPTCHA de Supabase contre les créations en masse. Phase 1 (C, tests de niveau) implémentée le 2026-10-19, en attente de validation : banques de 60 questions pour les 19 langues, blocs de 5 questions par niveau (30 au plus), tirage aléatoire équilibré entre compétences, plus de variante courant / pro. Reste à faire avant publication : relecture native des banques.
 
 Ce plan suit la règle du projet : une phase à la fois, chacune validée avant la suivante. Chaque phase se termine par la liste des fichiers modifiés, les commandes lancées, les tests réellement exécutés et leurs résultats.
 
@@ -145,7 +145,7 @@ Ordre décidé (2026-10-19), révisé après les réponses de l'utilisateur :
 
 ## Questions ouvertes
 
-- Nombre de jours de mission gratuite (trois proposés, à confirmer).
+- ~~Nombre de jours de mission gratuite~~ : tranché, 3 jours distincts (`GUEST_TRIAL_DAYS`).
 - Choix du fournisseur de transcription (phase E).
 
 ## Hors périmètre de ce document

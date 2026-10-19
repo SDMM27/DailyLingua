@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { toDateKey } from "@/lib/domain/dates";
+import { guestTrialStatus, type GuestTrialStatus } from "@/lib/domain/guest-trial";
 import { LANGUAGE_CODES } from "@/lib/domain/languages";
 import { applyReview, initialReviewState } from "@/lib/domain/spaced-repetition";
 import type { Database } from "@/lib/supabase/database.types";
@@ -182,6 +183,8 @@ export function createSupabaseRepository(
   userId: string,
   options: {
     contentPolicy?: ContentLicensePolicy;
+    /** The user is a guest (anonymous account): the trial limit applies. */
+    isGuest?: boolean;
     /** Writes the mission of a day (service role, server only). Absent: preparing is not configured. */
     prepareMission?: (userId: string, date: DateKey) => Promise<GenerateMissionOutcome>;
     /** Swaps the content of a session for another readable one (service role, server only). Absent: not configured. */
@@ -264,10 +267,27 @@ export function createSupabaseRepository(
     });
   }
 
+  async function getGuestTrial(): Promise<GuestTrialStatus | null> {
+    if (!options.isGuest) return null;
+    const { data, error } = await client
+      .from("missions")
+      .select("mission_date")
+      .eq("user_id", userId)
+      .eq("status", "ready");
+    if (error) throw new Error(`Supabase (essai) : ${error.message}`);
+    return guestTrialStatus(
+      data.map((row) => row.mission_date),
+      await getToday(),
+    );
+  }
+
   async function prepareTodayMission(): Promise<PrepareMissionResult> {
     if (!options.prepareMission) {
       throw new UserFacingError("La préparation des missions n’est pas configurée sur ce serveur.");
     }
+    // The trial limit is checked before the model is called.
+    const trial = await getGuestTrial();
+    if (trial && !trial.canStartToday) return { status: "signup-required" };
     const outcome = await options.prepareMission(userId, await getToday());
     switch (outcome.status) {
       case "ready":
@@ -825,6 +845,8 @@ export function createSupabaseRepository(
 
   return {
     isDemo: false,
+    isGuest: Boolean(options.isGuest),
+    getGuestTrial,
     getAccountEmail,
     getToday,
     getPreferences,

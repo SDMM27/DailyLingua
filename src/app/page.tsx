@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { connection } from "next/server";
+import { GuestTrialBanner } from "@/components/auth/guest-trial-banner";
 import { InstallBanner } from "@/components/install/install-banner";
 import { MissionSummaryCard } from "@/components/dashboard/mission-summary-card";
 import { ReviewPreview } from "@/components/dashboard/review-preview";
@@ -19,12 +20,13 @@ export default async function DashboardPage() {
   const repo = await getRepository();
   const preferences = await requirePreferences();
   const today = await getToday();
-  const [mission, history, studyDates, vocabulary, placements] = await Promise.all([
+  const [mission, history, studyDates, vocabulary, placements, guestTrial] = await Promise.all([
     repo.getMission(today),
     repo.getHistory(),
     repo.getStudyDates(),
     repo.listVocabulary(),
     repo.listPlacementTests(),
+    repo.getGuestTrial(),
   ]);
   const unassessed = !repo.isDemo && preferences.goals.some((g) => !placements.some((p) => p.language === g.language));
   const progress = mission ? await repo.getMissionProgress(mission) : null;
@@ -53,6 +55,8 @@ export default async function DashboardPage() {
       </header>
 
       <InstallBanner />
+
+      {guestTrial && <GuestTrialBanner trial={guestTrial} startedToday={mission !== null} />}
 
       {repo.isDemo && (
         <DemoNotice>

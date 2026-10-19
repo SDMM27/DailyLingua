@@ -8,6 +8,7 @@ import { LANGUAGE_CODES } from "@/lib/domain/languages";
 import { readContentLicensePolicy } from "@/lib/content/policy";
 import { prepareMission, replaceSession, writingFeedbackReviewer } from "@/lib/generation/server";
 import { addDays, toDateKey } from "@/lib/domain/dates";
+import type { GuestTrialStatus } from "@/lib/domain/guest-trial";
 import { dateKeySchema, type DateKey, type Language } from "@/lib/schemas/common";
 import {
   contentListItemSchema,
@@ -47,8 +48,8 @@ import type { WritingFeedbackResult } from "@/lib/schemas/writing-feedback";
 
 /** Outcome of asking for today's mission; internal reasons never leave the server. */
 export interface PrepareMissionResult {
-  /** pending: another request is writing it, ask again shortly. */
-  status: "ready" | "pending" | "failed" | "no-content";
+  /** pending: another request is writing it, ask again shortly; signup-required: the guest trial is over. */
+  status: "ready" | "pending" | "failed" | "no-content" | "signup-required";
 }
 
 /** Outcome of replacing the content of a session the user cannot read. */
@@ -67,6 +68,10 @@ export interface ReplaceContentResult {
 export interface DailyLinguaRepository {
   /** Demo data: nothing can be saved. */
   readonly isDemo: boolean;
+  /** Signed in without an account (anonymous user, free trial). Always false in the demo. */
+  readonly isGuest: boolean;
+  /** Where the guest stands in the trial; null for a real account and in the demo. */
+  getGuestTrial(): Promise<GuestTrialStatus | null>;
   /** E-mail of the signed-in account, null in the demo. */
   getAccountEmail(): Promise<string | null>;
   /** Today's date in the user's time zone. */
@@ -153,6 +158,10 @@ function createMockRepository(): DailyLinguaRepository {
   };
   return {
     isDemo: true,
+    isGuest: false,
+    async getGuestTrial() {
+      return null;
+    },
     async getAccountEmail() {
       return null;
     },
@@ -253,6 +262,7 @@ export const getRepository = cache(async (): Promise<DailyLinguaRepository> => {
   const { data } = await supabase.auth.getUser();
   if (!data.user) redirect("/connexion");
   return createSupabaseRepository(supabase, data.user.id, {
+    isGuest: data.user.is_anonymous === true,
     prepareMission,
     replaceSession,
     reviewWriting: writingFeedbackReviewer(),

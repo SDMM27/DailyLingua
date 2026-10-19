@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { prepareTodayMission } from "@/app/actions/mission";
+import { TrialOverCard } from "@/components/auth/trial-over-card";
 import { Card, Eyebrow } from "@/components/ui/primitives";
 
 /** Another request is writing the mission: ask again after this delay, at most this many times. */
@@ -13,7 +14,8 @@ const MAX_POLLS = 15;
 type State =
   | { kind: "working" }
   | { kind: "failed"; message: string }
-  | { kind: "no-content" };
+  | { kind: "no-content" }
+  | { kind: "signup-required" };
 
 const BUTTON =
   "mt-4 inline-flex min-h-11 items-center rounded-full bg-ink px-5 text-sm font-semibold text-paper";
@@ -42,6 +44,8 @@ export function MissionPreparing() {
           return setState({ kind: "failed", message: "La mission n’a pas pu être préparée." });
         case "no-content":
           return setState({ kind: "no-content" });
+        case "signup-required":
+          return setState({ kind: "signup-required" });
         case "pending":
           await new Promise((resolve) => setTimeout(resolve, POLL_DELAY_MS));
           if (cancelled.current) return;
@@ -61,6 +65,8 @@ export function MissionPreparing() {
       cancelled.current = true;
     };
   }, [run]);
+
+  if (state.kind === "signup-required") return <TrialOverCard />;
 
   return (
     <Card>

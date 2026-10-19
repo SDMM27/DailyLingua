@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AuthForm } from "@/components/auth/auth-form";
 import { PageHeader } from "@/components/ui/primitives";
@@ -28,6 +29,11 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
         }
         initialNotice={lien === "confirme" ? "Adresse confirmée. Connecte-toi." : undefined}
       />
+      <p className="mt-5 text-center text-sm">
+        <Link href="/decouvrir" className="text-ink-soft underline underline-offset-4">
+          Essayer sans compte
+        </Link>
+      </p>
     </div>
   );
 }

@@ -6,7 +6,7 @@ import { Card, PageHeader } from "@/components/ui/primitives";
 export const metadata: Metadata = { title: "Politique de confidentialité" };
 
 /** Update this date whenever the policy changes. */
-const LAST_UPDATED = "15 octobre 2026";
+const LAST_UPDATED = "19 octobre 2026";
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -63,6 +63,15 @@ export default function PrivacyPage() {
           Il n’y a ni publicité, ni traceur, ni outil de mesure d’audience, et tes données ne sont jamais revendues.
           Le seul cookie est celui de ta session de connexion : il est strictement nécessaire au fonctionnement du
           service, c’est pourquoi aucun bandeau de consentement n’est affiché.
+        </p>
+      </Section>
+
+      <Section title="L’essai sans compte">
+        <p>
+          Si tu choisis « Essayer sans compte », aucune adresse e-mail n’est demandée : un compte d’essai est créé et
+          ses données sont liées au cookie de session de ce navigateur. Si tu te déconnectes ou si tu effaces tes
+          cookies, tu ne peux plus le retrouver et ses données sont perdues. Un compte d’essai inactif est supprimé
+          automatiquement au bout de 30 jours. Si tu le transformes en compte complet, tout est conservé.
         </p>
       </Section>
 

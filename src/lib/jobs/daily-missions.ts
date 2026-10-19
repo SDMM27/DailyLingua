@@ -18,6 +18,8 @@ export interface DailyMissionsInput {
   concurrency?: number;
   /** Default 500. */
   limit?: number;
+  /** Deletes the guest accounts left unused for too long; resolves to how many were removed. */
+  cleanupGuests?: () => Promise<number>;
   log?: (message: string) => void;
 }
 
@@ -33,6 +35,10 @@ export interface DailyMissionsReport {
   errors: number;
   /** Not started for lack of time. */
   skipped: number;
+  /** Stale guest accounts removed. */
+  staleGuestsDeleted: number;
+  /** The guest cleanup threw (non-fatal: it does not change `status`). */
+  guestCleanupErrors: number;
   durationMs: number;
 }
 
@@ -57,6 +63,8 @@ export async function runDailyMissions(input: DailyMissionsInput): Promise<Daily
     noPreferences: 0,
     errors: 0,
     skipped: 0,
+    staleGuestsDeleted: 0,
+    guestCleanupErrors: 0,
     durationMs: 0,
   };
 
@@ -95,6 +103,14 @@ export async function runDailyMissions(input: DailyMissionsInput): Promise<Daily
 
   report.skipped = due.length - next;
   if (report.skipped > 0) log(`Échéance atteinte : ${report.skipped} utilisateur(s) non traité(s).`);
+  if (input.cleanupGuests) {
+    try {
+      report.staleGuestsDeleted = await input.cleanupGuests();
+    } catch (error) {
+      report.guestCleanupErrors++;
+      log(`Nettoyage des comptes invités : ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
   report.status = report.skipped > 0 || report.failed > 0 || report.errors > 0 ? "partial" : "ok";
   report.durationMs = now().getTime() - startedAt;
   return report;
@@ -106,5 +122,14 @@ export function createSupabaseDueUsers(client: SupabaseClient<Database>): DailyM
     const { data, error } = await client.rpc("list_due_mission_users", { p_now: now.toISOString(), p_limit: limit });
     if (error) throw new Error(`Supabase (utilisateurs à servir) : ${error.message}`);
     return data.map((row) => ({ userId: row.user_id, date: dateKeySchema.parse(row.mission_date) }));
+  };
+}
+
+/** `cleanupGuests` backed by `delete_stale_anonymous_users` (service role only): 30 days of inactivity. */
+export function createSupabaseGuestCleanup(client: SupabaseClient<Database>): () => Promise<number> {
+  return async () => {
+    const { data, error } = await client.rpc("delete_stale_anonymous_users", { p_inactive_for: "30 days" });
+    if (error) throw new Error(`Supabase (comptes invités inactifs) : ${error.message}`);
+    return data;
   };
 }

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
+import { GuestTrialBanner } from "@/components/auth/guest-trial-banner";
+import { TrialOverCard } from "@/components/auth/trial-over-card";
 import { MissionPreparing } from "@/components/mission/mission-preparing";
 import { MissionView } from "@/components/mission/mission-view";
 import { Card, PageHeader } from "@/components/ui/primitives";
@@ -18,12 +20,19 @@ export default async function MissionPage() {
   await requirePreferences();
   const today = await getToday();
   const mission = await repo.getMission(today);
+  const guestTrial = await repo.getGuestTrial();
+  const trialBanner = guestTrial && (
+    <div className="mb-6">
+      <GuestTrialBanner trial={guestTrial} startedToday={mission !== null} />
+    </div>
+  );
 
   if (!mission && !repo.isDemo) {
     return (
       <>
         <PageHeader eyebrow={formatLongDate(today)} title="Mission du jour" />
-        <MissionPreparing />
+        {trialBanner}
+        {guestTrial && !guestTrial.canStartToday ? <TrialOverCard /> : <MissionPreparing />}
       </>
     );
   }
@@ -65,6 +74,7 @@ export default async function MissionPage() {
           </span>
         )}
       </PageHeader>
+      {trialBanner}
       <MissionView
         mission={mission}
         progress={await repo.getMissionProgress(mission)}
