@@ -1,7 +1,7 @@
 import type { SourceAccess } from "@/lib/schemas/content";
 import type { ContentType } from "@/lib/schemas/common";
 import type { ActivityKind } from "@/lib/schemas/mission";
-import type { PlacementConfidence, PlacementVariant } from "@/lib/schemas/placement";
+import type { PlacementConfidence } from "@/lib/schemas/placement";
 import type { DifficultyMode, LanguagePurpose } from "@/lib/schemas/preferences";
 
 export const CONTENT_TYPE_LABELS: Record<ContentType, string> = {
@@ -39,11 +39,6 @@ export const LANGUAGE_PURPOSE_LABELS: Record<LanguagePurpose, { title: string; h
   professional: { title: "Professionnel", hint: "Réunions, e-mails, registre soutenu" },
   travel: { title: "Voyage", hint: "Situations pratiques sur place" },
   exam: { title: "Examen", hint: "Préparer une certification" },
-};
-
-export const PLACEMENT_VARIANT_LABELS: Record<PlacementVariant, { title: string; hint: string }> = {
-  everyday: { title: "Courant", hint: "Vie quotidienne, registre courant" },
-  professional: { title: "Pro", hint: "Travail, registre soutenu" },
 };
 
 export const PLACEMENT_CONFIDENCE_LABELS: Record<PlacementConfidence, { title: string; hint: string }> = {

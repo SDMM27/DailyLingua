@@ -200,7 +200,6 @@ function createMockRepository(): DailyLinguaRepository {
         {
           status: "completed",
           language: language.language,
-          variant: "everyday",
           estimatedLevel: language.level,
           confidence: "medium",
           chosenLevel: language.level,

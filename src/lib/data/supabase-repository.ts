@@ -677,7 +677,7 @@ export function createSupabaseRepository(
     const rows = unwrap(
       await client
         .from("placement_tests")
-        .select("language, status, variant, estimated_level, confidence, chosen_level, taken_at")
+        .select("language, status, estimated_level, confidence, chosen_level, taken_at")
         .eq("user_id", userId)
         .order("taken_at", { ascending: false }),
       "tests de niveau",
@@ -690,7 +690,6 @@ export function createSupabaseRepository(
       placementSummarySchema.parse({
         status: row.status,
         language: row.language,
-        variant: row.variant ?? undefined,
         estimatedLevel: row.estimated_level ?? undefined,
         confidence: row.confidence ?? undefined,
         chosenLevel: row.chosen_level ?? undefined,
@@ -706,7 +705,6 @@ export function createSupabaseRepository(
         ? {
             p_language: record.language,
             p_status: record.status,
-            p_variant: record.variant,
             p_start_level: record.startLevel,
             p_estimated_level: record.estimatedLevel,
             p_confidence: record.confidence,

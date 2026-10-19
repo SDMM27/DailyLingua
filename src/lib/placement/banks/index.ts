@@ -1,5 +1,5 @@
 import type { Language } from "@/lib/schemas/common";
-import type { PlacementBank, PlacementItem, PlacementVariant } from "@/lib/schemas/placement";
+import type { PlacementBank, PlacementItem } from "@/lib/schemas/placement";
 import { arBank } from "./ar";
 import { csBank } from "./cs";
 import { deBank } from "./de";
@@ -21,9 +21,9 @@ import { ukBank } from "./uk";
 import { zhBank } from "./zh";
 
 /**
- * Curated placement banks, one per study language (a unit test checks every language of the
- * registry has a valid one). Server side only: a page passes the questions of one language and
- * variant to the client, never the whole map.
+ * Curated placement banks as authored, one per study language (a unit test checks every language
+ * of the registry has a valid one). Server side only: a page passes the questions of one language
+ * to the client, never the whole map.
  */
 export const PLACEMENT_BANKS: Record<Language, PlacementBank> = {
   ru: ruBank,
@@ -47,6 +47,10 @@ export const PLACEMENT_BANKS: Record<Language, PlacementBank> = {
   id: idBank,
 };
 
-export function placementItems(language: Language, variant: PlacementVariant): PlacementItem[] {
-  return PLACEMENT_BANKS[language].variants[variant];
+export function placementBank(language: Language): PlacementBank {
+  return PLACEMENT_BANKS[language];
+}
+
+export function placementItems(language: Language): PlacementItem[] {
+  return placementBank(language).items;
 }

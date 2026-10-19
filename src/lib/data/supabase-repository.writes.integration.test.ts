@@ -208,12 +208,11 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
     const completed: Extract<PlacementRecord, { status: "completed" }> = {
       status: "completed",
       language: "ru",
-      variant: "everyday",
       startLevel: "B2",
       estimatedLevel: "B1",
       confidence: "medium",
       chosenLevel: "C1",
-      answers: [{ itemId: "ru-e-b2-1", choice: null, correct: false }],
+      answers: [{ itemId: "ru-b2-1", choice: null, correct: false }],
       bankVersion: "2026-10-15",
     };
 
@@ -234,7 +233,6 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
       expect(tests).toHaveLength(2);
       expect(tests.find((t) => t.language === "ru")).toMatchObject({
         status: "completed",
-        variant: "everyday",
         estimatedLevel: "B1",
         confidence: "medium",
         chosenLevel: "C1",

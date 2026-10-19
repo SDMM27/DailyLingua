@@ -7,16 +7,21 @@ Check a bank with `npm run placement:check -- <code>` (all banks without argumen
 ## Shape
 
 - `version`: date of the last change to the questions (`YYYY-MM-DD`). Bump it when questions change.
-- Two variants, 18 questions each: `everyday` (daily life, friends, family, shopping, leisure,
-  travel, opinions, culture; neutral to familiar register) and `professional` (work, e-mails,
-  meetings, negotiation, reports, customers, HR; formal register).
-- Order: A1, A2, B1, B2, C1, C2; three questions per level, in this order:
-  1. `grammar`: a sentence with one gap `___`, four forms to choose from.
-  2. `vocabulary`: a sentence with one gap `___`, four words or phrases.
-  3. `reading`: a short `context` passage, then a question about it (`prompt`), four short answers.
-- `id`: `<code>-<e|p>-<level>-<n>`, for example `ru-e-b1-2` (n = 1, 2, 3 as above).
-- `answer`: index (0–3) of the correct option. Over the 18 questions of a variant, each index is
-  used 4 or 5 times, with no visible pattern.
+- One flat list `items` of 60 questions, 10 per level, in the order A1, A2, B1, B2, C1, C2. Within a
+  level, in this order:
+  - 1 to 4 — `grammar`: a sentence with one gap `___`, four forms to choose from.
+  - 5 to 7 — `vocabulary`: a sentence with one gap `___`, four words or phrases.
+  - 8 to 10 — `reading`: a short `context` passage, then a question about it (`prompt`), four short answers.
+- `id`: `<code>-<level>-<n>`, for example `ru-b1-7` (n = 1 to 10 as above).
+- `answer`: index (0–3) of the correct option. Over the 60 questions, each index is used 14 to 16
+  times, with no visible pattern.
+- The engine asks blocks of 5 questions at one level (grammar, vocabulary, reading, grammar,
+  vocabulary), drawn in random order, so each level has two blocks' worth and a retest mostly
+  sees other questions. Questions of the same level must not give each other away.
+- Mix the contexts over the bank: daily life, friends, family, shopping, leisure, travel, opinions,
+  culture, and about a third workplace situations (work, e-mails, meetings, customers; formal
+  register), from A1 (introducing yourself at work, office objects, schedules) to C2 (contract
+  nuances, diplomatic phrasing).
 
 ## Content
 
@@ -44,6 +49,4 @@ Check a bank with `npm run placement:check -- <code>` (all banks without argumen
 - Language-specific difficulty belongs at its real level (Russian aspect and cases, German case
   endings, Arabic dual and broken plurals, Japanese keigo, Korean honorifics, Chinese measure words
   and complements, Polish/Czech cases, Greek aspect...).
-- Professional questions use realistic workplace situations at every level (A1: introducing
-  yourself at work, office objects, schedules; C2: contract nuances, diplomatic phrasing).
 - No sensitive topics (politics, religion, health conditions), no brand names, no real people.
