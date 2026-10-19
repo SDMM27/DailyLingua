@@ -129,6 +129,20 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"guest_mission_reservations": {
+                  Row: {
+                    "created_at": string,"mission_date": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"mission_date": string,"user_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"mission_date"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"languages": {
                   Row: {
                     "code": string,"created_at": string
@@ -476,9 +490,6 @@ isOneToOne: false
 "complete_mission_generation":
 { Args: { "p_meta": Json,"p_mission_id": string,"p_sessions": Json }; Returns: undefined
                            },
-"count_recent_guest_missions":
-{ Args: { "p_window"?: string }; Returns: number
-                           },
 "delete_stale_anonymous_users":
 { Args: { "p_inactive_for"?: string,"p_limit"?: number }; Returns: number
                            },
@@ -504,6 +515,9 @@ isOneToOne: false
                            },
 "replace_mission_session":
 { Args: { "p_meta": Json,"p_session": Json,"p_session_id": string,"p_user_id": string }; Returns: undefined
+                           },
+"reserve_guest_mission":
+{ Args: { "p_cap": number,"p_date": string,"p_user_id": string }; Returns: boolean
                            },
 "reserve_session_replacement":
 { Args: { "p_max_per_day"?: number,"p_session_id": string,"p_stale_after"?: string,"p_user_id": string }; Returns: undefined

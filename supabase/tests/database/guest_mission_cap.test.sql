@@ -1,51 +1,60 @@
--- pgTAP tests for migration 20261019000300: the count behind the global cap on guest missions.
--- Run with `npm run db:test`. Everything is rolled back.
+-- pgTAP tests for migration 20261019000400: the global cap on guest missions, reserved in a log
+-- that deleting or upgrading an account does not shrink. Run with `npm run db:test`. Rolled back.
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(5);
-
---   g1   anonymous, mission created now and one created 2 days ago
---   g2   anonymous, mission created now (still generating)
---   m1   e-mail account, mission created now
+select plan(9);
 
 insert into auth.users (instance_id, id, aud, role, email, is_anonymous) values
   ('00000000-0000-0000-0000-000000000000', 'a0000000-0000-4000-8000-0000000000c1', 'authenticated', 'authenticated', null, true),
   ('00000000-0000-0000-0000-000000000000', 'a0000000-0000-4000-8000-0000000000c2', 'authenticated', 'authenticated', null, true),
-  ('00000000-0000-0000-0000-000000000000', 'a0000000-0000-4000-8000-0000000000c3', 'authenticated', 'authenticated', 'member-cap@test.invalid', false);
+  ('00000000-0000-0000-0000-000000000000', 'a0000000-0000-4000-8000-0000000000c3', 'authenticated', 'authenticated', null, true);
+
+-- The cap leaves room for exactly two more reservations, whatever the local data already holds.
+create temporary table cap on commit drop as
+  select (count(*) + 2)::integer as n
+  from public.guest_mission_reservations where created_at >= now() - interval '24 hours';
+grant select on cap to service_role;
 
 set local role service_role;
-create temporary table before_count on commit drop as
-  select public.count_recent_guest_missions() as n;
+select ok(public.reserve_guest_mission('a0000000-0000-4000-8000-0000000000c1', current_date, (select n from cap)),
+  'a first guest gets a slot');
+select ok(public.reserve_guest_mission('a0000000-0000-4000-8000-0000000000c1', current_date, (select n from cap)),
+  'asking again for the same guest and day is allowed');
+select ok(public.reserve_guest_mission('a0000000-0000-4000-8000-0000000000c2', current_date, (select n from cap)),
+  'the retry did not use a slot: a second guest still gets one');
+select ok(not public.reserve_guest_mission('a0000000-0000-4000-8000-0000000000c3', current_date, (select n from cap)),
+  'a third guest is refused once the cap is reached');
 reset role;
 
-insert into public.missions (user_id, mission_date, budget_minutes, status, generated_at, created_at) values
-  ('a0000000-0000-4000-8000-0000000000c1', current_date, 30, 'ready', now(), now()),
-  ('a0000000-0000-4000-8000-0000000000c1', current_date - 2, 30, 'ready', now() - interval '2 days', now() - interval '2 days'),
-  ('a0000000-0000-4000-8000-0000000000c2', current_date, 30, 'generating', null, now()),
-  ('a0000000-0000-4000-8000-0000000000c3', current_date, 30, 'ready', now(), now());
+-- Deleting a guest (its missions cascade away) or upgrading it must not free a slot.
+delete from auth.users where id = 'a0000000-0000-4000-8000-0000000000c1';
+update auth.users set is_anonymous = false, email = 'upgraded-cap@test.invalid'
+where id = 'a0000000-0000-4000-8000-0000000000c2';
 
 set local role service_role;
-select is(public.count_recent_guest_missions() - (select n from before_count), 2,
-  'counts the guest missions of the last 24 hours, finished or not, and not those of full accounts');
-select is(public.count_recent_guest_missions(interval '3 days') - (select n from before_count), 3,
-  'the window can be widened');
+select ok(not public.reserve_guest_mission('a0000000-0000-4000-8000-0000000000c3', current_date, (select n from cap)),
+  'deleting or upgrading guest accounts does not free their slots');
 reset role;
+
+select is((select count(*)::int from public.guest_mission_reservations
+  where user_id in ('a0000000-0000-4000-8000-0000000000c1', 'a0000000-0000-4000-8000-0000000000c2')), 2,
+  'the reservations outlive the accounts');
 
 -- Privileges ----------------------------------------------------------------------------------
 
 select set_config('request.jwt.claims',
-  '{"sub": "a0000000-0000-4000-8000-0000000000c1", "role": "authenticated"}', true);
+  '{"sub": "a0000000-0000-4000-8000-0000000000c3", "role": "authenticated"}', true);
 set local role authenticated;
-select throws_ok($$select public.count_recent_guest_missions()$$, '42501', null,
-  'a user cannot read the count');
+select throws_ok($$select public.reserve_guest_mission('a0000000-0000-4000-8000-0000000000c3', current_date, 1000)$$,
+  '42501', null, 'a user cannot reserve a slot directly');
+select throws_ok($$delete from public.guest_mission_reservations$$, '42501', null,
+  'a user cannot erase the reservations');
 reset role;
 set local role anon;
-select throws_ok($$select public.count_recent_guest_missions()$$, '42501', null,
-  'anon cannot read the count');
+select throws_ok($$select public.reserve_guest_mission('a0000000-0000-4000-8000-0000000000c3', current_date, 1000)$$,
+  '42501', null, 'anon cannot reserve a slot');
 reset role;
-
-select has_index('public', 'missions', 'missions_created_at_idx', 'missions are indexed by creation time');
 
 select * from finish();
 rollback;

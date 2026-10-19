@@ -185,8 +185,11 @@ export function createSupabaseRepository(
     contentPolicy?: ContentLicensePolicy;
     /** The user is a guest (anonymous account): the trial limit applies. */
     isGuest?: boolean;
-    /** Whether one more guest mission may be started (global cap on guests). Absent: no cap. */
-    guestMissionAllowed?: () => Promise<boolean>;
+    /**
+     * Reserves a guest mission against the global cap on guests (service role, server only); false
+     * when the cap is reached. Absent: no cap.
+     */
+    reserveGuestMission?: (userId: string, date: DateKey) => Promise<boolean>;
     /** Writes the mission of a day (service role, server only). Absent: preparing is not configured. */
     prepareMission?: (userId: string, date: DateKey) => Promise<GenerateMissionOutcome>;
     /** Swaps the content of a session for another readable one (service role, server only). Absent: not configured. */
@@ -296,7 +299,9 @@ export function createSupabaseRepository(
     if (guestDates) {
       if (!guestTrialStatus(guestDates, today).canStartToday) return { status: "signup-required" };
       // A mission already there stays reachable; only a new one counts against the global cap.
-      if (!guestDates.includes(today) && options.guestMissionAllowed && !(await options.guestMissionAllowed())) {
+      const reserved =
+        guestDates.includes(today) || !options.reserveGuestMission || (await options.reserveGuestMission(userId, today));
+      if (!reserved) {
         throw new UserFacingError(
           "Trop de missions d’essai aujourd’hui. Réessaie demain, ou crée un compte pour continuer.",
         );
