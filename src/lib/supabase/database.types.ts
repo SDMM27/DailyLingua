@@ -476,6 +476,9 @@ isOneToOne: false
 "complete_mission_generation":
 { Args: { "p_meta": Json,"p_mission_id": string,"p_sessions": Json }; Returns: undefined
                            },
+"count_recent_guest_missions":
+{ Args: { "p_window"?: string }; Returns: number
+                           },
 "delete_stale_anonymous_users":
 { Args: { "p_inactive_for"?: string,"p_limit"?: number }; Returns: number
                            },

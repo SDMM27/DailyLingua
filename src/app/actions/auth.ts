@@ -116,22 +116,6 @@ export async function updatePassword(_previous: UpdatePasswordState, formData: F
   return { done: true };
 }
 
-/** Starts the free trial: an anonymous account (no e-mail, no password), then the first-run screen. */
-export async function startGuestTrial(): Promise<AuthFormState> {
-  const supabase = await createSupabaseServerClient();
-  if (!supabase) return { error: "L’essai n’est pas disponible dans la démo." };
-
-  const { error } = await supabase.auth.signInAnonymously();
-  if (error) {
-    if (error.status === 429 || error.code === "over_request_rate_limit") {
-      return { error: "Trop d’essais depuis cette connexion, réessaie plus tard." };
-    }
-    console.error("signInAnonymously failed", error);
-    return { error: "L’essai sans compte n’est pas disponible pour le moment." };
-  }
-  redirect("/bienvenue");
-}
-
 /**
  * Turns the guest into a real account: Supabase sends a confirmation to the new address; once it
  * is confirmed the same user (same id, all data kept) chooses a password on /nouveau-mot-de-passe.

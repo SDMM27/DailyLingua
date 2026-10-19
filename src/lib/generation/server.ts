@@ -1,7 +1,7 @@
 import "server-only";
 import type { DateKey } from "@/lib/schemas/common";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { readWritingFeedbackConfig } from "./config";
+import { readGuestDailyMissionCap, readWritingFeedbackConfig } from "./config";
 import type { GenerateMissionOutcome } from "./generate-mission";
 import { createMissionPreparer, createSessionReplacer } from "./preparer";
 import type { ReplaceSessionOutcome } from "./replace-session";
@@ -19,6 +19,19 @@ import {
  */
 export async function prepareMission(userId: string, date: DateKey): Promise<GenerateMissionOutcome> {
   return createMissionPreparer(createSupabaseAdminClient(), { log: console.warn })(userId, date);
+}
+
+/**
+ * Whether one more guest mission may be started: false once all guests together reached
+ * GUEST_DAILY_MISSION_CAP missions over the last 24 hours. Counted with the service role, since a
+ * user can only see their own missions.
+ */
+export async function guestMissionAllowed(): Promise<boolean> {
+  const cap = readGuestDailyMissionCap();
+  if (cap === null) return true;
+  const { data, error } = await createSupabaseAdminClient().rpc("count_recent_guest_missions");
+  if (error) throw new Error(`Supabase (missions des invités) : ${error.message}`);
+  return data < cap;
 }
 
 /**

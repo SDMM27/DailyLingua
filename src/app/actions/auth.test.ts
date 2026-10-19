@@ -1,10 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { deleteAccount, requestPasswordReset, startGuestTrial, updatePassword, upgradeGuestAccount } from "./auth";
+import { deleteAccount, requestPasswordReset, updatePassword, upgradeGuestAccount } from "./auth";
 
 const auth = vi.hoisted(() => ({
   resetPasswordForEmail: vi.fn(),
   updateUser: vi.fn(),
-  signInAnonymously: vi.fn(),
   getUser: vi.fn(),
   signOut: vi.fn(),
 }));
@@ -36,7 +35,6 @@ beforeEach(() => {
   state.demo = false;
   auth.resetPasswordForEmail.mockResolvedValue({ data: {}, error: null });
   auth.updateUser.mockResolvedValue({ data: {}, error: null });
-  auth.signInAnonymously.mockResolvedValue({ data: {}, error: null });
   auth.signOut.mockResolvedValue({ error: null });
   auth.getUser.mockResolvedValue({ data: { user: { id: "u1", is_anonymous: true, email: undefined } } });
   deleteUserAccount.mockResolvedValue(undefined);
@@ -138,29 +136,6 @@ describe("updatePassword", () => {
   it("is unavailable in the demo", async () => {
     state.demo = true;
     expect((await updatePassword({}, form(valid))).error).toMatch(/démo/);
-  });
-});
-
-describe("startGuestTrial", () => {
-  it("opens an anonymous session and goes to the first-run screen", async () => {
-    await expect(startGuestTrial()).rejects.toThrow("redirect:/bienvenue");
-    expect(auth.signInAnonymously).toHaveBeenCalledOnce();
-  });
-
-  it("reports a rate limit", async () => {
-    auth.signInAnonymously.mockResolvedValue({ data: null, error: { status: 429, code: "over_request_rate_limit" } });
-    const result = await startGuestTrial();
-    expect(result.error).toBe("Trop d’essais depuis cette connexion, réessaie plus tard.");
-  });
-
-  it("is unavailable when anonymous sign-ins are off", async () => {
-    auth.signInAnonymously.mockResolvedValue({ data: null, error: { status: 422, code: "anonymous_provider_disabled" } });
-    expect((await startGuestTrial()).error).toMatch(/pas disponible/);
-  });
-
-  it("is unavailable in the demo", async () => {
-    state.demo = true;
-    expect((await startGuestTrial()).error).toMatch(/démo/);
   });
 });
 

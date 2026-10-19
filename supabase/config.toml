@@ -212,10 +212,12 @@ token_verifications = 30
 web3 = 30
 
 # Configure one of the supported captcha providers: `hcaptcha`, `turnstile`.
+# Daily Lingua uses Turnstile for the guest trial (see docs/plans/product-features.md). Turning this on
+# also requires a captcha token for password sign-in, sign-up and password reset.
 # [auth.captcha]
 # enabled = true
-# provider = "hcaptcha"
-# secret = ""
+# provider = "turnstile"
+# secret = "env(SUPABASE_AUTH_CAPTCHA_SECRET)"
 
 [auth.email]
 # Allow/disallow new user signups via email to your project.

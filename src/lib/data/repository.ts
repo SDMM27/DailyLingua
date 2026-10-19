@@ -6,7 +6,7 @@ import { availableLanguages } from "@/lib/content/availability";
 import { SOURCE_CATALOG } from "@/lib/content/catalog";
 import { LANGUAGE_CODES } from "@/lib/domain/languages";
 import { readContentLicensePolicy } from "@/lib/content/policy";
-import { prepareMission, replaceSession, writingFeedbackReviewer } from "@/lib/generation/server";
+import { guestMissionAllowed, prepareMission, replaceSession, writingFeedbackReviewer } from "@/lib/generation/server";
 import { addDays, toDateKey } from "@/lib/domain/dates";
 import type { GuestTrialStatus } from "@/lib/domain/guest-trial";
 import { dateKeySchema, type DateKey, type Language } from "@/lib/schemas/common";
@@ -263,6 +263,7 @@ export const getRepository = cache(async (): Promise<DailyLinguaRepository> => {
   if (!data.user) redirect("/connexion");
   return createSupabaseRepository(supabase, data.user.id, {
     isGuest: data.user.is_anonymous === true,
+    guestMissionAllowed,
     prepareMission,
     replaceSession,
     reviewWriting: writingFeedbackReviewer(),

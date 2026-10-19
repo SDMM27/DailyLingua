@@ -34,7 +34,8 @@ const FEATURES = [
 
 export default async function DiscoverPage() {
   // Without Supabase the app is the public demo: there is nothing to try.
-  if (!getSupabaseEnv()) redirect("/");
+  const env = getSupabaseEnv();
+  if (!env) redirect("/");
 
   // Already signed in (validated with Supabase Auth, not just the cookie): the app is the home page.
   const supabase = await createSupabaseServerClient();
@@ -107,7 +108,11 @@ export default async function DiscoverPage() {
           Pas d’adresse e-mail à donner pour commencer. Au bout de {GUEST_TRIAL_DAYS} jours de mission, il faudra
           créer un compte pour continuer et garder ta progression.
         </p>
-        <GuestTrialForm />
+        <GuestTrialForm
+          supabaseUrl={env.NEXT_PUBLIC_SUPABASE_URL}
+          supabaseKey={env.NEXT_PUBLIC_SUPABASE_ANON_KEY}
+          turnstileSiteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() || undefined}
+        />
         <p className="mt-4 text-center text-sm">
           <Link href="/connexion" className="font-semibold text-ink underline underline-offset-4">
             J’ai déjà un compte

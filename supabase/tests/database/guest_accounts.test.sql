@@ -28,6 +28,10 @@ insert into auth.sessions (id, user_id, created_at, updated_at, refreshed_at) va
 
 update public.profiles set generation_time = '07:00', time_zone = 'Europe/Paris'
 where id::text like 'a0000000-0000-4000-8000-0000000000e_';
+-- The profile trigger stamps created_at with now(); align guest and member on their account date
+-- so both count as new (active) at p_now and only the guest flag tells them apart.
+update public.profiles set created_at = '2030-05-09 08:00+00'
+where id in ('a0000000-0000-4000-8000-0000000000e1', 'a0000000-0000-4000-8000-0000000000e2');
 insert into public.user_languages (user_id, language, level, target_level)
 select id, 'ru', 'B2', 'C1' from public.profiles where id::text like 'a0000000-0000-4000-8000-0000000000e_';
 insert into public.missions (user_id, mission_date, budget_minutes, status, generated_at, started_at, generation_attempts)

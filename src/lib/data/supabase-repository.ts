@@ -185,6 +185,8 @@ export function createSupabaseRepository(
     contentPolicy?: ContentLicensePolicy;
     /** The user is a guest (anonymous account): the trial limit applies. */
     isGuest?: boolean;
+    /** Whether one more guest mission may be started (global cap on guests). Absent: no cap. */
+    guestMissionAllowed?: () => Promise<boolean>;
     /** Writes the mission of a day (service role, server only). Absent: preparing is not configured. */
     prepareMission?: (userId: string, date: DateKey) => Promise<GenerateMissionOutcome>;
     /** Swaps the content of a session for another readable one (service role, server only). Absent: not configured. */
@@ -267,7 +269,8 @@ export function createSupabaseRepository(
     });
   }
 
-  async function getGuestTrial(): Promise<GuestTrialStatus | null> {
+  /** Days on which the guest got a mission, or null for a full account. */
+  async function getGuestMissionDates(): Promise<DateKey[] | null> {
     if (!options.isGuest) return null;
     const { data, error } = await client
       .from("missions")
@@ -275,20 +278,31 @@ export function createSupabaseRepository(
       .eq("user_id", userId)
       .eq("status", "ready");
     if (error) throw new Error(`Supabase (essai) : ${error.message}`);
-    return guestTrialStatus(
-      data.map((row) => row.mission_date),
-      await getToday(),
-    );
+    return data.map((row) => row.mission_date);
+  }
+
+  async function getGuestTrial(): Promise<GuestTrialStatus | null> {
+    const dates = await getGuestMissionDates();
+    return dates && guestTrialStatus(dates, await getToday());
   }
 
   async function prepareTodayMission(): Promise<PrepareMissionResult> {
     if (!options.prepareMission) {
       throw new UserFacingError("La préparation des missions n’est pas configurée sur ce serveur.");
     }
-    // The trial limit is checked before the model is called.
-    const trial = await getGuestTrial();
-    if (trial && !trial.canStartToday) return { status: "signup-required" };
-    const outcome = await options.prepareMission(userId, await getToday());
+    // The trial limits are checked before the model is called.
+    const today = await getToday();
+    const guestDates = await getGuestMissionDates();
+    if (guestDates) {
+      if (!guestTrialStatus(guestDates, today).canStartToday) return { status: "signup-required" };
+      // A mission already there stays reachable; only a new one counts against the global cap.
+      if (!guestDates.includes(today) && options.guestMissionAllowed && !(await options.guestMissionAllowed())) {
+        throw new UserFacingError(
+          "Trop de missions d’essai aujourd’hui. Réessaie demain, ou crée un compte pour continuer.",
+        );
+      }
+    }
+    const outcome = await options.prepareMission(userId, today);
     switch (outcome.status) {
       case "ready":
       case "pending":

@@ -21,6 +21,12 @@ describe("SECURITY_HEADERS", () => {
     }
   });
 
+  it("does not block the browser sign-in of the guest trial (Supabase) nor Turnstile", () => {
+    for (const directive of ["connect-src", "frame-src", "child-src"]) {
+      expect(CONTENT_SECURITY_POLICY).not.toContain(directive);
+    }
+  });
+
   it("does not set HSTS (done by Vercel)", () => {
     expect(byKey["Strict-Transport-Security"]).toBeUndefined();
   });
