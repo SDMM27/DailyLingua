@@ -32,6 +32,9 @@ export default defineConfig({
     env: {
       // Never call the paid AI during end-to-end tests.
       MISSION_GENERATOR: "template",
+      // No CAPTCHA: a real Turnstile site key from .env.local cannot be solved by the test browser
+      // and would keep the sign-in buttons disabled. Empty wins over .env.local (set, not undefined).
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: "",
     },
   },
 });

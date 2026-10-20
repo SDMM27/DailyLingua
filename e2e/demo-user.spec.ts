@@ -49,9 +49,10 @@ test("the demo account can run a placement test up to its result", async ({ page
   await expect(page).toHaveURL(/\/niveau\/[a-z]{2}$/);
   await page.getByRole("button", { name: "Commencer" }).click();
 
-  // Answering "I don't know" every time goes down from the declared level to the first fail.
+  // Answering "I don't know" every time fails each block of 5 questions, going down from the
+  // declared level to A1; the test asks 30 questions at most (src/lib/domain/placement.ts).
   const result = page.getByText("Niveau estimé");
-  for (let i = 0; i < 18 && (await result.count()) === 0; i++) {
+  for (let i = 0; i < 30 && (await result.count()) === 0; i++) {
     await expect(page.getByText(`Question ${i + 1}`)).toBeVisible();
     await expectNoHorizontalOverflow(page);
     await page.getByRole("button", { name: "Je ne sais pas" }).click();

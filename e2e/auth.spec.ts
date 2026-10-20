@@ -5,8 +5,16 @@ test.beforeAll(() => {
   requireLocalSupabase();
 });
 
-test("a visitor without account is sent to the sign-in screen", async ({ page }) => {
+test("a visitor without account sees the teaser on the home page", async ({ page }) => {
   await page.goto("/");
+  await expect(page).toHaveURL(/\/decouvrir$/);
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Essayer sans compte" })).toBeVisible();
+  await expectNoHorizontalOverflow(page);
+});
+
+test("a visitor without account is sent to the sign-in screen from any other page", async ({ page }) => {
+  await page.goto("/mission");
   await expect(page).toHaveURL(/\/connexion$/);
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 });
