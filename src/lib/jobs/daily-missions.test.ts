@@ -111,4 +111,27 @@ describe("runDailyMissions", () => {
       }),
     ).rejects.toThrow("rpc down");
   });
+
+  it("reports the stale guests removed, and a failing cleanup is non-fatal", async () => {
+    const ok = await runDailyMissions({
+      listDueUsers: async () => [],
+      prepare: async () => ({ status: "no-content" }),
+      cleanupGuests: async () => 4,
+      deadlineMs: 10_000,
+    });
+    expect(ok).toMatchObject({ status: "ok", staleGuestsDeleted: 4, guestCleanupErrors: 0 });
+
+    const logs: string[] = [];
+    const failed = await runDailyMissions({
+      listDueUsers: async () => users(1),
+      prepare: async () => ({ status: "ready", missionId: "m", source: "ai" }),
+      cleanupGuests: async () => {
+        throw new Error("rpc down");
+      },
+      deadlineMs: 10_000,
+      log: (m) => logs.push(m),
+    });
+    expect(failed).toMatchObject({ status: "ok", ready: 1, staleGuestsDeleted: 0, guestCleanupErrors: 1 });
+    expect(logs.join(" ")).toContain("rpc down");
+  });
 });

@@ -57,6 +57,32 @@ export default async function PreferencesPage() {
           <SourceAccessList sources={paidSources} readOnly={repo.isDemo} />
         </Card>
       )}
+      {repo.isGuest && (
+        <Card className="mt-6">
+          <Eyebrow>Compte d’essai</Eyebrow>
+          <p className="mt-2 text-sm text-ink-soft">
+            Tu n’as pas encore de compte : ta progression n’existe que sur ce navigateur.
+          </p>
+          <Link
+            href="/creer-mon-compte"
+            className="mt-4 inline-flex min-h-11 items-center rounded-full bg-ink px-5 text-sm font-semibold text-paper"
+          >
+            Créer mon compte
+          </Link>
+          <form action={signOut} className="mt-5 border-t border-line pt-4">
+            <p className="text-xs leading-relaxed text-muted">
+              Si tu te déconnectes, tu perds ton essai et tout ce que tu as fait : il n’y a aucun moyen de le
+              retrouver.
+            </p>
+            <button
+              type="submit"
+              className="mt-3 rounded-full border border-line px-4 py-2 text-sm font-semibold text-ink-soft hover:bg-surface-sunk"
+            >
+              Se déconnecter et perdre l’essai
+            </button>
+          </form>
+        </Card>
+      )}
       {email && (
         <Card className="mt-6 flex items-center justify-between gap-4">
           <div className="min-w-0">
@@ -73,7 +99,7 @@ export default async function PreferencesPage() {
           </form>
         </Card>
       )}
-      {email && <DeleteAccount email={email} />}
+      {(email || repo.isGuest) && <DeleteAccount email={email} />}
       <div className="mt-6 space-y-3">
       <Link
         href="/retour?depuis=/preferences"

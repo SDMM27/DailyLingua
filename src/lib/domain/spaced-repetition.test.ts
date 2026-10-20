@@ -3,6 +3,7 @@ import type { VocabularyItem } from "@/lib/schemas/vocabulary";
 import {
   MAX_BOX,
   applyReview,
+  dueItems,
   dueToday,
   initialReviewState,
   isDue,
@@ -69,6 +70,11 @@ describe("due words", () => {
   it("orders upcoming reviews and excludes known words", () => {
     expect(upcomingReviews(items).map((i) => i.id)).toEqual(["overdue", "today", "later"]);
     expect(dueToday(items, TODAY).map((i) => i.id)).toEqual(["overdue", "today"]);
+  });
+
+  it("lists what is due for any reviewable, most overdue first", () => {
+    expect(dueItems(items, TODAY).map((i) => i.id)).toEqual(["overdue", "today"]);
+    expect(dueItems([], TODAY)).toEqual([]);
   });
 
   it("does not mutate its input", () => {

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AuthForm } from "@/components/auth/auth-form";
 import { PageHeader } from "@/components/ui/primitives";
@@ -23,11 +24,17 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
         Connecte-toi pour retrouver tes mots, ta progression et la mission du jour.
       </PageHeader>
       <AuthForm
+        turnstileSiteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() || undefined}
         initialError={
           lien === "invalide" ? "Ce lien de confirmation n’est plus valide. Connecte-toi ou recrée un compte." : undefined
         }
         initialNotice={lien === "confirme" ? "Adresse confirmée. Connecte-toi." : undefined}
       />
+      <p className="mt-5 text-center text-sm">
+        <Link href="/decouvrir" className="text-ink-soft underline underline-offset-4">
+          Essayer sans compte
+        </Link>
+      </p>
     </div>
   );
 }

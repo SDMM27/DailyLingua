@@ -1,9 +1,9 @@
--- pgTAP tests for migration 20261015000500: placement_tests and record_placement_test.
+-- pgTAP tests for migrations 20261015000500 and 20261019000100: placement_tests and record_placement_test.
 -- Run with `npm run db:test`. Everything is rolled back.
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(14);
+select plan(15);
 
 insert into auth.users (instance_id, id, aud, role, email) values
   ('00000000-0000-0000-0000-000000000000', 'a0000000-0000-4000-8000-0000000000dd', 'authenticated', 'authenticated', 'placement-a@test.invalid'),
@@ -49,6 +49,11 @@ select throws_ok(
   $$select public.record_placement_test('es', 'skipped', null, null, null, null, null, null, null)$$,
   'P0002', null, 'a language the user does not study is refused');
 
+select lives_ok(
+  $$select public.record_placement_test('ru', 'completed', null, 'B1', 'B1', 'high', 'B1',
+    '[{"itemId": "ru-b1-1", "choice": 0, "correct": true}]', '2026-10-19')$$,
+  'a completed test without variant is recorded');
+
 select throws_ok(
   $$select public.record_placement_test('ru', 'completed', 'everyday', 'B1', null, 'high', 'B1',
     '[]', '2026-10-15')$$,
@@ -57,7 +62,7 @@ select throws_ok(
   $$select public.record_placement_test('ru', 'skipped', 'everyday', null, null, null, null, null, null)$$,
   '23514', null, 'a skipped test with a variant violates the check constraint');
 
-select is((select count(*)::int from public.placement_tests), 3, 'the user reads their own rows');
+select is((select count(*)::int from public.placement_tests), 4, 'the user reads their own rows');
 
 select throws_ok(
   $$update public.placement_tests set chosen_level = 'C2'$$,

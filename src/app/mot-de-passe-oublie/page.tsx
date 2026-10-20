@@ -12,6 +12,7 @@ export default async function ForgotPasswordPage({ searchParams }: { searchParam
         Indique ton adresse e-mail : tu recevras un lien pour choisir un nouveau mot de passe.
       </PageHeader>
       <RequestResetForm
+        turnstileSiteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() || undefined}
         initialError={lien === "invalide" ? "Ce lien a expiré ou a déjà servi. Demande-en un nouveau." : undefined}
       />
     </div>

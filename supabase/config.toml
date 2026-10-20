@@ -176,7 +176,7 @@ refresh_token_reuse_interval = 10
 # Allow/disallow new user signups to your project.
 enable_signup = true
 # Allow/disallow anonymous sign-ins to your project.
-enable_anonymous_sign_ins = false
+enable_anonymous_sign_ins = true
 # Allow/disallow testing manual linking of accounts
 enable_manual_linking = false
 # Passwords shorter than this value will be rejected as weak. Minimum 6, recommended 8 or more.
@@ -212,10 +212,13 @@ token_verifications = 30
 web3 = 30
 
 # Configure one of the supported captcha providers: `hcaptcha`, `turnstile`.
+# Daily Lingua uses Turnstile for the guest trial, password sign-in, sign-up and password reset: the
+# forms send the token when NEXT_PUBLIC_TURNSTILE_SITE_KEY is set (see docs/plans/product-features.md).
+# Turn this on only once the deployed app has that site key.
 # [auth.captcha]
 # enabled = true
-# provider = "hcaptcha"
-# secret = ""
+# provider = "turnstile"
+# secret = "env(SUPABASE_AUTH_CAPTCHA_SECRET)"
 
 [auth.email]
 # Allow/disallow new user signups via email to your project.

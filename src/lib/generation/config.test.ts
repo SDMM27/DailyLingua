@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_MISSION_MODEL, readGenerationConfig, readWritingFeedbackConfig } from "./config";
+import {
+  DEFAULT_GUEST_DAILY_MISSION_CAP,
+  DEFAULT_MISSION_MODEL,
+  readGenerationConfig,
+  readGuestDailyMissionCap,
+  readWritingFeedbackConfig,
+} from "./config";
 
 describe("readGenerationConfig", () => {
   it("uses the template without a key", () => {
@@ -57,5 +63,24 @@ describe("readWritingFeedbackConfig", () => {
       enabled: false,
     });
     expect(() => readWritingFeedbackConfig({ WRITING_FEEDBACK: "maybe" })).toThrow(/WRITING_FEEDBACK invalide/);
+  });
+});
+
+describe("readGuestDailyMissionCap", () => {
+  it("has a default cap", () => {
+    expect(readGuestDailyMissionCap({})).toBe(DEFAULT_GUEST_DAILY_MISSION_CAP);
+    expect(readGuestDailyMissionCap({ GUEST_DAILY_MISSION_CAP: " " })).toBe(DEFAULT_GUEST_DAILY_MISSION_CAP);
+  });
+
+  it("reads a number, or off for no cap", () => {
+    expect(readGuestDailyMissionCap({ GUEST_DAILY_MISSION_CAP: "50" })).toBe(50);
+    expect(readGuestDailyMissionCap({ GUEST_DAILY_MISSION_CAP: "0" })).toBe(0);
+    expect(readGuestDailyMissionCap({ GUEST_DAILY_MISSION_CAP: "off" })).toBeNull();
+  });
+
+  it("refuses anything else", () => {
+    for (const value of ["-1", "1.5", "lots"]) {
+      expect(() => readGuestDailyMissionCap({ GUEST_DAILY_MISSION_CAP: value })).toThrow(/GUEST_DAILY_MISSION_CAP/);
+    }
   });
 });

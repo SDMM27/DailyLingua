@@ -6,7 +6,7 @@ import { Card, PageHeader } from "@/components/ui/primitives";
 export const metadata: Metadata = { title: "Politique de confidentialité" };
 
 /** Update this date whenever the policy changes. */
-const LAST_UPDATED = "15 octobre 2026";
+const LAST_UPDATED = "20 octobre 2026";
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -55,7 +55,7 @@ export default function PrivacyPage() {
             heure de la mission.
           </li>
           <li>Tes missions, ta progression et tes réponses aux quiz.</li>
-          <li>Les textes que tu écris pour les productions écrites.</li>
+          <li>Les textes que tu écris pour les productions écrites, leurs corrections et les cartes d’erreurs à revoir.</li>
           <li>Ton vocabulaire et tes révisions.</li>
           <li>Les retours que tu envoies depuis l’app.</li>
         </ul>
@@ -63,6 +63,15 @@ export default function PrivacyPage() {
           Il n’y a ni publicité, ni traceur, ni outil de mesure d’audience, et tes données ne sont jamais revendues.
           Le seul cookie est celui de ta session de connexion : il est strictement nécessaire au fonctionnement du
           service, c’est pourquoi aucun bandeau de consentement n’est affiché.
+        </p>
+      </Section>
+
+      <Section title="L’essai sans compte">
+        <p>
+          Si tu choisis « Essayer sans compte », aucune adresse e-mail n’est demandée : un compte d’essai est créé et
+          ses données sont liées au cookie de session de ce navigateur. Si tu te déconnectes ou si tu effaces tes
+          cookies, tu ne peux plus le retrouver et ses données sont perdues. Un compte d’essai inactif est supprimé
+          automatiquement au bout de 30 jours. Si tu le transformes en compte complet, tout est conservé.
         </p>
       </Section>
 
@@ -82,10 +91,13 @@ export default function PrivacyPage() {
             <strong>Vercel</strong> : hébergement de l’application.
           </li>
           <li>
-            <strong>Anthropic</strong> : rédaction des exercices de la mission. Le modèle reçoit le titre, l’accroche,
-            le média, le type, le niveau habituel et la durée des contenus proposés, ainsi que ton niveau, ton niveau
-            visé, ton objectif libre s’il est renseigné, tes centres d’intérêt, le temps prévu et la date. Il ne reçoit
-            jamais ton adresse e-mail, ni tes productions écrites, ni ton vocabulaire, ni tes réponses aux quiz.
+            <strong>Anthropic</strong> : rédaction des exercices de la mission et correction de tes textes. Pour les
+            exercices, le modèle reçoit le titre, l’accroche, le média, le type, le niveau habituel et la durée des
+            contenus proposés, ainsi que ton niveau, ton niveau visé, ton objectif libre s’il est renseigné, tes
+            centres d’intérêt, le temps prévu et la date. Pour la correction, il reçoit le texte que tu as écrit, la
+            consigne, la langue, ton niveau, ton niveau visé et ton objectif. Il ne reçoit jamais ton adresse e-mail,
+            ni ton vocabulaire, ni tes réponses aux quiz. Anthropic n’utilise pas les données reçues par son API pour
+            entraîner ses modèles.
           </li>
           <li>
             <strong>Le service d’envoi d’e-mails</strong> configuré dans Supabase, pour les messages de confirmation et

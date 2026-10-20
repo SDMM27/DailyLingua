@@ -3,7 +3,7 @@
 import { UserFacingError } from "@/lib/data/errors";
 import type { DailyLinguaRepository } from "@/lib/data/repository";
 import { replayPlacement } from "@/lib/domain/placement";
-import { PLACEMENT_BANKS, placementItems } from "@/lib/placement/banks";
+import { placementBank } from "@/lib/placement/banks";
 import type { CefrLevel, Language } from "@/lib/schemas/common";
 import {
   completePlacementInputSchema,
@@ -30,16 +30,16 @@ export async function completePlacementTest(
 ): Promise<ActionResult<{ estimate: CefrLevel; confidence: PlacementConfidence }>> {
   return runAction(completePlacementInputSchema, input, async (repo, test) => {
     await requireStudied(repo, test.language);
-    const items = placementItems(test.language, test.variant);
+    const bank = placementBank(test.language);
+    const items = bank.items;
     const replay = replayPlacement(items, test.startLevel, test.answers);
     if (!replay.ok) {
-      console.error(`Placement test refused (${test.language}, ${test.variant}): ${replay.reason}`);
+      console.error(`Placement test refused (${test.language}): ${replay.reason}`);
       throw new UserFacingError("Le test n’a pas pu être vérifié. Recommence-le.");
     }
     await repo.recordPlacementTest({
       status: "completed",
       language: test.language,
-      variant: test.variant,
       startLevel: test.startLevel,
       estimatedLevel: replay.estimate,
       confidence: replay.confidence,
@@ -50,7 +50,7 @@ export async function completePlacementTest(
         // The replay checked that every answer is a question of the bank.
         correct: items.find((item) => item.id === a.itemId)?.answer === a.choice,
       })),
-      bankVersion: PLACEMENT_BANKS[test.language].version,
+      bankVersion: bank.version,
     });
     return { estimate: replay.estimate, confidence: replay.confidence };
   });

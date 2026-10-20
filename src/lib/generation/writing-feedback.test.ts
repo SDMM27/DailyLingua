@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { describe, expect, it, vi } from "vitest";
-import type { WireWritingFeedback } from "@/lib/schemas/writing-feedback";
+import { writingFeedbackSchema, type WireWritingFeedback } from "@/lib/schemas/writing-feedback";
 import { DEFAULT_MISSION_MODEL } from "./config";
 import { GenerationError } from "./errors";
 import { createClaudeWritingReviewer, validateWritingFeedback, type FeedbackParseClient } from "./writing-feedback";
@@ -36,9 +36,11 @@ function wire(overrides: Partial<WireWritingFeedback> = {}): WireWritingFeedback
         original: "due giorni per settimana",
         corrected: "due giorni alla settimana",
         explanation_fr: "On dit « alla settimana ».",
+        category: "function_word",
       },
     ],
     strength_fr: "Ton opinion est claire.",
+    native_version: " Secondo me il lavoro da casa è utile. Lavoro da casa due giorni alla settimana e sono più concentrato. ",
     ...overrides,
   };
 }
@@ -106,19 +108,36 @@ describe("validateWritingFeedback", () => {
           original: "due giorni per settimana",
           corrected: "due giorni alla settimana",
           explanation: "On dit « alla settimana ».",
+          category: "function_word",
         },
       ],
       strength: "Ton opinion est claire.",
+      nativeVersion: "Secondo me il lavoro da casa è utile. Lavoro da casa due giorni alla settimana e sono più concentrato.",
     });
+  });
+
+  it("still accepts a stored correction without category or native version", () => {
+    const stored = {
+      scores: Object.fromEntries(
+        ["grammar", "vocabulary", "register", "coherence"].map((c) => [c, { score: 3, comment: "Ok." }]),
+      ),
+      corrections: [{ original: "a", corrected: "b", explanation: "x" }],
+      strength: "Bien.",
+    };
+    expect(writingFeedbackSchema.safeParse(stored).success).toBe(true);
+    expect(
+      writingFeedbackSchema.safeParse({ ...stored, corrections: [{ ...stored.corrections[0], category: "nope" }] }).success,
+    ).toBe(false);
+    expect(writingFeedbackSchema.safeParse({ ...stored, nativeVersion: "x".repeat(3501) }).success).toBe(false);
   });
 
   it("drops corrections that are not in the text or change nothing", () => {
     const feedback = validateWritingFeedback(
       wire({
         corrections: [
-          { original: "una frase inventata", corrected: "una frase corretta", explanation_fr: "x" },
-          { original: "lavoro da casa", corrected: "lavoro  da casa", explanation_fr: "x" },
-          { original: "sono  più\nconcentrato", corrected: "mi concentro di più", explanation_fr: "Plus naturel." },
+          { original: "una frase inventata", corrected: "una frase corretta", explanation_fr: "x", category: "other" },
+          { original: "lavoro da casa", corrected: "lavoro  da casa", explanation_fr: "x", category: "other" },
+          { original: "sono  più\nconcentrato", corrected: "mi concentro di più", explanation_fr: "Plus naturel.", category: "word_choice" },
         ],
       }),
       TEXT,
@@ -129,7 +148,7 @@ describe("validateWritingFeedback", () => {
   it("matches passages containing angle brackets as the model saw them", () => {
     const text = "Il prezzo è <alto> per me, credo che sia troppo caro.";
     const feedback = validateWritingFeedback(
-      wire({ corrections: [{ original: "‹alto› per me", corrected: "alto per me", explanation_fr: "x" }] }),
+      wire({ corrections: [{ original: "‹alto› per me", corrected: "alto per me", explanation_fr: "x", category: "other" }] }),
       text,
     );
     expect(feedback.corrections).toHaveLength(1);
@@ -142,6 +161,21 @@ describe("validateWritingFeedback", () => {
     ["an empty comment", wire({ register: { score: 3, comment_fr: "  " } })],
     ["an empty strength", wire({ strength_fr: "" })],
     ["a runaway strength", wire({ strength_fr: "x".repeat(301) })],
+    ["a native version over the limit", wire({ native_version: "x".repeat(3501) })],
+    ["an empty native version", wire({ native_version: "  " })],
+    [
+      "an unknown category",
+      wire({
+        corrections: [
+          {
+            original: "lavoro da casa",
+            corrected: "lavoro a distanza",
+            explanation_fr: "x",
+            category: "grammar" as unknown as "other",
+          },
+        ],
+      }),
+    ],
     [
       "too many corrections",
       wire({
@@ -149,6 +183,7 @@ describe("validateWritingFeedback", () => {
           original: "lavoro da casa",
           corrected: "lavoro a distanza",
           explanation_fr: "x",
+          category: "other" as const,
         })),
       }),
     ],
@@ -162,6 +197,7 @@ describe("createClaudeWritingReviewer", () => {
     const { client, parse } = fakeClient(() => ok());
     const review = await createClaudeWritingReviewer({ client }).review(request);
     const params = parse.mock.calls[0]![0];
+    expect(params.max_tokens).toBe(8000);
     expect(params.model).toBe(DEFAULT_MISSION_MODEL);
     expect(params.system).toBe(WRITING_FEEDBACK_SYSTEM_PROMPT);
     expect(params.messages).toEqual([{ role: "user", content: buildWritingFeedbackMessage(request) }]);

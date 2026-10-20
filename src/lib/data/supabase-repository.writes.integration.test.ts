@@ -208,12 +208,11 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
     const completed: Extract<PlacementRecord, { status: "completed" }> = {
       status: "completed",
       language: "ru",
-      variant: "everyday",
       startLevel: "B2",
       estimatedLevel: "B1",
       confidence: "medium",
       chosenLevel: "C1",
-      answers: [{ itemId: "ru-e-b2-1", choice: null, correct: false }],
+      answers: [{ itemId: "ru-b2-1", choice: null, correct: false }],
       bankVersion: "2026-10-15",
     };
 
@@ -234,7 +233,6 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
       expect(tests).toHaveLength(2);
       expect(tests.find((t) => t.language === "ru")).toMatchObject({
         status: "completed",
-        variant: "everyday",
         estimatedLevel: "B1",
         confidence: "medium",
         chosenLevel: "C1",
@@ -336,6 +334,93 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
       await repo.saveProduction(seeded.sessionId, "  ");
       expect((await repo.getMissionProgress(mission)).drafts).toEqual({});
       expect(await repo.getStudyDates()).toEqual([today()]);
+    });
+  });
+
+  describe("written productions and correction cards", () => {
+    const score = { score: 3, comment: "Ok." };
+    const feedback = {
+      scores: { grammar: score, vocabulary: score, register: score, coherence: score },
+      corrections: [
+        { original: "мешают", corrected: "мешает", explanation: "Accord.", category: "verb" },
+        { original: "Шум в город", corrected: "Шум в городе", explanation: "Prépositionnel.", category: "spelling" },
+      ],
+      strength: "Clair.",
+      nativeVersion: "Шум в городе мешает спать.",
+    };
+
+    // Relies on the mission of today seeded by the previous describe (one Russian session).
+    it("lists productions, keeps corrections as cards and adds recurring errors by itself", async () => {
+      const sessionId = (await repo.getMission(today()))!.sessions[0].id;
+      const text = "Шум в город мешают спать";
+
+      // An older review of the same language, with a verb error: the verb error is now recurring.
+      const { data: older, error } = await admin
+        .from("missions")
+        .insert({ user_id: userId, mission_date: addDays(today(), -1), budget_minutes: 30, status: "ready", generated_at: new Date().toISOString() })
+        .select("id")
+        .single();
+      if (error) throw error;
+      const { data: content } = await admin.from("contents").select("id").eq("language", "ru").limit(1).single();
+      const { data: olderSession } = await admin
+        .from("mission_sessions")
+        .insert({ mission_id: older!.id, user_id: userId, position: 0, language: "ru", content_id: content!.id, production: { mode: "writing", prompt: "p", hints: [] } })
+        .select("id")
+        .single();
+      await admin.from("production_entries").insert({ session_id: olderSession!.id, user_id: userId, body: "Старый текст" });
+      await admin.from("writing_feedback").insert({
+        session_id: olderSession!.id,
+        user_id: userId,
+        attempts: 1,
+        body: "Старый текст",
+        feedback: { ...feedback, corrections: [feedback.corrections[0]] } as Json,
+        reviewed_at: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString(),
+      });
+
+      // The review of today is written by the service (here by the fake reviewer, after the draft).
+      await admin.from("writing_feedback").upsert({
+        session_id: sessionId,
+        user_id: userId,
+        attempts: 1,
+        body: text,
+        feedback: feedback as Json,
+        reviewed_at: new Date().toISOString(),
+      });
+      const reviewing = createSupabaseRepository(userClient, userId, {
+        reviewWriting: async () => ({ status: "ready", feedback: feedback as never, reviewedText: text, attemptsLeft: 2 }),
+      });
+      expect((await reviewing.requestWritingFeedback(sessionId, text)).status).toBe("ready");
+
+      // Only the verb error (seen in the older review) became a card.
+      expect((await repo.listCorrectionCards()).map((c) => [c.correctionIndex, c.category, c.review.dueOn])).toEqual([
+        [0, "verb", today()],
+      ]);
+
+      const productions = await repo.listProductions();
+      expect(productions.map((p) => p.sessionId)).toEqual([sessionId, olderSession!.id]);
+      expect(productions[0]).toMatchObject({
+        language: "ru",
+        body: text,
+        task: "p",
+        cardIndexes: [0],
+        feedback: { nativeVersion: "Шум в городе мешает спать." },
+      });
+
+      // On demand: idempotent, and refused for a correction that does not exist.
+      await repo.addCorrectionCard(sessionId, 1);
+      await repo.addCorrectionCard(sessionId, 1);
+      expect((await repo.listCorrectionCards()).map((c) => c.correctionIndex)).toEqual([0, 1]);
+      await expect(repo.addCorrectionCard(sessionId, 5)).rejects.toBeInstanceOf(UserFacingError);
+
+      // Review: moves the card on, refuses a stale count, deletion removes it.
+      const [card] = await repo.listCorrectionCards();
+      const reviewed = await repo.reviewCorrectionCard({ id: card.id, grade: "good", expectedReviewCount: 0 });
+      expect(reviewed.review).toMatchObject({ box: 1, reviewCount: 1, lastReviewedOn: today() });
+      await expect(
+        repo.reviewCorrectionCard({ id: card.id, grade: "good", expectedReviewCount: 0 }),
+      ).rejects.toBeInstanceOf(UserFacingError);
+      await repo.deleteCorrectionCard(card.id);
+      expect((await repo.listCorrectionCards()).map((c) => c.correctionIndex)).toEqual([1]);
     });
   });
 

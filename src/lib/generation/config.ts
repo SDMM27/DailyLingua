@@ -37,3 +37,21 @@ export function readWritingFeedbackConfig(
   if (setting === "off" || !apiKey) return { enabled: false };
   return { enabled: true, apiKey, model: source.WRITING_FEEDBACK_MODEL?.trim() || DEFAULT_MISSION_MODEL };
 }
+
+/** Guest missions (all guests together) allowed per rolling 24 hours when GUEST_DAILY_MISSION_CAP is unset. */
+export const DEFAULT_GUEST_DAILY_MISSION_CAP = 300;
+
+/**
+ * GUEST_DAILY_MISSION_CAP: how many missions all guests together may start per rolling 24 hours,
+ * a ceiling on the model money that anonymous accounts can spend. "off" removes the cap; a wrong
+ * value fails loudly. Returns null when there is no cap.
+ */
+export function readGuestDailyMissionCap(source: Record<string, string | undefined> = process.env): number | null {
+  const raw = source.GUEST_DAILY_MISSION_CAP?.trim();
+  if (!raw) return DEFAULT_GUEST_DAILY_MISSION_CAP;
+  if (raw === "off") return null;
+  if (!/^\d+$/.test(raw)) {
+    throw new Error(`GUEST_DAILY_MISSION_CAP invalide : « ${raw} » (un entier positif ou « off »).`);
+  }
+  return Number(raw);
+}

@@ -1,6 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { toDateKey } from "@/lib/domain/dates";
+import { recurringCorrectionIndexes } from "@/lib/domain/production-stats";
+import { guestTrialStatus, type GuestTrialStatus } from "@/lib/domain/guest-trial";
 import { LANGUAGE_CODES } from "@/lib/domain/languages";
 import { applyReview, initialReviewState } from "@/lib/domain/spaced-repetition";
 import type { Database } from "@/lib/supabase/database.types";
@@ -20,6 +22,7 @@ import {
 import {
   expressionSchema,
   missionHistoryEntrySchema,
+  productionTaskSchema,
   missionProgressSchema,
   missionSchema,
   type Mission,
@@ -31,6 +34,12 @@ import {
   FEEDBACK_RATE_LIMIT_SQLSTATE,
   type FeedbackInput,
 } from "@/lib/schemas/feedback";
+import {
+  correctionCardSchema,
+  type CorrectionCard,
+  type ReviewCorrectionInput,
+} from "@/lib/schemas/correction-card";
+import { productionEntrySchema, type ProductionEntry } from "@/lib/schemas/production";
 import { placementSummarySchema, type PlacementRecord, type PlacementSummary } from "@/lib/schemas/placement";
 import { preferencesSchema, type Preferences } from "@/lib/schemas/preferences";
 import {
@@ -58,6 +67,10 @@ import type { DailyLinguaRepository, PrepareMissionResult, ReplaceContentResult 
 
 /** How many past missions the history screen loads. */
 const HISTORY_LIMIT = 30;
+/** How many written productions the productions screen loads. */
+const PRODUCTIONS_LIMIT = 300;
+/** A category seen in another review within this many days makes a correction a recurring error. */
+const RECURRING_ERROR_DAYS = 30;
 
 type Client = SupabaseClient<Database>;
 
@@ -68,6 +81,7 @@ function storedFeedback(value: unknown): WritingFeedback | undefined {
   return parsed.success ? parsed.data : undefined;
 }
 type VocabularyRow = Database["public"]["Tables"]["vocabulary_items"]["Row"];
+type CorrectionCardRow = Database["public"]["Tables"]["correction_cards"]["Row"];
 type SourceRow = Database["public"]["Tables"]["sources"]["Row"];
 
 /** Columns of a source needed to show it with its licence. */
@@ -131,6 +145,59 @@ function toVocabularyItem(row: VocabularyRow): VocabularyItem {
   });
 }
 
+function toCorrectionCard(row: CorrectionCardRow): CorrectionCard {
+  return correctionCardSchema.parse({
+    id: row.id,
+    sessionId: row.session_id,
+    correctionIndex: row.correction_index,
+    language: row.language,
+    original: row.original,
+    corrected: row.corrected,
+    explanation: row.explanation,
+    category: row.category ?? undefined,
+    status: row.status,
+    review: {
+      box: row.box,
+      dueOn: row.due_on,
+      lastReviewedOn: row.last_reviewed_on,
+      reviewCount: row.review_count,
+    },
+    addedOn: row.added_on,
+  });
+}
+
+/** A session with what a production entry is built from (shape shared by the two queries). */
+interface ProductionSessionRow {
+  id: string;
+  language: string;
+  production: unknown;
+  missions: { mission_date: string } | null;
+  contents: { title: string; url: string; sources: { name: string } | null } | null;
+  production_entries: { body: string }[];
+  writing_feedback: { feedback: unknown; body: string | null }[];
+  correction_cards: { correction_index: number }[];
+}
+
+function toProductionEntry(row: ProductionSessionRow): ProductionEntry | null {
+  const feedback = storedFeedback(row.writing_feedback[0]?.feedback);
+  const body = (feedback ? row.writing_feedback[0]?.body : row.production_entries[0]?.body) ?? "";
+  if (!feedback && !body.trim()) return null;
+  if (!row.missions || !row.contents?.sources) return null;
+  const task = productionTaskSchema.safeParse(row.production);
+  return productionEntrySchema.parse({
+    sessionId: row.id,
+    date: row.missions.mission_date,
+    language: row.language,
+    title: row.contents.title,
+    sourceName: row.contents.sources.name,
+    url: row.contents.url,
+    task: task.success ? task.data.prompt : undefined,
+    body,
+    feedback,
+    cardIndexes: row.correction_cards.map((c) => c.correction_index),
+  });
+}
+
 /** Unwraps a Supabase response: a failed query is an error, never an empty result. */
 function unwrap<T>(result: { data: T; error: { message: string } | null }, what: string): NonNullable<T> {
   if (result.error) throw new Error(`Supabase (${what}) : ${result.error.message}`);
@@ -182,6 +249,13 @@ export function createSupabaseRepository(
   userId: string,
   options: {
     contentPolicy?: ContentLicensePolicy;
+    /** The user is a guest (anonymous account): the trial limit applies. */
+    isGuest?: boolean;
+    /**
+     * Reserves a guest mission against the global cap on guests (service role, server only); false
+     * when the cap is reached. Absent: no cap.
+     */
+    reserveGuestMission?: (userId: string, date: DateKey) => Promise<boolean>;
     /** Writes the mission of a day (service role, server only). Absent: preparing is not configured. */
     prepareMission?: (userId: string, date: DateKey) => Promise<GenerateMissionOutcome>;
     /** Swaps the content of a session for another readable one (service role, server only). Absent: not configured. */
@@ -264,11 +338,42 @@ export function createSupabaseRepository(
     });
   }
 
+  /** Days on which the guest got a mission, or null for a full account. */
+  async function getGuestMissionDates(): Promise<DateKey[] | null> {
+    if (!options.isGuest) return null;
+    const { data, error } = await client
+      .from("missions")
+      .select("mission_date")
+      .eq("user_id", userId)
+      .eq("status", "ready");
+    if (error) throw new Error(`Supabase (essai) : ${error.message}`);
+    return data.map((row) => row.mission_date);
+  }
+
+  async function getGuestTrial(): Promise<GuestTrialStatus | null> {
+    const dates = await getGuestMissionDates();
+    return dates && guestTrialStatus(dates, await getToday());
+  }
+
   async function prepareTodayMission(): Promise<PrepareMissionResult> {
     if (!options.prepareMission) {
       throw new UserFacingError("La préparation des missions n’est pas configurée sur ce serveur.");
     }
-    const outcome = await options.prepareMission(userId, await getToday());
+    // The trial limits are checked before the model is called.
+    const today = await getToday();
+    const guestDates = await getGuestMissionDates();
+    if (guestDates) {
+      if (!guestTrialStatus(guestDates, today).canStartToday) return { status: "signup-required" };
+      // A mission already there stays reachable; only a new one counts against the global cap.
+      const reserved =
+        guestDates.includes(today) || !options.reserveGuestMission || (await options.reserveGuestMission(userId, today));
+      if (!reserved) {
+        throw new UserFacingError(
+          "Trop de missions d’essai aujourd’hui. Réessaie demain, ou crée un compte pour continuer.",
+        );
+      }
+    }
+    const outcome = await options.prepareMission(userId, today);
     switch (outcome.status) {
       case "ready":
       case "pending":
@@ -410,6 +515,44 @@ export function createSupabaseRepository(
     return rows.map(toVocabularyItem);
   }
 
+  /**
+   * Sessions with a saved text or a review, newest first. Two queries because "has a text OR a
+   * review" cannot be one inner join: a review outlives a draft that was cleared afterwards.
+   */
+  async function listProductions(): Promise<ProductionEntry[]> {
+    const today = await getToday();
+    const columns = `id, language, production,
+      missions!inner ( mission_date ),
+      contents ( title, url, sources ( name ) ),
+      correction_cards ( correction_index )`;
+    const [withText, withReview] = await Promise.all([
+      client
+        .from("mission_sessions")
+        .select(`${columns}, production_entries!inner ( body ), writing_feedback ( feedback, body )`)
+        .eq("user_id", userId)
+        .lte("missions.mission_date", today)
+        .order("created_at", { ascending: false })
+        .limit(PRODUCTIONS_LIMIT),
+      client
+        .from("mission_sessions")
+        .select(`${columns}, production_entries ( body ), writing_feedback!inner ( feedback, body )`)
+        .eq("user_id", userId)
+        .not("writing_feedback.feedback", "is", null)
+        .lte("missions.mission_date", today)
+        .order("created_at", { ascending: false })
+        .limit(PRODUCTIONS_LIMIT),
+    ]);
+    const rows = new Map<string, ProductionSessionRow>();
+    for (const row of [...unwrap(withText, "productions"), ...unwrap(withReview, "productions corrigées")]) {
+      rows.set(row.id, row as unknown as ProductionSessionRow);
+    }
+    return [...rows.values()]
+      .map(toProductionEntry)
+      .filter((entry): entry is ProductionEntry => entry !== null)
+      .sort((a, b) => b.date.localeCompare(a.date) || a.language.localeCompare(b.language))
+      .slice(0, PRODUCTIONS_LIMIT);
+  }
+
   async function getAccountEmail(): Promise<string | null> {
     const { data } = await client.auth.getUser();
     return data.user?.email ?? null;
@@ -541,8 +684,9 @@ export function createSupabaseRepository(
 
     if (!options.reviewWriting) return { status: "unavailable", attemptsLeft: 0 };
     let outcome: WritingFeedbackOutcome;
+    const today = await getToday();
     try {
-      outcome = await options.reviewWriting({ userId, sessionId, body, today: await getToday() });
+      outcome = await options.reviewWriting({ userId, sessionId, body, today });
     } catch (error) {
       console.error(error);
       return { status: "unavailable", attemptsLeft: 0 };
@@ -554,6 +698,9 @@ export function createSupabaseRepository(
         throw new UserFacingError("Seule la production écrite peut être corrigée.");
       case "expired":
         throw new UserFacingError("La correction n’est possible que le jour de la mission.");
+      case "ready":
+        await addRecurringCorrectionCards(sessionId, outcome.feedback, today);
+        return outcome;
       default:
         return outcome;
     }
@@ -660,6 +807,123 @@ export function createSupabaseRepository(
     if (error) throw new Error(`Supabase (suppression du mot) : ${error.message}`);
   }
 
+  async function listCorrectionCards(): Promise<CorrectionCard[]> {
+    const rows = unwrap(
+      await client.from("correction_cards").select("*").eq("user_id", userId).order("due_on").order("created_at"),
+      "erreurs à revoir",
+    );
+    return rows.map(toCorrectionCard);
+  }
+
+  /** Inserts the cards of some corrections of a review; the ones already kept are left as they are. */
+  async function insertCorrectionCards(
+    sessionId: string,
+    language: string,
+    feedback: WritingFeedback,
+    indexes: number[],
+    today: DateKey,
+  ): Promise<void> {
+    if (indexes.length === 0) return;
+    const { error } = await client.from("correction_cards").upsert(
+      indexes.map((index) => {
+        const correction = feedback.corrections[index];
+        return {
+          user_id: userId,
+          session_id: sessionId,
+          correction_index: index,
+          language,
+          original: correction.original,
+          corrected: correction.corrected,
+          explanation: correction.explanation,
+          category: correction.category ?? null,
+          ...initialDates(today),
+        };
+      }),
+      { onConflict: "session_id,correction_index", ignoreDuplicates: true },
+    );
+    if (error) throw new Error(`Supabase (cartes d’erreurs) : ${error.message}`);
+  }
+
+  async function addCorrectionCard(sessionId: string, correctionIndex: number): Promise<void> {
+    const { data, error } = await client
+      .from("writing_feedback")
+      .select("feedback, mission_sessions ( language )")
+      .eq("session_id", sessionId)
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (error) throw new Error(`Supabase (correction) : ${error.message}`);
+    const feedback = storedFeedback(data?.feedback);
+    const language = data?.mission_sessions?.language;
+    if (!feedback || !language || !feedback.corrections[correctionIndex]) {
+      throw new UserFacingError("Cette correction n’existe plus.");
+    }
+    await insertCorrectionCards(sessionId, language, feedback, [correctionIndex], await getToday());
+  }
+
+  /**
+   * Recurring errors become cards by themselves: a correction whose category showed up in another
+   * review of the same language in the last 30 days. A failure here never fails the review.
+   */
+  async function addRecurringCorrectionCards(sessionId: string, feedback: WritingFeedback, today: DateKey) {
+    try {
+      const session = unwrap(
+        await client.from("mission_sessions").select("language").eq("id", sessionId).eq("user_id", userId).maybeSingle(),
+        "session",
+      );
+      const since = new Date(Date.now() - RECURRING_ERROR_DAYS * 24 * 60 * 60 * 1000).toISOString();
+      const others = unwrap(
+        await client
+          .from("writing_feedback")
+          .select("feedback, mission_sessions!inner ( language )")
+          .eq("user_id", userId)
+          .neq("session_id", sessionId)
+          .eq("mission_sessions.language", session.language)
+          .gte("reviewed_at", since),
+        "corrections récentes",
+      );
+      const previous = others.flatMap((o) => storedFeedback(o.feedback) ?? []);
+      await insertCorrectionCards(
+        sessionId,
+        session.language,
+        feedback,
+        recurringCorrectionIndexes(feedback, previous),
+        today,
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function reviewCorrectionCard(input: ReviewCorrectionInput): Promise<CorrectionCard> {
+    const { data: row, error } = await client
+      .from("correction_cards")
+      .select("*")
+      .eq("id", input.id)
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (error) throw new Error(`Supabase (révision) : ${error.message}`);
+    if (!row) throw new UserFacingError("Cette erreur n’existe plus.");
+
+    const card = toCorrectionCard(row);
+    const today = await getToday();
+    const next = applyReview(card.review, input.grade, today);
+    const { data: applied, error: rpcError } = await client.rpc("record_correction_review", {
+      p_card_id: card.id,
+      p_reviewed_on: today,
+      p_box_after: next.box,
+      p_due_on_after: next.dueOn,
+      p_expected_review_count: input.expectedReviewCount,
+    });
+    if (rpcError) throw new Error(`Supabase (révision) : ${rpcError.message}`);
+    if (!applied) throw new UserFacingError("Cette erreur a déjà été révisée ailleurs. Recharge la page.");
+    return { ...card, review: next };
+  }
+
+  async function deleteCorrectionCard(id: string): Promise<void> {
+    const { error } = await client.from("correction_cards").delete().eq("id", id).eq("user_id", userId);
+    if (error) throw new Error(`Supabase (suppression de la carte) : ${error.message}`);
+  }
+
   async function sendFeedback(input: FeedbackInput): Promise<void> {
     const { error } = await client.from("feedback").insert({
       user_id: userId,
@@ -677,7 +941,7 @@ export function createSupabaseRepository(
     const rows = unwrap(
       await client
         .from("placement_tests")
-        .select("language, status, variant, estimated_level, confidence, chosen_level, taken_at")
+        .select("language, status, estimated_level, confidence, chosen_level, taken_at")
         .eq("user_id", userId)
         .order("taken_at", { ascending: false }),
       "tests de niveau",
@@ -690,7 +954,6 @@ export function createSupabaseRepository(
       placementSummarySchema.parse({
         status: row.status,
         language: row.language,
-        variant: row.variant ?? undefined,
         estimatedLevel: row.estimated_level ?? undefined,
         confidence: row.confidence ?? undefined,
         chosenLevel: row.chosen_level ?? undefined,
@@ -706,7 +969,6 @@ export function createSupabaseRepository(
         ? {
             p_language: record.language,
             p_status: record.status,
-            p_variant: record.variant,
             p_start_level: record.startLevel,
             p_estimated_level: record.estimatedLevel,
             p_confidence: record.confidence,
@@ -827,6 +1089,8 @@ export function createSupabaseRepository(
 
   return {
     isDemo: false,
+    isGuest: Boolean(options.isGuest),
+    getGuestTrial,
     getAccountEmail,
     getToday,
     getPreferences,
@@ -843,6 +1107,11 @@ export function createSupabaseRepository(
     saveExpression,
     getHistory,
     getStudyDates,
+    listProductions,
+    listCorrectionCards,
+    addCorrectionCard,
+    reviewCorrectionCard,
+    deleteCorrectionCard,
     listVocabulary,
     addVocabulary,
     reviewVocabulary,

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { connection } from "next/server";
 import { ExternalIcon } from "@/components/icons";
 import { WritingFeedbackCard } from "@/components/mission/writing-feedback-card";
@@ -18,7 +19,10 @@ export default async function HistoryPage() {
   return (
     <>
       <PageHeader eyebrow="Historique" title="Missions passées">
-        Les contenus restent accessibles à leur source d’origine.
+        Les contenus restent accessibles à leur source d’origine.{" "}
+        <Link href="/productions" className="font-medium text-ink underline underline-offset-4">
+          Voir mes productions écrites
+        </Link>
       </PageHeader>
       {history.length === 0 ? (
         <p className="py-8 text-center text-sm text-muted">Aucune mission terminée pour l’instant.</p>

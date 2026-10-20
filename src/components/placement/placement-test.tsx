@@ -7,16 +7,15 @@ import { completePlacementTest } from "@/app/actions/placement";
 import { ArrowRightIcon } from "@/components/icons";
 import { languageStyle } from "@/components/ui/language-style";
 import { Card, Eyebrow, LanguageTag } from "@/components/ui/primitives";
-import { PLACEMENT_CONFIDENCE_LABELS, PLACEMENT_VARIANT_LABELS } from "@/lib/domain/labels";
+import { PLACEMENT_CONFIDENCE_LABELS } from "@/lib/domain/labels";
 import { languageInfo } from "@/lib/domain/languages";
-import { nextPlacementStep, pickPlacementItem } from "@/lib/domain/placement";
+import { nextPlacementStep, pickPlacementItem, shufflePlacementItems } from "@/lib/domain/placement";
 import { CEFR_LEVELS, type CefrLevel, type Language } from "@/lib/schemas/common";
 import {
   PLACEMENT_GAP,
-  PLACEMENT_VARIANTS,
+  PLACEMENT_MAX_ITEMS,
   type PlacementAnswer,
   type PlacementItem,
-  type PlacementVariant,
 } from "@/lib/schemas/placement";
 
 type Phase = "intro" | "questions" | "result";
@@ -51,13 +50,12 @@ function Prompt({ text }: { text: string }) {
 export function PlacementTest({
   language,
   items,
-  suggestedVariant,
   startLevel,
   persist,
 }: {
   language: Language;
-  items: Record<PlacementVariant, PlacementItem[]>;
-  suggestedVariant: PlacementVariant;
+  /** The questions of the language; shuffled once per test, the engine picks which to ask. */
+  items: PlacementItem[];
   /** The declared level: the test starts there. */
   startLevel: CefrLevel;
   persist: boolean;
@@ -65,20 +63,20 @@ export function PlacementTest({
   const router = useRouter();
   const info = languageInfo(language);
   const [phase, setPhase] = useState<Phase>("intro");
-  const [variant, setVariant] = useState<PlacementVariant>(suggestedVariant);
+  // The order is drawn when a test starts (never during render), so a retest asks other questions.
+  const [order, setOrder] = useState<PlacementItem[]>(items);
   const [answers, setAnswers] = useState<PlacementAnswer[]>([]);
   const [chosen, setChosen] = useState<CefrLevel | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const bank = items[variant];
   const responses = answers.flatMap((a) => {
-    const item = bank.find((i) => i.id === a.itemId);
+    const item = items.find((i) => i.id === a.itemId);
     return item ? [{ level: item.level, correct: a.choice === item.answer }] : [];
   });
   const step = phase === "intro" ? null : nextPlacementStep(startLevel, responses);
   const current =
-    step?.kind === "ask" ? pickPlacementItem(bank, step.level, new Set(answers.map((a) => a.itemId))) : null;
+    step?.kind === "ask" ? pickPlacementItem(order, step.level, new Set(answers.map((a) => a.itemId))) : null;
   const result = step?.kind === "done" ? step : null;
 
   function answer(choice: number | null) {
@@ -90,7 +88,13 @@ export function PlacementTest({
     }
   }
 
+  function start() {
+    setOrder(shufflePlacementItems(items));
+    setPhase("questions");
+  }
+
   function restart() {
+    setOrder(items);
     setAnswers([]);
     setChosen(null);
     setError(null);
@@ -103,7 +107,6 @@ export function PlacementTest({
     setError(null);
     const outcome = await completePlacementTest({
       language,
-      variant,
       startLevel,
       answers,
       chosenLevel: chosen ?? result.estimate,
@@ -136,7 +139,7 @@ export function PlacementTest({
         <Card>
           <Eyebrow>Comment ça marche</Eyebrow>
           <p className="mt-2 text-[15px] leading-relaxed text-ink-soft">
-            Un test adaptatif de {info.nameFr.toLowerCase()} : environ 5 à 12 questions, 5 minutes. Le niveau des
+            Un test adaptatif de {info.nameFr.toLowerCase()} : jusqu’à {PLACEMENT_MAX_ITEMS} questions, une dizaine de minutes. Le niveau des
             questions change selon tes réponses, il n’y a rien à préparer.
           </p>
           <p className="mt-3 text-[15px] leading-relaxed text-ink-soft">
@@ -144,38 +147,10 @@ export function PlacementTest({
             fausse, mais elle donne une estimation plus juste qu’un coup de chance.
           </p>
         </Card>
-        <Card className="mt-4">
-          <Eyebrow>Type de test</Eyebrow>
-          <div role="radiogroup" aria-label="Type de test" className="mt-3 grid grid-cols-2 gap-2">
-            {PLACEMENT_VARIANTS.map((v) => {
-              const active = variant === v;
-              return (
-                <button
-                  key={v}
-                  type="button"
-                  role="radio"
-                  aria-checked={active}
-                  onClick={() => setVariant(v)}
-                  className={`min-h-11 rounded-2xl border px-4 py-3 text-left transition-colors ${
-                    active ? "border-ink bg-ink text-paper" : "border-line hover:bg-surface-sunk"
-                  }`}
-                >
-                  <span className="block font-semibold">{PLACEMENT_VARIANT_LABELS[v].title}</span>
-                  <span className={`text-xs ${active ? "text-paper/75" : "text-muted"}`}>
-                    {PLACEMENT_VARIANT_LABELS[v].hint}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-          {variant === suggestedVariant && (
-            <p className="mt-2 text-xs text-muted">Proposé d’après ton usage de cette langue.</p>
-          )}
-        </Card>
         <div className="mt-6 space-y-3">
           <button
             type="button"
-            onClick={() => setPhase("questions")}
+            onClick={start}
             className="w-full rounded-2xl bg-ink px-5 py-3.5 text-[15px] font-semibold text-paper transition-transform active:scale-[0.98]"
           >
             Commencer
@@ -272,7 +247,24 @@ export function PlacementTest({
   return (
     <div>
       {header}
-      <Eyebrow className="mb-3">Question {answers.length + 1}</Eyebrow>
+      <div className="mb-3">
+        <Eyebrow>
+          Question {answers.length + 1} sur {PLACEMENT_MAX_ITEMS} max
+        </Eyebrow>
+        <div
+          role="progressbar"
+          aria-label="Progression du test"
+          aria-valuemin={0}
+          aria-valuemax={PLACEMENT_MAX_ITEMS}
+          aria-valuenow={answers.length}
+          className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-sunk"
+        >
+          <div
+            className="h-full rounded-full bg-ink transition-[width]"
+            style={{ width: `${(answers.length / PLACEMENT_MAX_ITEMS) * 100}%` }}
+          />
+        </div>
+      </div>
       <Card>
         {current.context && (
           <p

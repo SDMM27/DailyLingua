@@ -4,12 +4,19 @@ import { useActionState, useState } from "react";
 import { deleteAccount, type DeleteAccountState } from "@/app/actions/auth";
 import { Card, Eyebrow } from "@/components/ui/primitives";
 
-/** Irreversible: the user has to type their e-mail address before the button works. */
-export function DeleteAccount({ email }: { email: string }) {
+/** What a guest (no e-mail address) types to confirm. */
+const GUEST_WORD = "supprimer";
+
+/**
+ * Irreversible: the user has to type their e-mail address before the button works. A guest,
+ * who has none (`email` null), types « supprimer » instead.
+ */
+export function DeleteAccount({ email }: { email: string | null }) {
+  const expected = email ?? GUEST_WORD;
   const [open, setOpen] = useState(false);
   const [state, action, pending] = useActionState<DeleteAccountState, FormData>(deleteAccount, {});
   const [typed, setTyped] = useState("");
-  const matches = typed.trim().toLowerCase() === email.toLowerCase();
+  const matches = typed.trim().toLowerCase() === expected.toLowerCase();
 
   return (
     <Card className="mt-6">
@@ -17,7 +24,7 @@ export function DeleteAccount({ email }: { email: string }) {
       {!open ? (
         <>
           <p className="mt-2 text-sm text-ink-soft">
-            Efface définitivement ton compte et toutes tes données : langues, vocabulaire, révisions,
+            Efface définitivement {email ? "ton compte" : "ton compte d’essai"} et toutes tes données : langues, vocabulaire, révisions,
             progression et historique.
           </p>
           <button
@@ -31,17 +38,17 @@ export function DeleteAccount({ email }: { email: string }) {
       ) : (
         <form action={action} className="mt-3 space-y-3">
           <p className="text-sm text-ink-soft">
-            Cette action est <strong>irréversible</strong>. Pour confirmer, saisis <strong>{email}</strong>.
+            Cette action est <strong>irréversible</strong>. Pour confirmer, saisis <strong>{expected}</strong>.
           </p>
           <input
             name="confirmation"
-            type="email"
+            type={email ? "email" : "text"}
             autoComplete="off"
             autoCapitalize="none"
             spellCheck={false}
             value={typed}
             onChange={(e) => setTyped(e.target.value)}
-            aria-label="Ton adresse e-mail pour confirmer"
+            aria-label={email ? "Ton adresse e-mail pour confirmer" : "Le mot « supprimer » pour confirmer"}
             className="w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-base focus:border-ink-soft focus:outline-none"
           />
           <div aria-live="polite">

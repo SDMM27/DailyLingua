@@ -60,6 +60,8 @@ for (const evalCase of EVAL_CASES) {
         feedback.corrections.length < (evalCase.minCorrections ?? band.minCorrections)
           ? `moins de ${evalCase.minCorrections ?? band.minCorrections} corrections`
           : null,
+        feedback.nativeVersion ? null : "pas de version native",
+        feedback.corrections.every((c) => c.category) ? null : "correction sans catégorie",
       ].filter(Boolean);
       if (problems.length > 0) failures.push(`${evalCase.id} : ${problems.join(", ")}`);
 

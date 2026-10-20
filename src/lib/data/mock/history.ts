@@ -30,9 +30,12 @@ const PAST_SESSIONS: MissionHistoryEntry["sessions"][] = [
             original: "он используют",
             corrected: "он использует",
             explanation: "Le verbe s’accorde avec « он » : troisième personne du singulier, « использует ».",
+            category: "verb",
           },
         ],
         strength: "Tu relies ton avis à un projet concret de lecture, ce qui rend le texte vivant.",
+        nativeVersion:
+          "Платонов пишет очень необычным языком. Мне понравилось, что он использует простые слова, но предложения звучат непривычно. На следующей неделе я хочу прочитать его роман «Котлован».",
       },
     },
     {

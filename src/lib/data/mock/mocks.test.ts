@@ -3,11 +3,14 @@ import { z } from "zod";
 import { contentListItemSchema, sourceInfoSchema } from "@/lib/schemas/content";
 import { missionHistoryEntrySchema, missionSchema } from "@/lib/schemas/mission";
 import { preferencesSchema } from "@/lib/schemas/preferences";
+import { correctionCardSchema } from "@/lib/schemas/correction-card";
+import { productionEntrySchema } from "@/lib/schemas/production";
 import { vocabularyItemSchema } from "@/lib/schemas/vocabulary";
 import { buildMockContents, buildMockSources } from "./contents";
 import { buildMockHistory } from "./history";
 import { buildMockMission } from "./mission";
 import { MOCK_PREFERENCES } from "./preferences";
+import { buildMockCorrectionCards, buildMockProductions } from "./productions";
 import { buildMockVocabulary } from "./vocabulary";
 
 const TODAY = "2026-10-13";
@@ -23,6 +26,11 @@ describe("demo data matches the schemas", () => {
 
   it("vocabulary", () => {
     expect(() => z.array(vocabularyItemSchema).parse(buildMockVocabulary(TODAY))).not.toThrow();
+  });
+
+  it("productions and correction cards", () => {
+    expect(() => z.array(productionEntrySchema).parse(buildMockProductions(TODAY))).not.toThrow();
+    expect(() => z.array(correctionCardSchema).parse(buildMockCorrectionCards(TODAY))).not.toThrow();
   });
 
   it("preferences", () => {

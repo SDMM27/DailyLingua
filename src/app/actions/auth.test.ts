@@ -1,15 +1,21 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { requestPasswordReset, updatePassword } from "./auth";
+import { deleteAccount, requestPasswordReset, signIn, signUp, updatePassword, upgradeGuestAccount } from "./auth";
 
 const auth = vi.hoisted(() => ({
+  signInWithPassword: vi.fn(),
+  signUp: vi.fn(),
   resetPasswordForEmail: vi.fn(),
   updateUser: vi.fn(),
+  getUser: vi.fn(),
+  signOut: vi.fn(),
 }));
+const deleteUserAccount = vi.hoisted(() => vi.fn());
 const state = vi.hoisted(() => ({ demo: false }));
 
 vi.mock("@/lib/supabase/server", () => ({
   createSupabaseServerClient: async () => (state.demo ? null : { auth }),
 }));
+vi.mock("@/lib/supabase/delete-account", () => ({ deleteUserAccount }));
 vi.mock("next/headers", () => ({
   headers: async () => new Headers({ host: "localhost:3000" }),
 }));
@@ -30,7 +36,12 @@ beforeEach(() => {
   vi.spyOn(console, "error").mockImplementation(() => {});
   state.demo = false;
   auth.resetPasswordForEmail.mockResolvedValue({ data: {}, error: null });
+  auth.signInWithPassword.mockResolvedValue({ data: {}, error: null });
+  auth.signUp.mockResolvedValue({ data: { session: null }, error: null });
   auth.updateUser.mockResolvedValue({ data: {}, error: null });
+  auth.signOut.mockResolvedValue({ error: null });
+  auth.getUser.mockResolvedValue({ data: { user: { id: "u1", is_anonymous: true, email: undefined } } });
+  deleteUserAccount.mockResolvedValue(undefined);
 });
 
 describe("requestPasswordReset", () => {
@@ -82,6 +93,63 @@ describe("requestPasswordReset", () => {
   });
 });
 
+describe("CAPTCHA token", () => {
+  const credentials = { email: "demo@dailylingua.test", password: "correct horse" };
+  const failed = { data: null, error: { status: 400, code: "captcha_failed" } };
+  const CAPTCHA_MESSAGE = "La vérification anti-robot a échoué. Réessaie.";
+
+  it("is passed to the password sign-in, and left out when empty", async () => {
+    await expect(signIn({}, form({ ...credentials, captchaToken: "tok" }))).rejects.toThrow("redirect:/");
+    expect(auth.signInWithPassword).toHaveBeenLastCalledWith({ ...credentials, options: { captchaToken: "tok" } });
+    await expect(signIn({}, form({ ...credentials, captchaToken: "" }))).rejects.toThrow("redirect:/");
+    expect(auth.signInWithPassword).toHaveBeenLastCalledWith(credentials);
+  });
+
+  it("is merged with the redirect URL on sign-up", async () => {
+    await signUp({}, form({ ...credentials, captchaToken: "tok" }));
+    expect(auth.signUp).toHaveBeenLastCalledWith({
+      ...credentials,
+      options: { emailRedirectTo: "http://localhost:3000/auth/confirm", captchaToken: "tok" },
+    });
+    await signUp({}, form(credentials));
+    expect(auth.signUp).toHaveBeenLastCalledWith({
+      ...credentials,
+      options: { emailRedirectTo: "http://localhost:3000/auth/confirm" },
+    });
+  });
+
+  it("is passed to the password reset, and left out when empty", async () => {
+    await requestPasswordReset({}, form({ email: credentials.email, captchaToken: "tok" }));
+    expect(auth.resetPasswordForEmail).toHaveBeenLastCalledWith(credentials.email, {
+      redirectTo: "http://localhost:3000/auth/confirm?next=/nouveau-mot-de-passe",
+      captchaToken: "tok",
+    });
+    await requestPasswordReset({}, form({ email: credentials.email }));
+    expect(auth.resetPasswordForEmail).toHaveBeenLastCalledWith(credentials.email, {
+      redirectTo: "http://localhost:3000/auth/confirm?next=/nouveau-mot-de-passe",
+    });
+  });
+
+  it("is ignored when it is absurdly long", async () => {
+    await expect(signIn({}, form({ ...credentials, captchaToken: "x".repeat(2049) }))).rejects.toThrow("redirect:/");
+    expect(auth.signInWithPassword).toHaveBeenLastCalledWith(credentials);
+  });
+
+  it("maps captcha_failed to its own message instead of a wrong password", async () => {
+    auth.signInWithPassword.mockResolvedValue(failed);
+    expect((await signIn({}, form({ ...credentials, captchaToken: "tok" }))).error).toBe(CAPTCHA_MESSAGE);
+    auth.signUp.mockResolvedValue(failed);
+    expect((await signUp({}, form({ ...credentials, captchaToken: "tok" }))).error).toBe(CAPTCHA_MESSAGE);
+  });
+
+  it("is reported by the password reset instead of the neutral notice", async () => {
+    auth.resetPasswordForEmail.mockResolvedValue(failed);
+    const result = await requestPasswordReset({}, form({ email: credentials.email }));
+    expect(result.error).toBe(CAPTCHA_MESSAGE);
+    expect(result.notice).toBeUndefined();
+  });
+});
+
 describe("updatePassword", () => {
   const valid = { password: "new-password-1", confirmation: "new-password-1" };
 
@@ -129,5 +197,77 @@ describe("updatePassword", () => {
   it("is unavailable in the demo", async () => {
     state.demo = true;
     expect((await updatePassword({}, form(valid))).error).toMatch(/démo/);
+  });
+});
+
+describe("upgradeGuestAccount", () => {
+  it("asks for an e-mail confirmation that leads to the password screen", async () => {
+    const result = await upgradeGuestAccount({}, form({ email: " moi@example.com " }));
+    expect(auth.updateUser).toHaveBeenCalledWith(
+      { email: "moi@example.com" },
+      { emailRedirectTo: "http://localhost:3000/auth/confirm?next=/nouveau-mot-de-passe" },
+    );
+    expect(result.notice).toMatch(/Ta progression est conservée/);
+    expect(result.error).toBeUndefined();
+  });
+
+  it("refuses an invalid address without calling Supabase", async () => {
+    expect((await upgradeGuestAccount({}, form({ email: "nope" }))).error).toBe("Adresse e-mail invalide");
+    expect(auth.updateUser).not.toHaveBeenCalled();
+  });
+
+  it("refuses a session that is not a guest", async () => {
+    auth.getUser.mockResolvedValue({ data: { user: { id: "u1", is_anonymous: false, email: "a@b.co" } } });
+    const result = await upgradeGuestAccount({}, form({ email: "moi@example.com" }));
+    expect(result.error).toBeDefined();
+    expect(auth.updateUser).not.toHaveBeenCalled();
+  });
+
+  it("sends a signed-out visitor to the sign-in screen", async () => {
+    auth.getUser.mockResolvedValue({ data: { user: null } });
+    await expect(upgradeGuestAccount({}, form({ email: "moi@example.com" }))).rejects.toThrow("redirect:/connexion");
+  });
+
+  it("answers a taken address exactly like a free one (no account enumeration)", async () => {
+    auth.updateUser.mockResolvedValue({ data: {}, error: null });
+    const free = await upgradeGuestAccount({}, form({ email: "moi@example.com" }));
+    auth.updateUser.mockResolvedValue({ data: null, error: { status: 422, code: "email_exists" } });
+    const taken = await upgradeGuestAccount({}, form({ email: "moi@example.com" }));
+    auth.updateUser.mockResolvedValue({ data: null, error: { status: 422, message: "A user with this email address has already been registered" } });
+    const takenByMessage = await upgradeGuestAccount({}, form({ email: "moi@example.com" }));
+    expect(taken).toEqual(free);
+    expect(takenByMessage).toEqual(free);
+    expect(free.error).toBeUndefined();
+  });
+
+  it("reports a rate limit", async () => {
+    auth.updateUser.mockResolvedValue({ data: null, error: { status: 429, code: "over_email_send_rate_limit" } });
+    expect((await upgradeGuestAccount({}, form({ email: "moi@example.com" }))).error).toMatch(/Trop de demandes/);
+  });
+
+  it("hides unexpected errors", async () => {
+    auth.updateUser.mockResolvedValue({ data: null, error: { status: 500, message: "boom" } });
+    const result = await upgradeGuestAccount({}, form({ email: "moi@example.com" }));
+    expect(result.error).toMatch(/Impossible/);
+    expect(result.error).not.toMatch(/boom/);
+  });
+});
+
+describe("deleteAccount", () => {
+  it("asks a guest to type « supprimer », whatever the case", async () => {
+    expect((await deleteAccount({}, form({ confirmation: "oui" }))).error).toMatch(/supprimer/);
+    expect(deleteUserAccount).not.toHaveBeenCalled();
+
+    await expect(deleteAccount({}, form({ confirmation: " Supprimer " }))).rejects.toThrow("redirect:/connexion");
+    expect(deleteUserAccount).toHaveBeenCalledWith("u1");
+  });
+
+  it("still asks a member for their e-mail", async () => {
+    auth.getUser.mockResolvedValue({ data: { user: { id: "u2", is_anonymous: false, email: "Moi@Example.com" } } });
+    expect((await deleteAccount({}, form({ confirmation: "supprimer" }))).error).toMatch(/adresse e-mail/);
+    expect(deleteUserAccount).not.toHaveBeenCalled();
+
+    await expect(deleteAccount({}, form({ confirmation: "moi@example.com" }))).rejects.toThrow("redirect:/connexion");
+    expect(deleteUserAccount).toHaveBeenCalledWith("u2");
   });
 });

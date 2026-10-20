@@ -1,16 +1,17 @@
 import Link from "next/link";
 import { connection } from "next/server";
+import { GuestTrialBanner } from "@/components/auth/guest-trial-banner";
 import { InstallBanner } from "@/components/install/install-banner";
 import { MissionSummaryCard } from "@/components/dashboard/mission-summary-card";
 import { ReviewPreview } from "@/components/dashboard/review-preview";
 import { WeekCard } from "@/components/dashboard/week-card";
 import { languageStyle } from "@/components/ui/language-style";
-import { ArrowRightIcon, HistoryIcon, SlidersIcon } from "@/components/icons";
+import { ArrowRightIcon, HistoryIcon, PenIcon, SlidersIcon } from "@/components/icons";
 import { Card, DemoNotice, Eyebrow } from "@/components/ui/primitives";
 import { getRepository, getToday, requirePreferences } from "@/lib/data/repository";
 import { addDays, diffInDays, formatLongDate } from "@/lib/domain/dates";
 import { languageInfo } from "@/lib/domain/languages";
-import { dueToday, upcomingReviews } from "@/lib/domain/spaced-repetition";
+import { dueItems, dueToday, upcomingReviews } from "@/lib/domain/spaced-repetition";
 import { computeStreak, recentDays } from "@/lib/domain/stats";
 import { completedMinutes } from "@/lib/domain/time-budget";
 
@@ -19,14 +20,17 @@ export default async function DashboardPage() {
   const repo = await getRepository();
   const preferences = await requirePreferences();
   const today = await getToday();
-  const [mission, history, studyDates, vocabulary, placements] = await Promise.all([
+  const [mission, history, studyDates, vocabulary, correctionCards, placements, guestTrial] = await Promise.all([
     repo.getMission(today),
     repo.getHistory(),
     repo.getStudyDates(),
     repo.listVocabulary(),
+    repo.listCorrectionCards(),
     repo.listPlacementTests(),
+    repo.getGuestTrial(),
   ]);
   const unassessed = !repo.isDemo && preferences.goals.some((g) => !placements.some((p) => p.language === g.language));
+  const dueErrors = dueItems(correctionCards, today).length;
   const progress = mission ? await repo.getMissionProgress(mission) : null;
 
   const weekStart = addDays(today, -6);
@@ -53,6 +57,8 @@ export default async function DashboardPage() {
       </header>
 
       <InstallBanner />
+
+      {guestTrial && <GuestTrialBanner trial={guestTrial} startedToday={mission !== null} />}
 
       {repo.isDemo && (
         <DemoNotice>
@@ -96,6 +102,22 @@ export default async function DashboardPage() {
         </Link>
       )}
 
+      {dueErrors > 0 && (
+        <Link
+          href="/productions#revoir"
+          className="flex items-center gap-3 rounded-3xl border border-line bg-surface px-5 py-4 transition-colors hover:bg-surface-sunk"
+        >
+          <span className="min-w-0 flex-1">
+            <Eyebrow>Erreurs</Eyebrow>
+            <span className="mt-1 block font-semibold">
+              {dueErrors} erreur{dueErrors > 1 ? "s" : ""} à revoir
+            </span>
+            <span className="text-xs text-muted">Des passages corrigés dans tes textes, à retravailler.</span>
+          </span>
+          <ArrowRightIcon width={16} height={16} className="text-muted" />
+        </Link>
+      )}
+
       <WeekCard days={recentDays(studyDates, today)} stats={stats} />
 
       <ReviewPreview
@@ -104,15 +126,19 @@ export default async function DashboardPage() {
         today={today}
       />
 
-      <nav aria-label="Raccourcis" className="grid grid-cols-2 gap-3">
+      <nav aria-label="Raccourcis" className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {[
           { href: "/historique" as const, label: "Historique", hint: `${history.length} missions`, icon: HistoryIcon },
+          { href: "/productions" as const, label: "Productions", hint: "Mes textes corrigés", icon: PenIcon },
           { href: "/preferences" as const, label: "Préférences", hint: "Niveaux, temps, sujets", icon: SlidersIcon },
-        ].map(({ href, label, hint, icon: Icon }) => (
+        ].map(({ href, label, hint, icon: Icon }, i, all) => (
           <Link
             key={href}
             href={href}
-            className="group flex flex-col gap-3 rounded-3xl border border-line bg-surface p-4 transition-colors hover:bg-surface-sunk"
+            className={`group flex flex-col gap-3 rounded-3xl border border-line bg-surface p-4 transition-colors hover:bg-surface-sunk ${
+              // An odd last tile spans the row on a phone instead of leaving a hole.
+              i === all.length - 1 && all.length % 2 === 1 ? "col-span-2 sm:col-span-1" : ""
+            }`}
           >
             <Icon className="text-ink-soft" />
             <span>
