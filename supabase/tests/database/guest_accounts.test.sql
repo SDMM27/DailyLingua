@@ -37,8 +37,11 @@ select id, 'ru', 'B2', 'C1' from public.profiles where id::text like 'a0000000-0
 insert into public.missions (user_id, mission_date, budget_minutes, status, generated_at, started_at, generation_attempts)
 values ('a0000000-0000-4000-8000-0000000000e3', '2030-05-01', 30, 'ready', '2030-05-01 05:00+00', '2030-05-01 06:00+00', 1);
 
+-- As the scheduled job calls it: service_role, which cannot read auth.users itself.
+set local role service_role;
 create temporary table due on commit drop as
   select * from public.list_due_mission_users('2030-05-10 10:00+00');
+reset role;
 
 select ok(not exists (select 1 from due where user_id = 'a0000000-0000-4000-8000-0000000000e1'),
   'a guest is never due: they get their mission when they open the app');
