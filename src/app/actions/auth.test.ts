@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { deleteAccount, requestPasswordReset, updatePassword, upgradeGuestAccount } from "./auth";
+import { deleteAccount, requestPasswordReset, signIn, signUp, updatePassword, upgradeGuestAccount } from "./auth";
 
 const auth = vi.hoisted(() => ({
+  signInWithPassword: vi.fn(),
+  signUp: vi.fn(),
   resetPasswordForEmail: vi.fn(),
   updateUser: vi.fn(),
   getUser: vi.fn(),
@@ -34,6 +36,8 @@ beforeEach(() => {
   vi.spyOn(console, "error").mockImplementation(() => {});
   state.demo = false;
   auth.resetPasswordForEmail.mockResolvedValue({ data: {}, error: null });
+  auth.signInWithPassword.mockResolvedValue({ data: {}, error: null });
+  auth.signUp.mockResolvedValue({ data: { session: null }, error: null });
   auth.updateUser.mockResolvedValue({ data: {}, error: null });
   auth.signOut.mockResolvedValue({ error: null });
   auth.getUser.mockResolvedValue({ data: { user: { id: "u1", is_anonymous: true, email: undefined } } });
@@ -85,6 +89,63 @@ describe("requestPasswordReset", () => {
     state.demo = true;
     const result = await requestPasswordReset({}, form({ email: "demo@dailylingua.test" }));
     expect(result.error).toMatch(/démo/);
+    expect(result.notice).toBeUndefined();
+  });
+});
+
+describe("CAPTCHA token", () => {
+  const credentials = { email: "demo@dailylingua.test", password: "correct horse" };
+  const failed = { data: null, error: { status: 400, code: "captcha_failed" } };
+  const CAPTCHA_MESSAGE = "La vérification anti-robot a échoué. Réessaie.";
+
+  it("is passed to the password sign-in, and left out when empty", async () => {
+    await expect(signIn({}, form({ ...credentials, captchaToken: "tok" }))).rejects.toThrow("redirect:/");
+    expect(auth.signInWithPassword).toHaveBeenLastCalledWith({ ...credentials, options: { captchaToken: "tok" } });
+    await expect(signIn({}, form({ ...credentials, captchaToken: "" }))).rejects.toThrow("redirect:/");
+    expect(auth.signInWithPassword).toHaveBeenLastCalledWith(credentials);
+  });
+
+  it("is merged with the redirect URL on sign-up", async () => {
+    await signUp({}, form({ ...credentials, captchaToken: "tok" }));
+    expect(auth.signUp).toHaveBeenLastCalledWith({
+      ...credentials,
+      options: { emailRedirectTo: "http://localhost:3000/auth/confirm", captchaToken: "tok" },
+    });
+    await signUp({}, form(credentials));
+    expect(auth.signUp).toHaveBeenLastCalledWith({
+      ...credentials,
+      options: { emailRedirectTo: "http://localhost:3000/auth/confirm" },
+    });
+  });
+
+  it("is passed to the password reset, and left out when empty", async () => {
+    await requestPasswordReset({}, form({ email: credentials.email, captchaToken: "tok" }));
+    expect(auth.resetPasswordForEmail).toHaveBeenLastCalledWith(credentials.email, {
+      redirectTo: "http://localhost:3000/auth/confirm?next=/nouveau-mot-de-passe",
+      captchaToken: "tok",
+    });
+    await requestPasswordReset({}, form({ email: credentials.email }));
+    expect(auth.resetPasswordForEmail).toHaveBeenLastCalledWith(credentials.email, {
+      redirectTo: "http://localhost:3000/auth/confirm?next=/nouveau-mot-de-passe",
+    });
+  });
+
+  it("is ignored when it is absurdly long", async () => {
+    await expect(signIn({}, form({ ...credentials, captchaToken: "x".repeat(2049) }))).rejects.toThrow("redirect:/");
+    expect(auth.signInWithPassword).toHaveBeenLastCalledWith(credentials);
+  });
+
+  it("maps captcha_failed to its own message instead of a wrong password", async () => {
+    auth.signInWithPassword.mockResolvedValue(failed);
+    expect((await signIn({}, form({ ...credentials, captchaToken: "tok" }))).error).toBe(CAPTCHA_MESSAGE);
+    auth.signUp.mockResolvedValue(failed);
+    expect((await signUp({}, form({ ...credentials, captchaToken: "tok" }))).error).toBe(CAPTCHA_MESSAGE);
+  });
+
+  it("is reported by the password reset instead of the neutral notice", async () => {
+    auth.resetPasswordForEmail.mockResolvedValue(failed);
+    const result = await requestPasswordReset({}, form({ email: credentials.email }));
+    expect(result.error).toBe(CAPTCHA_MESSAGE);
     expect(result.notice).toBeUndefined();
   });
 });

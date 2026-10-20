@@ -18,6 +18,17 @@ export type AuthFormState = { error?: string; notice?: string; email?: string };
 const GUEST_DELETE_WORD = "supprimer";
 
 const UNAVAILABLE = "La connexion n’est pas disponible pour le moment.";
+const CAPTCHA_FAILED = "La vérification anti-robot a échoué. Réessaie.";
+
+/** Longest Turnstile token accepted from a form (they are about 1 000 characters). */
+const MAX_CAPTCHA_TOKEN_LENGTH = 2048;
+
+/** The Turnstile token posted by the form, if any (empty or oversized values are ignored). */
+function captchaTokenOf(formData: FormData): string | undefined {
+  const value = formData.get("captchaToken");
+  if (typeof value !== "string" || value === "" || value.length > MAX_CAPTCHA_TOKEN_LENGTH) return undefined;
+  return value;
+}
 
 export async function signIn(_previous: AuthFormState, formData: FormData): Promise<AuthFormState> {
   const email = String(formData.get("email") ?? "").trim();
@@ -27,8 +38,13 @@ export async function signIn(_previous: AuthFormState, formData: FormData): Prom
   const supabase = await createSupabaseServerClient();
   if (!supabase) return { email, error: UNAVAILABLE };
 
-  const { error } = await supabase.auth.signInWithPassword(parsed.data);
+  const captchaToken = captchaTokenOf(formData);
+  const { error } = await supabase.auth.signInWithPassword({
+    ...parsed.data,
+    ...(captchaToken && { options: { captchaToken } }),
+  });
   if (error) {
+    if (error.code === "captcha_failed") return { email, error: CAPTCHA_FAILED };
     // A network or server failure is not a wrong password: do not blame the credentials.
     const rejected = error.status !== undefined && error.status >= 400 && error.status < 500;
     return { email, error: rejected ? "E-mail ou mot de passe incorrect." : UNAVAILABLE };
@@ -45,11 +61,13 @@ export async function signUp(_previous: AuthFormState, formData: FormData): Prom
   if (!supabase) return { email, error: UNAVAILABLE };
 
   const origin = await requestOrigin();
+  const captchaToken = captchaTokenOf(formData);
   const { data, error } = await supabase.auth.signUp({
     ...parsed.data,
-    options: { emailRedirectTo: `${origin}/auth/confirm` },
+    options: { emailRedirectTo: `${origin}/auth/confirm`, ...(captchaToken && { captchaToken }) },
   });
   if (error) {
+    if (error.code === "captcha_failed") return { email, error: CAPTCHA_FAILED };
     return { email, error: error.status === 422 ? error.message : "Impossible de créer le compte pour le moment." };
   }
   // With e-mail confirmation on there is no session yet: the link in the e-mail finishes the job.
@@ -65,7 +83,8 @@ const RESET_NOTICE =
 /**
  * Sends the password reset e-mail. The answer is the same whether the account exists or not
  * (and even if Supabase fails: the error is only logged), so the form cannot be used to find out
- * who has an account. Only a rate limit is reported, since it does not depend on the address.
+ * who has an account. Only a rate limit and a failed
+ * CAPTCHA are reported, since they do not depend on the address.
  */
 export async function requestPasswordReset(_previous: AuthFormState, formData: FormData): Promise<AuthFormState> {
   const email = String(formData.get("email") ?? "").trim();
@@ -76,10 +95,14 @@ export async function requestPasswordReset(_previous: AuthFormState, formData: F
   if (!supabase) return { email, error: "La réinitialisation du mot de passe n’est pas disponible dans la démo." };
 
   const origin = await requestOrigin();
+  const captchaToken = captchaTokenOf(formData);
   const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
     redirectTo: `${origin}/auth/confirm?next=/nouveau-mot-de-passe`,
+    ...(captchaToken && { captchaToken }),
   });
   if (error) {
+    // Says nothing about the account, so it is safe to report.
+    if (error.code === "captcha_failed") return { email, error: CAPTCHA_FAILED };
     if (error.status === 429 || error.code === "over_email_send_rate_limit") {
       return { email, error: "Trop de demandes, réessaie dans quelques minutes." };
     }

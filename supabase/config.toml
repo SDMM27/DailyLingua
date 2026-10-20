@@ -212,8 +212,9 @@ token_verifications = 30
 web3 = 30
 
 # Configure one of the supported captcha providers: `hcaptcha`, `turnstile`.
-# Daily Lingua uses Turnstile for the guest trial (see docs/plans/product-features.md). Turning this on
-# also requires a captcha token for password sign-in, sign-up and password reset.
+# Daily Lingua uses Turnstile for the guest trial, password sign-in, sign-up and password reset: the
+# forms send the token when NEXT_PUBLIC_TURNSTILE_SITE_KEY is set (see docs/plans/product-features.md).
+# Turn this on only once the deployed app has that site key.
 # [auth.captcha]
 # enabled = true
 # provider = "turnstile"

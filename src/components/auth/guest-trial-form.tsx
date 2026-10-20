@@ -2,36 +2,11 @@
 
 import { createBrowserClient } from "@supabase/ssr";
 import { useRouter } from "next/navigation";
-import Script from "next/script";
-import { useEffect, useRef, useState, useTransition, type FormEvent } from "react";
+import { useState, useTransition, type FormEvent } from "react";
 import type { Database } from "@/lib/supabase/database.types";
 import { Feedback, SubmitButton } from "./auth-fields";
 import { guestSignInErrorMessage } from "./guest-sign-in-error";
-
-/** Cloudflare Turnstile, explicit rendering (https://developers.cloudflare.com/turnstile/). */
-const TURNSTILE_SCRIPT = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-
-interface Turnstile {
-  render(
-    container: HTMLElement,
-    options: {
-      sitekey: string;
-      language?: string;
-      size?: "normal" | "flexible" | "compact";
-      callback: (token: string) => void;
-      "expired-callback"?: () => void;
-      "error-callback"?: () => void;
-    },
-  ): string;
-  reset(widgetId: string): void;
-  remove(widgetId: string): void;
-}
-
-declare global {
-  interface Window {
-    turnstile?: Turnstile;
-  }
-}
+import { TurnstileWidget } from "./turnstile-widget";
 
 /**
  * « Essayer sans compte »: opens an anonymous session, then the first-run screen.
@@ -53,28 +28,7 @@ export function GuestTrialForm({
   const [submitting, setSubmitting] = useState(false);
   const [navigating, startNavigation] = useTransition();
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const captchaRef = useRef<HTMLDivElement>(null);
-  const widgetRef = useRef<string | null>(null);
-
-  function renderCaptcha() {
-    if (!turnstileSiteKey || !window.turnstile || !captchaRef.current || widgetRef.current) return;
-    widgetRef.current = window.turnstile.render(captchaRef.current, {
-      sitekey: turnstileSiteKey,
-      language: "fr",
-      size: "flexible",
-      callback: setCaptchaToken,
-      "expired-callback": () => setCaptchaToken(null),
-      "error-callback": () => setCaptchaToken(null),
-    });
-  }
-
-  useEffect(
-    () => () => {
-      if (widgetRef.current) window.turnstile?.remove(widgetRef.current);
-      widgetRef.current = null;
-    },
-    [],
-  );
+  const [captchaReset, setCaptchaReset] = useState(0);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -95,8 +49,7 @@ export function GuestTrialForm({
       }
       setError(guestSignInErrorMessage(signInError));
       // A Turnstile token is single-use: ask for a new one.
-      if (widgetRef.current) window.turnstile?.reset(widgetRef.current);
-      setCaptchaToken(null);
+      setCaptchaReset((n) => n + 1);
       return;
     }
     // The session cookies are set: the server sees the guest on the next request.
@@ -107,16 +60,7 @@ export function GuestTrialForm({
 
   return (
     <form onSubmit={onSubmit} className="space-y-3">
-      {turnstileSiteKey && (
-        <>
-          <Script
-            src={TURNSTILE_SCRIPT}
-            onReady={renderCaptcha}
-            onError={() => setError("La vérification anti-robot n’a pas pu se charger. Recharge la page.")}
-          />
-          <div ref={captchaRef} className="min-h-[65px]" />
-        </>
-      )}
+      {turnstileSiteKey && <TurnstileWidget siteKey={turnstileSiteKey} onToken={setCaptchaToken} resetKey={captchaReset} />}
       <Feedback state={{ error }} />
       <SubmitButton
         pending={submitting || navigating || waitingForCaptcha}

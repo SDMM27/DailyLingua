@@ -24,6 +24,7 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
         Connecte-toi pour retrouver tes mots, ta progression et la mission du jour.
       </PageHeader>
       <AuthForm
+        turnstileSiteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() || undefined}
         initialError={
           lien === "invalide" ? "Ce lien de confirmation n’est plus valide. Connecte-toi ou recrée un compte." : undefined
         }
