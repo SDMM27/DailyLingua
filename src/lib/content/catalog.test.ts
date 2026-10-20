@@ -70,6 +70,28 @@ describe("source catalogue", () => {
     }
   });
 
+  it("only gives audio hosts to podcasts, never the bare host of a shared CDN or podcast platform", () => {
+    // A bare platform domain would let any show hosted there through; subdomains of these are fine.
+    const tooBroad = new Set(["akamaihd.net", "akamaized.net", "cloudfront.net", "spotify.com", "podtrac.com"]);
+    for (const s of sources.filter((s) => s.audioHosts)) {
+      expect(s.contentType, s.key).toBe("podcast");
+      expect(s.audioHosts!.length, s.key).toBeGreaterThan(0);
+      for (const host of s.audioHosts!) expect(tooBroad.has(host), `${s.key}: ${host}`).toBe(false);
+    }
+  });
+
+  it("gives every language a podcast playable in the app and at least two article sources", () => {
+    for (const code of LANGUAGE_CODES) {
+      const own = sources.filter((s) => s.language === code);
+      expect(own.some((s) => s.contentType === "podcast" && s.audioHosts), `${code}: podcast`).toBe(true);
+      expect(own.filter((s) => s.contentType === "article").length, `${code}: articles`).toBeGreaterThanOrEqual(2);
+    }
+  });
+
+  it("reads each feed once", () => {
+    expect(new Set(sources.map((s) => s.feedUrl)).size).toBe(sources.length);
+  });
+
   it("keeps at least one source per language usable under the commercial policy for the main languages", () => {
     const commercial = new Set(sources.filter((s) => s.license.commercialUse).map((s) => s.language));
     expect([...commercial].sort()).toEqual(expect.arrayContaining(["en", "es", "it", "ru"]));

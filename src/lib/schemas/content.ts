@@ -56,6 +56,12 @@ export const sourceDefinitionSchema = z
      */
     hosts: z.array(z.string().regex(/^[a-z0-9.-]+\.[a-z]{2,}$/)).min(1),
     /**
+     * Podcasts only: hosts an episode's audio file (RSS `<enclosure>`) may be served from, subdomains
+     * included (the publisher's CDN, its podcast host, a measurement redirector it uses). Absent: the
+     * episodes are only linked, never played in the app.
+     */
+    audioHosts: z.array(z.string().regex(/^[a-z0-9.-]+\.[a-z]{2,}$/)).min(1).optional(),
+    /**
      * Items older than this many days are ignored. Defaults to MAX_ITEM_AGE_DAYS (news); sources
      * whose items stay useful for longer, such as learning videos, set a wider window.
      */
@@ -127,6 +133,8 @@ export const contentListItemSchema = z.object({
   difficulty: cefrLevelSchema,
   durationMinutes: z.number().int().positive(),
   summary: z.string().min(1),
+  /** Podcasts: the episode's audio file (https), played in the app on demand. */
+  audioUrl: z.url({ protocol: /^https$/ }).nullish(),
   author: z.string().optional(),
   publishedAt: z.iso.datetime({ offset: true }).nullable(),
   source: sourceInfoSchema.pick({ key: true, name: true, homepage: true, access: true, license: true }),

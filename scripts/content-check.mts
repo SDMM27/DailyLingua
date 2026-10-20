@@ -47,6 +47,7 @@ interface Row {
   flux: string;
   items: number;
   valides: number;
+  audio: string;
   "plus récent": string;
   "lien test": string;
   pages: string;
@@ -62,6 +63,7 @@ for (const source of sources) {
     flux: "ok",
     items: 0,
     valides: 0,
+    audio: "",
     "plus récent": "",
     "lien test": "",
     pages: "",
@@ -75,11 +77,16 @@ for (const source of sources) {
     const newest = drafts.find((d) => d.publishedAt)?.publishedAt;
     row["plus récent"] = newest ? newest.toISOString().slice(0, 10) : "sans date";
     const reasons = Object.entries(rejected).map(([reason, count]) => `${reason}: ${count}`).join(", ");
+    if (source.contentType === "podcast") {
+      const playable = drafts.filter((d) => d.audioUrl).length;
+      row.audio = `${playable}/${drafts.length}`;
+      if (source.audioHosts && playable === 0) problems.push("aucun fichier audio lisible");
+    }
     if (drafts.length === 0) problems.push(`aucun item valide${reasons ? ` (${reasons})` : ""}`);
     if (newest && now.getTime() - newest.getTime() > STALE_AFTER_DAYS * 86_400_000) problems.push("flux inactif");
     if (rejected["foreign-host"]) problems.push(`${rejected["foreign-host"]} lien(s) hors domaine`);
     if (drafts[0]) {
-      const link = await checkLink(drafts[0].url, source.hosts);
+      const link = await checkLink(drafts[0].url, [...source.hosts, ...(source.audioHosts ?? [])]);
       row["lien test"] = link.status ?? `incertain (${link.httpStatus ?? "délai"})`;
       if (link.status === "broken") problems.push("lien cassé");
     }

@@ -1,5 +1,5 @@
 import { LANGUAGE_CODES, type Language } from "@/lib/domain/languages";
-import { CEFR_LEVELS, type CefrLevel } from "@/lib/schemas/common";
+import { CEFR_LEVELS, type CefrLevel, type ContentType } from "@/lib/schemas/common";
 import type { SourceDefinition } from "@/lib/schemas/content";
 
 export type CoverageMatrix = Record<Language, Record<CefrLevel, number>>;
@@ -11,13 +11,13 @@ export function emptyMatrix(): CoverageMatrix {
 }
 
 /**
- * Number of video channels able to yield each level: a channel counts for its `difficulty` and for
- * every level its `levelRules` can assign.
+ * Number of sources of a content type able to yield each level: a source counts for its `difficulty`
+ * and for every level its `levelRules` can assign.
  */
-export function catalogVideoCoverage(catalog: SourceDefinition[]): CoverageMatrix {
+export function catalogCoverage(catalog: SourceDefinition[], type: ContentType): CoverageMatrix {
   const matrix = emptyMatrix();
   for (const s of catalog) {
-    if (s.contentType !== "video") continue;
+    if (s.contentType !== type) continue;
     const levels = new Set<CefrLevel>([s.difficulty, ...(s.levelRules ?? []).map((r) => r.difficulty)]);
     for (const level of levels) matrix[s.language][level] += 1;
   }

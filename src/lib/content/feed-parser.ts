@@ -14,6 +14,8 @@ export interface RawFeedItem {
   categories: string[];
   /** itunes:duration as given. */
   duration: string | null;
+  /** First audio/video attachment (RSS `<enclosure>`, Atom `link rel="enclosure"`); not checked here. */
+  enclosure: { url: string; type: string | null } | null;
 }
 
 export interface ParsedFeed {
@@ -32,6 +34,7 @@ const DOCTYPE = /<!DOCTYPE/i;
 const ARRAY_PATHS = new Set([
   "rss.channel.item",
   "rss.channel.item.category",
+  "rss.channel.item.enclosure",
   "feed.entry",
   "feed.entry.link",
   "feed.entry.category",
@@ -93,6 +96,11 @@ function categories(values: unknown[]): string[] {
     .filter((c): c is string => c !== null);
 }
 
+function rssEnclosure(item: Node): RawFeedItem["enclosure"] {
+  const enclosure = asArray(item.enclosure).filter(isNode).find((e) => text(e["@_url"]));
+  return enclosure ? { url: text(enclosure["@_url"])!, type: text(enclosure["@_type"]) } : null;
+}
+
 function rssItem(item: Node): RawFeedItem {
   const guid = item.guid;
   const guidText = text(guid);
@@ -109,6 +117,7 @@ function rssItem(item: Node): RawFeedItem {
     author: first(item["dc:creator"], item.author, item["itunes:author"]),
     categories: categories(asArray(item.category)),
     duration: first(item["itunes:duration"]),
+    enclosure: rssEnclosure(item),
   };
 }
 
@@ -119,6 +128,11 @@ function atomLink(entry: Node): string | null {
     links.find((l) => l["@_rel"] === undefined) ??
     links.find((l) => l["@_rel"] === "alternate");
   return alternate ? text(alternate["@_href"]) : null;
+}
+
+function atomEnclosure(entry: Node): RawFeedItem["enclosure"] {
+  const link = asArray(entry.link).filter(isNode).find((l) => l["@_rel"] === "enclosure" && text(l["@_href"]));
+  return link ? { url: text(link["@_href"])!, type: text(link["@_type"]) } : null;
 }
 
 function atomEntry(entry: Node): RawFeedItem {
@@ -137,6 +151,7 @@ function atomEntry(entry: Node): RawFeedItem {
     author: author ? first(author.name) : null,
     categories: categories(asArray(entry.category)),
     duration: null,
+    enclosure: atomEnclosure(entry),
   };
 }
 
@@ -151,6 +166,7 @@ function rdfItem(item: Node): RawFeedItem {
     author: first(item["dc:creator"]),
     categories: categories(asArray(item["dc:subject"])),
     duration: null,
+    enclosure: null,
   };
 }
 

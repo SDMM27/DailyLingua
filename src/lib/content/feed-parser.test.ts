@@ -175,6 +175,27 @@ describe("parseFeed", () => {
     expect(feed.items[1].description).toBeNull();
   });
 
+  it("reads the first enclosure of an RSS item, with its type", () => {
+    const feed = parseFeed(`<rss version="2.0"><channel><title>Pod</title>
+      <item><title>One</title><enclosure url="https://cdn.example/1.mp3" length="123" type="audio/mpeg"/>
+        <enclosure url="https://cdn.example/1.m4a" type="audio/mp4"/></item>
+      <item><title>Two</title><enclosure url="https://cdn.example/2.mp3"/></item>
+      <item><title>Three</title></item>
+    </channel></rss>`);
+    expect(feed.items.map((i) => i.enclosure)).toEqual([
+      { url: "https://cdn.example/1.mp3", type: "audio/mpeg" },
+      { url: "https://cdn.example/2.mp3", type: null },
+      null,
+    ]);
+  });
+
+  it("reads an Atom enclosure link, and no enclosure from RDF", () => {
+    expect(parseFeed(ATOM).items[0].enclosure).toEqual({ url: "https://images.example/1.jpg", type: null });
+    const rdf = parseFeed(`<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://purl.org/rss/1.0/">
+      <item rdf:about="https://x.example/1"><title>A</title><link>https://x.example/1</link></item></rdf:RDF>`);
+    expect(rdf.items[0].enclosure).toBeNull();
+  });
+
   it("accepts an empty channel", () => {
     expect(parseFeed('<rss version="2.0"><channel><title>Vide</title></channel></rss>').items).toEqual([]);
   });

@@ -39,6 +39,7 @@ function item(overrides: Partial<RawFeedItem> = {}): RawFeedItem {
     author: null,
     categories: [],
     duration: null,
+    enclosure: null,
     ...overrides,
   };
 }
@@ -62,6 +63,7 @@ describe("normalizeItem", () => {
       author: "Anna",
       categories: ["Viaggi"],
       publishedAt: new Date("2026-10-13T08:00:00Z"),
+      audioUrl: null,
     });
   });
 
@@ -271,5 +273,76 @@ describe("normalizeItem — YouTube", () => {
   it("does not apply the YouTube rules to other formats", () => {
     const result = normalizeItem(video({ link: "https://www.example.it/shorts/x" }), source(), NOW);
     expect(result.ok).toBe(true);
+  });
+});
+
+describe("normalizeItem — podcast audio", () => {
+  const podcast = (overrides: Partial<SourceDefinition> = {}) =>
+    source({
+      key: "test-podcast",
+      contentType: "podcast",
+      homepageUrl: "https://www.example.it/podcast",
+      hosts: ["example.it"],
+      audioHosts: ["cdn.example.net"],
+      ...overrides,
+    });
+  const episode = (overrides: Partial<RawFeedItem> = {}) =>
+    item({
+      link: "https://www.example.it/podcast/episodio-1",
+      enclosure: { url: "https://media.cdn.example.net/ep1.mp3?token=a", type: "audio/mpeg" },
+      ...overrides,
+    });
+
+  it("keeps an https audio enclosure on an audio host", () => {
+    const draft = draftOf(normalizeItem(episode(), podcast(), NOW));
+    expect(draft.audioUrl).toBe("https://media.cdn.example.net/ep1.mp3?token=a");
+    expect(draft.url).toBe("https://www.example.it/podcast/episodio-1");
+  });
+
+  it("accepts a missing or generic type when the file extension is audio", () => {
+    const enclosure = (url: string, type: string | null) => ({ url, type });
+    const audio = (e: RawFeedItem["enclosure"]) => draftOf(normalizeItem(episode({ enclosure: e }), podcast(), NOW)).audioUrl;
+    expect(audio(enclosure("https://cdn.example.net/a.m4a", null))).toBe("https://cdn.example.net/a.m4a");
+    expect(audio(enclosure("https://cdn.example.net/a.opus", "application/octet-stream"))).toBe("https://cdn.example.net/a.opus");
+    expect(audio(enclosure("https://cdn.example.net/a.bin", null))).toBeNull();
+  });
+
+  it("refuses http, a foreign host and video without rejecting the episode", () => {
+    for (const enclosure of [
+      { url: "http://cdn.example.net/ep1.mp3", type: "audio/mpeg" },
+      { url: "https://evil.example.org/ep1.mp3", type: "audio/mpeg" },
+      { url: "https://cdn.example.net/ep1.mp4", type: "video/mp4" },
+      { url: "not a url", type: "audio/mpeg" },
+    ]) {
+      const draft = draftOf(normalizeItem(episode({ enclosure }), podcast(), NOW));
+      expect(draft.audioUrl).toBeNull();
+      expect(draft.url).toBe("https://www.example.it/podcast/episodio-1");
+    }
+  });
+
+  it("refuses an audio URL longer than 2000 characters", () => {
+    const enclosure = { url: `https://cdn.example.net/ep1.mp3?t=${"a".repeat(2000)}`, type: "audio/mpeg" };
+    expect(draftOf(normalizeItem(episode({ enclosure }), podcast(), NOW)).audioUrl).toBeNull();
+  });
+
+  it("ignores enclosures when the source has no audioHosts, and for articles", () => {
+    expect(draftOf(normalizeItem(episode(), podcast({ audioHosts: undefined }), NOW)).audioUrl).toBeNull();
+    expect(draftOf(normalizeItem(episode(), source({ audioHosts: ["cdn.example.net"] }), NOW)).audioUrl).toBeNull();
+  });
+
+  it("uses the audio file as the link when the item has none or links to the show's homepage", () => {
+    const audio = "https://media.cdn.example.net/ep1.mp3?token=a";
+    expect(draftOf(normalizeItem(episode({ link: null }), podcast(), NOW)).url).toBe(audio);
+    expect(draftOf(normalizeItem(episode({ link: "https://example.it/podcast/" }), podcast(), NOW)).url).toBe(audio);
+    // The fallback does not need the audio host to be among `hosts`.
+    expect(draftOf(normalizeItem(episode({ link: null }), podcast({ hosts: ["example.it"] }), NOW)).audioUrl).toBe(audio);
+  });
+
+  it("still rejects an item without link and without accepted audio, or with a foreign link", () => {
+    expect(normalizeItem(episode({ link: null, enclosure: null }), podcast(), NOW)).toEqual({ ok: false, reason: "no-link" });
+    expect(normalizeItem(episode({ link: "https://other.example.org/x" }), podcast(), NOW)).toEqual({
+      ok: false,
+      reason: "foreign-host",
+    });
   });
 });

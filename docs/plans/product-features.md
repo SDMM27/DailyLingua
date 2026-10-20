@@ -10,6 +10,19 @@ Phase 5 (F, regarder / écouter) implémentée le 2026-10-20, en attente de vali
 
 Ce plan suit la règle du projet : une phase à la fois, chacune validée avant la suivante. Chaque phase se termine par la liste des fichiers modifiés, les commandes lancées, les tests réellement exécutés et leurs résultats.
 
+## Phase F (suite) — podcasts et sites d'information, conception retenue
+
+Deux volets : écouter un podcast dans l'app, et plus de sources (podcasts, sites d'information) dans toutes les langues et à tous les niveaux.
+
+1. **Fichier audio du flux.** L'analyseur lit `<enclosure url type length>` (RSS) et `link rel="enclosure"` (Atom). Pour une source `podcast`, l'épisode garde son adresse audio si elle est en `https`, de type `audio/*` (ou, sans type, d'extension `.mp3`, `.m4a`, `.aac`, `.ogg`, `.opus`) et sur un hôte de `audioHosts` (nouveau champ du catalogue : CDN de l'éditeur, hébergeur du podcast, redirecteur de mesure qu'il utilise). Sinon l'épisode reste proposé, en lien seulement. Les fichiers vidéo sont ignorés. Quand un épisode n'a pas de lien propre (absent, ou identique à la page d'accueil de l'émission), son adresse audio sert de lien.
+2. **Stockage.** Migration : colonne `contents.audio_url` (facultative, `https` seulement). Les épisodes déjà enregistrés ne sont pas modifiés. `audioUrl` facultatif dans les schémas de contenu (liste et mission).
+3. **Lecteur, chargé au clic.** Composant client `AudioPlayer` : tant que l'utilisateur n'a pas touché « Écouter ici », rien n'est demandé à l'éditeur. Ensuite, élément `<audio controls>` natif (lecture en arrière-plan et écran verrouillé sur iPhone), vitesse 0,75× / 1× / 1,25×, et message de repli si le fichier ne se lit pas (« Ouvre l'épisode chez l'éditeur »). Le lecteur apparaît dans la carte de contenu de la mission et sur `/lire` sous un podcast. La CSP n'a pas de `media-src` : rien à changer.
+4. **Licence.** On fait comme une application de podcasts : le fichier est lu depuis le serveur de l'éditeur, à partir du flux qu'il publie pour cela, et n'est jamais copié. Les sources restent `all-rights-reserved` et `commercialUse: false`, sauf licence ouverte vérifiée.
+5. **Sources.** Pour chacune des 19 langues : au moins un podcast lisible dans l'app, des niveaux A2 à C1 quand c'est possible (émissions pour apprenants, puis radios publiques), et au moins deux sites d'information, dont un en langue simple (A2–B1) quand il en existe un. Mêmes critères que pour YouTube (flux officiel, actif depuis moins de 21 jours, ligne éditoriale, licence vérifiée), avec raisons des exclusions dans le commentaire du catalogue.
+6. **Outils.** `npm run content:coverage` affiche une matrice par type (articles, vidéos, podcasts). `npm run content:check` indique, pour un podcast, combien d'épisodes ont un fichier audio lisible.
+
+Confidentialité : la politique explique que l'audio n'est chargé qu'au clic, directement depuis le serveur de l'éditeur ou de son hébergeur, qui reçoit alors l'adresse IP.
+
 ## Phase F — conception retenue
 
 Constat : le schéma connaît déjà les types `video` et `podcast` (contrainte de `contents.content_type`, libellés, activité « Regarder la vidéo » du planificateur). Il manque des sources vidéo, un lecteur et un filtre par type. **Aucune migration.**

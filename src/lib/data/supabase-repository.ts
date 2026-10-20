@@ -320,7 +320,7 @@ export function createSupabaseRepository(
          mission_sessions (
            id, position, language, questions, expressions, production,
            contents ( title, content_type, language, url, difficulty, duration_minutes, summary,
-                      transcript_available, sources ( key, name, homepage_url ) ),
+                      audio_url, transcript_available, sources ( key, name, homepage_url ) ),
            mission_activities ( id, position, kind, title, estimated_minutes )
          )`,
       )
@@ -361,6 +361,7 @@ export function createSupabaseRepository(
             difficulty: content.difficulty,
             durationMinutes: content.duration_minutes,
             summary: content.summary,
+            audioUrl: content.audio_url ?? undefined,
             transcriptAvailable: content.transcript_available,
           },
           activities: s.mission_activities.map((a) => ({
@@ -1184,7 +1185,7 @@ export function createSupabaseRepository(
         let query = client
           .from("contents")
           .select(
-            `id, language, content_type, title, url, difficulty, duration_minutes, summary, author, published_at,
+            `id, language, content_type, title, url, audio_url, difficulty, duration_minutes, summary, author, published_at,
              sources!inner ( ${SOURCE_COLUMNS} )`,
           )
           .eq("language", language)
@@ -1212,6 +1213,7 @@ export function createSupabaseRepository(
         difficulty: row.difficulty,
         durationMinutes: row.duration_minutes,
         summary: row.summary,
+        audioUrl: row.audio_url ?? undefined,
         author: row.author ?? undefined,
         publishedAt: row.published_at,
         source: {

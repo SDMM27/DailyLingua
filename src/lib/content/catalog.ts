@@ -66,10 +66,45 @@ import type { SourceDefinition, SourceLicense } from "@/lib/schemas/content";
  * no channel met the bar for them.
  * Known limits: La Polyglotte also posts videos for Greek speakers learning French (the Greek lessons
  * are the ones that matter), and several Peppa Pig and Diva channels publish 24/7 live replays.
+ *
+ * Phase F, podcasts and news (2026-10-20). Podcasts are played in the app from the publisher's own
+ * file (`audioHosts`), as a podcast app does; learners' shows keep episodes 180 days, news shows the
+ * default window. Same title rule as YouTube, same editorial rules, licence read for each publisher.
+ * Left out in this pass:
+ * - audio served over `http` only (no in-app playback, and the episodes are on YouTube already for
+ *   some): BBC Learning English (6 Minute English), BBC Lê, BBC Russian, Arabic, Turkish and
+ *   Indonesian podcasts, Nihongo con Teppei, SBS 뉴스 브리핑 (also no episode links);
+ * - feed over the 5 MB the app accepts: NOS De Dag and Bureau Buitenland (NPO), Vinohradská 12 (ČRo),
+ *   Easy Greek, Medyascope, Meduza's podcasts, Timpul prezent (Radio România Cultural); Easy German's
+ *   podcast is at 5.15 MB and would break within weeks;
+ * - no episode for 3 weeks or more: Fala Gringo, Acum înțeleg!, Selaksa Senja, ArabicLearners, News in
+ *   Simple Turkish, Slow Chinese, KBR, VOA Indonesia, Thmanyah (فنجان, سقراط...), Kerning Cultures,
+ *   Easy Stories in English; Radio Svoboda's Russian feed mixes in 1994 archive programmes;
+ * - titles in English: slowczech, Learn Ukrainian with Viktoriia; Endgame (Gita
+ *   Wirjawan) has whole episodes in English;
+ * - unclear production: Lingopie « News in Easy … », LinguaWire « Learn German A1 / B1+ », ARTICLY
+ *   « Almanya kompakt » (generated news readings, no named newsroom);
+ * - terms: Radio Ambulante (iHeart's feed notice forbids computational analysis), Yonhap and the
+ *   Hankyoreh (feeds say « AI 학습 및 활용 금지 »: no use with AI); Apaçık Radyo (Açık Dergi) and
+ *   Euronews answer bots with a challenge (403 / 406), so their terms could not be read;
+ * - content: RSI Radiogiornale and NPR News Now (every episode has the same title: nothing to ask
+ *   about), Antara (state news agency), Tempo (feed stale, mostly advertorials), TVN24 (we keep
+ *   Rzeczpospolita for Polish).
+ * Not found: an official article feed for nachrichtenleicht.de (only its podcast), NHK News Web Easy
+ * (no public feed), Breaking News English (403), Due Parole (no feed).
+ * Korean news: Kyunghyang (경향신문) rather than Yonhap or the Hankyoreh, whose feeds forbid AI use.
+ * After this pass every language has a podcast playable in the app and at least two article sources.
+ * Still without a simple-language article source (no official easy-language feed found): it, pt,
+ * pl, cs, ro, el, ko, tr, ar, ja, id, uk, ru.
+ * To re-read: France Médias Monde (RFI, MCD) reserves text and data mining on its sites; we only
+ * store titles and teasers from its public feeds and play its podcast files, but a lawyer should
+ * confirm that use before any commercial release.
  */
 
 const VERIFIED_ON = "2026-10-13";
 const YOUTUBE_VERIFIED_ON = "2026-10-20";
+/** Podcasts and news sites added in phase F (suite). */
+const PHASE_F_SOURCES_VERIFIED_ON = "2026-10-20";
 
 // Licences ------------------------------------------------------------------------------------
 
@@ -107,17 +142,32 @@ const WIKIPEDIA_LICENSE: SourceLicense = {
 };
 
 /** Publisher keeps all rights; the feed is used as published: title, teaser, link. */
-function allRightsReserved(termsUrl: string, note: string, attribution?: string): SourceLicense {
+function allRightsReserved(
+  termsUrl: string,
+  note: string,
+  attribution?: string,
+  verifiedOn: string = VERIFIED_ON,
+): SourceLicense {
   return {
     kind: "all-rights-reserved",
     name: "Tous droits réservés",
     termsUrl,
     commercialUse: false,
     attribution,
-    verifiedOn: VERIFIED_ON,
+    verifiedOn,
     note,
   };
 }
+
+/** Same, for the podcasts and news sites checked on PHASE_F_SOURCES_VERIFIED_ON. */
+function checkedNow(termsUrl: string, note: string, attribution?: string): SourceLicense {
+  return allRightsReserved(termsUrl, note, attribution, PHASE_F_SOURCES_VERIFIED_ON);
+}
+
+/** Podcast feeds are published for podcast apps: the app plays the publisher's file the same way. */
+const PODCAST_PLAYBACK =
+  "The file is played from the publisher's server (or its podcast host) when the user taps play, " +
+  "as a podcast app does; it is never copied.";
 
 const BBC_LICENSE = allRightsReserved(
   "https://www.bbc.co.uk/news/10628494",
@@ -141,6 +191,68 @@ const YOUTUBE_LICENSE: SourceLicense = {
     "only when the user taps play). We only store the channel feed's metadata (title, link, date) and the first " +
     "lines of the description; the video itself is never copied. Channel owners keep all rights.",
 };
+
+// Phase F (suite): podcasts and news sites. All checked on PHASE_F_SOURCES_VERIFIED_ON.
+
+const DW_SOURCES_LICENSE = checkedNow(
+  "https://www.dw.com/de/impressum/a-66180469",
+  "Official feeds at rss.dw.com (articles in each language, Deutsch lernen podcasts). Impressum re-read: " +
+    "no feed licence, all rights assumed. " + PODCAST_PLAYBACK,
+);
+const DEUTSCHLANDRADIO_LICENSE = checkedNow(
+  "https://www.deutschlandradio.de/impressum-120.html",
+  "Deutschlandfunk feeds linked from its pages (nachrichtenleicht links its podcast feed). Impressum: " +
+    "pictures for private use only, no feed licence: all rights assumed. " + PODCAST_PLAYBACK,
+  "Deutschlandfunk",
+);
+const NPR_LICENSE = checkedNow(
+  "https://www.npr.org/about-npr/179876898/terms-of-use",
+  "Terms of Use (updated 2025-09-10), « Podcasts »: personal, noncommercial use only, linking allowed; " +
+    "attribution « NPR » with a link back required. " + PODCAST_PLAYBACK,
+  "NPR",
+);
+const EASY_LANGUAGES_LICENSE = checkedNow(
+  "https://www.easy-languages.org/imprint",
+  "Easy Languages GmbH (Berlin), imprint read; no reuse licence published: all rights assumed. " + PODCAST_PLAYBACK,
+);
+const IN_LEVELS_LICENSE = checkedNow(
+  "https://www.englishinlevels.com/wp-content/uploads/2026/02/Terms_and_Conditions_English_in_Levels.pdf",
+  "English in Levels s.r.o. terms (PDF linked from every « in Levels » site, read): content copyrighted, " +
+    "copying only for personal learning or a teacher's classes, no commercial use. We link and show the teaser.",
+);
+const SR_LICENSE = checkedNow(
+  "https://om.sverigesradio.se/",
+  "Swedish public radio; feeds at public-api.sr.se / api.sr.se, each saying « Copyright Sveriges Radio. All " +
+    "rights reserved. » Licensing of SR material goes through Clipsource (not for direct commercial use). " +
+    PODCAST_PLAYBACK,
+);
+const FRANCE_MEDIAS_MONDE_LICENSE = checkedNow(
+  "https://www.francemm.com/en/legal-notice",
+  "France Médias Monde (RFI, MCD) GTU 6.1: content reserved, collecting or storing it without authorisation " +
+    "is forbidden and text and data mining is opted out (tdmrep.json), in particular for AI training. We only " +
+    "keep what its public feeds publish (title, teaser, link) and play podcast files from its servers. " +
+    "To re-read before any commercial use. " + PODCAST_PLAYBACK,
+);
+const RFE_RL_LICENSE = checkedNow(
+  "https://www.radiosvoboda.org/copyright",
+  "RFE/RL « Правові аспекти »: use and redistribution of its materials welcomed with a link to the source; " +
+    "selling them is forbidden. No open licence: all rights assumed. " + PODCAST_PLAYBACK,
+  "Радіо Свобода",
+);
+const NOS_PODCAST_LICENSE = checkedNow(
+  "https://npo.nl/overnpo/algemene-voorwaarden/algemene-voorwaarden-online",
+  "NPO general terms for its online services (read; feed copyright « © NPO Radio 1 / NOS »): content " +
+    "protected, linking allowed. " + PODCAST_PLAYBACK,
+);
+
+/** A creator who publishes a podcast through a hosting service, with no terms page of their own. */
+function independentPodcastLicense(termsUrl: string, owner: string): SourceLicense {
+  return checkedNow(
+    termsUrl,
+    `Independent podcast by ${owner}; no terms page found, the feed names the owner as copyright holder: ` +
+      "all rights assumed. " + PODCAST_PLAYBACK,
+  );
+}
 
 // Helpers for multi-edition publishers -----------------------------------------------------
 
@@ -249,6 +361,63 @@ function youtube(
     hosts: ["youtube.com"],
     itemFormat: "youtube",
     license: YOUTUBE_LICENSE,
+  };
+}
+
+/** Age limit of an episode made for learners: lessons do not expire like news (see `maxAgeDays`). */
+const LEARNER_PODCAST_MAX_AGE_DAYS = 180;
+
+interface PodcastDefinition extends Omit<SourceDefinition, "contentType" | "audioHosts" | "maxAgeDays"> {
+  /** Hosts the RSS enclosures are served from (measurement redirector included when the URL starts with it). */
+  audioHosts: string[];
+  /** Made for learners: episodes keep LEARNER_PODCAST_MAX_AGE_DAYS; news shows keep the default window. */
+  learners?: boolean;
+}
+
+/** A podcast whose episodes can be played in the app (RSS `<enclosure>` on one of `audioHosts`). */
+function podcast({ learners, ...definition }: PodcastDefinition): SourceDefinition {
+  return {
+    ...definition,
+    contentType: "podcast",
+    ...(learners ? { maxAgeDays: LEARNER_PODCAST_MAX_AGE_DAYS } : {}),
+  };
+}
+
+/** A language edition of DW's news site (feed `rss-<code>-all`). */
+function dwEdition(language: Language, code: string, name: string): SourceDefinition {
+  return {
+    key: `dw-${language}`,
+    name,
+    language,
+    homepageUrl: `https://www.dw.com/${language}/`,
+    feedUrl: `https://rss.dw.com/xml/rss-${code}-all`,
+    contentType: "article",
+    difficulty: "B2",
+    defaultMinutes: 5,
+    hosts: ["dw.com"],
+    license: DW_SOURCES_LICENSE,
+  };
+}
+
+/** A « News in Levels » site: each story is published at three levels, labelled in the title. */
+function inLevels(language: Language, domain: string, name: string, levelWord: RegExp): SourceDefinition {
+  const level = (n: number) => new RegExp(`${levelWord.source}\\s*${n}\\b`, "i");
+  return {
+    key: domain.split(".")[0],
+    name,
+    language,
+    homepageUrl: `https://www.${domain}/`,
+    feedUrl: `https://www.${domain}/feed/`,
+    contentType: "article",
+    difficulty: "A2",
+    defaultMinutes: 3,
+    levelRules: [
+      { pattern: level(1), difficulty: "A1" },
+      { pattern: level(2), difficulty: "A2" },
+      { pattern: level(3), difficulty: "B1" },
+    ],
+    hosts: [domain],
+    license: IN_LEVELS_LICENSE,
   };
 }
 
@@ -382,7 +551,8 @@ export const SOURCE_CATALOG: SourceDefinition[] = [
     difficulty: "B1",
     defaultMinutes: 10,
     hosts: ["dw.com"],
-    license: DW_LICENSE,
+    audioHosts: ["radiodownloaddw-a.akamaihd.net"],
+    license: DW_SOURCES_LICENSE,
   },
   {
     key: "tagesschau",
@@ -780,4 +950,822 @@ export const SOURCE_CATALOG: SourceDefinition[] = [
   youtube("ko", "mbc-100-minute-debate", "MBC 100분 토론", "UCD46H9Pm3nLqCj7vv3pQkPA", "C2", 100),
   youtube("id", "gita-wirjawan", "Gita Wirjawan — Endgame", "UCDaqDYhGmJdrlHr4h9LQ5uw", "C2", 60),
   youtube("id", "harian-kompas", "Harian Kompas", "UCovqoUzPm9_s6mMt9OiWKpA", "C1", 10),
+
+  // Phase F (suite): news sites, simple language first
+  inLevels("en", "newsinlevels.com", "News in Levels", /level/),
+  inLevels("es", "spanishinlevels.com", "Spanish in Levels", /nivel/),
+  inLevels("de", "germaninlevels.com", "German in Levels", /Stufe/),
+  inLevels("zh", "chineseinlevels.com", "Chinese in Levels", /第/),
+  {
+    key: "deutschlandfunk",
+    name: "Deutschlandfunk — Nachrichten",
+    language: "de",
+    homepageUrl: "https://www.deutschlandfunk.de/",
+    feedUrl: "https://www.deutschlandfunk.de/nachrichten-100.rss",
+    contentType: "article",
+    difficulty: "B2",
+    defaultMinutes: 3,
+    hosts: ["deutschlandfunk.de"],
+    license: DEUTSCHLANDRADIO_LICENSE,
+  },
+  {
+    key: "nos-jeugdjournaal",
+    name: "NOS Jeugdjournaal",
+    language: "nl",
+    homepageUrl: "https://jeugdjournaal.nl/",
+    feedUrl: "https://feeds.nos.nl/jeugdjournaal",
+    contentType: "article",
+    difficulty: "A2",
+    defaultMinutes: 3,
+    audience: "children",
+    hosts: ["jeugdjournaal.nl", "nos.nl"],
+    license: checkedNow(
+      "https://over.nos.nl/wp-content/uploads/2025/10/NOS-Algemene-Voorwaarden-2025.pdf",
+      "NOS news for children, official feed at feeds.nos.nl (« Copyright NOS »). Same NOS terms as NOS Nieuws: " +
+        "reuse beyond personal non-commercial use needs written consent.",
+    ),
+  },
+  {
+    key: "vrt-nws",
+    name: "VRT NWS",
+    language: "nl",
+    homepageUrl: "https://www.vrt.be/vrtnws/nl/",
+    feedUrl: "https://www.vrt.be/vrtnws/nl.rss.articles.xml",
+    contentType: "article",
+    difficulty: "B2",
+    defaultMinutes: 4,
+    // Items link to the short vrtnws.be address, which redirects to vrt.be.
+    hosts: ["vrt.be", "vrtnws.be"],
+    license: checkedNow(
+      "https://www.vrt.be/nl/info/gebruiksvoorwaarden/",
+      "Flemish public broadcaster. Gebruiksvoorwaarden read: they govern viewing, listening, reading and " +
+        "(re)using VRT content, metadata included; no open licence: all rights assumed.",
+    ),
+  },
+  {
+    key: "8-sidor",
+    name: "8 Sidor",
+    language: "sv",
+    homepageUrl: "https://8sidor.se/",
+    feedUrl: "https://8sidor.se/feed/",
+    contentType: "article",
+    difficulty: "A2",
+    defaultMinutes: 3,
+    hosts: ["8sidor.se"],
+    license: checkedNow(
+      "https://8sidor.se/om-8-sidor/",
+      "News in easy Swedish, published by the Swedish Agency for Accessible Media. About page read, no reuse " +
+        "licence: all rights assumed. The feed also lists the daily audio bulletin (linked only).",
+    ),
+  },
+  {
+    key: "sr-klartext",
+    name: "Klartext (Sveriges Radio)",
+    language: "sv",
+    homepageUrl: "https://www.sverigesradio.se/nyheter/klartext",
+    feedUrl: "https://api.sr.se/api/rss/program/493",
+    contentType: "article",
+    difficulty: "B1",
+    defaultMinutes: 3,
+    hosts: ["sverigesradio.se"],
+    license: SR_LICENSE,
+  },
+  {
+    key: "rzeczpospolita",
+    name: "Rzeczpospolita",
+    language: "pl",
+    homepageUrl: "https://www.rp.pl/",
+    feedUrl: "https://www.rp.pl/rss_main",
+    contentType: "article",
+    difficulty: "B2",
+    defaultMinutes: 5,
+    access: "metered",
+    hosts: ["rp.pl"],
+    license: checkedNow(
+      "https://gremimedia.pl/regulamin-serwisow.html",
+      "Gremi Media terms read: content protected, personal permitted use only; copying or redistribution " +
+        "beyond it needs consent. Feed linked as rss_main. Part of the articles for subscribers.",
+    ),
+  },
+  {
+    key: "ct24",
+    name: "ČT24",
+    language: "cs",
+    homepageUrl: "https://ct24.ceskatelevize.cz/",
+    feedUrl: "https://ct24.ceskatelevize.cz/rss/hlavni-zpravy",
+    contentType: "article",
+    difficulty: "B2",
+    defaultMinutes: 4,
+    hosts: ["ct24.ceskatelevize.cz"],
+    license: checkedNow(
+      "https://www.ceskatelevize.cz/vse-o-ct/zakony-a-pravidla/",
+      "Czech public television; official RSS (« Výběr redakce »). Zákony a pravidla page answers but gives no " +
+        "feed licence: all rights assumed.",
+    ),
+  },
+  dwEdition("ro", "rom", "DW România"),
+  {
+    key: "rfi-ro",
+    name: "RFI România",
+    language: "ro",
+    homepageUrl: "https://www.rfi.fr/ro/",
+    feedUrl: "https://www.rfi.fr/ro/rss",
+    contentType: "article",
+    difficulty: "B2",
+    defaultMinutes: 4,
+    hosts: ["rfi.fr"],
+    license: FRANCE_MEDIAS_MONDE_LICENSE,
+  },
+  dwEdition("el", "gre", "DW Ελληνικά"),
+  {
+    key: "ertnews",
+    name: "ertnews.gr",
+    language: "el",
+    homepageUrl: "https://www.ertnews.gr/",
+    feedUrl: "https://www.ertnews.gr/feed/",
+    contentType: "article",
+    difficulty: "B2",
+    defaultMinutes: 4,
+    hosts: ["ertnews.gr"],
+    license: checkedNow(
+      "https://www.ertnews.gr/oroi-xrisis/",
+      "Greek public broadcaster. Όροι χρήσης read: material protected by copyright; copies only in the same " +
+        "form with the notices, on request for schools. We link and show the feed teaser.",
+    ),
+  },
+  {
+    key: "kyunghyang",
+    name: "경향신문",
+    language: "ko",
+    homepageUrl: "https://www.khan.co.kr/",
+    feedUrl: "https://www.khan.co.kr/rss/rssdata/total_news.xml",
+    contentType: "article",
+    difficulty: "B2",
+    defaultMinutes: 5,
+    hosts: ["khan.co.kr"],
+    license: checkedNow(
+      "https://www.khan.co.kr/help/help_digital.html",
+      "디지털 뉴스 이용규칙 (Korean Digital News Association rules) read: no copying or retransmission without " +
+        "consent; deep links with the headline are allowed for non-commercial use, commercial use needs " +
+        "permission. Feed notice « All right reserved », no AI clause (unlike Yonhap and the Hankyoreh).",
+    ),
+  },
+  dwEdition("tr", "tur", "DW Türkçe"),
+  dwEdition("zh", "chi", "DW 中文"),
+  {
+    key: "rfi-zh",
+    name: "RFI 华语",
+    language: "zh",
+    homepageUrl: "https://www.rfi.fr/cn/",
+    feedUrl: "https://www.rfi.fr/cn/rss",
+    contentType: "article",
+    difficulty: "B2",
+    defaultMinutes: 4,
+    hosts: ["rfi.fr"],
+    license: FRANCE_MEDIAS_MONDE_LICENSE,
+  },
+  bbc("id", "indonesia", "BBC News Indonesia"),
+  dwEdition("id", "ind", "DW Indonesia"),
+  dwEdition("uk", "ukr", "DW Українською"),
+  {
+    key: "radio-svoboda",
+    name: "Радіо Свобода",
+    language: "uk",
+    homepageUrl: "https://www.radiosvoboda.org/",
+    feedUrl: "https://www.radiosvoboda.org/api/zrqiteuuir",
+    contentType: "article",
+    difficulty: "B2",
+    defaultMinutes: 3,
+    hosts: ["radiosvoboda.org"],
+    license: RFE_RL_LICENSE,
+  },
+
+  // Phase F (suite): podcasts played in the app, learners' shows first, then public radio
+  // German
+  podcast({
+    key: "dw-top-thema",
+    name: "DW — Top-Thema mit Vokabeln",
+    language: "de",
+    homepageUrl: "https://learngerman.dw.com/de/top-thema/s-55861562",
+    feedUrl: "https://rss.dw.com/xml/DKpodcast_topthemamitvokabeln_de",
+    difficulty: "B1",
+    defaultMinutes: 3,
+    learners: true,
+    hosts: ["dw.com"],
+    audioHosts: ["radiodownloaddw-a.akamaihd.net"],
+    license: DW_SOURCES_LICENSE,
+  }),
+  podcast({
+    key: "nachrichtenleicht",
+    name: "nachrichtenleicht — Nachrichten in Einfacher Sprache",
+    language: "de",
+    homepageUrl: "https://www.nachrichtenleicht.de/",
+    feedUrl: "https://www.deutschlandfunk.de/podcast-nachrichtenleicht-der-wochenrueckblick-in-einfacher-sprache-100.xml",
+    difficulty: "A2",
+    defaultMinutes: 5,
+    hosts: ["nachrichtenleicht.de", "deutschlandfunk.de"],
+    audioHosts: ["podcast-mp3.dradio.de"],
+    license: DEUTSCHLANDRADIO_LICENSE,
+  }),
+  podcast({
+    key: "deutschlandfunk-nachrichten",
+    name: "Deutschlandfunk — Die Nachrichten",
+    language: "de",
+    homepageUrl: "https://www.deutschlandfunk.de/nachrichten-100.html",
+    feedUrl: "https://www.deutschlandfunk.de/nachrichten-108.xml",
+    difficulty: "B2",
+    defaultMinutes: 5,
+    hosts: ["deutschlandfunk.de"],
+    audioHosts: ["podcast-mp3.dradio.de"],
+    license: DEUTSCHLANDRADIO_LICENSE,
+  }),
+  // English
+  podcast({
+    key: "leonardo-english",
+    name: "English Learning for Curious Minds",
+    language: "en",
+    homepageUrl: "https://www.leonardoenglish.com/",
+    feedUrl: "https://feeds.transistor.fm/leonardo-english-english-language-learning-for-curious-minds",
+    difficulty: "B2",
+    defaultMinutes: 25,
+    learners: true,
+    // One crossover episode links to its partner show's site.
+    hosts: ["leonardoenglish.com", "share.transistor.fm", "easystoriesinenglish.com"],
+    audioHosts: ["p.podderapp.com"],
+    license: checkedNow(
+      "https://www.leonardoenglish.com/terms-conditions",
+      "Leonardo English AB terms (2024-10-30) read: content for personal use only, no redistribution or " +
+        "commercial use without consent. " + PODCAST_PLAYBACK,
+    ),
+  }),
+  podcast({
+    key: "npr-up-first",
+    name: "Up First (NPR)",
+    language: "en",
+    homepageUrl: "https://www.npr.org/podcasts/510318/up-first",
+    feedUrl: "https://feeds.npr.org/510318/podcast.xml",
+    difficulty: "B2",
+    defaultMinutes: 13,
+    hosts: ["npr.org"],
+    audioHosts: ["prfx.byspotify.com"],
+    license: NPR_LICENSE,
+  }),
+  // Spanish
+  podcast({
+    key: "hoy-hablamos-basico",
+    name: "Hoy Hablamos Básico",
+    language: "es",
+    homepageUrl: "https://www.hoyhablamos.com/category/podcast-basico/",
+    feedUrl: "https://www.hoyhablamos.com/feed/podcast-basico/",
+    difficulty: "A2",
+    defaultMinutes: 10,
+    learners: true,
+    hosts: ["hoyhablamos.com"],
+    audioHosts: ["media.blubrry.com"],
+    license: checkedNow(
+      "https://www.hoyhablamos.com/aviso-legal-imprint/",
+      "Hoy Hablamos (Spain) aviso legal read: publisher identification, no reuse licence: all rights " +
+        "assumed. " + PODCAST_PLAYBACK,
+    ),
+  }),
+  podcast({
+    key: "hoy-hablamos",
+    name: "Hoy Hablamos",
+    language: "es",
+    homepageUrl: "https://www.hoyhablamos.com/",
+    feedUrl: "https://www.hoyhablamos.com/category/podcast/feed/",
+    difficulty: "B1",
+    defaultMinutes: 12,
+    learners: true,
+    hosts: ["hoyhablamos.com"],
+    audioHosts: ["media.blubrry.com"],
+    license: checkedNow(
+      "https://www.hoyhablamos.com/aviso-legal-imprint/",
+      "Hoy Hablamos (Spain) aviso legal read: publisher identification, no reuse licence: all rights " +
+        "assumed. " + PODCAST_PLAYBACK,
+    ),
+  }),
+  podcast({
+    key: "rne-24-horas",
+    name: "24 horas (Radio Nacional)",
+    language: "es",
+    homepageUrl: "https://www.rtve.es/play/audios/24-horas/",
+    feedUrl: "https://api.rtve.es/api/adapter/programas/1871/audios.rss",
+    difficulty: "C1",
+    defaultMinutes: 20,
+    hosts: ["rtve.es"],
+    audioHosts: ["ztnr.rtve.es"],
+    license: checkedNow(
+      "https://www.rtve.es/comunes/aviso_legal.html",
+      "Spanish public broadcaster. Aviso legal read: RTVE reserves reproduction, distribution and public " +
+        "communication rights. " + PODCAST_PLAYBACK,
+    ),
+  }),
+  // Italian
+  podcast({
+    key: "quattro-stagioni",
+    name: "Podcast Quattro Stagioni (italiano facile)",
+    language: "it",
+    homepageUrl: "https://www.podcastquattrostagioni.ch/",
+    feedUrl: "https://anchor.fm/s/fd29e34/podcast/rss",
+    difficulty: "A2",
+    defaultMinutes: 5,
+    learners: true,
+    hosts: ["podcastquattrostagioni.ch", "podcasters.spotify.com", "creators.spotify.com"],
+    audioHosts: ["anchor.fm"],
+    license: checkedNow(
+      "https://www.podcastquattrostagioni.ch/menzioni-legali",
+      "Avviso legale read: published by Alessandra Pasqui (Zug), « ©2019 PodArt Quattro Stagioni », no reuse " +
+        "licence: all rights assumed. " + PODCAST_PLAYBACK,
+    ),
+  }),
+  podcast({
+    key: "podcast-italiano-principiante",
+    name: "Podcast Italiano Principiante",
+    language: "it",
+    homepageUrl: "https://www.podcastitaliano.com/podcast/principiante",
+    feedUrl: "https://rss.buzzsprout.com/2632944.rss",
+    difficulty: "A2",
+    defaultMinutes: 18,
+    learners: true,
+    hosts: ["podcastitaliano.com"],
+    audioHosts: ["buzzsprout.com"],
+    license: checkedNow(
+      "https://www.podcastitaliano.com/privacy-policy",
+      "Podcast Italiano (Davide Gemello); the site only publishes a privacy policy, no terms or reuse " +
+        "licence: all rights assumed. Episodes have no page of their own in the feed. " + PODCAST_PLAYBACK,
+    ),
+  }),
+  podcast({
+    key: "italiano-automatico",
+    name: "Italiano Automatico",
+    language: "it",
+    homepageUrl: "https://www.italianoautomatico.com/",
+    feedUrl: "https://italianoautomatico.podomatic.com/rss2.xml",
+    difficulty: "B1",
+    defaultMinutes: 12,
+    learners: true,
+    hosts: ["italianoautomatico.com", "podomatic.com"],
+    audioHosts: ["italianoautomatico.podomatic.com"],
+    license: checkedNow(
+      "https://www.italianoautomatico.com/privacy-policy",
+      "Italiano Automatico (Alberto Arrighini), feed « Copyright 2026 Alberto Arrighini »; the site only " +
+        "publishes a privacy policy: all rights assumed. " + PODCAST_PLAYBACK,
+    ),
+  }),
+  podcast({
+    key: "podcast-italiano",
+    name: "Podcast Italiano (intermedio e avanzato)",
+    language: "it",
+    homepageUrl: "https://www.podcastitaliano.com/",
+    feedUrl: "https://rss.buzzsprout.com/2413795.rss",
+    difficulty: "B2",
+    defaultMinutes: 28,
+    learners: true,
+    levelRules: [
+      { pattern: /Avanzato/i, difficulty: "C1" },
+      { pattern: /Intermedio/i, difficulty: "B1" },
+    ],
+    hosts: ["podcastitaliano.com"],
+    audioHosts: ["buzzsprout.com"],
+    license: checkedNow(
+      "https://www.podcastitaliano.com/privacy-policy",
+      "Podcast Italiano (Davide Gemello); the site only publishes a privacy policy, no terms or reuse " +
+        "licence: all rights assumed. Episodes have no page of their own in the feed. " + PODCAST_PLAYBACK,
+    ),
+  }),
+  podcast({
+    key: "internazionale-il-mondo",
+    name: "Il Mondo (Internazionale)",
+    language: "it",
+    homepageUrl: "https://www.spreaker.com/podcast/il-mondo--5773405",
+    feedUrl: "https://www.spreaker.com/show/5773405/episodes/feed",
+    difficulty: "C1",
+    defaultMinutes: 25,
+    hosts: ["spreaker.com", "internazionale.it"],
+    audioHosts: ["api.spreaker.com"],
+    license: checkedNow(
+      "https://www.internazionale.it/notelegali",
+      "Internazionale's daily podcast (feed « Copyright Internazionale », hosted on Spreaker). Note legali: " +
+        "all rights reserved. " + PODCAST_PLAYBACK,
+    ),
+  }),
+  // Portuguese
+  podcast({
+    key: "portugues-pra-fora",
+    name: "Português Pra Fora",
+    language: "pt",
+    homepageUrl: "https://shows.acast.com/portuguespraforapodcast",
+    feedUrl: "https://feeds.acast.com/public/shows/606541192de7686415bbf925",
+    difficulty: "B1",
+    defaultMinutes: 30,
+    learners: true,
+    hosts: ["shows.acast.com"],
+    audioHosts: ["sphinx.acast.com"],
+    license: independentPodcastLicense("https://shows.acast.com/portuguespraforapodcast", "Olavo & Letícia"),
+  }),
+  podcast({
+    key: "rtp-noticiario",
+    name: "Noticiário (Antena 1, RTP)",
+    language: "pt",
+    homepageUrl: "https://www.rtp.pt/play/p7496/noticiario-nacional",
+    feedUrl:
+      "https://www.omnycontent.com/d/playlist/f175b1e3-ecc7-4dc5-8307-b3aa008ffd8a/d1fe3b63-b8c1-4962-abdc-b40300f6c3e4/5dceb6f0-be7b-409b-b512-b40300f6c3ec/podcast.rss",
+    difficulty: "B2",
+    defaultMinutes: 12,
+    hosts: ["rtp.pt", "omny.fm"],
+    audioHosts: ["traffic.omny.fm"],
+    license: checkedNow(
+      "https://media.rtp.pt/rgpd/termos-e-condicoes/",
+      "Portuguese public broadcaster; feed listed by RTP (hosted on Omny, « 2026 Antena1 - RTP »). Termos e " +
+        "condições § 4 read: content protected, any reproduction or distribution needs RTP's consent. " +
+        PODCAST_PLAYBACK,
+    ),
+  }),
+  // Dutch
+  podcast({
+    key: "easy-dutch-podcast",
+    name: "Easy Dutch Podcast",
+    language: "nl",
+    homepageUrl: "https://www.easydutch.fm/",
+    feedUrl: "https://feeds.fireside.fm/easydutch/rss",
+    difficulty: "B1",
+    defaultMinutes: 22,
+    learners: true,
+    hosts: ["easydutch.fm"],
+    audioHosts: ["aphid.fireside.fm"],
+    license: EASY_LANGUAGES_LICENSE,
+  }),
+  podcast({
+    key: "vrt-nws-kwartier",
+    name: "VRT NWS Kwartier",
+    language: "nl",
+    homepageUrl: "https://www.vrt.be/vrtnws/",
+    feedUrl: "https://podcasts.vrt.be/v1/program-55f7d28c-af40-43ca-884d-980d5e96212e",
+    difficulty: "B2",
+    defaultMinutes: 15,
+    hosts: ["vrt.be"],
+    audioHosts: ["vrt.simplecastaudio.com"],
+    license: checkedNow(
+      "https://www.vrt.be/nl/info/gebruiksvoorwaarden/",
+      "Flemish public broadcaster's daily news podcast (feed at podcasts.vrt.be, no episode pages). " +
+        "Gebruiksvoorwaarden read: they cover podcasts; no open licence. " + PODCAST_PLAYBACK,
+    ),
+  }),
+  podcast({
+    key: "nos-met-het-oog-op-morgen",
+    name: "NOS Met het Oog op Morgen",
+    language: "nl",
+    homepageUrl: "https://www.nporadio1.nl/programmas/nos-met-het-oog-op-morgen",
+    feedUrl: "https://podcast.npo.nl/feed/met-het-oog-op-morgen.xml",
+    difficulty: "C1",
+    defaultMinutes: 50,
+    hosts: ["nporadio1.nl", "npo.nl"],
+    audioHosts: ["podcast.npo.nl"],
+    license: NOS_PODCAST_LICENSE,
+  }),
+  // Swedish
+  podcast({
+    key: "radio-sweden-latt-svenska",
+    name: "Radio Sweden på lätt svenska",
+    language: "sv",
+    homepageUrl: "https://www.sverigesradio.se/radio-sweden-pa-latt-svenska",
+    feedUrl: "https://public-api.sr.se/rss/radio-sweden-pa-latt-svenska",
+    difficulty: "A2",
+    defaultMinutes: 9,
+    hosts: ["sverigesradio.se"],
+    audioHosts: ["static-cdn.sr.se"],
+    license: SR_LICENSE,
+  }),
+  podcast({
+    key: "ekot-nyhetssandning",
+    name: "Ekot nyhetssändning",
+    language: "sv",
+    homepageUrl: "https://www.sverigesradio.se/ekot-nyhetssandning",
+    feedUrl: "https://public-api.sr.se/rss/ekot-nyhetssandning",
+    difficulty: "B2",
+    defaultMinutes: 15,
+    hosts: ["sverigesradio.se"],
+    audioHosts: ["static-cdn.sr.se"],
+    license: SR_LICENSE,
+  }),
+  // Polish
+  podcast({
+    key: "real-polish",
+    name: "Real Polish",
+    language: "pl",
+    homepageUrl: "https://realpolish.pl/",
+    feedUrl: "https://anchor.fm/s/f6829c30/podcast/rss",
+    difficulty: "B2",
+    defaultMinutes: 55,
+    learners: true,
+    hosts: ["realpolish.pl", "podcasters.spotify.com", "creators.spotify.com"],
+    audioHosts: ["anchor.fm"],
+    license: checkedNow(
+      "https://realpolish.pl/regulamin/",
+      "RealPolish.pl regulamin read: recordings, texts and transcripts are the author's property, " +
+        "protected by copyright. " + PODCAST_PLAYBACK,
+    ),
+  }),
+  podcast({
+    key: "polskie-radio-reportaze",
+    name: "Reportaże i dokumenty Polskiego Radia",
+    language: "pl",
+    homepageUrl: "https://www.polskieradio.pl/podcasty/reportaze-i-dokumenty-polskiego-radia",
+    feedUrl: "https://www.polskieradio.pl/rss/5a6719f0-56ac-4915-9b5a-aa8e3d7752af",
+    difficulty: "C1",
+    defaultMinutes: 25,
+    hosts: ["polskieradio.pl"],
+    audioHosts: ["polskieradio.pl"],
+    license: checkedNow(
+      "https://www.polskieradio.pl/podcasty/reportaze-i-dokumenty-polskiego-radia",
+      "Polish public radio, official podcast feed (« Copyright Polskie Radio S.A. w likwidacji »). No terms " +
+        "page found on polskieradio.pl: all rights assumed. Episodes link to their audio file. " + PODCAST_PLAYBACK,
+    ),
+  }),
+  // Czech
+  podcast({
+    key: "cestina-s-michalem",
+    name: "Čeština s Michalem",
+    language: "cs",
+    homepageUrl: "https://cesky.buzzsprout.com/",
+    feedUrl: "https://rss.buzzsprout.com/1016932.rss",
+    difficulty: "B1",
+    defaultMinutes: 14,
+    learners: true,
+    hosts: ["cesky.buzzsprout.com"],
+    audioHosts: ["buzzsprout.com"],
+    license: independentPodcastLicense("https://cesky.buzzsprout.com/", "Michal (« © 2026 Čeština s Michalem »)"),
+  }),
+  podcast({
+    key: "cesky-rozhlas-politika",
+    name: "Český rozhlas — Politika a zpravodajství",
+    language: "cs",
+    homepageUrl: "https://portal.rozhlas.cz/",
+    feedUrl: "https://api.mujrozhlas.cz/rss/topic/e95e8fce-5237-4c41-8118-6853af4703db.rss",
+    difficulty: "C1",
+    defaultMinutes: 15,
+    hosts: ["rozhlas.cz", "mujrozhlas.cz"],
+    audioHosts: ["dts.podtrac.com", "media.blubrry.com"],
+    license: checkedNow(
+      "https://www.rozhlas.cz/podminky-uziti",
+      "Czech Radio terms (same as iROZHLAS): materials copyrighted, sharing without consent prohibited. " +
+        "Topic feed of mujrozhlas.cz (interviews, commentaries). " + PODCAST_PLAYBACK,
+    ),
+  }),
+  // Romanian
+  podcast({
+    key: "romanian-weekly",
+    name: "Romanian Weekly Podcast",
+    language: "ro",
+    homepageUrl: "https://romanianweekly.podbean.com/",
+    feedUrl: "https://feed.podbean.com/romanianweekly/feed.xml",
+    difficulty: "A2",
+    defaultMinutes: 5,
+    learners: true,
+    levelRules: [
+      { pattern: /nivel\s*B2/i, difficulty: "B2" },
+      { pattern: /nivel\s*B1/i, difficulty: "B1" },
+      { pattern: /nivel\s*A2/i, difficulty: "A2" },
+    ],
+    hosts: ["romanianweekly.podbean.com"],
+    audioHosts: ["mcdn.podbean.com"],
+    license: independentPodcastLicense("https://romanianweekly.podbean.com/", "Romanian Weekly"),
+  }),
+  podcast({
+    key: "rfi-ro-eurocronica",
+    name: "Eurocronica (RFI România)",
+    language: "ro",
+    homepageUrl: "https://www.rfi.fr/ro/podcasturi/eurocronica/",
+    feedUrl:
+      "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WBMZ1350-RFI-RO-20240122",
+    difficulty: "B2",
+    defaultMinutes: 4,
+    hosts: ["rfi.fr"],
+    audioHosts: ["audio.audiomeans.fr"],
+    license: FRANCE_MEDIAS_MONDE_LICENSE,
+  }),
+  // Greek
+  podcast({
+    key: "super-easy-greek",
+    name: "Super Easy Greek",
+    language: "el",
+    homepageUrl: "https://beginners.easygreek.fm/",
+    feedUrl: "https://feeds.fireside.fm/supereasygreek/rss",
+    difficulty: "A2",
+    defaultMinutes: 6,
+    learners: true,
+    hosts: ["easygreek.fm"],
+    audioHosts: ["aphid.fireside.fm"],
+    license: EASY_LANGUAGES_LICENSE,
+  }),
+  podcast({
+    key: "radio-k",
+    name: "Ράδιο «Κ» (Καθημερινή)",
+    language: "el",
+    homepageUrl: "https://shows.acast.com/radio-k",
+    feedUrl: "https://feeds.acast.com/public/shows/6017fdf9312dd56dd20b09ca",
+    difficulty: "C1",
+    defaultMinutes: 30,
+    hosts: ["shows.acast.com"],
+    audioHosts: ["sphinx.acast.com"],
+    license: checkedNow(
+      "https://www.kathimerini.gr/termsofuse/",
+      "Kathimerini's weekly podcast (feed « Kathimerini », hosted on Acast). Όροι χρήσης read: all content " +
+        "protected, no copying or redistribution beyond one personal copy. " + PODCAST_PLAYBACK,
+    ),
+  }),
+  // Korean
+  podcast({
+    key: "han-korean",
+    name: "Han Korean 하루 한스텝 쉬운 한국어",
+    language: "ko",
+    homepageUrl: "https://creators.spotify.com/pod/profile/han-kim6/",
+    feedUrl: "https://anchor.fm/s/1105b15c4/podcast/rss",
+    difficulty: "A2",
+    defaultMinutes: 6,
+    learners: true,
+    hosts: ["podcasters.spotify.com", "creators.spotify.com"],
+    audioHosts: ["anchor.fm"],
+    license: independentPodcastLicense("https://creators.spotify.com/pod/profile/han-kim6/", "Han Kim"),
+  }),
+  podcast({
+    key: "kbs-oneul-segyeneun",
+    name: "KBS 1라디오 오늘 세계는",
+    language: "ko",
+    homepageUrl: "https://radio.kbs.co.kr/",
+    feedUrl: "https://api.kbs.co.kr/mediafactory/v1/podcast/rss/todayworld",
+    difficulty: "C1",
+    defaultMinutes: 45,
+    hosts: ["kbs.co.kr"],
+    audioHosts: ["static.api.kbs.co.kr"],
+    license: checkedNow(
+      "https://radio.kbs.co.kr/",
+      "Korean public broadcaster's podcast feed (« (c)KBS », no AI clause in the feed, unlike Yonhap). No " +
+        "terms page reachable on kbs.co.kr during the check: all rights assumed, to re-read. Episodes have no " +
+        "page of their own. " + PODCAST_PLAYBACK,
+    ),
+  }),
+  // Turkish
+  podcast({
+    key: "easy-turkish-podcast",
+    name: "Easy Turkish Podcast",
+    language: "tr",
+    homepageUrl: "https://www.easyturkish.fm/",
+    feedUrl: "https://feeds.fireside.fm/easyturkish/rss",
+    difficulty: "B1",
+    defaultMinutes: 18,
+    learners: true,
+    hosts: ["easyturkish.fm"],
+    audioHosts: ["aphid.fireside.fm"],
+    license: EASY_LANGUAGES_LICENSE,
+  }),
+  // Arabic
+  podcast({
+    key: "mcd-press-review",
+    name: "قراءة في الصحف العربية (مونت كارلو الدولية)",
+    language: "ar",
+    homepageUrl: "https://www.mc-doualiya.com/%D8%A8%D8%B1%D8%A7%D9%85%D8%AC-%D8%A5%D8%AE%D8%A8%D8%A7%D8%B1%D9%8A%D8%A9/%D9%82%D8%B1%D8%A7%D8%A1%D8%A9-%D9%81%D9%8A-%D8%A7%D9%84%D8%B5%D8%AD%D9%81-%D8%A7%D9%84%D8%B9%D8%B1%D8%A8%D9%8A%D8%A9/",
+    feedUrl:
+      "https://apis.mc-doualiya.com/products/get_product/mcd_getpodcast_by_nid?token_application=2ecc8b76-7e21-11e9-9f79-005056bf586f&program.entrepriseId=WBMZ63584-MCD-AR-20200930",
+    difficulty: "B2",
+    defaultMinutes: 5,
+    hosts: ["mc-doualiya.com"],
+    audioHosts: ["audio.audiomeans.fr"],
+    license: FRANCE_MEDIAS_MONDE_LICENSE,
+  }),
+  // Chinese
+  podcast({
+    key: "rfi-zh-yaowen-jieshuo",
+    name: "要闻解说 (RFI 华语)",
+    language: "zh",
+    homepageUrl: "https://www.rfi.fr/cn/%E4%B8%93%E6%A0%8F%E6%A3%80%E7%B4%A2/%E8%A6%81%E9%97%BB%E8%A7%A3%E8%AF%B4/",
+    feedUrl:
+      "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WB15400-RFI-CN-20100304",
+    difficulty: "B2",
+    defaultMinutes: 6,
+    hosts: ["rfi.fr"],
+    audioHosts: ["audio.audiomeans.fr"],
+    license: FRANCE_MEDIAS_MONDE_LICENSE,
+  }),
+  podcast({
+    key: "storyfm",
+    name: "故事FM",
+    language: "zh",
+    homepageUrl: "https://storyfm.cn/",
+    feedUrl: "https://feeds.storyfm.cn/storyfm.xml",
+    difficulty: "C1",
+    defaultMinutes: 45,
+    hosts: ["storyfm.cn"],
+    audioHosts: ["tk.wavpub.com"],
+    license: checkedNow(
+      "https://storyfm.cn/about/",
+      "About page read: all programmes are the copyright of 北京声音故事文化传媒有限公司. Episodes have no " +
+        "page of their own in the feed. " + PODCAST_PLAYBACK,
+    ),
+  }),
+  // Japanese
+  podcast({
+    key: "yuyu-nihongo",
+    name: "YUYUの日本語Podcast",
+    language: "ja",
+    homepageUrl: "https://creators.spotify.com/pod/profile/yuyunihongo/",
+    feedUrl: "https://anchor.fm/s/cda85d4/podcast/rss",
+    difficulty: "B1",
+    defaultMinutes: 45,
+    learners: true,
+    hosts: ["podcasters.spotify.com", "creators.spotify.com"],
+    audioHosts: ["anchor.fm"],
+    license: independentPodcastLicense("https://creators.spotify.com/pod/profile/yuyunihongo/", "YUYU NIHONGO"),
+  }),
+  podcast({
+    key: "nhk-radio-news",
+    name: "NHKラジオニュース",
+    language: "ja",
+    homepageUrl: "https://www.nhk.or.jp/radionews/",
+    feedUrl: "https://www.nhk.or.jp/s-media/news/podcast/list/v1/all.xml",
+    difficulty: "B2",
+    defaultMinutes: 5,
+    hosts: ["nhk.or.jp"],
+    audioHosts: ["nhk.or.jp"],
+    license: checkedNow(
+      "https://www.nhk.or.jp/toppage/nhk_info/copyright.html",
+      "NHK « 放送番組と著作権 » read: programmes are NHK's copyright, private use only. Official radio news " +
+        "podcast (the old NHK news feed stays out: stale). Episodes have no page of their own. " + PODCAST_PLAYBACK,
+    ),
+  }),
+  // Indonesian
+  podcast({
+    key: "bahasa-indonesia-bersama-windah",
+    name: "Bahasa Indonesia Bersama Windah",
+    language: "id",
+    homepageUrl: "https://creators.spotify.com/pod/profile/podcastbahasaindonesia/",
+    feedUrl: "https://anchor.fm/s/520f510c/podcast/rss",
+    difficulty: "B1",
+    defaultMinutes: 15,
+    learners: true,
+    hosts: ["podcasters.spotify.com", "creators.spotify.com"],
+    audioHosts: ["anchor.fm"],
+    license: independentPodcastLicense(
+      "https://creators.spotify.com/pod/profile/podcastbahasaindonesia/",
+      "Windah Anastasia",
+    ),
+  }),
+  // Ukrainian
+  podcast({
+    key: "slow-ukrainian",
+    name: "Slow Ukrainian with Yevhen",
+    language: "uk",
+    homepageUrl: "https://creators.spotify.com/pod/profile/slowukrainian/",
+    feedUrl: "https://anchor.fm/s/973b404c/podcast/rss",
+    difficulty: "B1",
+    defaultMinutes: 18,
+    learners: true,
+    hosts: ["podcasters.spotify.com", "creators.spotify.com"],
+    audioHosts: ["anchor.fm"],
+    license: independentPodcastLicense("https://creators.spotify.com/pod/profile/slowukrainian/", "YevhenCo Ukraine Show"),
+  }),
+  podcast({
+    key: "radio-svoboda-podcast",
+    name: "Радіо Свобода — подкасти",
+    language: "uk",
+    homepageUrl: "https://www.radiosvoboda.org/podcasts",
+    feedUrl: "https://www.radiosvoboda.org/podcast/",
+    difficulty: "C1",
+    defaultMinutes: 45,
+    hosts: ["radiosvoboda.org"],
+    audioHosts: ["rfe-audio-ns.akamaized.net", "rfe-audio.rferl.org"],
+    license: RFE_RL_LICENSE,
+  }),
+  // Russian
+  podcast({
+    key: "russian-progress-podcast",
+    name: "Russian Progress Podcast",
+    language: "ru",
+    homepageUrl: "https://russianprogress.com/",
+    feedUrl: "https://russianprogress.com/category/%d0%bf%d0%be%d0%b4%d0%ba%d0%b0%d1%81%d1%82%d1%8b/feed/",
+    difficulty: "B1",
+    defaultMinutes: 18,
+    learners: true,
+    hosts: ["russianprogress.com"],
+    audioHosts: ["public-api.wordpress.com", "russianprogress.com"],
+    license: independentPodcastLicense("https://russianprogress.com/about/", "Artyom Nazarov (« Russian Progress »)"),
+  }),
+  podcast({
+    key: "arzamas-lectures",
+    name: "Лекции Arzamas",
+    language: "ru",
+    homepageUrl: "https://arzamas.academy/courses",
+    feedUrl: "https://arzamas.academy/feed_v1/podcast.rss",
+    difficulty: "C1",
+    defaultMinutes: 45,
+    learners: true,
+    hosts: ["arzamas.academy"],
+    audioHosts: ["arzamas.academy"],
+    license: checkedNow(
+      "https://arzamas.academy/rules",
+      "Same rules as the Arzamas magazine: protected material, no reuse grant. Lecture courses do not age " +
+        "like news, hence the learners' window. " + PODCAST_PLAYBACK,
+    ),
+  }),
 ];

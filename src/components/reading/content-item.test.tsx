@@ -103,6 +103,15 @@ describe("ContentItem", () => {
     expect(screen.getByText("Jeunesse")).toBeTruthy();
   });
 
+  it("offers « Écouter ici » for a podcast episode with an audio file only", () => {
+    const podcast = { ...ITEM, type: "podcast" as const };
+    render(<ContentItem item={podcast} now={NOW} timeZone="Europe/Paris" />);
+    expect(screen.queryByRole("button", { name: "Écouter ici" })).toBeNull();
+    cleanup();
+    render(<ContentItem item={{ ...podcast, audioUrl: "https://cdn.example.net/1.mp3" }} now={NOW} timeZone="Europe/Paris" />);
+    expect(screen.getByRole("button", { name: "Écouter ici" })).toBeTruthy();
+  });
+
   it("has no player for an article or a video that is not a YouTube watch link", () => {
     render(<ContentItem item={ITEM} now={NOW} timeZone="Europe/Paris" />);
     expect(screen.queryByRole("button", { name: "Regarder ici" })).toBeNull();
