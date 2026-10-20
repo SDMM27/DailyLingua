@@ -3,6 +3,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { addDays, toDateKey } from "@/lib/domain/dates";
 import { createSessionReplacer } from "@/lib/generation/preparer";
 import { createTemplateGenerator } from "@/lib/generation/template-generator";
+import { createSupabaseVocabularyTranslationStore } from "@/lib/generation/vocabulary-translation";
 import type { PlacementRecord } from "@/lib/schemas/placement";
 import type { Preferences } from "@/lib/schemas/preferences";
 import type { Database, Json } from "@/lib/supabase/database.types";
@@ -187,6 +188,101 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
       expect((await repo.listVocabulary())[0].status).toBe("known");
       await repo.deleteVocabulary(item.id);
       expect(await repo.listVocabulary()).toEqual([]);
+    });
+  });
+
+  describe("vocabulary lists", () => {
+    it("creates, renames, pauses and lists a list", async () => {
+      const created = await repo.createVocabularyList({ language: "it", name: "Livre", description: "Chapitre 1" });
+      expect(created).toMatchObject({ language: "it", name: "Livre", description: "Chapitre 1", active: true });
+
+      const renamed = await repo.updateVocabularyList({ id: created.id, name: "Il libro", description: "", active: false });
+      expect(renamed).toEqual({ id: created.id, language: "it", name: "Il libro", active: false });
+      expect(await repo.listVocabularyLists()).toEqual([renamed]);
+      await expect(repo.updateVocabularyList({ id: "00000000-0000-4000-8000-000000000000", active: true })).rejects.toBeInstanceOf(
+        UserFacingError,
+      );
+    });
+
+    it("refuses a name already used with a message for the user", async () => {
+      await expect(repo.createVocabularyList({ language: "ru", name: "Il libro" })).rejects.toThrow("Tu as déjà une liste de ce nom.");
+    });
+
+    it("accepts a word in a list of its language only", async () => {
+      const [list] = await repo.listVocabularyLists();
+      const word = await repo.addVocabulary({ language: "it", term: "ciao", translation: "salut", listId: list.id });
+      expect(word.listId).toBe(list.id);
+      await expect(
+        repo.addVocabulary({ language: "ru", term: "привет", translation: "salut", listId: list.id }),
+      ).rejects.toBeInstanceOf(UserFacingError);
+    });
+
+    it("imports into a new list, skipping words already there whatever their case", async () => {
+      const result = await repo.importVocabulary({
+        language: "it",
+        newListName: "Cours",
+        entries: [
+          { term: "CIAO", translation: "salut" },
+          { term: "grazie", translation: "merci", example: "Grazie mille!" },
+          { term: "Prego", translation: "de rien" },
+          { term: "prego ", translation: "de rien" },
+        ],
+      });
+      expect(result.added.map((i) => i.term)).toEqual(["grazie", "Prego"]);
+      expect(result.skipped).toEqual(["CIAO", "prego "]);
+      expect(result.list).toMatchObject({ name: "Cours", language: "it", active: true });
+      expect(result.added[0]).toMatchObject({ example: "Grazie mille!", listId: result.list!.id });
+      expect(result.added[0].review).toEqual({ box: 0, dueOn: today(), lastReviewedOn: null, reviewCount: 0 });
+
+      // Nothing new: no list is created.
+      const again = await repo.importVocabulary({
+        language: "it",
+        newListName: "Autre",
+        entries: [{ term: "grazie", translation: "merci" }],
+      });
+      expect(again).toEqual({ added: [], skipped: ["grazie"] });
+      expect((await repo.listVocabularyLists()).map((l) => l.name)).not.toContain("Autre");
+    });
+
+    it("refuses an import into a list of another language, or one that does not exist", async () => {
+      const [list] = await repo.listVocabularyLists();
+      await expect(
+        repo.importVocabulary({ language: "ru", listId: list.id, entries: [{ term: "привет", translation: "salut" }] }),
+      ).rejects.toBeInstanceOf(UserFacingError);
+      await expect(
+        repo.importVocabulary({
+          language: "it",
+          listId: "00000000-0000-4000-8000-000000000000",
+          entries: [{ term: "nuovo", translation: "nouveau" }],
+        }),
+      ).rejects.toBeInstanceOf(UserFacingError);
+    });
+
+    it("deletes a list with its words", async () => {
+      const lists = await repo.listVocabularyLists();
+      const cours = lists.find((l) => l.name === "Cours")!;
+      await repo.deleteVocabularyList(cours.id);
+      const words = await repo.listVocabulary();
+      expect(words.some((w) => w.listId === cours.id)).toBe(false);
+      expect(words.map((w) => w.term)).toEqual(["ciao"]);
+      await repo.deleteVocabularyList(lists.find((l) => l.name === "Il libro")!.id);
+      expect(await repo.listVocabulary()).toEqual([]);
+      expect(await repo.listVocabularyLists()).toEqual([]);
+    });
+
+    it("reserves translations against the daily limit with the service role", async () => {
+      const store = createSupabaseVocabularyTranslationStore(admin);
+      expect(await store.claim(userId, "2030-05-01", 150, 200)).toBe(true);
+      expect(await store.claim(userId, "2030-05-01", 51, 200)).toBe(false);
+      expect(await store.claim(userId, "2030-05-01", 50, 200)).toBe(true);
+      expect(await store.claim(userId, "2030-05-02", 50, 200)).toBe(true);
+    });
+
+    it("keeps the usage table and the claim function closed to the user", async () => {
+      expect((await userClient.from("vocabulary_translation_usage").select("*")).error).not.toBeNull();
+      expect(
+        (await userClient.rpc("claim_vocabulary_translation", { p_user_id: userId, p_day: "2030-05-03", p_terms: 1, p_limit: 200 })).error,
+      ).not.toBeNull();
     });
   });
 

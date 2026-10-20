@@ -56,7 +56,7 @@ export default function PrivacyPage() {
           </li>
           <li>Tes missions, ta progression et tes réponses aux quiz.</li>
           <li>Les textes que tu écris pour les productions écrites, leurs corrections et les cartes d’erreurs à revoir.</li>
-          <li>Ton vocabulaire et tes révisions.</li>
+          <li>Ton vocabulaire, tes listes de mots et tes révisions.</li>
           <li>Les retours que tu envoies depuis l’app.</li>
         </ul>
         <p>
@@ -91,12 +91,15 @@ export default function PrivacyPage() {
             <strong>Vercel</strong> : hébergement de l’application.
           </li>
           <li>
-            <strong>Anthropic</strong> : rédaction des exercices de la mission et correction de tes textes. Pour les
+            <strong>Anthropic</strong> : rédaction des exercices de la mission, correction de tes textes et traduction des
+            mots que tu importes. Pour les
             exercices, le modèle reçoit le titre, l’accroche, le média, le type, le niveau habituel et la durée des
             contenus proposés, ainsi que ton niveau, ton niveau visé, ton objectif libre s’il est renseigné, tes
             centres d’intérêt, le temps prévu et la date. Pour la correction, il reçoit le texte que tu as écrit, la
-            consigne, la langue, ton niveau, ton niveau visé et ton objectif. Il ne reçoit jamais ton adresse e-mail,
-            ni ton vocabulaire, ni tes réponses aux quiz. Anthropic n’utilise pas les données reçues par son API pour
+            consigne, la langue, ton niveau, ton niveau visé et ton objectif. Pour la traduction, il reçoit les mots
+            que tu demandes à traduire automatiquement (sans leur exemple ni le reste de ton vocabulaire) et leur
+            langue, et seulement si ton compte est complet. Il ne reçoit jamais ton adresse e-mail, ni le reste de
+            ton vocabulaire, ni tes réponses aux quiz. Anthropic n’utilise pas les données reçues par son API pour
             entraîner ses modèles.
           </li>
           <li>

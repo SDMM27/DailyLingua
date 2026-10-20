@@ -415,14 +415,14 @@ isOneToOne: false
                   ]
                 },"vocabulary_items": {
                   Row: {
-                    "added_on": string,"box": number,"content_id": string | null,"created_at": string,"definition": string | null,"due_on": string,"example": string | null,"id": string,"language": string,"last_reviewed_on": string | null,"review_count": number,"source_name": string | null,"source_url": string | null,"status": string,"term": string,"translation": string,"updated_at": string,"user_id": string
+                    "added_on": string,"box": number,"content_id": string | null,"created_at": string,"definition": string | null,"due_on": string,"example": string | null,"id": string,"language": string,"last_reviewed_on": string | null,"list_id": string | null,"review_count": number,"source_name": string | null,"source_url": string | null,"status": string,"term": string,"translation": string,"updated_at": string,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "added_on": string,"box"?: number,"content_id"?: string | null,"created_at"?: string,"definition"?: string | null,"due_on": string,"example"?: string | null,"id"?: string,"language": string,"last_reviewed_on"?: string | null,"review_count"?: number,"source_name"?: string | null,"source_url"?: string | null,"status"?: string,"term": string,"translation": string,"updated_at"?: string,"user_id": string
+                    "added_on": string,"box"?: number,"content_id"?: string | null,"created_at"?: string,"definition"?: string | null,"due_on": string,"example"?: string | null,"id"?: string,"language": string,"last_reviewed_on"?: string | null,"list_id"?: string | null,"review_count"?: number,"source_name"?: string | null,"source_url"?: string | null,"status"?: string,"term": string,"translation": string,"updated_at"?: string,"user_id": string
                   }
                   Update: {
-                    "added_on"?: string,"box"?: number,"content_id"?: string | null,"created_at"?: string,"definition"?: string | null,"due_on"?: string,"example"?: string | null,"id"?: string,"language"?: string,"last_reviewed_on"?: string | null,"review_count"?: number,"source_name"?: string | null,"source_url"?: string | null,"status"?: string,"term"?: string,"translation"?: string,"updated_at"?: string,"user_id"?: string
+                    "added_on"?: string,"box"?: number,"content_id"?: string | null,"created_at"?: string,"definition"?: string | null,"due_on"?: string,"example"?: string | null,"id"?: string,"language"?: string,"last_reviewed_on"?: string | null,"list_id"?: string | null,"review_count"?: number,"source_name"?: string | null,"source_url"?: string | null,"status"?: string,"term"?: string,"translation"?: string,"updated_at"?: string,"user_id"?: string
                   }
                   Relationships: [
                     {
@@ -438,7 +438,39 @@ isOneToOne: false
       referencedRelation: "languages"
       referencedColumns: ["code"]
     },{
+      foreignKeyName: "vocabulary_items_list_fkey"
+      columns: ["list_id","user_id","language"]
+isOneToOne: false
+      referencedRelation: "vocabulary_lists"
+      referencedColumns: ["id","user_id","language"]
+    },{
       foreignKeyName: "vocabulary_items_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"vocabulary_lists": {
+                  Row: {
+                    "active": boolean,"created_at": string,"description": string | null,"id": string,"language": string,"name": string,"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "active"?: boolean,"created_at"?: string,"description"?: string | null,"id"?: string,"language": string,"name": string,"updated_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "active"?: boolean,"created_at"?: string,"description"?: string | null,"id"?: string,"language"?: string,"name"?: string,"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "vocabulary_lists_language_fkey"
+      columns: ["language"]
+isOneToOne: false
+      referencedRelation: "languages"
+      referencedColumns: ["code"]
+    },{
+      foreignKeyName: "vocabulary_lists_user_id_fkey"
       columns: ["user_id"]
 isOneToOne: false
       referencedRelation: "profiles"
@@ -463,6 +495,26 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "vocabulary_items"
       referencedColumns: ["id","user_id"]
+    }
+                  ]
+                },"vocabulary_translation_usage": {
+                  Row: {
+                    "day": string,"terms": number,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "day": string,"terms": number,"user_id": string
+                  }
+                  Update: {
+                    "day"?: string,"terms"?: number,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "vocabulary_translation_usage_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
     }
                   ]
                 },"writing_feedback": {
@@ -509,6 +561,9 @@ isOneToOne: false
 { Args: { "p_budget_minutes": number,"p_max_attempts"?: number,"p_mission_date": string,"p_stale_after"?: string,"p_user_id": string }; Returns: {
               "claimed": boolean,"mission_id": string,"status": string
             }[]
+                           },
+"claim_vocabulary_translation":
+{ Args: { "p_day": string,"p_limit": number,"p_terms": number,"p_user_id": string }; Returns: boolean
                            },
 "claim_writing_feedback_attempt":
 { Args: { "p_session_id": string,"p_user_id": string }; Returns: number

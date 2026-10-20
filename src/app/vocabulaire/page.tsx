@@ -12,20 +12,23 @@ export default async function VocabularyPage() {
   const repo = await getRepository();
   const preferences = await requirePreferences();
   const today = await getToday();
-  const items = await repo.listVocabulary();
+  const [items, lists] = await Promise.all([repo.listVocabulary(), repo.listVocabularyLists()]);
   const learning = items.filter((i) => i.status === "learning").length;
 
   return (
     <>
       <PageHeader eyebrow="Vocabulaire" title="Mes mots">
         {learning} en cours d’apprentissage, {items.length - learning} connus ·{" "}
-        {dueToday(items, today).length} à revoir aujourd’hui.
+        {dueToday(items, today, lists).length} à revoir aujourd’hui.
       </PageHeader>
       <VocabularyView
         initialItems={items}
+        initialLists={lists}
         languages={preferences.goals.map((g) => g.language)}
         today={today}
         persist={!repo.isDemo}
+        canTranslate={repo.canTranslateVocabulary}
+        isGuest={repo.isGuest}
       />
     </>
   );

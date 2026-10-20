@@ -20,11 +20,12 @@ export default async function DashboardPage() {
   const repo = await getRepository();
   const preferences = await requirePreferences();
   const today = await getToday();
-  const [mission, history, studyDates, vocabulary, correctionCards, placements, guestTrial] = await Promise.all([
+  const [mission, history, studyDates, vocabulary, vocabularyLists, correctionCards, placements, guestTrial] = await Promise.all([
     repo.getMission(today),
     repo.getHistory(),
     repo.getStudyDates(),
     repo.listVocabulary(),
+    repo.listVocabularyLists(),
     repo.listCorrectionCards(),
     repo.listPlacementTests(),
     repo.getGuestTrial(),
@@ -121,8 +122,8 @@ export default async function DashboardPage() {
       <WeekCard days={recentDays(studyDates, today)} stats={stats} />
 
       <ReviewPreview
-        items={upcomingReviews(vocabulary).slice(0, 4)}
-        dueCount={dueToday(vocabulary, today).length}
+        items={upcomingReviews(vocabulary, vocabularyLists).slice(0, 4)}
+        dueCount={dueToday(vocabulary, today, vocabularyLists).length}
         today={today}
       />
 

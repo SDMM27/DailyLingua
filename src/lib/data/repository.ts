@@ -6,7 +6,13 @@ import { availableLanguages } from "@/lib/content/availability";
 import { SOURCE_CATALOG } from "@/lib/content/catalog";
 import { LANGUAGE_CODES } from "@/lib/domain/languages";
 import { readContentLicensePolicy } from "@/lib/content/policy";
-import { prepareMission, replaceSession, reserveGuestMission, writingFeedbackReviewer } from "@/lib/generation/server";
+import {
+  prepareMission,
+  replaceSession,
+  reserveGuestMission,
+  vocabularyTranslator,
+  writingFeedbackReviewer,
+} from "@/lib/generation/server";
 import { addDays, toDateKey } from "@/lib/domain/dates";
 import type { GuestTrialStatus } from "@/lib/domain/guest-trial";
 import { dateKeySchema, type DateKey, type Language } from "@/lib/schemas/common";
@@ -33,9 +39,17 @@ import { placementSummarySchema, type PlacementRecord, type PlacementSummary } f
 import { preferencesSchema, type Preferences } from "@/lib/schemas/preferences";
 import {
   vocabularyItemSchema,
+  vocabularyListSchema,
+  type ImportVocabularyInput,
+  type ImportVocabularyResult,
   type NewVocabularyInput,
+  type NewVocabularyListInput,
   type ReviewInput,
+  type TranslateVocabularyInput,
+  type UpdateVocabularyListInput,
   type VocabularyItem,
+  type VocabularyList,
+  type VocabularyTranslationResult,
 } from "@/lib/schemas/vocabulary";
 import { getSupabaseEnv } from "@/lib/supabase/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -45,7 +59,7 @@ import { buildMockHistory, buildMockStudyDates } from "./mock/history";
 import { buildMockMission } from "./mock/mission";
 import { MOCK_PREFERENCES } from "./mock/preferences";
 import { buildMockCorrectionCards, buildMockProductions } from "./mock/productions";
-import { buildMockVocabulary } from "./mock/vocabulary";
+import { buildMockVocabulary, buildMockVocabularyLists } from "./mock/vocabulary";
 import { createSupabaseRepository } from "./supabase-repository";
 import type { WritingFeedbackResult } from "@/lib/schemas/writing-feedback";
 
@@ -135,6 +149,27 @@ export interface DailyLinguaRepository {
   reviewVocabulary(input: ReviewInput): Promise<VocabularyItem>;
   setVocabularyStatus(id: string, status: VocabularyItem["status"]): Promise<void>;
   deleteVocabulary(id: string): Promise<void>;
+
+  listVocabularyLists(): Promise<VocabularyList[]>;
+  /** Refuses a name the user already uses (UserFacingError). */
+  createVocabularyList(input: NewVocabularyListInput): Promise<VocabularyList>;
+  /** Renames, describes, pauses or reactivates a list; returns it as saved. */
+  updateVocabularyList(input: UpdateVocabularyListInput): Promise<VocabularyList>;
+  /** Deletes the list and its words. */
+  deleteVocabularyList(id: string): Promise<void>;
+  /**
+   * Adds many words at once, to an existing list, to a new one (`newListName`, created only when at
+   * least one word is added) or to none. Words the user already has in that language (case and
+   * spacing ignored) are skipped, not overwritten, and returned in `skipped`.
+   */
+  importVocabulary(input: ImportVocabularyInput): Promise<ImportVocabularyResult>;
+  /** Whether imported words can be translated by the language model here. */
+  readonly canTranslateVocabulary: boolean;
+  /**
+   * Suggests French translations; nothing is saved. `guest`: guests cannot use it; `limit`: the
+   * day's quota is used up; `unavailable`: off, or the model failed.
+   */
+  suggestTranslations(input: TranslateVocabularyInput): Promise<VocabularyTranslationResult>;
 
   /** Latest placement test (completed or skipped) of each of the user's languages that has one. */
   listPlacementTests(): Promise<PlacementSummary[]>;
@@ -229,6 +264,17 @@ function createMockRepository(): DailyLinguaRepository {
     reviewVocabulary: readOnly,
     setVocabularyStatus: readOnly,
     deleteVocabulary: readOnly,
+    async listVocabularyLists() {
+      return z.array(vocabularyListSchema).parse(buildMockVocabularyLists());
+    },
+    createVocabularyList: readOnly,
+    updateVocabularyList: readOnly,
+    deleteVocabularyList: readOnly,
+    importVocabulary: readOnly,
+    canTranslateVocabulary: false,
+    async suggestTranslations() {
+      return { status: "unavailable" };
+    },
     async listPlacementTests() {
       // One completed test, to show the screen as it looks once a level was assessed.
       const language = MOCK_PREFERENCES.goals[0];
@@ -294,6 +340,7 @@ export const getRepository = cache(async (): Promise<DailyLinguaRepository> => {
     prepareMission,
     replaceSession,
     reviewWriting: writingFeedbackReviewer(),
+    translateVocabulary: vocabularyTranslator(),
   });
 });
 

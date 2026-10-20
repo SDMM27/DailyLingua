@@ -1,6 +1,6 @@
 import { addDays } from "@/lib/domain/dates";
 import type { DateKey } from "@/lib/schemas/common";
-import type { VocabularyItem } from "@/lib/schemas/vocabulary";
+import type { VocabularyItem, VocabularyList } from "@/lib/schemas/vocabulary";
 
 type Seed = Omit<VocabularyItem, "review" | "addedOn"> & {
   box: number;
@@ -137,7 +137,41 @@ const SEEDS: Seed[] = [
     addedDaysAgo: 35,
     reviewCount: 7,
   },
+  {
+    id: "v11",
+    language: "it",
+    term: "mettercela tutta",
+    translation: "y mettre tout son cœur",
+    example: "Ce l'ha messa tutta per finire in tempo.",
+    status: "learning",
+    listId: "l1",
+    box: 1,
+    dueInDays: 2,
+    addedDaysAgo: 2,
+    reviewCount: 1,
+  },
+  {
+    id: "v12",
+    language: "it",
+    term: "prendere in giro",
+    translation: "se moquer de, taquiner",
+    example: "Smettila di prendermi in giro!",
+    status: "learning",
+    listId: "l1",
+    box: 0,
+    dueInDays: 1,
+    addedDaysAgo: 2,
+    reviewCount: 0,
+  },
 ];
+
+const LISTS: VocabularyList[] = [
+  { id: "l1", language: "it", name: "Expressions du cours", description: "Les tournures vues en cours du jeudi.", active: true },
+];
+
+export function buildMockVocabularyLists(): VocabularyList[] {
+  return LISTS.map((list) => ({ ...list }));
+}
 
 export function buildMockVocabulary(today: DateKey): VocabularyItem[] {
   return SEEDS.map(({ box, dueInDays, addedDaysAgo, reviewCount, ...item }) => ({

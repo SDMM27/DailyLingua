@@ -44,10 +44,19 @@ import { placementSummarySchema, type PlacementRecord, type PlacementSummary } f
 import { preferencesSchema, type Preferences } from "@/lib/schemas/preferences";
 import {
   vocabularyItemSchema,
+  vocabularyListSchema,
+  type ImportVocabularyInput,
+  type ImportVocabularyResult,
   type NewVocabularyInput,
+  type NewVocabularyListInput,
   type ReviewInput,
+  type TranslateVocabularyInput,
+  type UpdateVocabularyListInput,
   type VocabularyItem,
+  type VocabularyList,
+  type VocabularyTranslationResult,
 } from "@/lib/schemas/vocabulary";
+import { normalizeTermKey } from "@/lib/domain/vocabulary-import";
 import type { GenerateMissionOutcome } from "@/lib/generation/generate-mission";
 import type { ReplaceSessionOutcome } from "@/lib/generation/replace-session";
 import { generationMetaSchema } from "@/lib/schemas/generation";
@@ -58,6 +67,7 @@ import {
   type WritingFeedbackResult,
   type WritingReviewState,
 } from "@/lib/schemas/writing-feedback";
+import type { TranslateVocabularyRequest } from "@/lib/generation/vocabulary-translation";
 import type {
   RequestWritingFeedbackInput,
   WritingFeedbackOutcome,
@@ -81,6 +91,7 @@ function storedFeedback(value: unknown): WritingFeedback | undefined {
   return parsed.success ? parsed.data : undefined;
 }
 type VocabularyRow = Database["public"]["Tables"]["vocabulary_items"]["Row"];
+type VocabularyListRow = Database["public"]["Tables"]["vocabulary_lists"]["Row"];
 type CorrectionCardRow = Database["public"]["Tables"]["correction_cards"]["Row"];
 type SourceRow = Database["public"]["Tables"]["sources"]["Row"];
 
@@ -122,6 +133,12 @@ function toSourceInfo(
 }
 
 const UNIQUE_VIOLATION = "23505";
+const FOREIGN_KEY_VIOLATION = "23503";
+const LIST_NAME_TAKEN = "Tu as déjà une liste de ce nom.";
+const LIST_NOT_FOUND = "Cette liste n’existe plus.";
+const LIST_OTHER_LANGUAGE = "Cette liste est dans une autre langue.";
+/** PostgREST returns at most 1000 rows per request (max_rows in supabase/config.toml). */
+const PAGE_SIZE = 1000;
 /** Raised by record_placement_test when the language is not one of the user's. */
 const NO_DATA_FOUND = "P0002";
 
@@ -142,6 +159,17 @@ function toVocabularyItem(row: VocabularyRow): VocabularyItem {
       reviewCount: row.review_count,
     },
     addedOn: row.added_on,
+    listId: row.list_id ?? undefined,
+  });
+}
+
+function toVocabularyList(row: VocabularyListRow): VocabularyList {
+  return vocabularyListSchema.parse({
+    id: row.id,
+    language: row.language,
+    name: row.name,
+    description: row.description ?? undefined,
+    active: row.active,
   });
 }
 
@@ -262,6 +290,8 @@ export function createSupabaseRepository(
     replaceSession?: (userId: string, sessionId: string) => Promise<ReplaceSessionOutcome>;
     /** Reviews a written production (service role, server only). Absent: reviews are off. */
     reviewWriting?: ((input: RequestWritingFeedbackInput) => Promise<WritingFeedbackOutcome>) | null;
+    /** Suggests French translations for imported words (service role, server only). Absent: translation is off. */
+    translateVocabulary?: ((input: TranslateVocabularyRequest) => Promise<VocabularyTranslationResult>) | null;
   } = {},
 ): DailyLinguaRepository {
   const contentPolicy = options.contentPolicy ?? readContentLicensePolicy();
@@ -757,12 +787,164 @@ export function createSupabaseRepository(
         definition: input.definition ?? null,
         example: input.example ?? null,
         source_name: input.sourceName ?? null,
+        list_id: input.listId ?? null,
         ...initialDates(today),
       })
       .select("*")
       .single();
     if (error?.code === UNIQUE_VIOLATION) throw new UserFacingError("Ce mot est déjà dans ta liste.");
+    // The composite key (list, user, language) refuses a missing list and a list of another language.
+    if (error?.code === FOREIGN_KEY_VIOLATION && input.listId) {
+      throw new UserFacingError("Cette liste n’existe plus ou est dans une autre langue.");
+    }
     return toVocabularyItem(unwrap({ data, error }, "ajout du mot"));
+  }
+
+  async function listVocabularyLists(): Promise<VocabularyList[]> {
+    const rows = unwrap(
+      await client.from("vocabulary_lists").select("*").eq("user_id", userId).order("name"),
+      "listes de vocabulaire",
+    );
+    return rows.map(toVocabularyList);
+  }
+
+  async function createVocabularyList(input: NewVocabularyListInput): Promise<VocabularyList> {
+    const { data, error } = await client
+      .from("vocabulary_lists")
+      .insert({
+        user_id: userId,
+        language: input.language,
+        name: input.name,
+        description: input.description || null,
+      })
+      .select("*")
+      .single();
+    if (error?.code === UNIQUE_VIOLATION) throw new UserFacingError(LIST_NAME_TAKEN);
+    return toVocabularyList(unwrap({ data, error }, "création de la liste"));
+  }
+
+  async function updateVocabularyList(input: UpdateVocabularyListInput): Promise<VocabularyList> {
+    const patch: Database["public"]["Tables"]["vocabulary_lists"]["Update"] = {};
+    if (input.name !== undefined) patch.name = input.name;
+    if (input.description !== undefined) patch.description = input.description || null;
+    if (input.active !== undefined) patch.active = input.active;
+
+    const table = client.from("vocabulary_lists");
+    const { data, error } =
+      Object.keys(patch).length === 0
+        ? await table.select("*").eq("id", input.id).eq("user_id", userId).maybeSingle()
+        : await table.update(patch).eq("id", input.id).eq("user_id", userId).select("*").maybeSingle();
+    if (error?.code === UNIQUE_VIOLATION) throw new UserFacingError(LIST_NAME_TAKEN);
+    if (error) throw new Error(`Supabase (liste de vocabulaire) : ${error.message}`);
+    if (!data) throw new UserFacingError(LIST_NOT_FOUND);
+    return toVocabularyList(data);
+  }
+
+  /** Deletes the list and, by cascade, its words. */
+  async function deleteVocabularyList(id: string): Promise<void> {
+    const { error } = await client.from("vocabulary_lists").delete().eq("id", id).eq("user_id", userId);
+    if (error) throw new Error(`Supabase (suppression de la liste) : ${error.message}`);
+  }
+
+  /** Every term the user has in `language`, past the 1000-row page of the API. */
+  async function existingTerms(language: Language): Promise<string[]> {
+    const terms: string[] = [];
+    for (let from = 0; ; from += PAGE_SIZE) {
+      const rows = unwrap(
+        await client
+          .from("vocabulary_items")
+          .select("term")
+          .eq("user_id", userId)
+          .eq("language", language)
+          .order("term")
+          .range(from, from + PAGE_SIZE - 1),
+        "mots existants",
+      );
+      terms.push(...rows.map((row) => row.term));
+      if (rows.length < PAGE_SIZE) return terms;
+    }
+  }
+
+  async function importVocabulary(input: ImportVocabularyInput): Promise<ImportVocabularyResult> {
+    let list: VocabularyList | undefined;
+    let createdList = false;
+    if (input.listId) {
+      const { data, error } = await client
+        .from("vocabulary_lists")
+        .select("*")
+        .eq("id", input.listId)
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (error) throw new Error(`Supabase (liste de vocabulaire) : ${error.message}`);
+      if (!data) throw new UserFacingError(LIST_NOT_FOUND);
+      if (data.language !== input.language) throw new UserFacingError(LIST_OTHER_LANGUAGE);
+      list = toVocabularyList(data);
+    }
+
+    // Words the user already has (or repeats in this very import) are skipped, not overwritten.
+    const taken = new Set((await existingTerms(input.language)).map(normalizeTermKey));
+    const skipped: string[] = [];
+    const entries = input.entries.filter((entry) => {
+      const key = normalizeTermKey(entry.term);
+      if (taken.has(key)) {
+        skipped.push(entry.term);
+        return false;
+      }
+      taken.add(key);
+      return true;
+    });
+    if (entries.length === 0) return { added: [], skipped };
+
+    if (input.newListName) {
+      list = await createVocabularyList({ language: input.language, name: input.newListName });
+      createdList = true;
+    }
+
+    const today = await getToday();
+    // Do nothing on conflict: a word added in the meantime (same exact term) is skipped, not an error.
+    const { data, error } = await client
+      .from("vocabulary_items")
+      .upsert(
+        entries.map((entry) => ({
+          user_id: userId,
+          language: input.language,
+          term: entry.term,
+          translation: entry.translation,
+          example: entry.example ?? null,
+          list_id: list?.id ?? null,
+          ...initialDates(today),
+        })),
+        { onConflict: "user_id,language,term", ignoreDuplicates: true },
+      )
+      .select("*");
+    if (error) {
+      // Do not leave behind the empty list this import just made.
+      if (createdList && list) await client.from("vocabulary_lists").delete().eq("id", list.id).eq("user_id", userId);
+      throw new Error(`Supabase (import de mots) : ${error.message}`);
+    }
+
+    const added = data.map(toVocabularyItem);
+    const addedTerms = new Set(added.map((item) => item.term));
+    skipped.push(...entries.map((entry) => entry.term).filter((term) => !addedTerms.has(term)));
+    const order = new Map(entries.map((entry, index) => [entry.term, index]));
+    added.sort((a, b) => (order.get(a.term) ?? 0) - (order.get(b.term) ?? 0));
+    return { added, skipped, list: createdList ? list : undefined };
+  }
+
+  async function suggestTranslations(input: TranslateVocabularyInput): Promise<VocabularyTranslationResult> {
+    if (!options.translateVocabulary) return { status: "unavailable" };
+    try {
+      return await options.translateVocabulary({
+        userId,
+        isGuest: Boolean(options.isGuest),
+        today: await getToday(),
+        language: input.language,
+        terms: input.terms,
+      });
+    } catch (error) {
+      console.error(error);
+      return { status: "unavailable" };
+    }
   }
 
   async function reviewVocabulary(input: ReviewInput): Promise<VocabularyItem> {
@@ -1117,6 +1299,13 @@ export function createSupabaseRepository(
     reviewVocabulary,
     setVocabularyStatus,
     deleteVocabulary,
+    listVocabularyLists,
+    createVocabularyList,
+    updateVocabularyList,
+    deleteVocabularyList,
+    importVocabulary,
+    canTranslateVocabulary: Boolean(options.translateVocabulary),
+    suggestTranslations,
     listPlacementTests,
     recordPlacementTest,
     sendFeedback,
