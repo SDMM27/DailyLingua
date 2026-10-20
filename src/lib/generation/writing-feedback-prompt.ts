@@ -12,7 +12,7 @@ import { PURPOSE_REGISTERS, escapeData } from "./prompt";
  * goes in the user message. The learner's text is wrapped in <text> tags and the task (written by
  * the mission generator from third-party feeds) in <task> tags: both are data, never instructions.
  */
-export const WRITING_FEEDBACK_PROMPT_VERSION = "2026-10-15.2";
+export const WRITING_FEEDBACK_PROMPT_VERSION = "2026-10-20.1";
 
 const L = WRITING_FEEDBACK_LIMITS;
 
@@ -41,9 +41,20 @@ corrections (at most ${L.corrections.max}): the most useful corrections first â€
 - original: a passage copied EXACTLY from the learner's text (same characters, same spelling, errors included), as short as possible while keeping the context â€” usually a few words, at most one sentence.
 - corrected: the same passage corrected, changing as little as possible, at the learner's level and in the expected register.
 - explanation_fr: short reason in French (the rule, the right case or tense, the more natural phrase).
+- category: the kind of error, one of:
+  - verb: conjugation, tense, mood, aspect.
+  - agreement: gender, number, case.
+  - function_word: articles, prepositions, particles.
+  - word_order: order of words or clauses.
+  - word_choice: vocabulary, collocations, calques from French.
+  - spelling: spelling, accents, punctuation, script.
+  - register: formality, tone, set phrases of the genre.
+  - other: anything that fits none of the above.
 Never correct what is already correct. A very good text may have no correction at all.
 
 strength_fr: one precise thing the learner did well, in French, quoting their words in the studied language when useful.
+
+native_version: the WHOLE learner's text rewritten as a native speaker would write it, in the studied language, at the learner's TARGET level and in the register expected for the purpose. Keep the learner's ideas and the structure of their text (same paragraphs, same order); do not add ideas or information. If the text is already natural, return it almost unchanged.
 
 Rules:
 - Every French sentence addresses the learner with "tu", never "vous".

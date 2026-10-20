@@ -95,6 +95,32 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"correction_cards": {
+                  Row: {
+                    "added_on": string,"box": number,"category": string | null,"corrected": string,"correction_index": number,"created_at": string,"due_on": string,"explanation": string,"id": string,"language": string,"last_reviewed_on": string | null,"original": string,"review_count": number,"session_id": string,"status": string,"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "added_on": string,"box"?: number,"category"?: string | null,"corrected": string,"correction_index": number,"created_at"?: string,"due_on": string,"explanation": string,"id"?: string,"language": string,"last_reviewed_on"?: string | null,"original": string,"review_count"?: number,"session_id": string,"status"?: string,"updated_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "added_on"?: string,"box"?: number,"category"?: string | null,"corrected"?: string,"correction_index"?: number,"created_at"?: string,"due_on"?: string,"explanation"?: string,"id"?: string,"language"?: string,"last_reviewed_on"?: string | null,"original"?: string,"review_count"?: number,"session_id"?: string,"status"?: string,"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "correction_cards_language_fkey"
+      columns: ["language"]
+isOneToOne: false
+      referencedRelation: "languages"
+      referencedColumns: ["code"]
+    },{
+      foreignKeyName: "correction_cards_session_id_user_id_fkey"
+      columns: ["session_id","user_id"]
+isOneToOne: false
+      referencedRelation: "mission_sessions"
+      referencedColumns: ["id","user_id"]
+    }
+                  ]
                 },"cron_runs": {
                   Row: {
                     "error": string | null,"finished_at": string | null,"id": string,"job": string,"started_at": string,"stats": NonNullable<Json>,"status": string
@@ -503,6 +529,9 @@ isOneToOne: false
                            },
 "normalize_url":
 { Args: { "url": string }; Returns: string
+                           },
+"record_correction_review":
+{ Args: { "p_box_after": number,"p_card_id": string,"p_due_on_after": string,"p_expected_review_count": number,"p_reviewed_on": string }; Returns: boolean
                            },
 "record_placement_test":
 { Args: { "p_answers"?: Json,"p_bank_version"?: string,"p_chosen_level"?: string,"p_confidence"?: string,"p_estimated_level"?: string,"p_language": string,"p_start_level"?: string,"p_status": string,"p_variant"?: string }; Returns: undefined

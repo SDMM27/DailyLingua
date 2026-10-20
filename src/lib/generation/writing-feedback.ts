@@ -55,7 +55,7 @@ export interface ClaudeWritingReviewerOptions {
   client?: FeedbackParseClient;
   /** Default "medium": at "low", telegraphic texts were scored too high (see `npm run feedback:eval`). */
   effort?: "low" | "medium";
-  /** Per attempt; the SDK retries once. Default 20 s: the learner is waiting on the screen. */
+  /** Per attempt; the SDK retries once. Default 30 s: the learner is waiting on the screen (the native version makes the output longer). */
   timeoutMs?: number;
 }
 
@@ -78,6 +78,7 @@ export function validateWritingFeedback(wire: WireWritingFeedback, text: string)
       original: c.original.trim(),
       corrected: c.corrected.trim(),
       explanation: c.explanation_fr.trim(),
+      category: c.category,
     }))
     .filter((c) => c.original && seen.includes(normalise(c.original)) && normalise(c.original) !== normalise(c.corrected));
 
@@ -90,6 +91,7 @@ export function validateWritingFeedback(wire: WireWritingFeedback, text: string)
     ),
     corrections,
     strength: wire.strength_fr,
+    nativeVersion: wire.native_version.trim(),
   });
   if (!parsed.success) {
     const issue = parsed.error.issues[0];
@@ -106,7 +108,7 @@ export function createClaudeWritingReviewer(options: ClaudeWritingReviewerOption
   function getClient(): FeedbackParseClient {
     client ??= new Anthropic({
       apiKey: options.apiKey,
-      timeout: options.timeoutMs ?? 20_000,
+      timeout: options.timeoutMs ?? 30_000,
       maxRetries: 1,
     }) as unknown as FeedbackParseClient;
     return client;
@@ -121,7 +123,7 @@ export function createClaudeWritingReviewer(options: ClaudeWritingReviewerOption
       try {
         response = await getClient().messages.parse({
           model,
-          max_tokens: 4000,
+          max_tokens: 8000,
           system: WRITING_FEEDBACK_SYSTEM_PROMPT,
           messages: [{ role: "user", content: buildWritingFeedbackMessage(request) }],
           output_config: { format: zodOutputFormat(wireWritingFeedbackSchema), effort: options.effort ?? "medium" },

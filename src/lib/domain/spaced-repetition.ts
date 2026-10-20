@@ -60,6 +60,19 @@ export function upcomingReviews(items: readonly VocabularyItem[]): VocabularyIte
     );
 }
 
+/** Anything scheduled like a vocabulary item (words, correction cards). */
+export interface Reviewable {
+  status: "learning" | "known";
+  review: ReviewState;
+}
+
+/** Items still being learned and due today, most overdue first (ties keep their order). */
+export function dueItems<T extends Reviewable>(items: readonly T[], today: DateKey): T[] {
+  return items
+    .filter((item) => item.status === "learning" && isDue(item.review, today))
+    .sort((a, b) => a.review.dueOn.localeCompare(b.review.dueOn));
+}
+
 export function dueToday(items: readonly VocabularyItem[], today: DateKey): VocabularyItem[] {
   return upcomingReviews(items).filter((item) => isDue(item.review, today));
 }

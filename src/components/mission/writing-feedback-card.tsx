@@ -1,5 +1,7 @@
+import type { ReactNode } from "react";
 import type { Language } from "@/lib/schemas/common";
 import {
+  CORRECTION_CATEGORY_LABELS,
   WRITING_CRITERIA,
   WRITING_CRITERION_LABELS,
   WRITING_FEEDBACK_LIMITS,
@@ -18,8 +20,20 @@ function ScoreDots({ score }: { score: number }) {
   );
 }
 
-/** Review of a written production: scores on four criteria, corrections and one strength. */
-export function WritingFeedbackCard({ language, feedback }: { language: Language; feedback: WritingFeedback }) {
+/**
+ * Review of a written production: scores on four criteria, corrections (with their category),
+ * one strength and the text as a native would write it. `correctionAction` adds something under
+ * each correction (e.g. the "keep for review" button), given its index.
+ */
+export function WritingFeedbackCard({
+  language,
+  feedback,
+  correctionAction,
+}: {
+  language: Language;
+  feedback: WritingFeedback;
+  correctionAction?: (index: number) => ReactNode;
+}) {
   return (
     <div className="space-y-5">
       <ul className="space-y-3">
@@ -58,6 +72,11 @@ export function WritingFeedbackCard({ language, feedback }: { language: Language
           <ul className="mt-2 space-y-3">
             {feedback.corrections.map((correction, i) => (
               <li key={i} className="rounded-2xl border border-line px-4 py-3">
+                {correction.category && (
+                  <span className="mb-1.5 inline-block rounded-full bg-surface-sunk px-2 py-0.5 text-[11px] font-medium text-ink-soft">
+                    {CORRECTION_CATEGORY_LABELS[correction.category]}
+                  </span>
+                )}
                 <p lang={language} className="font-serif leading-relaxed">
                   <span className="rounded bg-danger-soft px-1 text-danger line-through">{correction.original}</span>
                   <span aria-hidden="true" className="mx-1.5 text-muted">
@@ -67,9 +86,19 @@ export function WritingFeedbackCard({ language, feedback }: { language: Language
                   <span className="font-semibold">{correction.corrected}</span>
                 </p>
                 <p className="mt-1.5 text-[13px] leading-relaxed text-ink-soft">{correction.explanation}</p>
+                {correctionAction?.(i)}
               </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {feedback.nativeVersion && (
+        <div>
+          <p className="text-xs font-semibold tracking-wide text-muted uppercase">Ce qu’un natif écrirait</p>
+          <p lang={language} className="mt-2 font-serif leading-relaxed whitespace-pre-wrap">
+            {feedback.nativeVersion}
+          </p>
         </div>
       )}
 

@@ -27,6 +27,8 @@ import {
   type MissionProgress,
 } from "@/lib/schemas/mission";
 import type { FeedbackInput } from "@/lib/schemas/feedback";
+import { correctionCardSchema, type CorrectionCard, type ReviewCorrectionInput } from "@/lib/schemas/correction-card";
+import { productionEntrySchema, type ProductionEntry } from "@/lib/schemas/production";
 import { placementSummarySchema, type PlacementRecord, type PlacementSummary } from "@/lib/schemas/placement";
 import { preferencesSchema, type Preferences } from "@/lib/schemas/preferences";
 import {
@@ -42,6 +44,7 @@ import { buildMockContents, buildMockSources } from "./mock/contents";
 import { buildMockHistory, buildMockStudyDates } from "./mock/history";
 import { buildMockMission } from "./mock/mission";
 import { MOCK_PREFERENCES } from "./mock/preferences";
+import { buildMockCorrectionCards, buildMockProductions } from "./mock/productions";
 import { buildMockVocabulary } from "./mock/vocabulary";
 import { createSupabaseRepository } from "./supabase-repository";
 import type { WritingFeedbackResult } from "@/lib/schemas/writing-feedback";
@@ -110,6 +113,21 @@ export interface DailyLinguaRepository {
 
   getHistory(): Promise<MissionHistoryEntry[]>;
   getStudyDates(): Promise<DateKey[]>;
+  /**
+   * Written productions of past missions (today included), newest first, at most 300: those with
+   * a saved text or a review. `body` is the reviewed text when there is a review, the draft otherwise.
+   */
+  listProductions(): Promise<ProductionEntry[]>;
+
+  listCorrectionCards(): Promise<CorrectionCard[]>;
+  /**
+   * Keeps one correction of a session's review as a review card. Idempotent; refused when the
+   * correction does not exist.
+   */
+  addCorrectionCard(sessionId: string, correctionIndex: number): Promise<void>;
+  /** Grades a review; returns the card with its new review state. */
+  reviewCorrectionCard(input: ReviewCorrectionInput): Promise<CorrectionCard>;
+  deleteCorrectionCard(id: string): Promise<void>;
 
   listVocabulary(): Promise<VocabularyItem[]>;
   addVocabulary(input: NewVocabularyInput): Promise<VocabularyItem>;
@@ -195,6 +213,15 @@ function createMockRepository(): DailyLinguaRepository {
     async getStudyDates() {
       return z.array(dateKeySchema).parse(buildMockStudyDates(today()));
     },
+    async listProductions() {
+      return z.array(productionEntrySchema).parse(buildMockProductions(today()));
+    },
+    async listCorrectionCards() {
+      return z.array(correctionCardSchema).parse(buildMockCorrectionCards(today()));
+    },
+    addCorrectionCard: readOnly,
+    reviewCorrectionCard: readOnly,
+    deleteCorrectionCard: readOnly,
     async listVocabulary() {
       return z.array(vocabularyItemSchema).parse(buildMockVocabulary(today()));
     },

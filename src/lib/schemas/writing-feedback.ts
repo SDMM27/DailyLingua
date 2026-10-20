@@ -20,6 +20,8 @@ export const WRITING_FEEDBACK_LIMITS = {
   comment: 300,
   /** Characters of an original or corrected passage. */
   passage: 400,
+  /** Characters of the native version (the whole text rewritten; the text itself is capped at `maxChars`). */
+  nativeVersion: 3500,
 } as const;
 
 const L = WRITING_FEEDBACK_LIMITS;
@@ -32,6 +34,29 @@ export const WRITING_CRITERION_LABELS: Record<WritingCriterion, string> = {
   vocabulary: "Lexique",
   register: "Registre",
   coherence: "Cohérence",
+};
+
+export const CORRECTION_CATEGORIES = [
+  "verb",
+  "agreement",
+  "function_word",
+  "word_order",
+  "word_choice",
+  "spelling",
+  "register",
+  "other",
+] as const;
+export type CorrectionCategory = (typeof CORRECTION_CATEGORIES)[number];
+
+export const CORRECTION_CATEGORY_LABELS: Record<CorrectionCategory, string> = {
+  verb: "Verbes",
+  agreement: "Accords",
+  function_word: "Mots outils",
+  word_order: "Ordre des mots",
+  word_choice: "Choix des mots",
+  spelling: "Orthographe",
+  register: "Registre",
+  other: "Autre",
 };
 
 // Stored and displayed shape ---------------------------------------------------------------------
@@ -52,6 +77,8 @@ export const writingCorrectionSchema = z.object({
   corrected: text(L.passage),
   /** In French. */
   explanation: text(L.comment),
+  /** Optional: corrections stored before categories existed have none. */
+  category: z.enum(CORRECTION_CATEGORIES).optional(),
 });
 export type WritingCorrection = z.infer<typeof writingCorrectionSchema>;
 
@@ -65,6 +92,8 @@ export const writingFeedbackSchema = z.object({
   corrections: z.array(writingCorrectionSchema).max(L.corrections.max),
   /** In French: what the learner did well. */
   strength: text(L.comment),
+  /** The whole text as a native would write it (studied language). Optional: older reviews have none. */
+  nativeVersion: text(L.nativeVersion).optional(),
 });
 export type WritingFeedback = z.infer<typeof writingFeedbackSchema>;
 
@@ -100,9 +129,17 @@ export const wireWritingFeedbackSchema = z.object({
       original: z.string().describe(`${STUDIED} Passage copied exactly from the learner's text.`),
       corrected: z.string().describe(`${STUDIED} The same passage, corrected.`),
       explanation_fr: z.string().describe(`${FRENCH} Short reason for the correction.`),
+      category: z
+        .enum(CORRECTION_CATEGORIES)
+        .describe(
+          "Kind of error: verb (conjugation, tense, mood, aspect), agreement (gender, number, case), function_word (articles, prepositions, particles), word_order, word_choice (vocabulary, collocations, calques from French), spelling (spelling, accents, punctuation, script), register, other.",
+        ),
     }),
   ),
   strength_fr: z.string().describe(`${FRENCH} One thing the learner did well, precisely.`),
+  native_version: z
+    .string()
+    .describe(`${STUDIED} The whole learner's text rewritten as a native would write it, keeping the learner's ideas.`),
 });
 export type WireWritingFeedback = z.infer<typeof wireWritingFeedbackSchema>;
 
