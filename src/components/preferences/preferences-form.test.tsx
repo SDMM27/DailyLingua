@@ -195,7 +195,7 @@ describe("PreferencesForm", () => {
       await user.click(screen.getByRole("button", { name: "Commencer" }));
       expect(savePreferences).toHaveBeenCalledWith(
         expect.objectContaining({
-          goals: [expect.objectContaining({ language: "it", topics: ["société", "culture"], contentTypes: ["article", "podcast"] })],
+          goals: [expect.objectContaining({ language: "it", topics: ["société", "culture"], contentTypes: ["article", "podcast", "video"] })],
         }),
       );
       expect(replace).toHaveBeenCalledWith("/niveau?bienvenue=1");

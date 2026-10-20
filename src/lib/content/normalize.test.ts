@@ -109,6 +109,39 @@ describe("normalizeItem", () => {
     expect(draftOf(normalizeItem(item({ publishedAt: future }), source(), NOW)).publishedAt).toBeNull();
   });
 
+  it("uses the source's own age limit when it has one", () => {
+    const videos = source({ maxAgeDays: 180 });
+    const old = new Date(NOW.getTime() - (MAX_ITEM_AGE_DAYS + 100) * 86_400_000);
+    expect(draftOf(normalizeItem(item({ publishedAt: old }), videos, NOW)).publishedAt).toEqual(old);
+    const tooOld = new Date(NOW.getTime() - 181 * 86_400_000);
+    expect(normalizeItem(item({ publishedAt: tooOld }), videos, NOW)).toEqual({ ok: false, reason: "too-old" });
+    const short = source({ maxAgeDays: 7 });
+    const tenDays = new Date(NOW.getTime() - 10 * 86_400_000);
+    expect(normalizeItem(item({ publishedAt: tenDays }), short, NOW)).toEqual({ ok: false, reason: "too-old" });
+  });
+
+  it("reads the level from the title, first matching rule first, else the source's level", () => {
+    const labelled = source({
+      difficulty: "B1",
+      levelRules: [
+        { pattern: /\bA2\b/, difficulty: "A2" },
+        { pattern: /\bB2\b/i, difficulty: "B2" },
+      ],
+    });
+    const level = (title: string) => draftOf(normalizeItem(item({ title }), labelled, NOW)).difficulty;
+    expect(level("Storia breve (A2 B2)")).toBe("A2");
+    expect(level("Discorso avanzato b2")).toBe("B2");
+    expect(level("Un video qualunque")).toBe("B1");
+    expect(draftOf(normalizeItem(item(), source(), NOW)).difficulty).toBe("B2");
+  });
+
+  it("does not let a global rule keep state from one title to the next", () => {
+    const labelled = source({ levelRules: [{ pattern: /A2/g, difficulty: "A2" }] });
+    for (let i = 0; i < 3; i++) {
+      expect(draftOf(normalizeItem(item({ title: "Episodio A2" }), labelled, NOW)).difficulty).toBe("A2");
+    }
+  });
+
   it("unwraps Wikipedia's featured article entries", () => {
     const wikipedia = source({
       language: "en",
@@ -150,5 +183,93 @@ describe("normalizeFeed", () => {
     );
     expect(drafts.map((d) => d.title)).toEqual(["B", "C"]);
     expect(rejected).toEqual({ duplicate: 1, "foreign-host": 1 });
+  });
+});
+
+describe("normalizeItem — YouTube", () => {
+  const channel = source({
+    key: "test-channel",
+    language: "de",
+    homepageUrl: "https://www.youtube.com/channel/UCbxb2fqe9oNgglAoYqsYOtQ",
+    feedUrl: "https://www.youtube.com/feeds/videos.xml?channel_id=UCbxb2fqe9oNgglAoYqsYOtQ",
+    contentType: "video",
+    defaultMinutes: 12,
+    hosts: ["youtube.com"],
+    itemFormat: "youtube",
+  });
+  const video = (overrides: Partial<RawFeedItem> = {}) =>
+    item({
+      title: "Was machst du am Wochenende?",
+      link: "https://www.youtube.com/watch?v=abcdEFGhi_1",
+      description: "Wir fragen Leute auf der Straße.\nUnd sie antworten.\n\nMehr: https://example.com/x\nFolge uns!",
+      ...overrides,
+    });
+
+  it("keeps the watch link, the channel's duration and the description up to the first link", () => {
+    const draft = draftOf(normalizeItem(video(), channel, NOW));
+    expect(draft.url).toBe("https://www.youtube.com/watch?v=abcdEFGhi_1");
+    expect(draft.contentType).toBe("video");
+    expect(draft.durationMinutes).toBe(12);
+    expect(draft.summary).toBe("Wir fragen Leute auf der Straße. Und sie antworten.");
+  });
+
+  it("normalizes the link to https://www.youtube.com/watch?v=<id>, dropping other parameters", () => {
+    const draft = draftOf(
+      normalizeItem(
+        video({ link: "http://m.youtube.com/watch?feature=share&v=abcdEFGhi_1&utm_source=rss&t=30s#top" }),
+        source({ ...channel, hosts: ["youtube.com"] }),
+        NOW,
+      ),
+    );
+    expect(draft.url).toBe("https://www.youtube.com/watch?v=abcdEFGhi_1");
+  });
+
+  it("rejects Shorts and links that cannot be played", () => {
+    expect(normalizeItem(video({ link: "https://www.youtube.com/shorts/abcdEFGhi_1" }), channel, NOW)).toEqual({
+      ok: false,
+      reason: "short",
+    });
+    expect(normalizeItem(video({ link: "https://www.youtube.com/watch?v=tooshort" }), channel, NOW)).toEqual({
+      ok: false,
+      reason: "no-link",
+    });
+    expect(normalizeItem(video({ link: "https://www.youtube.com/@EasyGerman" }), channel, NOW)).toEqual({
+      ok: false,
+      reason: "no-link",
+    });
+  });
+
+  it("rejects live streams and their replays, but not the word « live » in a sentence", () => {
+    for (const title of ["🔴 Peppa Pig en direct", "[LIVE] 뉴스 특보", "Lofi German 24/7", "Easy German LIVE Q&A"]) {
+      expect(normalizeItem(video({ title }), channel, NOW)).toEqual({ ok: false, reason: "live" });
+    }
+    expect(normalizeItem(video({ title: "How Germans live in small flats" }), channel, NOW).ok).toBe(true);
+  });
+
+  it("keeps only the titles matching the channel's filter", () => {
+    const filtered = source({ ...channel, titleFilter: /grec moderne/i });
+    expect(normalizeItem(video({ title: "Grec Moderne A1 - Leçon 1" }), filtered, NOW).ok).toBe(true);
+    expect(normalizeItem(video({ title: "Μαθαίνω γαλλικά A1" }), filtered, NOW)).toEqual({ ok: false, reason: "off-topic" });
+  });
+
+  it("stops the teaser at a separator line, whatever the dashes or underscores", () => {
+    expect(draftOf(normalizeItem(video({ description: "Intro du jour.\n---\nAbonne-toi" }), channel, NOW)).summary).toBe("Intro du jour.");
+    expect(draftOf(normalizeItem(video({ description: "Intro du jour.\n_____\nAbonne-toi" }), channel, NOW)).summary).toBe("Intro du jour.");
+  });
+
+  it("stops at a bare www. link too", () => {
+    expect(draftOf(normalizeItem(video({ description: "Intro.\nBesuch www.example.com\nSuite" }), channel, NOW)).summary).toBe("Intro.");
+  });
+
+  it("falls back to the title when the description starts with a link or is missing", () => {
+    expect(draftOf(normalizeItem(video({ description: "https://example.com\nIntro" }), channel, NOW)).summary).toBe(
+      "Was machst du am Wochenende?",
+    );
+    expect(draftOf(normalizeItem(video({ description: null }), channel, NOW)).summary).toBe("Was machst du am Wochenende?");
+  });
+
+  it("does not apply the YouTube rules to other formats", () => {
+    const result = normalizeItem(video({ link: "https://www.example.it/shorts/x" }), source(), NOW);
+    expect(result.ok).toBe(true);
   });
 });

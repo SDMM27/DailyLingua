@@ -74,7 +74,8 @@ for (const source of sources) {
     row.valides = drafts.length;
     const newest = drafts.find((d) => d.publishedAt)?.publishedAt;
     row["plus récent"] = newest ? newest.toISOString().slice(0, 10) : "sans date";
-    if (drafts.length === 0) problems.push("aucun item valide");
+    const reasons = Object.entries(rejected).map(([reason, count]) => `${reason}: ${count}`).join(", ");
+    if (drafts.length === 0) problems.push(`aucun item valide${reasons ? ` (${reasons})` : ""}`);
     if (newest && now.getTime() - newest.getTime() > STALE_AFTER_DAYS * 86_400_000) problems.push("flux inactif");
     if (rejected["foreign-host"]) problems.push(`${rejected["foreign-host"]} lien(s) hors domaine`);
     if (drafts[0]) {

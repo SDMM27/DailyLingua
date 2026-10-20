@@ -4,7 +4,7 @@ import { DEFAULT_TIME_ZONE } from "./dates";
 /** Topics and content types given to a language added without a first language to copy from. */
 export const DEFAULT_LANGUAGE_TASTES: Pick<LanguageGoal, "topics" | "contentTypes"> = {
   topics: ["société", "culture"],
-  contentTypes: ["article", "podcast"],
+  contentTypes: ["article", "podcast", "video"],
 };
 
 /**

@@ -139,6 +139,9 @@ describe.skipIf(!stackIsUp)("content ingestion on Supabase (local database)", ()
   });
 
   it("hides contents whose link is broken", async () => {
+    // The local database may hold more than a page (1,000 rows) of real contents waiting for a
+    // check after `content:ingest`; the oldest fetched come first, so date this run's rows back.
+    await admin.from("contents").update({ fetched_at: "2000-01-01T00:00:00Z" }).eq("source_id", sourceId);
     const pending = await store().listUncheckedLinks(1000);
     const b = pending.find((p) => p.url === `https://${HOST}/b`);
     expect(b?.sourceKey).toBe(TEST_SOURCE.key);

@@ -113,3 +113,11 @@ describe("parseDurationMinutes", () => {
     expect(parseDurationMinutes("about 5 min")).toBeNull();
   });
 });
+
+describe("cleanUrl — video links", () => {
+  it("keeps the v parameter of a watch link while dropping tracking", () => {
+    expect(cleanUrl("https://www.youtube.com/watch?v=abcdEFGhi_1&utm_source=x")?.toString()).toBe(
+      "https://www.youtube.com/watch?v=abcdEFGhi_1",
+    );
+  });
+});

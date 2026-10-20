@@ -9,7 +9,8 @@ import type { Database } from "@/lib/supabase/database.types";
 import { availableLanguages } from "@/lib/content/availability";
 import { SOURCE_CATALOG } from "@/lib/content/catalog";
 import { readContentLicensePolicy } from "@/lib/content/policy";
-import { dateKeySchema, type DateKey, type Language } from "@/lib/schemas/common";
+import { sourceTraits, type SourceTraits } from "@/lib/content/source-traits";
+import { dateKeySchema, type ContentType, type DateKey, type Language } from "@/lib/schemas/common";
 import {
   contentListItemSchema,
   paidSourceSchema,
@@ -266,6 +267,11 @@ export async function fetchPreferences(client: Client, userId: string): Promise<
   });
 }
 
+/** `{ traits }` when the source has any, nothing otherwise (most sources are plain target-language ones). */
+function withTraits(traits: SourceTraits): { traits?: SourceTraits } {
+  return traits.instructionLanguage || traits.audience ? { traits } : {};
+}
+
 /**
  * Repository backed by Supabase. `client` must act as `userId` (anon key + user
  * session), so Row Level Security applies on top of the explicit `user_id` filters below.
@@ -314,7 +320,7 @@ export function createSupabaseRepository(
          mission_sessions (
            id, position, language, questions, expressions, production,
            contents ( title, content_type, language, url, difficulty, duration_minutes, summary,
-                      transcript_available, sources ( name, homepage_url ) ),
+                      transcript_available, sources ( key, name, homepage_url ) ),
            mission_activities ( id, position, kind, title, estimated_minutes )
          )`,
       )
@@ -346,7 +352,11 @@ export function createSupabaseRepository(
             title: content.title,
             type: content.content_type,
             language: content.language,
-            source: { name: content.sources.name, homepage: content.sources.homepage_url },
+            source: {
+              name: content.sources.name,
+              homepage: content.sources.homepage_url,
+              ...withTraits(sourceTraits(content.sources.key)),
+            },
             url: content.url,
             difficulty: content.difficulty,
             durationMinutes: content.duration_minutes,
@@ -1164,7 +1174,11 @@ export function createSupabaseRepository(
     if (error) throw new Error(`Supabase (test de niveau) : ${error.message}`);
   }
 
-  async function listContents(languages: Language[], perLanguage: number): Promise<ContentListItem[]> {
+  async function listContents(
+    languages: Language[],
+    perLanguage: number,
+    options?: { types?: ContentType[] },
+  ): Promise<ContentListItem[]> {
     const lists = await Promise.all(
       languages.map(async (language) => {
         let query = client
@@ -1179,6 +1193,7 @@ export function createSupabaseRepository(
           .eq("sources.active", true)
           .not("sources.key", "is", null);
         if (contentPolicy === "commercial") query = query.eq("sources.commercial_use", true);
+        if (options?.types) query = query.in("content_type", options.types);
         const { data, error } = await query
           .order("published_at", { ascending: false, nullsFirst: false })
           .limit(perLanguage);
@@ -1199,7 +1214,13 @@ export function createSupabaseRepository(
         summary: row.summary,
         author: row.author ?? undefined,
         publishedAt: row.published_at,
-        source: { name: source.name, homepage: source.homepage, access: source.access, license: source.license },
+        source: {
+          key: source.key,
+          name: source.name,
+          homepage: source.homepage,
+          access: source.access,
+          license: source.license,
+        },
       });
     });
   }
