@@ -251,6 +251,7 @@ declare
   s jsonb;
   v record;
   cid uuid;
+  lid uuid;
   mid uuid;
   sid uuid;
   aid uuid;
@@ -411,6 +412,10 @@ begin
     from jsonb_array_elements(s -> 'activities') with ordinality as act(value, n);
   end loop;
 
+  insert into public.vocabulary_lists (user_id, language, name, description)
+  values (demo_id, 'it', 'Expressions du cours', 'Les tournures vues en cours du jeudi.')
+  returning id into lid;
+
   -- Vocabulary, with a review journal whose last entry matches the current state.
   for v in
     select * from (values
@@ -423,7 +428,9 @@ begin
       ('it', 'a malapena', 'à peine', null, 'Lo conosco a malapena.', null, null, 'learning', 3, 6, 18, 4),
       ('ru', 'тем не ме́нее', 'néanmoins', null, 'Тем не менее, проект решили продолжить.', null, null, 'known', 5, 25, 40, 8),
       ('it', 'in bocca al lupo', 'bonne chance (« merde »)', null, 'Domani hai l''esame? In bocca al lupo!', null, null, 'known', 6, 50, 60, 9),
-      ('ru', 'по большо́му счёту', 'au fond, globalement', null, 'По большому счёту, ничего не изменилось.', null, null, 'known', 5, 14, 35, 7)
+      ('ru', 'по большо́му счёту', 'au fond, globalement', null, 'По большому счёту, ничего не изменилось.', null, null, 'known', 5, 14, 35, 7),
+      ('it', 'mettercela tutta', 'y mettre tout son cœur', null, 'Ce l''ha messa tutta per finire in tempo.', null, null, 'learning', 1, 2, 2, 1),
+      ('it', 'prendere in giro', 'se moquer de, taquiner', null, 'Smettila di prendermi in giro!', null, null, 'learning', 0, 1, 2, 0)
     ) as t(language, term, translation, definition, example, source_name, source_url, status, box, due_in, added_ago, review_count)
   loop
     insert into public.vocabulary_items (
@@ -449,5 +456,8 @@ begin
       );
     end loop;
   end loop;
+
+  update public.vocabulary_items set list_id = lid
+  where user_id = demo_id and language = 'it' and term in ('mettercela tutta', 'prendere in giro');
 end
 $seed$;

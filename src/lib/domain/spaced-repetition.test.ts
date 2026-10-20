@@ -5,6 +5,7 @@ import {
   applyReview,
   dueItems,
   dueToday,
+  inActiveLists,
   initialReviewState,
   isDue,
   relativeDueLabel,
@@ -68,8 +69,19 @@ describe("due words", () => {
   });
 
   it("orders upcoming reviews and excludes known words", () => {
-    expect(upcomingReviews(items).map((i) => i.id)).toEqual(["overdue", "today", "later"]);
-    expect(dueToday(items, TODAY).map((i) => i.id)).toEqual(["overdue", "today"]);
+    expect(upcomingReviews(items, []).map((i) => i.id)).toEqual(["overdue", "today", "later"]);
+    expect(dueToday(items, TODAY, []).map((i) => i.id)).toEqual(["overdue", "today"]);
+  });
+
+  it("leaves the words of a paused list out of the review", () => {
+    const listed = [{ ...items[1], id: "in-list", listId: "l1" }, { ...items[2], id: "in-other", listId: "l2" }, items[1]];
+    const lists = [
+      { id: "l1", language: "it" as const, name: "Livre", active: false },
+      { id: "l2", language: "it" as const, name: "Cours", active: true },
+    ];
+    expect(dueToday(listed, TODAY, lists).map((i) => i.id)).toEqual(["in-other", "today"]);
+    expect(upcomingReviews(listed, lists).map((i) => i.id)).toEqual(["in-other", "today"]);
+    expect(inActiveLists(listed, lists)).toHaveLength(2);
   });
 
   it("lists what is due for any reviewable, most overdue first", () => {
@@ -78,7 +90,7 @@ describe("due words", () => {
   });
 
   it("does not mutate its input", () => {
-    upcomingReviews(items);
+    upcomingReviews(items, []);
     expect(items[0].id).toBe("later");
   });
 

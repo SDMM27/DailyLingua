@@ -55,3 +55,21 @@ export function readGuestDailyMissionCap(source: Record<string, string | undefin
   }
   return Number(raw);
 }
+
+export type VocabularyTranslationConfig = { enabled: true; apiKey: string; model: string } | { enabled: false };
+
+/**
+ * Automatic translation of the words a user imports: on as soon as ANTHROPIC_API_KEY is set, unless
+ * VOCABULARY_TRANSLATION=off. VOCABULARY_TRANSLATION_MODEL picks the model (default: the mission model).
+ */
+export function readVocabularyTranslationConfig(
+  source: Record<string, string | undefined> = process.env,
+): VocabularyTranslationConfig {
+  const apiKey = source.ANTHROPIC_API_KEY?.trim() ?? "";
+  const setting = source.VOCABULARY_TRANSLATION?.trim() || "on";
+  if (setting !== "on" && setting !== "off") {
+    throw new Error(`VOCABULARY_TRANSLATION invalide : « ${setting} » (valeurs : on, off).`);
+  }
+  if (setting === "off" || !apiKey) return { enabled: false };
+  return { enabled: true, apiKey, model: source.VOCABULARY_TRANSLATION_MODEL?.trim() || DEFAULT_MISSION_MODEL };
+}

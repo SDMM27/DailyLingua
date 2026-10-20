@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { languageInfo } from "@/lib/domain/languages";
 import type { Language } from "@/lib/schemas/common";
-import { newVocabularyInputSchema, type NewVocabularyInput } from "@/lib/schemas/vocabulary";
+import { newVocabularyInputSchema, type NewVocabularyInput, type VocabularyList } from "@/lib/schemas/vocabulary";
 
 type FieldErrors = Partial<Record<keyof NewVocabularyInput, string>>;
 
@@ -12,10 +12,13 @@ const inputClass =
 
 export function AddWordForm({
   languages,
+  lists,
   onAdd,
   onCancel,
 }: {
   languages: Language[];
+  /** The user's lists; only those of the chosen language are offered. */
+  lists: VocabularyList[];
   /** Resolves to an error message to show in the form, or null when the word was added. */
   onAdd: (input: NewVocabularyInput) => Promise<string | null>;
   onCancel: () => void;
@@ -23,6 +26,8 @@ export function AddWordForm({
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [language, setLanguage] = useState<Language>(languages[0]);
+  const languageLists = lists.filter((list) => list.language === language);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -39,6 +44,7 @@ export function AddWordForm({
       definition: optional("definition"),
       example: optional("example"),
       sourceName: optional("sourceName"),
+      listId: optional("listId"),
     });
     if (!result.success) {
       const fieldErrors: FieldErrors = {};
@@ -55,7 +61,10 @@ export function AddWordForm({
     const error = await onAdd(result.data);
     setPending(false);
     if (error) setFormError(error);
-    else form.reset();
+    else {
+      form.reset();
+      setLanguage(languages[0]);
+    }
   }
 
   return (
@@ -63,7 +72,14 @@ export function AddWordForm({
       <div className="flex gap-2" role="radiogroup" aria-label="Langue">
         {languages.map((lang, i) => (
           <label key={lang} className="flex-1">
-            <input type="radio" name="language" value={lang} defaultChecked={i === 0} className="peer sr-only" />
+            <input
+              type="radio"
+              name="language"
+              value={lang}
+              defaultChecked={i === 0}
+              onChange={() => setLanguage(lang)}
+              className="peer sr-only"
+            />
             <span className="block cursor-pointer rounded-xl border border-line py-2 text-center text-sm font-medium text-ink-soft transition-colors peer-checked:border-ink peer-checked:bg-ink peer-checked:text-paper peer-focus-visible:ring-2 peer-focus-visible:ring-ink">
               {languageInfo(lang).nameFr}
             </span>
@@ -85,6 +101,18 @@ export function AddWordForm({
       <Field label="Source (facultatif)" error={errors.sourceName}>
         <input name="sourceName" autoComplete="off" placeholder="ex. Meduza, Il Post…" className={inputClass} />
       </Field>
+      {languageLists.length > 0 && (
+        <Field label="Liste (facultatif)" error={errors.listId}>
+          <select key={language} name="listId" defaultValue="" className={inputClass}>
+            <option value="">Aucune liste</option>
+            {languageLists.map((list) => (
+              <option key={list.id} value={list.id}>
+                {list.name}
+              </option>
+            ))}
+          </select>
+        </Field>
+      )}
       {formError && (
         <p role="alert" className="rounded-2xl bg-danger-soft px-4 py-3 text-sm text-danger">
           {formError}

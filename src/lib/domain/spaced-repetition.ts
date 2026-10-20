@@ -1,5 +1,5 @@
 import type { DateKey } from "@/lib/schemas/common";
-import type { ReviewGrade, ReviewState, VocabularyItem } from "@/lib/schemas/vocabulary";
+import type { ReviewGrade, ReviewState, VocabularyItem, VocabularyList } from "@/lib/schemas/vocabulary";
 import { addDays, diffInDays } from "./dates";
 
 /**
@@ -51,9 +51,15 @@ export function isDue(state: ReviewState, today: DateKey): boolean {
   return diffInDays(state.dueOn, today) >= 0;
 }
 
-/** Words still being learned, ordered by due date (most overdue first). */
-export function upcomingReviews(items: readonly VocabularyItem[]): VocabularyItem[] {
-  return items
+/** Words that are not in a paused list: the only ones that enter the review. */
+export function inActiveLists(items: readonly VocabularyItem[], lists: readonly VocabularyList[]): VocabularyItem[] {
+  const paused = new Set(lists.filter((list) => !list.active).map((list) => list.id));
+  return items.filter((item) => item.listId === undefined || !paused.has(item.listId));
+}
+
+/** Words still being learned (paused lists left out), ordered by due date (most overdue first). */
+export function upcomingReviews(items: readonly VocabularyItem[], lists: readonly VocabularyList[]): VocabularyItem[] {
+  return inActiveLists(items, lists)
     .filter((item) => item.status === "learning")
     .sort(
       (a, b) => a.review.dueOn.localeCompare(b.review.dueOn) || a.term.localeCompare(b.term),
@@ -73,8 +79,13 @@ export function dueItems<T extends Reviewable>(items: readonly T[], today: DateK
     .sort((a, b) => a.review.dueOn.localeCompare(b.review.dueOn));
 }
 
-export function dueToday(items: readonly VocabularyItem[], today: DateKey): VocabularyItem[] {
-  return upcomingReviews(items).filter((item) => isDue(item.review, today));
+/** Words to review today: still being learned, due, and not in a paused list. */
+export function dueToday(
+  items: readonly VocabularyItem[],
+  today: DateKey,
+  lists: readonly VocabularyList[],
+): VocabularyItem[] {
+  return upcomingReviews(items, lists).filter((item) => isDue(item.review, today));
 }
 
 export function relativeDueLabel(dueOn: DateKey, today: DateKey): string {

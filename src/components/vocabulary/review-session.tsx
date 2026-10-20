@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Card, Eyebrow, LanguageTag, ProgressBar } from "@/components/ui/primitives";
 import { applyReview, relativeDueLabel } from "@/lib/domain/spaced-repetition";
 import type { DateKey } from "@/lib/schemas/common";
-import type { ReviewGrade, VocabularyItem } from "@/lib/schemas/vocabulary";
+import type { ReviewGrade, VocabularyItem, VocabularyList } from "@/lib/schemas/vocabulary";
 
 const GRADES: { grade: ReviewGrade; label: string; tone: string }[] = [
   { grade: "again", label: "À revoir", tone: "border-danger/40 text-danger" },
@@ -16,10 +16,12 @@ const GRADES: { grade: ReviewGrade; label: string; tone: string }[] = [
 /** Flashcard review of the words due today. `queue` is fixed when the session starts. */
 export function ReviewSession({
   queue,
+  lists,
   today,
   onReviewed,
 }: {
   queue: VocabularyItem[];
+  lists: VocabularyList[];
   today: DateKey;
   onReviewed: (item: VocabularyItem, grade: ReviewGrade) => void;
 }) {
@@ -46,6 +48,7 @@ export function ReviewSession({
   }
 
   const item = queue[index];
+  const listName = lists.find((list) => list.id === item.listId)?.name;
   const grade = (g: ReviewGrade) => {
     onReviewed(item, g);
     setRevealed(false);
@@ -64,6 +67,7 @@ export function ReviewSession({
 
       <div className="flex min-h-44 flex-col items-center justify-center py-6 text-center">
         <LanguageTag language={item.language} />
+        {listName && <p className="mt-1.5 text-xs text-muted">Liste : {listName}</p>}
         <p lang={item.language} className="mt-4 font-serif text-3xl font-semibold text-balance">
           {item.term}
         </p>

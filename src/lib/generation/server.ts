@@ -1,10 +1,17 @@
 import "server-only";
 import type { DateKey } from "@/lib/schemas/common";
+import type { VocabularyTranslationResult } from "@/lib/schemas/vocabulary";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { readGuestDailyMissionCap, readWritingFeedbackConfig } from "./config";
+import { readGuestDailyMissionCap, readVocabularyTranslationConfig, readWritingFeedbackConfig } from "./config";
 import type { GenerateMissionOutcome } from "./generate-mission";
 import { createMissionPreparer, createSessionReplacer } from "./preparer";
 import type { ReplaceSessionOutcome } from "./replace-session";
+import {
+  createClaudeVocabularyTranslator,
+  createSupabaseVocabularyTranslationStore,
+  translateVocabulary,
+  type TranslateVocabularyRequest,
+} from "./vocabulary-translation";
 import { createClaudeWritingReviewer } from "./writing-feedback";
 import {
   createSupabaseWritingFeedbackStore,
@@ -61,6 +68,22 @@ export function writingFeedbackReviewer():
     requestWritingFeedback(input, {
       store: createSupabaseWritingFeedbackStore(createSupabaseAdminClient()),
       reviewer: createClaudeWritingReviewer({ apiKey: config.apiKey, model: config.model }),
+      log: console.warn,
+    });
+}
+
+/**
+ * Translates imported words with the service role, or null when the translation is off (no API
+ * key, or VOCABULARY_TRANSLATION=off). Same rule as `prepareMission`: only with the signed-in
+ * user's id.
+ */
+export function vocabularyTranslator(): ((input: TranslateVocabularyRequest) => Promise<VocabularyTranslationResult>) | null {
+  const config = readVocabularyTranslationConfig();
+  if (!config.enabled) return null;
+  return (input) =>
+    translateVocabulary(input, {
+      store: createSupabaseVocabularyTranslationStore(createSupabaseAdminClient()),
+      translator: createClaudeVocabularyTranslator({ apiKey: config.apiKey, model: config.model }),
       log: console.warn,
     });
 }

@@ -4,6 +4,7 @@ import {
   DEFAULT_MISSION_MODEL,
   readGenerationConfig,
   readGuestDailyMissionCap,
+  readVocabularyTranslationConfig,
   readWritingFeedbackConfig,
 } from "./config";
 
@@ -63,6 +64,29 @@ describe("readWritingFeedbackConfig", () => {
       enabled: false,
     });
     expect(() => readWritingFeedbackConfig({ WRITING_FEEDBACK: "maybe" })).toThrow(/WRITING_FEEDBACK invalide/);
+  });
+});
+
+describe("readVocabularyTranslationConfig", () => {
+  it("is off without a key, on with one (mission model by default)", () => {
+    expect(readVocabularyTranslationConfig({})).toEqual({ enabled: false });
+    expect(readVocabularyTranslationConfig({ ANTHROPIC_API_KEY: "sk-test" })).toEqual({
+      enabled: true,
+      apiKey: "sk-test",
+      model: DEFAULT_MISSION_MODEL,
+    });
+    expect(
+      readVocabularyTranslationConfig({ ANTHROPIC_API_KEY: "sk-test", VOCABULARY_TRANSLATION_MODEL: "claude-sonnet-5-5" }),
+    ).toMatchObject({ model: "claude-sonnet-5-5" });
+  });
+
+  it("can be switched off, and refuses an unknown value", () => {
+    expect(readVocabularyTranslationConfig({ ANTHROPIC_API_KEY: "sk-test", VOCABULARY_TRANSLATION: "off" })).toEqual({
+      enabled: false,
+    });
+    expect(() => readVocabularyTranslationConfig({ VOCABULARY_TRANSLATION: "maybe" })).toThrow(
+      /VOCABULARY_TRANSLATION invalide/,
+    );
   });
 });
 
