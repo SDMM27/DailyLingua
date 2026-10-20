@@ -122,7 +122,9 @@ function atomLink(entry: Node): string | null {
 }
 
 function atomEntry(entry: Node): RawFeedItem {
-  const summary = first(entry.summary);
+  // YouTube feeds carry the description in `media:group/media:description` (Media RSS).
+  const mediaGroup = asArray(entry["media:group"]).find(isNode);
+  const summary = first(entry.summary, mediaGroup?.["media:description"]);
   const fullText = first(entry.content);
   const author = asArray(entry.author).find(isNode);
   return {

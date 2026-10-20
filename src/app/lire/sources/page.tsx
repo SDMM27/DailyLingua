@@ -24,7 +24,7 @@ export default async function SourcesPage() {
 
   return (
     <>
-      <PageHeader eyebrow={<Link href="/lire">← Lire et écouter</Link>} title="Sources et licences">
+      <PageHeader eyebrow={<Link href="/lire">← Lire, regarder, écouter</Link>} title="Sources et licences">
         Daily Lingua ne reproduit pas les articles : il affiche le titre, une courte accroche et un lien vers
         l’éditeur, à partir de ses flux RSS publics. Chaque source garde ses droits ; voici sous quelle licence elle
         publie.

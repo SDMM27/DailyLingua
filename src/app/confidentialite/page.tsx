@@ -103,6 +103,11 @@ export default function PrivacyPage() {
             entraîner ses modèles.
           </li>
           <li>
+            <strong>Google (YouTube)</strong> : le lecteur vidéo n’est chargé que lorsque tu touches « lecture »,
+            depuis youtube-nocookie.com. À partir de là, Google reçoit ton adresse IP et les données de lecture, selon
+            ses propres règles ; rien ne lui est envoyé avant (pas de miniature, pas de cookie).
+          </li>
+          <li>
             <strong>Le service d’envoi d’e-mails</strong> configuré dans Supabase, pour les messages de confirmation et
             de réinitialisation du mot de passe.
           </li>

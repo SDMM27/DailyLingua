@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it } from "vitest";
 import type { ContentListItem } from "@/lib/schemas/content";
 import { ContentItem } from "./content-item";
@@ -19,6 +20,7 @@ const ITEM: ContentListItem = {
   summary: "ملخص قصير للمقال.",
   publishedAt: "2026-10-13T07:00:00Z",
   source: {
+    key: "bbc-ar",
     name: "بي بي سي عربي",
     homepage: "https://www.bbc.com/arabic",
     access: "metered",
@@ -69,5 +71,43 @@ describe("ContentItem", () => {
     expect(screen.getByRole("link", { name: "CC BY 3.0" })).toHaveProperty("href", "https://creativecommons.org/licenses/by/3.0/");
     expect(screen.getAllByText(ITEM.title)).toHaveLength(1);
     expect(screen.queryByText("Abonnement possible")).toBeNull();
+  });
+
+  it("offers « Regarder ici » for a YouTube video and loads no player until it is tapped", async () => {
+    const video: ContentListItem = {
+      ...ITEM,
+      language: "de",
+      type: "video",
+      title: "Was machst du am Wochenende?",
+      summary: "Wir fragen Leute auf der Straße.",
+      url: "https://www.youtube.com/watch?v=abcdEFGhi_1",
+    };
+    const { container } = render(<ContentItem item={video} now={NOW} timeZone="Europe/Paris" />);
+    expect(container.querySelector("iframe")).toBeNull();
+    await userEvent.setup().click(screen.getByRole("button", { name: "Regarder ici" }));
+    expect(container.querySelector("iframe")?.getAttribute("src")).toContain("youtube-nocookie.com/embed/abcdEFGhi_1");
+    // The link to the publisher stays.
+    expect(screen.getByRole("link", { name: /Was machst du/ })).toHaveProperty("href", video.url);
+  });
+
+  it("flags a channel explained in French and children's content, and nothing for a plain source", () => {
+    const { rerender } = render(<ContentItem item={ITEM} now={NOW} timeZone="Europe/Paris" />);
+    expect(screen.queryByText("Jeunesse")).toBeNull();
+    expect(screen.queryByText(/Expliqué en/)).toBeNull();
+    const video = { ...ITEM, type: "video" as const, url: "https://www.youtube.com/watch?v=abcdEFGhi_1" };
+    rerender(<ContentItem item={{ ...video, source: { ...ITEM.source, key: "youtube-holamigo" } }} now={NOW} timeZone="Europe/Paris" />);
+    expect(screen.getByText("Expliqué en français")).toBeTruthy();
+    rerender(<ContentItem item={{ ...video, source: { ...ITEM.source, key: "youtube-slow-swedish-katrin" } }} now={NOW} timeZone="Europe/Paris" />);
+    expect(screen.getByText("Expliqué en anglais")).toBeTruthy();
+    rerender(<ContentItem item={{ ...video, source: { ...ITEM.source, key: "youtube-nos-jeugdjournaal" } }} now={NOW} timeZone="Europe/Paris" />);
+    expect(screen.getByText("Jeunesse")).toBeTruthy();
+  });
+
+  it("has no player for an article or a video that is not a YouTube watch link", () => {
+    render(<ContentItem item={ITEM} now={NOW} timeZone="Europe/Paris" />);
+    expect(screen.queryByRole("button", { name: "Regarder ici" })).toBeNull();
+    cleanup();
+    render(<ContentItem item={{ ...ITEM, type: "video", url: "https://www.youtube.com/channel/UCbxb2fqe9oNgglAoYqsYOtQ" }} now={NOW} timeZone="Europe/Paris" />);
+    expect(screen.queryByRole("button", { name: "Regarder ici" })).toBeNull();
   });
 });

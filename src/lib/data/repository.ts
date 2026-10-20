@@ -15,7 +15,7 @@ import {
 } from "@/lib/generation/server";
 import { addDays, toDateKey } from "@/lib/domain/dates";
 import type { GuestTrialStatus } from "@/lib/domain/guest-trial";
-import { dateKeySchema, type DateKey, type Language } from "@/lib/schemas/common";
+import { dateKeySchema, type ContentType, type DateKey, type Language } from "@/lib/schemas/common";
 import {
   contentListItemSchema,
   paidSourceSchema,
@@ -184,9 +184,10 @@ export interface DailyLinguaRepository {
 
   /**
    * Latest authentic contents of `languages` (at most `perLanguage` each, newest first), from the
-   * active sources allowed by the licence policy. Broken links are left out.
+   * active sources allowed by the licence policy. Broken links are left out. `types` keeps only
+   * those content types (all of them when absent).
    */
-  listContents(languages: Language[], perLanguage: number): Promise<ContentListItem[]>;
+  listContents(languages: Language[], perLanguage: number, options?: { types?: ContentType[] }): Promise<ContentListItem[]>;
   /** Sources of the catalogue allowed by the licence policy, with their licence. */
   listSources(): Promise<SourceInfo[]>;
   /** Languages that can be chosen: at least one source allowed by the licence policy. */
@@ -291,8 +292,11 @@ function createMockRepository(): DailyLinguaRepository {
     },
     recordPlacementTest: readOnly,
     sendFeedback: readOnly,
-    async listContents(languages, perLanguage) {
-      const items = buildMockContents(new Date()).filter((c) => languages.includes(c.language));
+    async listContents(languages, perLanguage, options) {
+      const types = options?.types;
+      const items = buildMockContents(new Date()).filter(
+        (c) => languages.includes(c.language) && (!types || types.includes(c.type)),
+      );
       const kept = languages.flatMap((l) => items.filter((c) => c.language === l).slice(0, perLanguage));
       return z.array(contentListItemSchema).parse(kept);
     },

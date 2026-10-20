@@ -1,8 +1,16 @@
 import { z } from "zod";
 import { cefrLevelSchema, contentTypeSchema, dateKeySchema, languageSchema } from "./common";
+import { INSTRUCTION_LANGUAGES, SOURCE_AUDIENCES } from "./content";
 import { WRITING_FEEDBACK_LIMITS, writingFeedbackSchema, writingReviewStateSchema } from "./writing-feedback";
 
 export const contentSourceSchema = z.object({
+  /** Read from the catalogue on the server (explained in French or English, made for children). */
+  traits: z
+    .object({
+      instructionLanguage: z.enum(INSTRUCTION_LANGUAGES).optional(),
+      audience: z.enum(SOURCE_AUDIENCES).optional(),
+    })
+    .optional(),
   name: z.string().min(1),
   homepage: z.url(),
 });

@@ -6,25 +6,47 @@ import { languageStyle } from "@/components/ui/language-style";
 import { Card, DemoNotice, PageHeader } from "@/components/ui/primitives";
 import { getRepository, requirePreferences } from "@/lib/data/repository";
 import { languageInfo } from "@/lib/domain/languages";
-import type { Language } from "@/lib/schemas/common";
+import type { ContentType, Language } from "@/lib/schemas/common";
 
-export const metadata: Metadata = { title: "Lire et écouter" };
+export const metadata: Metadata = { title: "Lire, regarder, écouter" };
 
 /** Items per language when every language is shown, and when one is selected. */
 const PER_LANGUAGE_ALL = 8;
 const PER_LANGUAGE_ONE = 30;
 
-export default async function ReadingPage({ searchParams }: { searchParams: Promise<{ langue?: string }> }) {
+/** Type filter: the query value, its chip label and the content type it keeps. Interviews only show under « Tout ». */
+const TYPE_FILTERS = [
+  { value: "article", label: "Lire", type: "article" },
+  { value: "video", label: "Regarder", type: "video" },
+  { value: "podcast", label: "Écouter", type: "podcast" },
+] as const satisfies readonly { value: string; label: string; type: ContentType }[];
+
+/** `/lire` with the given filters; a missing filter is left out of the query string. */
+function readingHref(langue: Language | undefined, type: string | undefined): string {
+  const params = new URLSearchParams();
+  if (langue) params.set("langue", langue);
+  if (type) params.set("type", type);
+  const query = params.toString();
+  return query ? `/lire?${query}` : "/lire";
+}
+
+export default async function ReadingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ langue?: string; type?: string }>;
+}) {
   await connection();
   const preferences = await requirePreferences();
   const repository = await getRepository();
   const languages = preferences.goals.map((g) => g.language);
-  const { langue } = await searchParams;
+  const { langue, type } = await searchParams;
   const selected = languages.find((l) => l === langue);
+  const selectedType = TYPE_FILTERS.find((f) => f.value === type);
 
   const items = await repository.listContents(
     selected ? [selected] : languages,
     selected ? PER_LANGUAGE_ONE : PER_LANGUAGE_ALL,
+    selectedType ? { types: [selectedType.type] } : undefined,
   );
   // Newest first across languages; undated items last.
   items.sort((a, b) => (b.publishedAt ?? "").localeCompare(a.publishedAt ?? ""));
@@ -32,9 +54,9 @@ export default async function ReadingPage({ searchParams }: { searchParams: Prom
 
   return (
     <>
-      <PageHeader eyebrow="Contenus authentiques" title="Lire et écouter">
-        Les dernières parutions de sources fiables dans tes langues. Tu lis ou écoutes chez l’éditeur ; ici, seulement
-        le titre, une courte accroche et le lien.
+      <PageHeader eyebrow="Contenus authentiques" title="Lire, regarder, écouter">
+        Les dernières parutions de sources fiables dans tes langues. Tu lis ou écoutes chez l’éditeur ; les
+        vidéos YouTube se regardent aussi ici. Seuls le titre, une courte accroche et le lien sont repris.
       </PageHeader>
 
       {repository.isDemo && (
@@ -46,11 +68,11 @@ export default async function ReadingPage({ searchParams }: { searchParams: Prom
       {languages.length > 1 && (
         <nav aria-label="Filtrer par langue" className="-mx-4 mb-4 overflow-x-auto px-4">
           <ul className="flex gap-2">
-            <FilterChip href="/lire" active={!selected} label="Toutes" />
+            <FilterChip href={readingHref(undefined, selectedType?.value)} active={!selected} label="Toutes" />
             {languages.map((language) => (
               <FilterChip
                 key={language}
-                href={`/lire?langue=${language}`}
+                href={readingHref(language, selectedType?.value)}
                 active={selected === language}
                 label={languageInfo(language).nameFr}
                 language={language}
@@ -60,12 +82,37 @@ export default async function ReadingPage({ searchParams }: { searchParams: Prom
         </nav>
       )}
 
+      <nav aria-label="Filtrer par type" className="-mx-4 mb-4 overflow-x-auto px-4">
+        <ul className="flex gap-2">
+          <FilterChip href={readingHref(selected, undefined)} active={!selectedType} label="Tout" />
+          {TYPE_FILTERS.map((filter) => (
+            <FilterChip
+              key={filter.value}
+              href={readingHref(selected, filter.value)}
+              active={selectedType?.value === filter.value}
+              label={filter.label}
+            />
+          ))}
+        </ul>
+      </nav>
+
       {items.length === 0 ? (
         <Card className="text-center">
-          <p className="text-sm text-ink-soft">Aucun contenu pour l’instant.</p>
-          <p className="mt-1 text-xs text-muted">
-            Les flux n’ont pas encore été relevés. En local : <code>npm run content:ingest</code>.
-          </p>
+          {selectedType ? (
+            <>
+              <p className="text-sm text-ink-soft">Rien à {selectedType.label.toLowerCase()} pour l’instant.</p>
+              <p className="mt-1 text-xs text-muted">
+                Essaie une autre langue, ou « Tout » : toutes les langues n’ont pas encore de source de ce type.
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-ink-soft">Aucun contenu pour l’instant.</p>
+              <p className="mt-1 text-xs text-muted">
+                Les flux n’ont pas encore été relevés. En local : <code>npm run content:ingest</code>.
+              </p>
+            </>
+          )}
         </Card>
       ) : (
         <Card className="py-1 sm:py-2">

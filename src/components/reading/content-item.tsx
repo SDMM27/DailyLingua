@@ -4,7 +4,10 @@ import { Pill } from "@/components/ui/primitives";
 import { formatTimeAgo } from "@/lib/domain/dates";
 import { CONTENT_TYPE_LABELS } from "@/lib/domain/labels";
 import { languageInfo } from "@/lib/domain/languages";
+import { sourceTraitLabels } from "@/lib/content/source-traits";
+import { youtubeVideoId } from "@/lib/content/youtube";
 import type { ContentListItem, SourceInfo } from "@/lib/schemas/content";
+import { WatchHere } from "./watch-here";
 
 /** "CC BY 3.0" linked to the licence, or the publisher's terms for all-rights-reserved sources. */
 export function LicenseLink({ license }: { license: SourceInfo["license"] }) {
@@ -27,6 +30,7 @@ export function LicenseLink({ license }: { license: SourceInfo["license"] }) {
 export function ContentItem({ item, now, timeZone }: { item: ContentListItem; now: Date; timeZone: string }) {
   const info = languageInfo(item.language);
   const style = languageStyle(item.language);
+  const videoId = item.type === "video" ? youtubeVideoId(item.url) : null;
   const published = item.publishedAt ? formatTimeAgo(new Date(item.publishedAt), now, timeZone) : null;
   return (
     <article className="flex gap-3 border-b border-line py-4 last:border-b-0">
@@ -54,10 +58,14 @@ export function ContentItem({ item, now, timeZone }: { item: ContentListItem; no
             {item.summary}
           </p>
         )}
+        {videoId && <WatchHere videoId={videoId} title={item.title} language={item.language} />}
         <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
           <Pill>{CONTENT_TYPE_LABELS[item.type]}</Pill>
           <Pill>{item.difficulty}</Pill>
           <Pill>≈ {item.durationMinutes} min</Pill>
+          {sourceTraitLabels(item.source.key).map((label) => (
+            <Pill key={label}>{label}</Pill>
+          ))}
           {item.source.access !== "free" && (
             <Pill>{item.source.access === "metered" ? "Abonnement possible" : "Abonnés"}</Pill>
           )}

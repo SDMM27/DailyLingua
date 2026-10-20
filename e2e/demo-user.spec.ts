@@ -16,7 +16,7 @@ test.beforeAll(() => {
 const TABS = [
   { label: "Aujourd'hui", path: "/" },
   { label: "Mission", path: "/mission" },
-  { label: "Lire", path: "/lire" },
+  { label: "Contenus", path: "/lire" },
   { label: "Mots", path: "/vocabulaire" },
   { label: "Réglages", path: "/preferences" },
 ];

@@ -54,6 +54,65 @@ const RDF = `<?xml version="1.0"?>
   </item>
 </rdf:RDF>`;
 
+/** Trimmed YouTube channel feed: a regular video and a Short (same entry shape, `/shorts/` link). */
+const YOUTUBE = `<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/" xmlns="http://www.w3.org/2005/Atom">
+ <link rel="self" href="http://www.youtube.com/feeds/videos.xml?channel_id=UCbxb2fqe9oNgglAoYqsYOtQ"/>
+ <id>yt:channel:bxb2fqe9oNgglAoYqsYOtQ</id>
+ <yt:channelId>bxb2fqe9oNgglAoYqsYOtQ</yt:channelId>
+ <title>Easy German</title>
+ <link rel="alternate" href="https://www.youtube.com/channel/UCbxb2fqe9oNgglAoYqsYOtQ"/>
+ <author>
+  <name>Easy German</name>
+  <uri>https://www.youtube.com/channel/UCbxb2fqe9oNgglAoYqsYOtQ</uri>
+ </author>
+ <published>2011-01-12T14:11:21+00:00</published>
+ <entry>
+  <id>yt:video:abcdEFGhi_1</id>
+  <yt:videoId>abcdEFGhi_1</yt:videoId>
+  <yt:channelId>bxb2fqe9oNgglAoYqsYOtQ</yt:channelId>
+  <title>Was machst du am Wochenende? | Easy German 500</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=abcdEFGhi_1"/>
+  <author>
+   <name>Easy German</name>
+   <uri>https://www.youtube.com/channel/UCbxb2fqe9oNgglAoYqsYOtQ</uri>
+  </author>
+  <published>2026-10-10T11:00:03+00:00</published>
+  <updated>2026-10-12T08:12:44+00:00</updated>
+  <media:group>
+   <media:title>Was machst du am Wochenende? | Easy German 500</media:title>
+   <media:content url="https://www.youtube.com/v/abcdEFGhi_1?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i2.ytimg.com/vi/abcdEFGhi_1/hqdefault.jpg" width="480" height="360"/>
+   <media:description>Wir fragen Leute auf der Straße nach ihren Plänen.
+
+Support us: https://www.patreon.com/easygerman</media:description>
+   <media:community>
+    <media:starRating count="1200" average="5.00" min="1" max="5"/>
+    <media:statistics views="45000"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:zyxWVUtsr-2</id>
+  <yt:videoId>zyxWVUtsr-2</yt:videoId>
+  <yt:channelId>bxb2fqe9oNgglAoYqsYOtQ</yt:channelId>
+  <title>Kurz erklärt #shorts</title>
+  <link rel="alternate" href="https://www.youtube.com/shorts/zyxWVUtsr-2"/>
+  <author>
+   <name>Easy German</name>
+   <uri>https://www.youtube.com/channel/UCbxb2fqe9oNgglAoYqsYOtQ</uri>
+  </author>
+  <published>2026-10-11T09:00:00+00:00</published>
+  <updated>2026-10-11T09:30:00+00:00</updated>
+  <media:group>
+   <media:title>Kurz erklärt #shorts</media:title>
+   <media:content url="https://www.youtube.com/v/zyxWVUtsr-2?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/zyxWVUtsr-2/hqdefault.jpg" width="480" height="360"/>
+   <media:description/>
+  </media:group>
+ </entry>
+</feed>`;
+
 describe("parseFeed", () => {
   it("reads RSS 2.0 items, CDATA, entities, author and categories", () => {
     const feed = parseFeed(RSS);
@@ -98,6 +157,22 @@ describe("parseFeed", () => {
     const feed = parseFeed(RDF);
     expect(feed.format).toBe("rdf");
     expect(feed.items[0]).toMatchObject({ title: "Nachricht", link: "https://www.tagesschau.de/a-1" });
+  });
+
+  it("reads a YouTube feed: watch and Shorts links, description from media:group", () => {
+    const feed = parseFeed(YOUTUBE);
+    expect(feed.format).toBe("atom");
+    expect(feed.items).toHaveLength(2);
+    expect(feed.items[0]).toMatchObject({
+      title: "Was machst du am Wochenende? | Easy German 500",
+      link: "https://www.youtube.com/watch?v=abcdEFGhi_1",
+      author: "Easy German",
+      descriptionIsFullText: false,
+    });
+    expect(feed.items[0].description).toContain("Wir fragen Leute auf der Straße");
+    expect(feed.items[0].publishedAt?.toISOString()).toBe("2026-10-10T11:00:03.000Z");
+    expect(feed.items[1].link).toBe("https://www.youtube.com/shorts/zyxWVUtsr-2");
+    expect(feed.items[1].description).toBeNull();
   });
 
   it("accepts an empty channel", () => {

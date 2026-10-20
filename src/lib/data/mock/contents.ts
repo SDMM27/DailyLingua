@@ -42,6 +42,12 @@ const DEMO_ITEMS: { source: string; hoursAgo: number; title: string; summary: st
     summary: "Краткое введение в язык и мир Николая Лескова: сказ, народная этимология и неожиданный юмор.",
   },
   {
+    source: "youtube-russian-progress",
+    hoursAgo: 20,
+    title: "Выходные в деревне: влог для изучающих русский",
+    summary: "Короткий влог о поездке за город: простая речь, субтитры и бытовая лексика.",
+  },
+  {
     source: "global-voices-it",
     hoursAgo: 5,
     title: "Le lingue minoritarie trovano spazio sui social",
@@ -77,7 +83,13 @@ export function buildMockContents(now: Date): ContentListItem[] {
       durationMinutes: item.minutes ?? definition.defaultMinutes,
       summary: item.summary,
       publishedAt: new Date(now.getTime() - item.hoursAgo * 3_600_000).toISOString(),
-      source: { name: source.name, homepage: source.homepage, access: source.access, license: source.license },
+      source: {
+        key: source.key,
+        name: source.name,
+        homepage: source.homepage,
+        access: source.access,
+        license: source.license,
+      },
     };
   });
 }

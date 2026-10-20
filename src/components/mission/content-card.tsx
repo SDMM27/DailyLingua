@@ -1,6 +1,9 @@
 import type { ComponentType, SVGProps } from "react";
 import { BookIcon, ExternalIcon, HeadphonesIcon, InfoIcon, MicIcon, PlayIcon } from "@/components/icons";
+import { YouTubePlayer } from "@/components/reading/youtube-player";
 import { Pill } from "@/components/ui/primitives";
+import { traitLabels } from "@/lib/content/trait-labels";
+import { youtubeVideoId } from "@/lib/content/youtube";
 import { CONTENT_TYPE_LABELS } from "@/lib/domain/labels";
 import type { ContentType } from "@/lib/schemas/common";
 import type { Content } from "@/lib/schemas/mission";
@@ -16,6 +19,7 @@ const TYPE_ICONS: Record<ContentType, ComponentType<SVGProps<SVGSVGElement>>> = 
 /** `sessionId` set: the learner can say they cannot read this content (see NoAccessButton). */
 export function ContentCard({ content, sessionId }: { content: Content; sessionId?: string }) {
   const Icon = TYPE_ICONS[content.type];
+  const videoId = content.type === "video" ? youtubeVideoId(content.url) : null;
   return (
     <article className="rounded-3xl bg-surface-sunk/60 p-5">
       <div className="flex flex-wrap items-center gap-2">
@@ -25,6 +29,9 @@ export function ContentCard({ content, sessionId }: { content: Content; sessionI
         </Pill>
         <Pill>{content.difficulty}</Pill>
         <Pill>{content.durationMinutes} min</Pill>
+        {traitLabels(content.source.traits ?? {}).map((label) => (
+          <Pill key={label}>{label}</Pill>
+        ))}
       </div>
       <p className="mt-3 text-xs font-semibold tracking-wide text-muted uppercase">{content.source.name}</p>
       <h3 lang={content.language} className="mt-1 font-serif text-[1.35rem] leading-snug font-semibold text-balance">
@@ -40,6 +47,12 @@ export function ContentCard({ content, sessionId }: { content: Content; sessionI
             publiés par la source.
           </span>
         </p>
+      )}
+
+      {videoId && (
+        <div className="mt-4">
+          <YouTubePlayer videoId={videoId} title={content.title} language={content.language} />
+        </div>
       )}
 
       <a

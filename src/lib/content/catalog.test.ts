@@ -45,6 +45,31 @@ describe("source catalogue", () => {
     for (const s of sources) expect(s.license.verifiedOn <= today, s.key).toBe(true);
   });
 
+  it("reads YouTube channels as videos, from their own feed, with the YouTube terms", () => {
+    const channels = sources.filter((s) => s.itemFormat === "youtube");
+    expect(channels.length).toBeGreaterThan(0);
+    for (const s of channels) {
+      expect(s.contentType, s.key).toBe("video");
+      expect(s.hosts, s.key).toEqual(["youtube.com"]);
+      expect(s.feedUrl, s.key).toMatch(/^https:\/\/www\.youtube\.com\/feeds\/videos\.xml\?channel_id=UC[\w-]{22}$/);
+      expect(s.homepageUrl, s.key).toMatch(/^https:\/\/www\.youtube\.com\/channel\/UC[\w-]{22}$/);
+      expect(s.license.termsUrl, s.key).toBe("https://www.youtube.com/t/terms");
+    }
+  });
+
+  it("gives YouTube channels a wider age window than news and distinct channel ids", () => {
+    const channels = sources.filter((s) => s.itemFormat === "youtube");
+    for (const s of channels) expect(s.maxAgeDays, s.key).toBe(180);
+    expect(new Set(channels.map((s) => s.feedUrl)).size).toBe(channels.length);
+  });
+
+  it("only uses level rules on sources that label their titles, with a plain regular expression", () => {
+    for (const s of sources.filter((s) => s.levelRules)) {
+      expect(s.levelRules!.length, s.key).toBeGreaterThan(0);
+      for (const rule of s.levelRules!) expect(rule.pattern.global || rule.pattern.sticky, s.key).toBe(false);
+    }
+  });
+
   it("keeps at least one source per language usable under the commercial policy for the main languages", () => {
     const commercial = new Set(sources.filter((s) => s.license.commercialUse).map((s) => s.language));
     expect([...commercial].sort()).toEqual(expect.arrayContaining(["en", "es", "it", "ru"]));
