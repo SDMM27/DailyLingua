@@ -83,13 +83,22 @@ jobs:
           "${CURL[@]}" --output /dev/null "$BASE/manifest.webmanifest" || fail "/manifest.webmanifest ne répond pas 200"
           pass "/manifest.webmanifest : 200"
 
-          # 3. Signed-out visitor is sent to the sign-in screen
-          HEADERS=$(curl --silent --output /dev/null --dump-header - --max-time 20 --retry 3 --retry-all-errors "$BASE/")
-          CODE=$(echo "$HEADERS" | head -n 1 | awk '{print $2}')
-          LOCATION=$(echo "$HEADERS" | tr -d '\r' | awk 'tolower($1) == "location:" {print $2}')
-          case "$CODE" in 30[1-8]) ;; *) fail "/ sans session : code $CODE au lieu d'une redirection" ;; esac
-          case "$LOCATION" in */connexion|*/connexion\?*) ;; *) fail "/ redirige vers $LOCATION au lieu de /connexion" ;; esac
-          pass "/ sans session : redirection vers /connexion"
+          # 3. Signed-out visitor: the home page leads to the teaser, any other page to the sign-in
+          # screen (src/proxy.ts).
+          headers_of() { curl --silent --output /dev/null --dump-header - --max-time 20 --retry 3 --retry-all-errors "$1"; }
+          expect_redirect() { # path, expected target path, headers
+            local code location
+            code=$(echo "$3" | head -n 1 | awk '{print $2}')
+            location=$(echo "$3" | tr -d '\r' | awk 'tolower($1) == "location:" {print $2}')
+            case "$code" in 30[1-8]) ;; *) fail "$1 sans session : code $code au lieu d'une redirection" ;; esac
+            case "$location" in *"$2"|*"$2"\?*) ;; *) fail "$1 redirige vers $location au lieu de $2" ;; esac
+            pass "$1 sans session : redirection vers $2"
+          }
+          HEADERS=$(headers_of "$BASE/")
+          expect_redirect / /decouvrir "$HEADERS"
+          expect_redirect /mission /connexion "$(headers_of "$BASE/mission")"
+          "${CURL[@]}" --output /dev/null "$BASE/decouvrir" || fail "/decouvrir ne répond pas 200"
+          pass "/decouvrir : 200"
 
           # 4. Security headers
           echo "$HEADERS" | tr -d '\r' | grep -qi '^x-content-type-options: nosniff$' \
