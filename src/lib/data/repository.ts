@@ -34,6 +34,8 @@ import {
 } from "@/lib/schemas/mission";
 import type { FeedbackInput } from "@/lib/schemas/feedback";
 import { correctionCardSchema, type CorrectionCard, type ReviewCorrectionInput } from "@/lib/schemas/correction-card";
+import type { GrammarPracticeResult } from "@/lib/domain/grammar";
+import { grammarCardSchema, type GrammarCard, type RecordGrammarPracticeInput } from "@/lib/schemas/grammar";
 import { productionEntrySchema, type ProductionEntry } from "@/lib/schemas/production";
 import { placementSummarySchema, type PlacementRecord, type PlacementSummary } from "@/lib/schemas/placement";
 import { preferencesSchema, type Preferences } from "@/lib/schemas/preferences";
@@ -58,6 +60,7 @@ import { buildMockContents, buildMockSources } from "./mock/contents";
 import { buildMockHistory, buildMockStudyDates } from "./mock/history";
 import { buildMockMission } from "./mock/mission";
 import { MOCK_PREFERENCES } from "./mock/preferences";
+import { buildMockGrammarCards } from "./mock/grammar";
 import { buildMockCorrectionCards, buildMockProductions } from "./mock/productions";
 import { buildMockVocabulary, buildMockVocabularyLists } from "./mock/vocabulary";
 import { createSupabaseRepository } from "./supabase-repository";
@@ -142,6 +145,16 @@ export interface DailyLinguaRepository {
   /** Grades a review; returns the card with its new review state. */
   reviewCorrectionCard(input: ReviewCorrectionInput): Promise<CorrectionCard>;
   deleteCorrectionCard(id: string): Promise<void>;
+
+  /** Grammar points practised successfully, as review cards (due date order). */
+  listGrammarCards(): Promise<GrammarCard[]>;
+  /**
+   * Records one run through the exercises of a point: creates the card (score of 60 % or more),
+   * reviews it when it is due, otherwise records nothing. Refused when the point does not exist
+   * or is hidden, or when the card changed since the page was loaded (`expectedReviewCount`).
+   */
+  recordGrammarPractice(input: RecordGrammarPracticeInput): Promise<GrammarPracticeResult>;
+  deleteGrammarCard(id: string): Promise<void>;
 
   listVocabulary(): Promise<VocabularyItem[]>;
   addVocabulary(input: NewVocabularyInput): Promise<VocabularyItem>;
@@ -258,6 +271,11 @@ function createMockRepository(): DailyLinguaRepository {
     addCorrectionCard: readOnly,
     reviewCorrectionCard: readOnly,
     deleteCorrectionCard: readOnly,
+    async listGrammarCards() {
+      return z.array(grammarCardSchema).parse(buildMockGrammarCards(today()));
+    },
+    recordGrammarPractice: readOnly,
+    deleteGrammarCard: readOnly,
     async listVocabulary() {
       return z.array(vocabularyItemSchema).parse(buildMockVocabulary(today()));
     },
