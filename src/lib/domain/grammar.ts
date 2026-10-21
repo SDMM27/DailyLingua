@@ -49,6 +49,12 @@ export function gradeFromScore(correct: number, total: number): ReviewGrade {
   return "again";
 }
 
+/** What the Leitner logic needs of a card: grammar points and alphabet groups share it. */
+export interface PracticeCard {
+  status: "learning" | "known";
+  review: ReviewState;
+}
+
 export type GrammarPracticeOutcome = "created" | "reviewed" | "practice" | "not-passed";
 
 export interface GrammarPracticePlan {
@@ -62,7 +68,7 @@ export interface GrammarPracticePlan {
  * reviewed when it is due; any other run is free practice and records nothing.
  */
 export function planGrammarPractice(
-  card: GrammarCard | undefined,
+  card: PracticeCard | undefined,
   correct: number,
   total: number,
   today: DateKey,
@@ -78,7 +84,7 @@ export function planGrammarPractice(
   return { outcome: "practice" };
 }
 
-export function grammarPointState(card: GrammarCard | undefined): GrammarPointState {
+export function grammarPointState(card: PracticeCard | undefined): GrammarPointState {
   if (!card) return "new";
   if (card.status === "known" || card.review.box >= GRAMMAR_MASTERED_BOX) return "mastered";
   return "practised";

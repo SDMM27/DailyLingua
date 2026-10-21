@@ -43,6 +43,32 @@ isOneToOne: false
       referencedColumns: ["id","user_id"]
     }
                   ]
+                },"alphabet_cards": {
+                  Row: {
+                    "added_on": string,"box": number,"created_at": string,"due_on": string,"group_id": string,"id": string,"language": string,"last_reviewed_on": string | null,"review_count": number,"status": string,"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "added_on": string,"box"?: number,"created_at"?: string,"due_on": string,"group_id": string,"id"?: string,"language": string,"last_reviewed_on"?: string | null,"review_count"?: number,"status"?: string,"updated_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "added_on"?: string,"box"?: number,"created_at"?: string,"due_on"?: string,"group_id"?: string,"id"?: string,"language"?: string,"last_reviewed_on"?: string | null,"review_count"?: number,"status"?: string,"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "alphabet_cards_language_fkey"
+      columns: ["language"]
+isOneToOne: false
+      referencedRelation: "languages"
+      referencedColumns: ["code"]
+    },{
+      foreignKeyName: "alphabet_cards_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"content_refusals": {
                   Row: {
                     "content_id": string,"created_at": string,"reason": string,"user_id": string
@@ -610,6 +636,9 @@ isOneToOne: false
                            },
 "normalize_url":
 { Args: { "url": string }; Returns: string
+                           },
+"record_alphabet_practice":
+{ Args: { "p_box_after": number,"p_due_on_after": string,"p_expected_review_count": number,"p_group_id": string,"p_language": string,"p_practised_on": string }; Returns: boolean
                            },
 "record_correction_review":
 { Args: { "p_box_after": number,"p_card_id": string,"p_due_on_after": string,"p_expected_review_count": number,"p_reviewed_on": string }; Returns: boolean

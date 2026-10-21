@@ -1,5 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
+import { findVisibleAlphabetGroup, readAlphabetDraftPolicy } from "@/lib/alphabets/policy";
+import type { AlphabetPracticeResult } from "@/lib/domain/alphabet";
 import { toDateKey } from "@/lib/domain/dates";
 import { planGrammarPractice, type GrammarPracticeResult } from "@/lib/domain/grammar";
 import { recurringCorrectionIndexes } from "@/lib/domain/production-stats";
@@ -12,6 +14,7 @@ import { SOURCE_CATALOG } from "@/lib/content/catalog";
 import { readContentLicensePolicy } from "@/lib/content/policy";
 import { sourceTraits, type SourceTraits } from "@/lib/content/source-traits";
 import { findVisibleGrammarPoint, readGrammarDraftPolicy } from "@/lib/grammar/policy";
+import { alphabetCardSchema, type AlphabetCard, type RecordAlphabetPracticeInput } from "@/lib/schemas/alphabet";
 import { grammarCardSchema, type GrammarCard, type RecordGrammarPracticeInput } from "@/lib/schemas/grammar";
 import { dateKeySchema, type ContentType, type DateKey, type Language } from "@/lib/schemas/common";
 import {
@@ -98,6 +101,7 @@ type VocabularyRow = Database["public"]["Tables"]["vocabulary_items"]["Row"];
 type VocabularyListRow = Database["public"]["Tables"]["vocabulary_lists"]["Row"];
 type CorrectionCardRow = Database["public"]["Tables"]["correction_cards"]["Row"];
 type GrammarCardRow = Database["public"]["Tables"]["grammar_cards"]["Row"];
+type AlphabetCardRow = Database["public"]["Tables"]["alphabet_cards"]["Row"];
 type SourceRow = Database["public"]["Tables"]["sources"]["Row"];
 
 /** Columns of a source needed to show it with its licence. */
@@ -203,6 +207,22 @@ function toGrammarCard(row: GrammarCardRow): GrammarCard {
   return grammarCardSchema.parse({
     id: row.id,
     pointId: row.point_id,
+    language: row.language,
+    status: row.status,
+    review: {
+      box: row.box,
+      dueOn: row.due_on,
+      lastReviewedOn: row.last_reviewed_on,
+      reviewCount: row.review_count,
+    },
+    addedOn: row.added_on,
+  });
+}
+
+function toAlphabetCard(row: AlphabetCardRow): AlphabetCard {
+  return alphabetCardSchema.parse({
+    id: row.id,
+    groupId: row.group_id,
     language: row.language,
     status: row.status,
     review: {
@@ -1188,6 +1208,54 @@ export function createSupabaseRepository(
     if (error) throw new Error(`Supabase (suppression de la fiche) : ${error.message}`);
   }
 
+  async function listAlphabetCards(): Promise<AlphabetCard[]> {
+    const rows = unwrap(
+      await client.from("alphabet_cards").select("*").eq("user_id", userId).order("due_on").order("created_at"),
+      "fiches d’alphabet",
+    );
+    return rows.map(toAlphabetCard);
+  }
+
+  async function readAlphabetCard(groupId: string): Promise<AlphabetCard | undefined> {
+    const { data, error } = await client
+      .from("alphabet_cards")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("group_id", groupId)
+      .maybeSingle();
+    if (error) throw new Error(`Supabase (fiche d’alphabet) : ${error.message}`);
+    return data ? toAlphabetCard(data) : undefined;
+  }
+
+  async function recordAlphabetPractice(input: RecordAlphabetPracticeInput): Promise<AlphabetPracticeResult> {
+    const stale = () => new UserFacingError("Cette fiche a changé entre-temps : recharge la page.");
+    const found = findVisibleAlphabetGroup(input.groupId, readAlphabetDraftPolicy());
+    if (!found) throw new UserFacingError("Ce groupe de lettres n’existe pas.");
+    // Every letter and 3 words, plus up to 2 listening questions (dropped without a local voice).
+    const letters = found.group.letters.length;
+    if (input.total < letters + 3 || input.total > letters + 5) throw new UserFacingError("Données invalides.");
+
+    const today = await getToday();
+    const existing = await readAlphabetCard(input.groupId);
+    if ((existing?.review.reviewCount ?? null) !== input.expectedReviewCount) throw stale();
+
+    const plan = planGrammarPractice(existing, input.correct, input.total, today);
+    if (!plan.review) return { outcome: plan.outcome, card: existing ?? null };
+
+    const { data: applied, error } = await client.rpc("record_alphabet_practice", {
+      p_group_id: input.groupId,
+      p_language: found.language,
+      p_practised_on: today,
+      p_box_after: plan.review.box,
+      p_due_on_after: plan.review.dueOn,
+      // null = no card yet (the generated types do not know the function accepts it).
+      p_expected_review_count: input.expectedReviewCount as number,
+    });
+    if (error) throw new Error(`Supabase (alphabet) : ${error.message}`);
+    if (!applied) throw stale();
+    return { outcome: plan.outcome, card: (await readAlphabetCard(input.groupId)) ?? null };
+  }
+
   async function sendFeedback(input: FeedbackInput): Promise<void> {
     const { error } = await client.from("feedback").insert({
       user_id: userId,
@@ -1391,6 +1459,8 @@ export function createSupabaseRepository(
     listGrammarCards,
     recordGrammarPractice,
     deleteGrammarCard,
+    listAlphabetCards,
+    recordAlphabetPractice,
     listVocabulary,
     addVocabulary,
     reviewVocabulary,

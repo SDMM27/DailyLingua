@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 import { GrammarView } from "@/components/grammar/grammar-view";
 import { getRepository, getToday, requirePreferences } from "@/lib/data/repository";
+import { readAlphabetDraftPolicy, visibleAlphabet } from "@/lib/alphabets/policy";
 import { grammarLanguages } from "@/lib/grammar/courses";
 import { readGrammarDraftPolicy, visibleGrammarPoints } from "@/lib/grammar/policy";
 import { languageSchema } from "@/lib/schemas/common";
@@ -35,6 +36,7 @@ export default async function GrammarPage({ searchParams }: { searchParams: Prom
       cards={cards.filter((c) => c.language === language)}
       level={goal.level}
       today={today}
+      hasAlphabet={visibleAlphabet(language, readAlphabetDraftPolicy()) !== undefined}
     />
   );
 }

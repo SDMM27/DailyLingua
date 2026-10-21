@@ -1,6 +1,6 @@
 # Plan — grammaire, alphabets, révision du vocabulaire, parcours par niveau
 
-Statut : **proposition**, rien n'est implémenté. Date : 2026-10-21. Ce plan complète [product-features.md](product-features.md) (phases A à G) sans le remplacer. Les phases ci-dessous portent les lettres H à K pour ne pas se confondre avec les précédentes.
+Statut : **H1 (grammaire pilote) est fait, I1 (cyrillique : russe, ukrainien) est implémenté** ; le reste est une proposition. Date : 2026-10-21. Ce plan complète [product-features.md](product-features.md) (phases A à G) sans le remplacer. Les phases ci-dessous portent les lettres H à K pour ne pas se confondre avec les précédentes.
 
 ## 1. Constat
 
@@ -88,6 +88,15 @@ Le niveau vient du test de niveau (phase C) ou de la préférence déclarée. Il
 6. **Hors v1** : tracé à la main (canvas, plus lourd, peu de gain prouvé).
 
 Ordre des écritures : cyrillique (russe, ukrainien) → coréen → grec → japonais (kana) → arabe.
+
+**I1 (fait)** : cyrillique, russe et ukrainien (`src/lib/alphabets`, `/alphabet`). Décisions prises :
+
+- Une carte de révision par groupe de lettres (5 groupes par langue), et non par lettre : une série d'exercices correspond à une carte, comme pour la grammaire (table `alphabet_cards`, RPC `record_alphabet_practice`, même moteur Leitner que `grammar_cards`).
+- Les exercices sont générés à partir des données des lettres (lettre → transcription, transcription → lettre, lecture d'un mot, écoute d'un mot), pas rédigés. Graine `groupe:jour` : la série est la même toute la journée.
+- Transcription savante lettre à lettre, une forme latine unique par lettre, pour pouvoir relire un mot à partir d'elle.
+- Relecture native de l'alphabet entier : drapeau `reviewedOn` (null = brouillon) et variable `ALPHABET_DRAFTS` (show / hide), comme `GRAMMAR_DRAFTS`.
+- Entrée depuis l'accueil pour les apprenants A1 tant que l'alphabet n'est pas complet, puis pour les révisions dues.
+- Reste à faire : le test « tu lis déjà cette écriture ? » pour sauter le module.
 
 ### Phase J — Révision du vocabulaire : modes et mesure
 

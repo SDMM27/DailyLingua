@@ -4,10 +4,12 @@ import { contentListItemSchema, sourceInfoSchema } from "@/lib/schemas/content";
 import { missionHistoryEntrySchema, missionSchema } from "@/lib/schemas/mission";
 import { preferencesSchema } from "@/lib/schemas/preferences";
 import { correctionCardSchema } from "@/lib/schemas/correction-card";
+import { alphabetCardSchema } from "@/lib/schemas/alphabet";
 import { grammarCardSchema } from "@/lib/schemas/grammar";
 import { productionEntrySchema } from "@/lib/schemas/production";
 import { vocabularyItemSchema } from "@/lib/schemas/vocabulary";
 import { buildMockContents, buildMockSources } from "./contents";
+import { buildMockAlphabetCards } from "./alphabet";
 import { buildMockGrammarCards } from "./grammar";
 import { buildMockHistory } from "./history";
 import { buildMockMission } from "./mission";
@@ -37,6 +39,10 @@ describe("demo data matches the schemas", () => {
 
   it("grammar cards", () => {
     expect(() => z.array(grammarCardSchema).parse(buildMockGrammarCards(TODAY))).not.toThrow();
+  });
+
+  it("alphabet cards", () => {
+    expect(() => z.array(alphabetCardSchema).parse(buildMockAlphabetCards(TODAY))).not.toThrow();
   });
 
   it("preferences", () => {
