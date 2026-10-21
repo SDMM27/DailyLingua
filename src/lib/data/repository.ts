@@ -34,7 +34,9 @@ import {
 } from "@/lib/schemas/mission";
 import type { FeedbackInput } from "@/lib/schemas/feedback";
 import { correctionCardSchema, type CorrectionCard, type ReviewCorrectionInput } from "@/lib/schemas/correction-card";
+import type { AlphabetPracticeResult } from "@/lib/domain/alphabet";
 import type { GrammarPracticeResult } from "@/lib/domain/grammar";
+import { alphabetCardSchema, type AlphabetCard, type RecordAlphabetPracticeInput } from "@/lib/schemas/alphabet";
 import { grammarCardSchema, type GrammarCard, type RecordGrammarPracticeInput } from "@/lib/schemas/grammar";
 import { productionEntrySchema, type ProductionEntry } from "@/lib/schemas/production";
 import { placementSummarySchema, type PlacementRecord, type PlacementSummary } from "@/lib/schemas/placement";
@@ -60,6 +62,7 @@ import { buildMockContents, buildMockSources } from "./mock/contents";
 import { buildMockHistory, buildMockStudyDates } from "./mock/history";
 import { buildMockMission } from "./mock/mission";
 import { MOCK_PREFERENCES } from "./mock/preferences";
+import { buildMockAlphabetCards } from "./mock/alphabet";
 import { buildMockGrammarCards } from "./mock/grammar";
 import { buildMockCorrectionCards, buildMockProductions } from "./mock/productions";
 import { buildMockVocabulary, buildMockVocabularyLists } from "./mock/vocabulary";
@@ -155,6 +158,16 @@ export interface DailyLinguaRepository {
    */
   recordGrammarPractice(input: RecordGrammarPracticeInput): Promise<GrammarPracticeResult>;
   deleteGrammarCard(id: string): Promise<void>;
+
+  /** Groups of letters practised successfully, as review cards (due date order). */
+  listAlphabetCards(): Promise<AlphabetCard[]>;
+  /**
+   * Records one run through the exercises of a group of letters: creates the card (score of 60 %
+   * or more), reviews it when it is due, otherwise records nothing. Refused when the group does
+   * not exist or is hidden, or when the card changed since the page was loaded
+   * (`expectedReviewCount`).
+   */
+  recordAlphabetPractice(input: RecordAlphabetPracticeInput): Promise<AlphabetPracticeResult>;
 
   listVocabulary(): Promise<VocabularyItem[]>;
   addVocabulary(input: NewVocabularyInput): Promise<VocabularyItem>;
@@ -276,6 +289,10 @@ function createMockRepository(): DailyLinguaRepository {
     },
     recordGrammarPractice: readOnly,
     deleteGrammarCard: readOnly,
+    async listAlphabetCards() {
+      return z.array(alphabetCardSchema).parse(buildMockAlphabetCards(today()));
+    },
+    recordAlphabetPractice: readOnly,
     async listVocabulary() {
       return z.array(vocabularyItemSchema).parse(buildMockVocabulary(today()));
     },

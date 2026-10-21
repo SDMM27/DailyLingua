@@ -26,6 +26,7 @@ export function GrammarView({
   cards,
   level,
   today,
+  hasAlphabet = false,
 }: {
   userLanguages: Language[];
   language: Language;
@@ -34,6 +35,8 @@ export function GrammarView({
   /** The learner's declared level in this language. */
   level: CefrLevel;
   today: DateKey;
+  /** The language has a visible alphabet: link to it. */
+  hasAlphabet?: boolean;
 }) {
   const cardOf = (point: GrammarPoint) => cards.find((c) => c.pointId === point.id);
   const dueCards = dueItems(cards, today).filter((c) => points.some((p) => p.id === c.pointId));
@@ -66,6 +69,17 @@ export function GrammarView({
             ))}
           </ul>
         </nav>
+      )}
+
+      {hasAlphabet && (
+        <p className="-mt-3 mb-6 text-sm">
+          <Link
+            href={`/alphabet?langue=${language}`}
+            className="inline-flex min-h-11 items-center font-medium text-ink-soft underline underline-offset-2 hover:text-ink"
+          >
+            Revoir l’alphabet
+          </Link>
+        </p>
       )}
 
       {points.length === 0 ? (
