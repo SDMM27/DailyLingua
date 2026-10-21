@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { connection } from "next/server";
 import { GuestTrialBanner } from "@/components/auth/guest-trial-banner";
+import { GrammarPreview } from "@/components/dashboard/grammar-preview";
 import { InstallBanner } from "@/components/install/install-banner";
 import { MissionSummaryCard } from "@/components/dashboard/mission-summary-card";
 import { ReviewPreview } from "@/components/dashboard/review-preview";
@@ -11,6 +12,8 @@ import { Card, DemoNotice, Eyebrow } from "@/components/ui/primitives";
 import { getRepository, getToday, requirePreferences } from "@/lib/data/repository";
 import { addDays, diffInDays, formatLongDate } from "@/lib/domain/dates";
 import { languageInfo } from "@/lib/domain/languages";
+import { grammarLanguages } from "@/lib/grammar/courses";
+import { readGrammarDraftPolicy, visibleGrammarPoints } from "@/lib/grammar/policy";
 import { dueItems, dueToday, upcomingReviews } from "@/lib/domain/spaced-repetition";
 import { computeStreak, recentDays } from "@/lib/domain/stats";
 import { completedMinutes } from "@/lib/domain/time-budget";
@@ -20,18 +23,27 @@ export default async function DashboardPage() {
   const repo = await getRepository();
   const preferences = await requirePreferences();
   const today = await getToday();
-  const [mission, history, studyDates, vocabulary, vocabularyLists, correctionCards, placements, guestTrial] = await Promise.all([
+  const [mission, history, studyDates, vocabulary, vocabularyLists, correctionCards, grammarCards, placements, guestTrial] = await Promise.all([
     repo.getMission(today),
     repo.getHistory(),
     repo.getStudyDates(),
     repo.listVocabulary(),
     repo.listVocabularyLists(),
     repo.listCorrectionCards(),
+    repo.listGrammarCards(),
     repo.listPlacementTests(),
     repo.getGuestTrial(),
   ]);
   const unassessed = !repo.isDemo && preferences.goals.some((g) => !placements.some((p) => p.language === g.language));
   const dueErrors = dueItems(correctionCards, today).length;
+  // Grammar: only for languages of the user that have a visible course.
+  const grammarPolicy = readGrammarDraftPolicy();
+  const grammarOfUser = preferences.goals
+    .map((g) => g.language)
+    .filter((l) => grammarLanguages().includes(l) && visibleGrammarPoints(l, grammarPolicy).length > 0);
+  const dueGrammar = dueItems(grammarCards, today).filter(
+    (c) => grammarOfUser.includes(c.language) && visibleGrammarPoints(c.language, grammarPolicy).some((p) => p.id === c.pointId),
+  );
   const progress = mission ? await repo.getMissionProgress(mission) : null;
 
   const weekStart = addDays(today, -6);
@@ -117,6 +129,10 @@ export default async function DashboardPage() {
           </span>
           <ArrowRightIcon width={16} height={16} className="text-muted" />
         </Link>
+      )}
+
+      {grammarOfUser.length > 0 && (
+        <GrammarPreview dueCount={dueGrammar.length} language={dueGrammar[0]?.language ?? grammarOfUser[0]} />
       )}
 
       <WeekCard days={recentDays(studyDates, today)} stats={stats} />
