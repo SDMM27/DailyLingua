@@ -25,6 +25,7 @@
     "cron:run": "tsx --env-file-if-exists=.env.local scripts/cron-run.mts",
     "feedback:eval": "tsx --env-file-if-exists=.env.local scripts/writing-feedback-eval.mts",
     "placement:check": "tsx scripts/placement-check.mts",
+    "grammar:check": "tsx scripts/grammar-check.mts",
     "e2e": "playwright test",
     "e2e:install": "playwright install webkit"
   },

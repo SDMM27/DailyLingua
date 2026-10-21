@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { toDateKey } from "@/lib/domain/dates";
+import { planGrammarPractice, type GrammarPracticeResult } from "@/lib/domain/grammar";
 import { recurringCorrectionIndexes } from "@/lib/domain/production-stats";
 import { guestTrialStatus, type GuestTrialStatus } from "@/lib/domain/guest-trial";
 import { LANGUAGE_CODES } from "@/lib/domain/languages";
@@ -10,6 +11,8 @@ import { availableLanguages } from "@/lib/content/availability";
 import { SOURCE_CATALOG } from "@/lib/content/catalog";
 import { readContentLicensePolicy } from "@/lib/content/policy";
 import { sourceTraits, type SourceTraits } from "@/lib/content/source-traits";
+import { findVisibleGrammarPoint, readGrammarDraftPolicy } from "@/lib/grammar/policy";
+import { grammarCardSchema, type GrammarCard, type RecordGrammarPracticeInput } from "@/lib/schemas/grammar";
 import { dateKeySchema, type ContentType, type DateKey, type Language } from "@/lib/schemas/common";
 import {
   contentListItemSchema,
@@ -94,6 +97,7 @@ function storedFeedback(value: unknown): WritingFeedback | undefined {
 type VocabularyRow = Database["public"]["Tables"]["vocabulary_items"]["Row"];
 type VocabularyListRow = Database["public"]["Tables"]["vocabulary_lists"]["Row"];
 type CorrectionCardRow = Database["public"]["Tables"]["correction_cards"]["Row"];
+type GrammarCardRow = Database["public"]["Tables"]["grammar_cards"]["Row"];
 type SourceRow = Database["public"]["Tables"]["sources"]["Row"];
 
 /** Columns of a source needed to show it with its licence. */
@@ -184,6 +188,22 @@ function toCorrectionCard(row: CorrectionCardRow): CorrectionCard {
     corrected: row.corrected,
     explanation: row.explanation,
     category: row.category ?? undefined,
+    status: row.status,
+    review: {
+      box: row.box,
+      dueOn: row.due_on,
+      lastReviewedOn: row.last_reviewed_on,
+      reviewCount: row.review_count,
+    },
+    addedOn: row.added_on,
+  });
+}
+
+function toGrammarCard(row: GrammarCardRow): GrammarCard {
+  return grammarCardSchema.parse({
+    id: row.id,
+    pointId: row.point_id,
+    language: row.language,
     status: row.status,
     review: {
       box: row.box,
@@ -1117,6 +1137,57 @@ export function createSupabaseRepository(
     if (error) throw new Error(`Supabase (suppression de la carte) : ${error.message}`);
   }
 
+  async function listGrammarCards(): Promise<GrammarCard[]> {
+    const rows = unwrap(
+      await client.from("grammar_cards").select("*").eq("user_id", userId).order("due_on").order("created_at"),
+      "fiches de grammaire",
+    );
+    return rows.map(toGrammarCard);
+  }
+
+  async function readGrammarCard(pointId: string): Promise<GrammarCard | undefined> {
+    const { data, error } = await client
+      .from("grammar_cards")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("point_id", pointId)
+      .maybeSingle();
+    if (error) throw new Error(`Supabase (fiche de grammaire) : ${error.message}`);
+    return data ? toGrammarCard(data) : undefined;
+  }
+
+  async function recordGrammarPractice(input: RecordGrammarPracticeInput): Promise<GrammarPracticeResult> {
+    const stale = () => new UserFacingError("Cette fiche a changé entre-temps : recharge la page.");
+    const found = findVisibleGrammarPoint(input.pointId, readGrammarDraftPolicy());
+    if (!found) throw new UserFacingError("Cette fiche n’existe pas.");
+    if (input.total !== found.point.exercises.length) throw new UserFacingError("Données invalides.");
+
+    const today = await getToday();
+    const existing = await readGrammarCard(input.pointId);
+    if ((existing?.review.reviewCount ?? null) !== input.expectedReviewCount) throw stale();
+
+    const plan = planGrammarPractice(existing, input.correct, input.total, today);
+    if (!plan.review) return { outcome: plan.outcome, card: existing ?? null };
+
+    const { data: applied, error } = await client.rpc("record_grammar_practice", {
+      p_point_id: input.pointId,
+      p_language: found.language,
+      p_practised_on: today,
+      p_box_after: plan.review.box,
+      p_due_on_after: plan.review.dueOn,
+      // null = no card yet (the generated types do not know the function accepts it).
+      p_expected_review_count: input.expectedReviewCount as number,
+    });
+    if (error) throw new Error(`Supabase (grammaire) : ${error.message}`);
+    if (!applied) throw stale();
+    return { outcome: plan.outcome, card: (await readGrammarCard(input.pointId)) ?? null };
+  }
+
+  async function deleteGrammarCard(id: string): Promise<void> {
+    const { error } = await client.from("grammar_cards").delete().eq("id", id).eq("user_id", userId);
+    if (error) throw new Error(`Supabase (suppression de la fiche) : ${error.message}`);
+  }
+
   async function sendFeedback(input: FeedbackInput): Promise<void> {
     const { error } = await client.from("feedback").insert({
       user_id: userId,
@@ -1317,6 +1388,9 @@ export function createSupabaseRepository(
     addCorrectionCard,
     reviewCorrectionCard,
     deleteCorrectionCard,
+    listGrammarCards,
+    recordGrammarPractice,
+    deleteGrammarCard,
     listVocabulary,
     addVocabulary,
     reviewVocabulary,

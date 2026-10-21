@@ -155,6 +155,32 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"grammar_cards": {
+                  Row: {
+                    "added_on": string,"box": number,"created_at": string,"due_on": string,"id": string,"language": string,"last_reviewed_on": string | null,"point_id": string,"review_count": number,"status": string,"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "added_on": string,"box"?: number,"created_at"?: string,"due_on": string,"id"?: string,"language": string,"last_reviewed_on"?: string | null,"point_id": string,"review_count"?: number,"status"?: string,"updated_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "added_on"?: string,"box"?: number,"created_at"?: string,"due_on"?: string,"id"?: string,"language"?: string,"last_reviewed_on"?: string | null,"point_id"?: string,"review_count"?: number,"status"?: string,"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "grammar_cards_language_fkey"
+      columns: ["language"]
+isOneToOne: false
+      referencedRelation: "languages"
+      referencedColumns: ["code"]
+    },{
+      foreignKeyName: "grammar_cards_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"guest_mission_reservations": {
                   Row: {
                     "created_at": string,"mission_date": string,"user_id": string
@@ -587,6 +613,9 @@ isOneToOne: false
                            },
 "record_correction_review":
 { Args: { "p_box_after": number,"p_card_id": string,"p_due_on_after": string,"p_expected_review_count": number,"p_reviewed_on": string }; Returns: boolean
+                           },
+"record_grammar_practice":
+{ Args: { "p_box_after": number,"p_due_on_after": string,"p_expected_review_count": number,"p_language": string,"p_point_id": string,"p_practised_on": string }; Returns: boolean
                            },
 "record_placement_test":
 { Args: { "p_answers"?: Json,"p_bank_version"?: string,"p_chosen_level"?: string,"p_confidence"?: string,"p_estimated_level"?: string,"p_language": string,"p_start_level"?: string,"p_status": string,"p_variant"?: string }; Returns: undefined

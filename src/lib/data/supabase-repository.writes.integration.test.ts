@@ -1,5 +1,5 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { addDays, toDateKey } from "@/lib/domain/dates";
 import { createSessionReplacer } from "@/lib/generation/preparer";
 import { createTemplateGenerator } from "@/lib/generation/template-generator";
@@ -10,6 +10,17 @@ import type { Database, Json } from "@/lib/supabase/database.types";
 import { deleteUserAccount } from "@/lib/supabase/delete-account";
 import { UserFacingError } from "./errors";
 import { createSupabaseRepository } from "./supabase-repository";
+
+// The real courses are content that changes on its own: the grammar tests use a fixture point.
+vi.mock("@/lib/grammar/courses", async () => {
+  const { FIXTURE_POINT } = await import("@/test/grammar-fixtures");
+  const course = { language: "it", version: "2026-10-21", points: [FIXTURE_POINT] };
+  return {
+    GRAMMAR_COURSES: { it: course },
+    grammarPoint: (id: string) => course.points.find((p) => p.id === id),
+    grammarLanguages: () => ["it"],
+  };
+});
 
 /**
  * Write-path integration tests against the LOCAL Supabase stack. Each run creates its own
@@ -517,6 +528,93 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
       ).rejects.toBeInstanceOf(UserFacingError);
       await repo.deleteCorrectionCard(card.id);
       expect((await repo.listCorrectionCards()).map((c) => c.correctionIndex)).toEqual([1]);
+    });
+  });
+
+  describe("grammar cards", () => {
+    const pointId = "it-a1-present";
+
+    it("creates a card on a pass, reviews it when due, refuses stale counts and keeps cards private", async () => {
+      expect(await repo.listGrammarCards()).toEqual([]);
+
+      // Refused: unknown point, wrong number of exercises, card unexpectedly there / missing.
+      await expect(
+        repo.recordGrammarPractice({ pointId: "it-a1-unknown", correct: 3, total: 3, expectedReviewCount: null }),
+      ).rejects.toBeInstanceOf(UserFacingError);
+      await expect(
+        repo.recordGrammarPractice({ pointId, correct: 3, total: 3, expectedReviewCount: 1 }),
+      ).rejects.toBeInstanceOf(UserFacingError);
+
+      // Below 60 %: nothing is recorded.
+      expect(await repo.recordGrammarPractice({ pointId, correct: 1, total: 3, expectedReviewCount: null })).toEqual({
+        outcome: "not-passed",
+        card: null,
+      });
+      expect(await repo.listGrammarCards()).toEqual([]);
+
+      // A pass creates the card (box 1 after a perfect score), due in two days.
+      const created = await repo.recordGrammarPractice({ pointId, correct: 3, total: 3, expectedReviewCount: null });
+      expect(created.outcome).toBe("created");
+      expect(created.card).toMatchObject({
+        pointId,
+        language: "it",
+        status: "learning",
+        addedOn: today(),
+        review: { box: 1, dueOn: addDays(today(), 2), lastReviewedOn: today(), reviewCount: 1 },
+      });
+
+      // The same page opened twice: a second creation is refused.
+      await expect(
+        repo.recordGrammarPractice({ pointId, correct: 3, total: 3, expectedReviewCount: null }),
+      ).rejects.toBeInstanceOf(UserFacingError);
+
+      // Not due yet: free practice, nothing changes.
+      expect(await repo.recordGrammarPractice({ pointId, correct: 3, total: 3, expectedReviewCount: 1 })).toMatchObject({
+        outcome: "practice",
+        card: { review: { reviewCount: 1 } },
+      });
+
+      // Due: reviewed. A stale count is refused.
+      const [card] = await repo.listGrammarCards();
+      await admin.from("grammar_cards").update({ due_on: today() }).eq("id", card.id);
+      await expect(
+        repo.recordGrammarPractice({ pointId, correct: 3, total: 3, expectedReviewCount: 0 }),
+      ).rejects.toBeInstanceOf(UserFacingError);
+      const reviewed = await repo.recordGrammarPractice({ pointId, correct: 3, total: 3, expectedReviewCount: 1 });
+      expect(reviewed.outcome).toBe("reviewed");
+      expect(reviewed.card?.review).toMatchObject({ box: 2, reviewCount: 2, lastReviewedOn: today() });
+      await expect(
+        repo.recordGrammarPractice({ pointId, correct: 3, total: 3, expectedReviewCount: 1 }),
+      ).rejects.toBeInstanceOf(UserFacingError);
+
+      // Another user sees nothing, cannot move the card, and deleting it removes it.
+      const email = `grammar-${Date.now()}@test.invalid`;
+      const password = `pw-${Math.random().toString(36).slice(2)}-${Date.now()}`;
+      const other = await admin.auth.admin.createUser({ email, password, email_confirm: true });
+      if (other.error) throw other.error;
+      try {
+        const otherClient = createClient<Database>(url!, anonKey!, { auth: { persistSession: false } });
+        const signedIn = await otherClient.auth.signInWithPassword({ email, password });
+        if (signedIn.error) throw signedIn.error;
+        const otherRepo = createSupabaseRepository(otherClient, other.data.user.id);
+        expect(await otherRepo.listGrammarCards()).toEqual([]);
+        const { data: moved } = await otherClient.rpc("record_grammar_practice", {
+          p_point_id: pointId,
+          p_language: "it",
+          p_practised_on: today(),
+          p_box_after: 5,
+          p_due_on_after: addDays(today(), 60),
+          p_expected_review_count: 2,
+        });
+        expect(moved).toBe(false);
+        await otherRepo.deleteGrammarCard(card.id);
+      } finally {
+        await admin.auth.admin.deleteUser(other.data.user.id);
+      }
+      expect(await repo.listGrammarCards()).toHaveLength(1);
+
+      await repo.deleteGrammarCard(card.id);
+      expect(await repo.listGrammarCards()).toEqual([]);
     });
   });
 
