@@ -13,6 +13,7 @@ import {
   type CandidateContent,
   type GenerationRequest,
   type GenerationResult,
+  type GeneratedProductionMode,
   type SessionRequest,
   type WireSession,
 } from "@/lib/schemas/generation";
@@ -24,7 +25,7 @@ export interface ValidatedSession {
   content: CandidateContent;
   questions: ComprehensionQuestion[];
   expressions: Expression[];
-  production: ProductionTask;
+  production: ProductionTask & { mode: GeneratedProductionMode };
 }
 
 const L = GENERATION_LIMITS;
@@ -110,7 +111,7 @@ export function validateGeneratedSession(
     .filter((h) => usable(h))
     .slice(0, L.hints.max);
   // targetLength is set by the app once the minutes are planned (see productionTargetLength).
-  const production = productionTaskSchema.parse({ mode: request.productionMode, prompt, hints });
+  const production = { ...productionTaskSchema.parse({ mode: request.productionMode, prompt, hints }), mode: request.productionMode };
 
   return { language, content, questions, expressions, production };
 }

@@ -30,6 +30,7 @@ const italian = {
   level: "B1",
   targetLevel: "B2",
   purpose: "general",
+  mode: "writing",
   task: "Secondo te, è meglio lavorare da casa o in ufficio? Spiega perché, con un esempio della tua esperienza.",
   targetLength: "50–80 mots",
 } as const;
@@ -39,6 +40,7 @@ const russian = {
   level: "B2",
   targetLevel: "C1",
   purpose: "professional",
+  mode: "writing",
   task: "Напишите коллеге короткое письмо: предложите перенести завтрашнее совещание и объясните причину.",
   targetLength: "60–90 mots",
 } as const;
@@ -48,7 +50,19 @@ const spanish = {
   level: "A2",
   targetLevel: "B1",
   purpose: "conversational",
+  mode: "writing",
   task: "Escribe un mensaje a un amigo para contarle qué hiciste el fin de semana.",
+  targetLength: "30–50 mots",
+} as const;
+
+// Spoken mode: a script to be said aloud, so the expected register is the spoken one.
+const germanSpoken = {
+  language: "de",
+  level: "B1",
+  targetLevel: "B2",
+  purpose: "conversational",
+  mode: "spoken",
+  task: "Schreib auf, was du einem Freund über den Artikel erzählen würdest, und sag es dann laut.",
   targetLength: "30–50 mots",
 } as const;
 
@@ -123,6 +137,30 @@ export const EVAL_CASES: EvalCase[] = [
     request: {
       ...spanish,
       text: "Hola. Sabado yo ir mercado hermana. Domingo parque bueno tiempo comer. Muy bien fin semana. Adios",
+    },
+  },
+  {
+    id: "de-B1-spoken-good",
+    expected: "good",
+    request: {
+      ...germanSpoken,
+      text: "Hör mal, ich habe gestern einen Artikel über Homeoffice gelesen. Weißt du, was mich überrascht hat? Viele Leute arbeiten zu Hause sogar mehr als im Büro! Ich finde das ziemlich schade, denn man braucht ja auch mal Pause. Was meinst du dazu?",
+    },
+  },
+  {
+    id: "de-B1-spoken-fair",
+    expected: "fair",
+    request: {
+      ...germanSpoken,
+      text: "Ich habe gestern ein Artikel gelesen über Homeoffice. Es war sehr interessant, weil viele Menschen arbeiten mehr zu Hause als in das Büro. Ich denke das ist nicht gut, man muss auch pause machen. Was denkst du?",
+    },
+  },
+  {
+    id: "de-B1-spoken-very-weak",
+    expected: "very-weak",
+    request: {
+      ...germanSpoken,
+      text: "Artikel gestern lesen Homeoffice. Viel Mensch arbeiten Haus mehr. Nicht gut, Pause nicht. Du denken?",
     },
   },
   {

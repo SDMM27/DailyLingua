@@ -33,7 +33,7 @@ function sessionRequest(language: SessionRequest["language"] = "it"): SessionReq
     purpose: "general",
     topics: ["société"],
     minutes: 20,
-    productionMode: "speaking",
+    productionMode: "spoken",
     productionMinutes: 6,
     candidates: [candidate("c0"), candidate("c1")],
   };
@@ -75,7 +75,7 @@ describe("validateGeneratedSession", () => {
     expect(result.expressions[0].note).toBeUndefined();
     expect(result.expressions[1].note).toBe("usage");
     expect(result.production).toEqual({
-      mode: "speaking",
+      mode: "spoken",
       prompt: "Che ne pensi?",
       hints: ["Un conseil", "Un autre"],
     });

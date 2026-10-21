@@ -14,7 +14,7 @@ function templateSession(request: SessionRequest): WireSession {
     production: {
       prompt: writing
         ? `En ${language}, résume en quelques phrases ce que tu as compris de « ${title} », puis donne ton avis.`
-        : `En ${language}, raconte à voix haute ce que tu as compris de « ${title} », puis donne ton avis.`,
+        : `En ${language}, écris ce que tu dirais à quelqu’un pour lui raconter « ${title} » et donner ton avis, puis dis-le à voix haute.`,
       hints_fr: writing
         ? [
             "Commence par l’idée principale en une phrase.",
@@ -22,9 +22,9 @@ function templateSession(request: SessionRequest): WireSession {
             "Termine par ton avis, avec un connecteur de ton niveau.",
           ]
         : [
-            "Prépare trois mots-clés, pas des phrases entières.",
-            "Parle sans t’arrêter, même si tu cherches un mot.",
-            "Réécoute-toi si possible et note ce qui a manqué.",
+            "Écris comme tu parlerais : des phrases courtes, faciles à dire.",
+            "Commence par ce qui t’a le plus surpris, puis donne ton avis.",
+            "Garde des mots et des tournures que tu sais prononcer.",
           ],
     },
   };

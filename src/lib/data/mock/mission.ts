@@ -130,7 +130,7 @@ export function buildMockMission(today: DateKey): Mission {
         activities: [
           { id: "it-listen", kind: "listening", title: "Écouter l'extrait (4 min)", estimatedMinutes: 4 },
           { id: "it-vocab", kind: "vocabulary", title: "Expressions du quotidien", estimatedMinutes: 2 },
-          { id: "it-speak", kind: "speaking", title: "Parler 2 minutes sans t'arrêter", estimatedMinutes: 4 },
+          { id: "it-speak", kind: "writing", title: "Écrire puis dire à voix haute", estimatedMinutes: 4 },
         ],
         questions: [],
         expressions: [
@@ -160,13 +160,14 @@ export function buildMockMission(today: DateKey): Mission {
           },
         ],
         production: {
-          mode: "speaking",
+          mode: "spoken",
           prompt:
-            "Registrati per due minuti: racconta la tua routine del mattino. Usa almeno tre espressioni e non fermarti, anche se sbagli.",
+            "Scrivi quello che diresti a un amico per raccontargli la tua routine del mattino, poi dillo ad alta voce. Usa almeno tre espressioni della lezione.",
+          targetLength: "30–50 mots",
           hints: [
-            "Parle à voix haute, même seul·e : le but est la fluidité",
+            "Écris comme tu parlerais : des phrases courtes, faciles à dire",
             "Si un mot manque, contourne-le (« quella cosa che… »)",
-            "Réécoute-toi et note une erreur à corriger demain",
+            "Garde des mots et des tournures que tu sais prononcer",
           ],
         },
       },

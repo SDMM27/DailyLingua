@@ -10,6 +10,7 @@ import {
   type WritingFeedbackResult,
   type WritingReviewState,
 } from "@/lib/schemas/writing-feedback";
+import { SpeakAloud } from "./speak-aloud";
 import { WritingFeedbackCard } from "./writing-feedback-card";
 
 function countWords(text: string): number {
@@ -57,6 +58,7 @@ export function ProductionTask({
   const [review, setReview] = useState<WritingReviewState | null>(initialReview ?? null);
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const [hidden, setHidden] = useState(false);
   const lastSaved = useRef(initialText);
   const latest = useRef({ text, onSave });
   const textareaId = useId();
@@ -123,12 +125,19 @@ export function ProductionTask({
   const canRequest = !tooShort && !loading && attemptsLeft > 0 && !alreadyReviewed;
   const showCounter = text.length > MAX_PRODUCTION_LENGTH * COUNTER_THRESHOLD;
   const Icon = task.mode === "writing" ? PenIcon : MicIcon;
+  const heading = { writing: "Production écrite", spoken: "Écrire puis dire", speaking: "Production orale" }[task.mode];
+  // Speaking steps: on the native version once corrected; otherwise on the learner's own text,
+  // as soon as it is meaningful and no correction can still come (demo, old review without
+  // native version, unavailable, limit reached).
+  const nativeVersion = review?.feedback?.nativeVersion;
+  const showSpeakAloud =
+    task.mode === "spoken" && (Boolean(nativeVersion) || (!tooShort && (!onRequestFeedback || review !== null)));
 
   return (
     <div>
       <p className="flex items-center gap-2 text-xs font-semibold tracking-wide text-muted uppercase">
         <Icon width={15} height={15} />
-        {task.mode === "writing" ? "Production écrite" : "Production orale"}
+        {heading}
         {task.targetLength && <span className="font-normal normal-case">· {task.targetLength}</span>}
       </p>
       <p lang={language} className="mt-2 font-serif text-[17px] leading-relaxed">
@@ -143,7 +152,7 @@ export function ProductionTask({
         ))}
       </ul>
 
-      {task.mode === "writing" ? (
+      {task.mode !== "speaking" ? (
         <div className="mt-4">
           <label htmlFor={textareaId} className="sr-only">
             Ton texte
@@ -201,14 +210,23 @@ export function ProductionTask({
                   Cette correction porte sur une version précédente de ton texte.
                 </p>
               )}
-              <WritingFeedbackCard language={language} feedback={review.feedback} />
+              <WritingFeedbackCard language={language} feedback={review.feedback} hideNativeVersion={hidden} />
             </div>
+          )}
+
+          {showSpeakAloud && (
+            <SpeakAloud
+              language={language}
+              nativeVersion={nativeVersion}
+              ownText={text}
+              hidden={hidden}
+              onToggleHidden={() => setHidden((h) => !h)}
+            />
           )}
         </div>
       ) : (
         <p className="mt-4 rounded-2xl border border-dashed border-line px-4 py-3 text-[13px] leading-relaxed text-muted">
-          Enregistre-toi avec le dictaphone de ton téléphone pour l’instant : l’enregistrement dans l’app
-          arrivera plus tard.
+          Parle à voix haute, même seul·e : le but est la fluidité.
         </p>
       )}
     </div>

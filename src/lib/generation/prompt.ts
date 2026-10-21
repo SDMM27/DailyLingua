@@ -11,7 +11,7 @@ import { productionTargetLength } from "./plan-activities";
  * that varies goes in the user message. Feed titles and teasers come from third-party publishers:
  * they are wrapped in <content> tags and the model is told to treat them as data only.
  */
-export const PROMPT_VERSION = "2026-10-16.1";
+export const PROMPT_VERSION = "2026-10-21.1";
 
 const L = GENERATION_LIMITS;
 
@@ -54,14 +54,16 @@ For each language, return one session:
    - Stress: ${STRESS_LANGUAGES}. For these languages, write the stress of every word of "text" that has two or more syllables, as a combining acute accent (U+0301) right after the stressed vowel, e.g. "сло́во", "в пе́рвую о́чередь".Do not put a mark on "ё" (always stressed) nor on one-syllable words. For a phrase, mark each word. Mark only the stress you are sure of; a missing mark is better than a wrong one. Leave "example" without marks.
    - translation_fr. example: a natural sentence written by you, not copied from the teaser. note_fr: short usage note in French (register, government, false friend...) or an empty string.
 
-4. production: a writing or speaking task, as requested for that language, linked to the topic of the chosen content and doable without having read it in full.
-   - Size it for the expected length given for that language (a word range for writing, a speaking time for speaking): with a short length, ask for one focused idea (a reaction, one argument, a short comparison), not a structured essay. The app displays that length next to the task: never state a number of words, minutes or sentences in the prompt or the hints.
+4. production: a "writing" or "spoken" task, as requested for that language, linked to the topic of the chosen content and doable without having read it in full.
+   - "writing": a text to be read (an opinion, a message, a short e-mail...).
+   - "spoken": the learner writes what they would SAY, then says it aloud: an oral situation linked to the content, such as reacting to it, telling it to someone, giving an opinion to someone, speaking in a meeting, or an oral-exam monologue, depending on the learner's purpose. Ask for the spoken register of that purpose (informal for a conversation, polite for travel, formal for work or an exam) and for sentences that are easy to say aloud. The hints_fr never mention recording or listening back: the app handles the speaking steps.
+   - Size it for the expected length given for that language (a word range, for both modes): with a short length, ask for one focused idea (a reaction, one argument, a short comparison), not a structured essay. The app displays that length next to the task: never state a number of words, minutes or sentences in the prompt or the hints.
    - prompt: at the learner's level, asking for an opinion, a comparison with the learner's own experience, or a short argument; encourage reusing the expressions above.
    - hints_fr: ${L.hints.min} to ${L.hints.max} short tips in French (what to include, connectors of the target level quoted in the studied language, structure only when there is time for it).
 
 Learner's purpose: each language comes with a purpose. It sets the register and the kind of exercises; the level still sets the difficulty.
 - general: neutral standard register. Varied expressions; the production asks for an opinion or a comparison.
-- conversational: informal spoken register, as between friends (in languages with a formal and an informal "you", use the informal one). Expressions: everyday spoken phrases, idioms, reactions and fillers, no bookish words. Production: a reply as in a conversation (react, tell a short anecdote, give a quick opinion); in writing, a message to a friend.
+- conversational: informal spoken register, as between friends (in languages with a formal and an informal "you", use the informal one). Expressions: everyday spoken phrases, idioms, reactions and fillers, no bookish words. Production: a reply as in a conversation (react, tell a short anecdote, give a quick opinion); in writing, a message to a friend; spoken, what you would tell a friend.
 - professional: formal workplace register (the formal "you" where the language has one). Expressions: set phrases of meetings, e-mails, presentations and negotiation; say in note_fr when an expression is formal. Production: a workplace task (a short professional e-mail, a point to make in a meeting, a summary for a colleague).
 - travel: polite practical register of a visitor. Expressions: what a traveller needs in shops, transport, lodging, restaurants or to ask for help. Production: a concrete situation (ask, book, complain, describe a place).
 - exam: formal register of language certification exams. Expressions: connectors and structures that organise an argument. Questions: paraphrase and inference, as in exam reading tasks. Production: an exam-style task (an argued opinion with a clear position, or a formal letter); hints_fr say what an examiner checks.

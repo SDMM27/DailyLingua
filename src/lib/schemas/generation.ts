@@ -39,8 +39,16 @@ export const candidateContentSchema = z.object({
 });
 export type CandidateContent = z.infer<typeof candidateContentSchema>;
 
-export const productionModeSchema = z.enum(["writing", "speaking"]);
+/**
+ * `spoken`: written first (so it can be corrected), then said aloud. `speaking` is the former
+ * spoken-only task: still readable in stored missions, never generated any more.
+ */
+export const productionModeSchema = z.enum(["writing", "spoken", "speaking"]);
 export type ProductionMode = z.infer<typeof productionModeSchema>;
+
+/** The modes a new mission can ask for. */
+export const generatedProductionModeSchema = z.enum(["writing", "spoken"]);
+export type GeneratedProductionMode = z.infer<typeof generatedProductionModeSchema>;
 
 /** What to generate for one language. */
 export const sessionRequestSchema = z.object({
@@ -54,7 +62,7 @@ export const sessionRequestSchema = z.object({
   /** Interests chosen for this language (French labels); never mixed with another language's. */
   topics: z.array(z.string()),
   minutes: z.number().int().positive(),
-  productionMode: productionModeSchema,
+  productionMode: generatedProductionModeSchema,
   /** Minutes planned for the production task (estimate: the final plan depends on the exercises). */
   productionMinutes: z.number().int().positive(),
   /** Best first; at least one. */

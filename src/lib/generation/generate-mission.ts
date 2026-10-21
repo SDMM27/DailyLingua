@@ -12,7 +12,7 @@ import {
   type GenerationRequest,
   type GenerationResult,
   type PlannedActivity,
-  type ProductionMode,
+  type GeneratedProductionMode,
 } from "@/lib/schemas/generation";
 import type {
   ComprehensionQuestion,
@@ -22,7 +22,7 @@ import type {
 } from "@/lib/schemas/mission";
 import type { Preferences } from "@/lib/schemas/preferences";
 import { GenerationError } from "./errors";
-import { chooseProductionMode, planActivities, productionTargetLength } from "./plan-activities";
+import { chooseProductionMode, planActivities, productionActivityKind, productionTargetLength } from "./plan-activities";
 import { rankCandidates } from "./select-contents";
 import { createTemplateGenerator } from "./template-generator";
 import { validateGeneratedMission, type ValidatedSession } from "./validate";
@@ -111,7 +111,7 @@ export async function loadUsablePool(store: Pick<MissionStore, "listCandidates">
 
 /** The request for one language: ranked candidates, minutes and the production task asked for. */
 export function buildSessionRequest(
-  o: PoolOptions & { pool: CandidateContent[]; productionMode: ProductionMode },
+  o: PoolOptions & { pool: CandidateContent[]; productionMode: GeneratedProductionMode },
 ): GenerationRequest["sessions"][number] {
   const candidates = rankCandidates(o.pool, {
     level: o.goal.level,
@@ -172,7 +172,7 @@ export function planSession(session: ValidatedSession, minutes: number): Planned
     expressionCount: session.expressions.length,
     productionMode: session.production.mode,
   }).map((activity) => plannedActivitySchema.parse(activity));
-  const production = activities.find((a) => a.kind === session.production.mode);
+  const production = activities.find((a) => a.kind === productionActivityKind(session.production.mode));
   return {
     language: session.language,
     contentId: session.content.id,
@@ -180,7 +180,7 @@ export function planSession(session: ValidatedSession, minutes: number): Planned
     expressions: session.expressions,
     // The length asked follows the minutes actually planned (none when there is no room).
     production: production
-      ? { ...session.production, targetLength: productionTargetLength(production.kind as ProductionMode, production.estimatedMinutes) }
+      ? { ...session.production, targetLength: productionTargetLength(session.production.mode, production.estimatedMinutes) }
       : session.production,
     activities,
   };

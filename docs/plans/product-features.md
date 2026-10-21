@@ -10,7 +10,30 @@ Phase 5 (F, regarder / écouter) implémentée le 2026-10-20, en attente de vali
 
 Phase F (suite, podcasts et sites d'information) implémentée le 2026-10-21, en attente de validation : conception ci-dessous (« Phase F (suite) »). 51 sources ajoutées (33 podcasts lisibles dans l'app, 18 sites d'information) ; chaque langue a au moins deux sites d'information et, sauf l'arabe, un podcast lisible dans l'app. France Médias Monde (RFI, MCD) écarté sur ses conditions (collecte et stockage interdits sans autorisation, fouille de textes exclue), décision de l'utilisateur du 2026-10-21. À faire avant publication : appliquer la migration `20261020000400_content_audio_url.sql` sur le projet hébergé (`supabase db push`), contrôle visuel du lecteur audio sur iPhone (lecture, écran verrouillé, vitesses), Licences relues le 2026-10-21 : KBS écarté (« 무단 전재, 재배포 및 이용(AI 학습 포함) 금지 » sur son site et ses chaînes YouTube : podcast 오늘 세계는, KBS News, KBS 다큐) ; règlement de Polskie Radio lu (usage personnel, pas de clause sur l'IA) ; Podcast Italiano et Italiano Automatico n'ont qu'une politique de confidentialité ; créateurs indépendants : flux RSS publié volontairement pour les applications de podcasts. Tous les flux du catalogue passés au crible d'une mention « pas d'IA » : seul KBS en porte une. Restent à couvrir : un podcast arabe, des sites d'information en langue simple pour 13 langues.
 
+Phase E (audio) **reportée** le 2026-10-21, décision de l'utilisateur : pas d'enregistrement ni de transcription pour l'instant (voir « E. Enregistrement audio et revue », estimations de coût). À la place, phase G (« écrire puis dire ») : la production orale sans retour est remplacée par une production écrite pensée pour être dite, corrigée, puis dite à voix haute par l'utilisateur, seul. Conception ci-dessous (« Phase G — conception proposée »), validée le 2026-10-21 ; implémentée le même jour, en attente de validation. Ajout en cours de route : le registre peut restreindre les régions des voix de synthèse (`speechRegions`, pour le chinois : CN, TW, SG, car une voix `zh-HK` parle cantonais).
+
 Ce plan suit la règle du projet : une phase à la fois, chacune validée avant la suivante. Chaque phase se termine par la liste des fichiers modifiés, les commandes lancées, les tests réellement exécutés et leurs résultats.
+
+## Phase G — écrire puis dire, conception proposée
+
+Constat : un jour sur deux et par langue, la production est orale (`chooseProductionMode`). L'utilisateur parle seul, sans enregistrement (l'écran renvoie au dictaphone du téléphone) et sans aucun retour : le retour écrit refuse les tâches orales (`not-writing`). La phase garde l'alternance, mais l'oral passe par l'écrit, donc par la correction. **Aucune migration**, aucun nouveau fournisseur, aucun coût en plus de la correction écrite existante.
+
+1. **Nouveau mode `spoken`.** `productionModeSchema` et `productionTaskSchema.mode` deviennent `writing | spoken | speaking`. `speaking` reste lisible (missions déjà enregistrées) mais n'est plus jamais produit : `chooseProductionMode` alterne `writing` et `spoken`. L'activité garde le type `writing` (c'est une production écrite) : la case se coche comme aujourd'hui quand la correction est demandée, sans toucher à la contrainte `mission_activities.kind`. Titre : « Écrire puis dire à voix haute ». Une fonction `productionActivityKind(mode)` remplace la comparaison directe `a.kind === mode` de `planSession`.
+2. **Durée et longueur.** Plafond de 10 minutes (au lieu de 8). Environ la moitié du temps sert à écrire, l'autre à dire : `productionTargetLength("spoken", m)` vaut la fourchette de mots de l'écrit pour `m / 2` minutes (« 30–50 mots » pour 8 minutes), soit à peu près une minute de parole.
+3. **Génération.** Le prompt de mission décrit le mode `spoken` : ce que l'apprenant dirait dans une situation orale liée au contenu (réagir, raconter, donner son avis à quelqu'un, prendre la parole en réunion, monologue d'examen oral selon l'objectif), dans le registre **parlé** de cet objectif, en phrases faciles à dire ; les conseils (`hints_fr`) ne parlent ni d'enregistrement ni de réécoute. Nouvelle version du prompt. Le modèle de repli (`template-generator.ts`) gagne une consigne `spoken` : « En <langue>, écris ce que tu dirais à quelqu'un pour lui raconter « <titre> » et donner ton avis, puis dis-le à voix haute. »
+4. **Correction.** `requestWritingFeedback` accepte `writing` et `spoken` (seul `speaking` reste refusé). La demande transmet le mode ; le prompt de correction précise que, pour un texte `spoken`, le texte est destiné à être dit : le registre attendu est celui de l'oral et `native_version` doit sonner naturel à voix haute (pas de prose écrite). Nouvelle version du prompt ; `npm run feedback:eval` gagne au moins deux cas `spoken`. Le format stocké ne change pas.
+5. **Écran.** Pour `spoken`, l'en-tête indique « Écrire puis dire » (icône micro) et la zone de texte est la même que pour l'écrit. Après la correction, un bloc « À voix haute » propose trois étapes, sans rien enregistrer :
+   1. lis la version du natif à voix haute, deux fois ;
+   2. masque-la (bouton « Masquer ») et redis ton texte de mémoire, en reprenant les corrections ;
+   3. réponds de nouveau à la consigne à voix haute, sans rien regarder.
+   Sans correction (mode démo, correction indisponible ou limite atteinte), les mêmes étapes portent sur le texte de l'utilisateur. Le bouton « Écouter » lit la version du natif avec la synthèse vocale de l'appareil (`speechSynthesis`), seulement si une voix **locale** (`localService`) existe pour la langue : rien n'est envoyé à un tiers ; sinon le bouton n'apparaît pas. Les anciennes tâches `speaking` affichent « Parle à voix haute, même seul·e » à la place du renvoi au dictaphone.
+6. **Données d'exemple.** Mode démo (`src/lib/data/mock`) et `supabase/seed.sql` passent à `spoken`. La page `/decouvrir` parle de « production écrite, puis à voix haute ».
+
+Confidentialité : rien à changer (aucun audio ; la synthèse vocale, quand elle est proposée, reste sur l'appareil).
+
+Tests : `chooseProductionMode` ne renvoie plus `speaking` ; `productionTargetLength` et `planActivities` en mode `spoken` ; la correction accepte `spoken` et refuse `speaking` ; validation d'une session générée `spoken` ; composant : bloc « À voix haute » après correction, masquage de la version du natif, bouton « Écouter » absent sans voix locale ; ancienne tâche `speaking` toujours affichée.
+
+À faire avant publication : `npm run feedback:eval` avec une vraie clé, contrôle visuel sur iPhone (bloc « À voix haute », voix disponibles).
 
 ## Phase F (suite) — podcasts et sites d'information, conception retenue
 
@@ -164,6 +187,8 @@ Trois protections contre les visiteurs qui créeraient des comptes invités en b
 
 ## E. Enregistrement audio et revue
 
+**Statut : reporté** (2026-10-21), remplacé pour l'instant par la phase G (« écrire puis dire »). Estimations à reprendre le moment venu, prix publics relevés le 2026-10-21 sur des comparatifs (à vérifier chez chaque fournisseur) : transcription après enregistrement ≈ 0,0025 $/min (AssemblyAI Universal-2), 0,003 $/min (OpenAI gpt-4o-mini-transcribe), 0,0077 $/min (Deepgram Nova-3). Avec une production orale de 3 minutes au plus, un jour sur deux, un utilisateur actif parle environ 45 minutes par mois sur une langue, soit 0,10 à 0,35 $ par mois de transcription, plus la correction (déjà payée pour l'écrit). Le coût n'est donc pas le frein principal ; ce sont l'enregistrement dans la PWA sur iPhone, la vie privée (voix, sous-traitant) et l'ampleur du chantier. Piste pour la reprise : réservé à une offre payante, avec plafond de durée et d'essais par jour.
+
 **Objectif.** L'utilisateur parle dans la langue, réécoute son enregistrement et le compare à un modèle ou à une transcription corrigée.
 
 **Pistes.**
@@ -205,7 +230,8 @@ Ordre décidé (2026-10-19), révisé après les réponses de l'utilisateur :
 3. **D — Revue des productions** : retour complet (points forts, points à améliorer, formulation d'un natif) et erreurs récurrentes transformées en exercices.
 4. **B — Vocabulaire personnel** : saisie et collage, traduction automatique relue par l'utilisateur.
 5. **F — Regarder / écouter** : YouTube en priorité, podcasts et sites d'information ensuite, sous réserve de licence.
-6. **E — Audio** : précédé d'une phase de faisabilité. Sans stockage des voix (voir décision 4).
+6. ~~**E — Audio**~~ : reporté le 2026-10-21 (voir E).
+7. **G — Écrire puis dire** : la production orale passe par l'écrit et la correction, puis se dit à voix haute, sans enregistrement.
 
 ## Décisions de l'utilisateur
 
@@ -217,6 +243,7 @@ Ordre décidé (2026-10-19), révisé après les réponses de l'utilisateur :
    - *Transcription* : la voix est envoyée à un service de reconnaissance vocale pour produire un texte corrigeable, sans stockage de l'audio. Le fournisseur est un sous-traitant : il doit être mentionné dans la politique de confidentialité, et sa politique de conservation doit être vérifiée.
    - Choix retenu : transcription éphémère (audio non conservé, texte seul enregistré), suivie d'une correction, et réécoute pendant la session.
    - Contrainte : le fournisseur de transcription doit être choisi sans conservation ni réutilisation des données pour l'entraînement, et mentionné dans la politique de confidentialité.
+   - Révision du 2026-10-21 : audio reporté. La production orale devient « écrire puis dire » (phase G) ; la transcription reste une piste pour plus tard.
 5. **Regarder / écouter** : YouTube surtout, podcasts éventuellement, sites d'information possibles. Licence à vérifier pour chaque source.
 6. **Accès sans compte** : l'utilisateur veut faire une mission sans compte, voir l'ensemble des fonctions, et être invité à créer un compte pour personnaliser. Recommandation : compte anonyme Supabase (2a), pour que la mission faite sans compte soit conservée lors de la création du compte. Une mission par jour pendant quelques jours (nombre à fixer, trois jours proposés), puis création de compte obligatoire, avec limitation d'abus. Préférences par défaut tant que l'utilisateur n'a pas de compte.
 7. **Priorité** : ordre ci-dessus, laissé à l'appréciation du plan.
@@ -224,7 +251,7 @@ Ordre décidé (2026-10-19), révisé après les réponses de l'utilisateur :
 ## Questions ouvertes
 
 - ~~Nombre de jours de mission gratuite~~ : tranché, 3 jours distincts (`GUEST_TRIAL_DAYS`).
-- Choix du fournisseur de transcription (phase E).
+- Choix du fournisseur de transcription (phase E, reportée).
 
 ## Hors périmètre de ce document
 

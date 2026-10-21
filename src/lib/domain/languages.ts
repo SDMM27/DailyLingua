@@ -36,6 +36,11 @@ export interface LanguageInfo {
    */
   markStress?: boolean;
   /**
+   * Only voices of these regions read the language aloud, when a region of the same code speaks
+   * another variety (a "zh-HK" voice speaks Cantonese, not Mandarin). Absent: any region.
+   */
+  speechRegions?: readonly string[];
+  /**
    * Colour of the language in the UI. There are fewer accents than languages: the languages
    * people are most likely to study together get distinct accents.
    */
@@ -58,7 +63,7 @@ export const LANGUAGE_REGISTRY = {
   el: { code: "el", nameFr: "Grec", nativeName: "Ελληνικά", greeting: "Καλημέρα", dir: "ltr", accent: "azure" },
   tr: { code: "tr", nameFr: "Turc", nativeName: "Türkçe", greeting: "Günaydın", dir: "ltr", accent: "berry" },
   ar: { code: "ar", nameFr: "Arabe", nativeName: "العربية", greeting: "صباح الخير", dir: "rtl", accent: "fern" },
-  zh: { code: "zh", nameFr: "Chinois (mandarin)", nativeName: "中文", greeting: "早上好", dir: "ltr", denseScript: true, accent: "berry" },
+  zh: { code: "zh", nameFr: "Chinois (mandarin)", nativeName: "中文", greeting: "早上好", dir: "ltr", denseScript: true, speechRegions: ["CN", "TW", "SG"], accent: "berry" },
   ja: { code: "ja", nameFr: "Japonais", nativeName: "日本語", greeting: "おはようございます", dir: "ltr", denseScript: true, accent: "graphite" },
   ko: { code: "ko", nameFr: "Coréen", nativeName: "한국어", greeting: "좋은 아침이에요", dir: "ltr", denseScript: true, accent: "teal" },
   id: { code: "id", nameFr: "Indonésien", nativeName: "Bahasa Indonesia", greeting: "Selamat pagi", dir: "ltr", accent: "ochre" },

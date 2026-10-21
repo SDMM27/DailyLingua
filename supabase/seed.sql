@@ -202,8 +202,8 @@ declare
         },
         {
           "id": "it-speak",
-          "kind": "speaking",
-          "title": "Parler 2 minutes sans t'arrêter",
+          "kind": "writing",
+          "title": "Écrire puis dire à voix haute",
           "estimatedMinutes": 4
         }
       ],
@@ -235,12 +235,13 @@ declare
         }
       ],
       "production": {
-        "mode": "speaking",
-        "prompt": "Registrati per due minuti: racconta la tua routine del mattino. Usa almeno tre espressioni e non fermarti, anche se sbagli.",
+        "mode": "spoken",
+        "prompt": "Scrivi quello che diresti a un amico per raccontargli la tua routine del mattino, poi dillo ad alta voce. Usa almeno tre espressioni della lezione.",
+        "targetLength": "30–50 mots",
         "hints": [
-          "Parle à voix haute, même seul·e : le but est la fluidité",
+          "Écris comme tu parlerais : des phrases courtes, faciles à dire",
           "Si un mot manque, contourne-le (« quella cosa che… »)",
-          "Réécoute-toi et note une erreur à corriger demain"
+          "Garde des mots et des tournures que tu sais prononcer"
         ]
       }
     }
@@ -350,7 +351,7 @@ begin
         ),
         '[]'::jsonb,
         jsonb_build_object(
-          'mode', case when s ->> 'language' = 'ru' then 'writing' else 'speaking' end,
+          'mode', case when s ->> 'language' = 'ru' then 'writing' else 'spoken' end,
           'prompt', 'Tâche de démonstration.', 'hints', '[]'::jsonb
         )
       ) returning id into sid;

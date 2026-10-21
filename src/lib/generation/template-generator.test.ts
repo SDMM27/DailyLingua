@@ -15,7 +15,7 @@ function request(): GenerationRequest {
       purpose: "general",
       topics: ["société"],
       minutes: 10,
-      productionMode: i % 2 === 0 ? "writing" : "speaking",
+      productionMode: i % 2 === 0 ? "writing" : "spoken",
       productionMinutes: 4,
       candidates: [
         {
@@ -58,6 +58,9 @@ describe("createTemplateGenerator", () => {
     expect(ru.production.prompt).toContain("En russe");
     expect(ru.production.prompt).toContain("résume");
     expect(it_.production.prompt).toContain("« Un titre »");
-    expect(it_.production.prompt).toContain("à voix haute");
+    expect(it_.production.prompt).toBe(
+      "En italien, écris ce que tu dirais à quelqu’un pour lui raconter « Un titre » et donner ton avis, puis dis-le à voix haute.",
+    );
+    expect(it_.production.hints_fr.join(" ")).not.toMatch(/enregistr|réécoute/i);
   });
 });
