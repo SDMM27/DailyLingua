@@ -1,8 +1,9 @@
 import type { Language } from "@/lib/schemas/common";
 import type { GrammarPoint } from "@/lib/schemas/grammar";
+import { readDraftPolicy, type DraftPolicy } from "@/lib/draft-policy";
 import { GRAMMAR_COURSES, grammarLanguages } from "./courses";
 
-export type GrammarDraftPolicy = "show" | "hide";
+export type GrammarDraftPolicy = DraftPolicy;
 
 /**
  * GRAMMAR_DRAFTS: "show" or "hide" the points no native speaker has approved yet
@@ -10,10 +11,7 @@ export type GrammarDraftPolicy = "show" | "hide";
  * wrong value fails loudly rather than silently showing drafts.
  */
 export function readGrammarDraftPolicy(source: Record<string, string | undefined> = process.env): GrammarDraftPolicy {
-  const raw = source.GRAMMAR_DRAFTS?.trim();
-  if (!raw) return source.VERCEL_ENV === "production" ? "hide" : "show";
-  if (raw === "show" || raw === "hide") return raw;
-  throw new Error(`GRAMMAR_DRAFTS invalide : « ${raw} » (valeurs : show, hide).`);
+  return readDraftPolicy("GRAMMAR_DRAFTS", source);
 }
 
 export function isGrammarPointVisible(point: GrammarPoint, policy: GrammarDraftPolicy): boolean {

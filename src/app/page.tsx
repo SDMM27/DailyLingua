@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { connection } from "next/server";
 import { GuestTrialBanner } from "@/components/auth/guest-trial-banner";
+import { AlphabetPreview } from "@/components/dashboard/alphabet-preview";
 import { GrammarPreview } from "@/components/dashboard/grammar-preview";
 import { InstallBanner } from "@/components/install/install-banner";
 import { MissionSummaryCard } from "@/components/dashboard/mission-summary-card";
@@ -12,6 +13,9 @@ import { Card, DemoNotice, Eyebrow } from "@/components/ui/primitives";
 import { getRepository, getToday, requirePreferences } from "@/lib/data/repository";
 import { addDays, diffInDays, formatLongDate } from "@/lib/domain/dates";
 import { languageInfo } from "@/lib/domain/languages";
+import { alphabetLanguages } from "@/lib/alphabets";
+import { readAlphabetDraftPolicy, visibleAlphabet } from "@/lib/alphabets/policy";
+import { isAlphabetComplete } from "@/lib/domain/alphabet";
 import { grammarLanguages } from "@/lib/grammar/courses";
 import { readGrammarDraftPolicy, visibleGrammarPoints } from "@/lib/grammar/policy";
 import { dueItems, dueToday, upcomingReviews } from "@/lib/domain/spaced-repetition";
@@ -23,7 +27,7 @@ export default async function DashboardPage() {
   const repo = await getRepository();
   const preferences = await requirePreferences();
   const today = await getToday();
-  const [mission, history, studyDates, vocabulary, vocabularyLists, correctionCards, grammarCards, placements, guestTrial] = await Promise.all([
+  const [mission, history, studyDates, vocabulary, vocabularyLists, correctionCards, grammarCards, alphabetCards, placements, guestTrial] = await Promise.all([
     repo.getMission(today),
     repo.getHistory(),
     repo.getStudyDates(),
@@ -31,6 +35,7 @@ export default async function DashboardPage() {
     repo.listVocabularyLists(),
     repo.listCorrectionCards(),
     repo.listGrammarCards(),
+    repo.listAlphabetCards(),
     repo.listPlacementTests(),
     repo.getGuestTrial(),
   ]);
@@ -44,6 +49,17 @@ export default async function DashboardPage() {
   const dueGrammar = dueItems(grammarCards, today).filter(
     (c) => grammarOfUser.includes(c.language) && visibleGrammarPoints(c.language, grammarPolicy).some((p) => p.id === c.pointId),
   );
+  // Alphabets: for each language of the user with a visible one, the groups to review, or (A1
+  // learners) an invitation to learn to read until every group has a card.
+  const alphabetPolicy = readAlphabetDraftPolicy();
+  const alphabetPreviews = preferences.goals.flatMap((goal) => {
+    const alphabet = alphabetLanguages().includes(goal.language) ? visibleAlphabet(goal.language, alphabetPolicy) : undefined;
+    if (!alphabet) return [];
+    const cardsOfLanguage = alphabetCards.filter((c) => c.language === goal.language);
+    const due = dueItems(cardsOfLanguage, today).filter((c) => alphabet.groups.some((g) => g.id === c.groupId));
+    const invite = goal.level === "A1" && !isAlphabetComplete(alphabet, cardsOfLanguage);
+    return due.length > 0 || invite ? [{ language: goal.language, script: alphabet.script, dueCount: due.length }] : [];
+  });
   const progress = mission ? await repo.getMissionProgress(mission) : null;
 
   const weekStart = addDays(today, -6);
@@ -134,6 +150,10 @@ export default async function DashboardPage() {
       {grammarOfUser.length > 0 && (
         <GrammarPreview dueCount={dueGrammar.length} language={dueGrammar[0]?.language ?? grammarOfUser[0]} />
       )}
+
+      {alphabetPreviews.map((preview) => (
+        <AlphabetPreview key={preview.language} {...preview} />
+      ))}
 
       <WeekCard days={recentDays(studyDates, today)} stats={stats} />
 

@@ -618,6 +618,91 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
     });
   });
 
+  describe("alphabet cards", () => {
+    // Russian group 1 has 6 letters: a run is 6 + 3 + 2 questions (2 fewer without a local voice).
+    const groupId = "ru-alphabet-1";
+    const total = 11;
+
+    it("creates a card on a pass, reviews it when due, refuses stale counts and keeps cards private", async () => {
+      expect(await repo.listAlphabetCards()).toEqual([]);
+
+      // Refused: unknown group, wrong number of questions, card unexpectedly there / missing.
+      await expect(
+        repo.recordAlphabetPractice({ groupId: "ru-alphabet-9", correct: total, total, expectedReviewCount: null }),
+      ).rejects.toBeInstanceOf(UserFacingError);
+      await expect(
+        repo.recordAlphabetPractice({ groupId, correct: 3, total: 3, expectedReviewCount: null }),
+      ).rejects.toBeInstanceOf(UserFacingError);
+      await expect(
+        repo.recordAlphabetPractice({ groupId, correct: total, total, expectedReviewCount: 1 }),
+      ).rejects.toBeInstanceOf(UserFacingError);
+
+      // Below 60 %: nothing is recorded.
+      expect(await repo.recordAlphabetPractice({ groupId, correct: 3, total, expectedReviewCount: null })).toEqual({
+        outcome: "not-passed",
+        card: null,
+      });
+      expect(await repo.listAlphabetCards()).toEqual([]);
+
+      // A pass creates the card (box 1 after a perfect score), due in two days.
+      const created = await repo.recordAlphabetPractice({ groupId, correct: total, total, expectedReviewCount: null });
+      expect(created.outcome).toBe("created");
+      expect(created.card).toMatchObject({
+        groupId,
+        language: "ru",
+        status: "learning",
+        addedOn: today(),
+        review: { box: 1, dueOn: addDays(today(), 2), lastReviewedOn: today(), reviewCount: 1 },
+      });
+
+      // The same page opened twice: a second creation is refused.
+      await expect(
+        repo.recordAlphabetPractice({ groupId, correct: total, total, expectedReviewCount: null }),
+      ).rejects.toBeInstanceOf(UserFacingError);
+
+      // Not due yet: free practice, nothing changes.
+      expect(await repo.recordAlphabetPractice({ groupId, correct: total, total, expectedReviewCount: 1 })).toMatchObject({
+        outcome: "practice",
+        card: { review: { reviewCount: 1 } },
+      });
+
+      // Due: reviewed. A stale count is refused.
+      const [card] = await repo.listAlphabetCards();
+      await admin.from("alphabet_cards").update({ due_on: today() }).eq("id", card.id);
+      await expect(
+        repo.recordAlphabetPractice({ groupId, correct: total, total, expectedReviewCount: 0 }),
+      ).rejects.toBeInstanceOf(UserFacingError);
+      const reviewed = await repo.recordAlphabetPractice({ groupId, correct: total, total, expectedReviewCount: 1 });
+      expect(reviewed.outcome).toBe("reviewed");
+      expect(reviewed.card?.review).toMatchObject({ box: 2, reviewCount: 2, lastReviewedOn: today() });
+
+      // Another user sees nothing and cannot move the card.
+      const email = `alphabet-${Date.now()}@test.invalid`;
+      const password = `pw-${Math.random().toString(36).slice(2)}-${Date.now()}`;
+      const other = await admin.auth.admin.createUser({ email, password, email_confirm: true });
+      if (other.error) throw other.error;
+      try {
+        const otherClient = createClient<Database>(url!, anonKey!, { auth: { persistSession: false } });
+        const signedIn = await otherClient.auth.signInWithPassword({ email, password });
+        if (signedIn.error) throw signedIn.error;
+        const otherRepo = createSupabaseRepository(otherClient, other.data.user.id);
+        expect(await otherRepo.listAlphabetCards()).toEqual([]);
+        const { data: moved } = await otherClient.rpc("record_alphabet_practice", {
+          p_group_id: groupId,
+          p_language: "ru",
+          p_practised_on: today(),
+          p_box_after: 5,
+          p_due_on_after: addDays(today(), 60),
+          p_expected_review_count: 2,
+        });
+        expect(moved).toBe(false);
+      } finally {
+        await admin.auth.admin.deleteUser(other.data.user.id);
+      }
+      expect(await repo.listAlphabetCards()).toHaveLength(1);
+    });
+  });
+
   describe("content refusals and session replacement", () => {
     // Its own feed source (the seed's sources have no key, so they are never candidates) with two
     // free Russian contents: one for the session, one to replace it.
