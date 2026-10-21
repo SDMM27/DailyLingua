@@ -34,6 +34,15 @@ describe("ContentCard", () => {
     expect(screen.getByText("Expliqué en français")).toBeTruthy();
   });
 
+  it("offers to listen to a podcast that has an audio file, and not otherwise", () => {
+    const podcast = { ...CONTENT, type: "podcast" as const, url: "https://www.example.es/podcast/1" };
+    render(<ContentCard content={podcast} />);
+    expect(screen.queryByRole("button", { name: "Écouter ici" })).toBeNull();
+    cleanup();
+    render(<ContentCard content={{ ...podcast, audioUrl: "https://cdn.example.es/1.mp3" }} />);
+    expect(screen.getByRole("button", { name: "Écouter ici" })).toBeTruthy();
+  });
+
   it("flags children's content", () => {
     const traits = { audience: "children" } as const;
     render(<ContentCard content={{ ...CONTENT, source: { ...CONTENT.source, traits } }} />);

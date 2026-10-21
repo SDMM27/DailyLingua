@@ -56,7 +56,7 @@ export default async function ReadingPage({
     <>
       <PageHeader eyebrow="Contenus authentiques" title="Lire, regarder, écouter">
         Les dernières parutions de sources fiables dans tes langues. Tu lis ou écoutes chez l’éditeur ; les
-        vidéos YouTube se regardent aussi ici. Seuls le titre, une courte accroche et le lien sont repris.
+        vidéos YouTube se regardent aussi ici, et les podcasts s’écoutent ici quand l’éditeur le permet. Seuls le titre, une courte accroche et le lien sont repris.
       </PageHeader>
 
       {repository.isDemo && (

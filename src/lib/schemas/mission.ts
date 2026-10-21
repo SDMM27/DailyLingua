@@ -24,6 +24,8 @@ export const contentSchema = z.object({
   difficulty: cefrLevelSchema,
   durationMinutes: z.number().int().positive(),
   summary: z.string().min(1),
+  /** Podcasts: the episode's audio file (https), played in the app on demand. */
+  audioUrl: z.url({ protocol: /^https$/ }).nullish(),
   /**
    * Whether a transcript or full text was actually available to build the exercises.
    * When false, exercises are based only on public metadata (title, description).

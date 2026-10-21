@@ -73,6 +73,7 @@ export function createSupabaseContentStore(client: Client): ContentStore {
             author: d.author,
             categories: d.categories,
             published_at: d.publishedAt?.toISOString() ?? null,
+            audio_url: d.audioUrl,
             transcript_available: false,
           })),
           // Known URLs are left untouched: a content may already be used by a mission.

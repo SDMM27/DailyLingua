@@ -64,6 +64,7 @@ function draft(path: string, minutesAgo: number): ContentDraft {
     author: "Redazione",
     categories: ["Prova"],
     publishedAt: new Date(Date.now() - minutesAgo * 60_000),
+    audioUrl: null,
   };
 }
 

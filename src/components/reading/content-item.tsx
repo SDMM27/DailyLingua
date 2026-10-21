@@ -7,6 +7,7 @@ import { languageInfo } from "@/lib/domain/languages";
 import { sourceTraitLabels } from "@/lib/content/source-traits";
 import { youtubeVideoId } from "@/lib/content/youtube";
 import type { ContentListItem, SourceInfo } from "@/lib/schemas/content";
+import { AudioPlayer } from "./audio-player";
 import { WatchHere } from "./watch-here";
 
 /** "CC BY 3.0" linked to the licence, or the publisher's terms for all-rights-reserved sources. */
@@ -59,6 +60,7 @@ export function ContentItem({ item, now, timeZone }: { item: ContentListItem; no
           </p>
         )}
         {videoId && <WatchHere videoId={videoId} title={item.title} language={item.language} />}
+        {item.type === "podcast" && item.audioUrl && <AudioPlayer audioUrl={item.audioUrl} title={item.title} />}
         <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
           <Pill>{CONTENT_TYPE_LABELS[item.type]}</Pill>
           <Pill>{item.difficulty}</Pill>

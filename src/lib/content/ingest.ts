@@ -115,7 +115,8 @@ export async function ingest(catalog: SourceDefinition[], store: ContentStore, o
 
   const links = { checked: 0, ok: 0, redirected: 0, broken: 0, inconclusive: 0 };
   if (linkChecks > 0) {
-    const hostsByKey = new Map(sources.map((s) => [s.key, s.hosts]));
+    // A podcast episode may be linked to its audio file (no page of its own): its hosts count too.
+    const hostsByKey = new Map(sources.map((s) => [s.key, [...s.hosts, ...(s.audioHosts ?? [])]]));
     const pending = await store.listUncheckedLinks(linkChecks);
     await pool(pending, 4, async ({ id, url, sourceKey }) => {
       const hosts = sourceKey ? hostsByKey.get(sourceKey) : undefined;

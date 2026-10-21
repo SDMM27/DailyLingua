@@ -27,6 +27,8 @@ export interface ContentDraft {
   author: string | null;
   categories: string[];
   publishedAt: Date | null;
+  /** Podcasts only: the episode's audio file, when the feed's enclosure passed the checks. */
+  audioUrl: string | null;
 }
 
 export type RejectReason =
@@ -54,6 +56,8 @@ const DENSE_FULL_TEXT_TEASER_LENGTH = 90;
 const MAX_CATEGORIES = 8;
 const MAX_CATEGORY_LENGTH = 60;
 const MAX_AUTHOR_LENGTH = 200;
+const MAX_AUDIO_URL_LENGTH = 2000;
+const AUDIO_EXTENSION = /\.(?:mp3|m4a|aac|ogg|opus)$/i;
 
 /** First bold link of the featured-article blurb: `<b><a href="/wiki/X" title="X">X</a></b>`. */
 const WIKIPEDIA_LEAD = /<b>\s*<a\s[^>]*?href="([^"]+)"[^>]*?(?:title="([^"]*)")?[^>]*>([\s\S]*?)<\/a>\s*<\/b>/i;
@@ -98,6 +102,36 @@ function matches(pattern: RegExp, text: string): boolean {
   return new RegExp(pattern.source, pattern.flags.replace(/[gy]/g, "")).test(text);
 }
 
+/**
+ * The enclosure's URL when it is a playable audio file on one of the source's audio hosts: `https`,
+ * an `audio/*` type (or, without a usable type, an audio file extension). Anything else (video,
+ * `http`, another host) is ignored: the episode stays a plain link.
+ */
+function acceptedAudioUrl(enclosure: RawFeedItem["enclosure"], audioHosts: readonly string[]): URL | null {
+  if (!enclosure) return null;
+  let url: URL;
+  try {
+    url = new URL(enclosure.url.trim());
+  } catch {
+    return null;
+  }
+  if (url.protocol !== "https:" || url.username || url.password) return null;
+  if (url.toString().length > MAX_AUDIO_URL_LENGTH) return null;
+  const type = enclosure.type?.split(";")[0].trim().toLowerCase() || null;
+  const audioType = type === null || type === "application/octet-stream"
+    ? AUDIO_EXTENSION.test(url.pathname)
+    : type.startsWith("audio/");
+  if (!audioType) return null;
+  return isAllowedHost(url.hostname, audioHosts) ? url : null;
+}
+
+/** Same page for our purposes: same host without `www.` and same path without a trailing slash. */
+function isSamePage(a: URL, b: URL): boolean {
+  const host = (url: URL) => url.hostname.toLowerCase().replace(/^www\./, "");
+  const path = (url: URL) => url.pathname.replace(/\/+$/, "");
+  return host(a) === host(b) && path(a) === path(b);
+}
+
 /** Turns a raw feed item into a content draft, or says why it is skipped. */
 export function normalizeItem(rawItem: RawFeedItem, source: ParsedSourceDefinition, now: Date): NormalizeResult {
   const item = source.itemFormat === "wikipedia-featured" ? unwrapWikipediaFeatured(rawItem) : rawItem;
@@ -105,10 +139,20 @@ export function normalizeItem(rawItem: RawFeedItem, source: ParsedSourceDefiniti
   if (!title) return { ok: false, reason: "no-title" };
   if (source.titleFilter && !matches(source.titleFilter, title)) return { ok: false, reason: "off-topic" };
 
+  const audio = source.contentType === "podcast" && source.audioHosts
+    ? acceptedAudioUrl(item.enclosure, source.audioHosts)
+    : null;
   let url = item.link ? cleanUrl(htmlToText(item.link), source.homepageUrl) : null;
-  if (!url) return { ok: false, reason: "no-link" };
-  // A feed only speaks for its own site: links elsewhere (ads, partners, hijacked feeds) are dropped.
-  if (!isAllowedHost(url.hostname, source.hosts)) return { ok: false, reason: "foreign-host" };
+  // A podcast episode without its own page (no link, or the show's homepage) is linked to its audio file,
+  // already checked against the audio hosts.
+  const audioIsLink = audio !== null && (!url || isSamePage(url, new URL(source.homepageUrl)));
+  if (audioIsLink) {
+    url = audio;
+  } else {
+    if (!url) return { ok: false, reason: "no-link" };
+    // A feed only speaks for its own site: links elsewhere (ads, partners, hijacked feeds) are dropped.
+    if (!isAllowedHost(url.hostname, source.hosts)) return { ok: false, reason: "foreign-host" };
+  }
   const youtube = source.itemFormat === "youtube";
   if (youtube) {
     // Shorts are too short for an activity; anything but a plain watch link cannot be played.
@@ -160,6 +204,7 @@ export function normalizeItem(rawItem: RawFeedItem, source: ParsedSourceDefiniti
       author,
       categories,
       publishedAt,
+      audioUrl: audio?.toString() ?? null,
     },
   };
 }

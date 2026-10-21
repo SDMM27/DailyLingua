@@ -108,6 +108,12 @@ export default function PrivacyPage() {
             ses propres règles ; rien ne lui est envoyé avant (pas de miniature, pas de cookie).
           </li>
           <li>
+            <strong>Éditeurs de podcasts et leurs hébergeurs</strong> : le son d’un épisode n’est chargé que lorsque tu
+            touches « Écouter ici », directement depuis le serveur de l’éditeur ou de son hébergeur de podcast. Il
+            reçoit alors ton adresse IP et les données de lecture, selon ses propres règles ; rien ne lui est envoyé
+            avant, et l’application ne copie jamais le fichier audio.
+          </li>
+          <li>
             <strong>Le service d’envoi d’e-mails</strong> configuré dans Supabase, pour les messages de confirmation et
             de réinitialisation du mot de passe.
           </li>

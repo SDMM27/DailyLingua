@@ -1,5 +1,6 @@
 import type { ComponentType, SVGProps } from "react";
 import { BookIcon, ExternalIcon, HeadphonesIcon, InfoIcon, MicIcon, PlayIcon } from "@/components/icons";
+import { AudioPlayer } from "@/components/reading/audio-player";
 import { YouTubePlayer } from "@/components/reading/youtube-player";
 import { Pill } from "@/components/ui/primitives";
 import { traitLabels } from "@/lib/content/trait-labels";
@@ -52,6 +53,12 @@ export function ContentCard({ content, sessionId }: { content: Content; sessionI
       {videoId && (
         <div className="mt-4">
           <YouTubePlayer videoId={videoId} title={content.title} language={content.language} />
+        </div>
+      )}
+
+      {content.type === "podcast" && content.audioUrl && (
+        <div className="mt-4">
+          <AudioPlayer audioUrl={content.audioUrl} title={content.title} />
         </div>
       )}
 
