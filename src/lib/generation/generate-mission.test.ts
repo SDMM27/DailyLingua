@@ -11,7 +11,7 @@ import type { SourceAccess } from "@/lib/schemas/content";
 import type { Preferences } from "@/lib/schemas/preferences";
 import { GenerationError } from "./errors";
 import { productionTargetLength } from "./plan-activities";
-import { generateMission, type MissionStore, type PlannedSession } from "./generate-mission";
+import { generateMission, planSession, type MissionStore, type PlannedSession } from "./generate-mission";
 import { createTemplateGenerator } from "./template-generator";
 
 const NOW = new Date("2026-10-13T12:00:00Z");
@@ -189,7 +189,7 @@ describe("generateMission", () => {
     expect(done.sessions.map((s) => s.language)).toEqual(["it", "es"]);
     expect(done.sessions.map(total)).toEqual([10, 10]);
     expect(done.sessions[0].questions[0].id).toBe("it-q1");
-    expect(done.sessions[0].activities.map((a) => a.kind)).toEqual(["reading", "comprehension", "vocabulary", expect.stringMatching(/writing|speaking/)]);
+    expect(done.sessions[0].activities.map((a) => a.kind)).toEqual(["reading", "comprehension", "vocabulary", "writing"]);
     expect(done.meta).toMatchObject({
       source: "ai",
       model: "claude-test",
@@ -249,9 +249,25 @@ describe("generateMission", () => {
       expect(request.productionMinutes).toBeGreaterThan(0);
       expect(request.productionMinutes).toBeLessThanOrEqual(request.minutes);
       expect(session.production.targetLength).toBe(
-        productionTargetLength(session.production.mode, production.estimatedMinutes),
+        productionTargetLength(session.production.mode as "writing" | "spoken", production.estimatedMinutes),
       );
     }
+  });
+
+  it("plans a spoken session: a writing activity of up to 10 minutes, sized from the mode", () => {
+    const planned = planSession(
+      {
+        language: "it",
+        content: content("it", 1),
+        questions: [],
+        expressions: [],
+        production: { mode: "spoken", prompt: "Scrivi.", hints: [] },
+      },
+      40,
+    );
+    expect(planned.activities.at(-1)).toMatchObject({ kind: "writing", title: "Écrire puis dire à voix haute", estimatedMinutes: 10 });
+    expect(planned.production).toMatchObject({ mode: "spoken", targetLength: productionTargetLength("spoken", 10) });
+    expect(planned.production.targetLength).toBe("40–60 mots");
   });
 
   it("falls back to the template when the generator throws", async () => {
@@ -270,7 +286,7 @@ describe("generateMission", () => {
     expect(meta).toMatchObject({ source: "template", model: "template", promptVersion: null, inputTokens: null });
     expect(meta.fallbackReason).toBe("timeout: Claude : délai dépassé");
     expect(sessions.map(total)).toEqual([10, 10]);
-    expect(sessions[0].activities.map((a) => a.kind)).toEqual(["reading", expect.stringMatching(/writing|speaking/)]);
+    expect(sessions[0].activities.map((a) => a.kind)).toEqual(["reading", "writing"]);
     expect(logs.length).toBeGreaterThan(0);
   });
 

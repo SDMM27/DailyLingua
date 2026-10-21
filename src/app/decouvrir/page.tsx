@@ -20,7 +20,7 @@ const FEATURES = [
   },
   {
     title: "Des exercices sur ce contenu",
-    text: "Compréhension, expressions à retenir, production écrite ou orale : de quoi vraiment travailler le texte, pas seulement le lire.",
+    text: "Compréhension, expressions à retenir, production écrite, puis à voix haute : de quoi vraiment travailler le texte, pas seulement le lire.",
   },
   {
     title: "Des révisions de vocabulaire",

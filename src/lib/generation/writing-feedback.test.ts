@@ -18,6 +18,7 @@ const request: WritingFeedbackRequest = {
   level: "B1",
   targetLevel: "B2",
   purpose: "professional",
+  mode: "writing",
   task: "Cosa pensi del lavoro da remoto?",
   targetLength: "40–60 mots",
   text: TEXT,
@@ -77,6 +78,13 @@ describe("buildWritingFeedbackMessage", () => {
     expect(message).toContain("expected length: 40–60 mots");
     expect(message).toContain("<task>Cosa pensi del lavoro da remoto?</task>");
     expect(message).toContain(`<text>${TEXT}</text>`);
+  });
+
+  it("tells the production mode, and the prompt explains the spoken one", () => {
+    expect(buildWritingFeedbackMessage(request)).toContain("production mode: writing");
+    expect(buildWritingFeedbackMessage({ ...request, mode: "spoken" })).toContain("production mode: spoken");
+    expect(WRITING_FEEDBACK_SYSTEM_PROMPT).toMatch(/"spoken" is a script the learner writes first and then says aloud/);
+    expect(WRITING_FEEDBACK_SYSTEM_PROMPT).toMatch(/native_version must sound natural when said aloud/);
   });
 
   it("treats the learner's text as data: it cannot close the tag or open a new one", () => {

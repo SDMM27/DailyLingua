@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { addDays } from "@/lib/domain/dates";
 import { cefrLevelSchema, languageSchema, type DateKey } from "@/lib/schemas/common";
-import { productionTaskSchema } from "@/lib/schemas/mission";
+import { productionTaskSchema, type ProductionTask } from "@/lib/schemas/mission";
 import { languagePurposeSchema } from "@/lib/schemas/preferences";
 import {
   WRITING_FEEDBACK_LIMITS,
@@ -18,8 +18,8 @@ import type { WritingFeedbackRequest } from "./writing-feedback-prompt";
 export interface FeedbackSession {
   missionDate: DateKey;
   /** Everything but the text, which comes from the request. */
-  request: Omit<WritingFeedbackRequest, "text">;
-  mode: "writing" | "speaking";
+  request: Omit<WritingFeedbackRequest, "text" | "mode">;
+  mode: ProductionTask["mode"];
   previous: { feedback: WritingFeedback; body: string } | null;
   attempts: number;
 }
@@ -34,7 +34,7 @@ export interface WritingFeedbackStore {
 
 export type WritingFeedbackOutcome =
   | WritingFeedbackResult
-  /** The session is not the user's, is a speaking task, or is older than yesterday. */
+  /** The session is not the user's, is a (legacy) speaking-only task, or is older than yesterday. */
   | { status: "not-found" | "not-writing" | "expired" };
 
 export interface RequestWritingFeedbackInput {
@@ -63,7 +63,8 @@ export async function requestWritingFeedback(
 
   const session = await store.loadSession(userId, sessionId);
   if (!session) return { status: "not-found" };
-  if (session.mode !== "writing") return { status: "not-writing" };
+  // A spoken task is written first, so it can be reviewed; only the former speech-only task cannot.
+  if (session.mode === "speaking") return { status: "not-writing" };
   if (session.missionDate !== today && session.missionDate !== addDays(today, -1)) return { status: "expired" };
 
   if (session.previous && session.previous.body === body) {
@@ -81,7 +82,7 @@ export async function requestWritingFeedback(
 
   let review: WritingReview;
   try {
-    review = await reviewer.review({ ...session.request, text: body });
+    review = await reviewer.review({ ...session.request, mode: session.mode, text: body });
   } catch (error) {
     // Only the reason and our own message: never the raw error (see GenerationError).
     const reason = error instanceof GenerationError ? `${error.reason}: ${error.message}` : "unexpected error";

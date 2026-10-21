@@ -23,16 +23,19 @@ function ScoreDots({ score }: { score: number }) {
 /**
  * Review of a written production: scores on four criteria, corrections (with their category),
  * one strength and the text as a native would write it. `correctionAction` adds something under
- * each correction (e.g. the "keep for review" button), given its index.
+ * each correction (e.g. the "keep for review" button), given its index. `hideNativeVersion`
+ * replaces the native version by a note (to say the text from memory).
  */
 export function WritingFeedbackCard({
   language,
   feedback,
   correctionAction,
+  hideNativeVersion = false,
 }: {
   language: Language;
   feedback: WritingFeedback;
   correctionAction?: (index: number) => ReactNode;
+  hideNativeVersion?: boolean;
 }) {
   return (
     <div className="space-y-5">
@@ -96,9 +99,13 @@ export function WritingFeedbackCard({
       {feedback.nativeVersion && (
         <div>
           <p className="text-xs font-semibold tracking-wide text-muted uppercase">Ce qu’un natif écrirait</p>
-          <p lang={language} className="mt-2 font-serif leading-relaxed whitespace-pre-wrap">
-            {feedback.nativeVersion}
-          </p>
+          {hideNativeVersion ? (
+            <p className="mt-2 text-[13px] leading-relaxed text-muted">Version masquée.</p>
+          ) : (
+            <p lang={language} className="mt-2 font-serif leading-relaxed whitespace-pre-wrap">
+              {feedback.nativeVersion}
+            </p>
+          )}
         </div>
       )}
 

@@ -80,7 +80,7 @@ describe("MissionView", () => {
   it("counts words in the writing task, including Cyrillic", async () => {
     const user = userEvent.setup();
     render(<MissionView mission={buildMockMission("2026-10-13")} progress={EMPTY_MISSION_PROGRESS} persist={false} />);
-    await user.type(screen.getByLabelText("Ton texte"), "Шум в моём городе мешает спать");
+    await user.type(screen.getAllByLabelText("Ton texte")[0], "Шум в моём городе мешает спать");
     expect(screen.getByText("6 mots")).toBeTruthy();
   });
 
@@ -104,7 +104,7 @@ describe("MissionView", () => {
     render(<MissionView mission={mission} progress={progress} persist={false} />);
     expect(screen.getByText("8 / 30 min")).toBeTruthy();
     expect(screen.getByRole("checkbox", { name: /Lire l'article/ }).getAttribute("aria-checked")).toBe("true");
-    expect((screen.getByLabelText("Ton texte") as HTMLTextAreaElement).value).toBe("Bonjour");
+    expect((screen.getAllByLabelText("Ton texte")[0] as HTMLTextAreaElement).value).toBe("Bonjour");
   });
 
   describe("with persistence", () => {
@@ -146,7 +146,7 @@ describe("MissionView", () => {
       actions.saveProduction.mockResolvedValue({ ok: true, data: undefined });
       const user = userEvent.setup();
       mount();
-      await user.type(screen.getByLabelText("Ton texte"), "Шум мешает");
+      await user.type(screen.getAllByLabelText("Ton texte")[0], "Шум мешает");
       expect(await screen.findByText("Enregistré")).toBeTruthy();
       // One request for the whole burst of typing, with the full text.
       expect(actions.saveProduction).toHaveBeenCalledTimes(1);
@@ -157,7 +157,7 @@ describe("MissionView", () => {
       actions.saveProduction.mockResolvedValue({ ok: false, error: "Hors ligne" });
       const user = userEvent.setup();
       mount();
-      await user.type(screen.getByLabelText("Ton texte"), "abc");
+      await user.type(screen.getAllByLabelText("Ton texte")[0], "abc");
       expect(await screen.findByText("Non enregistré")).toBeTruthy();
       expect((await screen.findByRole("alert")).textContent).toMatch(/Hors ligne/);
     });
@@ -174,7 +174,8 @@ describe("MissionView", () => {
           canReviewWriting={props.canReviewWriting ?? true}
         />,
       );
-    const button = () => screen.getByRole("button", { name: /Terminer et obtenir une correction/ }) as HTMLButtonElement;
+    // The Russian written task comes first; the Italian one is spoken and has its own button.
+    const button = () => screen.getAllByRole("button", { name: /Terminer et obtenir une correction/ })[0] as HTMLButtonElement;
 
     it("has no review button when reviews are unavailable", () => {
       mount({ canReviewWriting: false });
@@ -184,7 +185,7 @@ describe("MissionView", () => {
     it("disables the button below the minimum", () => {
       mount({ text: "Шум" });
       expect(button().disabled).toBe(true);
-      expect(screen.getByText(/Écris au moins quelques phrases/)).toBeTruthy();
+      expect(screen.getAllByText(/Écris au moins quelques phrases/).length).toBeGreaterThan(0);
     });
 
     it("asks for the review and shows it", async () => {
@@ -213,7 +214,7 @@ describe("MissionView", () => {
       mount({ text: LONG_TEXT });
       await user.click(button());
       await screen.findByLabelText("Grammaire : 4 sur 5");
-      await user.type(screen.getByLabelText("Ton texte"), " !");
+      await user.type(screen.getAllByLabelText("Ton texte")[0], " !");
       expect(screen.getByText("Cette correction porte sur une version précédente de ton texte.")).toBeTruthy();
       expect(screen.getByRole("button", { name: "Corriger à nouveau (2 restantes)" })).toBeTruthy();
     });

@@ -1,13 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { addDays } from "@/lib/domain/dates";
 import { CONTENT_TYPES } from "@/lib/schemas/common";
-import { chooseProductionMode, planActivities, productionTargetLength } from "./plan-activities";
+import { chooseProductionMode, planActivities, productionActivityKind, productionTargetLength } from "./plan-activities";
 
-const CAPS: Record<string, (questions: number, expressions: number) => number> = {
+const CAPS: Record<string, (questions: number, expressions: number, mode: string) => number> = {
   comprehension: (questions) => 2 + questions,
   vocabulary: (_, expressions) => 1 + expressions,
-  writing: () => 15,
-  speaking: () => 8,
+  writing: (_q, _e, mode) => (mode === "spoken" ? 10 : 15),
 };
 
 describe("productionTargetLength", () => {
@@ -15,8 +14,20 @@ describe("productionTargetLength", () => {
     expect(productionTargetLength("writing", 3)).toBe("25–35 mots");
     expect(productionTargetLength("writing", 15)).toBe("120–180 mots");
     expect(productionTargetLength("writing", 1)).toBe("20–30 mots");
-    expect(productionTargetLength("speaking", 8)).toBe("3 minutes");
-    expect(productionTargetLength("speaking", 2)).toBe("1 minute");
+  });
+
+  it("asks a spoken task for the words of half the minutes: the other half is for saying it", () => {
+    expect(productionTargetLength("spoken", 8)).toBe(productionTargetLength("writing", 4));
+    expect(productionTargetLength("spoken", 8)).toBe("30–50 mots");
+    expect(productionTargetLength("spoken", 1)).toBe("20–30 mots");
+  });
+});
+
+describe("productionActivityKind", () => {
+  it("keeps the activity of a spoken task a writing one, and the legacy task a speaking one", () => {
+    expect(productionActivityKind("writing")).toBe("writing");
+    expect(productionActivityKind("spoken")).toBe("writing");
+    expect(productionActivityKind("speaking")).toBe("speaking");
   });
 });
 
@@ -30,6 +41,14 @@ describe("chooseProductionMode", () => {
   it("alternates between languages of the same day", () => {
     expect(chooseProductionMode("2026-10-13", 0)).not.toBe(chooseProductionMode("2026-10-13", 1));
     expect(chooseProductionMode("2026-10-13", 0)).toBe(chooseProductionMode("2026-10-13", 2));
+  });
+
+  it("never produces the former speaking-only task, and still uses both modes", () => {
+    const modes = new Set<string>();
+    for (let day = 0; day < 6; day++) {
+      for (let index = 0; index < 4; index++) modes.add(chooseProductionMode(addDays("2026-10-13", day), index));
+    }
+    expect([...modes].sort()).toEqual(["spoken", "writing"]);
   });
 
   it("is deterministic, also before 1970", () => {
@@ -64,9 +83,10 @@ describe("planActivities", () => {
     expect(planActivities({ ...base, type: "podcast" })[0]).toMatchObject({ kind: "listening", title: "Écouter l’épisode" });
     expect(planActivities({ ...base, type: "video" })[0]).toMatchObject({ kind: "watching", title: "Regarder la vidéo" });
     expect(planActivities({ ...base, type: "interview" })[0].kind).toBe("listening");
-    expect(planActivities({ ...base, productionMode: "speaking" }).at(-1)).toMatchObject({
-      kind: "speaking",
-      title: "Parler sans t’arrêter",
+    // A spoken task is written first: its activity is a writing one.
+    expect(planActivities({ ...base, productionMode: "spoken" }).at(-1)).toMatchObject({
+      kind: "writing",
+      title: "Écrire puis dire à voix haute",
     });
   });
 
@@ -95,10 +115,10 @@ describe("planActivities", () => {
 
   it("never stretches an exercise beyond what it takes", () => {
     // Template session: no quiz, no expressions, a large share.
-    const plan = planActivities({ ...base, minutes: 40, durationMinutes: 6, questionCount: 0, expressionCount: 0, productionMode: "speaking" });
+    const plan = planActivities({ ...base, minutes: 40, durationMinutes: 6, questionCount: 0, expressionCount: 0, productionMode: "spoken" });
     expect(plan.map((a) => [a.kind, a.estimatedMinutes])).toEqual([
       ["reading", 6],
-      ["speaking", 8],
+      ["writing", 10],
     ]);
     // What a capped exercise cannot take goes to the others.
     const full = planActivities({ ...base, minutes: 60, durationMinutes: 6 });
@@ -115,7 +135,7 @@ describe("planActivities", () => {
       for (const durationMinutes of [1, 3, 10, 45]) {
         for (const questionCount of [0, 3]) {
           for (const expressionCount of [0, 1, 5]) {
-            for (const productionMode of ["writing", "speaking"] as const) {
+            for (const productionMode of ["writing", "spoken"] as const) {
               for (let minutes = 1; minutes <= 40; minutes++) {
                 const plan = planActivities({ type, durationMinutes, minutes, questionCount, expressionCount, productionMode });
                 const total = plan.reduce((sum, a) => sum + a.estimatedMinutes, 0);
@@ -125,7 +145,7 @@ describe("planActivities", () => {
                 }
                 expect(total).toBeLessThanOrEqual(minutes);
                 // The whole budget is used unless every exercise reached its cap.
-                const capped = plan.slice(1).every((a) => a.estimatedMinutes === CAPS[a.kind](questionCount, expressionCount));
+                const capped = plan.slice(1).every((a) => a.estimatedMinutes === CAPS[a.kind](questionCount, expressionCount, productionMode));
                 if (minutes >= 2 && !capped) expect(total).toBe(minutes);
               }
             }

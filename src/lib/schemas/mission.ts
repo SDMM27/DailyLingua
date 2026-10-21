@@ -78,7 +78,7 @@ export const expressionSchema = z.object({
 export type Expression = z.infer<typeof expressionSchema>;
 
 export const productionTaskSchema = z.object({
-  mode: z.enum(["writing", "speaking"]),
+  mode: z.enum(["writing", "spoken", "speaking"]),
   prompt: z.string().min(1),
   hints: z.array(z.string().min(1)),
   targetLength: z.string().optional(),

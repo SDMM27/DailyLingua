@@ -58,7 +58,7 @@ describe("requestWritingFeedback", () => {
   it("reviews the text with the session's level and purpose, then stores it", async () => {
     const { store, reviewer, run } = setup();
     expect(await run()).toEqual({ status: "ready", feedback, reviewedText: BODY, attemptsLeft: 2 });
-    expect(reviewer.review).toHaveBeenCalledWith({ ...session().request, text: BODY });
+    expect(reviewer.review).toHaveBeenCalledWith({ ...session().request, mode: "writing", text: BODY });
     expect(store.saveReview).toHaveBeenCalledWith("u", "s", BODY, review);
   });
 
@@ -110,6 +110,13 @@ describe("requestWritingFeedback", () => {
     expect(await run()).toEqual({ status });
     expect(store.claimAttempt).not.toHaveBeenCalled();
     expect(reviewer.review).not.toHaveBeenCalled();
+  });
+
+  it("reviews a spoken task like a written one, telling the model the text is to be said aloud", async () => {
+    const { store, reviewer, run } = setup(session({ mode: "spoken" }));
+    expect(await run()).toMatchObject({ status: "ready", feedback });
+    expect(reviewer.review).toHaveBeenCalledWith({ ...session().request, mode: "spoken", text: BODY });
+    expect(store.saveReview).toHaveBeenCalled();
   });
 
   it("accepts yesterday's mission (a text finished after midnight)", async () => {

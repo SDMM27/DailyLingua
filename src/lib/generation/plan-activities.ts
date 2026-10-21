@@ -1,16 +1,21 @@
 import { diffInDays } from "@/lib/domain/dates";
 import type { ContentType, DateKey } from "@/lib/schemas/common";
-import type { PlannedActivity, ProductionMode } from "@/lib/schemas/generation";
+import type { GeneratedProductionMode, PlannedActivity, ProductionMode } from "@/lib/schemas/generation";
 import type { ActivityKind } from "@/lib/schemas/mission";
 
 /**
- * Writing or speaking, alternating day by day and between the languages of the same day (parity
- * of the day number plus the language's position), so each language gets both over time and a
- * day never asks for the same production everywhere. Deterministic: no state to store.
+ * Writing or spoken (written, then said aloud), alternating day by day and between the languages
+ * of the same day (parity of the day number plus the language's position), so each language gets
+ * both over time and a day never asks for the same production everywhere. Deterministic: no state to store.
  */
-export function chooseProductionMode(date: DateKey, index: number): ProductionMode {
+export function chooseProductionMode(date: DateKey, index: number): GeneratedProductionMode {
   const day = diffInDays("1970-01-01", date);
-  return (((day + index) % 2) + 2) % 2 === 0 ? "writing" : "speaking";
+  return (((day + index) % 2) + 2) % 2 === 0 ? "writing" : "spoken";
+}
+
+/** A spoken production is written first, so its activity is a writing one (ticked on correction). */
+export function productionActivityKind(mode: ProductionMode): ActivityKind {
+  return mode === "speaking" ? "speaking" : "writing";
 }
 
 const CONSUME: Record<ContentType, { kind: ActivityKind; title: string }> = {
@@ -28,7 +33,7 @@ const CONSUME_SHARE = 0.45;
  * activity because the day's budget is large. Time beyond every cap is left unplanned.
  */
 const MAX_WRITING_MINUTES = 15;
-const MAX_SPEAKING_MINUTES = 8;
+const MAX_SPOKEN_MINUTES = 10;
 
 export interface PlanInput {
   type: ContentType;
@@ -37,29 +42,27 @@ export interface PlanInput {
   minutes: number;
   questionCount: number;
   expressionCount: number;
-  productionMode: ProductionMode;
+  productionMode: GeneratedProductionMode;
 }
 
 /** Writing pace assumed for a learner, words per minute of the activity (thinking included). */
 const WORDS_PER_MINUTE = { min: 8, max: 12 };
-/** Speaking: about a third of the activity is talking, the rest is preparing and listening back. */
-const SPEAKING_SHARE = 1 / 3;
+/** Spoken: about half of the activity is writing, the other half is saying it aloud. */
+const SPOKEN_WRITING_SHARE = 1 / 2;
 
 const roundTo5 = (n: number) => Math.max(5, Math.round(n / 5) * 5);
 
 /**
  * Length asked for the production task, derived from the minutes it was given so the request is
- * doable: "25–35 mots" for 3 minutes of writing, "3 minutes" of talk for 8 minutes of speaking.
+ * doable: "25–35 mots" for 3 minutes of writing; a spoken task counts only the half of the
+ * minutes spent writing ("30–50 mots" for 8 minutes, about a minute of talk).
  * Set by the app, in French like the rest of the interface, never by the model.
  */
-export function productionTargetLength(mode: ProductionMode, minutes: number): string {
-  if (mode === "writing") {
-    const low = roundTo5(Math.max(20, minutes * WORDS_PER_MINUTE.min));
-    const high = Math.max(low + 10, roundTo5(minutes * WORDS_PER_MINUTE.max));
-    return `${low}–${high} mots`;
-  }
-  const talk = Math.max(1, Math.round(minutes * SPEAKING_SHARE));
-  return talk === 1 ? "1 minute" : `${talk} minutes`;
+export function productionTargetLength(mode: GeneratedProductionMode, minutes: number): string {
+  const writingMinutes = mode === "spoken" ? minutes * SPOKEN_WRITING_SHARE : minutes;
+  const low = roundTo5(Math.max(20, writingMinutes * WORDS_PER_MINUTE.min));
+  const high = Math.max(low + 10, roundTo5(writingMinutes * WORDS_PER_MINUTE.max));
+  return `${low}–${high} mots`;
 }
 
 /** Integer split of `total` in proportion to `weights` (largest remainder), ties to the first. */
@@ -140,8 +143,8 @@ export function planActivities(input: PlanInput): PlannedActivity[] {
   }
   exercises.push(
     input.productionMode === "writing"
-      ? { kind: "writing", title: "Écrire un court texte", weight: 4, cap: MAX_WRITING_MINUTES }
-      : { kind: "speaking", title: "Parler sans t’arrêter", weight: 4, cap: MAX_SPEAKING_MINUTES },
+      ? { kind: productionActivityKind("writing"), title: "Écrire un court texte", weight: 4, cap: MAX_WRITING_MINUTES }
+      : { kind: productionActivityKind("spoken"), title: "Écrire puis dire à voix haute", weight: 4, cap: MAX_SPOKEN_MINUTES },
   );
 
   // Not enough time for all of them: drop vocabulary, then comprehension.

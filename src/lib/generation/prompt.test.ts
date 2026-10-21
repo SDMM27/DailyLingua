@@ -34,6 +34,20 @@ describe("SYSTEM_PROMPT", () => {
   });
 });
 
+describe("production modes", () => {
+  it("describes the spoken mode without mentioning a recording", () => {
+    expect(SYSTEM_PROMPT).toContain('"spoken"');
+    expect(SYSTEM_PROMPT).toMatch(/hints_fr never mention recording or listening back/);
+    expect(SYSTEM_PROMPT).not.toContain("speaking task");
+  });
+
+  it("gives the expected length of a spoken task as a word range", () => {
+    const spoken = { ...session("it", "general"), productionMode: "spoken", productionMinutes: 8 } as const;
+    const message = buildUserMessage({ date: "2026-10-15", sessions: [spoken] });
+    expect(message).toContain("production: spoken, expected length: 30–50 mots");
+  });
+});
+
 describe("buildUserMessage", () => {
   it("gives each language the register of its own purpose", () => {
     const request: GenerationRequest = {

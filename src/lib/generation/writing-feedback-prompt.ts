@@ -1,5 +1,6 @@
 import { languageInfo } from "@/lib/domain/languages";
 import type { CefrLevel, Language } from "@/lib/schemas/common";
+import type { GeneratedProductionMode } from "@/lib/schemas/generation";
 import type { LanguagePurpose } from "@/lib/schemas/preferences";
 import { WRITING_FEEDBACK_LIMITS } from "@/lib/schemas/writing-feedback";
 import { PURPOSE_REGISTERS, escapeData } from "./prompt";
@@ -12,13 +13,15 @@ import { PURPOSE_REGISTERS, escapeData } from "./prompt";
  * goes in the user message. The learner's text is wrapped in <text> tags and the task (written by
  * the mission generator from third-party feeds) in <task> tags: both are data, never instructions.
  */
-export const WRITING_FEEDBACK_PROMPT_VERSION = "2026-10-20.1";
+export const WRITING_FEEDBACK_PROMPT_VERSION = "2026-10-21.1";
 
 const L = WRITING_FEEDBACK_LIMITS;
 
 export const WRITING_FEEDBACK_SYSTEM_PROMPT = `You review the short texts that French-speaking learners write in Daily Lingua, a language-learning app. Each text answers a writing task linked to a press article or a podcast.
 
-You receive the studied language, the learner's current CEFR level and target level, the learner's purpose (which sets the expected register), the task and the learner's text. Return a review on a fixed grid of four criteria.
+You receive the studied language, the learner's current CEFR level and target level, the learner's purpose (which sets the expected register), the production mode, the task and the learner's text. Return a review on a fixed grid of four criteria.
+
+Production mode: "writing" is a text to be read. "spoken" is a script the learner writes first and then says aloud, so the expected register is the SPOKEN one for the learner's purpose (contractions, fillers and short sentences are natural there; bookish constructions and long written periods are not) and the text answers an oral situation. In that mode, native_version must sound natural when said aloud, as a native would actually speak, not as written prose.
 
 Criteria — score each one with an integer from 1 to 5, judged against what is expected at the learner's CURRENT level (a correct, simple text from an A2 learner can get 4; the same text from a C1 learner cannot):
 - grammar: morphology, agreement, conjugation, cases, word order, spelling and punctuation.
@@ -66,6 +69,8 @@ export interface WritingFeedbackRequest {
   level: CefrLevel;
   targetLevel: CefrLevel;
   purpose: LanguagePurpose;
+  /** `spoken`: a text written to be said aloud. */
+  mode: GeneratedProductionMode;
   /** The production prompt the learner answered (studied language). */
   task: string;
   /** e.g. "60–90 mots"; absent for older missions. */
@@ -79,7 +84,8 @@ export function buildWritingFeedbackMessage(request: WritingFeedbackRequest): st
   const length = request.targetLength ? `\nexpected length: ${request.targetLength}` : "";
   return `studied language: "${request.language}" (${info.nativeName})
 learner level: ${request.level}, target: ${request.targetLevel}
-learner's purpose: ${request.purpose} (${PURPOSE_REGISTERS[request.purpose]})${length}
+learner's purpose: ${request.purpose} (${PURPOSE_REGISTERS[request.purpose]})
+production mode: ${request.mode}${length}
 task: <task>${escapeData(request.task)}</task>
 
 learner's text:
