@@ -85,7 +85,13 @@ import type { SourceDefinition, SourceLicense } from "@/lib/schemas/content";
  * - unclear production: Lingopie « News in Easy … », LinguaWire « Learn German A1 / B1+ », ARTICLY
  *   « Almanya kompakt » (generated news readings, no named newsroom);
  * - terms: Radio Ambulante (iHeart's feed notice forbids computational analysis), Yonhap and the
- *   Hankyoreh (feeds say « AI 학습 및 활용 금지 »: no use with AI); Apaçık Radyo (Açık Dergi) and
+ *   Hankyoreh (feeds say « AI 학습 및 활용 금지 »: no use with AI); France Médias Monde (RFI România,
+ *   RFI 华语 and their podcasts Eurocronica and 要闻解说, MCD's Arabic press review: GTU 6.1 forbids
+ *   collecting or storing its content without authorisation and opts out of text and data mining,
+ *   while the app stores teasers and sends them to the model); KBS (its site and both YouTube
+ *   channels, KBS News and KBS 다큐, say « 무단 전재, 재배포 및 이용(AI 학습 포함) 금지 »: no
+ *   unauthorised use, AI training included; the radio podcast 오늘 세계는 and the two channels are out,
+ *   found when the licences were re-read on 2026-10-21); Apaçık Radyo (Açık Dergi) and
  *   Euronews answer bots with a challenge (403 / 406), so their terms could not be read;
  * - content: RSI Radiogiornale and NPR News Now (every episode has the same title: nothing to ask
  *   about), Antara (state news agency), Tempo (feed stale, mostly advertorials), TVN24 (we keep
@@ -93,18 +99,19 @@ import type { SourceDefinition, SourceLicense } from "@/lib/schemas/content";
  * Not found: an official article feed for nachrichtenleicht.de (only its podcast), NHK News Web Easy
  * (no public feed), Breaking News English (403), Due Parole (no feed).
  * Korean news: Kyunghyang (경향신문) rather than Yonhap or the Hankyoreh, whose feeds forbid AI use.
- * After this pass every language has a podcast playable in the app and at least two article sources.
+ * After this pass every language has at least two article sources and, except Arabic, a podcast
+ * playable in the app (Arabic: BBC Arabic serves http only, MCD is left out on terms, the learner
+ * and Thmanyah shows are inactive).
  * Still without a simple-language article source (no official easy-language feed found): it, pt,
  * pl, cs, ro, el, ko, tr, ar, ja, id, uk, ru.
- * To re-read: France Médias Monde (RFI, MCD) reserves text and data mining on its sites; we only
- * store titles and teasers from its public feeds and play its podcast files, but a lawyer should
- * confirm that use before any commercial release.
  */
 
 const VERIFIED_ON = "2026-10-13";
 const YOUTUBE_VERIFIED_ON = "2026-10-20";
 /** Podcasts and news sites added in phase F (suite). */
 const PHASE_F_SOURCES_VERIFIED_ON = "2026-10-20";
+/** Second reading of the phase F licences (terms pages, plus a scan of every feed for no-AI notices). */
+const LICENSES_REREAD_ON = "2026-10-21";
 
 // Licences ------------------------------------------------------------------------------------
 
@@ -226,13 +233,6 @@ const SR_LICENSE = checkedNow(
     "rights reserved. » Licensing of SR material goes through Clipsource (not for direct commercial use). " +
     PODCAST_PLAYBACK,
 );
-const FRANCE_MEDIAS_MONDE_LICENSE = checkedNow(
-  "https://www.francemm.com/en/legal-notice",
-  "France Médias Monde (RFI, MCD) GTU 6.1: content reserved, collecting or storing it without authorisation " +
-    "is forbidden and text and data mining is opted out (tdmrep.json), in particular for AI training. We only " +
-    "keep what its public feeds publish (title, teaser, link) and play podcast files from its servers. " +
-    "To re-read before any commercial use. " + PODCAST_PLAYBACK,
-);
 const RFE_RL_LICENSE = checkedNow(
   "https://www.radiosvoboda.org/copyright",
   "RFE/RL « Правові аспекти »: use and redistribution of its materials welcomed with a link to the source; " +
@@ -247,10 +247,14 @@ const NOS_PODCAST_LICENSE = checkedNow(
 
 /** A creator who publishes a podcast through a hosting service, with no terms page of their own. */
 function independentPodcastLicense(termsUrl: string, owner: string): SourceLicense {
-  return checkedNow(
+  return allRightsReserved(
     termsUrl,
     `Independent podcast by ${owner}; no terms page found, the feed names the owner as copyright holder: ` +
-      "all rights assumed. " + PODCAST_PLAYBACK,
+      "all rights assumed. The public RSS feed is one the creator chose to publish for podcast apps (on " +
+      "Spotify for Creators it is off until the creator turns it on); no no-AI notice in the feed. " +
+      PODCAST_PLAYBACK,
+    undefined,
+    LICENSES_REREAD_ON,
   );
 }
 
@@ -779,8 +783,6 @@ export const SOURCE_CATALOG: SourceDefinition[] = [
   youtube("ja", "tbs-news-dig", "TBS NEWS DIG", "UC6AG81pAkf6Lbi_1VC5NmPA", "B2", 10),
   youtube("ko", "speaking-korean", "한국어로 말해요", "UCwgUzX2ey4FaxJU-pVw3ZtA", "A2", 8),
   youtube("ko", "ebs-jisikchaenel-e", "EBS 지식채널e", "UCL44YGs2BXxtM4GZRH-wnrQ", "B2", 5),
-  youtube("ko", "kbs-news", "KBS News", "UCcQTRi69dsVYHN3exePtZ1A", "B2", 10),
-  youtube("ko", "kbs-docu", "KBS 다큐", "UC4LW3sOslC14Vn5bcoNUBkg", "C1", 30),
   youtube("id", "kok-bisa", "Kok Bisa?", "UCu0yQD7NFMyLu_-TmKa4Hqg", "B1", 8),
   youtube("id", "alamaya", "Alamaya", "UCq8Mzf2SMb_KpMgRiNdaP3g", "B2", 10),
   youtube("id", "narasi-newsroom", "Narasi Newsroom", "UCnOf30K0d0e8M7mc4FUzR0A", "B2", 10),
@@ -1064,18 +1066,6 @@ export const SOURCE_CATALOG: SourceDefinition[] = [
     ),
   },
   dwEdition("ro", "rom", "DW România"),
-  {
-    key: "rfi-ro",
-    name: "RFI România",
-    language: "ro",
-    homepageUrl: "https://www.rfi.fr/ro/",
-    feedUrl: "https://www.rfi.fr/ro/rss",
-    contentType: "article",
-    difficulty: "B2",
-    defaultMinutes: 4,
-    hosts: ["rfi.fr"],
-    license: FRANCE_MEDIAS_MONDE_LICENSE,
-  },
   dwEdition("el", "gre", "DW Ελληνικά"),
   {
     key: "ertnews",
@@ -1112,18 +1102,6 @@ export const SOURCE_CATALOG: SourceDefinition[] = [
   },
   dwEdition("tr", "tur", "DW Türkçe"),
   dwEdition("zh", "chi", "DW 中文"),
-  {
-    key: "rfi-zh",
-    name: "RFI 华语",
-    language: "zh",
-    homepageUrl: "https://www.rfi.fr/cn/",
-    feedUrl: "https://www.rfi.fr/cn/rss",
-    contentType: "article",
-    difficulty: "B2",
-    defaultMinutes: 4,
-    hosts: ["rfi.fr"],
-    license: FRANCE_MEDIAS_MONDE_LICENSE,
-  },
   bbc("id", "indonesia", "BBC News Indonesia"),
   dwEdition("id", "ind", "DW Indonesia"),
   dwEdition("uk", "ukr", "DW Українською"),
@@ -1477,10 +1455,14 @@ export const SOURCE_CATALOG: SourceDefinition[] = [
     defaultMinutes: 25,
     hosts: ["polskieradio.pl"],
     audioHosts: ["polskieradio.pl"],
-    license: checkedNow(
-      "https://www.polskieradio.pl/podcasty/reportaze-i-dokumenty-polskiego-radia",
-      "Polish public radio, official podcast feed (« Copyright Polskie Radio S.A. w likwidacji »). No terms " +
-        "page found on polskieradio.pl: all rights assumed. Episodes link to their audio file. " + PODCAST_PLAYBACK,
+    license: allRightsReserved(
+      "https://www.polskieradio.pl/13/11807/Artykul/3643432,Regulamin",
+      "Polish public radio, official podcast feed (« Copyright Polskie Radio S.A. w likwidacji »). Regulamin " +
+        "serwisów (in force 2026-02-06) read: personal use only (V.2), copying or redistribution without written " +
+        "consent forbidden (V.3); no clause on feeds, linking, text and data mining or AI. Episodes link to their " +
+        "audio file. " + PODCAST_PLAYBACK,
+      undefined,
+      LICENSES_REREAD_ON,
     ),
   }),
   // Czech
@@ -1532,19 +1514,6 @@ export const SOURCE_CATALOG: SourceDefinition[] = [
     audioHosts: ["mcdn.podbean.com"],
     license: independentPodcastLicense("https://romanianweekly.podbean.com/", "Romanian Weekly"),
   }),
-  podcast({
-    key: "rfi-ro-eurocronica",
-    name: "Eurocronica (RFI România)",
-    language: "ro",
-    homepageUrl: "https://www.rfi.fr/ro/podcasturi/eurocronica/",
-    feedUrl:
-      "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WBMZ1350-RFI-RO-20240122",
-    difficulty: "B2",
-    defaultMinutes: 4,
-    hosts: ["rfi.fr"],
-    audioHosts: ["audio.audiomeans.fr"],
-    license: FRANCE_MEDIAS_MONDE_LICENSE,
-  }),
   // Greek
   podcast({
     key: "super-easy-greek",
@@ -1589,23 +1558,6 @@ export const SOURCE_CATALOG: SourceDefinition[] = [
     audioHosts: ["anchor.fm"],
     license: independentPodcastLicense("https://creators.spotify.com/pod/profile/han-kim6/", "Han Kim"),
   }),
-  podcast({
-    key: "kbs-oneul-segyeneun",
-    name: "KBS 1라디오 오늘 세계는",
-    language: "ko",
-    homepageUrl: "https://radio.kbs.co.kr/",
-    feedUrl: "https://api.kbs.co.kr/mediafactory/v1/podcast/rss/todayworld",
-    difficulty: "C1",
-    defaultMinutes: 45,
-    hosts: ["kbs.co.kr"],
-    audioHosts: ["static.api.kbs.co.kr"],
-    license: checkedNow(
-      "https://radio.kbs.co.kr/",
-      "Korean public broadcaster's podcast feed (« (c)KBS », no AI clause in the feed, unlike Yonhap). No " +
-        "terms page reachable on kbs.co.kr during the check: all rights assumed, to re-read. Episodes have no " +
-        "page of their own. " + PODCAST_PLAYBACK,
-    ),
-  }),
   // Turkish
   podcast({
     key: "easy-turkish-podcast",
@@ -1620,34 +1572,7 @@ export const SOURCE_CATALOG: SourceDefinition[] = [
     audioHosts: ["aphid.fireside.fm"],
     license: EASY_LANGUAGES_LICENSE,
   }),
-  // Arabic
-  podcast({
-    key: "mcd-press-review",
-    name: "قراءة في الصحف العربية (مونت كارلو الدولية)",
-    language: "ar",
-    homepageUrl: "https://www.mc-doualiya.com/%D8%A8%D8%B1%D8%A7%D9%85%D8%AC-%D8%A5%D8%AE%D8%A8%D8%A7%D8%B1%D9%8A%D8%A9/%D9%82%D8%B1%D8%A7%D8%A1%D8%A9-%D9%81%D9%8A-%D8%A7%D9%84%D8%B5%D8%AD%D9%81-%D8%A7%D9%84%D8%B9%D8%B1%D8%A8%D9%8A%D8%A9/",
-    feedUrl:
-      "https://apis.mc-doualiya.com/products/get_product/mcd_getpodcast_by_nid?token_application=2ecc8b76-7e21-11e9-9f79-005056bf586f&program.entrepriseId=WBMZ63584-MCD-AR-20200930",
-    difficulty: "B2",
-    defaultMinutes: 5,
-    hosts: ["mc-doualiya.com"],
-    audioHosts: ["audio.audiomeans.fr"],
-    license: FRANCE_MEDIAS_MONDE_LICENSE,
-  }),
   // Chinese
-  podcast({
-    key: "rfi-zh-yaowen-jieshuo",
-    name: "要闻解说 (RFI 华语)",
-    language: "zh",
-    homepageUrl: "https://www.rfi.fr/cn/%E4%B8%93%E6%A0%8F%E6%A3%80%E7%B4%A2/%E8%A6%81%E9%97%BB%E8%A7%A3%E8%AF%B4/",
-    feedUrl:
-      "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WB15400-RFI-CN-20100304",
-    difficulty: "B2",
-    defaultMinutes: 6,
-    hosts: ["rfi.fr"],
-    audioHosts: ["audio.audiomeans.fr"],
-    license: FRANCE_MEDIAS_MONDE_LICENSE,
-  }),
   podcast({
     key: "storyfm",
     name: "故事FM",
