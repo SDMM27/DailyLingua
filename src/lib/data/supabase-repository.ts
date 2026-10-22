@@ -1,9 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import { findVisibleAlphabetGroup, readAlphabetDraftPolicy } from "@/lib/alphabets/policy";
-import type { AlphabetPracticeResult } from "@/lib/domain/alphabet";
-import { toDateKey } from "@/lib/domain/dates";
-import { planGrammarPractice, type GrammarPracticeResult } from "@/lib/domain/grammar";
+import { findVisibleAlphabetGroup, readAlphabetDraftPolicy, visibleAlphabet } from "@/lib/alphabets/policy";
+import { buildAlphabetCheck, gradeAlphabetCheck, type AlphabetCheckResult, type AlphabetPracticeResult } from "@/lib/domain/alphabet";
+import { addDays, toDateKey } from "@/lib/domain/dates";
+import { GRAMMAR_MASTERED_BOX, planGrammarPractice, type GrammarPracticeResult } from "@/lib/domain/grammar";
 import { recurringCorrectionIndexes } from "@/lib/domain/production-stats";
 import { guestTrialStatus, type GuestTrialStatus } from "@/lib/domain/guest-trial";
 import { LANGUAGE_CODES } from "@/lib/domain/languages";
@@ -14,7 +14,12 @@ import { SOURCE_CATALOG } from "@/lib/content/catalog";
 import { readContentLicensePolicy } from "@/lib/content/policy";
 import { sourceTraits, type SourceTraits } from "@/lib/content/source-traits";
 import { findVisibleGrammarPoint, readGrammarDraftPolicy } from "@/lib/grammar/policy";
-import { alphabetCardSchema, type AlphabetCard, type RecordAlphabetPracticeInput } from "@/lib/schemas/alphabet";
+import {
+  alphabetCardSchema,
+  type AlphabetCard,
+  type RecordAlphabetCheckInput,
+  type RecordAlphabetPracticeInput,
+} from "@/lib/schemas/alphabet";
 import { grammarCardSchema, type GrammarCard, type RecordGrammarPracticeInput } from "@/lib/schemas/grammar";
 import { dateKeySchema, type ContentType, type DateKey, type Language } from "@/lib/schemas/common";
 import {
@@ -1256,6 +1261,38 @@ export function createSupabaseRepository(
     return { outcome: plan.outcome, card: (await readAlphabetCard(input.groupId)) ?? null };
   }
 
+  /** A pass is trusted only after grading the answers against the check rebuilt from its day. */
+  async function recordAlphabetCheck(input: RecordAlphabetCheckInput): Promise<AlphabetCheckResult> {
+    const alphabet = visibleAlphabet(input.language, readAlphabetDraftPolicy());
+    if (!alphabet) throw new UserFacingError("Cet alphabet n’existe pas.");
+    const today = await getToday();
+    if (input.day !== today && input.day !== addDays(today, -1)) {
+      throw new UserFacingError("Ce test a expiré : recharge la page.");
+    }
+
+    const graded = gradeAlphabetCheck(buildAlphabetCheck(alphabet, `check:${input.day}`), input.choices);
+    if (!graded.passed) return { ...graded, marked: 0 };
+
+    // Groups that already have a card keep it: the check only fills the gaps, as mastered.
+    const rows = alphabet.groups.map((group) => ({
+      user_id: userId,
+      group_id: group.id,
+      language: input.language,
+      status: "known" as const,
+      box: GRAMMAR_MASTERED_BOX,
+      due_on: addDays(today, 16),
+      last_reviewed_on: today,
+      review_count: 0,
+      added_on: today,
+    }));
+    const { data, error } = await client
+      .from("alphabet_cards")
+      .upsert(rows, { onConflict: "user_id,group_id", ignoreDuplicates: true })
+      .select("id");
+    if (error) throw new Error(`Supabase (test de lecture) : ${error.message}`);
+    return { ...graded, marked: data.length };
+  }
+
   async function sendFeedback(input: FeedbackInput): Promise<void> {
     const { error } = await client.from("feedback").insert({
       user_id: userId,
@@ -1461,6 +1498,7 @@ export function createSupabaseRepository(
     deleteGrammarCard,
     listAlphabetCards,
     recordAlphabetPractice,
+    recordAlphabetCheck,
     listVocabulary,
     addVocabulary,
     reviewVocabulary,

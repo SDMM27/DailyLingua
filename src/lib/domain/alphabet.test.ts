@@ -1,7 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { ALPHABETS } from "@/lib/alphabets";
 import { ALPHABET_PRACTICE_MAX, type AlphabetCard, type AlphabetExercise } from "@/lib/schemas/alphabet";
-import { buildAlphabetExercises, isAlphabetComplete, letterLabel, seededRandom, transliterate } from "./alphabet";
+import {
+  ALPHABET_CHECK_PASS,
+  buildAlphabetCheck,
+  buildAlphabetExercises,
+  gradeAlphabetCheck,
+  isAlphabetComplete,
+  letterLabel,
+  seededRandom,
+  transliterate,
+} from "./alphabet";
 import { stripStress } from "./stress";
 
 const ru = ALPHABETS.ru!;
@@ -133,5 +142,58 @@ describe("isAlphabetComplete", () => {
     expect(isAlphabetComplete(ru, [])).toBe(false);
     expect(isAlphabetComplete(ru, ids.slice(0, 4).map(card))).toBe(false);
     expect(isAlphabetComplete(ru, ids.map(card))).toBe(true);
+  });
+});
+
+describe.each([["ru", ru], ["uk", uk]] as const)("buildAlphabetCheck (%s)", (_name, alphabet) => {
+  const check = buildAlphabetCheck(alphabet, "check:2026-10-21");
+
+  it("asks 2 distinct words of every group, 10 questions in all", () => {
+    expect(check).toHaveLength(alphabet.groups.length * 2);
+    expect(check).toHaveLength(10);
+    expect(check.every((e) => e.type === "read-word")).toBe(true);
+    const words = check.map((e) => (e.type === "read-word" ? e.word : ""));
+    expect(new Set(words).size).toBe(words.length);
+    for (const group of alphabet.groups) {
+      const own = words.filter((w) => group.words.some((gw) => gw.word === w));
+      expect(own.length, group.id).toBeGreaterThanOrEqual(2);
+    }
+  });
+
+  it("offers 4 distinct options with the right reading at `answer`", () => {
+    for (const e of check) {
+      expect(e.options).toHaveLength(4);
+      expect(new Set(e.options).size).toBe(4);
+      if (e.type === "read-word") expect(e.options[e.answer]).toBe(transliterate(alphabet, e.word));
+    }
+  });
+
+  it("is the same check for the same seed, another for another seed", () => {
+    expect(buildAlphabetCheck(alphabet, "check:2026-10-21")).toEqual(check);
+    expect(buildAlphabetCheck(alphabet, "check:2026-10-22")).not.toEqual(check);
+  });
+});
+
+describe("gradeAlphabetCheck", () => {
+  const check = buildAlphabetCheck(ru, "check:2026-10-21");
+  const right = check.map((e) => e.answer);
+  const withWrong = (count: number) => right.map((c, i) => (i < count ? (c + 1) % 4 : c));
+
+  it("passes at 9 right answers out of 10, not at 8", () => {
+    expect(ALPHABET_CHECK_PASS).toBe(0.9);
+    expect(gradeAlphabetCheck(check, right)).toEqual({ correct: 10, total: 10, passed: true });
+    expect(gradeAlphabetCheck(check, withWrong(1))).toEqual({ correct: 9, total: 10, passed: true });
+    expect(gradeAlphabetCheck(check, withWrong(2))).toEqual({ correct: 8, total: 10, passed: false });
+  });
+
+  it("counts « Je ne sais pas » as wrong", () => {
+    expect(gradeAlphabetCheck(check, right.map((c, i) => (i < 2 ? null : c))).passed).toBe(false);
+    expect(gradeAlphabetCheck(check, right.map((c, i) => (i < 1 ? null : c))).passed).toBe(true);
+  });
+
+  it("fails when the number of answers is not the number of questions", () => {
+    expect(gradeAlphabetCheck(check, right.slice(1)).passed).toBe(false);
+    expect(gradeAlphabetCheck(check, [...right, 0]).passed).toBe(false);
+    expect(gradeAlphabetCheck(check, []).passed).toBe(false);
   });
 });

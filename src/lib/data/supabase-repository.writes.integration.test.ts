@@ -1,5 +1,8 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { ALPHABETS } from "@/lib/alphabets";
+import { buildAlphabetCheck } from "@/lib/domain/alphabet";
+import { GRAMMAR_MASTERED_BOX } from "@/lib/domain/grammar";
 import { addDays, toDateKey } from "@/lib/domain/dates";
 import { createSessionReplacer } from "@/lib/generation/preparer";
 import { createTemplateGenerator } from "@/lib/generation/template-generator";
@@ -700,6 +703,76 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
         await admin.auth.admin.deleteUser(other.data.user.id);
       }
       expect(await repo.listAlphabetCards()).toHaveLength(1);
+    });
+  });
+
+  describe("alphabet reading check", () => {
+    const alphabet = ALPHABETS.uk!;
+    const [first, ...others] = alphabet.groups;
+    const answersOf = (day: string) => buildAlphabetCheck(alphabet, `check:${day}`).map((e) => e.answer);
+    const ukCards = async () => (await repo.listAlphabetCards()).filter((c) => c.language === "uk");
+
+    it("marks the groups without a card as known on a pass, and only then", async () => {
+      const day = today();
+      const right = answersOf(day);
+
+      // Refused: unknown alphabet, a day that is neither today nor yesterday.
+      await expect(repo.recordAlphabetCheck({ language: "it", day, choices: right })).rejects.toBeInstanceOf(UserFacingError);
+      await expect(
+        repo.recordAlphabetCheck({ language: "uk", day: addDays(day, -2), choices: answersOf(addDays(day, -2)) }),
+      ).rejects.toBeInstanceOf(UserFacingError);
+
+      // Below 90 %, « Je ne sais pas » and a wrong number of answers: nothing is recorded.
+      const wrong = right.map((c, i) => (i < 2 ? (c + 1) % 4 : c));
+      expect(await repo.recordAlphabetCheck({ language: "uk", day, choices: wrong })).toEqual({
+        correct: 8,
+        total: 10,
+        passed: false,
+        marked: 0,
+      });
+      expect(await repo.recordAlphabetCheck({ language: "uk", day, choices: right.map((c, i) => (i < 2 ? null : c)) })).toMatchObject({
+        passed: false,
+        marked: 0,
+      });
+      expect(await repo.recordAlphabetCheck({ language: "uk", day, choices: right.slice(1) })).toMatchObject({ passed: false, marked: 0 });
+      expect(await ukCards()).toEqual([]);
+
+      // The first group already has a card: it stays as it is.
+      const { error } = await admin.from("alphabet_cards").insert({
+        user_id: userId,
+        group_id: first.id,
+        language: "uk",
+        status: "learning",
+        box: 1,
+        due_on: addDays(day, 2),
+        last_reviewed_on: day,
+        review_count: 3,
+        added_on: addDays(day, -5),
+      });
+      expect(error).toBeNull();
+
+      // One answer off is still a pass: every other group gets a card, mastered.
+      const almost = right.map((c, i) => (i === 0 ? (c + 1) % 4 : c));
+      const passed = await repo.recordAlphabetCheck({ language: "uk", day, choices: almost });
+      expect(passed).toEqual({ correct: 9, total: 10, passed: true, marked: others.length });
+      const cards = await ukCards();
+      expect(cards).toHaveLength(alphabet.groups.length);
+      expect(cards.find((c) => c.groupId === first.id)).toMatchObject({
+        status: "learning",
+        addedOn: addDays(day, -5),
+        review: { box: 1, reviewCount: 3 },
+      });
+      for (const group of others) {
+        expect(cards.find((c) => c.groupId === group.id)).toMatchObject({
+          language: "uk",
+          status: "known",
+          addedOn: day,
+          review: { box: GRAMMAR_MASTERED_BOX, dueOn: addDays(day, 16), lastReviewedOn: day, reviewCount: 0 },
+        });
+      }
+
+      // Again: nothing new to mark.
+      expect(await repo.recordAlphabetCheck({ language: "uk", day, choices: right })).toMatchObject({ passed: true, marked: 0 });
     });
   });
 

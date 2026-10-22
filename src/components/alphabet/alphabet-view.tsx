@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRightIcon } from "@/components/icons";
 import { languageStyle } from "@/components/ui/language-style";
 import { Card, PageHeader, SectionTitle } from "@/components/ui/primitives";
+import { ALPHABET_SCRIPT_NAMES, isAlphabetComplete } from "@/lib/domain/alphabet";
 import { grammarPointState } from "@/lib/domain/grammar";
 import { languageInfo } from "@/lib/domain/languages";
 import { dueItems, relativeDueLabel } from "@/lib/domain/spaced-repetition";
@@ -88,6 +89,18 @@ export function AlphabetView({
             </ul>
           )}
         </section>
+
+        {!isAlphabetComplete(alphabet, cards) && (
+          <Card className="flex items-center justify-between gap-3 !p-4">
+            <p className="text-[15px] font-medium">Tu lis déjà le {ALPHABET_SCRIPT_NAMES[alphabet.script]} ?</p>
+            <Link
+              href={`/alphabet/${language}/test`}
+              className="flex min-h-11 shrink-0 items-center text-sm font-semibold underline underline-offset-2"
+            >
+              Faire le test de lecture
+            </Link>
+          </Card>
+        )}
 
         <section aria-label="Les groupes de lettres">
           <SectionTitle

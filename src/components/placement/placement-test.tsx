@@ -7,9 +7,11 @@ import { completePlacementTest } from "@/app/actions/placement";
 import { ArrowRightIcon } from "@/components/icons";
 import { languageStyle } from "@/components/ui/language-style";
 import { Card, Eyebrow, LanguageTag } from "@/components/ui/primitives";
+import { ALPHABET_SCRIPT_NAMES } from "@/lib/domain/alphabet";
 import { PLACEMENT_CONFIDENCE_LABELS } from "@/lib/domain/labels";
 import { languageInfo } from "@/lib/domain/languages";
 import { nextPlacementStep, pickPlacementItem, shufflePlacementItems } from "@/lib/domain/placement";
+import type { AlphabetScript } from "@/lib/schemas/alphabet";
 import { CEFR_LEVELS, type CefrLevel, type Language } from "@/lib/schemas/common";
 import {
   PLACEMENT_GAP,
@@ -52,6 +54,7 @@ export function PlacementTest({
   items,
   startLevel,
   persist,
+  alphabet,
 }: {
   language: Language;
   /** The questions of the language; shuffled once per test, the engine picks which to ask. */
@@ -59,6 +62,8 @@ export function PlacementTest({
   /** The declared level: the test starts there. */
   startLevel: CefrLevel;
   persist: boolean;
+  /** Set when the language has an alphabet the learner has not completed: the intro points to it. */
+  alphabet?: { script: AlphabetScript };
 }) {
   const router = useRouter();
   const info = languageInfo(language);
@@ -147,6 +152,18 @@ export function PlacementTest({
             fausse, mais elle donne une estimation plus juste qu’un coup de chance.
           </p>
         </Card>
+        {alphabet && (
+          <p className="mt-4 text-sm leading-relaxed text-ink-soft">
+            Tu ne lis pas encore le {ALPHABET_SCRIPT_NAMES[alphabet.script]} ?{" "}
+            <Link href={`/alphabet?langue=${language}`} className="font-medium text-ink underline underline-offset-2">
+              Commence par l’alphabet.
+            </Link>{" "}
+            Tu le lis déjà ?{" "}
+            <Link href={`/alphabet/${language}/test`} className="font-medium text-ink underline underline-offset-2">
+              Vérifie-le en 10 mots.
+            </Link>
+          </p>
+        )}
         <div className="mt-6 space-y-3">
           <button
             type="button"

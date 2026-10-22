@@ -121,6 +121,15 @@ export const recordAlphabetPracticeInputSchema = z
   .refine((i) => i.correct <= i.total, { message: "correct > total", path: ["correct"] });
 export type RecordAlphabetPracticeInput = z.infer<typeof recordAlphabetPracticeInputSchema>;
 
+/** Answers to the reading check of a language; `day` is the day the check was drawn (its seed). */
+export const recordAlphabetCheckInputSchema = z.object({
+  language: languageSchema,
+  day: dateKeySchema,
+  /** The option picked for each question, null for « Je ne sais pas ». */
+  choices: z.array(z.number().int().min(0).max(3).nullable()).min(1).max(40),
+});
+export type RecordAlphabetCheckInput = z.infer<typeof recordAlphabetCheckInputSchema>;
+
 /** A generated question; `options` are 4 distinct strings and `answer` indexes the right one. */
 export type AlphabetExercise =
   | { type: "letter-to-latin"; upper: string; lower: string; options: string[]; answer: number }

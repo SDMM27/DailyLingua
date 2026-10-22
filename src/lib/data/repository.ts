@@ -34,9 +34,14 @@ import {
 } from "@/lib/schemas/mission";
 import type { FeedbackInput } from "@/lib/schemas/feedback";
 import { correctionCardSchema, type CorrectionCard, type ReviewCorrectionInput } from "@/lib/schemas/correction-card";
-import type { AlphabetPracticeResult } from "@/lib/domain/alphabet";
+import type { AlphabetCheckResult, AlphabetPracticeResult } from "@/lib/domain/alphabet";
 import type { GrammarPracticeResult } from "@/lib/domain/grammar";
-import { alphabetCardSchema, type AlphabetCard, type RecordAlphabetPracticeInput } from "@/lib/schemas/alphabet";
+import {
+  alphabetCardSchema,
+  type AlphabetCard,
+  type RecordAlphabetCheckInput,
+  type RecordAlphabetPracticeInput,
+} from "@/lib/schemas/alphabet";
 import { grammarCardSchema, type GrammarCard, type RecordGrammarPracticeInput } from "@/lib/schemas/grammar";
 import { productionEntrySchema, type ProductionEntry } from "@/lib/schemas/production";
 import { placementSummarySchema, type PlacementRecord, type PlacementSummary } from "@/lib/schemas/placement";
@@ -168,6 +173,11 @@ export interface DailyLinguaRepository {
    * (`expectedReviewCount`).
    */
   recordAlphabetPractice(input: RecordAlphabetPracticeInput): Promise<AlphabetPracticeResult>;
+  /**
+   * Grades the reading check of an alphabet (rebuilt from `input.day`, today or yesterday). A pass
+   * marks every group without a card as known; cards that exist are left untouched.
+   */
+  recordAlphabetCheck(input: RecordAlphabetCheckInput): Promise<AlphabetCheckResult>;
 
   listVocabulary(): Promise<VocabularyItem[]>;
   addVocabulary(input: NewVocabularyInput): Promise<VocabularyItem>;
@@ -293,6 +303,7 @@ function createMockRepository(): DailyLinguaRepository {
       return z.array(alphabetCardSchema).parse(buildMockAlphabetCards(today()));
     },
     recordAlphabetPractice: readOnly,
+    recordAlphabetCheck: readOnly,
     async listVocabulary() {
       return z.array(vocabularyItemSchema).parse(buildMockVocabulary(today()));
     },
