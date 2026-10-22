@@ -220,7 +220,7 @@ export function AlphabetPractice({
   );
 }
 
-function Question({ exercise, language }: { exercise: AlphabetExercise; language: Language }) {
+export function Question({ exercise, language }: { exercise: AlphabetExercise; language: Language }) {
   switch (exercise.type) {
     case "letter-to-latin":
       return (

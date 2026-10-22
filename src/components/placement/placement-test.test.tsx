@@ -145,3 +145,17 @@ describe("PlacementTest", () => {
     expect(screen.queryByRole("button", { name: "Enregistrer ce niveau" })).toBeNull();
   });
 });
+
+describe("PlacementTest alphabet note", () => {
+  it("points to the alphabet and its reading check when the script is not mastered", () => {
+    setup({ language: "ru", alphabet: { script: "cyrillic" } });
+    expect(screen.getByText(/Tu ne lis pas encore le cyrillique/)).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Commence par l’alphabet." }).getAttribute("href")).toBe("/alphabet?langue=ru");
+    expect(screen.getByRole("link", { name: "Vérifie-le en 10 mots." }).getAttribute("href")).toBe("/alphabet/ru/test");
+  });
+
+  it("says nothing about the alphabet otherwise", () => {
+    setup();
+    expect(screen.queryByText(/Tu ne lis pas encore/)).toBeNull();
+  });
+});

@@ -212,6 +212,44 @@ export function isAlphabetComplete(alphabet: Alphabet, cards: readonly Pick<Alph
   return alphabet.groups.every((g) => cards.some((c) => c.groupId === g.id));
 }
 
+/** Words read per group in the reading check, and the share of right answers that passes it. */
+export const ALPHABET_CHECK_WORDS_PER_GROUP = 2;
+export const ALPHABET_CHECK_PASS = 0.9;
+
+/**
+ * The reading check: for every group, 2 of its words to read, all questions mixed. Every letter of
+ * the alphabet may appear in a wrong answer (the learner is supposed to know them all). Same seed,
+ * same check: the server rebuilds it to grade the answers.
+ */
+export function buildAlphabetCheck(alphabet: Alphabet, seed: string): AlphabetExercise[] {
+  const random = seededRandom(`${alphabet.language}:${seed}`);
+  const questions = alphabet.groups.flatMap((group) =>
+    shuffled(group.words, random)
+      .slice(0, ALPHABET_CHECK_WORDS_PER_GROUP)
+      .map((w) => readWord(alphabet, group, w.word, alphabet.letters, random)),
+  );
+  return shuffled(questions, random);
+}
+
+/** Result of a reading check; `choices` are the option indexes picked, null for « Je ne sais pas ». */
+export function gradeAlphabetCheck(
+  exercises: readonly AlphabetExercise[],
+  choices: readonly (number | null)[],
+): { correct: number; total: number; passed: boolean } {
+  const total = exercises.length;
+  const correct = exercises.filter((e, i) => choices[i] === e.answer).length;
+  return { correct, total, passed: choices.length === total && total > 0 && correct / total >= ALPHABET_CHECK_PASS };
+}
+
+/** What the server answers once a reading check is graded. */
+export interface AlphabetCheckResult {
+  correct: number;
+  total: number;
+  passed: boolean;
+  /** Groups newly marked as known (0 when failed, or when they all had a card already). */
+  marked: number;
+}
+
 /** What the server answers once a run is recorded (or not). */
 export interface AlphabetPracticeResult {
   outcome: GrammarPracticeOutcome;

@@ -96,7 +96,7 @@ Ordre des écritures : cyrillique (russe, ukrainien) → coréen → grec → ja
 - Transcription savante lettre à lettre, une forme latine unique par lettre, pour pouvoir relire un mot à partir d'elle.
 - Relecture native de l'alphabet entier : drapeau `reviewedOn` (null = brouillon) et variable `ALPHABET_DRAFTS` (show / hide), comme `GRAMMAR_DRAFTS`.
 - Entrée depuis l'accueil pour les apprenants A1 tant que l'alphabet n'est pas complet, puis pour les révisions dues.
-- Reste à faire : le test « tu lis déjà cette écriture ? » pour sauter le module.
+- Test « Tu lis déjà cette écriture ? » : 10 mots à lire (2 par groupe, tirés selon le jour), il en faut 9 justes ; un score suffisant crée une carte `known` pour chaque groupe sans carte (les cartes existantes ne bougent pas), sans passer par les révisions de découverte. Accès depuis `/alphabet` (tant que l’alphabet n’est pas complet) et depuis l’intro du test de niveau.
 
 ### Phase J — Révision du vocabulaire : modes et mesure
 
