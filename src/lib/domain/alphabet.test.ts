@@ -15,6 +15,7 @@ import { stripStress } from "./stress";
 
 const ru = ALPHABETS.ru!;
 const uk = ALPHABETS.uk!;
+const ko = ALPHABETS.ko!;
 
 function card(groupId: string): AlphabetCard {
   return {
@@ -37,8 +38,32 @@ describe("transliterate", () => {
     expect(transliterate(uk, "ґа́нок")).toBe("ganok");
   });
 
+  it("reads hangul syllables jamo by jamo, with final forms and liaison", () => {
+    const readings: Record<string, string> = {
+      꽃: "kkot",
+      외국: "oeguk",
+      사람: "saram",
+      아이: "ai",
+      빵: "ppang",
+      물: "mul",
+      엄마: "eomma",
+      한국어: "hangugeo",
+      옷이: "osi",
+      시계: "sigye",
+      의사: "uisa",
+    };
+    for (const [word, reading] of Object.entries(readings)) expect(transliterate(ko, word), word).toBe(reading);
+  });
+
   it("keeps what is not a letter", () => {
     expect(transliterate(ru, "да, нет!")).toBe("da, net!");
+  });
+});
+
+describe("letterLabel", () => {
+  it("shows both cases, or a letter without case once", () => {
+    expect(letterLabel({ upper: "Р", lower: "р" })).toBe("Р р");
+    expect(letterLabel({ upper: "ㄱ", lower: "ㄱ" })).toBe("ㄱ");
   });
 });
 
@@ -81,7 +106,7 @@ describe("buildAlphabetExercises", () => {
       expect(count("read-word")).toBe(3);
       expect(count("listen-word")).toBe(2);
       const labels = exercises.flatMap((e) =>
-        e.type === "letter-to-latin" ? [e.lower] : e.type === "latin-to-letter" ? [e.options[e.answer].split(" ")[1]] : [],
+        e.type === "letter-to-latin" ? [e.lower] : e.type === "latin-to-letter" ? [e.options[e.answer].split(" ").at(-1)!] : [],
       );
       expect(labels.sort()).toEqual([...group.letters].sort());
     });
@@ -117,7 +142,7 @@ describe("buildAlphabetExercises", () => {
       for (const e of exercises) {
         if (e.type === "listen-word") for (const o of e.options) expect(learnedWords.has(o), o).toBe(true);
         if (e.type === "latin-to-letter") {
-          for (const o of e.options) expect(learnedLetters.has(o.split(" ")[1]), o).toBe(true);
+          for (const o of e.options) expect(learnedLetters.has(o.split(" ").at(-1)!), o).toBe(true);
         }
       }
     });
@@ -145,12 +170,11 @@ describe("isAlphabetComplete", () => {
   });
 });
 
-describe.each([["ru", ru], ["uk", uk]] as const)("buildAlphabetCheck (%s)", (_name, alphabet) => {
+describe.each([["ru", ru], ["uk", uk], ["ko", ko]] as const)("buildAlphabetCheck (%s)", (_name, alphabet) => {
   const check = buildAlphabetCheck(alphabet, "check:2026-10-21");
 
-  it("asks 2 distinct words of every group, 10 questions in all", () => {
+  it("asks 2 distinct words of every group", () => {
     expect(check).toHaveLength(alphabet.groups.length * 2);
-    expect(check).toHaveLength(10);
     expect(check.every((e) => e.type === "read-word")).toBe(true);
     const words = check.map((e) => (e.type === "read-word" ? e.word : ""));
     expect(new Set(words).size).toBe(words.length);
@@ -171,6 +195,20 @@ describe.each([["ru", ru], ["uk", uk]] as const)("buildAlphabetCheck (%s)", (_na
   it("is the same check for the same seed, another for another seed", () => {
     expect(buildAlphabetCheck(alphabet, "check:2026-10-21")).toEqual(check);
     expect(buildAlphabetCheck(alphabet, "check:2026-10-22")).not.toEqual(check);
+  });
+});
+
+describe("misreadings in hangul", () => {
+  it("offers the right reading exactly once", () => {
+    for (const group of ko.groups) {
+      for (let i = 0; i < 5; i++) {
+        for (const e of buildAlphabetExercises(ko, group.id, `m${i}`)) {
+          if (e.type !== "read-word") continue;
+          const right = transliterate(ko, e.word);
+          expect(e.options.filter((o) => o === right)).toHaveLength(1);
+        }
+      }
+    }
   });
 });
 

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { languageStyle } from "@/components/ui/language-style";
 import { ListenButton } from "@/components/ui/listen-button";
 import { Card, Eyebrow, LanguageTag } from "@/components/ui/primitives";
+import { letterLabel } from "@/lib/domain/alphabet";
 import { stripStress } from "@/lib/domain/stress";
 import type { AlphabetCard, AlphabetExercise, AlphabetGroup, AlphabetLetter } from "@/lib/schemas/alphabet";
 import type { DateKey, Language } from "@/lib/schemas/common";
@@ -92,8 +93,14 @@ function LetterCard({ letter, language }: { letter: AlphabetLetter; language: La
   return (
     <article className="rounded-2xl border border-line bg-surface px-4 py-4">
       <div className="flex items-start gap-4">
-        <p lang={language} aria-label={`Lettre ${letter.upper} ${letter.lower}`} className={`shrink-0 font-serif text-5xl leading-none font-semibold ${style.text}`}>
-          <span>{letter.upper}</span> <span>{letter.lower}</span>
+        <p lang={language} aria-label={`Lettre ${letterLabel(letter)}`} className={`shrink-0 font-serif text-5xl leading-none font-semibold ${style.text}`}>
+          {letter.upper === letter.lower ? (
+            <span>{letter.lower}</span>
+          ) : (
+            <>
+              <span>{letter.upper}</span> <span>{letter.lower}</span>
+            </>
+          )}
         </p>
         <div className="min-w-0 flex-1">
           <p className="text-sm text-muted">
@@ -102,6 +109,12 @@ function LetterCard({ letter, language }: { letter: AlphabetLetter; language: La
           <p className="mt-0.5 text-sm text-muted">
             Transcription : <span className="font-semibold text-ink">{letter.latin}</span>
           </p>
+          {letter.latinFinal && (
+            <p className="mt-0.5 text-sm text-muted">
+              En fin de syllabe :{" "}<span className="font-semibold text-ink">{letter.latinFinal}</span>
+            </p>
+          )}
+          {letter.silentInitial && <p className="mt-0.5 text-sm text-muted">Muet en début de syllabe</p>}
         </div>
       </div>
 

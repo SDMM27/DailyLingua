@@ -1,21 +1,29 @@
 import { describe, expect, it } from "vitest";
+import { wordLetters } from "@/lib/domain/alphabet";
 import { stripStress } from "@/lib/domain/stress";
 import { alphabetSchema } from "@/lib/schemas/alphabet";
 import { ALPHABETS, alphabetGroup, alphabetLanguages } from ".";
 
+/** Letters and groups expected per alphabet. */
+const SIZES: Record<string, { letters: number; groups: number }> = {
+  ru: { letters: 33, groups: 5 },
+  uk: { letters: 33, groups: 5 },
+  ko: { letters: 40, groups: 6 },
+};
+
 describe("alphabets", () => {
-  it("covers Russian and Ukrainian", () => {
-    expect(alphabetLanguages().sort()).toEqual(["ru", "uk"]);
+  it("covers Korean, Russian and Ukrainian", () => {
+    expect(alphabetLanguages().sort()).toEqual(["ko", "ru", "uk"]);
     expect(alphabetGroup("ru-alphabet-2")?.language).toBe("ru");
     expect(alphabetGroup("xx-alphabet-1")).toBeUndefined();
   });
 
   describe.each(Object.entries(ALPHABETS))("the %s alphabet", (code, alphabet) => {
-    it("parses and has 33 letters in 5 groups", () => {
+    it("parses and has the expected letters and groups", () => {
       expect(() => alphabetSchema.parse(alphabet)).not.toThrow();
       expect(alphabet.language).toBe(code);
-      expect(alphabet.letters).toHaveLength(33);
-      expect(alphabet.groups).toHaveLength(5);
+      expect(alphabet.letters).toHaveLength(SIZES[code].letters);
+      expect(alphabet.groups).toHaveLength(SIZES[code].groups);
     });
 
     it("is a draft until a native speaker has reviewed it", () => {
@@ -35,12 +43,14 @@ describe("alphabets", () => {
     });
 
     it("numbers the groups in order, with the language as prefix", () => {
-      expect(alphabet.groups.map((g) => g.id)).toEqual([1, 2, 3, 4, 5].map((n) => `${code}-alphabet-${n}`));
+      expect(alphabet.groups.map((g) => g.id)).toEqual(Array.from({ length: SIZES[code].groups }, (_, i) => i + 1).map((n) => `${code}-alphabet-${n}`));
     });
 
     it("has upper and lower case that match, and a lookalike for every false friend", () => {
       for (const letter of alphabet.letters) {
-        expect(letter.upper.toLowerCase()).toBe(letter.lower);
+        // A script without case has the same letter twice.
+        if (alphabet.script === "hangul") expect(letter.upper).toBe(letter.lower);
+        else expect(letter.upper.toLowerCase()).toBe(letter.lower);
         if (letter.kind === "false-friend") expect(letter.lookalike).toBeTruthy();
       }
     });
@@ -52,10 +62,10 @@ describe("alphabets", () => {
         expect(group.words.length).toBeGreaterThanOrEqual(4);
         expect(group.words.length).toBeLessThanOrEqual(8);
         for (const { word } of group.words) {
-          const letters = [...stripStress(word).toLowerCase()];
+          const letters = wordLetters(alphabet, word);
           expect(letters.length, word).toBeGreaterThanOrEqual(2);
-          expect(letters.length, word).toBeLessThanOrEqual(7);
-          for (const c of letters) expect(learned.has(c), `${word} (${group.id})`).toBe(true);
+          expect([...new Intl.Segmenter().segment(stripStress(word))].length, word).toBeLessThanOrEqual(7);
+          for (const { char } of letters) expect(learned.has(char), `${word} (${group.id})`).toBe(true);
         }
       }
     });

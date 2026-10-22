@@ -8,11 +8,13 @@ import {
   type AlphabetScript,
 } from "@/lib/schemas/alphabet";
 import type { GrammarPracticeOutcome } from "./grammar";
+import { decomposeHangul, HANGUL_VOWELS, type HangulPosition } from "./hangul";
 import { stripStress } from "./stress";
 
 /** The name of a script, as in « Apprendre à lire le cyrillique ». */
 export const ALPHABET_SCRIPT_NAMES: Record<AlphabetScript, string> = {
   cyrillic: "cyrillique",
+  hangul: "hangeul",
 };
 
 /** Every question offers this many options, the right one included. */
@@ -25,10 +27,49 @@ function normalizeWord(word: string): string {
   return stripStress(word.normalize("NFC")).toLowerCase();
 }
 
+/** One letter of a word; `position` (hangul only) is its place in the syllable block. */
+interface WordLetter {
+  char: string;
+  position?: HangulPosition;
+}
+
+/**
+ * A word taken apart into the letters the alphabet teaches. Cyrillic: stress dropped, lowercased,
+ * one letter per character. Hangul: the syllable blocks decomposed into jamo, each with its position.
+ * Anything that is not a letter is kept as is.
+ */
+export function wordLetters(alphabet: Alphabet, word: string): WordLetter[] {
+  if (alphabet.script === "hangul") return decomposeHangul(word);
+  return [...normalizeWord(word)].map((char) => ({ char }));
+}
+
+/**
+ * How `letter` reads at `index` of `letters`. Most letters read as their `latin` form; in hangul,
+ * a silent initial reads as nothing, and a final takes its `latinFinal` form unless the next
+ * syllable starts with a silent initial (the consonant then moves to it: 옷이 reads "osi").
+ */
+function letterReading(alphabet: Alphabet, letters: WordLetter[], index: number, letter: AlphabetLetter): string {
+  const position = letters[index].position;
+  if (alphabet.script !== "hangul" || !position) return letter.latin;
+  if (position === "initial") return letter.silentInitial ? "" : letter.latin;
+  if (position === "final") {
+    const next = letters[index + 1];
+    const nextLetter = next?.position === "initial" ? alphabet.letters.find((l) => l.lower === next.char) : undefined;
+    return nextLetter?.silentInitial ? letter.latin : (letter.latinFinal ?? letter.latin);
+  }
+  return letter.latin;
+}
+
 /** Letter-by-letter reading of a word: stress dropped, lowercased, anything but a letter kept. */
 export function transliterate(alphabet: Alphabet, word: string): string {
-  const latinOf = new Map(alphabet.letters.map((l) => [l.lower, l.latin]));
-  return [...normalizeWord(word)].map((char) => latinOf.get(char) ?? char).join("");
+  const byLower = new Map(alphabet.letters.map((l) => [l.lower, l]));
+  const letters = wordLetters(alphabet, word);
+  return letters
+    .map((token, index) => {
+      const letter = byLower.get(token.char);
+      return letter ? letterReading(alphabet, letters, index, letter) : token.char;
+    })
+    .join("");
 }
 
 /** A seeded pseudo-random generator in [0, 1) (mulberry32 over an FNV-1a hash of the seed). */
@@ -96,9 +137,9 @@ function groupLetters(alphabet: Alphabet, groupIndex: number): { learned: Alphab
   };
 }
 
-/** The label of a letter as an answer: both cases, "Р р". */
+/** The label of a letter as an answer: both cases, "Р р"; a letter without case, once ("ㄱ"). */
 export function letterLabel(letter: Pick<AlphabetLetter, "upper" | "lower">): string {
-  return `${letter.upper} ${letter.lower}`;
+  return letter.upper === letter.lower ? letter.lower : `${letter.upper} ${letter.lower}`;
 }
 
 function letterToLatin(letter: AlphabetLetter, learned: AlphabetLetter[], all: AlphabetLetter[], random: Random): AlphabetExercise {
@@ -136,9 +177,10 @@ function misreadings(
   random: Random,
 ): { preferred: string[]; others: string[] } {
   const byLower = new Map(alphabet.letters.map((l) => [l.lower, l]));
-  const tokens = [...normalizeWord(word)].map((char) => {
-    const letter = byLower.get(char);
-    return { letter, reading: letter?.latin ?? char };
+  const letters = wordLetters(alphabet, word);
+  const tokens = letters.map((token, index) => {
+    const letter = byLower.get(token.char);
+    return { letter, reading: letter ? letterReading(alphabet, letters, index, letter) : token.char };
   });
   const replaced = (index: number, reading: string) => tokens.map((t, i) => (i === index ? reading : t.reading)).join("");
   const preferred: string[] = [];
@@ -146,7 +188,13 @@ function misreadings(
   tokens.forEach((token, index) => {
     if (!token.letter) return;
     if (token.letter.kind === "false-friend" && token.letter.lookalike) preferred.push(replaced(index, token.letter.lookalike));
-    for (const other of shuffled(learned, random).slice(0, 3)) others.push(replaced(index, other.latin));
+    // In hangul a vowel is only mistaken for another vowel, a consonant for another consonant.
+    const isVowel = HANGUL_VOWELS.has(token.letter.lower);
+    const candidates =
+      alphabet.script === "hangul" ? learned.filter((l) => HANGUL_VOWELS.has(l.lower) === isVowel) : learned;
+    for (const other of shuffled(candidates, random).slice(0, 3)) {
+      others.push(replaced(index, letterReading(alphabet, letters, index, other)));
+    }
   });
   return { preferred, others };
 }

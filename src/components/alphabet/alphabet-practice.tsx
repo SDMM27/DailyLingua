@@ -7,6 +7,7 @@ import { ListenButton, useHasLocalVoice } from "@/components/ui/listen-button";
 import { Card, Eyebrow, ProgressBar } from "@/components/ui/primitives";
 import { GRAMMAR_PASS_RATIO, type GrammarPracticeOutcome } from "@/lib/domain/grammar";
 import { relativeDueLabel } from "@/lib/domain/spaced-repetition";
+import { letterLabel } from "@/lib/domain/alphabet";
 import { stripStress } from "@/lib/domain/stress";
 import type { AlphabetCard, AlphabetExercise } from "@/lib/schemas/alphabet";
 import type { DateKey, Language } from "@/lib/schemas/common";
@@ -227,7 +228,7 @@ export function Question({ exercise, language }: { exercise: AlphabetExercise; l
         <>
           <p className="text-[15px] text-ink-soft">Comment se transcrit cette lettre ?</p>
           <p lang={language} className="mt-2 font-serif text-6xl font-semibold">
-            {exercise.upper} {exercise.lower}
+            {letterLabel(exercise)}
           </p>
         </>
       );

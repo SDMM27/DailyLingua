@@ -1,13 +1,15 @@
 import type { Language } from "@/lib/schemas/common";
 import type { Alphabet, AlphabetGroup } from "@/lib/schemas/alphabet";
+import { koAlphabet } from "./ko";
 import { ruAlphabet } from "./ru";
 import { ukAlphabet } from "./uk";
 
 /**
- * Alphabets as authored (phase I1). Server side only: a page passes one group to the client,
+ * Alphabets as authored (phases I1 and I2). Server side only: a page passes one group to the client,
  * never the whole map.
  */
 export const ALPHABETS: Partial<Record<Language, Alphabet>> = {
+  ko: koAlphabet,
   ru: ruAlphabet,
   uk: ukAlphabet,
 };

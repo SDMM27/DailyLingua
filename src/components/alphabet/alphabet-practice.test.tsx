@@ -62,6 +62,15 @@ async function run(user: ReturnType<typeof userEvent.setup>, right: boolean[]) {
 }
 
 describe("AlphabetPractice", () => {
+  it("shows a letter without case once", () => {
+    setup({
+      exercises: [{ type: "letter-to-latin", upper: "ㄱ", lower: "ㄱ", options: ["g", "n", "d", "m"], answer: 0 }],
+      language: "ko",
+    });
+    expect(screen.getByText("ㄱ")).toBeTruthy();
+    expect(screen.queryByText("ㄱ ㄱ")).toBeNull();
+  });
+
   it("shows the verdict and the right answer at once, with big tap targets", async () => {
     const user = setup();
     const options = screen.getByRole("group", { name: "Choisis la bonne réponse" }).querySelectorAll("button");

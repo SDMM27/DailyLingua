@@ -108,6 +108,14 @@ Ordre des écritures : cyrillique (russe, ukrainien) → coréen → grec → ja
 - Entrée depuis l'accueil pour les apprenants A1 tant que l'alphabet n'est pas complet, puis pour les révisions dues.
 - Test « Tu lis déjà cette écriture ? » : 10 mots à lire (2 par groupe, tirés selon le jour), il en faut 9 justes ; un score suffisant crée une carte `known` pour chaque groupe sans carte (les cartes existantes ne bougent pas), sans passer par les révisions de découverte. Accès depuis `/alphabet` (tant que l’alphabet n’est pas complet) et depuis l’intro du test de niveau.
 
+**I2 (implémenté)** : hangeul, coréen (`src/lib/alphabets/ko.ts`). Décisions prises :
+
+- Les lettres sont les 40 jamo (19 consonnes, 21 voyelles, doubles et composées comprises), en 6 groupes : voyelles de base avec ㅇ et ㄴ, consonnes de base, voyelles en « y », consonnes aspirées, consonnes tendues, voyelles composées rares. Pas de majuscules : une seule forme par lettre.
+- Les mots sont écrits en blocs syllabiques et découpés en jamo pour la lecture (`src/lib/domain/hangul.ts`). Les syllabes à double consonne finale sont découpées en deux lettres.
+- Transcription : la romanisation révisée sans les changements de son. Une consonne finale prend sa forme de fin de syllabe (`latinFinal` : ㄱ → k, ㅅ → t), sauf devant une syllabe qui commence par ㅇ muet (liaison : 한국어 → hangugeo). ㅇ est muet en début de syllabe (`silentInitial`). Les mots de lecture évitent les assimilations que cette règle ne couvre pas (ㄴ + ㄹ, ㄱ + ㄴ, etc.).
+- Dans les mauvaises réponses de lecture, une voyelle ne remplace qu'une voyelle et une consonne qu'une consonne, pour que les erreurs proposées restent plausibles.
+- Même moteur que I1 : une carte par groupe, test de lecture (2 mots par groupe, 12 questions), brouillon jusqu'à la relecture native.
+
 ### Phase J — Révision du vocabulaire : modes et mesure
 
 1. **Modes de rappel** en plus de la reconnaissance : écrire la traduction, écouter et taper, phrase à trou dans une vraie phrase de contenu.
@@ -123,14 +131,14 @@ Pas une phase de développement isolé. C'est un fichier de configuration qui in
 Une phase validée avant la suivante, comme pour le reste du projet.
 
 1. **H1 — Grammaire pilote** (ru, it, A1–B1). Le plus visible pour le niveau intermédiaire. *Fait.*
-2. **I — Alphabets** (cyrillique d'abord). Débloque les débutants en russe, ukrainien, puis les autres écritures. *I1 (cyrillique) fait ; suivant : coréen (I2), puis grec, kana, arabe.*
+2. **I — Alphabets** (cyrillique d'abord). Débloque les débutants en russe, ukrainien, puis les autres écritures. *I1 (cyrillique) fait, I2 (hangeul) implémenté ; suivant : grec, puis kana, arabe.*
 3. **J — Modes de révision et mesure de rétention.** Commencer la mesure tôt : elle prend des semaines à produire des données.
 4. **H2 — Grammaire suggérée par les erreurs.** Dépend de D (déjà fait) et de H1.
 5. **K — Parcours par niveau**, appliqué progressivement.
 
 Phase G (écrire puis dire) est faite ; elle n'avait pas de dépendance avec ce plan.
 
-En parallèle du développement : faire relire par des natifs les 36 points de grammaire et les deux alphabets cyrilliques, pour pouvoir les publier en production.
+En parallèle du développement : faire relire par des natifs les 36 points de grammaire et les alphabets (russe, ukrainien, coréen), pour pouvoir les publier en production.
 
 ## 5. Décisions
 

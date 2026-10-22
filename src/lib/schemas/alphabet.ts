@@ -24,7 +24,7 @@ const grapheme = z
   .min(1)
   .refine((s) => [...new Intl.Segmenter().segment(s)].length === 1, { message: "must be a single grapheme" });
 
-export const ALPHABET_SCRIPTS = ["cyrillic"] as const;
+export const ALPHABET_SCRIPTS = ["cyrillic", "hangul"] as const;
 export const alphabetScriptSchema = z.enum(ALPHABET_SCRIPTS);
 export type AlphabetScript = z.infer<typeof alphabetScriptSchema>;
 
@@ -53,6 +53,10 @@ export const alphabetLetterSchema = z
     name: text(20),
     /** Letter-by-letter transliteration, unique within an alphabet. */
     latin: text(4),
+    /** Reading when the letter closes a syllable (hangul), when it differs from `latin`. */
+    latinFinal: text(4).optional(),
+    /** No sound at the start of a syllable, where the letter only holds the place of a consonant (hangul ㅇ). */
+    silentInitial: z.literal(true).optional(),
     /** French, how it sounds. */
     soundFr: text(160),
     kind: alphabetLetterKindSchema,
