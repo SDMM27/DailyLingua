@@ -1,6 +1,6 @@
 # Plan — grammaire, alphabets, révision du vocabulaire, parcours par niveau
 
-Statut : **H1 (grammaire pilote) est fait, I1 (cyrillique : russe, ukrainien) est implémenté** ; le reste est une proposition. Date : 2026-10-21. Ce plan complète [product-features.md](product-features.md) (phases A à G) sans le remplacer. Les phases ci-dessous portent les lettres H à K pour ne pas se confondre avec les précédentes.
+Statut : **H1 (grammaire pilote) et I1 (cyrillique : russe, ukrainien, avec le test de lecture) sont faits**, en attente de relecture native ; le reste est une proposition. Date : 2026-10-21, mis à jour le 2026-10-22. Ce plan complète [product-features.md](product-features.md) (phases A à G) sans le remplacer. Les phases ci-dessous portent les lettres H à K pour ne pas se confondre avec les précédentes.
 
 ## 1. Constat
 
@@ -76,6 +76,16 @@ Le niveau vient du test de niveau (phase C) ou de la préférence déclarée. Il
 4. Répétition espacée : chaque point exercé avec succès devient une carte, même moteur que `correction_cards`.
 5. Relecture native obligatoire avant publication de chaque point.
 
+**H1 (fait)** : russe et italien, A1 à B1 (`src/lib/grammar`, `/grammaire`). Décisions prises :
+
+- Programme fixe : 6 points par niveau et par langue, soit 18 par langue (`src/lib/grammar/curriculum.ts`). Les identifiants sont stables : les cartes y renvoient, un point n'est jamais renommé, seulement ajouté.
+- Contenu en fichiers TypeScript par langue (`src/lib/grammar/courses/<code>.ts`), soumis aux règles de rédaction de `src/lib/grammar/AUTHORING.md` et vérifié par `npm run grammar:check`.
+- Trois types d'exercices : `choose`, `fill`, `transform`. Les réponses sont comparées sans tenir compte de la casse, des espaces, de la ponctuation finale, de l'apostrophe typographique ni, pour le russe, de l'accent tonique et de ё/е.
+- Une carte de révision par point (table `grammar_cards`, RPC `record_grammar_practice`). Elle est créée à partir de 60 % de bonnes réponses, puis mise à jour seulement quand elle est due ; toute autre série est un entraînement libre qui n'enregistre rien. Un point est « maîtrisé » à partir de la boîte 4.
+- Chaque point porte les catégories de correction qu'il traite (`agreement`, `verb`, `function_word`, etc.) : c'est ce qui permettra le lien avec les erreurs en H2.
+- Relecture native : drapeau `reviewedOn` (null = brouillon) et variable `GRAMMAR_DRAFTS` (show / hide). Par défaut les brouillons sont masqués en production. Les 36 points sont encore des brouillons.
+- Entrée depuis l'accueil : nombre de fiches à revoir, ou invitation à commencer, pour les langues de l'utilisateur qui ont un cours visible. Sur `/grammaire`, le niveau de l'apprenant passe en premier ; au-dessus de B1, tous les points servent de référence.
+
 **H2 (après D et H1)** : grammaire suggérée par les erreurs. Une erreur de catégorie `agreement` ou `verb` répétée au moins 3 fois sur une langue propose la fiche correspondante. Étendre ensuite aux 19 langues, par ordre de demande.
 
 ### Phase I — Alphabets
@@ -112,21 +122,28 @@ Pas une phase de développement isolé. C'est un fichier de configuration qui in
 
 Une phase validée avant la suivante, comme pour le reste du projet.
 
-1. **H1 — Grammaire pilote** (ru, it, A1–B1). Le plus visible pour le niveau intermédiaire.
-2. **I — Alphabets** (cyrillique d'abord). Débloque les débutants en russe, ukrainien, puis les autres écritures.
+1. **H1 — Grammaire pilote** (ru, it, A1–B1). Le plus visible pour le niveau intermédiaire. *Fait.*
+2. **I — Alphabets** (cyrillique d'abord). Débloque les débutants en russe, ukrainien, puis les autres écritures. *I1 (cyrillique) fait ; suivant : coréen (I2), puis grec, kana, arabe.*
 3. **J — Modes de révision et mesure de rétention.** Commencer la mesure tôt : elle prend des semaines à produire des données.
 4. **H2 — Grammaire suggérée par les erreurs.** Dépend de D (déjà fait) et de H1.
 5. **K — Parcours par niveau**, appliqué progressivement.
 
-Phase G (écrire puis dire, déjà conçue) passe avant H si elle est validée en premier : elle n'a pas de dépendance avec ce plan.
+Phase G (écrire puis dire) est faite ; elle n'avait pas de dépendance avec ce plan.
 
-## 5. Décisions à prendre
+En parallèle du développement : faire relire par des natifs les 36 points de grammaire et les deux alphabets cyrilliques, pour pouvoir les publier en production.
 
-1. **Grammaire** : leçons curées (recommandé, coût contrôlé, qualité relue) ou générées par IA à la demande ?
-2. **Gamification** : série de jours seule (recommandé), ou aussi points et ligues pour une expérimentation ?
-3. **Langues pilotes de la grammaire** : russe et italien (recommandé, vos deux langues principales), ou une autre paire ?
-4. **Chinois** : les hanzis entrent-ils dans le périmètre, ou seulement plus tard ?
-5. **Fréquence des mots** pour le niveau A1–A2 : une liste de fréquence doit avoir une licence compatible avec un usage commercial. À vérifier avant de l'utiliser.
+## 5. Décisions
+
+Prises :
+
+1. **Grammaire** : leçons curées, relues avant publication (H1).
+2. **Langues pilotes de la grammaire** : russe et italien (H1).
+
+À prendre :
+
+1. **Gamification** : série de jours seule (recommandé), ou aussi points et ligues pour une expérimentation ? À trancher avant J.
+2. **Chinois** : les hanzis entrent-ils dans le périmètre, ou seulement plus tard ?
+3. **Fréquence des mots** pour le niveau A1–A2 : une liste de fréquence doit avoir une licence compatible avec un usage commercial. À vérifier avant de l'utiliser.
 
 ## 6. Risques
 
