@@ -5,6 +5,11 @@ export const REVIEW_GRADES = ["again", "hard", "good", "easy"] as const;
 export const reviewGradeSchema = z.enum(REVIEW_GRADES);
 export type ReviewGrade = z.infer<typeof reviewGradeSchema>;
 
+/** How a word is recalled: `flip` is the self-graded card, the others are typed and graded by the app. */
+export const REVIEW_MODES = ["flip", "translate", "produce", "listen", "cloze"] as const;
+export const reviewModeSchema = z.enum(REVIEW_MODES);
+export type ReviewMode = z.infer<typeof reviewModeSchema>;
+
 export const reviewStateSchema = z.object({
   /** Leitner box, 0 = new / failed, higher = better known. */
   box: z.number().int().min(0),
@@ -50,8 +55,23 @@ export const reviewInputSchema = z.object({
   grade: reviewGradeSchema,
   /** The review count the user saw; the review is refused if the word changed since. */
   expectedReviewCount: z.number().int().nonnegative(),
+  mode: reviewModeSchema.default("flip"),
 });
 export type ReviewInput = z.infer<typeof reviewInputSchema>;
+
+/** Reviews counted and recalled (any grade but "again") in one mode. */
+export const modeRetentionSchema = z.object({
+  reviews: z.number().int().nonnegative(),
+  recalled: z.number().int().nonnegative(),
+});
+export type ModeRetention = z.infer<typeof modeRetentionSchema>;
+
+/** Recall rate of reviews made long after the previous one, per mode (see `retentionByMode`). */
+export const retentionStatsSchema = z.object({
+  total: modeRetentionSchema,
+  byMode: z.record(reviewModeSchema, modeRetentionSchema),
+});
+export type RetentionStats = z.infer<typeof retentionStatsSchema>;
 
 export const wordStatusInputSchema = z.object({ id: z.string().min(1), status: z.enum(["learning", "known"]) });
 export const wordIdInputSchema = z.object({ id: z.string().min(1) });

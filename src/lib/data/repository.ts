@@ -53,6 +53,7 @@ import {
   type ImportVocabularyResult,
   type NewVocabularyInput,
   type NewVocabularyListInput,
+  type RetentionStats,
   type ReviewInput,
   type TranslateVocabularyInput,
   type UpdateVocabularyListInput,
@@ -183,6 +184,8 @@ export interface DailyLinguaRepository {
   addVocabulary(input: NewVocabularyInput): Promise<VocabularyItem>;
   /** Grades a review; returns the word with its new review state. */
   reviewVocabulary(input: ReviewInput): Promise<VocabularyItem>;
+  /** Recall rate per review mode, from the reviews of the last 90 days made 7+ days after the previous one. */
+  vocabularyRetention(): Promise<RetentionStats>;
   setVocabularyStatus(id: string, status: VocabularyItem["status"]): Promise<void>;
   deleteVocabulary(id: string): Promise<void>;
 
@@ -309,6 +312,19 @@ function createMockRepository(): DailyLinguaRepository {
     },
     addVocabulary: readOnly,
     reviewVocabulary: readOnly,
+    async vocabularyRetention() {
+      // A plausible sample, to show the card in the demo.
+      return {
+        total: { reviews: 71, recalled: 56 },
+        byMode: {
+          flip: { reviews: 22, recalled: 20 },
+          translate: { reviews: 34, recalled: 28 },
+          produce: { reviews: 3, recalled: 2 },
+          listen: { reviews: 4, recalled: 3 },
+          cloze: { reviews: 8, recalled: 3 },
+        },
+      };
+    },
     setVocabularyStatus: readOnly,
     deleteVocabulary: readOnly,
     async listVocabularyLists() {

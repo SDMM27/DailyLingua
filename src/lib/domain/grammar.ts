@@ -17,7 +17,13 @@ export const GRAMMAR_LEVELS: readonly CefrLevel[] = ["A1", "A2", "B1"];
  * (for languages that mark stress, i.e. Cyrillic ones) stress mark and ё/е.
  */
 export function normalizeGrammarAnswer(language: Language, text: string): string {
-  let value = text
+  const value = normalizeTypedText(text);
+  return languageInfo(language).markStress ? stripStress(value).replaceAll("ё", "е").normalize("NFC") : value;
+}
+
+/** The language-independent part of `normalizeGrammarAnswer`: also used for answers in French. */
+export function normalizeTypedText(text: string): string {
+  return text
     .normalize("NFC")
     .replaceAll("’", "'")
     .trim()
@@ -25,10 +31,6 @@ export function normalizeGrammarAnswer(language: Language, text: string): string
     .replace(/\s+/g, " ")
     .replace(/(?:\s*[.!?…])+$/u, "")
     .trim();
-  if (languageInfo(language).markStress) {
-    value = stripStress(value).replaceAll("ё", "е").normalize("NFC");
-  }
-  return value;
 }
 
 export function isExerciseAnswerCorrect(exercise: GrammarExercise, answer: string | number, language: Language): boolean {

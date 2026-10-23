@@ -186,12 +186,14 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
 
     it("reviews a word once, and refuses a stale replay", async () => {
       const [item] = await repo.listVocabulary();
-      const reviewed = await repo.reviewVocabulary({ id: item.id, grade: "good", expectedReviewCount: 0 });
+      const reviewed = await repo.reviewVocabulary({ id: item.id, grade: "good", expectedReviewCount: 0, mode: "translate" });
+      // A first review has no previous one: it does not count for the retention.
+      expect((await repo.vocabularyRetention()).total).toEqual({ reviews: 0, recalled: 0 });
       expect(reviewed.review).toMatchObject({ box: 1, lastReviewedOn: today(), reviewCount: 1 });
       expect((await repo.listVocabulary())[0].review).toEqual(reviewed.review);
 
       await expect(
-        repo.reviewVocabulary({ id: item.id, grade: "good", expectedReviewCount: 0 }),
+        repo.reviewVocabulary({ id: item.id, grade: "good", expectedReviewCount: 0, mode: "flip" }),
       ).rejects.toBeInstanceOf(UserFacingError);
       expect((await repo.listVocabulary())[0].review.reviewCount).toBe(1);
     });

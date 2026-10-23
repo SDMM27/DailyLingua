@@ -1,6 +1,6 @@
 # Plan — grammaire, alphabets, révision du vocabulaire, parcours par niveau
 
-Statut : **H1 (grammaire pilote) et I1 (cyrillique : russe, ukrainien, avec le test de lecture) sont faits**, en attente de relecture native ; le reste est une proposition. Date : 2026-10-21, mis à jour le 2026-10-22. Ce plan complète [product-features.md](product-features.md) (phases A à G) sans le remplacer. Les phases ci-dessous portent les lettres H à K pour ne pas se confondre avec les précédentes.
+Statut : **H1 (grammaire pilote) et I1 (cyrillique : russe, ukrainien, avec le test de lecture) sont faits**, en attente de relecture native ; le reste est une proposition. Date : 2026-10-21, mis à jour le 2026-10-23. Ce plan complète [product-features.md](product-features.md) (phases A à G) sans le remplacer. Les phases ci-dessous portent les lettres H à K pour ne pas se confondre avec les précédentes.
 
 ## 1. Constat
 
@@ -136,6 +136,15 @@ Ordre des écritures : cyrillique (russe, ukrainien) → coréen → grec → ja
 2. **Mesure** : une fois par semaine, une révision « surprise » de 10 mots appris il y a 7 jours et jamais revus. Le taux de rappel par mode est enregistré. C'est la seule façon de savoir si le système fonctionne pour cet utilisateur.
 3. **Gamification légère** (à décider, voir section 5) : série de jours, sans points ni ligues. Activable et désactivable.
 
+**J1 et J2 (implémentés)** : modes de rappel et mesure de la rétention (`src/lib/domain/review-modes.ts`, `/vocabulaire`). J3 attend la décision sur la gamification. Décisions prises :
+
+- Cinq modes : `flip` (la carte actuelle, auto-évaluée), `translate` (le mot → taper la traduction), `produce` (la traduction → taper le mot), `listen` (écouter le mot → le taper) et `cloze` (la phrase d’exemple avec un trou → taper le mot).
+- Par défaut, la séance est « mélangée » : le mode dépend de la boîte du mot. Boîte 0 : `flip` ; boîte 1 : `flip` ou `translate` ; boîtes 2 et 3 : `translate`, `listen` ou `cloze` ; à partir de la boîte 4 : `produce`, `listen` ou `cloze`. Le tirage utilise la graine `mot:jour`, donc le mode d’un mot ne change pas dans la journée. On peut aussi choisir un seul mode pour toute la séance.
+- `cloze` ne sert que si l’exemple contient le mot tel quel. `listen` ne sert que si l’appareil a une voix pour la langue (rien n’est envoyé à un tiers). Sinon, le mot passe en `translate`.
+- Les réponses tapées sont corrigées automatiquement, avec la même normalisation que la grammaire. Pour la traduction, chaque sens séparé par une virgule est accepté, avec ou sans article. Les notes sont : juste → « Bien », presque (accents seuls, ou une lettre d’écart sur un mot de 5 lettres ou plus) → « Difficile », faux → « À revoir ». L’apprenant peut corriger la note : « J’avais bon » (→ « Bien ») ou « Trop facile » (→ « Facile »).
+- **Mesure** : au lieu d’une révision « surprise », qui dérangerait le calendrier des révisions, la mesure vient du journal `vocabulary_reviews`. Chaque révision y enregistre désormais son mode et le nombre de jours depuis la révision précédente (`mode`, `days_since_last`). La rétention est le taux de mots rappelés (toute note sauf « À revoir ») parmi les révisions faites au moins 7 jours après la précédente, sur les 90 derniers jours, par mode. Ces écarts arrivent naturellement à partir de la boîte 3 (8 jours).
+- Affichage sur `/vocabulaire` : un mode n’apparaît qu’à partir de 10 révisions, et la carte reste indicative tant qu’il y en a moins de 30 en tout. Le mode `flip` est signalé comme auto-évalué, donc moins fiable que les modes tapés.
+
 ### Phase K — Parcours par niveau (transversal)
 
 Pas une phase de développement isolé. C'est un fichier de configuration qui indique, pour chaque niveau, quels modules sont mis en avant, quel contenu est proposé en premier et quels rappels s'affichent sur l'accueil. Il est appliqué au fur et à mesure que H, I et J arrivent. Le premier pas : définir la table niveau → modules, puis l'utiliser sur l'accueil.
@@ -146,7 +155,7 @@ Une phase validée avant la suivante, comme pour le reste du projet.
 
 1. **H1 — Grammaire pilote** (ru, it, A1–B1). Le plus visible pour le niveau intermédiaire. *Fait.*
 2. **I — Alphabets** (cyrillique d'abord). Débloque les débutants en russe, ukrainien, puis les autres écritures. *I1 (cyrillique) fait, I2 à I5 (hangeul, grec, kana, arabe) implémentés : toutes les écritures prévues sont couvertes, en attente de relecture native.*
-3. **J — Modes de révision et mesure de rétention.** Commencer la mesure tôt : elle prend des semaines à produire des données.
+3. **J — Modes de révision et mesure de rétention.** Commencer la mesure tôt : elle prend des semaines à produire des données. *J1 (modes) et J2 (mesure) implémentés ; J3 (gamification) attend la décision 1 de la section 5.*
 4. **H2 — Grammaire suggérée par les erreurs.** Dépend de D (déjà fait) et de H1.
 5. **K — Parcours par niveau**, appliqué progressivement.
 

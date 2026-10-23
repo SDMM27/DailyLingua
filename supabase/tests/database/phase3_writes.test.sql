@@ -4,7 +4,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(24);
+select plan(29);
 
 insert into auth.users (instance_id, id, aud, role, email) values
   ('00000000-0000-0000-0000-000000000000', 'a0000000-0000-4000-8000-0000000000bb', 'authenticated', 'authenticated', 'writer-a@test.invalid'),
@@ -87,7 +87,7 @@ select throws_ok(
 -- record_vocabulary_review ---------------------------------------------------------------------
 
 select is(
-  public.record_vocabulary_review('10000000-0000-4000-8000-0000000000bb', 'good', '2030-01-10', 1::smallint, '2030-01-12', 0),
+  public.record_vocabulary_review('10000000-0000-4000-8000-0000000000bb', 'good', '2030-01-10', 1::smallint, '2030-01-12', 0, 'translate'),
   true, 'a review is recorded');
 select is(
   (select box::text || ' ' || due_on::text || ' ' || last_reviewed_on::text || ' ' || review_count::text
@@ -97,18 +97,32 @@ select is(
   (select box_before::text || '>' || box_after::text || ' ' || reviewed_on::text from public.vocabulary_reviews),
   '0>1 2030-01-10', 'the journal got one entry with the previous box');
 select is(
-  public.record_vocabulary_review('10000000-0000-4000-8000-0000000000bb', 'good', '2030-01-10', 2::smallint, '2030-01-14', 0),
+  (select mode || ' ' || coalesce(days_since_last::text, 'null') from public.vocabulary_reviews),
+  'translate null', 'the journal keeps the mode; a first review has no previous one');
+select is(
+  public.record_vocabulary_review('10000000-0000-4000-8000-0000000000bb', 'good', '2030-01-10', 2::smallint, '2030-01-14', 0, 'flip'),
   false, 'replaying the same review (stale review count) changes nothing');
 
 select set_config('request.jwt.claims',
   '{"sub": "b0000000-0000-4000-8000-0000000000bb", "role": "authenticated"}', true);
 select is(
-  public.record_vocabulary_review('10000000-0000-4000-8000-0000000000bb', 'easy', '2030-01-10', 3::smallint, '2030-01-20', 1),
+  public.record_vocabulary_review('10000000-0000-4000-8000-0000000000bb', 'easy', '2030-01-10', 3::smallint, '2030-01-20', 1, 'flip'),
   false, 'another user cannot review the word');
 
 select set_config('request.jwt.claims',
   '{"sub": "a0000000-0000-4000-8000-0000000000bb", "role": "authenticated"}', true);
 select is((select review_count from public.vocabulary_items), 1, 'the word was reviewed exactly once');
+
+select is(
+  public.record_vocabulary_review('10000000-0000-4000-8000-0000000000bb', 'easy', '2030-01-18', 3::smallint, '2030-01-26', 1, 'cloze'),
+  true, 'a second review is recorded');
+select is(
+  (select mode || ' ' || days_since_last::text from public.vocabulary_reviews order by reviewed_on desc limit 1),
+  'cloze 8', 'days_since_last is the gap with the previous review');
+select throws_ok(
+  $$select public.record_vocabulary_review('10000000-0000-4000-8000-0000000000bb', 'good', '2030-01-19', 4::smallint, '2030-01-27', 2, 'telepathy')$$,
+  '22023', null, 'an unknown mode is refused');
+select is((select count(*)::int from public.vocabulary_reviews), 2, 'a refused review writes nothing');
 
 -- Mission progress ------------------------------------------------------------------------------
 
@@ -138,7 +152,7 @@ select throws_ok(
 reset role;
 set local role anon;
 select throws_ok(
-  $$select public.record_vocabulary_review('10000000-0000-4000-8000-0000000000bb', 'good', '2030-01-10', 1::smallint, '2030-01-12', 1)$$,
+  $$select public.record_vocabulary_review('10000000-0000-4000-8000-0000000000bb', 'good', '2030-01-10', 1::smallint, '2030-01-12', 1, 'flip')$$,
   '42501', null, 'anon cannot call the review function');
 
 select * from finish();

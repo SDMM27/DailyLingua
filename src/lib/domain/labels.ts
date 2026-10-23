@@ -3,6 +3,7 @@ import type { ContentType } from "@/lib/schemas/common";
 import type { ActivityKind } from "@/lib/schemas/mission";
 import type { PlacementConfidence } from "@/lib/schemas/placement";
 import type { DifficultyMode, LanguagePurpose } from "@/lib/schemas/preferences";
+import type { ReviewMode } from "@/lib/schemas/vocabulary";
 
 export const CONTENT_TYPE_LABELS: Record<ContentType, string> = {
   article: "Article",
@@ -45,4 +46,12 @@ export const PLACEMENT_CONFIDENCE_LABELS: Record<PlacementConfidence, { title: s
   low: { title: "faible", hint: "Tes réponses hésitent autour de ce niveau : prends-le comme une indication." },
   medium: { title: "moyenne", hint: "Tes réponses balancent un peu entre deux niveaux voisins." },
   high: { title: "élevée", hint: "Tes réponses sont nettes de part et d’autre de ce niveau." },
+};
+
+export const REVIEW_MODE_LABELS: Record<ReviewMode, string> = {
+  flip: "Cartes",
+  translate: "Traduire",
+  produce: "Écrire le mot",
+  listen: "Écouter",
+  cloze: "Phrase à trou",
 };
