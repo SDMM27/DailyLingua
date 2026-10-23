@@ -1,0 +1,106 @@
+import type { Alphabet } from "@/lib/schemas/alphabet";
+
+/**
+ * Greek alphabet (24 letters), phase I3. Transliteration is letter by letter, one Latin form per
+ * letter (η → ē and ω → ō keep it reversible), with the two digraphs of ELOT 743: ου reads "ou",
+ * αυ / ευ read "av" / "ev" ("af" / "ef" before a voiceless consonant or at the end of a word).
+ * μπ, ντ, γκ stay letter by letter (mp, nt, gk): the tips say how they sound. The accent (tonos)
+ * is written in the words and ignored when reading; final ς is read as σ.
+ */
+export const elAlphabet = {
+  language: "el",
+  script: "greek",
+  version: "2026-10-23",
+  letters: [
+    { upper: "Α", lower: "α", name: "άλφα", latin: "a", kind: "same", soundFr: "comme « a » dans « papa »", example: { word: "αλάτι", translation: "sel" } },
+    { upper: "Β", lower: "β", name: "βήτα", latin: "v", kind: "false-friend", lookalike: "b", soundFr: "comme « v » dans « vache » (jamais « b »)", example: { word: "βιβλίο", translation: "livre" } },
+    { upper: "Γ", lower: "γ", name: "γάμμα", latin: "g", kind: "new", soundFr: "un « r » doux du fond de la gorge ; devant ε et ι, proche de « y » dans « yeux »", example: { word: "γάλα", translation: "lait" } },
+    { upper: "Δ", lower: "δ", name: "δέλτα", latin: "d", kind: "new", soundFr: "comme « th » anglais dans « this », la langue entre les dents", example: { word: "δώρο", translation: "cadeau" } },
+    { upper: "Ε", lower: "ε", name: "έψιλον", latin: "e", kind: "same", soundFr: "comme « è » dans « père »", example: { word: "ελιά", translation: "olive" } },
+    { upper: "Ζ", lower: "ζ", name: "ζήτα", latin: "z", kind: "new", soundFr: "comme « z » dans « zèbre »", example: { word: "ζάχαρη", translation: "sucre" } },
+    { upper: "Η", lower: "η", name: "ήτα", latin: "ē", kind: "false-friend", lookalike: "h", soundFr: "comme « i » dans « midi » (la majuscule ressemble à un H)", example: { word: "ήλιος", translation: "soleil" } },
+    { upper: "Θ", lower: "θ", name: "θήτα", latin: "th", kind: "new", soundFr: "comme « th » anglais dans « think », la langue entre les dents", example: { word: "θάλασσα", translation: "mer" } },
+    { upper: "Ι", lower: "ι", name: "γιώτα", latin: "i", kind: "same", soundFr: "comme « i » dans « midi »", example: { word: "ιδέα", translation: "idée" } },
+    { upper: "Κ", lower: "κ", name: "κάπα", latin: "k", kind: "same", soundFr: "comme « k » dans « kilo »", example: { word: "καφές", translation: "café" } },
+    { upper: "Λ", lower: "λ", name: "λάμδα", latin: "l", kind: "new", soundFr: "comme « l » dans « lac »", example: { word: "λεμόνι", translation: "citron" } },
+    { upper: "Μ", lower: "μ", name: "μι", latin: "m", kind: "same", soundFr: "comme « m » dans « mère »", example: { word: "μήλο", translation: "pomme" } },
+    { upper: "Ν", lower: "ν", name: "νι", latin: "n", kind: "false-friend", lookalike: "v", soundFr: "comme « n » dans « nuit » (la minuscule ressemble à un v)", example: { word: "νερό", translation: "eau" } },
+    { upper: "Ξ", lower: "ξ", name: "ξι", latin: "x", kind: "new", soundFr: "comme « x » dans « taxi » (« ks »)", example: { word: "ξύλο", translation: "bois" } },
+    { upper: "Ο", lower: "ο", name: "όμικρον", latin: "o", kind: "same", soundFr: "comme « o » dans « mot »", example: { word: "όνομα", translation: "nom, prénom" } },
+    { upper: "Π", lower: "π", name: "πι", latin: "p", kind: "new", soundFr: "comme « p » dans « papa »", example: { word: "πόρτα", translation: "porte" } },
+    { upper: "Ρ", lower: "ρ", name: "ρο", latin: "r", kind: "false-friend", lookalike: "p", soundFr: "un « r » roulé avec la pointe de la langue, comme en italien", example: { word: "ρολόι", translation: "montre, horloge" } },
+    { upper: "Σ", lower: "σ", name: "σίγμα", latin: "s", kind: "new", soundFr: "comme « s » dans « sac » ; s’écrit ς à la fin d’un mot", example: { word: "σπίτι", translation: "maison" } },
+    { upper: "Τ", lower: "τ", name: "ταυ", latin: "t", kind: "same", soundFr: "comme « t » dans « table »", example: { word: "τρένο", translation: "train" } },
+    { upper: "Υ", lower: "υ", name: "ύψιλον", latin: "y", kind: "false-friend", lookalike: "u", soundFr: "comme « i » dans « midi » ; ου se lit « ou », αυ et ευ « av, ev » ou « af, ef »", example: { word: "ύπνος", translation: "sommeil" } },
+    { upper: "Φ", lower: "φ", name: "φι", latin: "f", kind: "new", soundFr: "comme « f » dans « fou »", example: { word: "φίλος", translation: "ami" } },
+    { upper: "Χ", lower: "χ", name: "χι", latin: "ch", kind: "false-friend", lookalike: "x", soundFr: "un souffle rauque, comme la « jota » espagnole ; plus doux devant ε et ι", example: { word: "χέρι", translation: "main" } },
+    { upper: "Ψ", lower: "ψ", name: "ψι", latin: "ps", kind: "new", soundFr: "comme « ps » dans « psy »", example: { word: "ψωμί", translation: "pain" } },
+    { upper: "Ω", lower: "ω", name: "ωμέγα", latin: "ō", kind: "new", soundFr: "comme « o » dans « mot », le même son que ο", example: { word: "ώρα", translation: "heure" } },
+  ],
+  groups: [
+    {
+      id: "el-alphabet-1",
+      title: "Les lettres familières",
+      summary: "α ε ι κ μ ο : des lettres qui ressemblent aux lettres latines et se lisent presque pareil.",
+      letters: ["α", "ε", "ι", "κ", "μ", "ο"],
+      words: [
+        { word: "μαμά", translation: "maman" },
+        { word: "ακόμα", translation: "encore" },
+        { word: "καμία", translation: "aucune" },
+        { word: "κακό", translation: "le mal" },
+        { word: "εκεί", translation: "là-bas" },
+      ],
+      tip: "L’accent écrit (ά, έ, ί, ό) marque la syllabe accentuée : il ne change pas la lettre. Tout mot de plus d’une syllabe en porte un.",
+    },
+    {
+      id: "el-alphabet-2",
+      title: "Les faux amis",
+      summary: "β η ν ρ χ υ : elles ressemblent à des lettres latines, mais ne se lisent pas pareil.",
+      letters: ["β", "η", "ν", "ρ", "χ", "υ"],
+      words: [
+        { word: "νερό", translation: "eau" },
+        { word: "χέρι", translation: "main" },
+        { word: "κρέμα", translation: "crème" },
+        { word: "μηχανή", translation: "machine" },
+        { word: "ημέρα", translation: "jour" },
+        { word: "βουνό", translation: "montagne" },
+      ],
+      tip: "Β se lit « v », Η « i », Ρ « r », Χ comme la « jota » espagnole, et la minuscule ν est un « n ». ου se lit « ou » : βουνό se dit « vouno ».",
+    },
+    {
+      id: "el-alphabet-3",
+      title: "Les consonnes nouvelles",
+      summary: "γ δ λ π σ τ, et les groupes μπ, ντ, γκ, αυ, ευ.",
+      letters: ["γ", "δ", "λ", "π", "σ", "τ"],
+      words: [
+        { word: "γάλα", translation: "lait" },
+        { word: "πόλη", translation: "ville" },
+        { word: "σπίτι", translation: "maison" },
+        { word: "τρένο", translation: "train" },
+        { word: "χαρτί", translation: "papier" },
+        { word: "λεμόνι", translation: "citron" },
+        { word: "δέντρο", translation: "arbre" },
+        { word: "αυτό", translation: "ceci, cela" },
+      ],
+      tip: "σ s’écrit ς à la fin d’un mot. μπ se lit « b », ντ « d » et γκ « g » : δέντρο se dit « dendro ». αυ et ευ se lisent « av, ev », ou « af, ef » devant une consonne sourde (αυτό : « afto »).",
+    },
+    {
+      id: "el-alphabet-4",
+      title: "Les dernières lettres",
+      summary: "ζ θ ξ φ ψ ω : des lettres sans équivalent latin direct.",
+      letters: ["ζ", "θ", "ξ", "φ", "ψ", "ω"],
+      words: [
+        { word: "ώρα", translation: "heure" },
+        { word: "ψωμί", translation: "pain" },
+        { word: "φίλος", translation: "ami" },
+        { word: "ξένος", translation: "étranger" },
+        { word: "καφές", translation: "café" },
+        { word: "ζάχαρη", translation: "sucre" },
+        { word: "θάλασσα", translation: "mer" },
+        { word: "χορεύω", translation: "je danse" },
+      ],
+      tip: "ο et ω se prononcent de la même façon, comme η, ι et υ pour le son « i » : l’orthographe les distingue, pas la prononciation. θ est le « th » de l’anglais « think », δ celui de « this ».",
+    },
+  ],
+  reviewedOn: null,
+} satisfies Alphabet;

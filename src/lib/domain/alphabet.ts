@@ -8,11 +8,16 @@ import {
   type AlphabetScript,
 } from "@/lib/schemas/alphabet";
 import type { GrammarPracticeOutcome } from "./grammar";
+import { readingContext, scriptRules, type WordToken } from "./alphabet-scripts";
 import { stripStress } from "./stress";
 
-/** The name of a script, as in « Apprendre à lire le cyrillique ». */
+/** The name of a script with its article, as in « Apprendre à lire le cyrillique ». */
 export const ALPHABET_SCRIPT_NAMES: Record<AlphabetScript, string> = {
-  cyrillic: "cyrillique",
+  cyrillic: "le cyrillique",
+  hangul: "le hangeul",
+  greek: "le grec",
+  kana: "les kana",
+  arabic: "l’alphabet arabe",
 };
 
 /** Every question offers this many options, the right one included. */
@@ -25,10 +30,20 @@ function normalizeWord(word: string): string {
   return stripStress(word.normalize("NFC")).toLowerCase();
 }
 
-/** Letter-by-letter reading of a word: stress dropped, lowercased, anything but a letter kept. */
+/**
+ * A word taken apart into the tokens its script teaches (`alphabet-scripts.ts`): Cyrillic, stress
+ * dropped and lowercased; hangul, the syllable blocks decomposed into jamo, each with its
+ * position; Greek, without accents; kana, one per code point; Arabic, without tatweel and with
+ * the shadda right after its letter. Anything that is not a letter is kept as is.
+ */
+export function wordLetters(alphabet: Alphabet, word: string): WordToken[] {
+  return scriptRules(alphabet.script).tokenize(word);
+}
+
+/** Letter-by-letter reading of a word, in context (`alphabet-scripts.ts`); anything but a letter is kept. */
 export function transliterate(alphabet: Alphabet, word: string): string {
-  const latinOf = new Map(alphabet.letters.map((l) => [l.lower, l.latin]));
-  return [...normalizeWord(word)].map((char) => latinOf.get(char) ?? char).join("");
+  const context = readingContext(alphabet, word);
+  return context.tokens.map((_, index) => context.readAt(index)).join("");
 }
 
 /** A seeded pseudo-random generator in [0, 1) (mulberry32 over an FNV-1a hash of the seed). */
@@ -96,9 +111,13 @@ function groupLetters(alphabet: Alphabet, groupIndex: number): { learned: Alphab
   };
 }
 
-/** The label of a letter as an answer: both cases, "Р р". */
-export function letterLabel(letter: Pick<AlphabetLetter, "upper" | "lower">): string {
-  return `${letter.upper} ${letter.lower}`;
+/**
+ * The label of a letter as an answer: its `display` when it has one (a haraka on a tatweel), else
+ * both cases, "Р р"; a letter without case, once ("ㄱ").
+ */
+export function letterLabel(letter: Pick<AlphabetLetter, "upper" | "lower" | "display">): string {
+  if (letter.display) return letter.display;
+  return letter.upper === letter.lower ? letter.lower : `${letter.upper} ${letter.lower}`;
 }
 
 function letterToLatin(letter: AlphabetLetter, learned: AlphabetLetter[], all: AlphabetLetter[], random: Random): AlphabetExercise {
@@ -110,16 +129,26 @@ function letterToLatin(letter: AlphabetLetter, learned: AlphabetLetter[], all: A
     shuffled(all, random).map((l) => l.latin),
     random,
   );
-  return { type: "letter-to-latin", upper: letter.upper, lower: letter.lower, options, answer };
+  return {
+    type: "letter-to-latin",
+    upper: letter.upper,
+    lower: letter.lower,
+    ...(letter.display ? { display: letter.display } : {}),
+    options,
+    answer,
+  };
 }
 
 function latinToLetter(letter: AlphabetLetter, learned: AlphabetLetter[], all: AlphabetLetter[], random: Random): AlphabetExercise {
+  // Wrong answers: never a sign (it is not asked this way) nor a letter that reads the same
+  // (hiragana あ and katakana ア), and from the same series when the letter has one.
+  const eligible = (l: AlphabetLetter) => l.kind !== "sign" && l.latin !== letter.latin && l.series === letter.series;
   // Letters that look like the Latin letter shown are the natural wrong answers.
-  const lookingAlike = learned.filter((l) => l.lookalike === letter.latin);
+  const lookingAlike = learned.filter((l) => eligible(l) && l.lookalike === letter.latin);
   const { options, answer } = withOptions(
     letterLabel(letter),
-    [...lookingAlike, ...shuffled(learned, random)].map(letterLabel),
-    shuffled(all, random).map(letterLabel),
+    [...lookingAlike, ...shuffled(learned.filter(eligible), random)].map(letterLabel),
+    shuffled(all.filter(eligible), random).map(letterLabel),
     random,
   );
   return { type: "latin-to-letter", latin: letter.latin, soundFr: letter.soundFr, options, answer };
@@ -135,18 +164,21 @@ function misreadings(
   learned: AlphabetLetter[],
   random: Random,
 ): { preferred: string[]; others: string[] } {
-  const byLower = new Map(alphabet.letters.map((l) => [l.lower, l]));
-  const tokens = [...normalizeWord(word)].map((char) => {
-    const letter = byLower.get(char);
-    return { letter, reading: letter?.latin ?? char };
-  });
+  const rules = scriptRules(alphabet.script);
+  const context = readingContext(alphabet, word);
+  const tokens = context.tokens.map((token, index) => ({ letter: context.letterAt(index), reading: context.readAt(index) }));
   const replaced = (index: number, reading: string) => tokens.map((t, i) => (i === index ? reading : t.reading)).join("");
   const preferred: string[] = [];
   const others: string[] = [];
   tokens.forEach((token, index) => {
     if (!token.letter) return;
     if (token.letter.kind === "false-friend" && token.letter.lookalike) preferred.push(replaced(index, token.letter.lookalike));
-    for (const other of shuffled(learned, random).slice(0, 3)) others.push(replaced(index, other.latin));
+    // A letter is only mistaken for a letter of its own class (hangul vowel / consonant, kana series...).
+    const letterClass = rules.letterClass(token.letter);
+    const candidates = learned.filter((l) => rules.letterClass(l) === letterClass);
+    for (const other of shuffled(candidates, random).slice(0, 3)) {
+      others.push(replaced(index, rules.read(context, index, other)));
+    }
   });
   return { preferred, others };
 }
@@ -186,8 +218,9 @@ export function buildAlphabetExercises(alphabet: Alphabet, groupId: string, seed
   const random = seededRandom(`${alphabet.language}:${seed}`);
   const { learned, own } = groupLetters(alphabet, groupIndex);
 
+  // A sign (a haraka, a small kana) is never asked from its Latin reading: it cannot be written alone.
   const letterQuestions = own.map((letter, index) =>
-    index % 2 === 0
+    index % 2 === 0 || letter.kind === "sign"
       ? letterToLatin(letter, learned, alphabet.letters, random)
       : latinToLetter(letter, learned, alphabet.letters, random),
   );

@@ -62,6 +62,30 @@ async function run(user: ReturnType<typeof userEvent.setup>, right: boolean[]) {
 }
 
 describe("AlphabetPractice", () => {
+  it("shows a letter without case once", () => {
+    setup({
+      exercises: [{ type: "letter-to-latin", upper: "ㄱ", lower: "ㄱ", options: ["g", "n", "d", "m"], answer: 0 }],
+      language: "ko",
+    });
+    expect(screen.getByText("ㄱ")).toBeTruthy();
+    expect(screen.queryByText("ㄱ ㄱ")).toBeNull();
+  });
+
+  it("writes Arabic right to left, and a letter shown as its display", () => {
+    setup({
+      exercises: [
+        { type: "read-word", word: "بَاب", options: ["bāb", "bab", "bub", "bib"], answer: 0 },
+        { type: "letter-to-latin", upper: "َ", lower: "َ", display: "ـَ", options: ["a", "i", "u", "—"], answer: 0 },
+      ],
+      language: "ar",
+    });
+    const word = screen.getByText("بَاب");
+    expect(word.getAttribute("dir")).toBe("rtl");
+    expect(word.getAttribute("lang")).toBe("ar");
+    // The Latin answers stay left to right.
+    expect(screen.getByRole("button", { name: "bāb" }).getAttribute("dir")).toBeNull();
+  });
+
   it("shows the verdict and the right answer at once, with big tap targets", async () => {
     const user = setup();
     const options = screen.getByRole("group", { name: "Choisis la bonne réponse" }).querySelectorAll("button");

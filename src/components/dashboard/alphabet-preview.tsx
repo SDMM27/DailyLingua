@@ -25,7 +25,7 @@ export function AlphabetPreview({
         <span className="mt-1 block font-semibold">
           {dueCount > 0
             ? `${dueCount} groupe${dueCount > 1 ? "s" : ""} de lettres à revoir`
-            : `Apprendre à lire le ${ALPHABET_SCRIPT_NAMES[script]}`}
+            : `Apprendre à lire ${ALPHABET_SCRIPT_NAMES[script]}`}
         </span>
         <span className="text-xs text-muted">Quelques lettres à la fois, avec des mots à lire et à écouter.</span>
       </span>

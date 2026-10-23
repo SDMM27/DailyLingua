@@ -154,7 +154,7 @@ export function PlacementTest({
         </Card>
         {alphabet && (
           <p className="mt-4 text-sm leading-relaxed text-ink-soft">
-            Tu ne lis pas encore le {ALPHABET_SCRIPT_NAMES[alphabet.script]} ?{" "}
+            Tu ne lis pas encore {ALPHABET_SCRIPT_NAMES[alphabet.script]} ?{" "}
             <Link href={`/alphabet?langue=${language}`} className="font-medium text-ink underline underline-offset-2">
               Commence par l’alphabet.
             </Link>{" "}
