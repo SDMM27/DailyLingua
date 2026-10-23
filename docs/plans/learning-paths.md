@@ -88,6 +88,14 @@ Le niveau vient du test de niveau (phase C) ou de la préférence déclarée. Il
 
 **H2 (après D et H1)** : grammaire suggérée par les erreurs. Une erreur de catégorie `agreement` ou `verb` répétée au moins 3 fois sur une langue propose la fiche correspondante. Étendre ensuite aux 19 langues, par ordre de demande.
 
+**H2 (implémenté)** : suggestions dans `src/lib/domain/grammar-suggestions.ts`. Décisions prises :
+
+- Les erreurs comptées sont celles des productions corrigées des 30 derniers jours, la même fenêtre que le panneau « Évolution » de `/productions` (`productionStats`). Une catégorie déclenche une suggestion à partir de 3 erreurs.
+- Seules les catégories grammaticales déclenchent : `verb`, `agreement`, `function_word` et `word_order`. `word_choice`, `spelling` et `register` ne correspondent pas à une fiche de grammaire, même si certaines fiches les citent en second.
+- Fiches candidates : elles traitent une catégorie déclenchée, elles ne sont pas maîtrisées et elles sont du niveau de l’apprenant ou en dessous. Au-dessus de B1, toutes les fiches sont candidates. Le classement : d’abord le nombre d’erreurs des catégories traitées, ensuite les fiches jamais vues avant les fiches exercées, enfin l’ordre du programme. On garde 3 fiches au plus.
+- Les suggestions s’affichent à deux endroits. Sur `/grammaire`, une section « Suggéré par tes erreurs » en tête, avec la raison (« Accords : 5 erreurs en 30 jours »). Sur `/productions`, un lien vers la fiche sous les catégories de chaque langue qui a un cours. Rien sur l’accueil pour l’instant, parce qu’il faudrait y charger toutes les productions.
+- Pas de nouvelle table : la suggestion se calcule à chaque affichage, à partir des productions et des cartes de grammaire.
+
 ### Phase I — Alphabets
 
 1. Module `src/lib/domain/alphabets/` : un fichier par écriture, avec les lettres (majuscule, minuscule, nom, son, mot exemple tiré du vocabulaire réel). Pur, sans React, comme le reste du domaine.
@@ -156,7 +164,7 @@ Une phase validée avant la suivante, comme pour le reste du projet.
 1. **H1 — Grammaire pilote** (ru, it, A1–B1). Le plus visible pour le niveau intermédiaire. *Fait.*
 2. **I — Alphabets** (cyrillique d'abord). Débloque les débutants en russe, ukrainien, puis les autres écritures. *I1 (cyrillique) fait, I2 à I5 (hangeul, grec, kana, arabe) implémentés : toutes les écritures prévues sont couvertes, en attente de relecture native.*
 3. **J — Modes de révision et mesure de rétention.** Commencer la mesure tôt : elle prend des semaines à produire des données. *J1 (modes) et J2 (mesure) implémentés ; J3 (gamification) attend la décision 1 de la section 5.*
-4. **H2 — Grammaire suggérée par les erreurs.** Dépend de D (déjà fait) et de H1.
+4. **H2 — Grammaire suggérée par les erreurs.** Dépend de D (déjà fait) et de H1. *Implémenté pour les langues qui ont un cours (russe, italien).*
 5. **K — Parcours par niveau**, appliqué progressivement.
 
 Phase G (écrire puis dire) est faite ; elle n'avait pas de dépendance avec ce plan.

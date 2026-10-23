@@ -1,7 +1,10 @@
+import Link from "next/link";
 import { languageStyle } from "@/components/ui/language-style";
 import { Card, SectionTitle } from "@/components/ui/primitives";
+import type { GrammarSuggestion } from "@/lib/domain/grammar-suggestions";
 import { languageInfo } from "@/lib/domain/languages";
 import { STATS_WINDOW_DAYS, type CategoryCount, type LanguageProductionStats } from "@/lib/domain/production-stats";
+import type { Language } from "@/lib/schemas/common";
 import {
   CORRECTION_CATEGORY_LABELS,
   WRITING_CRITERIA,
@@ -33,7 +36,14 @@ function Trend({ recent, previous }: Pick<CategoryCount, "recent" | "previous">)
  * Evolution over the last 30 days against the 30 days before, per language: error categories and
  * mean of the four scores. Hidden when no review falls in the last 60 days.
  */
-export function ProductionStatsPanel({ stats }: { stats: LanguageProductionStats[] }) {
+export function ProductionStatsPanel({
+  stats,
+  grammarSuggestions = {},
+}: {
+  stats: LanguageProductionStats[];
+  /** Points to work on per language; nothing is shown for a language without any. */
+  grammarSuggestions?: Partial<Record<Language, GrammarSuggestion[]>>;
+}) {
   if (stats.length === 0) return null;
   return (
     <section aria-label="Évolution" className="mb-10">
@@ -65,6 +75,24 @@ export function ProductionStatsPanel({ stats }: { stats: LanguageProductionStats
                   </li>
                 ))}
               </ul>
+            )}
+
+            {(grammarSuggestions[s.language] ?? []).length > 0 && (
+              <div className="mt-3 border-t border-line pt-3 text-sm">
+                <p className="text-ink-soft">À travailler en grammaire</p>
+                <ul className="flex flex-wrap gap-x-4">
+                  {grammarSuggestions[s.language]!.map(({ point }) => (
+                    <li key={point.id}>
+                      <Link
+                        href={`/grammaire/${s.language}/${point.id}`}
+                        className="inline-flex min-h-11 items-center font-medium underline underline-offset-2 hover:text-ink-soft"
+                      >
+                        {point.title}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )}
 
             <ul className="mt-4 grid grid-cols-2 gap-x-4 gap-y-1.5 border-t border-line pt-3 text-sm">

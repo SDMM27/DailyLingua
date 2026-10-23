@@ -3,6 +3,7 @@ import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { buildMockCorrectionCards, buildMockProductions } from "@/lib/data/mock/productions";
+import { FIXTURE_POINT } from "@/test/grammar-fixtures";
 import { ProductionsView } from "./productions-view";
 
 const actions = vi.hoisted(() => ({
@@ -63,6 +64,20 @@ describe("ProductionsView", () => {
     expect(section.getAllByText("3,0").length).toBeGreaterThan(0);
   });
 
+  it("links the grammar points suggested by the errors under that language's categories", () => {
+    const point = { ...FIXTURE_POINT, id: "ru-a1-present-first", title: "Le présent, 1re conjugaison" };
+    setup({ grammarSuggestions: { ru: [{ point, reasons: [{ category: "verb", count: 4 }] }] } });
+    const section = within(screen.getByRole("region", { name: "Évolution" }));
+    expect(section.getAllByText("À travailler en grammaire")).toHaveLength(1);
+    const link = section.getByRole("link", { name: "Le présent, 1re conjugaison" });
+    expect(link.getAttribute("href")).toBe("/grammaire/ru/ru-a1-present-first");
+  });
+
+  it("shows no grammar line without suggestions", () => {
+    setup({ grammarSuggestions: { ru: [] } });
+    expect(screen.queryByText("À travailler en grammaire")).toBeNull();
+  });
+
   it("hides the evolution without any review", () => {
     setup({ entries: buildMockProductions(TODAY).map((e) => ({ ...e, feedback: undefined })) });
     expect(screen.queryByRole("region", { name: "Évolution" })).toBeNull();
@@ -91,10 +106,10 @@ describe("ProductionsView", () => {
     const user = setup({ persist: true });
     actions.addCorrectionCard.mockResolvedValue({ ok: true, data: undefined });
     const buttons = screen.getAllByRole("button", { name: "À réviser" });
-    expect(buttons).toHaveLength(2); // the second correction of the Russian texts
+    expect(buttons).toHaveLength(5); // the second correction of the first Russian text and the three of the other
     await user.click(buttons[0]);
     expect(actions.addCorrectionCard).toHaveBeenCalledWith({ sessionId: "mock-session-1", correctionIndex: 1 });
-    expect(screen.getAllByRole("button", { name: "À réviser" })).toHaveLength(1);
+    expect(screen.getAllByRole("button", { name: "À réviser" })).toHaveLength(4);
   });
 
   it("shows no « À réviser » in the demo", () => {

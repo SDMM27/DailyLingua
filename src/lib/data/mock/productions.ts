@@ -78,6 +78,46 @@ export function buildMockProductions(today: DateKey): ProductionEntry[] {
       cardIndexes: [0],
     },
     {
+      sessionId: "mock-session-5",
+      date: addDays(today, -9),
+      language: "ru",
+      title: "Почему россияне любят дачи",
+      sourceName: "Arzamas",
+      url: "https://arzamas.academy",
+      task: "Расскажите, как вы проводите выходные.",
+      body: "В субботу я ходю на рынок. Потом я хочю купить овощи и приготовить обед. Вечером друзья приходит ко мне.",
+      feedback: {
+        scores: {
+          grammar: { score: 3, comment: "Des erreurs de conjugaison à reprendre." },
+          vocabulary: { score: 3, comment: "Vocabulaire simple et adapté." },
+          register: { score: 4, comment: "Ton neutre, bien choisi." },
+          coherence: { score: 4, comment: "Les étapes de la journée se suivent bien." },
+        },
+        corrections: [
+          {
+            original: "я ходю",
+            corrected: "я хожу",
+            explanation: "À la première personne, « ходить » change de consonne : « хожу ».",
+            category: "verb",
+          },
+          {
+            original: "я хочю",
+            corrected: "я хочу",
+            explanation: "« хотеть » a une conjugaison mixte : « я хочу », mais « ты хочешь ».",
+            category: "verb",
+          },
+          {
+            original: "друзья приходит",
+            corrected: "друзья приходят",
+            explanation: "Le sujet « друзья » est au pluriel : le verbe prend la terminaison « -ят ».",
+            category: "verb",
+          },
+        ],
+        strength: "Tu enchaînes les actions de ta journée avec clarté.",
+      },
+      cardIndexes: [],
+    },
+    {
       sessionId: "mock-session-3",
       date: addDays(today, -35),
       language: "ru",
