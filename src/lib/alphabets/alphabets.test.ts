@@ -9,11 +9,14 @@ const SIZES: Record<string, { letters: number; groups: number }> = {
   ru: { letters: 33, groups: 5 },
   uk: { letters: 33, groups: 5 },
   ko: { letters: 40, groups: 6 },
+  el: { letters: 24, groups: 4 },
+  ar: { letters: 35, groups: 5 },
+  ja: { letters: 151, groups: 16 },
 };
 
 describe("alphabets", () => {
-  it("covers Korean, Russian and Ukrainian", () => {
-    expect(alphabetLanguages().sort()).toEqual(["ko", "ru", "uk"]);
+  it("covers Arabic, Greek, Japanese, Korean, Russian and Ukrainian", () => {
+    expect(alphabetLanguages().sort()).toEqual(Object.keys(SIZES).sort());
     expect(alphabetGroup("ru-alphabet-2")?.language).toBe("ru");
     expect(alphabetGroup("xx-alphabet-1")).toBeUndefined();
   });
@@ -37,8 +40,9 @@ describe("alphabets", () => {
       expect(grouped.slice().sort()).toEqual(known.slice().sort());
     });
 
-    it("gives each letter its own Latin reading", () => {
-      const latin = alphabet.letters.map((l) => l.latin);
+    it("gives each letter its own Latin reading, signs aside, within a series", () => {
+      // Hiragana あ and katakana ア both read "a": the series tell them apart.
+      const latin = alphabet.letters.filter((l) => l.kind !== "sign").map((l) => `${l.series ?? ""}:${l.latin}`);
       expect(new Set(latin).size).toBe(latin.length);
     });
 
@@ -49,9 +53,15 @@ describe("alphabets", () => {
     it("has upper and lower case that match, and a lookalike for every false friend", () => {
       for (const letter of alphabet.letters) {
         // A script without case has the same letter twice.
-        if (alphabet.script === "hangul") expect(letter.upper).toBe(letter.lower);
-        else expect(letter.upper.toLowerCase()).toBe(letter.lower);
+        expect(letter.upper.toLowerCase()).toBe(letter.lower);
         if (letter.kind === "false-friend") expect(letter.lookalike).toBeTruthy();
+      }
+    });
+
+    it("has 6 to 10 letters per group", () => {
+      for (const group of alphabet.groups) {
+        expect(group.letters.length, group.id).toBeGreaterThanOrEqual(6);
+        expect(group.letters.length, group.id).toBeLessThanOrEqual(10);
       }
     });
 

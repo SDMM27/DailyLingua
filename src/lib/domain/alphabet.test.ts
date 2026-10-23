@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ALPHABETS } from "@/lib/alphabets";
-import { ALPHABET_PRACTICE_MAX, type AlphabetCard, type AlphabetExercise } from "@/lib/schemas/alphabet";
+import { ALPHABET_PRACTICE_MAX, type Alphabet, type AlphabetCard, type AlphabetExercise, type AlphabetLetter } from "@/lib/schemas/alphabet";
 import {
   ALPHABET_CHECK_PASS,
   buildAlphabetCheck,
@@ -16,6 +16,45 @@ import { stripStress } from "./stress";
 const ru = ALPHABETS.ru!;
 const uk = ALPHABETS.uk!;
 const ko = ALPHABETS.ko!;
+const el = ALPHABETS.el!;
+const ar = ALPHABETS.ar!;
+
+/** A few kana, enough to read the test words whether or not the full syllabaries are written. */
+function kanaFixture(): Alphabet {
+  const kana = (lower: string, latin: string, series: "hiragana" | "katakana", kind: "new" | "sign" = "new"): AlphabetLetter => ({
+    upper: lower,
+    lower,
+    name: lower,
+    latin,
+    kind,
+    series,
+    soundFr: "test",
+    example: { word: lower, translation: "test" },
+  });
+  const hiragana: [string, string][] = [
+    ["し", "shi"], ["ん", "n"], ["き", "ki"], ["ぷ", "pu"], ["ち", "chi"], ["と", "to"], ["で", "de"], ["じ", "ji"],
+    ["う", "u"], ["お", "o"],
+  ];
+  const katakana: [string, string][] = [["コ", "ko"], ["ヒ", "hi"], ["カ", "ka"], ["メ", "me"], ["ラ", "ra"], ["ジ", "ji"], ["ス", "su"]];
+  return {
+    language: "ja",
+    script: "kana",
+    version: "2026-10-23",
+    letters: [
+      ...hiragana.map(([c, l]) => kana(c, l, "hiragana")),
+      ...katakana.map(([c, l]) => kana(c, l, "katakana")),
+      kana("ゃ", "ya", "hiragana", "sign"),
+      kana("ょ", "yo", "hiragana", "sign"),
+      kana("っ", "ltu", "hiragana", "sign"),
+      kana("ゅ", "yu", "hiragana", "sign"),
+      kana("ュ", "yu", "katakana", "sign"),
+      kana("ー", "—", "katakana", "sign"),
+    ],
+    groups: [],
+    reviewedOn: null,
+  };
+}
+const ja = ALPHABETS.ja!;
 
 function card(groupId: string): AlphabetCard {
   return {
@@ -55,6 +94,61 @@ describe("transliterate", () => {
     for (const [word, reading] of Object.entries(readings)) expect(transliterate(ko, word), word).toBe(reading);
   });
 
+  it("reads Greek with its accents dropped, ς as σ and υ in context", () => {
+    const readings: Record<string, string> = {
+      βουνό: "vouno",
+      αυτό: "afto",
+      χορεύω: "chorevō",
+      ξένος: "xenos",
+      θάλασσα: "thalassa",
+      ημέρα: "ēmera",
+      Αθήνα: "athēna",
+      δέντρο: "dentro",
+    };
+    for (const [word, reading] of Object.entries(readings)) expect(transliterate(el, word), word).toBe(reading);
+  });
+
+  it.each([["a minimal fixture", kanaFixture()], ["the kana of ja.ts", ja]] as const)("reads kana (%s): small ya yu yo, small tsu and the long vowel mark", (_name, kanaAlphabet) => {
+    const readings: Record<string, string> = {
+      しゃしん: "shashin",
+      きっぷ: "kippu",
+      ちょっと: "chotto",
+      でんしゃ: "densha",
+      きょう: "kyou",
+      じゅう: "juu",
+      コーヒー: "koohii",
+      カメラ: "kamera",
+      ジュース: "juusu",
+      おちゃ: "ocha",
+    };
+    for (const [word, reading] of Object.entries(readings)) expect(transliterate(kanaAlphabet, word), word).toBe(reading);
+  });
+
+  it("reads vocalized Arabic: long vowels, sukun, shadda and the hamza", () => {
+    const readings: Record<string, string> = {
+      بَاب: "bāb",
+      بِنْت: "bint",
+      لَيْمُون: "laymūn",
+      لَيْلَة: "layla",
+      كُلّ: "kull",
+      ذَكِيّ: "dhakiyy",
+      جَمِيل: "jamīl",
+      سُوق: "sūq",
+      أَب: "ab",
+      سَأَلَ: "saʾala",
+      مَدْرَسَة: "madrasa",
+      مُدَرِّس: "mudarris",
+    };
+    for (const [word, reading] of Object.entries(readings)) expect(transliterate(ar, word), word).toBe(reading);
+  });
+
+  it("reads a shadda with its vowel in either code-point order, and ignores the tatweel", () => {
+    expect(transliterate(ar, "مُدَرِّس")).toBe("mudarris");
+    expect(transliterate(ar, "مُدَرِّس".replace("ِّ", "ِّ"))).toBe("mudarris");
+    expect(transliterate(ar, "مُدَرِّس".replace("ِّ", "ِّ"))).toBe("mudarris");
+    expect(transliterate(ar, "بــاب")).toBe("bāb");
+  });
+
   it("keeps what is not a letter", () => {
     expect(transliterate(ru, "да, нет!")).toBe("da, net!");
   });
@@ -64,6 +158,10 @@ describe("letterLabel", () => {
   it("shows both cases, or a letter without case once", () => {
     expect(letterLabel({ upper: "Р", lower: "р" })).toBe("Р р");
     expect(letterLabel({ upper: "ㄱ", lower: "ㄱ" })).toBe("ㄱ");
+  });
+
+  it("shows the display of a letter that cannot stand alone", () => {
+    expect(letterLabel({ upper: "َ", lower: "َ", display: "ـَ" })).toBe("ـَ");
   });
 });
 
@@ -120,6 +218,19 @@ describe("buildAlphabetExercises", () => {
       }
     });
 
+    it("never asks a sign from its Latin reading, nor offers a letter that reads the same", () => {
+      for (const e of exercises) {
+        if (e.type !== "latin-to-letter") continue;
+        const right = alphabet.letters.find((l) => letterLabel(l) === e.options[e.answer])!;
+        expect(right.kind, group.id).not.toBe("sign");
+        for (const option of e.options) {
+          const letter = alphabet.letters.find((l) => letterLabel(l) === option)!;
+          expect(letter.series, option).toBe(right.series);
+          if (letter !== right) expect(letter.latin, option).not.toBe(right.latin);
+        }
+      }
+    });
+
     it("has the right answer", () => {
       for (const e of exercises) {
         const right = e.options[e.answer];
@@ -170,7 +281,7 @@ describe("isAlphabetComplete", () => {
   });
 });
 
-describe.each([["ru", ru], ["uk", uk], ["ko", ko]] as const)("buildAlphabetCheck (%s)", (_name, alphabet) => {
+describe.each(Object.entries(ALPHABETS) as [string, Alphabet][])("buildAlphabetCheck (%s)", (_name, alphabet) => {
   const check = buildAlphabetCheck(alphabet, "check:2026-10-21");
 
   it("asks 2 distinct words of every group", () => {

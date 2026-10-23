@@ -1,0 +1,140 @@
+import type { Alphabet } from "@/lib/schemas/alphabet";
+
+/**
+ * Arabic alphabet, phase I5: the 28 letters, the hamza on alif (أ), tāʾ marbūṭa (ة) and the five
+ * signs of vocalized text (fatha, kasra, damma, sukun, shadda). Reading words are fully vocalized,
+ * as in beginners' books; running text omits the short vowels.
+ *
+ * Transliteration is letter by letter, one Latin form per letter, with the rules of vocalized
+ * text: a short vowel followed by its long letter makes a long vowel (ـَا ā, ـُو ū, ـِي ī), sukun
+ * reads nothing, shadda doubles the consonant it sits on, ة after fatha adds nothing, and a hamza
+ * at the start of a word is not written. Words avoid the article ال (sun letters) and ى.
+ * Arabic has no case: `upper` and `lower` are the same letter; `display` shows a sign on a
+ * tatweel, `forms` the shapes a letter takes when it is joined.
+ */
+export const arAlphabet = {
+  language: "ar",
+  script: "arabic",
+  version: "2026-10-23",
+  letters: [
+    { upper: "ا", lower: "ا", name: "أَلِف", latin: "ā", kind: "new", forms: { final: "ـا" }, soundFr: "un « a » long ; ne s’attache jamais à la lettre suivante", example: { word: "بَاب", translation: "porte" } },
+    { upper: "أ", lower: "أ", name: "هَمْزَة", latin: "ʾ", kind: "new", forms: { final: "ـأ" }, soundFr: "un petit arrêt de la voix, comme la coupure dans « oh ! oh ! » ; en début de mot, on n’entend que la voyelle", example: { word: "أَب", translation: "père" } },
+    { upper: "ب", lower: "ب", name: "بَاء", latin: "b", kind: "new", forms: { initial: "بـ", medial: "ـبـ", final: "ـب" }, soundFr: "comme « b » dans « bébé » ; un point dessous", example: { word: "بَيْت", translation: "maison" } },
+    { upper: "ت", lower: "ت", name: "تَاء", latin: "t", kind: "new", forms: { initial: "تـ", medial: "ـتـ", final: "ـت" }, soundFr: "comme « t » dans « table » ; deux points dessus", example: { word: "تَمْر", translation: "dattes" } },
+    { upper: "ث", lower: "ث", name: "ثَاء", latin: "th", kind: "new", forms: { initial: "ثـ", medial: "ـثـ", final: "ـث" }, soundFr: "comme « th » anglais dans « think » ; trois points dessus", example: { word: "ثَلْج", translation: "neige" } },
+    { upper: "ج", lower: "ج", name: "جِيم", latin: "j", kind: "new", forms: { initial: "جـ", medial: "ـجـ", final: "ـج" }, soundFr: "comme « dj » dans « djinn »", example: { word: "جَمِيل", translation: "beau" } },
+    { upper: "ح", lower: "ح", name: "حَاء", latin: "ḥ", kind: "new", forms: { initial: "حـ", medial: "ـحـ", final: "ـح" }, soundFr: "un « h » soufflé fort, la gorge serrée, comme pour embuer une vitre", example: { word: "حُبّ", translation: "amour" } },
+    { upper: "خ", lower: "خ", name: "خَاء", latin: "kh", kind: "new", forms: { initial: "خـ", medial: "ـخـ", final: "ـخ" }, soundFr: "un raclement du fond de la gorge, comme la « jota » espagnole", example: { word: "خُبْز", translation: "pain" } },
+    { upper: "د", lower: "د", name: "دَال", latin: "d", kind: "new", forms: { final: "ـد" }, soundFr: "comme « d » dans « dame » ; ne s’attache pas à la lettre suivante", example: { word: "دَرْس", translation: "leçon" } },
+    { upper: "ذ", lower: "ذ", name: "ذَال", latin: "dh", kind: "new", forms: { final: "ـذ" }, soundFr: "comme « th » anglais dans « this » ; ne s’attache pas à la lettre suivante", example: { word: "ذَهَب", translation: "or (métal)" } },
+    { upper: "ر", lower: "ر", name: "رَاء", latin: "r", kind: "new", forms: { final: "ـر" }, soundFr: "un « r » roulé, comme en italien ; ne s’attache pas à la lettre suivante", example: { word: "رَأْس", translation: "tête" } },
+    { upper: "ز", lower: "ز", name: "زَاي", latin: "z", kind: "new", forms: { final: "ـز" }, soundFr: "comme « z » dans « zèbre » ; ne s’attache pas à la lettre suivante", example: { word: "زَيْت", translation: "huile" } },
+    { upper: "س", lower: "س", name: "سِين", latin: "s", kind: "new", forms: { initial: "سـ", medial: "ـسـ", final: "ـس" }, soundFr: "comme « s » dans « sac »", example: { word: "سَفَر", translation: "voyage" } },
+    { upper: "ش", lower: "ش", name: "شِين", latin: "sh", kind: "new", forms: { initial: "شـ", medial: "ـشـ", final: "ـش" }, soundFr: "comme « ch » dans « chat »", example: { word: "شَمْس", translation: "soleil" } },
+    { upper: "ص", lower: "ص", name: "صَاد", latin: "ṣ", kind: "new", forms: { initial: "صـ", medial: "ـصـ", final: "ـص" }, soundFr: "un « s » emphatique : la langue plus basse, la voyelle voisine s’assombrit", example: { word: "صَدِيق", translation: "ami" } },
+    { upper: "ض", lower: "ض", name: "ضَاد", latin: "ḍ", kind: "new", forms: { initial: "ضـ", medial: "ـضـ", final: "ـض" }, soundFr: "un « d » emphatique, la langue plus basse", example: { word: "ضَيْف", translation: "invité" } },
+    { upper: "ط", lower: "ط", name: "طَاء", latin: "ṭ", kind: "new", forms: { initial: "طـ", medial: "ـطـ", final: "ـط" }, soundFr: "un « t » emphatique, la langue plus basse", example: { word: "طَبِيب", translation: "médecin" } },
+    { upper: "ظ", lower: "ظ", name: "ظَاء", latin: "ẓ", kind: "new", forms: { initial: "ظـ", medial: "ـظـ", final: "ـظ" }, soundFr: "un « th » de « this » emphatique, appuyé", example: { word: "ظُهْر", translation: "midi" } },
+    { upper: "ع", lower: "ع", name: "عَيْن", latin: "ʿ", kind: "new", forms: { initial: "عـ", medial: "ـعـ", final: "ـع" }, soundFr: "une contraction du fond de la gorge, sans équivalent en français", example: { word: "عَيْن", translation: "œil" } },
+    { upper: "غ", lower: "غ", name: "غَيْن", latin: "gh", kind: "new", forms: { initial: "غـ", medial: "ـغـ", final: "ـغ" }, soundFr: "comme le « r » grasseyé français dans « Paris »", example: { word: "غُرْفَة", translation: "chambre" } },
+    { upper: "ف", lower: "ف", name: "فَاء", latin: "f", kind: "new", forms: { initial: "فـ", medial: "ـفـ", final: "ـف" }, soundFr: "comme « f » dans « fou »", example: { word: "فِيل", translation: "éléphant" } },
+    { upper: "ق", lower: "ق", name: "قَاف", latin: "q", kind: "new", forms: { initial: "قـ", medial: "ـقـ", final: "ـق" }, soundFr: "un « k » prononcé tout au fond de la gorge", example: { word: "قَلَم", translation: "stylo" } },
+    { upper: "ك", lower: "ك", name: "كَاف", latin: "k", kind: "new", forms: { initial: "كـ", medial: "ـكـ", final: "ـك" }, soundFr: "comme « k » dans « kilo »", example: { word: "كَلْب", translation: "chien" } },
+    { upper: "ل", lower: "ل", name: "لَام", latin: "l", kind: "new", forms: { initial: "لـ", medial: "ـلـ", final: "ـل" }, soundFr: "comme « l » dans « lac »", example: { word: "لَيْمُون", translation: "citron" } },
+    { upper: "م", lower: "م", name: "مِيم", latin: "m", kind: "new", forms: { initial: "مـ", medial: "ـمـ", final: "ـم" }, soundFr: "comme « m » dans « mère »", example: { word: "مَلِك", translation: "roi" } },
+    { upper: "ن", lower: "ن", name: "نُون", latin: "n", kind: "new", forms: { initial: "نـ", medial: "ـنـ", final: "ـن" }, soundFr: "comme « n » dans « nuit » ; un point dessus", example: { word: "نُور", translation: "lumière" } },
+    { upper: "ه", lower: "ه", name: "هَاء", latin: "h", kind: "new", forms: { initial: "هـ", medial: "ـهـ", final: "ـه" }, soundFr: "un « h » léger, expiré, comme en anglais dans « house »", example: { word: "وَجْه", translation: "visage" } },
+    { upper: "ة", lower: "ة", name: "تَاء مَرْبُوطَة", latin: "a", kind: "new", forms: { final: "ـة" }, soundFr: "« a » en fin de mot (« at » quand un complément suit) ; ne s’écrit qu’à la fin d’un mot", example: { word: "مَدْرَسَة", translation: "école" } },
+    { upper: "و", lower: "و", name: "وَاو", latin: "w", kind: "new", forms: { final: "ـو" }, soundFr: "comme « w » dans « web » ; après ـُ, un « ou » long (ū) ; ne s’attache pas à la lettre suivante", example: { word: "وَرْد", translation: "roses" } },
+    { upper: "ي", lower: "ي", name: "يَاء", latin: "y", kind: "new", forms: { initial: "يـ", medial: "ـيـ", final: "ـي" }, soundFr: "comme « y » dans « yaourt » ; après ـِ, un « i » long (ī)", example: { word: "يَوْم", translation: "jour" } },
+    { upper: "َ", lower: "َ", display: "ـَ", name: "فَتْحَة", latin: "a", kind: "sign", soundFr: "un petit trait au-dessus de la lettre : « a » bref", example: { word: "كَتَبَ", translation: "il a écrit" } },
+    { upper: "ِ", lower: "ِ", display: "ـِ", name: "كَسْرَة", latin: "i", kind: "sign", soundFr: "un petit trait sous la lettre : « i » bref", example: { word: "بِنْت", translation: "fille" } },
+    { upper: "ُ", lower: "ُ", display: "ـُ", name: "ضَمَّة", latin: "u", kind: "sign", soundFr: "une petite boucle au-dessus de la lettre : « ou » bref", example: { word: "كُتُب", translation: "livres" } },
+    { upper: "ْ", lower: "ْ", display: "ـْ", name: "سُكُون", latin: "—", kind: "sign", soundFr: "un petit rond au-dessus de la lettre : aucune voyelle après la consonne", example: { word: "بِنْت", translation: "fille" } },
+    { upper: "ّ", lower: "ّ", display: "ـّ", name: "شَدَّة", latin: "×2", kind: "sign", soundFr: "un petit « w » au-dessus de la lettre : la consonne est doublée", example: { word: "حُبّ", translation: "amour" } },
+  ],
+  groups: [
+    {
+      id: "ar-alphabet-1",
+      title: "Les voyelles brèves et les premières lettres",
+      summary: "ـَ ـِ ـُ ـْ, les signes des voyelles, avec ا ب ت ن.",
+      letters: ["َ", "ِ", "ُ", "ْ", "ا", "ب", "ت", "ن"],
+      words: [
+        { word: "بَاب", translation: "porte" },
+        { word: "بِنْت", translation: "fille" },
+        { word: "بَنَات", translation: "filles" },
+        { word: "نَبَات", translation: "plante" },
+        { word: "تِبْن", translation: "paille" },
+      ],
+      tip: "L’arabe s’écrit et se lit de droite à gauche. Les voyelles brèves sont de petits signes au-dessus ou au-dessous des lettres ; un texte courant ne les écrit pas. ب ت ن ont la même forme : seuls les points changent.",
+    },
+    {
+      id: "ar-alphabet-2",
+      title: "Lettres courantes et consonne doublée",
+      summary: "م ل ك ي و, le signe ـّ qui double une consonne et le ة de fin de mot.",
+      letters: ["م", "ل", "ك", "ي", "و", "ّ", "ة"],
+      words: [
+        { word: "كَلْب", translation: "chien" },
+        { word: "بَيْت", translation: "maison" },
+        { word: "مَلِك", translation: "roi" },
+        { word: "يَوْم", translation: "jour" },
+        { word: "كُلّ", translation: "tout, chaque" },
+        { word: "مَكْتَب", translation: "bureau" },
+        { word: "لَيْلَة", translation: "nuit" },
+        { word: "لَيْمُون", translation: "citron" },
+      ],
+      tip: "Chaque lettre change de forme selon sa place : seule, au début, au milieu ou à la fin du mot. Après ـُ, و se lit « ū » ; après ـِ, ي se lit « ī » ; après ـَ, ils restent « w » et « y » (بَيْت : « bayt »).",
+    },
+    {
+      id: "ar-alphabet-3",
+      title: "Les lettres qui ne s’attachent pas",
+      summary: "د ذ ر ز, qui ne s’attachent jamais à la lettre suivante, puis س ش ف.",
+      letters: ["د", "ذ", "ر", "ز", "س", "ش", "ف"],
+      words: [
+        { word: "دَرْس", translation: "leçon" },
+        { word: "سَفَر", translation: "voyage" },
+        { word: "شَمْس", translation: "soleil" },
+        { word: "زَيْت", translation: "huile" },
+        { word: "فِيل", translation: "éléphant" },
+        { word: "ذَكِيّ", translation: "intelligent" },
+        { word: "مَدْرَسَة", translation: "école" },
+      ],
+      tip: "ا د ذ ر ز و ne s’attachent pas à la lettre qui suit : le mot se coupe après elles (مَدْرَسَة). د et ذ, ر et ز ne diffèrent que par le point.",
+    },
+    {
+      id: "ar-alphabet-4",
+      title: "Les sons de la gorge",
+      summary: "ج ح خ ع غ ق ه : pour la plupart, des sons sans équivalent en français.",
+      letters: ["ج", "ح", "خ", "ع", "غ", "ق", "ه"],
+      words: [
+        { word: "حُبّ", translation: "amour" },
+        { word: "سُوق", translation: "marché" },
+        { word: "قَلَم", translation: "stylo" },
+        { word: "بَحْر", translation: "mer" },
+        { word: "عَيْن", translation: "œil" },
+        { word: "خُبْز", translation: "pain" },
+        { word: "وَجْه", translation: "visage" },
+        { word: "جَمِيل", translation: "beau" },
+      ],
+      tip: "ج ح خ ont la même forme, distinguée par le point : dessous, aucun, dessus. ح est un « h » soufflé fort, ه un « h » léger ; ع et غ se prononcent au fond de la gorge.",
+    },
+    {
+      id: "ar-alphabet-5",
+      title: "Les emphatiques et la hamza",
+      summary: "ص ض ط ظ, les consonnes emphatiques, avec ث et la hamza أ.",
+      letters: ["ص", "ض", "ط", "ظ", "ث", "أ"],
+      words: [
+        { word: "أَب", translation: "père" },
+        { word: "أُمّ", translation: "mère" },
+        { word: "ضَيْف", translation: "invité" },
+        { word: "ظُهْر", translation: "midi" },
+        { word: "ثَلْج", translation: "neige" },
+        { word: "سَأَلَ", translation: "il a demandé" },
+        { word: "صَدِيق", translation: "ami" },
+        { word: "طَبِيب", translation: "médecin" },
+      ],
+      tip: "ص ض ط ظ se prononcent la langue plus basse et assombrissent la voyelle voisine : compare س et ص, ت et ط. أ marque un arrêt de la voix ; en début de mot, on n’entend que sa voyelle.",
+    },
+  ],
+  reviewedOn: null,
+} satisfies Alphabet;

@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useState } from "react";
 import { recordAlphabetCheck } from "@/app/actions/alphabet";
-import { Question } from "@/components/alphabet/alphabet-practice";
+import { optionsInLanguage, Question } from "@/components/alphabet/alphabet-practice";
 import { languageStyle } from "@/components/ui/language-style";
 import { Card, Eyebrow, ProgressBar } from "@/components/ui/primitives";
 import { ALPHABET_CHECK_PASS, ALPHABET_SCRIPT_NAMES, gradeAlphabetCheck } from "@/lib/domain/alphabet";
+import { languageInfo } from "@/lib/domain/languages";
 import type { AlphabetExercise, AlphabetScript } from "@/lib/schemas/alphabet";
 import type { DateKey, Language } from "@/lib/schemas/common";
 
@@ -85,7 +86,7 @@ export function AlphabetCheck({
     return (
       <Card>
         <Eyebrow>Test de lecture</Eyebrow>
-        <h1 className="mt-2 font-serif text-2xl font-semibold">Tu lis déjà le {scriptName} ?</h1>
+        <h1 className="mt-2 font-serif text-2xl font-semibold">Tu lis déjà {scriptName} ?</h1>
         <p className="mt-2 text-[15px] leading-relaxed text-ink-soft">
           {exercises.length} mots à lire, il en faut {Math.ceil(exercises.length * ALPHABET_CHECK_PASS)} justes pour passer
           directement aux révisions.
@@ -144,6 +145,7 @@ export function AlphabetCheck({
   }
 
   const exercise = exercises[index];
+  const inLanguage = optionsInLanguage(exercise);
   return (
     <Card>
       <div className="flex items-center justify-between">
@@ -163,6 +165,8 @@ export function AlphabetCheck({
               key={`${index}-${option}`}
               type="button"
               onClick={() => answer(i)}
+              lang={inLanguage ? language : undefined}
+              dir={inLanguage ? languageInfo(language).dir : undefined}
               className="min-h-14 rounded-2xl border border-line px-3 py-3 text-center font-serif text-xl hover:bg-surface-sunk"
             >
               {option}

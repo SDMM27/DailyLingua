@@ -12,7 +12,7 @@ import { reviewStateSchema } from "./vocabulary";
 export const ALPHABET_PRACTICE_MAX = 20;
 
 export const ALPHABET_LIMITS = {
-  groupLetters: { min: 6, max: 8 },
+  groupLetters: { min: 6, max: 10 },
   groupWords: { min: 4, max: 8 },
 } as const;
 
@@ -24,7 +24,7 @@ const grapheme = z
   .min(1)
   .refine((s) => [...new Intl.Segmenter().segment(s)].length === 1, { message: "must be a single grapheme" });
 
-export const ALPHABET_SCRIPTS = ["cyrillic", "hangul"] as const;
+export const ALPHABET_SCRIPTS = ["cyrillic", "hangul", "greek", "kana", "arabic"] as const;
 export const alphabetScriptSchema = z.enum(ALPHABET_SCRIPTS);
 export type AlphabetScript = z.infer<typeof alphabetScriptSchema>;
 
@@ -60,6 +60,18 @@ export const alphabetLetterSchema = z
     /** French, how it sounds. */
     soundFr: text(160),
     kind: alphabetLetterKindSchema,
+    /** How the letter is shown on its own when it cannot be written alone (an Arabic haraka on a tatweel, « ـَ »). */
+    display: text(8).optional(),
+    /** Shapes of a joined letter (Arabic), shown on the letter card only; absent for a letter that has a single shape. */
+    forms: z
+      .object({
+        initial: text(8).optional(),
+        medial: text(8).optional(),
+        final: text(8).optional(),
+      })
+      .optional(),
+    /** Kana only: the syllabary the letter belongs to. */
+    series: z.enum(["hiragana", "katakana"]).optional(),
     /** The Latin letter it resembles; required for a false friend. */
     lookalike: text(2).optional(),
     example: alphabetWordSchema,
@@ -136,7 +148,7 @@ export type RecordAlphabetCheckInput = z.infer<typeof recordAlphabetCheckInputSc
 
 /** A generated question; `options` are 4 distinct strings and `answer` indexes the right one. */
 export type AlphabetExercise =
-  | { type: "letter-to-latin"; upper: string; lower: string; options: string[]; answer: number }
+  | { type: "letter-to-latin"; upper: string; lower: string; display?: string; options: string[]; answer: number }
   | { type: "latin-to-letter"; latin: string; soundFr: string; options: string[]; answer: number }
   | { type: "read-word"; word: string; options: string[]; answer: number }
   | { type: "listen-word"; word: string; options: string[]; answer: number };

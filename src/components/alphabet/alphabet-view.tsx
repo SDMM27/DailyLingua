@@ -79,6 +79,7 @@ export function AlphabetView({
                 <li key={card.id}>
                   <GroupRow
                     group={alphabet.groups.find((g) => g.id === card.groupId)!}
+                    alphabet={alphabet}
                     language={language}
                     card={card}
                     today={today}
@@ -92,7 +93,7 @@ export function AlphabetView({
 
         {!isAlphabetComplete(alphabet, cards) && (
           <Card className="flex items-center justify-between gap-3 !p-4">
-            <p className="text-[15px] font-medium">Tu lis déjà le {ALPHABET_SCRIPT_NAMES[alphabet.script]} ?</p>
+            <p className="text-[15px] font-medium">Tu lis déjà {ALPHABET_SCRIPT_NAMES[alphabet.script]} ?</p>
             <Link
               href={`/alphabet/${language}/test`}
               className="flex min-h-11 shrink-0 items-center text-sm font-semibold underline underline-offset-2"
@@ -119,6 +120,7 @@ export function AlphabetView({
               <li key={group.id}>
                 <GroupRow
                   group={group}
+                  alphabet={alphabet}
                   language={language}
                   card={cardOf(group)}
                   today={today}
@@ -135,6 +137,7 @@ export function AlphabetView({
 
 function GroupRow({
   group,
+  alphabet,
   language,
   card,
   today,
@@ -142,6 +145,7 @@ function GroupRow({
   suggested = false,
 }: {
   group: AlphabetGroup;
+  alphabet: Alphabet;
   language: Language;
   card?: AlphabetCard;
   today: DateKey;
@@ -159,8 +163,8 @@ function GroupRow({
     >
       <span className="min-w-0 flex-1">
         <span className="block font-semibold">{group.title}</span>
-        <span lang={language} className="mt-1 block font-serif text-lg tracking-wide text-ink-soft">
-          {group.letters.join(" ")}
+        <span lang={language} dir={languageInfo(language).dir} className="mt-1 block text-left font-serif text-lg tracking-wide text-ink-soft">
+          {group.letters.map((char) => alphabet.letters.find((l) => l.lower === char)?.display ?? char).join(" ")}
         </span>
         <span className="block text-xs text-muted">{group.summary}</span>
         <span className="mt-2 flex flex-wrap items-center gap-1.5">

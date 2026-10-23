@@ -6,6 +6,7 @@ import { languageStyle } from "@/components/ui/language-style";
 import { ListenButton, useHasLocalVoice } from "@/components/ui/listen-button";
 import { Card, Eyebrow, ProgressBar } from "@/components/ui/primitives";
 import { GRAMMAR_PASS_RATIO, type GrammarPracticeOutcome } from "@/lib/domain/grammar";
+import { languageInfo } from "@/lib/domain/languages";
 import { relativeDueLabel } from "@/lib/domain/spaced-repetition";
 import { letterLabel } from "@/lib/domain/alphabet";
 import { stripStress } from "@/lib/domain/stress";
@@ -42,7 +43,7 @@ function finishMessage(finish: Finish, today: DateKey, persist: boolean): string
 }
 
 /** Whether an option is written in the studied language (letters, words) rather than Latin. */
-function optionsInLanguage(exercise: AlphabetExercise): boolean {
+export function optionsInLanguage(exercise: AlphabetExercise): boolean {
   return exercise.type === "latin-to-letter" || exercise.type === "listen-word";
 }
 
@@ -75,6 +76,7 @@ export function AlphabetPractice({
   const [results, setResults] = useState<boolean[]>([]);
   const [finish, setFinish] = useState<Finish | null>(null);
   const style = languageStyle(language);
+  const dir = languageInfo(language).dir;
 
   const questions = frozen ?? (hasVoice ? exercises : exercises.filter((e) => e.type !== "listen-word"));
   const exercise = questions[index];
@@ -179,6 +181,7 @@ export function AlphabetPractice({
                 key={option}
                 type="button"
                 lang={inLanguage ? language : undefined}
+                dir={inLanguage ? dir : undefined}
                 disabled={answered}
                 onClick={() => choose(i)}
                 className={`min-h-14 rounded-2xl border px-3 py-3 text-center font-serif text-xl ${tone}`}
@@ -198,7 +201,7 @@ export function AlphabetPractice({
               {choice !== exercise.answer && (
                 <p className="text-[15px]">
                   Bonne réponse :{" "}
-                  <span lang={inLanguage ? language : undefined} className="font-serif font-semibold">
+                  <span lang={inLanguage ? language : undefined} dir={inLanguage ? dir : undefined} className="font-serif font-semibold">
                     {exercise.options[exercise.answer]}
                   </span>
                 </p>
@@ -222,12 +225,13 @@ export function AlphabetPractice({
 }
 
 export function Question({ exercise, language }: { exercise: AlphabetExercise; language: Language }) {
+  const dir = languageInfo(language).dir;
   switch (exercise.type) {
     case "letter-to-latin":
       return (
         <>
           <p className="text-[15px] text-ink-soft">Comment se transcrit cette lettre ?</p>
-          <p lang={language} className="mt-2 font-serif text-6xl font-semibold">
+          <p lang={language} dir={dir} className="mt-2 font-serif text-6xl font-semibold">
             {letterLabel(exercise)}
           </p>
         </>
@@ -244,7 +248,7 @@ export function Question({ exercise, language }: { exercise: AlphabetExercise; l
       return (
         <>
           <p className="text-[15px] text-ink-soft">Comment se lit ce mot, lettre par lettre ?</p>
-          <p lang={language} className="mt-2 font-serif text-4xl font-semibold">
+          <p lang={language} dir={dir} className="mt-2 font-serif text-4xl font-semibold">
             {exercise.word}
           </p>
         </>

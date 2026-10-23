@@ -116,6 +116,20 @@ Ordre des écritures : cyrillique (russe, ukrainien) → coréen → grec → ja
 - Dans les mauvaises réponses de lecture, une voyelle ne remplace qu'une voyelle et une consonne qu'une consonne, pour que les erreurs proposées restent plausibles.
 - Même moteur que I1 : une carte par groupe, test de lecture (2 mots par groupe, 12 questions), brouillon jusqu'à la relecture native.
 
+**I3 à I5 (implémentés)** : grec, kana japonais, arabe (`src/lib/alphabets/el.ts`, `ja.ts`, `ar.ts`). Chaque écriture a ses règles de lecture (tokenisation, lecture d'une lettre selon son contexte, classes de lettres pour les mauvaises réponses), réunies dans le domaine ; les règles du cyrillique et du hangeul ne changent pas. Décisions prises :
+
+- **Grec** (24 lettres, 4 groupes) : transcription lettre à lettre, avec η → ē et ω → ō pour garder une forme unique par lettre. Comme dans ELOT 743, ου se lit « ou », et αυ, ευ « av, ev » (ou « af, ef » devant une consonne sourde ou en fin de mot). μπ, ντ, γκ restent lettre à lettre (mp, nt, gk) ; les conseils de groupe disent comment ils se prononcent. L'accent écrit est ignoré à la lecture et ς est lu comme σ.
+- **Kana** (151 caractères, 16 groupes) : hiragana puis katakana, deux lignes du tableau par groupe (10 caractères au plus par groupe, au lieu de 8). Les caractères avec ゛ et ゜, les petits ゃゅょ, っ et ー sont compris. Transcription Hepburn lettre à lettre : を → wo, ぢ et づ → di et du. Une syllabe en -i devant un petit ゃゅょ se fond avec lui (きゃ → kya, しゃ → sha), っ double la consonne suivante et ー répète la voyelle (コーヒー → koohii). Un même son existe dans les deux séries : une transcription n'est unique que dans sa série, et les mauvaises réponses de « transcription → caractère » sont prises dans la même série. Les kanjis restent hors périmètre.
+- **Arabe** (35 signes, 5 groupes) : les 28 lettres, أ, ة et les cinq signes du texte vocalisé (fatha, kasra, damma, sukun, shadda). Les mots de lecture sont entièrement vocalisés, comme dans les manuels pour débutants. Règles de lecture :
+  - une voyelle brève suivie de sa lettre longue donne une voyelle longue (ـَا ā, ـُو ū, ـِي ī) ;
+  - sukun ne se lit pas, et shadda double la consonne ;
+  - ة après fatha n'ajoute rien, et la hamza en début de mot ne s'écrit pas en transcription.
+
+  Les mots évitent l'article ال (assimilation des lettres solaires) et ى. Les formes jointes des lettres sont affichées, et le texte arabe s'écrit de droite à gauche.
+- Les signes (kind `sign` : harakat arabes, petits kana, ー, ь, ъ) ne sont demandés que dans le sens « signe → transcription ».
+- Le nom de l'écriture porte son article (« le grec », « les kana », « l’alphabet arabe ») pour les phrases « Tu lis déjà … ? ».
+- Le test de lecture garde 2 mots par groupe : 32 questions pour les kana.
+
 ### Phase J — Révision du vocabulaire : modes et mesure
 
 1. **Modes de rappel** en plus de la reconnaissance : écrire la traduction, écouter et taper, phrase à trou dans une vraie phrase de contenu.
@@ -131,14 +145,14 @@ Pas une phase de développement isolé. C'est un fichier de configuration qui in
 Une phase validée avant la suivante, comme pour le reste du projet.
 
 1. **H1 — Grammaire pilote** (ru, it, A1–B1). Le plus visible pour le niveau intermédiaire. *Fait.*
-2. **I — Alphabets** (cyrillique d'abord). Débloque les débutants en russe, ukrainien, puis les autres écritures. *I1 (cyrillique) fait, I2 (hangeul) implémenté ; suivant : grec, puis kana, arabe.*
+2. **I — Alphabets** (cyrillique d'abord). Débloque les débutants en russe, ukrainien, puis les autres écritures. *I1 (cyrillique) fait, I2 à I5 (hangeul, grec, kana, arabe) implémentés : toutes les écritures prévues sont couvertes, en attente de relecture native.*
 3. **J — Modes de révision et mesure de rétention.** Commencer la mesure tôt : elle prend des semaines à produire des données.
 4. **H2 — Grammaire suggérée par les erreurs.** Dépend de D (déjà fait) et de H1.
 5. **K — Parcours par niveau**, appliqué progressivement.
 
 Phase G (écrire puis dire) est faite ; elle n'avait pas de dépendance avec ce plan.
 
-En parallèle du développement : faire relire par des natifs les 36 points de grammaire et les alphabets (russe, ukrainien, coréen), pour pouvoir les publier en production.
+En parallèle du développement : faire relire par des natifs les 36 points de grammaire et les six alphabets (russe, ukrainien, coréen, grec, japonais, arabe), pour pouvoir les publier en production.
 
 ## 5. Décisions
 
