@@ -31,6 +31,7 @@ import type {
   NewVocabularyInput,
   NewVocabularyListInput,
   ReviewGrade,
+  ReviewMode,
   VocabularyItem,
   VocabularyList,
 } from "@/lib/schemas/vocabulary";
@@ -99,11 +100,11 @@ export function VocabularyView({
     setReviewKey((key) => key + 1);
   };
 
-  const handleReviewed = async (reviewed: VocabularyItem, grade: ReviewGrade) => {
+  const handleReviewed = async (reviewed: VocabularyItem, grade: ReviewGrade, mode: ReviewMode) => {
     const before = reviewed.review;
     update(reviewed.id, (item) => ({ ...item, review: applyReview(item.review, grade, today) }));
     if (!persist) return;
-    const result = await reviewWord({ id: reviewed.id, grade, expectedReviewCount: before.reviewCount });
+    const result = await reviewWord({ id: reviewed.id, grade, mode, expectedReviewCount: before.reviewCount });
     if (result.ok) {
       update(reviewed.id, (item) => ({ ...item, review: result.data.review }));
       setError(null);

@@ -3,10 +3,13 @@ import { ArrowRightIcon } from "@/components/icons";
 import { languageStyle } from "@/components/ui/language-style";
 import { Card, PageHeader, SectionTitle } from "@/components/ui/primitives";
 import { GRAMMAR_LEVELS, grammarPointState } from "@/lib/domain/grammar";
+import type { GrammarSuggestion } from "@/lib/domain/grammar-suggestions";
 import { languageInfo } from "@/lib/domain/languages";
+import { STATS_WINDOW_DAYS } from "@/lib/domain/production-stats";
 import { dueItems, relativeDueLabel } from "@/lib/domain/spaced-repetition";
 import type { CefrLevel, DateKey, Language } from "@/lib/schemas/common";
 import type { GrammarCard, GrammarPoint, GrammarPointState } from "@/lib/schemas/grammar";
+import { CORRECTION_CATEGORY_LABELS } from "@/lib/schemas/writing-feedback";
 
 const STATE_LABELS: Record<GrammarPointState, string> = {
   new: "À voir",
@@ -14,8 +17,15 @@ const STATE_LABELS: Record<GrammarPointState, string> = {
   mastered: "Maîtrisée",
 };
 
+/** « Accords : 5 erreurs en 30 jours », several reasons joined with « · ». */
+function suggestionReason({ reasons }: GrammarSuggestion): string {
+  return reasons
+    .map((r) => `${CORRECTION_CATEGORY_LABELS[r.category]} : ${r.count} erreur${r.count > 1 ? "s" : ""} en ${STATS_WINDOW_DAYS} jours`)
+    .join(" · ");
+}
+
 /**
- * "Grammaire": the points to review today, then the points of the language by level, the
+ * "Grammaire": the points suggested by the repeated errors, the points to review today, then the points of the language by level, the
  * learner's own level first. `points` are the ones visible to the learner (the page applies the
  * draft policy) and `cards` the cards of the selected language.
  */
@@ -27,6 +37,7 @@ export function GrammarView({
   level,
   today,
   hasAlphabet = false,
+  suggestions = [],
 }: {
   userLanguages: Language[];
   language: Language;
@@ -37,6 +48,8 @@ export function GrammarView({
   today: DateKey;
   /** The language has a visible alphabet: link to it. */
   hasAlphabet?: boolean;
+  /** Points suggested by the errors of the last 30 days; the section is hidden when empty. */
+  suggestions?: GrammarSuggestion[];
 }) {
   const cardOf = (point: GrammarPoint) => cards.find((c) => c.pointId === point.id);
   const dueCards = dueItems(cards, today).filter((c) => points.some((p) => p.id === c.pointId));
@@ -88,6 +101,25 @@ export function GrammarView({
         </p>
       ) : (
         <div className="space-y-10">
+          {suggestions.length > 0 && (
+            <section aria-label="Suggéré par tes erreurs">
+              <SectionTitle>Suggéré par tes erreurs</SectionTitle>
+              <ul className="space-y-2">
+                {suggestions.map((suggestion) => (
+                  <li key={suggestion.point.id}>
+                    <PointRow
+                      point={suggestion.point}
+                      language={language}
+                      card={cardOf(suggestion.point)}
+                      today={today}
+                      note={suggestionReason(suggestion)}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
           <section aria-label="À revoir aujourd’hui">
             <SectionTitle>À revoir aujourd’hui</SectionTitle>
             {dueCards.length === 0 ? (
@@ -151,11 +183,14 @@ function PointRow({
   language,
   card,
   today,
+  note,
 }: {
   point: GrammarPoint;
   language: Language;
   card?: GrammarCard;
   today: DateKey;
+  /** Shown in place of the summary (the reason of a suggestion). */
+  note?: string;
 }) {
   const state = grammarPointState(card);
   const style = languageStyle(language);
@@ -166,7 +201,7 @@ function PointRow({
     >
       <span className="min-w-0 flex-1">
         <span className="block font-semibold">{point.title}</span>
-        <span className="block text-xs text-muted">{point.summary}</span>
+        <span className="block text-xs text-muted">{note ?? point.summary}</span>
         <span className="mt-2 flex flex-wrap items-center gap-1.5">
           <span
             className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${

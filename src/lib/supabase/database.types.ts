@@ -531,14 +531,14 @@ isOneToOne: false
                   ]
                 },"vocabulary_reviews": {
                   Row: {
-                    "box_after": number,"box_before": number,"due_on_after": string,"grade": string,"id": string,"item_id": string,"reviewed_at": string,"reviewed_on": string,"user_id": string
+                    "box_after": number,"box_before": number,"days_since_last": number | null,"due_on_after": string,"grade": string,"id": string,"item_id": string,"mode": string,"reviewed_at": string,"reviewed_on": string,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "box_after": number,"box_before": number,"due_on_after": string,"grade": string,"id"?: string,"item_id": string,"reviewed_at"?: string,"reviewed_on": string,"user_id": string
+                    "box_after": number,"box_before": number,"days_since_last"?: number | null,"due_on_after": string,"grade": string,"id"?: string,"item_id": string,"mode"?: string,"reviewed_at"?: string,"reviewed_on": string,"user_id": string
                   }
                   Update: {
-                    "box_after"?: number,"box_before"?: number,"due_on_after"?: string,"grade"?: string,"id"?: string,"item_id"?: string,"reviewed_at"?: string,"reviewed_on"?: string,"user_id"?: string
+                    "box_after"?: number,"box_before"?: number,"days_since_last"?: number | null,"due_on_after"?: string,"grade"?: string,"id"?: string,"item_id"?: string,"mode"?: string,"reviewed_at"?: string,"reviewed_on"?: string,"user_id"?: string
                   }
                   Relationships: [
                     {
@@ -650,7 +650,7 @@ isOneToOne: false
 { Args: { "p_answers"?: Json,"p_bank_version"?: string,"p_chosen_level"?: string,"p_confidence"?: string,"p_estimated_level"?: string,"p_language": string,"p_start_level"?: string,"p_status": string,"p_variant"?: string }; Returns: undefined
                            },
 "record_vocabulary_review":
-{ Args: { "p_box_after": number,"p_due_on_after": string,"p_expected_review_count": number,"p_grade": string,"p_item_id": string,"p_reviewed_on": string }; Returns: boolean
+{ Args: { "p_box_after": number,"p_due_on_after": string,"p_expected_review_count": number,"p_grade": string,"p_item_id": string,"p_mode": string,"p_reviewed_on": string }; Returns: boolean
                            },
 "release_session_replacement":
 { Args: { "p_session_id": string }; Returns: undefined

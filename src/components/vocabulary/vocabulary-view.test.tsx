@@ -59,9 +59,14 @@ function setup({
 /** The words of the list "Mes mots" (the flashcard above also shows words). */
 const wordList = () => within(screen.getByRole("list", { name: "Mes mots" }));
 
+/** The default session mixes modes by box; these tests are about the flashcards. */
+const useFlashcards = (user: ReturnType<typeof userEvent.setup>) =>
+  user.selectOptions(screen.getByLabelText("Mode"), "flip");
+
 describe("VocabularyView", () => {
   it("runs a review session through all due words", async () => {
     const user = setup();
+    await useFlashcards(user);
     expect(screen.getByText("1 / 4")).toBeTruthy();
     for (let i = 0; i < 4; i++) {
       await user.click(screen.getByRole("button", { name: "Afficher la réponse" }));
@@ -72,6 +77,7 @@ describe("VocabularyView", () => {
 
   it("shows the next interval on each grade button", async () => {
     const user = setup();
+    await useFlashcards(user);
     await user.click(screen.getByRole("button", { name: "Afficher la réponse" }));
     // First due word is in box 2 (interval 4); "again" → tomorrow, "good" → box 3 = 8 days.
     expect(screen.getByRole("button", { name: /À revoir.*demain/ })).toBeTruthy();
@@ -378,10 +384,81 @@ describe("VocabularyView", () => {
     });
   });
 
+  describe("review modes", () => {
+    const chooseMode = (user: ReturnType<typeof userEvent.setup>, mode: string) =>
+      user.selectOptions(screen.getByLabelText("Mode"), mode);
+
+    it("offers a mixed session and each mode", () => {
+      setup();
+      const select = screen.getByLabelText("Mode") as HTMLSelectElement;
+      expect([...select.options].map((o) => o.textContent)).toEqual([
+        "Mélangé",
+        "Cartes",
+        "Traduire",
+        "Écrire le mot",
+        "Écouter",
+        "Phrase à trou",
+      ]);
+      expect(select.value).toBe("mixed");
+    });
+
+    it("grades a right typed translation as good and sends the mode", async () => {
+      actions.reviewWord.mockResolvedValue({ ok: false, error: "x" });
+      const user = setup({ persist: true });
+      await chooseMode(user, "translate");
+      await user.type(screen.getByLabelText("Traduction en français"), "Du reste{Enter}");
+      expect(screen.getByText("Juste.")).toBeTruthy();
+      expect(screen.getByRole("button", { name: "Trop facile" })).toBeTruthy();
+      await user.click(screen.getByRole("button", { name: "Continuer" }));
+      expect(actions.reviewWord).toHaveBeenCalledWith(
+        expect.objectContaining({ id: "v1", grade: "good", mode: "translate" }),
+      );
+    });
+
+    it("lets the learner overrule a wrong answer", async () => {
+      actions.reviewWord.mockResolvedValue({ ok: false, error: "x" });
+      const user = setup({ persist: true });
+      await chooseMode(user, "translate");
+      await user.type(screen.getByLabelText("Traduction en français"), "maison");
+      await user.click(screen.getByRole("button", { name: "Vérifier" }));
+      expect(screen.getByText("Ce n’est pas ça.")).toBeTruthy();
+      await user.click(screen.getByRole("button", { name: "J’avais bon" }));
+      expect(actions.reviewWord).toHaveBeenCalledWith(
+        expect.objectContaining({ id: "v1", grade: "good", mode: "translate" }),
+      );
+    });
+
+    it("grades a wrong answer as again when the learner continues", async () => {
+      actions.reviewWord.mockResolvedValue({ ok: false, error: "x" });
+      const user = setup({ persist: true });
+      await chooseMode(user, "produce");
+      await user.type(screen.getByLabelText("Ta réponse"), "autre");
+      await user.click(screen.getByRole("button", { name: "Vérifier" }));
+      await user.click(screen.getByRole("button", { name: "Continuer" }));
+      expect(actions.reviewWord).toHaveBeenCalledWith(
+        expect.objectContaining({ id: "v1", grade: "again", mode: "produce" }),
+      );
+    });
+
+    it("shows the sentence with a blank for the cloze mode", async () => {
+      const user = setup();
+      await chooseMode(user, "cloze");
+      expect(screen.getByText(/＿＿＿, это уже совсем другая история\./)).toBeTruthy();
+      expect(screen.getByText(/Indice : d.ailleurs/)).toBeTruthy();
+    });
+
+    it("falls back to translating when the device cannot read the word", async () => {
+      const user = setup();
+      await chooseMode(user, "listen");
+      expect(screen.getByLabelText("Traduction en français")).toBeTruthy();
+    });
+  });
+
   describe("with persistence", () => {
     it("saves each review with the review count the user saw", async () => {
       actions.reviewWord.mockImplementation(async ({ id }) => ({ ok: false, error: `x${id}` }));
       const user = setup({ persist: true });
+      await useFlashcards(user);
       await user.click(screen.getByRole("button", { name: "Afficher la réponse" }));
       await user.click(screen.getByRole("button", { name: /^Bien/ }));
       expect(actions.reviewWord).toHaveBeenCalledWith(
@@ -392,6 +469,7 @@ describe("VocabularyView", () => {
     it("reports a review the server refused", async () => {
       actions.reviewWord.mockResolvedValue({ ok: false, error: "déjà révisé" });
       const user = setup({ persist: true });
+      await useFlashcards(user);
       await user.click(screen.getByRole("button", { name: "Afficher la réponse" }));
       await user.click(screen.getByRole("button", { name: /^Bien/ }));
       expect((await screen.findByRole("alert")).textContent).toMatch(/déjà révisé/);

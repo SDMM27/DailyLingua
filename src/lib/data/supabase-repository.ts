@@ -7,6 +7,7 @@ import { GRAMMAR_MASTERED_BOX, planGrammarPractice, type GrammarPracticeResult }
 import { recurringCorrectionIndexes } from "@/lib/domain/production-stats";
 import { guestTrialStatus, type GuestTrialStatus } from "@/lib/domain/guest-trial";
 import { LANGUAGE_CODES } from "@/lib/domain/languages";
+import { RETENTION_MIN_DELAY_DAYS, RETENTION_WINDOW_DAYS, retentionByMode, type RetentionRow } from "@/lib/domain/review-modes";
 import { applyReview, initialReviewState } from "@/lib/domain/spaced-repetition";
 import type { Database } from "@/lib/supabase/database.types";
 import { availableLanguages } from "@/lib/content/availability";
@@ -55,12 +56,15 @@ import { productionEntrySchema, type ProductionEntry } from "@/lib/schemas/produ
 import { placementSummarySchema, type PlacementRecord, type PlacementSummary } from "@/lib/schemas/placement";
 import { preferencesSchema, type Preferences } from "@/lib/schemas/preferences";
 import {
+  reviewGradeSchema,
+  reviewModeSchema,
   vocabularyItemSchema,
   vocabularyListSchema,
   type ImportVocabularyInput,
   type ImportVocabularyResult,
   type NewVocabularyInput,
   type NewVocabularyListInput,
+  type RetentionStats,
   type ReviewInput,
   type TranslateVocabularyInput,
   type UpdateVocabularyListInput,
@@ -1023,10 +1027,35 @@ export function createSupabaseRepository(
       p_box_after: next.box,
       p_due_on_after: next.dueOn,
       p_expected_review_count: input.expectedReviewCount,
+      p_mode: input.mode,
     });
     if (rpcError) throw new Error(`Supabase (révision) : ${rpcError.message}`);
     if (!applied) throw new UserFacingError("Ce mot a déjà été révisé ailleurs. Recharge la page.");
     return { ...item, review: next };
+  }
+
+  async function vocabularyRetention(): Promise<RetentionStats> {
+    const since = addDays(await getToday(), -RETENTION_WINDOW_DAYS);
+    const rows = unwrap(
+      await client
+        .from("vocabulary_reviews")
+        .select("mode, grade, days_since_last")
+        .eq("user_id", userId)
+        .gte("reviewed_on", since)
+        .gte("days_since_last", RETENTION_MIN_DELAY_DAYS)
+        .order("reviewed_on", { ascending: false })
+        .limit(5000),
+      "rétention du vocabulaire",
+    );
+    const measured: RetentionRow[] = [];
+    for (const row of rows) {
+      const mode = reviewModeSchema.safeParse(row.mode);
+      const grade = reviewGradeSchema.safeParse(row.grade);
+      if (mode.success && grade.success) {
+        measured.push({ mode: mode.data, grade: grade.data, daysSinceLast: row.days_since_last });
+      }
+    }
+    return retentionByMode(measured);
   }
 
   async function setVocabularyStatus(id: string, status: VocabularyItem["status"]): Promise<void> {
@@ -1502,6 +1531,7 @@ export function createSupabaseRepository(
     listVocabulary,
     addVocabulary,
     reviewVocabulary,
+    vocabularyRetention,
     setVocabularyStatus,
     deleteVocabulary,
     listVocabularyLists,

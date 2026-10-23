@@ -4,6 +4,7 @@ import { WritingFeedbackCard } from "@/components/mission/writing-feedback-card"
 import { languageStyle } from "@/components/ui/language-style";
 import { Card, Eyebrow, PageHeader, SectionTitle } from "@/components/ui/primitives";
 import { formatLongDate } from "@/lib/domain/dates";
+import type { GrammarSuggestion } from "@/lib/domain/grammar-suggestions";
 import { languageInfo } from "@/lib/domain/languages";
 import { productionStats } from "@/lib/domain/production-stats";
 import type { DateKey, Language } from "@/lib/schemas/common";
@@ -25,6 +26,7 @@ export function ProductionsView({
   selected,
   today,
   persist,
+  grammarSuggestions = {},
 }: {
   entries: ProductionEntry[];
   cards: CorrectionCard[];
@@ -32,6 +34,8 @@ export function ProductionsView({
   selected?: Language;
   today: DateKey;
   persist: boolean;
+  /** Grammar points suggested by the errors, per language (languages without a course are absent). */
+  grammarSuggestions?: Partial<Record<Language, GrammarSuggestion[]>>;
 }) {
   const withProductions = userLanguages.filter((l) => entries.some((e) => e.language === l));
   const visible = selected ? entries.filter((e) => e.language === selected) : entries;
@@ -63,7 +67,7 @@ export function ProductionsView({
       {visible.length === 0 ? (
         <p className="py-8 text-center text-sm text-muted">Aucune production écrite pour l’instant.</p>
       ) : (
-        <ProductionStatsPanel stats={productionStats(entries, today, selected)} />
+        <ProductionStatsPanel stats={productionStats(entries, today, selected)} grammarSuggestions={grammarSuggestions} />
       )}
 
       {visibleCards.length > 0 && (
