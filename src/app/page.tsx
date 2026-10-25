@@ -1,3 +1,4 @@
+import { Fragment, type ReactNode } from "react";
 import Link from "next/link";
 import { connection } from "next/server";
 import { GuestTrialBanner } from "@/components/auth/guest-trial-banner";
@@ -16,6 +17,7 @@ import { languageInfo } from "@/lib/domain/languages";
 import { alphabetLanguages } from "@/lib/alphabets";
 import { readAlphabetDraftPolicy, visibleAlphabet } from "@/lib/alphabets/policy";
 import { isAlphabetComplete } from "@/lib/domain/alphabet";
+import { LEARNING_PATHS, pathInvites, pathStage, type PathModule } from "@/lib/domain/learning-path";
 import { grammarLanguages } from "@/lib/grammar/courses";
 import { readGrammarDraftPolicy, visibleGrammarPoints } from "@/lib/grammar/policy";
 import { dueItems, dueToday, upcomingReviews } from "@/lib/domain/spaced-repetition";
@@ -49,17 +51,26 @@ export default async function DashboardPage() {
   const dueGrammar = dueItems(grammarCards, today).filter(
     (c) => grammarOfUser.includes(c.language) && visibleGrammarPoints(c.language, grammarPolicy).some((p) => p.id === c.pointId),
   );
-  // Alphabets: for each language of the user with a visible one, the groups to review, or (A1
-  // learners) an invitation to learn to read until every group has a card.
+  // Alphabets: for each language of the user with a visible one, the groups to review, or (for
+  // learners of the script) an invitation to learn to read until every group has a card.
   const alphabetPolicy = readAlphabetDraftPolicy();
-  const alphabetPreviews = preferences.goals.flatMap((goal) => {
+  // Where the learner stands in each language (learning-path.ts): drives which cards are invited and their order.
+  const goalStages = preferences.goals.map((goal) => {
     const alphabet = alphabetLanguages().includes(goal.language) ? visibleAlphabet(goal.language, alphabetPolicy) : undefined;
-    if (!alphabet) return [];
     const cardsOfLanguage = alphabetCards.filter((c) => c.language === goal.language);
+    const learningScript = !!alphabet && !isAlphabetComplete(alphabet, cardsOfLanguage);
+    return { goal, alphabet, cardsOfLanguage, stage: pathStage(goal.level, { learningScript }) };
+  });
+  const alphabetPreviews = goalStages.flatMap(({ goal, alphabet, cardsOfLanguage, stage }) => {
+    if (!alphabet) return [];
     const due = dueItems(cardsOfLanguage, today).filter((c) => alphabet.groups.some((g) => g.id === c.groupId));
-    const invite = goal.level === "A1" && !isAlphabetComplete(alphabet, cardsOfLanguage);
+    const invite = pathInvites(stage, "alphabet");
     return due.length > 0 || invite ? [{ language: goal.language, script: alphabet.script, dueCount: due.length }] : [];
   });
+  // Grammar: shown when something is due, or when a language's stage invites to it.
+  const grammarInvited = goalStages.find(({ goal, stage }) => grammarOfUser.includes(goal.language) && pathInvites(stage, "grammar"));
+  const grammarLanguage = dueGrammar[0]?.language ?? grammarInvited?.goal.language;
+  const primaryStage = goalStages[0].stage; // the first goal is the main language
   const progress = mission ? await repo.getMissionProgress(mission) : null;
 
   const weekStart = addDays(today, -6);
@@ -71,6 +82,38 @@ export default async function DashboardPage() {
       .filter((h) => diffInDays(weekStart, h.date) >= 0)
       .reduce((sum, h) => sum + h.completedMinutes, 0),
   };
+
+  // The module cards, in the order of the primary language's stage (see learning-path.ts).
+  const moduleCards: Record<PathModule, ReactNode> = {
+    errors:
+      dueErrors > 0 && (
+        <Link
+          href="/productions#revoir"
+          className="flex items-center gap-3 rounded-3xl border border-line bg-surface px-5 py-4 transition-colors hover:bg-surface-sunk"
+        >
+          <span className="min-w-0 flex-1">
+            <Eyebrow>Erreurs</Eyebrow>
+            <span className="mt-1 block font-semibold">
+              {dueErrors} erreur{dueErrors > 1 ? "s" : ""} à revoir
+            </span>
+            <span className="text-xs text-muted">Des passages corrigés dans tes textes, à retravailler.</span>
+          </span>
+          <ArrowRightIcon width={16} height={16} className="text-muted" />
+        </Link>
+      ),
+    grammar: grammarLanguage && <GrammarPreview dueCount={dueGrammar.length} language={grammarLanguage} />,
+    alphabet: alphabetPreviews.map((preview) => <AlphabetPreview key={preview.language} {...preview} />),
+    vocabulary: (
+      <ReviewPreview
+        items={upcomingReviews(vocabulary, vocabularyLists).slice(0, 4)}
+        dueCount={dueToday(vocabulary, today, vocabularyLists).length}
+        today={today}
+      />
+    ),
+  };
+  const orderedModules = LEARNING_PATHS[primaryStage].modules.map((name) => (
+    <Fragment key={name}>{moduleCards[name]}</Fragment>
+  ));
 
   return (
     <div className="space-y-8">
@@ -131,37 +174,9 @@ export default async function DashboardPage() {
         </Link>
       )}
 
-      {dueErrors > 0 && (
-        <Link
-          href="/productions#revoir"
-          className="flex items-center gap-3 rounded-3xl border border-line bg-surface px-5 py-4 transition-colors hover:bg-surface-sunk"
-        >
-          <span className="min-w-0 flex-1">
-            <Eyebrow>Erreurs</Eyebrow>
-            <span className="mt-1 block font-semibold">
-              {dueErrors} erreur{dueErrors > 1 ? "s" : ""} à revoir
-            </span>
-            <span className="text-xs text-muted">Des passages corrigés dans tes textes, à retravailler.</span>
-          </span>
-          <ArrowRightIcon width={16} height={16} className="text-muted" />
-        </Link>
-      )}
-
-      {grammarOfUser.length > 0 && (
-        <GrammarPreview dueCount={dueGrammar.length} language={dueGrammar[0]?.language ?? grammarOfUser[0]} />
-      )}
-
-      {alphabetPreviews.map((preview) => (
-        <AlphabetPreview key={preview.language} {...preview} />
-      ))}
+      {orderedModules}
 
       <WeekCard days={recentDays(studyDates, today)} stats={stats} />
-
-      <ReviewPreview
-        items={upcomingReviews(vocabulary, vocabularyLists).slice(0, 4)}
-        dueCount={dueToday(vocabulary, today, vocabularyLists).length}
-        today={today}
-      />
 
       <nav aria-label="Raccourcis" className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {[

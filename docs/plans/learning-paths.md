@@ -1,6 +1,6 @@
 # Plan — grammaire, alphabets, révision du vocabulaire, parcours par niveau
 
-Statut : **H1 (grammaire pilote) et I1 (cyrillique : russe, ukrainien, avec le test de lecture) sont faits**, en attente de relecture native ; le reste est une proposition. Date : 2026-10-21, mis à jour le 2026-10-23. Ce plan complète [product-features.md](product-features.md) (phases A à G) sans le remplacer. Les phases ci-dessous portent les lettres H à K pour ne pas se confondre avec les précédentes.
+Statut : **H1 (grammaire pilote) et I1 (cyrillique : russe, ukrainien, avec le test de lecture) sont faits**, en attente de relecture native ; le reste est une proposition. H2, I2 à I5, J1, J2 et K1 sont implémentés depuis. Date : 2026-10-21, mis à jour le 2026-10-23. Ce plan complète [product-features.md](product-features.md) (phases A à G) sans le remplacer. Les phases ci-dessous portent les lettres H à K pour ne pas se confondre avec les précédentes.
 
 ## 1. Constat
 
@@ -157,6 +157,23 @@ Ordre des écritures : cyrillique (russe, ukrainien) → coréen → grec → ja
 
 Pas une phase de développement isolé. C'est un fichier de configuration qui indique, pour chaque niveau, quels modules sont mis en avant, quel contenu est proposé en premier et quels rappels s'affichent sur l'accueil. Il est appliqué au fur et à mesure que H, I et J arrivent. Le premier pas : définir la table niveau → modules, puis l'utiliser sur l'accueil.
 
+**K1 (implémenté)** : table niveau → modules et accueil (`src/lib/domain/learning-path.ts`). Décisions prises :
+
+- Quatre étapes : `beginner` (A1 qui ne lit pas encore l'écriture : la langue a un alphabet visible dont un groupe n'a pas de carte), `basics` (A1 qui lit l'écriture, A2), `core` (B1–B2) et `advanced` (C1–C2). Le « débutant absolu » n'est pas un niveau à part : c'est un A1 qui apprend l'écriture, ce qui se déduit des cartes d'alphabet.
+- Quatre modules mis en avant à côté de la mission : `alphabet`, `grammar`, `vocabulary` et `errors` (cartes de correction). Pour chaque étape, la table donne l'ordre des modules sur l'accueil et ceux qui ont une invitation même sans révision due :
+
+  | Étape | Ordre sur l'accueil | Invitation sans révision due |
+  |---|---|---|
+  | beginner | alphabet, grammaire, vocabulaire, erreurs | alphabet, grammaire |
+  | basics | grammaire, vocabulaire, erreurs, alphabet | grammaire |
+  | core | erreurs, grammaire, vocabulaire, alphabet | grammaire |
+  | advanced | vocabulaire, erreurs, grammaire, alphabet | aucune |
+
+- La table change ce qui est mis en avant, pas ce qui existe : chaque module reste accessible à tous les niveaux, et une révision due s'affiche toujours.
+- Avec plusieurs langues, l'ordre des cartes suit l'étape de la première langue (la langue principale). Les invitations se décident langue par langue : l'alphabet pour chaque langue en `beginner` (même règle qu'avant, désormais portée par la table), la grammaire si une langue avec cours est à une étape qui l'invite. En C1–C2, la grammaire n'apparaît que pour les fiches à revoir.
+- La mission, l'invitation au test de niveau et les bannières restent en tête ; la carte de la semaine passe après les modules.
+- **Reste à faire (K2)** : le contenu proposé en premier selon l'étape (choix des sources de la mission), une fois la décision 3 de la section 5 prise pour le vocabulaire par fréquence.
+
 ## 4. Ordre proposé
 
 Une phase validée avant la suivante, comme pour le reste du projet.
@@ -165,7 +182,7 @@ Une phase validée avant la suivante, comme pour le reste du projet.
 2. **I — Alphabets** (cyrillique d'abord). Débloque les débutants en russe, ukrainien, puis les autres écritures. *I1 (cyrillique) fait, I2 à I5 (hangeul, grec, kana, arabe) implémentés : toutes les écritures prévues sont couvertes, en attente de relecture native.*
 3. **J — Modes de révision et mesure de rétention.** Commencer la mesure tôt : elle prend des semaines à produire des données. *J1 (modes) et J2 (mesure) implémentés ; J3 (gamification) attend la décision 1 de la section 5.*
 4. **H2 — Grammaire suggérée par les erreurs.** Dépend de D (déjà fait) et de H1. *Implémenté pour les langues qui ont un cours (russe, italien).*
-5. **K — Parcours par niveau**, appliqué progressivement.
+5. **K — Parcours par niveau**, appliqué progressivement. *K1 (table niveau → modules, accueil) implémenté.*
 
 Phase G (écrire puis dire) est faite ; elle n'avait pas de dépendance avec ce plan.
 
