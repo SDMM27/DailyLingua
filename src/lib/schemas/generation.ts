@@ -36,6 +36,10 @@ export const candidateContentSchema = z.object({
   durationMinutes: z.number().int().positive(),
   categories: z.array(z.string()),
   publishedAt: z.iso.datetime({ offset: true }).nullable(),
+  /** Catalogue key of the source, to look up its traits when ranking. Never sent to the model. */
+  sourceKey: z.string().min(1).nullable().optional(),
+  /** Frequent words of the teaser (A1–A2 only), set once the candidates are ranked; printed in the prompt. */
+  frequentWords: z.array(z.string()).optional(),
 });
 export type CandidateContent = z.infer<typeof candidateContentSchema>;
 
@@ -152,6 +156,20 @@ export const generationMetaSchema = z.object({
   durationMs: z.number().int().nonnegative(),
   /** Why the template was used instead of the model, when it was. */
   fallbackReason: z.string().max(300).nullable(),
+  /**
+   * Share of the words of the title and teaser of each chosen content among the 1000 and the 2000
+   * most frequent forms of its language (null when too short to measure). Absent on older missions.
+   */
+  coverage: z
+    .array(
+      z.object({
+        language: languageSchema,
+        contentId: z.string(),
+        top1000: z.number().min(0).max(1).nullable(),
+        top2000: z.number().min(0).max(1).nullable(),
+      }),
+    )
+    .optional(),
 });
 export type GenerationMeta = z.infer<typeof generationMetaSchema>;
 

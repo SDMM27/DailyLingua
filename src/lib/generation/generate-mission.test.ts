@@ -11,7 +11,9 @@ import type { SourceAccess } from "@/lib/schemas/content";
 import type { Preferences } from "@/lib/schemas/preferences";
 import { GenerationError } from "./errors";
 import { productionTargetLength } from "./plan-activities";
-import { generateMission, planSession, type MissionStore, type PlannedSession } from "./generate-mission";
+import { buildRanks } from "@/lib/domain/frequency";
+import { buildUserMessage } from "./prompt";
+import { buildSessionRequest, generateMission, planSession, type MissionStore, type PlannedSession } from "./generate-mission";
 import { createTemplateGenerator } from "./template-generator";
 
 const NOW = new Date("2026-10-13T12:00:00Z");
@@ -408,5 +410,74 @@ describe("generateMission", () => {
     };
     expect(await run(store, aiGenerator())).toMatchObject({ status: "failed" });
     expect(calls.failed).toHaveLength(1);
+  });
+});
+
+describe("vocabulary frequency", () => {
+  const frequency = buildRanks("es", ["el", "la", "de", "y", "casa", "grande", "es", "una", "en", "pan"]);
+  const teaser = "Una casa grande en la ciudad y el pan de la casa es muy bueno";
+
+  const sessionFor = (level: "A1" | "A2" | "B1" | "B2") =>
+    buildSessionRequest({
+      goal: { ...preferences.goals[1], level },
+      preferences,
+      declaredSourceIds: [],
+      minutes: 10,
+      excludeIds: new Set(),
+      now: NOW,
+      frequency,
+      pool: [content("es", 1, { summary: teaser })],
+      productionMode: "writing",
+    });
+
+  it("gives the frequent words of the teaser to the model at A1 and A2 only", () => {
+    for (const level of ["A1", "A2"] as const) {
+      const session = sessionFor(level);
+      expect(session.candidates[0].frequentWords).toEqual(["una", "casa", "grande", "en", "la", "y", "el", "pan", "de", "es"]);
+      expect(buildUserMessage({ date: "2026-10-13", sessions: [session] })).toContain("frequent words of the teaser: una, casa, grande");
+    }
+    for (const level of ["B1", "B2"] as const) {
+      expect(sessionFor(level).candidates[0].frequentWords).toBeUndefined();
+      expect(buildUserMessage({ date: "2026-10-13", sessions: [sessionFor(level)] })).not.toContain("frequent words");
+    }
+  });
+
+  it("records the coverage of the chosen content in the trace", async () => {
+    const { store, calls } = memoryStore({ pools: { it: [content("it", 1)], es: [content("es", 1, { summary: teaser })] } });
+    const lists = { it: buildRanks("it", ["il", "la"]), es: frequency };
+    await generateMission({
+      userId: "u1",
+      date: "2026-10-13",
+      store,
+      generator: aiGenerator(),
+      now: () => NOW,
+      loadFrequency: async (language) => lists[language as "it" | "es"],
+    });
+    const { coverage } = calls.completed[0].meta;
+    // Italian: "Titre it 1. Résumé" is under 8 words, so not measurable. Spanish: 17 words counted.
+    expect(coverage).toEqual([
+      { language: "it", contentId: "it-1", top1000: null, top2000: null },
+      { language: "es", contentId: "es-1", top1000: expect.any(Number), top2000: expect.any(Number) },
+    ]);
+    expect(coverage![1].top1000).toBeGreaterThan(0.4);
+  });
+
+  it("still writes the mission when a frequency list cannot be read", async () => {
+    const { store, calls } = memoryStore();
+    const logs: string[] = [];
+    const outcome = await generateMission({
+      userId: "u1",
+      date: "2026-10-13",
+      store,
+      generator: aiGenerator(),
+      now: () => NOW,
+      log: (m) => logs.push(m),
+      loadFrequency: async () => {
+        throw new Error("missing");
+      },
+    });
+    expect(outcome).toMatchObject({ status: "ready" });
+    expect(calls.completed[0].meta.coverage).toEqual([]);
+    expect(logs.some((m) => m.includes("no frequency list"))).toBe(true);
   });
 });

@@ -87,3 +87,26 @@ describe("buildUserMessage", () => {
     expect(message).toContain("interests for this language (French labels): aucun en particulier");
   });
 });
+
+describe("frequent words of the teaser", () => {
+  const withWords = { ...candidate, sourceKey: "secret-key", frequentWords: ["casa", "grande"] };
+
+  it("prints them when the candidate has some", () => {
+    const message = buildUserMessage({ date: "2026-10-26", sessions: [{ ...session("it", "general"), level: "A1", candidates: [withWords] }] });
+    expect(message).toContain("frequent words of the teaser: casa, grande");
+    expect(SYSTEM_PROMPT).toContain('lists "frequent words"');
+  });
+
+  it("prints nothing when there are none", () => {
+    for (const frequentWords of [undefined, []]) {
+      const message = buildUserMessage({ date: "2026-10-26", sessions: [{ ...session("it", "general"), candidates: [{ ...candidate, frequentWords }] }] });
+      expect(message).not.toContain("frequent words");
+    }
+  });
+
+  it("never sends the id or the source key of a candidate", () => {
+    const message = buildUserMessage({ date: "2026-10-26", sessions: [{ ...session("it", "general"), candidates: [withWords] }] });
+    expect(message).not.toContain("secret-key");
+    expect(message).not.toContain(candidate.id);
+  });
+});

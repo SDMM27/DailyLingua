@@ -32,7 +32,7 @@ export function createSupabaseMissionStore(
           .from("contents")
           .select(
             `id, content_type, title, summary, difficulty, duration_minutes, categories, published_at,
-             sources!inner ( name )`,
+             sources!inner ( name, key )`,
           )
           .eq("language", language)
           .neq("url_status", "broken")
@@ -63,6 +63,7 @@ export function createSupabaseMissionStore(
           title: row.title,
           summary: row.summary,
           sourceName: row.sources.name,
+          sourceKey: row.sources.key,
           difficulty: row.difficulty,
           durationMinutes: row.duration_minutes,
           categories: row.categories,

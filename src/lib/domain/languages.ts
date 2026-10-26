@@ -43,6 +43,11 @@ export interface LanguageInfo {
    */
   optionalVowelMarks?: boolean;
   /**
+   * Common nouns are capitalised (German): a capital in mid-sentence does not mark a proper name,
+   * so the word-frequency measure keeps those words.
+   */
+  capitalizedCommonNouns?: boolean;
+  /**
    * Only voices of these regions read the language aloud, when a region of the same code speaks
    * another variety (a "zh-HK" voice speaks Cantonese, not Mandarin). Absent: any region.
    */
@@ -58,7 +63,7 @@ export const LANGUAGE_REGISTRY = {
   ru: { code: "ru", nameFr: "Russe", nativeName: "Русский", greeting: "Доброе утро", dir: "ltr", markStress: true, accent: "indigo" },
   it: { code: "it", nameFr: "Italien", nativeName: "Italiano", greeting: "Buongiorno", dir: "ltr", accent: "terracotta" },
   es: { code: "es", nameFr: "Espagnol", nativeName: "Español", greeting: "Buenos días", dir: "ltr", accent: "ochre" },
-  de: { code: "de", nameFr: "Allemand", nativeName: "Deutsch", greeting: "Guten Morgen", dir: "ltr", accent: "teal" },
+  de: { code: "de", nameFr: "Allemand", nativeName: "Deutsch", greeting: "Guten Morgen", dir: "ltr", capitalizedCommonNouns: true, accent: "teal" },
   en: { code: "en", nameFr: "Anglais", nativeName: "English", greeting: "Good morning", dir: "ltr", accent: "plum" },
   pt: { code: "pt", nameFr: "Portugais", nativeName: "Português", greeting: "Bom dia", dir: "ltr", accent: "olive" },
   nl: { code: "nl", nameFr: "Néerlandais", nativeName: "Nederlands", greeting: "Goedemorgen", dir: "ltr", accent: "azure" },

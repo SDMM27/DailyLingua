@@ -1,0 +1,54 @@
+Word-frequency lists of Daily Lingua (src/lib/frequency/data/<code>.json)
+=========================================================================
+
+Each JSON file is a list of the 5000 most frequent word forms of one language, most frequent
+first, extracted by scripts/frequency/build.py from the data of wordfreq (version 3.1.1).
+
+These lists are derived from wordfreq's data and are therefore distributed under the Creative
+Commons Attribution-ShareAlike 4.0 International licence (CC BY-SA 4.0):
+https://creativecommons.org/licenses/by-sa/4.0/
+
+This licence applies to the lists in this folder only. It does not apply to the code of Daily
+Lingua. Changes made to the original data: only the 5000 most frequent forms of each language
+are kept, forms are lowercased, and numbers and punctuation are removed.
+
+Attributions
+------------
+
+wordfreq, by Robyn Speer (https://github.com/rspeer/wordfreq). wordfreq is Apache-2.0 code
+that ships data files redistributable under CC BY-SA 4.0. The data come from Exquisite Corpus
+(Luminoso), which combines, depending on the language:
+
+- Wikipedia, the free encyclopedia (https://www.wikipedia.org), CC BY-SA.
+- OPUS OpenSubtitles 2018 (https://opus.nlpl.eu/OpenSubtitles.php), from the OpenSubtitles
+  project (https://www.opensubtitles.org/), used with attribution to OpenSubtitles.
+- SUBTLEX word lists (SUBTLEX-US, SUBTLEX-UK, SUBTLEX-CH, SUBTLEX-DE, SUBTLEX-NL), created by
+  Marc Brysbaert et al. and freely available at https://crr.ugent.be/programs-data/subtitle-frequencies.
+- Google Books Ngrams and Syntactic Ngrams (https://books.google.com/ngrams): acknowledgement
+  of Google Books Ngram Viewer as the source.
+- NewsCrawl 2014 and Global Voices (news).
+- OSCAR (web text), the Leeds Internet Corpus (University of Leeds, Centre for Translation
+  Studies) and ParaCrawl (https://paracrawl.eu), the latter two under Creative Commons licences.
+- Word statistics collected from Twitter and Reddit (no content is republished).
+- For Chinese, the word list that comes with the Jieba word segmenter.
+
+References
+----------
+
+- Robyn Speer. (2022). rspeer/wordfreq: v3.0 (v3.0.2). Zenodo. https://doi.org/10.5281/zenodo.7199437
+- Brysbaert, M. & New, B. (2009). Moving beyond Kucera and Francis. Behavior Research Methods, 41(4), 977-990.
+- Brysbaert, M., Buchmeier, M., Conrad, M., Jacobs, A.M., Bolte, J., & Bohl, A. (2011). The word
+  frequency effect: A review of recent developments and implications for the choice of
+  frequency estimates in German. Experimental Psychology, 58, 412-424.
+- Cai, Q., & Brysbaert, M. (2010). SUBTLEX-CH: Chinese word and character frequencies based on
+  film subtitles. PLoS One, 5(6), e10729.
+- Keuleers, E., Brysbaert, M. & New, B. (2010). SUBTLEX-NL: A new frequency measure for Dutch
+  words based on film subtitles. Behavior Research Methods, 42(3), 643-650.
+- van Heuven, W. J., Mandera, P., Keuleers, E., & Brysbaert, M. (2014). SUBTLEX-UK: A new and
+  improved word frequency database for British English. The Quarterly Journal of Experimental
+  Psychology, 67(6), 1176-1190.
+- Lison, P. and Tiedemann, J. (2016). OpenSubtitles2016: Extracting Large Parallel Corpora from
+  Movie and TV Subtitles. LREC 2016.
+- Ortiz Suarez, P. J., Sagot, B., and Romary, L. (2019). Asynchronous pipelines for processing
+  huge corpora on medium to low resource infrastructures. CMLC-7.
+- ParaCrawl (2018). Provision of Web-Scale Parallel Corpora for Official European Languages.

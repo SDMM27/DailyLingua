@@ -1,6 +1,6 @@
 # Plan — grammaire, alphabets, révision du vocabulaire, parcours par niveau
 
-Statut : **H1 (grammaire pilote) et I1 (cyrillique : russe, ukrainien, avec le test de lecture) sont faits**, en attente de relecture native ; le reste est une proposition. H2, H3 (grammaire des 19 langues), I2 à I5, J1, J2, J3 et K1 sont implémentés depuis. Date : 2026-10-21, mis à jour le 2026-10-26 (J3). Ce plan complète [product-features.md](product-features.md) (phases A à G) sans le remplacer. Les phases ci-dessous portent les lettres H à K pour ne pas se confondre avec les précédentes.
+Statut : **H1 (grammaire pilote) et I1 (cyrillique : russe, ukrainien, avec le test de lecture) sont faits**, en attente de relecture native ; le reste est une proposition. H2, H3 (grammaire des 19 langues), I2 à I5, J1, J2, J3, K1 et K2 sont implémentés depuis. Date : 2026-10-21, mis à jour le 2026-10-26 (J3, K2). Ce plan complète [product-features.md](product-features.md) (phases A à G) sans le remplacer. Les phases ci-dessous portent les lettres H à K pour ne pas se confondre avec les précédentes.
 
 ## 1. Constat
 
@@ -187,7 +187,23 @@ Pas une phase de développement isolé. C'est un fichier de configuration qui in
 - La table change ce qui est mis en avant, pas ce qui existe : chaque module reste accessible à tous les niveaux, et une révision due s'affiche toujours.
 - Avec plusieurs langues, l'ordre des cartes suit l'étape de la première langue (la langue principale). Les invitations se décident langue par langue : l'alphabet pour chaque langue en `beginner` (même règle qu'avant, désormais portée par la table), la grammaire si une langue avec cours est à une étape qui l'invite. En C1–C2, la grammaire n'apparaît que pour les fiches à revoir.
 - La mission, l'invitation au test de niveau et les bannières restent en tête ; la carte de la semaine passe après les modules.
-- **Reste à faire (K2)** : le contenu proposé en premier selon l'étape (choix des sources de la mission), une fois la décision 2 de la section 5 (« À prendre ») prise pour le vocabulaire par fréquence.
+- K2 : le contenu proposé en premier selon l'étape, voir ci-dessous.
+
+**K2 (implémenté)** : contenus de la mission choisis selon l'étape, avec la fréquence des mots (décision 4 de la section 5). Aujourd'hui, `rankCandidates` (`src/lib/generation/select-contents.ts`) classe surtout par niveau, et ce niveau est celui de la source (« typiquement B2 »), pas celui du texte. Un débutant reçoit donc le contenu le moins difficile parmi des sources toutes trop dures. Décisions de conception :
+
+1. **Données.** Un script (`scripts/frequency/build.py`, lancé à la main, jamais au build ni en CI) tire de wordfreq les 5 000 formes les plus fréquentes de chaque langue, en minuscules, sans nombres ni ponctuation. Il les écrit dans `src/lib/frequency/data/<code>.json` (une liste ordonnée, 42 à 82 Ko par langue), avec un fichier `LICENSE` CC BY-SA 4.0 et les attributions dans ce dossier. Les fichiers sont versionnés. La normalisation fine (`normalizeWord` : celle des réponses tapées, `normalizeGrammarAnswer`, plus le sigma final grec écrit σ comme le fait wordfreq) est faite côté TypeScript au chargement (`src/lib/frequency/index.ts`, qui garde les rangs en cache), avec la fonction qui normalise aussi le texte mesuré : les deux côtés se correspondent donc toujours. Le module n'est importé que par la génération (serveur et scripts), jamais par un composant client.
+2. **Mesure, pure dans le domaine** (`src/lib/domain/frequency.ts`) : `lexicalCoverage(language, text, ranks, top)` (les rangs sont injectés : le domaine n'importe pas les listes) donne la part des mots du texte qui sont parmi les `top` formes les plus fréquentes. Les mots sont découpés par `Intl.Segmenter` (granularité `word`), qui découpe aussi le chinois et le japonais. Sous 8 mots, la mesure est `null` (texte trop court pour conclure). Les nombres et les noms propres repérés par la majuscule en milieu de phrase sont ignorés (pas de majuscules en arabe, chinois, japonais, coréen : rien n'y est ignoré ; l'allemand, qui met une majuscule à tous les noms, n'ignore rien non plus, d'où l'option `capitalizedCommonNouns` du registre). Une élision (« l'amico ») est cherchée entière, puis par ce qui suit l'apostrophe.
+3. **Ce qui est mesuré** : le titre et l'accroche, seul texte stocké. C'est court, donc la mesure est grossière ; elle départage des contenus de même niveau de source, elle ne remplace pas ce niveau.
+4. **Classement**, seulement aux étapes `beginner` et `basics` (A1–A2) :
+   - une pénalité de 0 à 6 points selon l'écart à la couverture visée : 90 % des mots dans les 1 000 premiers pour A1, dans les 2 000 premiers pour A2. Elle reste sous l'écart d'un niveau CECR (10 points), qui garde la priorité ;
+   - un bonus de 3 points pour les sources faites pour les apprenants : expliquées en français ou en anglais (`instructionLanguage`) ou jeunesse (`audience: "children"`). Le classement reçoit ces traits à côté du candidat ; ils ne sont pas envoyés au modèle (`sourceKey` du candidat, jamais écrit dans le prompt). Pénalité et bonus sont dans `rankCandidates` ; une accroche trop courte pour être mesurée reçoit la moitié de la pénalité maximale (3 points). Les deux termes ensemble s'étalent sur 9 points (de -3 à +6), sous l'écart d'un niveau CECR : le niveau garde la priorité sur eux (la fraîcheur, jusqu'à 14 points, peut toujours le renverser, comme avant K2).
+   - De B1 à C2, rien ne change.
+5. **Rédaction** : pour A1–A2, le prompt demande que les expressions « À retenir » soient prises de préférence parmi les mots fréquents. Il reçoit, pour chaque candidat retenu, les mots de l'accroche qui sont dans les 2 000 premiers (10 au plus, `frequentWords` du candidat, version du prompt `2026-10-26.1`). Le modèle reste libre ; aucune expression n'est rejetée sur ce critère.
+6. **Suivi** : la couverture du contenu choisi est ajoutée à la trace de génération (`generation_meta`), pour vérifier sur de vraies missions que les seuils de 90 % sont réalistes, langue par langue. Les seuils sont réglés dans une table par langue (`COVERAGE_TARGETS`, `src/lib/domain/frequency.ts`), d'abord identiques. La trace porte `coverage` : par session, la part des 1 000 et des 2 000 premiers (`null` si trop court), absente des anciennes missions ; c'est du jsonb, sans migration : le découpage du japonais par `Intl.Segmenter` ne suit pas exactement celui de wordfreq (MeCab), sa couverture mesurée sera plus basse.
+7. **Attribution** : une section « Données utilisées » sur `/confidentialite` cite wordfreq (Robyn Speer) et ses sources (SUBTLEX, OpenSubtitles, Google Books Ngrams, Wikipédia…), avec la licence CC BY-SA 4.0 et le lien vers la liste tirée.
+8. **Hors périmètre de K2** : un badge « mot fréquent » dans la liste de vocabulaire, et la même mesure pour l'onglet Lire. À reprendre après les premières données du point 6.
+
+Tests (`src/lib/domain/frequency.test.ts`, `select-contents.test.ts`, `prompt.test.ts`, `generate-mission.test.ts`) : `lexicalCoverage` (découpage de chaque écriture, texte court, majuscules) ; `rankCandidates` (un contenu plus couvert passe devant à même niveau de source pour A1–A2, jamais devant un contenu d'un meilleur niveau ; aucun changement en B1+) ; le prompt (les mots fréquents n'apparaissent que pour A1–A2).
 
 ## 4. Ordre proposé
 
@@ -197,7 +213,7 @@ Une phase validée avant la suivante, comme pour le reste du projet.
 2. **I — Alphabets** (cyrillique d'abord). Débloque les débutants en russe, ukrainien, puis les autres écritures. *I1 (cyrillique) fait, I2 à I5 (hangeul, grec, kana, arabe) implémentés : toutes les écritures prévues sont couvertes, en attente de relecture native.*
 3. **J — Modes de révision et mesure de rétention.** Commencer la mesure tôt : elle prend des semaines à produire des données. *J1 (modes), J2 (mesure) et J3 (gamification : série de jours seule) implémentés.*
 4. **H2 — Grammaire suggérée par les erreurs.** Dépend de D (déjà fait) et de H1. *Implémenté ; depuis H3, les suggestions couvrent les 19 langues.*
-5. **K — Parcours par niveau**, appliqué progressivement. *K1 (table niveau → modules, accueil) implémenté.*
+5. **K — Parcours par niveau**, appliqué progressivement. *K1 (table niveau → modules, accueil) implémenté ; K2 (contenus selon l'étape, fréquence des mots) implémenté.*
 
 Phase G (écrire puis dire) est faite ; elle n'avait pas de dépendance avec ce plan.
 
@@ -210,11 +226,22 @@ Prises :
 1. **Grammaire** : leçons curées, relues avant publication (H1).
 2. **Langues pilotes de la grammaire** : russe et italien (H1).
 3. **Gamification** : série de jours seule, désactivable (J3).
+4. **Fréquence des mots** : [wordfreq](https://github.com/rspeer/wordfreq), CC BY-SA 4.0 (2026-10-26). Recherche des licences après la liste « À prendre ».
 
 À prendre :
 
 1. **Chinois** : les hanzis entrent-ils dans le périmètre, ou seulement plus tard ?
-2. **Fréquence des mots** pour le niveau A1–A2 : une liste de fréquence doit avoir une licence compatible avec un usage commercial. À vérifier avant de l'utiliser.
+
+Recherche des licences pour la décision 4 (2026-10-26) : une liste de fréquence doit avoir une licence compatible avec un usage commercial.
+
+| Source | Licence des données | Usage commercial | Langues de l'app couvertes |
+| --- | --- | --- | --- |
+| [wordfreq](https://github.com/rspeer/wordfreq) (sous-titres, Wikipédia, livres, web…) | CC BY-SA 4.0, attributions par source (SUBTLEX, OpenSubtitles, Google Books) | Oui | 19 sur 19 |
+| [FrequencyWords](https://github.com/hermitdave/FrequencyWords) (OpenSubtitles 2018) | CC BY-SA 4.0 | Oui | 19 sur 19 |
+| [Leipzig Corpora Collection](https://wortschatz.uni-leipzig.de/en/usage) | CC BY affiché, mais usage commercial interdit sans accord écrit | Non, sauf accord | — |
+| Listes Kelly (lemmes classés par niveau CECR) | CC BY-SA 3.0 pour le suédois ; non commerciale pour les autres d'après Wiktionary, non confirmé | Suédois seulement | 1 |
+
+Recommandation retenue : wordfreq. Il couvre les 19 langues, mélange plusieurs sources (moins biaisé vers l'oral des sous-titres) et sa licence permet un usage commercial. Conditions : citer wordfreq et ses sources dans l'app (page `/confidentialite` ou une page « Sources »), et publier sous CC BY-SA 4.0 la liste qu'on en tire ; le code de l'app n'est pas concerné. Limites : les données s'arrêtent vers 2021 (projet en fin de vie), ce sont des formes et pas des lemmes (« parle » et « parlons » sont deux entrées), et elles contiennent des noms propres et des grossièretés. Pour K2, des formes suffisent : la part d'un texte couverte par les 2 000 à 3 000 formes les plus fréquentes est une mesure de lisibilité classique. Ce n'est pas un avis juridique.
 
 ## 6. Risques
 

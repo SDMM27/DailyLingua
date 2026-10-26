@@ -11,7 +11,7 @@ import { productionTargetLength } from "./plan-activities";
  * that varies goes in the user message. Feed titles and teasers come from third-party publishers:
  * they are wrapped in <content> tags and the model is told to treat them as data only.
  */
-export const PROMPT_VERSION = "2026-10-21.1";
+export const PROMPT_VERSION = "2026-10-26.1";
 
 const L = GENERATION_LIMITS;
 
@@ -50,6 +50,7 @@ For each language, return one session:
 
 3. expressions (${L.expressions.min} to ${L.expressions.max}): useful words or phrases for this content, taken from the title or the teaser when possible, otherwise expressions the learner is likely to meet in it or need to talk about its topic.
    - Choose them for the learner's target level: not words they surely know already.
+   - When a content lists "frequent words" (given for beginners, A1–A2), prefer to take the expressions from them: the most useful words to learn first. You may still choose others; this is a preference, not a rule.
    - text: dictionary form (for Russian, give the imperfective/perfective pair or the case it governs in note when useful).
    - Stress: ${STRESS_LANGUAGES}. For these languages, write the stress of every word of "text" that has two or more syllables, as a combining acute accent (U+0301) right after the stressed vowel, e.g. "сло́во", "в пе́рвую о́чередь".Do not put a mark on "ё" (always stressed) nor on one-syllable words. For a phrase, mark each word. Mark only the stress you are sure of; a missing mark is better than a wrong one. Leave "example" without marks.
    - translation_fr. example: a natural sentence written by you, not copied from the teaser. note_fr: short usage note in French (register, government, false friend...) or an empty string.
@@ -91,10 +92,11 @@ function describeSession(session: SessionRequest): string {
   const candidates = session.candidates
     .map((c, index) => {
       const categories = c.categories.length > 0 ? `\ncategories: ${escapeData(c.categories.join(", "))}` : "";
+      const frequent = c.frequentWords?.length ? `\nfrequent words of the teaser: ${escapeData(c.frequentWords.join(", "))}` : "";
       return `<content index="${index}">
 type: ${c.type} · outlet: ${escapeData(c.sourceName)} · typical level: ${c.difficulty} (${levelRelation(c.difficulty, session.level)} the learner) · about ${c.durationMinutes} min${categories}
 title: ${escapeData(c.title)}
-teaser: ${escapeData(c.summary)}
+teaser: ${escapeData(c.summary)}${frequent}
 </content>`;
     })
     .join("\n");
