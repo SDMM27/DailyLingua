@@ -7,6 +7,9 @@
 alter table public.profiles
   add column show_streak boolean not null default true;
 
+-- save_preferences runs as the caller, who may only update the columns granted to it.
+grant update (show_streak) on public.profiles to authenticated;
+
 drop function public.save_preferences(integer, text[], text[], text, time, text, jsonb);
 
 create function public.save_preferences(

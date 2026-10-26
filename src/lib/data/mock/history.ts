@@ -2,9 +2,12 @@ import { addDays } from "@/lib/domain/dates";
 import type { DateKey } from "@/lib/schemas/common";
 import type { MissionHistoryEntry } from "@/lib/schemas/mission";
 
-/** Days ago on which a session took place (today excluded: today's mission is pending). */
+/**
+ * Days ago on which the user studied (today excluded: today's mission is pending). 10 and 25 only
+ * have vocabulary reviews (seed.sql), which count as study days too.
+ */
 const STUDIED_DAYS_AGO = [
-  1, 2, 3, 4, 5, 7, 8, 9, 11, 12, 13, 14, 16, 17, 19, 20, 21, 22, 24, 26, 27, 28, 30, 31,
+  1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 19, 20, 21, 22, 24, 25, 26, 27, 28, 30, 31,
 ];
 
 const PAST_SESSIONS: MissionHistoryEntry["sessions"][] = [
