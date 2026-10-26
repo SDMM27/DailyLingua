@@ -80,6 +80,23 @@ describe("PreferencesForm", () => {
     expect(await screen.findByText("Préférences enregistrées.")).toBeTruthy();
   });
 
+  it("saves the day streak preference, shown by default", async () => {
+    savePreferences.mockResolvedValue({ ok: true, data: undefined });
+    const user = userEvent.setup();
+    render(<PreferencesForm initial={MOCK_PREFERENCES} languages={LANGUAGE_CODES} persist />);
+    const checkbox = screen.getByLabelText("Afficher ma série de jours") as HTMLInputElement;
+    expect(checkbox.checked).toBe(true);
+    expect(screen.getByText(/Aucun point, aucun classement/)).toBeTruthy();
+    await user.click(checkbox);
+    await user.click(screen.getByRole("button", { name: "Enregistrer" }));
+    expect(savePreferences).toHaveBeenCalledWith(expect.objectContaining({ showStreak: false }));
+  });
+
+  it("does not offer the streak choice on first run", () => {
+    render(<PreferencesForm initial={ONBOARDING_DEFAULTS} languages={LANGUAGE_CODES} mode="onboarding" persist />);
+    expect(screen.queryByLabelText("Afficher ma série de jours")).toBeNull();
+  });
+
   it("saves the chosen usage of a language", async () => {
     savePreferences.mockResolvedValue({ ok: true, data: undefined });
     const user = userEvent.setup();

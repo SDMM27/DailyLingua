@@ -56,5 +56,7 @@ export const preferencesSchema = z.object({
   /** HH:mm, local time in `timeZone`. */
   generationTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Format HH:mm attendu"),
   timeZone: z.string().min(1).refine(isValidTimeZone, "Fuseau horaire inconnu"),
+  /** Day streak shown on the home page; missing = shown, so data from before the field still parses. */
+  showStreak: z.boolean().default(true),
 });
 export type Preferences = z.infer<typeof preferencesSchema>;

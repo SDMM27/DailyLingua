@@ -24,6 +24,7 @@ const preferences: Preferences = {
   difficulty: "matched",
   generationTime: "07:00",
   timeZone: "Europe/Paris",
+  showStreak: true,
 };
 
 const content = (language: Language, n: number): CandidateContent => ({

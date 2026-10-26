@@ -1,6 +1,6 @@
 # Plan — grammaire, alphabets, révision du vocabulaire, parcours par niveau
 
-Statut : **H1 (grammaire pilote) et I1 (cyrillique : russe, ukrainien, avec le test de lecture) sont faits**, en attente de relecture native ; le reste est une proposition. H2, H3 (grammaire des 19 langues), I2 à I5, J1, J2 et K1 sont implémentés depuis. Date : 2026-10-21, mis à jour le 2026-10-26. Ce plan complète [product-features.md](product-features.md) (phases A à G) sans le remplacer. Les phases ci-dessous portent les lettres H à K pour ne pas se confondre avec les précédentes.
+Statut : **H1 (grammaire pilote) et I1 (cyrillique : russe, ukrainien, avec le test de lecture) sont faits**, en attente de relecture native ; le reste est une proposition. H2, H3 (grammaire des 19 langues), I2 à I5, J1, J2, J3 et K1 sont implémentés depuis. Date : 2026-10-21, mis à jour le 2026-10-26 (J3). Ce plan complète [product-features.md](product-features.md) (phases A à G) sans le remplacer. Les phases ci-dessous portent les lettres H à K pour ne pas se confondre avec les précédentes.
 
 ## 1. Constat
 
@@ -150,9 +150,9 @@ Ordre des écritures : cyrillique (russe, ukrainien) → coréen → grec → ja
 
 1. **Modes de rappel** en plus de la reconnaissance : écrire la traduction, écouter et taper, phrase à trou dans une vraie phrase de contenu.
 2. **Mesure** : une fois par semaine, une révision « surprise » de 10 mots appris il y a 7 jours et jamais revus. Le taux de rappel par mode est enregistré. C'est la seule façon de savoir si le système fonctionne pour cet utilisateur.
-3. **Gamification légère** (à décider, voir section 5) : série de jours, sans points ni ligues. Activable et désactivable.
+3. **Gamification légère** (décidée, voir J3) : série de jours, sans points ni ligues. Activable et désactivable.
 
-**J1 et J2 (implémentés)** : modes de rappel et mesure de la rétention (`src/lib/domain/review-modes.ts`, `/vocabulaire`). J3 attend la décision sur la gamification. Décisions prises :
+**J1 et J2 (implémentés)** : modes de rappel et mesure de la rétention (`src/lib/domain/review-modes.ts`, `/vocabulaire`). La gamification est traitée en J3 ci-dessous. Décisions prises :
 
 - Cinq modes : `flip` (la carte actuelle, auto-évaluée), `translate` (le mot → taper la traduction), `produce` (la traduction → taper le mot), `listen` (écouter le mot → le taper) et `cloze` (la phrase d’exemple avec un trou → taper le mot).
 - Par défaut, la séance est « mélangée » : le mode dépend de la boîte du mot. Boîte 0 : `flip` ; boîte 1 : `flip` ou `translate` ; boîtes 2 et 3 : `translate`, `listen` ou `cloze` ; à partir de la boîte 4 : `produce`, `listen` ou `cloze`. Le tirage utilise la graine `mot:jour`, donc le mode d’un mot ne change pas dans la journée. On peut aussi choisir un seul mode pour toute la séance.
@@ -160,6 +160,13 @@ Ordre des écritures : cyrillique (russe, ukrainien) → coréen → grec → ja
 - Les réponses tapées sont corrigées automatiquement, avec la même normalisation que la grammaire. Pour la traduction, chaque sens séparé par une virgule est accepté, avec ou sans article. Les notes sont : juste → « Bien », presque (accents seuls, ou une lettre d’écart sur un mot de 5 lettres ou plus) → « Difficile », faux → « À revoir ». L’apprenant peut corriger la note : « J’avais bon » (→ « Bien ») ou « Trop facile » (→ « Facile »).
 - **Mesure** : au lieu d’une révision « surprise », qui dérangerait le calendrier des révisions, la mesure vient du journal `vocabulary_reviews`. Chaque révision y enregistre désormais son mode et le nombre de jours depuis la révision précédente (`mode`, `days_since_last`). La rétention est le taux de mots rappelés (toute note sauf « À revoir ») parmi les révisions faites au moins 7 jours après la précédente, sur les 90 derniers jours, par mode. Ces écarts arrivent naturellement à partir de la boîte 3 (8 jours).
 - Affichage sur `/vocabulaire` : un mode n’apparaît qu’à partir de 10 révisions, et la carte reste indicative tant qu’il y en a moins de 30 en tout. Le mode `flip` est signalé comme auto-évalué, donc moins fiable que les modes tapés.
+
+**J3 (implémenté)** : gamification légère, la série de jours seule (`computeStreak` dans `src/lib/domain/stats.ts`, carte de la semaine sur l’accueil, `/preferences`). Décisions prises :
+
+- Série de jours seule : ni points, ni ligues, ni classement. La série existait déjà sur l’accueil ; J3 en précise le calcul et permet de la masquer.
+- Un jour d’étude est un jour avec au moins une activité de mission terminée **ou** au moins une révision de vocabulaire (`mission_stats` et `vocabulary_reviews`, deux journaux datés par jour calendaire dans le fuseau de l’utilisateur). Réviser ses mots suffit donc à garder la série.
+- La grammaire et l’alphabet ne comptent pas : ils n’ont pas de journal par jour, seulement `last_reviewed_on`, écrasé à chaque révision. Compter ces jours ferait disparaître les jours passés de la série.
+- Affichée par défaut ; désactivable dans `/preferences` (« Afficher ma série de jours », `profiles.show_streak`, `showStreak` dans les préférences). Désactivée, la flamme et le nombre disparaissent de l’accueil ; les sept pastilles de la semaine et les trois chiffres restent.
 
 ### Phase K — Parcours par niveau (transversal)
 
@@ -180,7 +187,7 @@ Pas une phase de développement isolé. C'est un fichier de configuration qui in
 - La table change ce qui est mis en avant, pas ce qui existe : chaque module reste accessible à tous les niveaux, et une révision due s'affiche toujours.
 - Avec plusieurs langues, l'ordre des cartes suit l'étape de la première langue (la langue principale). Les invitations se décident langue par langue : l'alphabet pour chaque langue en `beginner` (même règle qu'avant, désormais portée par la table), la grammaire si une langue avec cours est à une étape qui l'invite. En C1–C2, la grammaire n'apparaît que pour les fiches à revoir.
 - La mission, l'invitation au test de niveau et les bannières restent en tête ; la carte de la semaine passe après les modules.
-- **Reste à faire (K2)** : le contenu proposé en premier selon l'étape (choix des sources de la mission), une fois la décision 3 de la section 5 prise pour le vocabulaire par fréquence.
+- **Reste à faire (K2)** : le contenu proposé en premier selon l'étape (choix des sources de la mission), une fois la décision 2 de la section 5 (« À prendre ») prise pour le vocabulaire par fréquence.
 
 ## 4. Ordre proposé
 
@@ -188,7 +195,7 @@ Une phase validée avant la suivante, comme pour le reste du projet.
 
 1. **H1 — Grammaire pilote** (ru, it, A1–B1). Le plus visible pour le niveau intermédiaire. *Fait.*
 2. **I — Alphabets** (cyrillique d'abord). Débloque les débutants en russe, ukrainien, puis les autres écritures. *I1 (cyrillique) fait, I2 à I5 (hangeul, grec, kana, arabe) implémentés : toutes les écritures prévues sont couvertes, en attente de relecture native.*
-3. **J — Modes de révision et mesure de rétention.** Commencer la mesure tôt : elle prend des semaines à produire des données. *J1 (modes) et J2 (mesure) implémentés ; J3 (gamification) attend la décision 1 de la section 5.*
+3. **J — Modes de révision et mesure de rétention.** Commencer la mesure tôt : elle prend des semaines à produire des données. *J1 (modes), J2 (mesure) et J3 (gamification : série de jours seule) implémentés.*
 4. **H2 — Grammaire suggérée par les erreurs.** Dépend de D (déjà fait) et de H1. *Implémenté ; depuis H3, les suggestions couvrent les 19 langues.*
 5. **K — Parcours par niveau**, appliqué progressivement. *K1 (table niveau → modules, accueil) implémenté.*
 
@@ -202,12 +209,12 @@ Prises :
 
 1. **Grammaire** : leçons curées, relues avant publication (H1).
 2. **Langues pilotes de la grammaire** : russe et italien (H1).
+3. **Gamification** : série de jours seule, désactivable (J3).
 
 À prendre :
 
-1. **Gamification** : série de jours seule (recommandé), ou aussi points et ligues pour une expérimentation ? À trancher avant J.
-2. **Chinois** : les hanzis entrent-ils dans le périmètre, ou seulement plus tard ?
-3. **Fréquence des mots** pour le niveau A1–A2 : une liste de fréquence doit avoir une licence compatible avec un usage commercial. À vérifier avant de l'utiliser.
+1. **Chinois** : les hanzis entrent-ils dans le périmètre, ou seulement plus tard ?
+2. **Fréquence des mots** pour le niveau A1–A2 : une liste de fréquence doit avoir une licence compatible avec un usage commercial. À vérifier avant de l'utiliser.
 
 ## 6. Risques
 

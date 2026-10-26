@@ -361,14 +361,14 @@ isOneToOne: false
                   ]
                 },"profiles": {
                   Row: {
-                    "content_types": (string)[],"created_at": string,"daily_minutes": number,"difficulty": string,"generation_time": string,"id": string,"time_zone": string,"topics": (string)[],"updated_at": string
+                    "content_types": (string)[],"created_at": string,"daily_minutes": number,"difficulty": string,"generation_time": string,"id": string,"show_streak": boolean,"time_zone": string,"topics": (string)[],"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "content_types"?: (string)[],"created_at"?: string,"daily_minutes"?: number,"difficulty"?: string,"generation_time"?: string,"id": string,"time_zone"?: string,"topics"?: (string)[],"updated_at"?: string
+                    "content_types"?: (string)[],"created_at"?: string,"daily_minutes"?: number,"difficulty"?: string,"generation_time"?: string,"id": string,"show_streak"?: boolean,"time_zone"?: string,"topics"?: (string)[],"updated_at"?: string
                   }
                   Update: {
-                    "content_types"?: (string)[],"created_at"?: string,"daily_minutes"?: number,"difficulty"?: string,"generation_time"?: string,"id"?: string,"time_zone"?: string,"topics"?: (string)[],"updated_at"?: string
+                    "content_types"?: (string)[],"created_at"?: string,"daily_minutes"?: number,"difficulty"?: string,"generation_time"?: string,"id"?: string,"show_streak"?: boolean,"time_zone"?: string,"topics"?: (string)[],"updated_at"?: string
                   }
                   Relationships: [
                     
@@ -665,7 +665,7 @@ isOneToOne: false
 { Args: { "p_max_per_day"?: number,"p_session_id": string,"p_stale_after"?: string,"p_user_id": string }; Returns: undefined
                            },
 "save_preferences":
-{ Args: { "p_content_types": (string)[] | null,"p_daily_minutes": number,"p_difficulty": string,"p_generation_time": string,"p_goals": Json,"p_time_zone": string,"p_topics": (string)[] | null }; Returns: undefined
+{ Args: { "p_content_types": (string)[] | null,"p_daily_minutes": number,"p_difficulty": string,"p_generation_time": string,"p_goals": Json,"p_show_streak"?: boolean,"p_time_zone": string,"p_topics": (string)[] | null }; Returns: undefined
                            }
           }
           Enums: {

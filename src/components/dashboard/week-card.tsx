@@ -10,7 +10,7 @@ export interface DashboardStats {
   weekMinutes: number;
 }
 
-export function WeekCard({ days, stats }: { days: DayCell[]; stats: DashboardStats }) {
+export function WeekCard({ days, stats, showStreak = true }: { days: DayCell[]; stats: DashboardStats; showStreak?: boolean }) {
   const items = [
     { label: "jours étudiés", value: stats.daysStudied },
     { label: "mots maîtrisés", value: stats.wordsKnown },
@@ -18,16 +18,18 @@ export function WeekCard({ days, stats }: { days: DayCell[]; stats: DashboardSta
   ];
   return (
     <Card>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="grid size-9 place-items-center rounded-full bg-terracotta-soft text-terracotta">
-            <FlameIcon width={18} height={18} />
-          </span>
-          <div>
-            <p className="font-serif text-2xl leading-none font-semibold">{stats.streak}</p>
-            <p className="mt-0.5 text-xs text-muted">jours d’affilée</p>
+      <div className={`flex items-center ${showStreak ? "justify-between" : "justify-center"}`}>
+        {showStreak && (
+          <div className="flex items-center gap-2">
+            <span className="grid size-9 place-items-center rounded-full bg-terracotta-soft text-terracotta">
+              <FlameIcon width={18} height={18} />
+            </span>
+            <div>
+              <p className="font-serif text-2xl leading-none font-semibold">{stats.streak}</p>
+              <p className="mt-0.5 text-xs text-muted">jours d’affilée</p>
+            </div>
           </div>
-        </div>
+        )}
         <ol className="flex gap-1.5" aria-label="Sept derniers jours">
           {days.map((day) => (
             <li key={day.date} className="flex flex-col items-center gap-1">

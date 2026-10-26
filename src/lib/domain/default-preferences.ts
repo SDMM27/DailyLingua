@@ -17,4 +17,5 @@ export const ONBOARDING_DEFAULTS: Preferences = {
   difficulty: "matched",
   generationTime: "07:00",
   timeZone: DEFAULT_TIME_ZONE,
+  showStreak: true,
 };

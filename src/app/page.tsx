@@ -176,7 +176,7 @@ export default async function DashboardPage() {
 
       {orderedModules}
 
-      <WeekCard days={recentDays(studyDates, today)} stats={stats} />
+      <WeekCard days={recentDays(studyDates, today)} stats={stats} showStreak={preferences.showStreak} />
 
       <nav aria-label="Raccourcis" className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {[

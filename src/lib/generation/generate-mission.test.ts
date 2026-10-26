@@ -25,6 +25,7 @@ const preferences: Preferences = {
   difficulty: "matched",
   generationTime: "07:00",
   timeZone: "Europe/Paris",
+  showStreak: true,
 };
 
 function content(language: Language, n: number, overrides: Partial<CandidateContent> = {}): CandidateContent {
