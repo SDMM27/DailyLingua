@@ -189,7 +189,7 @@ Une phase validée avant la suivante, comme pour le reste du projet.
 1. **H1 — Grammaire pilote** (ru, it, A1–B1). Le plus visible pour le niveau intermédiaire. *Fait.*
 2. **I — Alphabets** (cyrillique d'abord). Débloque les débutants en russe, ukrainien, puis les autres écritures. *I1 (cyrillique) fait, I2 à I5 (hangeul, grec, kana, arabe) implémentés : toutes les écritures prévues sont couvertes, en attente de relecture native.*
 3. **J — Modes de révision et mesure de rétention.** Commencer la mesure tôt : elle prend des semaines à produire des données. *J1 (modes) et J2 (mesure) implémentés ; J3 (gamification) attend la décision 1 de la section 5.*
-4. **H2 — Grammaire suggérée par les erreurs.** Dépend de D (déjà fait) et de H1. *Implémenté pour les langues qui ont un cours (russe, italien).*
+4. **H2 — Grammaire suggérée par les erreurs.** Dépend de D (déjà fait) et de H1. *Implémenté ; depuis H3, les suggestions couvrent les 19 langues.*
 5. **K — Parcours par niveau**, appliqué progressivement. *K1 (table niveau → modules, accueil) implémenté.*
 
 Phase G (écrire puis dire) est faite ; elle n'avait pas de dépendance avec ce plan.
