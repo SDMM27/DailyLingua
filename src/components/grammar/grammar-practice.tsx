@@ -5,6 +5,7 @@ import { deleteGrammarCard, recordGrammarPractice } from "@/app/actions/grammar"
 import { languageStyle } from "@/components/ui/language-style";
 import { Card, Eyebrow, ProgressBar } from "@/components/ui/primitives";
 import { exerciseCorrection, GRAMMAR_PASS_RATIO, isExerciseAnswerCorrect, type GrammarPracticeOutcome } from "@/lib/domain/grammar";
+import { languageInfo } from "@/lib/domain/languages";
 import { relativeDueLabel } from "@/lib/domain/spaced-repetition";
 import type { DateKey, Language } from "@/lib/schemas/common";
 import { GRAMMAR_GAP, type GrammarCard, type GrammarPoint } from "@/lib/schemas/grammar";
@@ -90,6 +91,7 @@ export function GrammarPractice({
   const [finish, setFinish] = useState<Finish | null>(null);
   const [removeError, setRemoveError] = useState<string | null>(null);
   const style = languageStyle(language);
+  const { dir } = languageInfo(language);
 
   const exercise = exercises[index];
   const isLast = index === exercises.length - 1;
@@ -212,12 +214,12 @@ export function GrammarPractice({
         {exercise.type === "transform" ? (
           <>
             <p className="text-[15px] text-ink-soft">{exercise.instruction}</p>
-            <p lang={language} className="mt-2 font-serif text-2xl font-semibold text-balance">
+            <p lang={language} dir={dir} className="mt-2 font-serif text-2xl font-semibold text-balance">
               {exercise.source}
             </p>
           </>
         ) : (
-          <p lang={language} className="font-serif text-2xl font-semibold text-balance">
+          <p lang={language} dir={dir} className="font-serif text-2xl font-semibold text-balance">
             <Prompt text={exercise.prompt} hint={exercise.type === "fill" ? exercise.hint : undefined} />
           </p>
         )}
@@ -241,10 +243,11 @@ export function GrammarPractice({
                   key={option}
                   type="button"
                   lang={language}
+                  dir={dir}
                   aria-pressed={selected}
                   disabled={reveal}
                   onClick={() => setChoice(i)}
-                  className={`min-h-12 rounded-2xl border px-4 py-3 text-left font-serif text-lg ${tone}`}
+                  className={`min-h-12 rounded-2xl border px-4 py-3 text-start font-serif text-lg ${tone}`}
                 >
                   {option}
                 </button>
@@ -257,6 +260,7 @@ export function GrammarPractice({
             <input
               type="text"
               lang={language}
+              dir={dir}
               value={text}
               onChange={(e) => setText(e.target.value)}
               readOnly={checked !== null}
@@ -279,7 +283,7 @@ export function GrammarPractice({
               {!checked && (
                 <p className="text-[15px]">
                   Bonne réponse :{" "}
-                  <span lang={language} className="font-serif font-semibold">
+                  <span lang={language} dir={dir} className="font-serif font-semibold">
                     {exerciseCorrection(exercise)}
                   </span>
                 </p>

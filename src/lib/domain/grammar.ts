@@ -12,13 +12,21 @@ export const GRAMMAR_MASTERED_BOX = 4;
 /** Levels the pilot courses cover; a learner above them gets every point as a reference. */
 export const GRAMMAR_LEVELS: readonly CefrLevel[] = ["A1", "A2", "B1"];
 
+/** Arabic harakat (fathatan to sukun, superscript alef) and tatweel. */
+const ARABIC_VOWEL_MARKS = /[ً-ْٰـ]/g;
+
 /**
- * Compares typed answers whatever the spacing, case, final punctuation, typographic apostrophe or
- * (for languages that mark stress, i.e. Cyrillic ones) stress mark and ё/е.
+ * Compares typed answers whatever the spacing, case (with the language's own rules: Turkish ı/İ),
+ * final punctuation and typographic apostrophe; also, depending on the language, whatever the
+ * stress mark and ё/е (Cyrillic), the spaces (Chinese, Japanese) or the short vowels (Arabic).
  */
 export function normalizeGrammarAnswer(language: Language, text: string): string {
-  const value = normalizeTypedText(text);
-  return languageInfo(language).markStress ? stripStress(value).replaceAll("ё", "е").normalize("NFC") : value;
+  const info = languageInfo(language);
+  let value = normalizeTypedText(text.toLocaleLowerCase(language));
+  if (info.markStress) value = stripStress(value).replaceAll("ё", "е").normalize("NFC");
+  if (info.optionalVowelMarks) value = value.replace(ARABIC_VOWEL_MARKS, "");
+  if (info.unspaced) value = value.replace(/\s/g, "");
+  return value;
 }
 
 /** The language-independent part of `normalizeGrammarAnswer`: also used for answers in French. */
@@ -29,7 +37,9 @@ export function normalizeTypedText(text: string): string {
     .trim()
     .toLowerCase()
     .replace(/\s+/g, " ")
-    .replace(/(?:\s*[.!?…])+$/u, "")
+    // Final punctuation, Greek question mark (;), CJK and Arabic marks included; Spanish ¿ ¡ in front.
+    .replace(/(?:\s*[.!?…;。！？؟])+$/u, "")
+    .replace(/^[¿¡]+\s*/u, "")
     .trim();
 }
 
