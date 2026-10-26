@@ -1,49 +1,54 @@
-import type { CefrLevel } from "@/lib/schemas/common";
+import type { CefrLevel, Language } from "@/lib/schemas/common";
+import { arCurriculum } from "./curricula/ar";
+import { csCurriculum } from "./curricula/cs";
+import { deCurriculum } from "./curricula/de";
+import { elCurriculum } from "./curricula/el";
+import { enCurriculum } from "./curricula/en";
+import { esCurriculum } from "./curricula/es";
+import { idCurriculum } from "./curricula/id";
+import { itCurriculum } from "./curricula/it";
+import { jaCurriculum } from "./curricula/ja";
+import { koCurriculum } from "./curricula/ko";
+import { nlCurriculum } from "./curricula/nl";
+import { plCurriculum } from "./curricula/pl";
+import { ptCurriculum } from "./curricula/pt";
+import { roCurriculum } from "./curricula/ro";
+import { ruCurriculum } from "./curricula/ru";
+import { svCurriculum } from "./curricula/sv";
+import { trCurriculum } from "./curricula/tr";
+import { ukCurriculum } from "./curricula/uk";
+import { zhCurriculum } from "./curricula/zh";
+
+export type CurriculumEntry = { id: string; level: CefrLevel; topic: string };
+
+/** One list per language, in `curricula/<code>.ts`; an empty list = no course yet. */
+const ALL_CURRICULA: Record<Language, readonly CurriculumEntry[]> = {
+  ru: ruCurriculum,
+  it: itCurriculum,
+  es: esCurriculum,
+  de: deCurriculum,
+  en: enCurriculum,
+  pt: ptCurriculum,
+  nl: nlCurriculum,
+  sv: svCurriculum,
+  pl: plCurriculum,
+  cs: csCurriculum,
+  uk: ukCurriculum,
+  ro: roCurriculum,
+  el: elCurriculum,
+  tr: trCurriculum,
+  ar: arCurriculum,
+  zh: zhCurriculum,
+  ja: jaCurriculum,
+  ko: koCurriculum,
+  id: idCurriculum,
+};
 
 /**
- * The points each course must contain, in teaching order (checked by `checkGrammarCourse`).
- * Pilot (phase H1): Russian and Italian, A1 to B1, six points per level. Ids are stable: cards
- * point to them, so a point is never renamed, only added.
+ * The points each course must contain, in teaching order (checked by `checkGrammarCourse`), for
+ * the languages that have a course: A1 to B1, six points per level. Ids are stable: cards point to
+ * them, so a point is never renamed, only added.
  */
-export const GRAMMAR_CURRICULUM: Partial<Record<string, readonly { id: string; level: CefrLevel; topic: string }[]>> = {
-  ru: [
-    { id: "ru-a1-gender", level: "A1", topic: "Genre des noms (masculin, féminin, neutre) et он/она/оно" },
-    { id: "ru-a1-present-first", level: "A1", topic: "Présent, 1re conjugaison (читать, делать, жить)" },
-    { id: "ru-a1-present-second", level: "A1", topic: "Présent, 2e conjugaison (говорить, смотреть) et alternances (люблю)" },
-    { id: "ru-a1-plural", level: "A1", topic: "Pluriel des noms au nominatif (règle des 7 lettres)" },
-    { id: "ru-a1-prepositional", level: "A1", topic: "Prépositionnel du lieu : в / на + -е (où ?)" },
-    { id: "ru-a1-possessives", level: "A1", topic: "Possessifs мой, твой, наш, ваш, его, её, их" },
-    { id: "ru-a2-accusative", level: "A2", topic: "Accusatif : objet direct, animé et inanimé ; в / на + accusatif (où vas-tu ?)" },
-    { id: "ru-a2-genitive", level: "A2", topic: "Génitif : у меня есть / нет, absence, possession, после de quantité (много, мало)" },
-    { id: "ru-a2-past", level: "A2", topic: "Passé : -л, -ла, -ло, -ли, accord en genre" },
-    { id: "ru-a2-motion", level: "A2", topic: "Verbes de mouvement : идти / ходить, ехать / ездить" },
-    { id: "ru-a2-dative", level: "A2", topic: "Datif : мне нравится, l'âge (мне 20 лет), к + datif" },
-    { id: "ru-a2-instrumental", level: "A2", topic: "Instrumental : с + instrumental, работать / быть / стать кем" },
-    { id: "ru-b1-aspect", level: "B1", topic: "Aspect perfectif et imperfectif : processus, répétition, résultat" },
-    { id: "ru-b1-future", level: "B1", topic: "Futur composé (буду + imperfectif) et futur simple (perfectif)" },
-    { id: "ru-b1-imperative", level: "B1", topic: "Impératif : formation et choix de l'aspect" },
-    { id: "ru-b1-numbers", level: "B1", topic: "Nombres et cas : 1 / 2-4 / 5+ (один стол, два стола, пять столов)" },
-    { id: "ru-b1-relative", level: "B1", topic: "Pronom relatif который : genre, nombre, cas" },
-    { id: "ru-b1-prefixed-motion", level: "B1", topic: "Verbes de mouvement préfixés : при-, у-, в-, вы-, пере-, за-" },
-  ],
-  it: [
-    { id: "it-a1-articles", level: "A1", topic: "Articles définis et indéfinis (il, lo, la, l', un, uno, una, un')" },
-    { id: "it-a1-nouns", level: "A1", topic: "Genre et pluriel des noms et adjectifs (-o/-i, -a/-e, -e/-i)" },
-    { id: "it-a1-present", level: "A1", topic: "Présent des verbes réguliers en -are, -ere, -ire (dont -isc-)" },
-    { id: "it-a1-essere-avere", level: "A1", topic: "Essere et avere, c'è / ci sono" },
-    { id: "it-a1-prepositions", level: "A1", topic: "Prépositions simples et articulées (nel, sulla, dal...)" },
-    { id: "it-a1-possessives", level: "A1", topic: "Possessifs avec article (il mio libro) et sans article pour la famille (mia madre)" },
-    { id: "it-a2-passato-prossimo", level: "A2", topic: "Passato prossimo : choix de essere ou avere, accord du participe" },
-    { id: "it-a2-reflexive", level: "A2", topic: "Verbes pronominaux (alzarsi, chiamarsi), au présent et au passé" },
-    { id: "it-a2-imperfetto", level: "A2", topic: "Imperfetto et opposition avec le passato prossimo" },
-    { id: "it-a2-direct-pronouns", level: "A2", topic: "Pronoms complément d'objet direct (lo, la, li, le) et accord au passé" },
-    { id: "it-a2-piacere", level: "A2", topic: "Pronoms indirects et piacere (mi piace, mi piacciono)" },
-    { id: "it-a2-futuro", level: "A2", topic: "Futur simple : formation, irréguliers, futur de probabilité" },
-    { id: "it-b1-combined-pronouns", level: "B1", topic: "Pronoms combinés (me lo, glielo, te ne)" },
-    { id: "it-b1-ci-ne", level: "B1", topic: "Particules ci et ne" },
-    { id: "it-b1-condizionale", level: "B1", topic: "Conditionnel présent et passé : souhait, politesse, conseil" },
-    { id: "it-b1-congiuntivo", level: "B1", topic: "Subjonctif présent après penso che, credo che, è importante che" },
-    { id: "it-b1-relatives", level: "B1", topic: "Pronoms relatifs che, cui, il quale" },
-    { id: "it-b1-imperativo", level: "B1", topic: "Impératif (tu, Lei, voi), avec pronoms (dimmi, fallo)" },
-  ],
-};
+export const GRAMMAR_CURRICULUM: Partial<Record<string, readonly CurriculumEntry[]>> = Object.fromEntries(
+  Object.entries(ALL_CURRICULA).filter(([, entries]) => entries.length > 0),
+);

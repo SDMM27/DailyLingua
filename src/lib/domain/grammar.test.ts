@@ -45,6 +45,28 @@ describe("normalizeGrammarAnswer", () => {
     expect(normalizeGrammarAnswer("ru", "Всё")).toBe("все");
   });
 
+  it("drops the punctuation of other scripts", () => {
+    expect(normalizeGrammarAnswer("es", "¿Dónde vives?")).toBe("dónde vives");
+    expect(normalizeGrammarAnswer("el", "Πού μένεις;")).toBe("πού μένεις");
+    expect(normalizeGrammarAnswer("ja", "どこですか？")).toBe("どこですか");
+    expect(normalizeGrammarAnswer("zh", "我是学生。")).toBe("我是学生");
+    expect(normalizeGrammarAnswer("ar", "أين تسكن؟")).toBe("أين تسكن");
+  });
+
+  it("lowercases Turkish with its own rules", () => {
+    expect(normalizeGrammarAnswer("tr", "IRMAK İSTANBUL")).toBe("ırmak istanbul");
+  });
+
+  it("ignores spaces in Chinese and Japanese", () => {
+    expect(normalizeGrammarAnswer("zh", "我 是 学生")).toBe("我是学生");
+    expect(normalizeGrammarAnswer("ja", "わたし は がくせい です")).toBe("わたしはがくせいです");
+    expect(normalizeGrammarAnswer("ko", "저는  학생이에요")).toBe("저는 학생이에요");
+  });
+
+  it("ignores short vowels in Arabic", () => {
+    expect(normalizeGrammarAnswer("ar", "كَتَبَ")).toBe("كتب");
+  });
+
   it("leaves other languages alone", () => {
     expect(normalizeGrammarAnswer("it", "perché")).toBe("perché");
     expect(normalizeGrammarAnswer("it", "ё")).toBe("ё");

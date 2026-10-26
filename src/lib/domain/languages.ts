@@ -35,6 +35,13 @@ export interface LanguageInfo {
    * dictionary form of generated expressions carries a combining acute accent (see `stress.ts`).
    */
   markStress?: boolean;
+  /** Words are not separated by spaces (Chinese, Japanese): typed answers are compared without spaces. */
+  unspaced?: boolean;
+  /**
+   * Short vowels and other marks are optional in everyday text (Arabic harakat): typed answers are
+   * compared without them.
+   */
+  optionalVowelMarks?: boolean;
   /**
    * Only voices of these regions read the language aloud, when a region of the same code speaks
    * another variety (a "zh-HK" voice speaks Cantonese, not Mandarin). Absent: any region.
@@ -62,9 +69,9 @@ export const LANGUAGE_REGISTRY = {
   ro: { code: "ro", nameFr: "Roumain", nativeName: "Română", greeting: "Bună dimineața", dir: "ltr", accent: "fern" },
   el: { code: "el", nameFr: "Grec", nativeName: "Ελληνικά", greeting: "Καλημέρα", dir: "ltr", accent: "azure" },
   tr: { code: "tr", nameFr: "Turc", nativeName: "Türkçe", greeting: "Günaydın", dir: "ltr", accent: "berry" },
-  ar: { code: "ar", nameFr: "Arabe", nativeName: "العربية", greeting: "صباح الخير", dir: "rtl", accent: "fern" },
-  zh: { code: "zh", nameFr: "Chinois (mandarin)", nativeName: "中文", greeting: "早上好", dir: "ltr", denseScript: true, speechRegions: ["CN", "TW", "SG"], accent: "berry" },
-  ja: { code: "ja", nameFr: "Japonais", nativeName: "日本語", greeting: "おはようございます", dir: "ltr", denseScript: true, accent: "graphite" },
+  ar: { code: "ar", nameFr: "Arabe", nativeName: "العربية", greeting: "صباح الخير", dir: "rtl", optionalVowelMarks: true, accent: "fern" },
+  zh: { code: "zh", nameFr: "Chinois (mandarin)", nativeName: "中文", greeting: "早上好", dir: "ltr", denseScript: true, unspaced: true, speechRegions: ["CN", "TW", "SG"], accent: "berry" },
+  ja: { code: "ja", nameFr: "Japonais", nativeName: "日本語", greeting: "おはようございます", dir: "ltr", denseScript: true, unspaced: true, accent: "graphite" },
   ko: { code: "ko", nameFr: "Coréen", nativeName: "한국어", greeting: "좋은 아침이에요", dir: "ltr", denseScript: true, accent: "teal" },
   id: { code: "id", nameFr: "Indonésien", nativeName: "Bahasa Indonesia", greeting: "Selamat pagi", dir: "ltr", accent: "ochre" },
 } as const satisfies Record<string, LanguageInfo>;

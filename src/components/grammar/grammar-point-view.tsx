@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { languageStyle } from "@/components/ui/language-style";
 import { Card, Eyebrow, LanguageTag } from "@/components/ui/primitives";
+import { languageInfo } from "@/lib/domain/languages";
 import type { DateKey, Language } from "@/lib/schemas/common";
 import type { GrammarCard, GrammarPoint } from "@/lib/schemas/grammar";
 import { GrammarPractice } from "./grammar-practice";
@@ -20,6 +21,7 @@ export function GrammarPointView({
   persist: boolean;
 }) {
   const style = languageStyle(language);
+  const { dir } = languageInfo(language);
   const { table } = point;
 
   return (
@@ -74,7 +76,8 @@ export function GrammarPointView({
                 {table.rows.map((row, i) => (
                   <tr key={i}>
                     {row.map((cell, j) => (
-                      <td key={j} lang={j === 0 ? undefined : language} className="px-3 py-2 font-serif">
+                      // Cells may hold French as well as the studied language: the direction follows the text.
+                      <td key={j} lang={j === 0 ? undefined : language} dir="auto" className="px-3 py-2 font-serif">
                         {cell}
                       </td>
                     ))}
@@ -91,7 +94,7 @@ export function GrammarPointView({
         <ul className="space-y-3">
           {point.examples.map((example) => (
             <li key={example.text} className="rounded-2xl border border-line bg-surface px-4 py-3">
-              <p lang={language} className={`font-serif text-lg font-semibold ${style.text}`}>
+              <p lang={language} dir={dir} className={`font-serif text-lg font-semibold ${style.text}`}>
                 {example.text}
               </p>
               <p className="mt-1 text-sm text-ink-soft">{example.translation}</p>
