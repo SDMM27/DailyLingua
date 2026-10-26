@@ -65,6 +65,7 @@ const PREFERENCES: Preferences = {
   difficulty: "matched",
   generationTime: "07:00",
   timeZone: TIME_ZONE,
+  showStreak: true,
 };
 
 const stackIsUp = await localStackIsUp();
@@ -151,6 +152,25 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
     expect(byLanguage.es.contentTypes).toEqual(["interview"]);
     const { data: profile } = await admin.from("profiles").select("topics, content_types").eq("id", userId).single();
     expect(profile).toEqual({ topics: ["sciences"], content_types: ["interview"] });
+    await repo.savePreferences(PREFERENCES);
+  });
+
+  it("saves the day streak preference, and an old payload without it shows the streak again", async () => {
+    await repo.savePreferences({ ...PREFERENCES, showStreak: false });
+    expect((await repo.getPreferences())!.showStreak).toBe(false);
+    const { error } = await userClient.rpc("save_preferences", {
+      p_daily_minutes: 30,
+      p_topics: null,
+      p_content_types: null,
+      p_difficulty: "matched",
+      p_generation_time: "07:00",
+      p_time_zone: TIME_ZONE,
+      p_goals: PREFERENCES.goals.map((g) => ({
+        language: g.language, level: g.level, target_level: g.targetLevel, focus: "", purpose: "general", weight: g.weight,
+      })),
+    });
+    expect(error).toBeNull();
+    expect((await repo.getPreferences())!.showStreak).toBe(true);
     await repo.savePreferences(PREFERENCES);
   });
 

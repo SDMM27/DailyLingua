@@ -313,6 +313,7 @@ export async function fetchPreferences(client: Client, userId: string): Promise<
     difficulty: p.difficulty,
     generationTime: p.generation_time.slice(0, 5), // "HH:mm:ss" -> "HH:mm"
     timeZone: p.time_zone,
+    showStreak: p.show_streak,
   });
 }
 
@@ -580,16 +581,38 @@ export function createSupabaseRepository(
   }
 
   async function getStudyDates(): Promise<DateKey[]> {
-    const rows = unwrap(
-      await client
+    // A study day = a completed activity or a vocabulary review. Grammar and alphabet practice are
+    // not counted: they only keep last_reviewed_on, overwritten at each review, so past days would vanish.
+    const [missions, reviews] = await Promise.all([
+      client
         .from("mission_stats")
         .select("mission_date")
         .eq("user_id", userId)
-        .gt("completed_activities", 0)
-        .order("mission_date"),
-      "jours étudiés",
-    );
-    return z.array(dateKeySchema).parse(rows.map((r) => r.mission_date));
+        .gt("completed_activities", 0),
+      selectReviewDays(),
+    ]);
+    const days = new Set([...unwrap(missions, "jours étudiés").map((r) => r.mission_date), ...reviews]);
+    return z.array(dateKeySchema).parse([...days].sort());
+  }
+
+  /** Distinct days with a vocabulary review, read page by page (PostgREST caps a response at 1000 rows). */
+  async function selectReviewDays(): Promise<string[]> {
+    const PAGE = 1000;
+    const days = new Set<string>();
+    for (let from = 0; ; from += PAGE) {
+      const rows = unwrap(
+        await client
+          .from("vocabulary_reviews")
+          .select("reviewed_on")
+          .eq("user_id", userId)
+          .order("reviewed_on")
+          .order("id")
+          .range(from, from + PAGE - 1),
+        "jours de révision",
+      );
+      for (const r of rows) days.add(r.reviewed_on);
+      if (rows.length < PAGE) return [...days];
+    }
   }
 
   async function listVocabulary(): Promise<VocabularyItem[]> {
@@ -657,6 +680,7 @@ export function createSupabaseRepository(
       p_difficulty: preferences.difficulty,
       p_generation_time: preferences.generationTime,
       p_time_zone: preferences.timeZone,
+      p_show_streak: preferences.showStreak,
       p_goals: preferences.goals.map((g) => ({
         language: g.language,
         level: g.level,

@@ -372,6 +372,29 @@ export function PreferencesForm({
         </p>
       </Section>
 
+      {!onboarding && (
+        <Section title="Série de jours">
+          <div className="flex min-h-11 items-start gap-3 text-sm">
+            <input
+              id="show-streak"
+              type="checkbox"
+              checked={prefs.showStreak}
+              onChange={(e) => set("showStreak", e.target.checked)}
+              aria-describedby="show-streak-hint"
+              className="mt-0.5 size-5 shrink-0 accent-[var(--ink)]"
+            />
+            <div>
+              <label htmlFor="show-streak" className="block">
+                Afficher ma série de jours
+              </label>
+              <p id="show-streak-hint" className="text-xs text-muted">
+                Le nombre de jours d’affilée sur l’accueil. Aucun point, aucun classement.
+              </p>
+            </div>
+          </div>
+        </Section>
+      )}
+
       <div className="space-y-3">
         <button
           type="button"

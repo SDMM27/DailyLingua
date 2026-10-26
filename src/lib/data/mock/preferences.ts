@@ -28,4 +28,5 @@ export const MOCK_PREFERENCES: Preferences = {
   difficulty: "matched",
   generationTime: "07:00",
   timeZone: DEFAULT_TIME_ZONE,
+  showStreak: true,
 };

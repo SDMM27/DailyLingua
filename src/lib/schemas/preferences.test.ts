@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { LANGUAGE_PURPOSES, languageGoalSchema } from "./preferences";
+import { MOCK_PREFERENCES } from "@/lib/data/mock/preferences";
+import { LANGUAGE_PURPOSES, languageGoalSchema, preferencesSchema } from "./preferences";
 
 const goal = { language: "it", level: "B1", targetLevel: "B2", focus: "", weight: 1, topics: ["société"], contentTypes: ["article"] };
 
@@ -36,5 +37,17 @@ describe("languageGoalSchema topics and content types", () => {
     const parsed = languageGoalSchema.parse({ ...goal, topics: ["sport", "voyage"], contentTypes: ["video", "podcast"] });
     expect(parsed.topics).toEqual(["sport", "voyage"]);
     expect(parsed.contentTypes).toEqual(["video", "podcast"]);
+  });
+});
+
+describe("preferencesSchema showStreak", () => {
+  it("defaults to true when absent, so existing data still parses", () => {
+    const { showStreak: _omitted, ...legacy } = MOCK_PREFERENCES;
+    expect(preferencesSchema.parse(legacy).showStreak).toBe(true);
+  });
+
+  it("keeps an explicit false and refuses a non-boolean", () => {
+    expect(preferencesSchema.parse({ ...MOCK_PREFERENCES, showStreak: false }).showStreak).toBe(false);
+    expect(preferencesSchema.safeParse({ ...MOCK_PREFERENCES, showStreak: "non" }).success).toBe(false);
   });
 });

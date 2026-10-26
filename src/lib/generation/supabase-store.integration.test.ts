@@ -52,6 +52,7 @@ const PREFERENCES: Preferences = {
   difficulty: "matched",
   generationTime: "07:00",
   timeZone: TIME_ZONE,
+  showStreak: true,
 };
 
 const stackIsUp = await localStackIsUp();
