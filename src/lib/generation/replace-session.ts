@@ -15,8 +15,11 @@ import {
   buildMeta,
   buildSessionRequest,
   generateWithFallback,
+  loadFrequencies,
   loadUsablePool,
+  measureCoverage,
   planSession,
+  type FrequencyLoader,
   type MissionStore,
   type PlannedSession,
 } from "./generate-mission";
@@ -77,6 +80,8 @@ export interface ReplaceSessionInput {
   fallback?: ExerciseGenerator;
   now?: () => Date;
   log?: (message: string) => void;
+  /** Word-frequency ranks of a language. Default: the lists of src/lib/frequency. */
+  loadFrequency?: FrequencyLoader;
 }
 
 /**
@@ -140,7 +145,8 @@ export async function replaceMissionSession(input: ReplaceSessionInput): Promise
       ...(await store.listRefusedContentIds(userId)),
     ]);
     const declaredSourceIds = await store.listDeclaredSourceIds(userId);
-    const options = { goal, preferences, declaredSourceIds, minutes: old.minutes, excludeIds, now: startedAt };
+    const frequencies = await loadFrequencies([goal.language], { load: input.loadFrequency, log });
+    const options = { goal, preferences, declaredSourceIds, minutes: old.minutes, excludeIds, now: startedAt, frequency: frequencies.get(goal.language) };
     const pool = await loadUsablePool(store, options);
     if (!pool) {
       await release();
@@ -159,7 +165,11 @@ export async function replaceMissionSession(input: ReplaceSessionInput): Promise
     });
     const { result, sessions, fallbackReason } = await generateWithFallback(request, { generator, fallback, log });
     const planned = planSession(sessions[0], old.minutes);
-    const meta = buildMeta(result, { durationMs: now().getTime() - startedAt.getTime(), fallbackReason });
+    const meta = buildMeta(result, {
+      durationMs: now().getTime() - startedAt.getTime(),
+      fallbackReason,
+      coverage: measureCoverage(sessions, frequencies),
+    });
     await store.replaceSession(sessionId, userId, planned, meta);
     return { status: "ready" };
   } catch (error) {

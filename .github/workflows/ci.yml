@@ -88,7 +88,18 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-webkit-${{ runner.os }}-${{ steps.playwright.outputs.version }}
       # Browsers come from the cache when present; the system libraries are always installed.
-      - run: npx playwright install --with-deps webkit
+      # The runners' Azure apt mirror sometimes crawls (~20 kB/s): use the main Ubuntu
+      # archive first, keep Azure as fallback, and retry once instead of hanging the job.
+      - name: Install Playwright (WebKit + system libraries)
+        timeout-minutes: 14
+        run: |
+          printf '%s\n' http://archive.ubuntu.com/ubuntu/ http://azure.archive.ubuntu.com/ubuntu/ \
+            | sudo tee /etc/apt/apt-mirrors.txt
+          for attempt in 1 2; do
+            timeout 6m npx playwright install --with-deps webkit && exit 0
+            echo "::warning::Playwright install attempt $attempt failed or timed out"
+          done
+          exit 1
       - name: End-to-end tests
         run: npm run e2e
         env:

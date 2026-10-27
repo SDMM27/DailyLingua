@@ -1,4 +1,6 @@
 import { addDays } from "@/lib/domain/dates";
+import { coverageTarget, frequentWords, lexicalCoverage, type FrequencyRanks } from "@/lib/domain/frequency";
+import { loadFrequencyRanks } from "@/lib/frequency";
 import { splitBudget } from "@/lib/domain/time-budget";
 import type { ContentType, DateKey, Language } from "@/lib/schemas/common";
 import {
@@ -31,6 +33,9 @@ import { validateGeneratedMission, type ValidatedSession } from "./validate";
 const REUSE_WINDOW_DAYS = 30;
 const CANDIDATE_POOL = 30;
 const MAX_REASON_LENGTH = 300;
+/** At A1–A2 the prompt lists the words of each teaser among this many most frequent forms, and at most this many. */
+const FREQUENT_WORDS_TOP = 2000;
+const MAX_FREQUENT_WORDS = 10;
 
 /** Storage used by the orchestrator; implemented on Supabase by the app, in memory by the tests. */
 export interface MissionStore {
@@ -77,6 +82,29 @@ export interface GenerateMissionInput {
   fallback?: ExerciseGenerator;
   now?: () => Date;
   log?: (message: string) => void;
+  /** Word-frequency ranks of a language. Default: the lists of src/lib/frequency. */
+  loadFrequency?: FrequencyLoader;
+}
+
+export type FrequencyLoader = (language: Language) => Promise<FrequencyRanks>;
+
+/**
+ * Ranks of each language, or none for a language whose list cannot be read: the vocabulary of the
+ * contents is a refinement of the ranking and must never keep a mission from being written.
+ */
+export async function loadFrequencies(
+  languages: Iterable<Language>,
+  { load = loadFrequencyRanks, log = () => {} }: { load?: FrequencyLoader; log?: (message: string) => void } = {},
+): Promise<Map<Language, FrequencyRanks>> {
+  const ranks = new Map<Language, FrequencyRanks>();
+  for (const language of new Set(languages)) {
+    try {
+      ranks.set(language, await load(language));
+    } catch (error) {
+      log(`generation: no frequency list for ${language}: ${describeError(error).message}`);
+    }
+  }
+  return ranks;
 }
 
 interface PoolOptions {
@@ -86,19 +114,27 @@ interface PoolOptions {
   minutes: number;
   excludeIds: ReadonlySet<string>;
   now: Date;
+  /** Word-frequency ranks of the goal's language: the vocabulary of the contents counts at A1–A2. */
+  frequency?: FrequencyRanks;
+}
+
+/** The options of `rankCandidates` for one goal. */
+function rankOptions(o: PoolOptions) {
+  return {
+    level: o.goal.level,
+    difficulty: o.preferences.difficulty,
+    contentTypes: o.goal.contentTypes,
+    minutes: o.minutes,
+    excludeIds: o.excludeIds,
+    now: o.now,
+    frequency: o.frequency ? { language: o.goal.language, ranks: o.frequency } : undefined,
+  };
 }
 
 /** Candidates of a goal's language, or null when none is usable. */
 export async function loadUsablePool(store: Pick<MissionStore, "listCandidates">, o: PoolOptions): Promise<CandidateContent[] | null> {
   const usable = (pool: CandidateContent[]) =>
-    rankCandidates(pool, {
-      level: o.goal.level,
-      difficulty: o.preferences.difficulty,
-      contentTypes: o.goal.contentTypes,
-      minutes: o.minutes,
-      excludeIds: o.excludeIds,
-      now: o.now,
-    }).length > 0;
+    rankCandidates(pool, rankOptions(o)).length > 0;
   // Preferred content types first; any type when none is left (all used, or none published).
   let pool = await store.listCandidates(o.goal.language, {
     contentTypes: o.goal.contentTypes,
@@ -113,14 +149,13 @@ export async function loadUsablePool(store: Pick<MissionStore, "listCandidates">
 export function buildSessionRequest(
   o: PoolOptions & { pool: CandidateContent[]; productionMode: GeneratedProductionMode },
 ): GenerationRequest["sessions"][number] {
-  const candidates = rankCandidates(o.pool, {
-    level: o.goal.level,
-    difficulty: o.preferences.difficulty,
-    contentTypes: o.goal.contentTypes,
-    minutes: o.minutes,
-    excludeIds: o.excludeIds,
-    now: o.now,
-  });
+  const ranked = rankCandidates(o.pool, rankOptions(o));
+  // At A1–A2 the model is shown which words of each teaser are frequent, to pick its expressions from.
+  const { language, level } = o.goal;
+  const candidates =
+    o.frequency && coverageTarget(language, level)
+      ? ranked.map((c) => ({ ...c, frequentWords: frequentWords(language, c.summary, o.frequency!, FREQUENT_WORDS_TOP, MAX_FREQUENT_WORDS) }))
+      : ranked;
   // Told to the model so it sizes the task; the final plan is made once the exercises exist.
   const estimate = planActivities({
     type: candidates[0].type,
@@ -188,7 +223,7 @@ export function planSession(session: ValidatedSession, minutes: number): Planned
 
 export function buildMeta(
   result: GenerationResult,
-  { durationMs, fallbackReason }: { durationMs: number; fallbackReason: string | null },
+  { durationMs, fallbackReason, coverage }: { durationMs: number; fallbackReason: string | null; coverage?: GenerationMeta["coverage"] },
 ): GenerationMeta {
   return generationMetaSchema.parse({
     source: result.source,
@@ -198,6 +233,27 @@ export function buildMeta(
     outputTokens: result.usage?.outputTokens ?? null,
     durationMs: Math.max(0, Math.round(durationMs)),
     fallbackReason,
+    coverage,
+  });
+}
+
+/**
+ * Vocabulary coverage of the content chosen for each session, for the generation trace: it tells,
+ * on real missions, whether the targets of `COVERAGE_TARGETS` are realistic for each language.
+ */
+export function measureCoverage(sessions: readonly ValidatedSession[], frequencies: ReadonlyMap<Language, FrequencyRanks>): GenerationMeta["coverage"] {
+  return sessions.flatMap((session) => {
+    const ranks = frequencies.get(session.language);
+    if (!ranks) return [];
+    const text = `${session.content.title}. ${session.content.summary}`;
+    return [
+      {
+        language: session.language,
+        contentId: session.content.id,
+        top1000: lexicalCoverage(session.language, text, ranks, 1000),
+        top2000: lexicalCoverage(session.language, text, ranks, 2000),
+      },
+    ];
   });
 }
 
@@ -238,11 +294,16 @@ export async function generateMission(input: GenerateMissionInput): Promise<Gene
     const declaredSourceIds = await store.listDeclaredSourceIds(userId);
     const provisional = splitBudget(preferences.dailyMinutes, preferences.goals);
 
+    const frequencies = await loadFrequencies(
+      preferences.goals.map((g) => g.language),
+      { load: input.loadFrequency, log },
+    );
     const pools = new Map<Language, CandidateContent[]>();
     for (const [i, goal] of preferences.goals.entries()) {
       const pool = await loadUsablePool(store, {
         goal,
         preferences,
+        frequency: frequencies.get(goal.language),
         declaredSourceIds,
         minutes: provisional[i].minutes,
         excludeIds,
@@ -266,6 +327,7 @@ export async function generateMission(input: GenerateMissionInput): Promise<Gene
           goal,
           preferences,
           declaredSourceIds,
+          frequency: frequencies.get(goal.language),
           minutes: shares[index].minutes,
           excludeIds,
           now: startedAt,
@@ -277,7 +339,11 @@ export async function generateMission(input: GenerateMissionInput): Promise<Gene
 
     const { result, sessions, fallbackReason } = await generateWithFallback(request, { generator, fallback, log });
     const planned = sessions.map((session, index) => planSession(session, shares[index].minutes));
-    const meta = buildMeta(result, { durationMs: now().getTime() - startedAt.getTime(), fallbackReason });
+    const meta = buildMeta(result, {
+      durationMs: now().getTime() - startedAt.getTime(),
+      fallbackReason,
+      coverage: measureCoverage(sessions, frequencies),
+    });
     await store.complete(missionId, planned, meta);
     return { status: "ready", missionId, source: result.source };
   } catch (error) {

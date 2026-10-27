@@ -6,7 +6,7 @@ import { Card, PageHeader } from "@/components/ui/primitives";
 export const metadata: Metadata = { title: "Politique de confidentialité" };
 
 /** Update this date whenever the policy changes. */
-const LAST_UPDATED = "20 octobre 2026";
+const LAST_UPDATED = "26 octobre 2026";
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -153,6 +153,42 @@ export default function PrivacyPage() {
         <p>
           Les articles, podcasts et vidéos appartiennent à leurs éditeurs. L’app n’affiche que le titre, l’accroche et
           un lien vers l’éditeur : le contenu lui-même se lit ou s’écoute sur son site.
+        </p>
+      </Section>
+
+      <Section title="Données utilisées">
+        <p>
+          Pour repérer les contenus dont le vocabulaire est le plus courant, l’app s’appuie sur des listes de mots
+          classés par fréquence, tirées de{" "}
+          <a
+            href="https://github.com/rspeer/wordfreq"
+            className="font-semibold text-ink underline"
+            rel="noreferrer"
+          >
+            wordfreq
+          </a>{" "}
+          (Robyn Speer). Ces données viennent de plusieurs sources : Wikipédia, les sous-titres d’OpenSubtitles et les
+          listes SUBTLEX (Marc Brysbaert et ses collègues), Google Books Ngrams, des corpus de presse et de pages web,
+          ainsi que des statistiques de réseaux sociaux. Aucun texte de ces sources n’est republié.
+        </p>
+        <p>
+          Les listes que nous en tirons (les 5 000 mots les plus fréquents de chaque langue) sont publiées sous licence{" "}
+          <a
+            href="https://creativecommons.org/licenses/by-sa/4.0/deed.fr"
+            className="font-semibold text-ink underline"
+            rel="noreferrer"
+          >
+            CC BY-SA 4.0
+          </a>
+          , avec leurs attributions complètes :{" "}
+          <a
+            href="https://github.com/SDMM27/DailyLingua/tree/main/src/lib/frequency/data"
+            className="font-semibold text-ink underline"
+            rel="noreferrer"
+          >
+            voir les listes
+          </a>
+          . Elles n’utilisent aucune donnée personnelle.
         </p>
       </Section>
 
