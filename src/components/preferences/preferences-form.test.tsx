@@ -245,10 +245,12 @@ describe("PreferencesForm", () => {
         "Sam : russe · 20 min",
         "Dim : russe · 20 min",
       ]);
-      expect(screen.getByText("au plus 30 min par jour")).toBeTruthy();
+      // "au plus" is a smaller span inside the total, so match the whole paragraph.
+      const total = () => screen.getByText("30 min par jour").textContent;
+      expect(total()).toBe("au plus 30 min par jour");
       // Italian on the other days too: every day alike again.
       for (const day of ["mardi", "jeudi", "samedi", "dimanche"]) await user.click(chip(day, "Italien"));
-      expect(screen.getByText("30 min par jour")).toBeTruthy();
+      expect(total()).toBe("30 min par jour");
       expect(weekLines()).toContain("Dim : russe, italien · 30 min");
     });
 

@@ -177,13 +177,12 @@ export function PreferencesForm({
       >
         {prefs.goals.length > 0 && (
           <div className="mb-5">
-            <div className="flex items-baseline justify-between">
-              <span className="text-sm text-ink-soft">Temps quotidien</span>
-              <span className="font-serif text-2xl font-semibold">
-                {uniformDays ? "" : "au plus "}
-                {busiest} min par jour
-              </span>
-            </div>
+            {/* Label above the value: side by side, "au plus 30 min par jour" wraps at phone width. */}
+            <span className="block text-sm text-ink-soft">Temps quotidien</span>
+            <p className="font-serif text-2xl font-semibold">
+              {!uniformDays && <span className="font-sans text-base font-normal text-ink-soft">au plus </span>}
+              {busiest} min par jour
+            </p>
             <div className="mt-3 flex h-2 overflow-hidden rounded-full" aria-hidden="true">
               {split.map((s) => (
                 <div
@@ -329,7 +328,7 @@ export function PreferencesForm({
               </div>
               <div className="mt-3">
                 <span className="mb-2 block text-xs font-medium text-ink-soft">Jours travaillés</span>
-                <div role="group" aria-label={`Jours travaillés ${languageInfo(goal.language).nameFr}`} className="flex gap-1.5">
+                <div role="group" aria-label={`Jours travaillés ${languageInfo(goal.language).nameFr}`} className="grid grid-cols-7 gap-1">
                   {ALL_WEEKDAYS.map((day) => {
                     const active = goal.days.includes(day);
                     // The last checked day cannot be removed: a language needs at least one day.
@@ -342,7 +341,7 @@ export function PreferencesForm({
                         aria-label={`${WEEKDAY_NAMES[day - 1]} ${languageInfo(goal.language).nameFr}`}
                         disabled={last}
                         onClick={() => setGoal(goal.language, { days: ALL_WEEKDAYS.filter((d) => (d === day ? !active : goal.days.includes(d))) })}
-                        className={`min-h-11 min-w-11 flex-1 rounded-full border text-sm font-medium transition-colors disabled:opacity-60 ${
+                        className={`min-h-11 min-w-0 rounded-full border text-sm font-medium transition-colors disabled:opacity-60 ${
                           active ? "border-ink bg-ink text-paper" : "border-line text-ink-soft hover:bg-surface-sunk"
                         }`}
                       >
