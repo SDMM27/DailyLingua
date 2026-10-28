@@ -9,7 +9,15 @@ import { Card, Eyebrow, LanguageTag } from "@/components/ui/primitives";
 import { DEFAULT_LANGUAGE_TASTES } from "@/lib/domain/default-preferences";
 import { CONTENT_TYPE_LABELS, DIFFICULTY_LABELS, LANGUAGE_PURPOSE_LABELS } from "@/lib/domain/labels";
 import { languageInfo } from "@/lib/domain/languages";
-import { splitBudget } from "@/lib/domain/time-budget";
+import {
+  MAX_DAILY_MINUTES,
+  MINUTES_STEP,
+  MIN_LANGUAGE_MINUTES,
+  presetMinutes,
+  splitBudget,
+  totalMinutes,
+  type MinutesPreset,
+} from "@/lib/domain/time-budget";
 import { CEFR_LEVELS, CONTENT_TYPES, type CefrLevel, type Language } from "@/lib/schemas/common";
 import {
   DIFFICULTY_MODES,
@@ -22,6 +30,9 @@ import {
 } from "@/lib/schemas/preferences";
 
 const MAX_LANGUAGES = 4;
+/** Minutes of a language added to the list: a full half hour when it is the first, else a short session. */
+const FIRST_LANGUAGE_MINUTES = 30;
+const ADDED_LANGUAGE_MINUTES = 15;
 
 type SaveState =
   | { kind: "idle" }
@@ -98,8 +109,15 @@ export function PreferencesForm({
         .filter((g) => g.language !== language),
     );
 
-  const split = prefs.goals.length > 0 ? splitBudget(prefs.dailyMinutes, prefs.goals) : [];
-  const minutesFor = (language: Language) => split.find((s) => s.language === language)?.minutes ?? 0;
+  const total = totalMinutes(prefs.goals);
+  const split = prefs.goals.length > 0 ? splitBudget(total, prefs.goals) : [];
+  const applyPreset = (preset: MinutesPreset) => {
+    const shares = presetMinutes(total, prefs.goals.map((g) => g.language), preset);
+    set(
+      "goals",
+      prefs.goals.map((g) => ({ ...g, weight: shares.find((s) => s.language === g.language)?.minutes ?? g.weight })),
+    );
+  };
   const maxWeight = Math.max(...prefs.goals.map((g) => g.weight));
   const available = languages.filter((code) => !prefs.goals.some((g) => g.language === code)).sort((a, b) =>
     languageInfo(a).nameFr.localeCompare(languageInfo(b).nameFr, "fr"),
@@ -109,7 +127,10 @@ export function PreferencesForm({
     const goals = prefs.goals.map((g) =>
       follows(g) ? { ...g, topics: first.topics, contentTypes: first.contentTypes } : g,
     );
-    const result = preferencesSchema.safeParse({ ...prefs, goals, timeZone });
+    // The day's total is the sum of the languages' minutes; clamped here so that the schema reports
+    // the real error (a language or the total out of range) rather than the derived field.
+    const dailyMinutes = Math.min(MAX_DAILY_MINUTES, Math.max(MIN_LANGUAGE_MINUTES, totalMinutes(goals)));
+    const result = preferencesSchema.safeParse({ ...prefs, goals, dailyMinutes, timeZone });
     if (!result.success) {
       setSaveState({ kind: "error", messages: [...new Set(result.error.issues.map((i) => i.message))] });
       return;
@@ -140,9 +161,48 @@ export function PreferencesForm({
         hint={
           onboarding && prefs.goals.length === 0
             ? "Commence par choisir au moins une langue."
-            : "Le poids détermine la part du temps quotidien."
+            : "Choisis le temps de chaque langue, en minutes par jour."
         }
       >
+        {prefs.goals.length > 0 && (
+          <div className="mb-5">
+            <div className="flex items-baseline justify-between">
+              <span className="text-sm text-ink-soft">Temps quotidien</span>
+              <span className="font-serif text-2xl font-semibold">{total} min par jour</span>
+            </div>
+            <div className="mt-3 flex h-2 overflow-hidden rounded-full" aria-hidden="true">
+              {split.map((s) => (
+                <div
+                  key={s.language}
+                  className={languageStyle(s.language).bg}
+                  style={{ width: `${(s.minutes / total) * 100}%` }}
+                />
+              ))}
+            </div>
+            <p className="mt-2 text-xs text-muted">
+              {split.map((s) => `${languageInfo(s.language).nameFr} ${s.minutes} min`).join(" · ")}
+            </p>
+            {prefs.goals.length >= 2 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {(
+                  [
+                    ["balanced", "Équilibré"],
+                    ["focus-first", `Surtout ${languageInfo(first.language).nameFr}`],
+                  ] as const
+                ).map(([preset, label]) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => applyPreset(preset)}
+                    className="min-h-11 rounded-full border border-line px-3.5 py-1.5 text-sm text-ink-soft transition-colors hover:bg-surface-sunk"
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
         <ul className="space-y-4">
           {prefs.goals.map((goal) => (
             <li key={goal.language} className="rounded-2xl border border-line p-4">
@@ -242,17 +302,16 @@ export function PreferencesForm({
                 </div>
               )}
               <div className="mt-3 flex items-center justify-between">
-                <span className="text-xs font-medium text-ink-soft">Poids</span>
-                <div className="flex items-center gap-3">
-                  <Stepper
-                    value={goal.weight}
-                    min={1}
-                    max={5}
-                    label={`Poids ${languageInfo(goal.language).nameFr}`}
-                    onChange={(weight) => setGoal(goal.language, { weight })}
-                  />
-                  <span className="w-14 text-right text-sm font-semibold">{minutesFor(goal.language)} min</span>
-                </div>
+                <span className="text-xs font-medium text-ink-soft">Minutes par jour</span>
+                <Stepper
+                  value={goal.weight}
+                  min={MIN_LANGUAGE_MINUTES}
+                  max={MAX_DAILY_MINUTES}
+                  step={MINUTES_STEP}
+                  unit="min"
+                  label={`Minutes par jour ${languageInfo(goal.language).nameFr}`}
+                  onChange={(weight) => setGoal(goal.language, { weight })}
+                />
               </div>
             </li>
           ))}
@@ -272,7 +331,15 @@ export function PreferencesForm({
                     setShared((s) => ({ ...s, [code]: true }));
                     set("goals", [
                       ...prefs.goals,
-                      { language: code, level: "A2", targetLevel: "B1", focus: "", purpose: "general", weight: 1, ...tastes },
+                      {
+                        language: code,
+                        level: "A2",
+                        targetLevel: "B1",
+                        focus: "",
+                        purpose: "general",
+                        weight: first ? ADDED_LANGUAGE_MINUTES : FIRST_LANGUAGE_MINUTES,
+                        ...tastes,
+                      },
                     ]);
                   }}
                   className="inline-flex items-center gap-1 rounded-full border border-dashed border-line px-3 py-1.5 text-sm text-ink-soft hover:border-ink-soft"
@@ -284,37 +351,6 @@ export function PreferencesForm({
             </div>
           </div>
         )}
-      </Section>
-
-      <Section title="Temps quotidien">
-        <div className="flex items-baseline justify-between">
-          <label htmlFor="daily-minutes" className="text-sm text-ink-soft">
-            Durée de la mission
-          </label>
-          <span className="font-serif text-2xl font-semibold">{prefs.dailyMinutes} min</span>
-        </div>
-        <input
-          id="daily-minutes"
-          type="range"
-          min={10}
-          max={90}
-          step={5}
-          value={prefs.dailyMinutes}
-          onChange={(e) => set("dailyMinutes", Number(e.target.value))}
-          className="mt-3 w-full accent-[var(--ink)]"
-        />
-        <div className="mt-3 flex h-2 overflow-hidden rounded-full" aria-hidden="true">
-          {split.map((s) => (
-            <div
-              key={s.language}
-              className={languageStyle(s.language).bg}
-              style={{ width: `${(s.minutes / prefs.dailyMinutes) * 100}%` }}
-            />
-          ))}
-        </div>
-        <p className="mt-2 text-xs text-muted">
-          {split.map((s) => `${languageInfo(s.language).nameFr} ${s.minutes} min`).join(" · ")}
-        </p>
       </Section>
 
       <Section title="Difficulté souhaitée">
@@ -464,25 +500,29 @@ function Stepper({
   value,
   min,
   max,
+  step = 1,
+  unit,
   label,
   onChange,
 }: {
   value: number;
   min: number;
   max: number;
+  step?: number;
+  unit?: string;
   label: string;
   onChange: (value: number) => void;
 }) {
-  const button = "grid size-8 place-items-center rounded-full border border-line text-lg leading-none disabled:opacity-30";
+  const button = "grid size-11 place-items-center rounded-full border border-line text-lg leading-none disabled:opacity-30";
   return (
     <div className="flex items-center gap-2" role="group" aria-label={label}>
-      <button type="button" className={button} disabled={value <= min} onClick={() => onChange(value - 1)} aria-label="Diminuer">
+      <button type="button" className={button} disabled={value <= min} onClick={() => onChange(Math.max(min, value - step))} aria-label="Diminuer">
         −
       </button>
-      <span className="w-4 text-center font-semibold tabular-nums" aria-live="polite">
-        {value}
+      <span className="min-w-14 text-center font-semibold tabular-nums" aria-live="polite">
+        {unit ? `${value} ${unit}` : value}
       </span>
-      <button type="button" className={button} disabled={value >= max} onClick={() => onChange(value + 1)} aria-label="Augmenter">
+      <button type="button" className={button} disabled={value >= max} onClick={() => onChange(Math.min(max, value + step))} aria-label="Augmenter">
         +
       </button>
     </div>

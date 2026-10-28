@@ -23,23 +23,84 @@ afterEach(() => {
 const splitLine = () => screen.getByText(/^Russe \d+ min/).textContent;
 
 describe("PreferencesForm", () => {
-  it("shows the 20/10 split by default and updates it with the weights", async () => {
+  it("shows the minutes of each language and the total, and updates them by steps of 5", async () => {
     const user = userEvent.setup();
     render(<PreferencesForm initial={MOCK_PREFERENCES} languages={LANGUAGE_CODES} persist={false} />);
     expect(splitLine()).toBe("Russe 20 min · Italien 10 min");
+    expect(screen.getByText("30 min par jour")).toBeTruthy();
+    expect(screen.queryByText("Temps quotidien", { selector: "h2,p" })).toBeNull();
+    expect(screen.queryByRole("slider")).toBeNull();
 
-    const italianWeight = screen.getByRole("group", { name: "Poids Italien" });
-    await user.click(italianWeight.querySelector("button[aria-label=Augmenter]")!);
-    expect(splitLine()).toBe("Russe 15 min · Italien 15 min");
+    const italian = screen.getByRole("group", { name: "Minutes par jour Italien" });
+    expect(within(italian).getByText("10 min")).toBeTruthy();
+    // The minimum is 10 minutes per language.
+    expect((within(italian).getByRole("button", { name: "Diminuer" }) as HTMLButtonElement).disabled).toBe(true);
+    await user.click(within(italian).getByRole("button", { name: "Augmenter" }));
+    expect(within(italian).getByText("15 min")).toBeTruthy();
+    expect(splitLine()).toBe("Russe 20 min · Italien 15 min");
+    expect(screen.getByText("35 min par jour")).toBeTruthy();
+
+    await user.click(within(italian).getByRole("button", { name: "Diminuer" }));
+    expect(screen.getByText("30 min par jour")).toBeTruthy();
   });
 
-  it("adds a third language and splits time across all of them", async () => {
+  it("marks the language with the most minutes as the priority", async () => {
+    const user = userEvent.setup();
+    render(<PreferencesForm initial={MOCK_PREFERENCES} languages={LANGUAGE_CODES} persist={false} />);
+    expect(screen.getAllByText("prioritaire")).toHaveLength(1);
+    const italian = screen.getByRole("group", { name: "Minutes par jour Italien" });
+    await user.click(within(italian).getByRole("button", { name: "Augmenter" }));
+    await user.click(within(italian).getByRole("button", { name: "Augmenter" }));
+    expect(screen.getAllByText("prioritaire")).toHaveLength(2);
+  });
+
+  it("fills the minutes with the presets", async () => {
+    const user = userEvent.setup();
+    render(<PreferencesForm initial={MOCK_PREFERENCES} languages={LANGUAGE_CODES} persist={false} />);
+    await user.click(screen.getByRole("button", { name: "Équilibré" }));
+    expect(splitLine()).toBe("Russe 15 min · Italien 15 min");
+    await user.click(screen.getByRole("button", { name: "Surtout Russe" }));
+    expect(splitLine()).toBe("Russe 20 min · Italien 10 min");
+    expect(screen.getByText("30 min par jour")).toBeTruthy();
+  });
+
+  it("offers no preset with a single language", () => {
+    const single = { ...MOCK_PREFERENCES, goals: [MOCK_PREFERENCES.goals[0]] };
+    render(<PreferencesForm initial={single} languages={LANGUAGE_CODES} persist={false} />);
+    expect(screen.queryByRole("button", { name: "Équilibré" })).toBeNull();
+  });
+
+  it("refuses to save more than 120 minutes a day", async () => {
+    const user = userEvent.setup();
+    const over = {
+      ...MOCK_PREFERENCES,
+      goals: [
+        { ...MOCK_PREFERENCES.goals[0], weight: 60 },
+        { ...MOCK_PREFERENCES.goals[1], weight: 60 },
+      ],
+    };
+    render(<PreferencesForm initial={over} languages={LANGUAGE_CODES} persist />);
+    await user.click(within(screen.getByRole("group", { name: "Minutes par jour Italien" })).getByRole("button", { name: "Augmenter" }));
+    await user.click(screen.getByRole("button", { name: "Enregistrer" }));
+    expect(screen.getByText("Au plus 120 minutes par jour au total")).toBeTruthy();
+    expect(savePreferences).not.toHaveBeenCalled();
+  });
+
+  it("adds a third language with 15 minutes", async () => {
     const user = userEvent.setup();
     render(<PreferencesForm initial={MOCK_PREFERENCES} languages={LANGUAGE_CODES} persist={false} />);
     await user.click(screen.getByRole("button", { name: "Espagnol" }));
-    expect(splitLine()).toBe("Russe 15 min · Italien 8 min · Espagnol 7 min");
+    expect(splitLine()).toBe("Russe 20 min · Italien 10 min · Espagnol 15 min");
+    expect(screen.getByText("45 min par jour")).toBeTruthy();
     // A language already chosen is no longer offered.
     expect(screen.queryByRole("button", { name: "Espagnol" })).toBeNull();
+  });
+
+  it("gives a first language added on first run 30 minutes", async () => {
+    const user = userEvent.setup();
+    render(<PreferencesForm initial={ONBOARDING_DEFAULTS} languages={LANGUAGE_CODES} mode="onboarding" persist={false} />);
+    await user.click(screen.getByRole("button", { name: "Espagnol" }));
+    expect(screen.getByText("30 min par jour")).toBeTruthy();
   });
 
   it("only offers the languages that have content sources", () => {
@@ -51,7 +112,7 @@ describe("PreferencesForm", () => {
 
   it("keeps a chosen language that lost its sources, with a warning", () => {
     render(<PreferencesForm initial={MOCK_PREFERENCES} languages={["ru"]} persist={false} />);
-    expect(screen.getByRole("group", { name: "Poids Italien" })).toBeTruthy();
+    expect(screen.getByRole("group", { name: "Minutes par jour Italien" })).toBeTruthy();
     expect(screen.getAllByText(/Plus aucune source de contenus/)).toHaveLength(1);
   });
 

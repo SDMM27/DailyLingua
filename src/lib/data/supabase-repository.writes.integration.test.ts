@@ -58,8 +58,8 @@ const TIME_ZONE = "Pacific/Kiritimati";
 
 const PREFERENCES: Preferences = {
   goals: [
-    { language: "ru", level: "B2", targetLevel: "C1", focus: "", purpose: "general", weight: 2, topics: ["société"], contentTypes: ["article"] },
-    { language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 1, topics: ["société"], contentTypes: ["article"] },
+    { language: "ru", level: "B2", targetLevel: "C1", focus: "", purpose: "general", weight: 20, topics: ["société"], contentTypes: ["article"] },
+    { language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 10, topics: ["société"], contentTypes: ["article"] },
   ],
   dailyMinutes: 30,
   difficulty: "matched",
@@ -141,7 +141,7 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
       p_difficulty: "matched",
       p_generation_time: "07:00",
       p_time_zone: TIME_ZONE,
-      p_goals: [goal("ru", 2), goal("it", 1), goal("es", 1)],
+      p_goals: [goal("ru", 20), goal("it", 10), goal("es", 10)],
     });
     expect(error).toBeNull();
     const byLanguage = Object.fromEntries((await repo.getPreferences())!.goals.map((g) => [g.language, g]));

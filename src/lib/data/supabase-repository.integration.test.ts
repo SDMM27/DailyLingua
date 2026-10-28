@@ -80,7 +80,7 @@ describe.skipIf(!stackIsUp)("Supabase repository (local database, demo user)", (
     expect(data!.map((l) => l.code)).toEqual(expect.arrayContaining([...LANGUAGE_CODES]));
   });
 
-  it("reads the preferences (ru weight 2, it weight 1)", async () => {
+  it("reads the preferences (ru 20 min, it 10 min)", async () => {
     expect(await repo.getPreferences()).toEqual(MOCK_PREFERENCES);
   });
 

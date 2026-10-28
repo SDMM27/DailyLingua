@@ -9,6 +9,7 @@ import { guestTrialStatus, type GuestTrialStatus } from "@/lib/domain/guest-tria
 import { LANGUAGE_CODES } from "@/lib/domain/languages";
 import { RETENTION_MIN_DELAY_DAYS, RETENTION_WINDOW_DAYS, retentionByMode, type RetentionRow } from "@/lib/domain/review-modes";
 import { applyReview, initialReviewState } from "@/lib/domain/spaced-repetition";
+import { totalMinutes } from "@/lib/domain/time-budget";
 import type { Database } from "@/lib/supabase/database.types";
 import { availableLanguages } from "@/lib/content/availability";
 import { SOURCE_CATALOG } from "@/lib/content/catalog";
@@ -673,7 +674,7 @@ export function createSupabaseRepository(
 
   async function savePreferences(preferences: Preferences): Promise<void> {
     const { error } = await client.rpc("save_preferences", {
-      p_daily_minutes: preferences.dailyMinutes,
+      p_daily_minutes: totalMinutes(preferences.goals),
       // Topics and formats travel per language; the profile's own columns are left as they are.
       p_topics: null,
       p_content_types: null,

@@ -20,7 +20,7 @@ values
   ('c0000000-0000-4000-8000-000000000002', '50000000-0000-4000-8000-000000000001', 'it', 'article', 'IT', 'https://example.com/it', 'B2', 5, 's');
 
 insert into public.user_languages (user_id, language, level, target_level, weight)
-values ('b0000000-0000-4000-8000-000000000002', 'ru', 'B2', 'C1', 2);
+values ('b0000000-0000-4000-8000-000000000002', 'ru', 'B2', 'C1', 20);
 
 insert into public.missions (id, user_id, mission_date, budget_minutes, status, generated_at) values
   ('d0000000-0000-4000-8000-000000000001', 'a0000000-0000-4000-8000-000000000001', '2030-01-01', 30, 'ready', now()),
@@ -153,16 +153,16 @@ select throws_ok(
 
 select lives_ok(
   $$insert into public.user_languages (user_id, language, level, target_level, weight) values
-      ('a0000000-0000-4000-8000-000000000001', 'ru', 'B2', 'C1', 1),
-      ('a0000000-0000-4000-8000-000000000001', 'it', 'B1', 'B2', 1),
-      ('a0000000-0000-4000-8000-000000000001', 'es', 'A2', 'B1', 1),
-      ('a0000000-0000-4000-8000-000000000001', 'de', 'A1', 'A2', 1)$$,
+      ('a0000000-0000-4000-8000-000000000001', 'ru', 'B2', 'C1', 10),
+      ('a0000000-0000-4000-8000-000000000001', 'it', 'B1', 'B2', 10),
+      ('a0000000-0000-4000-8000-000000000001', 'es', 'A2', 'B1', 10),
+      ('a0000000-0000-4000-8000-000000000001', 'de', 'A1', 'A2', 10)$$,
   'a user can study 4 languages'
 );
 
 select throws_ok(
   $$insert into public.user_languages (user_id, language, level, target_level, weight)
-    values ('a0000000-0000-4000-8000-000000000001', 'en', 'B1', 'B2', 1)$$,
+    values ('a0000000-0000-4000-8000-000000000001', 'en', 'B1', 'B2', 10)$$,
   '23514',
   null,
   'a fifth language is rejected'
@@ -170,7 +170,7 @@ select throws_ok(
 
 select throws_ok(
   $$insert into public.user_languages (user_id, language, level, target_level, weight)
-    values ('b0000000-0000-4000-8000-000000000002', 'ru', 'B1', 'B2', 1)$$,
+    values ('b0000000-0000-4000-8000-000000000002', 'ru', 'B1', 'B2', 10)$$,
   '23505',
   null,
   'the same language twice for a user is rejected'
@@ -178,7 +178,7 @@ select throws_ok(
 
 select throws_ok(
   $$insert into public.user_languages (user_id, language, level, target_level, weight)
-    values ('b0000000-0000-4000-8000-000000000002', 'xx', 'B1', 'B2', 1)$$,
+    values ('b0000000-0000-4000-8000-000000000002', 'xx', 'B1', 'B2', 10)$$,
   '23503',
   null,
   'an unknown language code is rejected'

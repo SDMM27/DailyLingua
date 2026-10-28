@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { isValidTimeZone } from "@/lib/domain/dates";
+import { MAX_DAILY_MINUTES, MIN_LANGUAGE_MINUTES, totalMinutes } from "@/lib/domain/time-budget";
 import { cefrLevelSchema, contentTypeSchema, languageSchema } from "./common";
 
 export const TOPICS = [
@@ -34,8 +35,15 @@ export const languageGoalSchema = z.object({
   focus: z.string().trim().max(200),
   /** Why the learner studies this language; missing = general, so rows/payloads from before the field still parse. */
   purpose: languagePurposeSchema.default("general"),
-  /** Relative share of the daily time; weights are normalised across languages. */
-  weight: z.number().int().min(1).max(10),
+  /**
+   * Minutes per day for this language. The field keeps its historical name `weight` (storage, RPC):
+   * it used to be a relative share, and `splitBudget` still accepts it as one.
+   */
+  weight: z
+    .number()
+    .int()
+    .min(MIN_LANGUAGE_MINUTES, "Au moins 10 minutes par langue")
+    .max(MAX_DAILY_MINUTES, "Au plus 120 minutes par jour au total"),
   /** Interests for this language (French labels); each language has its own. */
   topics: z.array(topicSchema).min(1, "Choisis au moins un sujet"),
   /** Formats of content wanted for this language. */
@@ -43,20 +51,29 @@ export const languageGoalSchema = z.object({
 });
 export type LanguageGoal = z.infer<typeof languageGoalSchema>;
 
-export const preferencesSchema = z.object({
-  goals: z
-    .array(languageGoalSchema)
-    .min(1, "Choisis au moins une langue")
-    .max(4)
-    .refine((goals) => new Set(goals.map((g) => g.language)).size === goals.length, {
-      message: "Chaque langue ne peut apparaître qu'une fois",
-    }),
-  dailyMinutes: z.number().int().min(10).max(120),
-  difficulty: difficultyModeSchema,
-  /** HH:mm, local time in `timeZone`. */
-  generationTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Format HH:mm attendu"),
-  timeZone: z.string().min(1).refine(isValidTimeZone, "Fuseau horaire inconnu"),
-  /** Day streak shown on the home page; missing = shown, so data from before the field still parses. */
-  showStreak: z.boolean().default(true),
-});
+export const preferencesSchema = z
+  .object({
+    goals: z
+      .array(languageGoalSchema)
+      .min(1, "Choisis au moins une langue")
+      .max(4)
+      .refine((goals) => new Set(goals.map((g) => g.language)).size === goals.length, {
+        message: "Chaque langue ne peut apparaître qu'une fois",
+      }),
+    /**
+     * No longer entered: it is the sum of the languages' minutes, recomputed on save (and by the
+     * `save_preferences` RPC). Kept for code that still reads it.
+     */
+    dailyMinutes: z.number().int().min(10).max(120),
+    difficulty: difficultyModeSchema,
+    /** HH:mm, local time in `timeZone`. */
+    generationTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Format HH:mm attendu"),
+    timeZone: z.string().min(1).refine(isValidTimeZone, "Fuseau horaire inconnu"),
+    /** Day streak shown on the home page; missing = shown, so data from before the field still parses. */
+    showStreak: z.boolean().default(true),
+  })
+  .refine((prefs) => totalMinutes(prefs.goals) <= MAX_DAILY_MINUTES, {
+    message: "Au plus 120 minutes par jour au total",
+    path: ["goals"],
+  });
 export type Preferences = z.infer<typeof preferencesSchema>;

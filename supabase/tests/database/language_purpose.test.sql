@@ -14,8 +14,8 @@ set local role authenticated;
 
 select lives_ok(
   $$select public.save_preferences(30, array['histoire'], array['article'], 'matched', '07:00', 'Europe/Paris',
-    '[{"language": "ru", "level": "B2", "target_level": "C1", "focus": "", "weight": 2, "purpose": "professional"},
-      {"language": "it", "level": "B1", "target_level": "B2", "focus": "", "weight": 1}]')$$,
+    '[{"language": "ru", "level": "B2", "target_level": "C1", "focus": "", "weight": 20, "purpose": "professional"},
+      {"language": "it", "level": "B1", "target_level": "B2", "focus": "", "weight": 10}]')$$,
   'save_preferences accepts goals with and without purpose');
 
 select is(
@@ -28,8 +28,8 @@ select is(
 -- Saving again without purpose resets an existing row to general.
 select lives_ok(
   $$select public.save_preferences(30, array['histoire'], array['article'], 'matched', '07:00', 'Europe/Paris',
-    '[{"language": "ru", "level": "B2", "target_level": "C1", "focus": "", "weight": 2},
-      {"language": "it", "level": "B1", "target_level": "B2", "focus": "", "weight": 1, "purpose": "exam"}]')$$,
+    '[{"language": "ru", "level": "B2", "target_level": "C1", "focus": "", "weight": 20},
+      {"language": "it", "level": "B1", "target_level": "B2", "focus": "", "weight": 10, "purpose": "exam"}]')$$,
   'goals can be saved again');
 select is(
   (select string_agg(language || ':' || purpose, ',' order by language) from public.user_languages),

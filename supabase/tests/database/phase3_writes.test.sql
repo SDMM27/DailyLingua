@@ -36,8 +36,8 @@ set local role authenticated;
 
 select lives_ok(
   $$select public.save_preferences(45, array['histoire'], array['article'], 'challenge', '06:30', 'America/New_York',
-    '[{"language": "ru", "level": "B2", "target_level": "C1", "focus": "", "weight": 5},
-      {"language": "it", "level": "B1", "target_level": "B2", "focus": "parler", "weight": 2}]')$$,
+    '[{"language": "ru", "level": "B2", "target_level": "C1", "focus": "", "weight": 30},
+      {"language": "it", "level": "B1", "target_level": "B2", "focus": "parler", "weight": 15}]')$$,
   'a user without languages can save preferences (onboarding)');
 
 select is((select count(*)::int from public.user_languages), 2, 'both languages were saved');
@@ -47,24 +47,24 @@ select is(
 
 select lives_ok(
   $$select public.save_preferences(45, array['histoire'], array['article'], 'challenge', '06:30', 'America/New_York',
-    '[{"language": "ru", "level": "B2", "target_level": "C1", "focus": "", "weight": 5},
-      {"language": "it", "level": "B2", "target_level": "C1", "focus": "", "weight": 2},
-      {"language": "es", "level": "A2", "target_level": "B1", "focus": "", "weight": 1},
-      {"language": "de", "level": "A1", "target_level": "A2", "focus": "", "weight": 1}]')$$,
+    '[{"language": "ru", "level": "B2", "target_level": "C1", "focus": "", "weight": 30},
+      {"language": "it", "level": "B2", "target_level": "C1", "focus": "", "weight": 20},
+      {"language": "es", "level": "A2", "target_level": "B1", "focus": "", "weight": 10},
+      {"language": "de", "level": "A1", "target_level": "A2", "focus": "", "weight": 10}]')$$,
   'goals can grow to four languages');
 
 select lives_ok(
   $$select public.save_preferences(45, array['histoire'], array['article'], 'challenge', '06:30', 'America/New_York',
-    '[{"language": "ru", "level": "C1", "target_level": "C2", "focus": "", "weight": 5},
-      {"language": "it", "level": "B2", "target_level": "C1", "focus": "", "weight": 2},
-      {"language": "es", "level": "A2", "target_level": "B1", "focus": "", "weight": 1},
-      {"language": "de", "level": "A1", "target_level": "A2", "focus": "", "weight": 1}]')$$,
+    '[{"language": "ru", "level": "C1", "target_level": "C2", "focus": "", "weight": 30},
+      {"language": "it", "level": "B2", "target_level": "C1", "focus": "", "weight": 20},
+      {"language": "es", "level": "A2", "target_level": "B1", "focus": "", "weight": 10},
+      {"language": "de", "level": "A1", "target_level": "A2", "focus": "", "weight": 10}]')$$,
   'a user with four languages can still update them');
 select is((select level from public.user_languages where language = 'ru'), 'C1', 'the existing language was updated');
 
 select lives_ok(
   $$select public.save_preferences(30, array['histoire'], array['article'], 'matched', '07:00', 'Europe/Paris',
-    '[{"language": "it", "level": "B2", "target_level": "C1", "focus": "", "weight": 5}]')$$,
+    '[{"language": "it", "level": "B2", "target_level": "C1", "focus": "", "weight": 30}]')$$,
   'languages missing from the new list are removed');
 select is((select string_agg(language, ',') from public.user_languages), 'it', 'only the kept language remains');
 
@@ -73,15 +73,15 @@ select throws_ok(
   '23514', null, 'at least one language is required');
 select throws_ok(
   $$select public.save_preferences(30, array['histoire'], array['article'], 'matched', '07:00', 'Europe/Paris',
-    '[{"language": "ru", "level": "B2", "target_level": "C1", "focus": "", "weight": 1},
-      {"language": "it", "level": "B2", "target_level": "C1", "focus": "", "weight": 1},
-      {"language": "es", "level": "B2", "target_level": "C1", "focus": "", "weight": 1},
-      {"language": "de", "level": "B2", "target_level": "C1", "focus": "", "weight": 1},
-      {"language": "en", "level": "B2", "target_level": "C1", "focus": "", "weight": 1}]')$$,
+    '[{"language": "ru", "level": "B2", "target_level": "C1", "focus": "", "weight": 10},
+      {"language": "it", "level": "B2", "target_level": "C1", "focus": "", "weight": 10},
+      {"language": "es", "level": "B2", "target_level": "C1", "focus": "", "weight": 10},
+      {"language": "de", "level": "B2", "target_level": "C1", "focus": "", "weight": 10},
+      {"language": "en", "level": "B2", "target_level": "C1", "focus": "", "weight": 10}]')$$,
   '23514', null, 'five languages are rejected');
 select throws_ok(
   $$select public.save_preferences(30, array['histoire'], array['article'], 'matched', '07:00', 'Mars/Olympus',
-    '[{"language": "it", "level": "B2", "target_level": "C1", "focus": "", "weight": 5}]')$$,
+    '[{"language": "it", "level": "B2", "target_level": "C1", "focus": "", "weight": 30}]')$$,
   '22023', null, 'an unknown time zone is rejected');
 
 -- record_vocabulary_review ---------------------------------------------------------------------
