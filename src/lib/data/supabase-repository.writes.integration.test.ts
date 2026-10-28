@@ -58,8 +58,8 @@ const TIME_ZONE = "Pacific/Kiritimati";
 
 const PREFERENCES: Preferences = {
   goals: [
-    { language: "ru", level: "B2", targetLevel: "C1", focus: "", purpose: "general", weight: 20, topics: ["société"], contentTypes: ["article"] },
-    { language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 10, topics: ["société"], contentTypes: ["article"] },
+    { language: "ru", level: "B2", targetLevel: "C1", focus: "", purpose: "general", weight: 20, days: [1, 2, 3, 4, 5, 6, 7], topics: ["société"], contentTypes: ["article"] },
+    { language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 10, days: [1, 2, 3, 4, 5, 6, 7], topics: ["société"], contentTypes: ["article"] },
   ],
   dailyMinutes: 30,
   difficulty: "matched",
@@ -111,6 +111,20 @@ describe.skipIf(!stackIsUp)("Supabase repository writes (local database, throw-a
     ];
     await repo.savePreferences({ ...PREFERENCES, goals });
     expect((await repo.getPreferences())!.goals.map((g) => g.purpose)).toEqual(["professional", "exam"]);
+  });
+
+  it("round-trips the days of each language and stores the busiest day as daily minutes", async () => {
+    const goals = [
+      { ...PREFERENCES.goals[0], days: [1, 2, 3] },
+      { ...PREFERENCES.goals[1], days: [3, 4] },
+    ];
+    await repo.savePreferences({ ...PREFERENCES, dailyMinutes: 30, goals });
+    const saved = (await repo.getPreferences())!;
+    expect(saved.goals.map((g) => [g.language, g.days])).toEqual([["ru", [1, 2, 3]], ["it", [3, 4]]]);
+    // Wednesday carries both languages: 20 + 10.
+    expect(saved.dailyMinutes).toBe(30);
+    await repo.savePreferences({ ...PREFERENCES, dailyMinutes: 20, goals: [goals[0], { ...goals[1], days: [5] }] });
+    expect((await repo.getPreferences())!.dailyMinutes).toBe(20);
   });
 
   it("round-trips the topics and content types of each language", async () => {

@@ -1,16 +1,18 @@
-import { diffInDays } from "@/lib/domain/dates";
+import { workedDaysBefore } from "@/lib/domain/schedule";
 import type { ContentType, DateKey } from "@/lib/schemas/common";
 import type { GeneratedProductionMode, PlannedActivity, ProductionMode } from "@/lib/schemas/generation";
 import type { ActivityKind } from "@/lib/schemas/mission";
 
 /**
- * Writing or spoken (written, then said aloud), alternating day by day and between the languages
- * of the same day (parity of the day number plus the language's position), so each language gets
- * both over time and a day never asks for the same production everywhere. Deterministic: no state to store.
+ * Writing or spoken (written, then said aloud). It alternates with each day the language is worked
+ * (`days`, ISO weekdays; counted from a fixed Monday by `workedDaysBefore`), so a language worked
+ * on Monday and Wednesday still gets both modes, and with the language's `position` in the
+ * learner's list (not among the languages of the day, so it does not move when others rest): two
+ * languages of the same day get different modes when their positions differ by one.
+ * Deterministic: no state to store.
  */
-export function chooseProductionMode(date: DateKey, index: number): GeneratedProductionMode {
-  const day = diffInDays("1970-01-01", date);
-  return (((day + index) % 2) + 2) % 2 === 0 ? "writing" : "spoken";
+export function chooseProductionMode(date: DateKey, days: readonly number[], position: number): GeneratedProductionMode {
+  return (workedDaysBefore(days, date) + position) % 2 === 0 ? "writing" : "spoken";
 }
 
 /** A spoken production is written first, so its activity is a writing one (ticked on correction). */

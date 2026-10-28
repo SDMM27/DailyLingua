@@ -77,8 +77,8 @@ import type { WritingFeedbackResult } from "@/lib/schemas/writing-feedback";
 
 /** Outcome of asking for today's mission; internal reasons never leave the server. */
 export interface PrepareMissionResult {
-  /** pending: another request is writing it, ask again shortly; signup-required: the guest trial is over. */
-  status: "ready" | "pending" | "failed" | "no-content" | "signup-required";
+  /** pending: another request is writing it, ask again shortly; signup-required: the guest trial is over; rest-day: none of the languages is worked today. */
+  status: "ready" | "pending" | "failed" | "no-content" | "signup-required" | "rest-day";
 }
 
 /** Outcome of replacing the content of a session the user cannot read. */

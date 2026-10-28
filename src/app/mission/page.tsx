@@ -3,11 +3,13 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { GuestTrialBanner } from "@/components/auth/guest-trial-banner";
 import { TrialOverCard } from "@/components/auth/trial-over-card";
+import { RestDayCard } from "@/components/mission/rest-day-card";
 import { MissionPreparing } from "@/components/mission/mission-preparing";
 import { MissionView } from "@/components/mission/mission-view";
 import { Card, PageHeader } from "@/components/ui/primitives";
 import { getRepository, getToday, requirePreferences } from "@/lib/data/repository";
 import { formatLongDate } from "@/lib/domain/dates";
+import { goalsForDate } from "@/lib/domain/schedule";
 import { checkBudget } from "@/lib/domain/time-budget";
 
 export const metadata: Metadata = { title: "Mission du jour" };
@@ -17,7 +19,7 @@ export const maxDuration = 120;
 export default async function MissionPage() {
   await connection();
   const repo = await getRepository();
-  await requirePreferences();
+  const preferences = await requirePreferences();
   const today = await getToday();
   const mission = await repo.getMission(today);
   const guestTrial = await repo.getGuestTrial();
@@ -28,11 +30,13 @@ export default async function MissionPage() {
   );
 
   if (!mission && !repo.isDemo) {
+    // A rest day has no mission to prepare (the server would answer "rest-day" anyway).
+    const restDay = goalsForDate(preferences.goals, today).length === 0;
     return (
       <>
         <PageHeader eyebrow={formatLongDate(today)} title="Mission du jour" />
         {trialBanner}
-        {guestTrial && !guestTrial.canStartToday ? <TrialOverCard /> : <MissionPreparing />}
+        {restDay ? <RestDayCard homeLink /> : guestTrial && !guestTrial.canStartToday ? <TrialOverCard /> : <MissionPreparing />}
       </>
     );
   }

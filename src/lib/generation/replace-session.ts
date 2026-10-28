@@ -146,6 +146,8 @@ export async function replaceMissionSession(input: ReplaceSessionInput): Promise
     ]);
     const declaredSourceIds = await store.listDeclaredSourceIds(userId);
     const frequencies = await loadFrequencies([goal.language], { load: input.loadFrequency, log });
+    // Same inputs as in generateMission: the language's days and its position in the full list.
+    const position = preferences.goals.indexOf(goal);
     const options = { goal, preferences, declaredSourceIds, minutes: old.minutes, excludeIds, now: startedAt, frequency: frequencies.get(goal.language) };
     const pool = await loadUsablePool(store, options);
     if (!pool) {
@@ -159,7 +161,7 @@ export async function replaceMissionSession(input: ReplaceSessionInput): Promise
         buildSessionRequest({
           ...options,
           pool,
-          productionMode: chooseProductionMode(old.missionDate, old.position),
+          productionMode: chooseProductionMode(old.missionDate, goal.days, position),
         }),
       ],
     });

@@ -20,8 +20,8 @@ const NOW = new Date("2026-10-13T12:00:00Z");
 
 const preferences: Preferences = {
   goals: [
-    { language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 10, topics: ["société"], contentTypes: ["article"] },
-    { language: "es", level: "A2", targetLevel: "B1", focus: "oral", purpose: "conversational", weight: 10, topics: ["société"], contentTypes: ["article"] },
+    { language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 10, days: [1, 2, 3, 4, 5, 6, 7], topics: ["société"], contentTypes: ["article"] },
+    { language: "es", level: "A2", targetLevel: "B1", focus: "oral", purpose: "conversational", weight: 10, days: [1, 2, 3, 4, 5, 6, 7], topics: ["société"], contentTypes: ["article"] },
   ],
   dailyMinutes: 20,
   difficulty: "matched",
@@ -50,6 +50,8 @@ interface Calls {
   failed: { missionId: string; error: string }[];
   candidateQueries: { language: Language; contentTypes?: ContentType[] }[];
   usedSince: string[];
+  /** Budget (minutes) of each `claim`. */
+  claims: number[];
 }
 
 function memoryStore(
@@ -66,7 +68,7 @@ function memoryStore(
     declared?: string[];
   } = {},
 ) {
-  const calls: Calls = { completed: [], failed: [], candidateQueries: [], usedSince: [] };
+  const calls: Calls = { completed: [], failed: [], candidateQueries: [], usedSince: [], claims: [] };
   const pools = options.pools ?? { it: [content("it", 1), content("it", 2)], es: [content("es", 1)] };
   const store: MissionStore = {
     async getPreferences() {
@@ -88,7 +90,8 @@ function memoryStore(
     async listRefusedContentIds() {
       return options.refused ?? [];
     },
-    async claim() {
+    async claim(_userId, _date, budgetMinutes) {
+      calls.claims.push(budgetMinutes);
       return { missionId: "m1", ...(options.claim ?? { status: "generating", claimed: true }) };
     },
     async complete(missionId, sessions, meta) {
@@ -335,6 +338,59 @@ describe("generateMission", () => {
       expect(calls.candidateQueries).toEqual([]);
     }
     expect(generator.requests).toEqual([]);
+  });
+
+  describe("weekdays", () => {
+    // 2026-10-13 is a Tuesday. Italian: Monday and Tuesday (10 min); Spanish: Wednesday only (15 min).
+    const week: Preferences = {
+      ...preferences,
+      goals: [
+        { ...preferences.goals[0], days: [1, 2], weight: 10 },
+        { ...preferences.goals[1], days: [3], weight: 15 },
+      ],
+    };
+
+    it("makes no mission on a rest day: no claim, no model call", async () => {
+      const { store, calls } = memoryStore({ prefs: { ...week, goals: [{ ...week.goals[0], days: [1, 5] }, { ...week.goals[1], days: [3] }] } });
+      const generator = aiGenerator();
+      expect(await run(store, generator)).toEqual({ status: "rest-day" });
+      expect(calls.claims).toEqual([]);
+      expect(calls.candidateQueries).toEqual([]);
+      expect(calls.completed).toEqual([]);
+      expect(generator.requests).toEqual([]);
+    });
+
+    it("only plans the languages of the day, with their minutes as the budget", async () => {
+      const { store, calls } = memoryStore({ prefs: week });
+      const generator = aiGenerator();
+      expect(await run(store, generator)).toMatchObject({ status: "ready" });
+      expect(calls.claims).toEqual([10]);
+      expect(calls.candidateQueries.map((q) => q.language)).not.toContain("es");
+      expect(calls.completed[0].sessions.map((s) => s.language)).toEqual(["it"]);
+      expect(generator.requests[0].sessions).toHaveLength(1);
+      expect(generator.requests[0].sessions[0].minutes).toBe(10);
+    });
+
+    it("sums the minutes of the languages of the day", async () => {
+      const { store, calls } = memoryStore({ prefs: { ...week, goals: [{ ...week.goals[0], weight: 25 }, { ...week.goals[1], days: [2], weight: 15 }] } });
+      const generator = aiGenerator();
+      await run(store, generator);
+      expect(calls.claims).toEqual([40]);
+      expect(generator.requests[0].sessions.map((s) => s.minutes)).toEqual([25, 15]);
+    });
+
+    it("keeps a language's production mode tied to its position in the whole list", async () => {
+      const everyDay = [1, 2, 3, 4, 5, 6, 7];
+      const both = { ...preferences, goals: preferences.goals.map((g) => ({ ...g, days: everyDay })) };
+      const first = aiGenerator();
+      await run(memoryStore({ prefs: both }).store, first);
+      // Spanish alone that day (Italian rests): it keeps position 1, hence the other mode than Italian had.
+      const alone = { ...both, goals: [{ ...both.goals[0], days: [1] }, both.goals[1]] };
+      const second = aiGenerator();
+      await run(memoryStore({ prefs: alone }).store, second);
+      expect(second.requests[0].sessions[0].language).toBe("es");
+      expect(second.requests[0].sessions[0].productionMode).toBe(first.requests[0].sessions[1].productionMode);
+    });
   });
 
   it("needs preferences", async () => {

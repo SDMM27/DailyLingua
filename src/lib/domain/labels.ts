@@ -55,3 +55,8 @@ export const REVIEW_MODE_LABELS: Record<ReviewMode, string> = {
   listen: "Écouter",
   cloze: "Phrase à trou",
 };
+
+/** Weekdays by ISO number (index 0 = Monday): initial, short name and full name. */
+export const WEEKDAY_INITIALS = ["L", "M", "M", "J", "V", "S", "D"] as const;
+export const WEEKDAY_SHORT_NAMES = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"] as const;
+export const WEEKDAY_NAMES = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"] as const;

@@ -31,6 +31,8 @@ export interface DailyMissionsReport {
   failed: number;
   noContent: number;
   noPreferences: number;
+  /** None of the user's languages is worked that weekday (not an error). */
+  restDays: number;
   /** Exceptions thrown by `prepare` (it should return a "failed" outcome instead). */
   errors: number;
   /** Not started for lack of time. */
@@ -61,6 +63,7 @@ export async function runDailyMissions(input: DailyMissionsInput): Promise<Daily
     failed: 0,
     noContent: 0,
     noPreferences: 0,
+    restDays: 0,
     errors: 0,
     skipped: 0,
     staleGuestsDeleted: 0,
@@ -91,6 +94,9 @@ export async function runDailyMissions(input: DailyMissionsInput): Promise<Daily
             break;
           case "no-preferences":
             report.noPreferences++;
+            break;
+          case "rest-day":
+            report.restDays++;
             break;
         }
       } catch (error) {

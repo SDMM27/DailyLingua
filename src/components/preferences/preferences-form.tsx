@@ -7,8 +7,16 @@ import { PlusIcon } from "@/components/icons";
 import { languageStyle } from "@/components/ui/language-style";
 import { Card, Eyebrow, LanguageTag } from "@/components/ui/primitives";
 import { DEFAULT_LANGUAGE_TASTES } from "@/lib/domain/default-preferences";
-import { CONTENT_TYPE_LABELS, DIFFICULTY_LABELS, LANGUAGE_PURPOSE_LABELS } from "@/lib/domain/labels";
+import {
+  CONTENT_TYPE_LABELS,
+  DIFFICULTY_LABELS,
+  LANGUAGE_PURPOSE_LABELS,
+  WEEKDAY_INITIALS,
+  WEEKDAY_NAMES,
+  WEEKDAY_SHORT_NAMES,
+} from "@/lib/domain/labels";
 import { languageInfo } from "@/lib/domain/languages";
+import { ALL_WEEKDAYS, busiestDayMinutes, minutesOnWeekday } from "@/lib/domain/schedule";
 import {
   MAX_DAILY_MINUTES,
   MINUTES_STEP,
@@ -118,6 +126,9 @@ export function PreferencesForm({
       prefs.goals.map((g) => ({ ...g, weight: shares.find((s) => s.language === g.language)?.minutes ?? g.weight })),
     );
   };
+  // The header shows the busiest day; "au plus" when the days are not all alike.
+  const busiest = busiestDayMinutes(prefs.goals);
+  const uniformDays = ALL_WEEKDAYS.every((d) => minutesOnWeekday(prefs.goals, d) === busiest);
   const maxWeight = Math.max(...prefs.goals.map((g) => g.weight));
   const available = languages.filter((code) => !prefs.goals.some((g) => g.language === code)).sort((a, b) =>
     languageInfo(a).nameFr.localeCompare(languageInfo(b).nameFr, "fr"),
@@ -127,9 +138,9 @@ export function PreferencesForm({
     const goals = prefs.goals.map((g) =>
       follows(g) ? { ...g, topics: first.topics, contentTypes: first.contentTypes } : g,
     );
-    // The day's total is the sum of the languages' minutes; clamped here so that the schema reports
-    // the real error (a language or the total out of range) rather than the derived field.
-    const dailyMinutes = Math.min(MAX_DAILY_MINUTES, Math.max(MIN_LANGUAGE_MINUTES, totalMinutes(goals)));
+    // The busiest day's total; clamped here so that the schema reports the real error (a language
+    // or a day out of range) rather than the derived field.
+    const dailyMinutes = Math.min(MAX_DAILY_MINUTES, Math.max(MIN_LANGUAGE_MINUTES, busiestDayMinutes(goals)));
     const result = preferencesSchema.safeParse({ ...prefs, goals, dailyMinutes, timeZone });
     if (!result.success) {
       setSaveState({ kind: "error", messages: [...new Set(result.error.issues.map((i) => i.message))] });
@@ -168,7 +179,10 @@ export function PreferencesForm({
           <div className="mb-5">
             <div className="flex items-baseline justify-between">
               <span className="text-sm text-ink-soft">Temps quotidien</span>
-              <span className="font-serif text-2xl font-semibold">{total} min par jour</span>
+              <span className="font-serif text-2xl font-semibold">
+                {uniformDays ? "" : "au plus "}
+                {busiest} min par jour
+              </span>
             </div>
             <div className="mt-3 flex h-2 overflow-hidden rounded-full" aria-hidden="true">
               {split.map((s) => (
@@ -313,9 +327,52 @@ export function PreferencesForm({
                   onChange={(weight) => setGoal(goal.language, { weight })}
                 />
               </div>
+              <div className="mt-3">
+                <span className="mb-2 block text-xs font-medium text-ink-soft">Jours travaillés</span>
+                <div role="group" aria-label={`Jours travaillés ${languageInfo(goal.language).nameFr}`} className="flex gap-1.5">
+                  {ALL_WEEKDAYS.map((day) => {
+                    const active = goal.days.includes(day);
+                    // The last checked day cannot be removed: a language needs at least one day.
+                    const last = active && goal.days.length === 1;
+                    return (
+                      <button
+                        key={day}
+                        type="button"
+                        aria-pressed={active}
+                        aria-label={`${WEEKDAY_NAMES[day - 1]} ${languageInfo(goal.language).nameFr}`}
+                        disabled={last}
+                        onClick={() => setGoal(goal.language, { days: ALL_WEEKDAYS.filter((d) => (d === day ? !active : goal.days.includes(d))) })}
+                        className={`min-h-11 min-w-11 flex-1 rounded-full border text-sm font-medium transition-colors disabled:opacity-60 ${
+                          active ? "border-ink bg-ink text-paper" : "border-line text-ink-soft hover:bg-surface-sunk"
+                        }`}
+                      >
+                        {WEEKDAY_INITIALS[day - 1]}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </li>
           ))}
         </ul>
+        {prefs.goals.length > 0 && (
+          <div className="mt-4">
+            <p className="mb-2 text-xs font-medium text-ink-soft">Semaine</p>
+            <ul className="space-y-1 text-sm text-ink-soft" aria-label="Semaine">
+              {ALL_WEEKDAYS.map((day) => {
+                const worked = prefs.goals.filter((g) => g.days.includes(day));
+                return (
+                  <li key={day}>
+                    {WEEKDAY_SHORT_NAMES[day - 1]} :{" "}
+                    {worked.length === 0
+                      ? "repos"
+                      : `${worked.map((g) => languageInfo(g.language).nameFr.toLowerCase()).join(", ")} · ${minutesOnWeekday(prefs.goals, day)} min`}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
         {available.length > 0 && prefs.goals.length < MAX_LANGUAGES && (
           <div className="mt-4">
             <p className="mb-2 text-xs font-medium text-ink-soft">Ajouter une langue</p>
@@ -338,6 +395,7 @@ export function PreferencesForm({
                         focus: "",
                         purpose: "general",
                         weight: first ? ADDED_LANGUAGE_MINUTES : FIRST_LANGUAGE_MINUTES,
+                        days: [...ALL_WEEKDAYS],
                         ...tastes,
                       },
                     ]);

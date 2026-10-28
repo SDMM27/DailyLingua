@@ -32,28 +32,51 @@ describe("productionActivityKind", () => {
 });
 
 describe("chooseProductionMode", () => {
-  it("alternates from one day to the next", () => {
+  const EVERY_DAY = [1, 2, 3, 4, 5, 6, 7];
+  // 2026-10-12 is a Monday.
+  const monday = "2026-10-12";
+  const wednesday = "2026-10-14";
+  const nextMonday = "2026-10-19";
+
+  it("alternates from one day to the next when the language is worked every day", () => {
     const today = "2026-10-13";
-    expect(chooseProductionMode(today, 0)).not.toBe(chooseProductionMode(addDays(today, 1), 0));
-    expect(chooseProductionMode(today, 0)).toBe(chooseProductionMode(addDays(today, 2), 0));
+    expect(chooseProductionMode(today, EVERY_DAY, 0)).not.toBe(chooseProductionMode(addDays(today, 1), EVERY_DAY, 0));
+    expect(chooseProductionMode(today, EVERY_DAY, 0)).toBe(chooseProductionMode(addDays(today, 2), EVERY_DAY, 0));
   });
 
-  it("alternates between languages of the same day", () => {
-    expect(chooseProductionMode("2026-10-13", 0)).not.toBe(chooseProductionMode("2026-10-13", 1));
-    expect(chooseProductionMode("2026-10-13", 0)).toBe(chooseProductionMode("2026-10-13", 2));
+  it("alternates between the worked days of a Monday-Wednesday language", () => {
+    const days = [1, 3];
+    const modes = [monday, wednesday, nextMonday, addDays(nextMonday, 2)].map((d) => chooseProductionMode(d, days, 0));
+    expect(modes[0]).not.toBe(modes[1]);
+    expect(modes[1]).not.toBe(modes[2]);
+    expect(modes[2]).not.toBe(modes[3]);
+    expect(modes[0]).toBe(modes[2]);
+  });
+
+  it("alternates between the worked days of a Monday-Tuesday language", () => {
+    const days = [1, 2];
+    const modes = [monday, addDays(monday, 1), nextMonday, addDays(nextMonday, 1)].map((d) => chooseProductionMode(d, days, 0));
+    expect(modes[0]).not.toBe(modes[1]);
+    expect(modes[1]).not.toBe(modes[2]);
+    expect(modes[2]).not.toBe(modes[3]);
+  });
+
+  it("gives two languages of the same day different modes when their positions differ by one", () => {
+    expect(chooseProductionMode(monday, EVERY_DAY, 0)).not.toBe(chooseProductionMode(monday, EVERY_DAY, 1));
+    expect(chooseProductionMode(monday, [1, 3], 0)).not.toBe(chooseProductionMode(monday, [1, 3], 1));
+    expect(chooseProductionMode(monday, EVERY_DAY, 0)).toBe(chooseProductionMode(monday, EVERY_DAY, 2));
   });
 
   it("never produces the former speaking-only task, and still uses both modes", () => {
     const modes = new Set<string>();
     for (let day = 0; day < 6; day++) {
-      for (let index = 0; index < 4; index++) modes.add(chooseProductionMode(addDays("2026-10-13", day), index));
+      for (let index = 0; index < 4; index++) modes.add(chooseProductionMode(addDays("2026-10-13", day), EVERY_DAY, index));
     }
     expect([...modes].sort()).toEqual(["spoken", "writing"]);
   });
 
-  it("is deterministic, also before 1970", () => {
-    expect(chooseProductionMode("1969-12-31", 0)).toBe(chooseProductionMode("1969-12-31", 0));
-    expect(chooseProductionMode("1969-12-31", 0)).not.toBe(chooseProductionMode("1970-01-01", 0));
+  it("is deterministic, also before the reference date", () => {
+    expect(chooseProductionMode("1969-12-31", EVERY_DAY, 0)).toBe(chooseProductionMode("1969-12-31", EVERY_DAY, 0));
   });
 });
 

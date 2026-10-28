@@ -34,7 +34,7 @@ async function localStackIsUp(): Promise<boolean> {
 }
 
 const PREFERENCES: Preferences = {
-  goals: [{ language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 10, topics: ["société"], contentTypes: ["article"] }],
+  goals: [{ language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 10, days: [1, 2, 3, 4, 5, 6, 7], topics: ["société"], contentTypes: ["article"] }],
   dailyMinutes: 20,
   difficulty: "matched",
   generationTime: "07:00",

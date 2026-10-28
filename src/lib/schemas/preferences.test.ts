@@ -19,11 +19,47 @@ describe("minutes per language", () => {
   it("refuses a day above 120 minutes in total, and accepts exactly 120", () => {
     const [ru, it] = MOCK_PREFERENCES.goals;
     const withMinutes = (a: number, b: number) =>
-      preferencesSchema.safeParse({ ...MOCK_PREFERENCES, goals: [{ ...ru, weight: a }, { ...it, weight: b }] });
+      preferencesSchema.safeParse({ ...MOCK_PREFERENCES, goals: [{ ...ru, weight: a }, { ...it, weight: b, days: ru.days }] });
     const over = withMinutes(75, 50);
     expect(over.success).toBe(false);
     expect(over.error?.issues[0].message).toBe("Au plus 120 minutes par jour au total");
     expect(withMinutes(70, 50).success).toBe(true);
+  });
+
+  it("checks the total of each weekday, not of the week", () => {
+    const [ru, it] = MOCK_PREFERENCES.goals;
+    const withDays = (a: number[], b: number[]) =>
+      preferencesSchema.safeParse({
+        ...MOCK_PREFERENCES,
+        goals: [{ ...ru, weight: 80, days: a }, { ...it, weight: 60, days: b }],
+      });
+    // 140 minutes in the week's total, but never on the same day.
+    expect(withDays([1, 2, 3], [4, 5, 6]).success).toBe(true);
+    const over = withDays([1, 2, 3], [3, 4]);
+    expect(over.success).toBe(false);
+    expect(over.error?.issues[0].message).toBe("Au plus 120 minutes par jour au total (mercredi)");
+  });
+});
+
+describe("languageGoalSchema days", () => {
+  it("defaults to every day when absent, so old payloads stay valid", () => {
+    expect(languageGoalSchema.parse(goal).days).toEqual([1, 2, 3, 4, 5, 6, 7]);
+  });
+
+  it("keeps the chosen days", () => {
+    expect(languageGoalSchema.parse({ ...goal, days: [1, 3, 5] }).days).toEqual([1, 3, 5]);
+  });
+
+  it("refuses an empty list", () => {
+    const result = languageGoalSchema.safeParse({ ...goal, days: [] });
+    expect(result.error?.issues[0].message).toBe("Choisis au moins un jour");
+  });
+
+  it("refuses duplicates and values outside 1..7", () => {
+    expect(languageGoalSchema.safeParse({ ...goal, days: [1, 1] }).success).toBe(false);
+    expect(languageGoalSchema.safeParse({ ...goal, days: [0] }).success).toBe(false);
+    expect(languageGoalSchema.safeParse({ ...goal, days: [8] }).success).toBe(false);
+    expect(languageGoalSchema.safeParse({ ...goal, days: [1.5] }).success).toBe(false);
   });
 });
 

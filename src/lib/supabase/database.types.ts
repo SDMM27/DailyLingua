@@ -415,14 +415,14 @@ isOneToOne: false
                   ]
                 },"user_languages": {
                   Row: {
-                    "content_types": (string)[],"created_at": string,"focus": string,"id": string,"language": string,"level": string,"purpose": string,"target_level": string,"topics": (string)[],"updated_at": string,"user_id": string,"weight": number
+                    "content_types": (string)[],"created_at": string,"days": (number)[],"focus": string,"id": string,"language": string,"level": string,"purpose": string,"target_level": string,"topics": (string)[],"updated_at": string,"user_id": string,"weight": number
                   }
                   ComputedFields: never
                   Insert: {
-                    "content_types"?: (string)[],"created_at"?: string,"focus"?: string,"id"?: string,"language": string,"level": string,"purpose"?: string,"target_level": string,"topics"?: (string)[],"updated_at"?: string,"user_id": string,"weight"?: number
+                    "content_types"?: (string)[],"created_at"?: string,"days"?: (number)[],"focus"?: string,"id"?: string,"language": string,"level": string,"purpose"?: string,"target_level": string,"topics"?: (string)[],"updated_at"?: string,"user_id": string,"weight"?: number
                   }
                   Update: {
-                    "content_types"?: (string)[],"created_at"?: string,"focus"?: string,"id"?: string,"language"?: string,"level"?: string,"purpose"?: string,"target_level"?: string,"topics"?: (string)[],"updated_at"?: string,"user_id"?: string,"weight"?: number
+                    "content_types"?: (string)[],"created_at"?: string,"days"?: (number)[],"focus"?: string,"id"?: string,"language"?: string,"level"?: string,"purpose"?: string,"target_level"?: string,"topics"?: (string)[],"updated_at"?: string,"user_id"?: string,"weight"?: number
                   }
                   Relationships: [
                     {
@@ -628,6 +628,9 @@ isOneToOne: false
                            },
 "fail_mission_generation":
 { Args: { "p_error": string,"p_mission_id": string }; Returns: undefined
+                           },
+"is_valid_weekdays":
+{ Args: { "p_days": (number)[] }; Returns: boolean
                            },
 "list_due_mission_users":
 { Args: { "p_active_within"?: string,"p_limit"?: number,"p_max_attempts"?: number,"p_now"?: string }; Returns: {

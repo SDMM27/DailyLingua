@@ -9,7 +9,7 @@ import { guestTrialStatus, type GuestTrialStatus } from "@/lib/domain/guest-tria
 import { LANGUAGE_CODES } from "@/lib/domain/languages";
 import { RETENTION_MIN_DELAY_DAYS, RETENTION_WINDOW_DAYS, retentionByMode, type RetentionRow } from "@/lib/domain/review-modes";
 import { applyReview, initialReviewState } from "@/lib/domain/spaced-repetition";
-import { totalMinutes } from "@/lib/domain/time-budget";
+import { busiestDayMinutes } from "@/lib/domain/schedule";
 import type { Database } from "@/lib/supabase/database.types";
 import { availableLanguages } from "@/lib/content/availability";
 import { SOURCE_CATALOG } from "@/lib/content/catalog";
@@ -307,6 +307,7 @@ export async function fetchPreferences(client: Client, userId: string): Promise<
       focus: row.focus,
       purpose: row.purpose,
       weight: row.weight,
+      days: row.days,
       topics: row.topics,
       contentTypes: row.content_types,
     })),
@@ -471,6 +472,7 @@ export function createSupabaseRepository(
       case "pending":
       case "failed":
       case "no-content":
+      case "rest-day":
         return { status: outcome.status };
       case "no-preferences":
         throw new UserFacingError("Choisis d’abord tes langues.");
@@ -674,7 +676,7 @@ export function createSupabaseRepository(
 
   async function savePreferences(preferences: Preferences): Promise<void> {
     const { error } = await client.rpc("save_preferences", {
-      p_daily_minutes: totalMinutes(preferences.goals),
+      p_daily_minutes: busiestDayMinutes(preferences.goals),
       // Topics and formats travel per language; the profile's own columns are left as they are.
       p_topics: null,
       p_content_types: null,
@@ -689,6 +691,7 @@ export function createSupabaseRepository(
         focus: g.focus,
         purpose: g.purpose,
         weight: g.weight,
+        days: g.days,
         topics: g.topics,
         content_types: g.contentTypes,
       })),

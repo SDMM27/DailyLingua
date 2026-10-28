@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { isValidTimeZone } from "@/lib/domain/dates";
-import { MAX_DAILY_MINUTES, MIN_LANGUAGE_MINUTES, totalMinutes } from "@/lib/domain/time-budget";
+import { WEEKDAY_NAMES } from "@/lib/domain/labels";
+import { ALL_WEEKDAYS, minutesOnWeekday } from "@/lib/domain/schedule";
+import { MAX_DAILY_MINUTES, MIN_LANGUAGE_MINUTES } from "@/lib/domain/time-budget";
 import { cefrLevelSchema, contentTypeSchema, languageSchema } from "./common";
 
 export const TOPICS = [
@@ -44,6 +46,15 @@ export const languageGoalSchema = z.object({
     .int()
     .min(MIN_LANGUAGE_MINUTES, "Au moins 10 minutes par langue")
     .max(MAX_DAILY_MINUTES, "Au plus 120 minutes par jour au total"),
+  /**
+   * ISO weekdays (1 = Monday … 7 = Sunday) on which the language is worked, at least one, no
+   * duplicate. Missing = every day, so rows/payloads from before the field still parse.
+   */
+  days: z
+    .array(z.number().int().min(1).max(7))
+    .min(1, "Choisis au moins un jour")
+    .refine((days) => new Set(days).size === days.length, { message: "Chaque jour ne peut apparaître qu'une fois" })
+    .default([...ALL_WEEKDAYS]),
   /** Interests for this language (French labels); each language has its own. */
   topics: z.array(topicSchema).min(1, "Choisis au moins un sujet"),
   /** Formats of content wanted for this language. */
@@ -61,8 +72,8 @@ export const preferencesSchema = z
         message: "Chaque langue ne peut apparaître qu'une fois",
       }),
     /**
-     * No longer entered: it is the sum of the languages' minutes, recomputed on save (and by the
-     * `save_preferences` RPC). Kept for code that still reads it.
+     * No longer entered: it is the total of the busiest weekday (the languages' minutes of that
+     * day), recomputed on save (and by the `save_preferences` RPC). Kept for code that still reads it.
      */
     dailyMinutes: z.number().int().min(10).max(120),
     difficulty: difficultyModeSchema,
@@ -72,8 +83,11 @@ export const preferencesSchema = z
     /** Day streak shown on the home page; missing = shown, so data from before the field still parses. */
     showStreak: z.boolean().default(true),
   })
-  .refine((prefs) => totalMinutes(prefs.goals) <= MAX_DAILY_MINUTES, {
-    message: "Au plus 120 minutes par jour au total",
-    path: ["goals"],
+  .superRefine((prefs, ctx) => {
+    // A day may carry any number of languages, as long as they fit in 120 minutes together.
+    const over = ALL_WEEKDAYS.filter((weekday) => minutesOnWeekday(prefs.goals, weekday) > MAX_DAILY_MINUTES);
+    if (over.length === 0) return;
+    const names = over.length < ALL_WEEKDAYS.length ? ` (${over.map((d) => WEEKDAY_NAMES[d - 1]).join(", ")})` : "";
+    ctx.addIssue({ code: "custom", message: `Au plus 120 minutes par jour au total${names}`, path: ["goals"] });
   });
 export type Preferences = z.infer<typeof preferencesSchema>;

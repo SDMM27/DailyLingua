@@ -10,6 +10,7 @@ export const MOCK_PREFERENCES: Preferences = {
       focus: "Compréhension fine, registre soutenu, connecteurs écrits",
       purpose: "general",
       weight: 20,
+      days: [1, 2, 3, 4, 5, 6, 7],
       topics: ["société", "culture", "histoire", "sciences", "cinéma"],
       contentTypes: ["article", "podcast", "interview"],
     },
@@ -20,11 +21,13 @@ export const MOCK_PREFERENCES: Preferences = {
       focus: "Vocabulaire actif, expression orale, spontanéité",
       purpose: "conversational",
       weight: 10,
+      // Monday, Wednesday, Friday: the "Semaine" block of the form shows an alternating week.
+      days: [1, 3, 5],
       topics: ["société", "culture", "histoire", "sciences", "cinéma"],
       contentTypes: ["article", "podcast", "interview"],
     },
   ],
-  dailyMinutes: 30,
+  dailyMinutes: 30, // the busiest day (Monday, Wednesday, Friday: 20 + 10)
   difficulty: "matched",
   generationTime: "07:00",
   timeZone: DEFAULT_TIME_ZONE,

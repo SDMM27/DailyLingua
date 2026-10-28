@@ -6,6 +6,7 @@ import { AlphabetPreview } from "@/components/dashboard/alphabet-preview";
 import { GrammarPreview } from "@/components/dashboard/grammar-preview";
 import { InstallBanner } from "@/components/install/install-banner";
 import { MissionSummaryCard } from "@/components/dashboard/mission-summary-card";
+import { RestDayCard } from "@/components/mission/rest-day-card";
 import { ReviewPreview } from "@/components/dashboard/review-preview";
 import { WeekCard } from "@/components/dashboard/week-card";
 import { languageStyle } from "@/components/ui/language-style";
@@ -21,6 +22,7 @@ import { LEARNING_PATHS, pathInvites, pathStage, type PathModule } from "@/lib/d
 import { grammarLanguages } from "@/lib/grammar/courses";
 import { readGrammarDraftPolicy, visibleGrammarPoints } from "@/lib/grammar/policy";
 import { dueItems, dueToday, upcomingReviews } from "@/lib/domain/spaced-repetition";
+import { goalsForDate } from "@/lib/domain/schedule";
 import { computeStreak, recentDays } from "@/lib/domain/stats";
 import { completedMinutes } from "@/lib/domain/time-budget";
 
@@ -71,11 +73,15 @@ export default async function DashboardPage() {
   const grammarInvited = goalStages.find(({ goal, stage }) => grammarOfUser.includes(goal.language) && pathInvites(stage, "grammar"));
   const grammarLanguage = dueGrammar[0]?.language ?? grammarInvited?.goal.language;
   const primaryStage = goalStages[0].stage; // the first goal is the main language
+  // No language is worked today: no mission is expected (the reviews below stay daily).
+  const restDay = goalsForDate(preferences.goals, today).length === 0;
+  // The weekdays the learner works on; the streak skips the other ones. Current days apply to past dates too.
+  const studyWeekdays = new Set(preferences.goals.flatMap((g) => g.days));
   const progress = mission ? await repo.getMissionProgress(mission) : null;
 
   const weekStart = addDays(today, -6);
   const stats = {
-    streak: computeStreak(studyDates, today),
+    streak: computeStreak(studyDates, today, studyWeekdays),
     daysStudied: new Set(studyDates).size,
     wordsKnown: vocabulary.filter((v) => v.status === "known").length,
     weekMinutes: history
@@ -144,6 +150,8 @@ export default async function DashboardPage() {
           mission={mission}
           doneMinutes={completedMinutes(mission, new Set(progress?.completedActivityIds))}
         />
+      ) : restDay ? (
+        <RestDayCard />
       ) : (
         <Card>
           <Eyebrow>Mission du jour</Eyebrow>

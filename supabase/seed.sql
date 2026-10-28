@@ -291,11 +291,11 @@ begin
   where id = demo_id;
 
   insert into public.user_languages (
-    user_id, language, level, target_level, focus, weight, purpose, topics, content_types
+    user_id, language, level, target_level, focus, weight, days, purpose, topics, content_types
   ) values
-    (demo_id, 'ru', 'B2', 'C1', 'Compréhension fine, registre soutenu, connecteurs écrits', 20, 'general',
+    (demo_id, 'ru', 'B2', 'C1', 'Compréhension fine, registre soutenu, connecteurs écrits', 20, '{1,2,3,4,5,6,7}', 'general',
      array['société', 'culture', 'histoire', 'sciences', 'cinéma'], array['article', 'podcast', 'interview']),
-    (demo_id, 'it', 'B1', 'B2', 'Vocabulaire actif, expression orale, spontanéité', 10, 'conversational',
+    (demo_id, 'it', 'B1', 'B2', 'Vocabulaire actif, expression orale, spontanéité', 10, '{1,3,5}', 'conversational',
      array['société', 'culture', 'histoire', 'sciences', 'cinéma'], array['article', 'podcast', 'interview']);
 
   insert into public.sources (name, homepage_url) values
