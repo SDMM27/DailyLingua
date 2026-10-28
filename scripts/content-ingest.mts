@@ -5,6 +5,8 @@
  *   npm run content:ingest -- --source meduza   one or more sources (repeatable)
  *   npm run content:ingest -- --no-links        skip link checks
  *
+ * Then classifies the new contents by domain (Claude), unless CONTENT_TOPICS=off or no key is set;
+ * `npm run content:topics` does that part alone.
  * Needs NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (read from .env.local).
  * The daily job (/api/cron/ingest, phase 6) runs the same `ingest()`.
  */
@@ -14,6 +16,9 @@ import { SOURCE_CATALOG } from "@/lib/content/catalog";
 import { ingest } from "@/lib/content/ingest";
 import { readContentLicensePolicy } from "@/lib/content/policy";
 import { createSupabaseContentStore } from "@/lib/content/supabase-store";
+import { classifyPendingContents } from "@/lib/content/topics";
+import { readContentTopicsConfig } from "@/lib/generation/config";
+import { createClaudeTopicClassifier } from "@/lib/generation/content-topics";
 import type { Database } from "@/lib/supabase/database.types";
 
 const { values } = parseArgs({
@@ -39,7 +44,8 @@ if (unknown.length > 0) {
 const client = createClient<Database>(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
 const policy = readContentLicensePolicy();
 const started = Date.now();
-const report = await ingest(SOURCE_CATALOG, createSupabaseContentStore(client), {
+const store = createSupabaseContentStore(client);
+const report = await ingest(SOURCE_CATALOG, store, {
   policy,
   only: values.source,
   linkChecks: values["no-links"] ? 0 : undefined,
@@ -60,6 +66,16 @@ console.table(
   })),
 );
 console.log("Liens vérifiés :", report.links);
+const topicsConfig = readContentTopicsConfig();
+if (topicsConfig.enabled) {
+  const topics = await classifyPendingContents(
+    store,
+    createClaudeTopicClassifier({ apiKeys: topicsConfig.apiKeys, model: topicsConfig.model }),
+  );
+  console.log(`Thèmes : ${topics.classified} contenus classés, ${topics.failedBatches} lots en échec.`);
+} else {
+  console.log("Thèmes : classement désactivé (pas de clé Anthropic, ou CONTENT_TOPICS=off).");
+}
 const failed = report.sources.filter((s) => s.status === "error").length;
 const inserted = report.sources.reduce((total, s) => total + s.inserted, 0);
 console.log(`\n${inserted} nouveaux contenus, ${failed} flux en erreur, ${((Date.now() - started) / 1000).toFixed(1)} s.`);

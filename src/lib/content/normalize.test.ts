@@ -64,7 +64,16 @@ describe("normalizeItem", () => {
       categories: ["Viaggi"],
       publishedAt: new Date("2026-10-13T08:00:00Z"),
       audioUrl: null,
+      topics: null,
     });
+  });
+
+  it("gives the draft the source's fixed domains, and none to classify otherwise", () => {
+    expect(draftOf(normalizeItem(item(), source({ defaultTopics: ["sciences", "histoire"] }), NOW)).topics).toEqual([
+      "sciences",
+      "histoire",
+    ]);
+    expect(draftOf(normalizeItem(item(), source(), NOW)).topics).toBeNull();
   });
 
   it("caps the teaser at 280 characters, and a full-text fallback at 200", () => {

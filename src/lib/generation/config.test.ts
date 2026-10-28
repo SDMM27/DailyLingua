@@ -3,6 +3,7 @@ import {
   DEFAULT_GUEST_DAILY_MISSION_CAP,
   DEFAULT_MISSION_MODEL,
   readApiKeys,
+  readContentTopicsConfig,
   readGenerationConfig,
   readGuestDailyMissionCap,
   readVocabularyTranslationConfig,
@@ -124,6 +125,25 @@ describe("readVocabularyTranslationConfig", () => {
     expect(() => readVocabularyTranslationConfig({ VOCABULARY_TRANSLATION: "maybe" })).toThrow(
       /VOCABULARY_TRANSLATION invalide/,
     );
+  });
+});
+
+describe("readContentTopicsConfig", () => {
+  it("is off without a key, on with one (mission model by default)", () => {
+    expect(readContentTopicsConfig({})).toEqual({ enabled: false });
+    expect(readContentTopicsConfig({ ANTHROPIC_API_KEY: "sk-test" })).toEqual({
+      enabled: true,
+      apiKeys: ["sk-test"],
+      model: DEFAULT_MISSION_MODEL,
+    });
+    expect(readContentTopicsConfig({ ANTHROPIC_API_KEY: "sk-test", CONTENT_TOPICS_MODEL: "claude-sonnet-5-5" })).toMatchObject({
+      model: "claude-sonnet-5-5",
+    });
+  });
+
+  it("can be switched off, and refuses an unknown value", () => {
+    expect(readContentTopicsConfig({ ANTHROPIC_API_KEY: "sk-test", CONTENT_TOPICS: "off" })).toEqual({ enabled: false });
+    expect(() => readContentTopicsConfig({ CONTENT_TOPICS: "maybe" })).toThrow(/CONTENT_TOPICS invalide/);
   });
 });
 

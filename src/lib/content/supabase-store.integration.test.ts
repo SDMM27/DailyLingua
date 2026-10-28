@@ -65,6 +65,7 @@ function draft(path: string, minutesAgo: number): ContentDraft {
     categories: ["Prova"],
     publishedAt: new Date(Date.now() - minutesAgo * 60_000),
     audioUrl: null,
+    topics: null,
   };
 }
 
@@ -160,6 +161,56 @@ describe.skipIf(!stackIsUp)("content ingestion on Supabase (local database)", ()
     expect(after.some((p) => p.id === a!.id)).toBe(false);
     const { data } = await admin.from("contents").select("url_status").eq("id", a!.id).single();
     expect(data?.url_status).toBe("unchecked");
+  });
+
+  it("lists the contents to classify, newest first, then stores their domains", async () => {
+    // Back to unclassified: the previous tests left some of this run's rows with a broken link.
+    await admin.from("contents").update({ topics: null, url_status: "unchecked" }).eq("source_id", sourceId);
+    await admin.from("contents").update({ fetched_at: "2000-01-01T00:00:00Z" }).eq("source_id", sourceId);
+    const { data: rows } = await admin.from("contents").select("id, url").eq("source_id", sourceId);
+    const a = rows!.find((r) => r.url === `https://${HOST}/a`)!;
+    const b = rows!.find((r) => r.url === `https://${HOST}/b`)!;
+    await admin.from("contents").update({ fetched_at: "2000-01-02T00:00:00Z" }).eq("id", a.id);
+
+    // The local database may hold real contents to classify: look at this run's rows only.
+    const mine = async () => (await store().listUnclassifiedContents(5000)).filter((c) => c.id === a.id || c.id === b.id);
+    expect((await mine()).map((c) => c.id)).toEqual([a.id, b.id]);
+    expect((await mine())[0]).toMatchObject({ language: "it", title: "Articolo di prova a", summary: "Una breve presentazione." });
+
+    await store().setContentTopics([
+      { id: a.id, topics: ["société", "sciences"] },
+      { id: b.id, topics: [] },
+    ]);
+    expect(await mine()).toEqual([]);
+    const { data } = await admin.from("contents").select("id, topics").in("id", [a.id, b.id]);
+    expect(data!.find((r) => r.id === a.id)?.topics).toEqual(["société", "sciences"]);
+    expect(data!.find((r) => r.id === b.id)?.topics).toEqual([]);
+
+    // A broken link is not worth classifying.
+    await admin.from("contents").update({ topics: null, url_status: "broken" }).eq("id", b.id);
+    expect((await mine()).map((c) => c.id)).toEqual([a.id].filter(() => false));
+  });
+
+  it("refuses domains outside the list or more than three per content", async () => {
+    const { data: rows } = await admin.from("contents").select("id").eq("source_id", sourceId).limit(1);
+    const id = rows![0].id;
+    expect((await admin.from("contents").update({ topics: ["cuisine"] }).eq("id", id)).error?.code).toBe("23514");
+    expect(
+      (await admin.from("contents").update({ topics: ["société", "culture", "histoire", "sciences"] }).eq("id", id)).error?.code,
+    ).toBe("23514");
+  });
+
+  it("applies a source's domains to its unclassified contents only", async () => {
+    await admin.from("contents").update({ topics: null, url_status: "unchecked" }).eq("source_id", sourceId);
+    const { data: rows } = await admin.from("contents").select("id").eq("source_id", sourceId).order("id");
+    await admin.from("contents").update({ topics: ["sport"] }).eq("id", rows![0].id);
+
+    expect(await store().applySourceTopics(TEST_SOURCE.key, ["voyage"])).toBe(rows!.length - 1);
+    expect(await store().applySourceTopics(TEST_SOURCE.key, ["voyage"])).toBe(0);
+    expect(await store().applySourceTopics("unknown-source", ["voyage"])).toBe(0);
+    const { data } = await admin.from("contents").select("id, topics").eq("source_id", sourceId);
+    expect(data!.find((r) => r.id === rows![0].id)?.topics).toEqual(["sport"]);
+    expect(data!.filter((r) => r.id !== rows![0].id).every((r) => r.topics?.[0] === "voyage")).toBe(true);
   });
 
   it("under the commercial policy, hides sources that do not allow it", async () => {

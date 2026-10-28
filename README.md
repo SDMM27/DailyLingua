@@ -42,6 +42,7 @@ Si la page ne s’ouvre pas, autoriser Node.js dans le pare-feu Windows (réseau
 | `npm run db:types` | Régénère `src/lib/supabase/database.types.ts` depuis la base locale |
 | `npm run content:check` | Vérifie le catalogue de sources sans toucher la base : flux, items, liens, pages de conditions et de licence (`-- --source <clé> --verbose`) |
 | `npm run content:ingest` | Relève les flux et enregistre les nouveaux contenus dans Supabase, puis vérifie les liens (`-- --source <clé>`, `-- --no-links`) |
+| `npm run content:topics` | Classe par domaine les contenus encore sans thème (`-- --backfill` : applique d’abord les thèmes fixes des sources, puis classe tout le stock) |
 | `npm run mission:generate` | Prépare la mission d’un utilisateur (`-- --email <adresse>`, `--date AAAA-MM-JJ`, `--template` sans IA, `--replace` en local seulement) et affiche la trace (modèle, tokens, durée) |
 | `npm run cron:run` | Lance une tâche planifiée en local, sans HTTP (`-- ingest` ou `-- missions`) et affiche son rapport |
 | `npm run placement:check` | Vérifie les banques de questions du test de niveau (`-- <code>` pour une seule langue) : structure, consignes d’écriture contrôlables automatiquement |
@@ -145,6 +146,8 @@ npm run content:ingest    # remplit la base locale (Supabase lancé, .env.local 
 ```
 
 La relève automatique est faite toutes les 6 heures par la tâche planifiée de la phase 6, qui appelle la même fonction `ingest()`.
+
+Chaque contenu reçoit 0 à 3 domaines (les `TOPICS`) : ceux que la source porte dans le catalogue (`defaultTopics`) ou, à défaut, ceux que Claude Haiku lit dans le titre et l’accroche, par lots de 20, après chaque relève (`CONTENT_TOPICS=off` le coupe ; `npm run content:topics -- --backfill` rattrape les contenus déjà en base ; `npm run content:coverage -- --topics` affiche la matrice domaine × niveau).
 
 ### Schéma
 

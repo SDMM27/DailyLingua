@@ -23,26 +23,26 @@ declare
     [
       {"language": "ru", "type": "podcast", "source": "Arzamas", "difficulty": "C1", "minutes": 25,
        "title": "Как читать Платонова: язык, который сопротивляется",
-       "url": "https://arzamas.academy", "score": [3, 3]},
+       "url": "https://arzamas.academy", "score": [3, 3], "topics": ["littérature", "culture"]},
       {"language": "it", "type": "article", "source": "Il Post", "difficulty": "B2", "minutes": 6,
        "title": "Le città italiane che si svuotano",
-       "url": "https://www.ilpost.it", "score": [2, 3]}
+       "url": "https://www.ilpost.it", "score": [2, 3], "topics": ["société"]}
     ],
     [
       {"language": "ru", "type": "video", "source": "ПостНаука", "difficulty": "C1", "minutes": 12,
        "title": "Почему мы так плохо запоминаем лица",
-       "url": "https://postnauka.org/video", "score": [2, 3]},
+       "url": "https://postnauka.org/video", "score": [2, 3], "topics": ["sciences"]},
       {"language": "it", "type": "interview", "source": "Rai Radio 3", "difficulty": "B2", "minutes": 10,
        "title": "Intervista: il mestiere del doppiatore",
-       "url": "https://www.raiplaysound.it", "score": null}
+       "url": "https://www.raiplaysound.it", "score": null, "topics": ["cinéma", "culture"]}
     ],
     [
       {"language": "ru", "type": "article", "source": "Медуза", "difficulty": "B2", "minutes": 9,
        "title": "Сибирские города: жизнь после заводов",
-       "url": "https://meduza.io", "score": [3, 4]},
+       "url": "https://meduza.io", "score": [3, 4], "topics": ["société", "économie"]},
       {"language": "it", "type": "article", "source": "Focus", "difficulty": "B2", "minutes": 5,
        "title": "Che cosa mangiavano gli antichi romani",
-       "url": "https://www.focus.it", "score": [3, 3]}
+       "url": "https://www.focus.it", "score": [3, 3], "topics": ["histoire", "gastronomie"]}
     ]
   ]
   $json$::jsonb;
@@ -61,6 +61,7 @@ declare
           "homepage": "https://postnauka.org"
         },
         "url": "https://postnauka.org",
+        "topics": ["sciences"],
         "difficulty": "C1",
         "durationMinutes": 8,
         "summary": "Un article de vulgarisation sur l'adaptation des oiseaux urbains au bruit : chants plus aigus, horaires décalés, et ce que les confinements de 2020 ont permis d'observer.",
@@ -182,6 +183,7 @@ declare
           "homepage": "https://www.ilpost.it/podcasts/"
         },
         "url": "https://www.ilpost.it/podcasts/",
+        "topics": ["société", "gastronomie"],
         "difficulty": "B2",
         "durationMinutes": 4,
         "summary": "Un court épisode sur l'évolution du café au bar en Italie : prix, habitudes, et ce que le rituel dit du quotidien.",
@@ -311,10 +313,11 @@ begin
     for i in 0..1 loop
       s := past -> tpl -> i;
       insert into public.contents (
-        source_id, language, content_type, title, url, difficulty, duration_minutes, summary, transcript_available
+        source_id, language, content_type, title, url, difficulty, duration_minutes, summary, transcript_available, topics
       )
       select src.id, s ->> 'language', s ->> 'type', s ->> 'title', s ->> 'url', s ->> 'difficulty',
-             (s ->> 'minutes')::int, 'Contenu de démonstration (titre inventé).', true
+             (s ->> 'minutes')::int, 'Contenu de démonstration (titre inventé).', true,
+             array(select jsonb_array_elements_text(s -> 'topics'))
       from public.sources src where src.name = s ->> 'source'
       returning id into cid;
       past_content_ids := past_content_ids || cid;
@@ -391,12 +394,13 @@ begin
 
   for s in select value from jsonb_array_elements(today_sessions) loop
     insert into public.contents (
-      source_id, language, content_type, title, url, difficulty, duration_minutes, summary, transcript_available
+      source_id, language, content_type, title, url, difficulty, duration_minutes, summary, transcript_available, topics
     )
     select src.id, s ->> 'language', s -> 'content' ->> 'type', s -> 'content' ->> 'title',
            s -> 'content' ->> 'url', s -> 'content' ->> 'difficulty',
            (s -> 'content' ->> 'durationMinutes')::int, s -> 'content' ->> 'summary',
-           (s -> 'content' ->> 'transcriptAvailable')::boolean
+           (s -> 'content' ->> 'transcriptAvailable')::boolean,
+           array(select jsonb_array_elements_text(s -> 'content' -> 'topics'))
     from public.sources src where src.name = s -> 'content' -> 'source' ->> 'name'
     returning id into cid;
 

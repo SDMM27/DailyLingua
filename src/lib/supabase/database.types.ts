@@ -97,14 +97,14 @@ isOneToOne: false
                   ]
                 },"contents": {
                   Row: {
-                    "audio_url": string | null,"author": string | null,"categories": (string)[],"content_type": string,"created_at": string,"difficulty": string,"duration_minutes": number,"excerpt": string | null,"fetched_at": string,"id": string,"language": string,"published_at": string | null,"source_id": string,"summary": string,"title": string,"transcript_available": boolean,"updated_at": string,"url": string,"url_checked_at": string | null,"url_normalized": string | null,"url_status": string
+                    "audio_url": string | null,"author": string | null,"categories": (string)[],"content_type": string,"created_at": string,"difficulty": string,"duration_minutes": number,"excerpt": string | null,"fetched_at": string,"id": string,"language": string,"published_at": string | null,"source_id": string,"summary": string,"title": string,"topics": (string)[] | null,"transcript_available": boolean,"updated_at": string,"url": string,"url_checked_at": string | null,"url_normalized": string | null,"url_status": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "audio_url"?: string | null,"author"?: string | null,"categories"?: (string)[],"content_type": string,"created_at"?: string,"difficulty": string,"duration_minutes": number,"excerpt"?: string | null,"fetched_at"?: string,"id"?: string,"language": string,"published_at"?: string | null,"source_id": string,"summary": string,"title": string,"transcript_available"?: boolean,"updated_at"?: string,"url": string,"url_checked_at"?: string | null,"url_normalized"?: never,"url_status"?: string
+                    "audio_url"?: string | null,"author"?: string | null,"categories"?: (string)[],"content_type": string,"created_at"?: string,"difficulty": string,"duration_minutes": number,"excerpt"?: string | null,"fetched_at"?: string,"id"?: string,"language": string,"published_at"?: string | null,"source_id": string,"summary": string,"title": string,"topics"?: (string)[] | null,"transcript_available"?: boolean,"updated_at"?: string,"url": string,"url_checked_at"?: string | null,"url_normalized"?: never,"url_status"?: string
                   }
                   Update: {
-                    "audio_url"?: string | null,"author"?: string | null,"categories"?: (string)[],"content_type"?: string,"created_at"?: string,"difficulty"?: string,"duration_minutes"?: number,"excerpt"?: string | null,"fetched_at"?: string,"id"?: string,"language"?: string,"published_at"?: string | null,"source_id"?: string,"summary"?: string,"title"?: string,"transcript_available"?: boolean,"updated_at"?: string,"url"?: string,"url_checked_at"?: string | null,"url_normalized"?: never,"url_status"?: string
+                    "audio_url"?: string | null,"author"?: string | null,"categories"?: (string)[],"content_type"?: string,"created_at"?: string,"difficulty"?: string,"duration_minutes"?: number,"excerpt"?: string | null,"fetched_at"?: string,"id"?: string,"language"?: string,"published_at"?: string | null,"source_id"?: string,"summary"?: string,"title"?: string,"topics"?: (string)[] | null,"transcript_available"?: boolean,"updated_at"?: string,"url"?: string,"url_checked_at"?: string | null,"url_normalized"?: never,"url_status"?: string
                   }
                   Relationships: [
                     {

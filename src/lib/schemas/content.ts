@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { cefrLevelSchema, contentTypeSchema, dateKeySchema, languageSchema } from "./common";
+import { topicSchema } from "./preferences";
 
 export const LICENSE_KINDS = ["cc-by", "cc-by-sa", "cc-by-nd", "public-domain", "all-rights-reserved"] as const;
 export const licenseKindSchema = z.enum(LICENSE_KINDS);
@@ -15,6 +16,9 @@ export type InstructionLanguage = (typeof INSTRUCTION_LANGUAGES)[number];
 
 export const SOURCE_AUDIENCES = ["children"] as const;
 export type SourceAudience = (typeof SOURCE_AUDIENCES)[number];
+
+/** A content belongs to at most this many domains (`TOPICS`), also enforced by the database. */
+export const MAX_CONTENT_TOPICS = 3;
 
 const httpsUrl = z.url({ protocol: /^https$/ });
 
@@ -80,6 +84,12 @@ export const sourceDefinitionSchema = z
     instructionLanguage: z.enum(INSTRUCTION_LANGUAGES).optional(),
     /** "children": made for children (cartoons, kids' news), good material for the first levels. */
     audience: z.enum(SOURCE_AUDIENCES).optional(),
+    /**
+     * Domains (`TOPICS`) every item of the source belongs to: a cooking channel is « gastronomie ».
+     * When set, the items get them as they are ingested and are not sent to the classifier. Absent:
+     * the classifier reads each item (general news, channels on any subject).
+     */
+    defaultTopics: z.array(topicSchema).min(1).max(MAX_CONTENT_TOPICS).optional(),
     access: sourceAccessSchema.default("free"),
     /**
      * How items are read. "wikipedia-featured": the feed entry is a dated wrapper; the real article

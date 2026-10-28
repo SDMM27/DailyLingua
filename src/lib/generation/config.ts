@@ -86,3 +86,22 @@ export function readVocabularyTranslationConfig(
   if (setting === "off" || !apiKeys.length) return { enabled: false };
   return { enabled: true, apiKeys, model: source.VOCABULARY_TRANSLATION_MODEL?.trim() || DEFAULT_MISSION_MODEL };
 }
+
+export type ContentTopicsConfig = { enabled: true; apiKeys: string[]; model: string } | { enabled: false };
+
+/**
+ * Classification of the contents by domain at ingestion: on as soon as ANTHROPIC_API_KEY (or
+ * ANTHROPIC_API_KEY_FALLBACK) is set, unless CONTENT_TOPICS=off. CONTENT_TOPICS_MODEL picks the model
+ * (default: the mission model).
+ */
+export function readContentTopicsConfig(
+  source: Record<string, string | undefined> = process.env,
+): ContentTopicsConfig {
+  const apiKeys = readApiKeys(source);
+  const setting = source.CONTENT_TOPICS?.trim() || "on";
+  if (setting !== "on" && setting !== "off") {
+    throw new Error(`CONTENT_TOPICS invalide : « ${setting} » (valeurs : on, off).`);
+  }
+  if (setting === "off" || !apiKeys.length) return { enabled: false };
+  return { enabled: true, apiKeys, model: source.CONTENT_TOPICS_MODEL?.trim() || DEFAULT_MISSION_MODEL };
+}
