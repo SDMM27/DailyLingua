@@ -1,46 +1,16 @@
-# Plan — correction « écrire puis dire », répartition du temps, thèmes, bilan par compétence
+# Plan — répartition du temps, thèmes, bilan par compétence
 
-Statut : **proposition validée dans ses grandes lignes**, rien n'est implémenté. Date : 2026-10-27. Ce plan fait suite à [learning-paths.md](learning-paths.md) (phases H à K) ; ses phases portent les lettres L à O. Il part de notes brutes de l'utilisateur. Les choix ont été tranchés le 2026-10-27 (section « Décisions » de chaque phase) ; les points encore ouverts sont marqués **À trancher**, avec une option par défaut (*défaut*) : si l'utilisateur n'a pas répondu, l'implémentation part de celle-là et le signale.
+Statut : **proposition validée dans ses grandes lignes**, rien n'est implémenté. Date : 2026-10-27. Ce plan fait suite à [learning-paths.md](learning-paths.md) (phases H à K) ; ses phases portent les lettres M à O. Il part de notes brutes de l'utilisateur. Les choix ont été tranchés le 2026-10-27 (section « Décisions » de chaque phase) ; les points encore ouverts sont marqués **À trancher**, avec une option par défaut (*défaut*) : si l'utilisateur n'a pas répondu, l'implémentation part de celle-là et le signale.
 
 Décisions de l'utilisateur (2026-10-27) :
 
-- L : le bug « pas de retour » n'existe probablement plus ; à vérifier sans s'y attarder.
 - M : minutes saisies par langue ; possibilité d'alterner les langues selon les jours de la semaine.
 - N : le tri voulu est par **domaine** (sport, politique, sciences…) ; le thème se choisit **pour le lendemain** seulement.
 - O : bilan complet **facultatif après le QCM, mais recommandé** ; compréhension orale sur **enregistrements de natifs** ; l'utilisateur trouve les relecteurs (et voix) pour le pilote.
 
 Règles du projet à respecter dans chaque phase (rappel, voir `CLAUDE.md`) : mobile d'abord (largeur téléphone, zones sûres, champs ≥ 16 px) ; aucune langue codée en dur (registre `src/lib/domain/languages.ts`) ; `src/lib/domain` et `src/lib/schemas` sans import Next.js/React ; données lues seulement par `getRepository()` ; `await connection()` pour les pages qui dépendent du jour ; `npm run check` et `npm run build` avant de rendre. Une phase à la fois, validée avant la suivante ; chaque phase se termine par les fichiers modifiés, les commandes lancées, les tests réellement exécutés et leurs résultats. Le dépôt est surtout en LF : vérifier `git diff --stat` après délégation (réécritures complètes en CRLF).
 
-Ordre proposé : **L → M → N → O**. L et M sont petites ; N est moyenne ; O est la plus lourde et commence par un pilote russe + italien.
-
-## Phase L — « Aucun retour » sur la production « écrire puis dire »
-
-### Constat
-
-La note dit « Aucun retour si c'est de la production orale (écrite) ». Le code actuel prévoit pourtant une correction pour le mode `spoken` :
-
-- `src/lib/generation/writing-feedback-service.ts` (l. 66-67) ne refuse que l'ancien mode `speaking` (`not-writing`) ;
-- `src/components/mission/production-task.tsx` affiche le bouton « Terminer et obtenir une correction » pour `writing` et `spoken`, dès que `onRequestFeedback` est fourni ;
-- `src/components/mission/mission-view.tsx` (l. 154-155) ne le fournit que si `persist && canReviewWriting`.
-
-Causes possibles, à vérifier dans l'ordre :
-
-1. **Mission ancienne** : une mission générée avant la phase G garde le mode `speaking`, sans zone de texte ni correction (« Parle à voix haute, même seul·e »). Normal, mais à confirmer par la date.
-2. **Mode démo** ou **invité** : `persist` faux ou `canReviewWriting` faux → pas de bouton. Le bloc « À voix haute » s'affiche alors sur le texte de l'utilisateur, ce qui peut donner l'impression d'un écran « sans retour ».
-3. **Correction indisponible** (`ANTHROPIC_API_KEY` absente, erreur du modèle) : message « La correction n'est pas disponible pour l'instant ».
-4. **Texte trop court** (`WRITING_FEEDBACK_LIMITS.minChars`) : bouton grisé.
-5. **Session expirée** (plus vieille que la veille) : `expired`.
-6. Un vrai bug non encore identifié.
-
-### À faire
-
-1. Reproduire avec l'utilisateur (date de la mission, langue, compte invité ou complet, capture d'écran). Lire `writing_feedback` et `mission_activities` de la session en base.
-2. Corriger la cause trouvée. Quelle qu'elle soit, rendre la raison visible : quand la correction n'est pas proposée, une ligne explique pourquoi (« Crée ton compte pour obtenir une correction », « Mode démonstration », « Correction possible jusqu'au lendemain de la mission », etc.) au lieu d'un écran muet. Fonction pure `feedbackAvailability(...)` qui renvoie la raison, testée.
-3. Si la cause est l'interprétation (« écrire puis dire » vécu comme de l'oral sans retour sur l'oral) : c'est attendu tant que la phase E (enregistrement) est reportée ; le dire dans le bloc « À voix haute » (« Ta prononciation n'est pas évaluée »).
-
-**Décision** : c'était un bug constaté, que l'utilisateur pense disparu. Le point 1 se limite donc à une vérification rapide (une mission `spoken` récente d'un compte complet, en local avec une vraie clé) ; s'il ne se reproduit pas, la phase se réduit au point 2 (raison affichée), qui évite de toute façon un écran muet. Petite phase : peut être faite en même temps que M.
-
-Tests : `feedbackAvailability` pour chaque cas ; composant : message affiché à la place du bouton pour un invité, en démo et pour une session expirée.
+Ordre proposé : **M → N → O**. M est petite ; N est moyenne ; O est la plus lourde et commence par un pilote russe + italien.
 
 ## Phase M — Répartition du temps entre les langues
 
