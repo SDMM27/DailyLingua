@@ -20,7 +20,7 @@ function resolveGenerator(options: MissionPreparerOptions): ExerciseGenerator {
   if (options.generator) return options.generator;
   const config = readGenerationConfig();
   return config.provider === "claude"
-    ? createClaudeGenerator({ apiKey: config.apiKey, model: config.model })
+    ? createClaudeGenerator({ apiKeys: config.apiKeys, model: config.model })
     : createTemplateGenerator();
 }
 

@@ -67,7 +67,7 @@ export function writingFeedbackReviewer():
   return (input) =>
     requestWritingFeedback(input, {
       store: createSupabaseWritingFeedbackStore(createSupabaseAdminClient()),
-      reviewer: createClaudeWritingReviewer({ apiKey: config.apiKey, model: config.model }),
+      reviewer: createClaudeWritingReviewer({ apiKeys: config.apiKeys, model: config.model }),
       log: console.warn,
     });
 }
@@ -83,7 +83,7 @@ export function vocabularyTranslator(): ((input: TranslateVocabularyRequest) => 
   return (input) =>
     translateVocabulary(input, {
       store: createSupabaseVocabularyTranslationStore(createSupabaseAdminClient()),
-      translator: createClaudeVocabularyTranslator({ apiKey: config.apiKey, model: config.model }),
+      translator: createClaudeVocabularyTranslator({ apiKeys: config.apiKeys, model: config.model }),
       log: console.warn,
     });
 }

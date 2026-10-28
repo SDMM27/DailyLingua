@@ -193,7 +193,7 @@ auth.users 1─1 profiles 1─* user_languages *─1 languages
 
 Côté écran, `/mission` affiche « Préparation de ta mission… » et appelle l’action serveur `prepareTodayMission` ; le jour est toujours calculé sur le serveur, dans le fuseau de l’utilisateur. Ces fonctions SQL ne sont exécutables que par le rôle service : le serveur de l’app a donc besoin de `SUPABASE_SERVICE_ROLE_KEY`.
 
-**Configuration** (`.env.local`, jamais côté navigateur) : `ANTHROPIC_API_KEY` (sans clé, le générateur de secours est utilisé), `MISSION_GENERATOR=claude|template`, `MISSION_MODEL` (défaut `claude-haiku-5-5`). Coût estimé avec Claude Haiku 5.5 : environ 0,002 $ par mission, soit quelques centimes par utilisateur et par mois.
+**Configuration** (`.env.local`, jamais côté navigateur) : `ANTHROPIC_API_KEY` (sans clé, le générateur de secours est utilisé ; `ANTHROPIC_API_KEY_FALLBACK` optionnelle : seconde clé utilisée automatiquement quand la première est refusée), `MISSION_GENERATOR=claude|template`, `MISSION_MODEL` (défaut `claude-haiku-5-5`). Coût estimé avec Claude Haiku 5.5 : environ 0,002 $ par mission, soit quelques centimes par utilisateur et par mois.
 
 ```bash
 npm run mission:generate -- --email demo@dailylingua.test --date 2026-10-14             # Claude si une clé est configurée
@@ -217,7 +217,7 @@ npm run mission:generate -- --email demo@dailylingua.test --date 2026-10-14 --te
 - **Suivi** : chaque exécution est notée dans la table `cron_runs` (tâche, début, fin, statut `ok` / `partial` / `error`, compteurs, erreur), lisible seulement par le rôle service (Supabase Studio).
 - **Mise en production** :
   - générer le secret : `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` ;
-  - l’ajouter dans Vercel (Settings → Environment Variables, environnement Production) sous `CRON_SECRET`, à côté des trois variables Supabase (voir « Déploiement sur un vrai projet Supabase ») et de `ANTHROPIC_API_KEY`, puis redéployer ;
+  - l’ajouter dans Vercel (Settings → Environment Variables, environnement Production) sous `CRON_SECRET`, à côté des trois variables Supabase (voir « Déploiement sur un vrai projet Supabase ») et de `ANTHROPIC_API_KEY` (et, en option, `ANTHROPIC_API_KEY_FALLBACK`), puis redéployer ;
   - appliquer les migrations sur le projet de production : `npx supabase db push --linked` (sans quoi les tâches échouent en 500) ;
   - dans GitHub (Settings → Secrets and variables → Actions), créer les secrets `CRON_SECRET` (même valeur) et `APP_URL` (URL de production affichée dans Vercel → Domains, sans slash final) ;
   - lancer le workflow à la main (Actions → Tâches planifiées → Run workflow) et vérifier sa sortie, puis la table `cron_runs`. Un appel en échec fait échouer le workflow, et GitHub prévient par e-mail.
@@ -266,7 +266,7 @@ Un nouveau commit annule le run en cours sur la même branche. Compter environ 1
 
 ### Check-list de mise en production
 
-1. Variables Vercel (Production) : les trois variables Supabase, `ANTHROPIC_API_KEY`, `CRON_SECRET` ; `CONTENT_LICENSE_POLICY=commercial` avant toute vente.
+1. Variables Vercel (Production) : les trois variables Supabase, `ANTHROPIC_API_KEY` (et, en option, `ANTHROPIC_API_KEY_FALLBACK`), `CRON_SECRET` ; `CONTENT_LICENSE_POLICY=commercial` avant toute vente.
 2. Migrations : `npx supabase db push --linked` après chaque nouvelle migration, **avant** de fusionner le code qui en dépend.
 3. Supabase Auth : *Site URL* et *Redirect URLs* (`https://<domaine>/auth/confirm`), modèles d’e-mail de `supabase/templates/`, confirmation d’e-mail activée, mot de passe d’au moins 8 caractères, SMTP réel (voir « Déploiement sur un vrai projet Supabase »).
 4. Secrets GitHub : `APP_URL`, `CRON_SECRET`.

@@ -1,4 +1,3 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import {
   WRITING_CRITERIA,
@@ -11,6 +10,7 @@ import {
 } from "@/lib/schemas/writing-feedback";
 import { toGenerationError } from "./claude-generator";
 import { DEFAULT_MISSION_MODEL } from "./config";
+import { createFailoverParseClient } from "./anthropic-client";
 import { GenerationError } from "./errors";
 import { escapeData } from "./prompt";
 import {
@@ -50,7 +50,7 @@ export interface WritingReviewer {
 }
 
 export interface ClaudeWritingReviewerOptions {
-  apiKey?: string;
+  apiKeys?: string[];
   model?: string;
   client?: FeedbackParseClient;
   /** Default "medium": at "low", telegraphic texts were scored too high (see `npm run feedback:eval`). */
@@ -106,11 +106,10 @@ export function createClaudeWritingReviewer(options: ClaudeWritingReviewerOption
   let client: FeedbackParseClient | undefined = options.client;
 
   function getClient(): FeedbackParseClient {
-    client ??= new Anthropic({
-      apiKey: options.apiKey,
-      timeout: options.timeoutMs ?? 30_000,
-      maxRetries: 1,
-    }) as unknown as FeedbackParseClient;
+    client ??= createFailoverParseClient<FeedbackParseClient>({
+      apiKeys: options.apiKeys ?? [],
+      timeoutMs: options.timeoutMs ?? 30_000,
+    });
     return client;
   }
 

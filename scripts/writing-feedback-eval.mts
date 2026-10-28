@@ -26,13 +26,13 @@ const { values } = parseArgs({
 
 const config = readWritingFeedbackConfig();
 if (!config.enabled) {
-  console.error("ANTHROPIC_API_KEY est requis (voir .env.example), et WRITING_FEEDBACK ne doit pas valoir off.");
+  console.error("ANTHROPIC_API_KEY (ou ANTHROPIC_API_KEY_FALLBACK) est requis (voir .env.example), et WRITING_FEEDBACK ne doit pas valoir off.");
   process.exit(1);
 }
 const runs = Math.max(1, Number.parseInt(values.runs ?? "1", 10) || 1);
 const model = values.model ?? config.model;
 const effort = values.effort === "low" ? "low" : "medium";
-const reviewer = createClaudeWritingReviewer({ apiKey: config.apiKey, model, effort, timeoutMs: 60_000 });
+const reviewer = createClaudeWritingReviewer({ apiKeys: config.apiKeys, model, effort, timeoutMs: 60_000 });
 
 const mean = (feedback: WritingFeedback) =>
   WRITING_CRITERIA.reduce((sum, c) => sum + feedback.scores[c].score, 0) / WRITING_CRITERIA.length;

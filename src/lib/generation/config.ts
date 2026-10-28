@@ -1,41 +1,54 @@
 export const DEFAULT_MISSION_MODEL = "claude-haiku-5-5";
 
-export type GenerationConfig = { provider: "claude"; apiKey: string; model: string } | { provider: "template" };
+/**
+ * ANTHROPIC_API_KEY (primary) then ANTHROPIC_API_KEY_FALLBACK (optional, used when the primary is
+ * refused): trimmed, blanks dropped, duplicates removed.
+ */
+export function readApiKeys(source: Record<string, string | undefined> = process.env): string[] {
+  const keys = [source.ANTHROPIC_API_KEY, source.ANTHROPIC_API_KEY_FALLBACK]
+    .map((key) => key?.trim() ?? "")
+    .filter(Boolean);
+  return [...new Set(keys)];
+}
+
+export type GenerationConfig = { provider: "claude"; apiKeys: string[]; model: string } | { provider: "template" };
 
 /**
- * ANTHROPIC_API_KEY, MISSION_GENERATOR ("claude" | "template") and MISSION_MODEL. Without an
+ * ANTHROPIC_API_KEY (and optional ANTHROPIC_API_KEY_FALLBACK), MISSION_GENERATOR ("claude" | "template") and MISSION_MODEL. Without an
  * explicit generator, Claude is used as soon as a key is set. Asking for Claude without a key, or
  * a wrong value, fails loudly rather than silently falling back to the template.
  */
 export function readGenerationConfig(
   source: Record<string, string | undefined> = process.env,
 ): GenerationConfig {
-  const apiKey = source.ANTHROPIC_API_KEY?.trim() ?? "";
-  const requested = source.MISSION_GENERATOR?.trim() || (apiKey ? "claude" : "template");
+  const apiKeys = readApiKeys(source);
+  const requested = source.MISSION_GENERATOR?.trim() || (apiKeys.length ? "claude" : "template");
   if (requested === "template") return { provider: "template" };
   if (requested !== "claude") {
     throw new Error(`MISSION_GENERATOR invalide : « ${requested} » (valeurs : claude, template).`);
   }
-  if (!apiKey) throw new Error("MISSION_GENERATOR=claude demande ANTHROPIC_API_KEY (voir .env.example).");
-  return { provider: "claude", apiKey, model: source.MISSION_MODEL?.trim() || DEFAULT_MISSION_MODEL };
+  if (!apiKeys.length) {
+    throw new Error("MISSION_GENERATOR=claude demande ANTHROPIC_API_KEY ou ANTHROPIC_API_KEY_FALLBACK (voir .env.example).");
+  }
+  return { provider: "claude", apiKeys, model: source.MISSION_MODEL?.trim() || DEFAULT_MISSION_MODEL };
 }
 
-export type WritingFeedbackConfig = { enabled: true; apiKey: string; model: string } | { enabled: false };
+export type WritingFeedbackConfig = { enabled: true; apiKeys: string[]; model: string } | { enabled: false };
 
 /**
- * Review of written productions: on as soon as ANTHROPIC_API_KEY is set, unless
+ * Review of written productions: on as soon as ANTHROPIC_API_KEY (or ANTHROPIC_API_KEY_FALLBACK) is set, unless
  * WRITING_FEEDBACK=off. WRITING_FEEDBACK_MODEL picks the model (default: the mission model).
  */
 export function readWritingFeedbackConfig(
   source: Record<string, string | undefined> = process.env,
 ): WritingFeedbackConfig {
-  const apiKey = source.ANTHROPIC_API_KEY?.trim() ?? "";
+  const apiKeys = readApiKeys(source);
   const setting = source.WRITING_FEEDBACK?.trim() || "on";
   if (setting !== "on" && setting !== "off") {
     throw new Error(`WRITING_FEEDBACK invalide : « ${setting} » (valeurs : on, off).`);
   }
-  if (setting === "off" || !apiKey) return { enabled: false };
-  return { enabled: true, apiKey, model: source.WRITING_FEEDBACK_MODEL?.trim() || DEFAULT_MISSION_MODEL };
+  if (setting === "off" || !apiKeys.length) return { enabled: false };
+  return { enabled: true, apiKeys, model: source.WRITING_FEEDBACK_MODEL?.trim() || DEFAULT_MISSION_MODEL };
 }
 
 /** Guest missions (all guests together) allowed per rolling 24 hours when GUEST_DAILY_MISSION_CAP is unset. */
@@ -56,20 +69,20 @@ export function readGuestDailyMissionCap(source: Record<string, string | undefin
   return Number(raw);
 }
 
-export type VocabularyTranslationConfig = { enabled: true; apiKey: string; model: string } | { enabled: false };
+export type VocabularyTranslationConfig = { enabled: true; apiKeys: string[]; model: string } | { enabled: false };
 
 /**
- * Automatic translation of the words a user imports: on as soon as ANTHROPIC_API_KEY is set, unless
+ * Automatic translation of the words a user imports: on as soon as ANTHROPIC_API_KEY (or ANTHROPIC_API_KEY_FALLBACK) is set, unless
  * VOCABULARY_TRANSLATION=off. VOCABULARY_TRANSLATION_MODEL picks the model (default: the mission model).
  */
 export function readVocabularyTranslationConfig(
   source: Record<string, string | undefined> = process.env,
 ): VocabularyTranslationConfig {
-  const apiKey = source.ANTHROPIC_API_KEY?.trim() ?? "";
+  const apiKeys = readApiKeys(source);
   const setting = source.VOCABULARY_TRANSLATION?.trim() || "on";
   if (setting !== "on" && setting !== "off") {
     throw new Error(`VOCABULARY_TRANSLATION invalide : « ${setting} » (valeurs : on, off).`);
   }
-  if (setting === "off" || !apiKey) return { enabled: false };
-  return { enabled: true, apiKey, model: source.VOCABULARY_TRANSLATION_MODEL?.trim() || DEFAULT_MISSION_MODEL };
+  if (setting === "off" || !apiKeys.length) return { enabled: false };
+  return { enabled: true, apiKeys, model: source.VOCABULARY_TRANSLATION_MODEL?.trim() || DEFAULT_MISSION_MODEL };
 }
