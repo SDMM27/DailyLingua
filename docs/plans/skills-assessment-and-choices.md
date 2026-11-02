@@ -1,6 +1,6 @@
 # Plan — répartition du temps, thèmes, bilan par compétence
 
-Statut : **proposition validée dans ses grandes lignes**, rien n'est implémenté. Date : 2026-10-27. Ce plan fait suite à [learning-paths.md](learning-paths.md) (phases H à K) ; ses phases portent les lettres M à O. Il part de notes brutes de l'utilisateur. Les choix ont été tranchés le 2026-10-27 (section « Décisions » de chaque phase) ; les points encore ouverts sont marqués **À trancher**, avec une option par défaut (*défaut*) : si l'utilisateur n'a pas répondu, l'implémentation part de celle-là et le signale.
+Statut : M1, M2, N1, N2 et N3 implémentées (N2 et N3 : commit `2d014d5`, 2026-11-02) ; phase O à faire. Date : 2026-10-27. Ce plan fait suite à [learning-paths.md](learning-paths.md) (phases H à K) ; ses phases portent les lettres M à O. Il part de notes brutes de l'utilisateur. Les choix ont été tranchés le 2026-10-27 (section « Décisions » de chaque phase) ; les points encore ouverts sont marqués **À trancher**, avec une option par défaut (*défaut*) : si l'utilisateur n'a pas répondu, l'implémentation part de celle-là et le signale.
 
 Décisions de l'utilisateur (2026-10-27) :
 
