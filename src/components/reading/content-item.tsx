@@ -2,7 +2,7 @@ import { ExternalIcon } from "@/components/icons";
 import { languageStyle } from "@/components/ui/language-style";
 import { Pill } from "@/components/ui/primitives";
 import { formatTimeAgo } from "@/lib/domain/dates";
-import { CONTENT_TYPE_LABELS } from "@/lib/domain/labels";
+import { CONTENT_TYPE_LABELS, topicLabel } from "@/lib/domain/labels";
 import { languageInfo } from "@/lib/domain/languages";
 import { sourceTraitLabels } from "@/lib/content/source-traits";
 import { youtubeVideoId } from "@/lib/content/youtube";
@@ -65,6 +65,9 @@ export function ContentItem({ item, now, timeZone }: { item: ContentListItem; no
           <Pill>{CONTENT_TYPE_LABELS[item.type]}</Pill>
           <Pill>{item.difficulty}</Pill>
           <Pill>≈ {item.durationMinutes} min</Pill>
+          {item.topics.map((topic) => (
+            <Pill key={topic}>{topicLabel(topic)}</Pill>
+          ))}
           {sourceTraitLabels(item.source.key).map((label) => (
             <Pill key={label}>{label}</Pill>
           ))}

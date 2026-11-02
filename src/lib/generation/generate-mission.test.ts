@@ -8,7 +8,7 @@ import type {
 } from "@/lib/schemas/generation";
 import { isSourceReadable } from "@/lib/content/policy";
 import type { SourceAccess } from "@/lib/schemas/content";
-import type { Preferences } from "@/lib/schemas/preferences";
+import type { Preferences, Topic } from "@/lib/schemas/preferences";
 import { GenerationError } from "./errors";
 import { productionTargetLength } from "./plan-activities";
 import { buildRanks } from "@/lib/domain/frequency";
@@ -40,6 +40,7 @@ function content(language: Language, n: number, overrides: Partial<CandidateCont
     difficulty: "B1",
     durationMinutes: 4,
     categories: [],
+    topics: [],
     publishedAt: "2026-10-13T08:00:00Z",
     ...overrides,
   };
@@ -66,6 +67,8 @@ function memoryStore(
     sourceAccess?: Record<string, SourceAccess>;
     /** Paid sources the user declared (source ids). */
     declared?: string[];
+    /** Domains asked for the mission, by language. */
+    requests?: Partial<Record<Language, Topic>>;
   } = {},
 ) {
   const calls: Calls = { completed: [], failed: [], candidateQueries: [], usedSince: [], claims: [] };
@@ -74,11 +77,16 @@ function memoryStore(
     async getPreferences() {
       return options.prefs === undefined ? preferences : options.prefs;
     },
-    async listCandidates(language, { contentTypes, declaredSourceIds }) {
+    async listCandidates(language, { contentTypes, topics, declaredSourceIds }) {
       calls.candidateQueries.push({ language, contentTypes });
-      return (pools[language] ?? []).filter((c) =>
-        isSourceReadable({ id: `src-${c.id}`, access: options.sourceAccess?.[c.id] ?? "free" }, declaredSourceIds),
-      );
+      return (pools[language] ?? [])
+        .filter((c) => !topics || c.topics.some((t) => topics.includes(t)))
+        .filter((c) =>
+          isSourceReadable({ id: `src-${c.id}`, access: options.sourceAccess?.[c.id] ?? "free" }, declaredSourceIds),
+        );
+    },
+    async listMissionRequests() {
+      return options.requests ?? {};
     },
     async listDeclaredSourceIds() {
       return options.declared ?? [];
@@ -183,6 +191,65 @@ describe("generateMission", () => {
       const { store, calls } = memoryStore({ pools: { it: [content("it", 1)] }, sourceAccess: { "it-1": "metered" } });
       expect(await run(store, aiGenerator())).toEqual({ status: "no-content" });
       expect(calls.failed).toHaveLength(1);
+    });
+  });
+
+  describe("requested domain", () => {
+    const pools = {
+      it: [content("it", 1), content("it", 2, { topics: ["sport"] }), content("it", 3, { topics: ["sport", "culture"] })],
+      es: [content("es", 1)],
+    };
+
+    it("prefers the contents of the domain asked for that language", async () => {
+      const { store, calls } = memoryStore({ pools, requests: { it: "sport" } });
+      const generator = aiGenerator();
+      await run(store, generator);
+      expect(generator.requests[0].sessions[0].candidates.map((c) => c.id).sort()).toEqual(["it-2", "it-3"]);
+      expect(["it-2", "it-3"]).toContain(calls.completed[0].sessions[0].contentId);
+      // Another language without a request is untouched.
+      expect(generator.requests[0].sessions[1].candidates.map((c) => c.id)).toEqual(["es-1"]);
+    });
+
+    it("never sends the domains of the candidates to the model", async () => {
+      const { store } = memoryStore({ pools, requests: { it: "sport" } });
+      const generator = aiGenerator();
+      await run(store, generator);
+      expect(buildUserMessage(generator.requests[0])).not.toContain("sport");
+    });
+
+    it("falls back to every content when the domain has none", async () => {
+      const { store, calls } = memoryStore({ pools, requests: { it: "voyage" } });
+      const generator = aiGenerator();
+      expect(await run(store, generator)).toMatchObject({ status: "ready" });
+      expect(generator.requests[0].sessions[0].candidates.map((c) => c.id).sort()).toEqual(["it-1", "it-2", "it-3"]);
+      expect(calls.completed[0].sessions.map((s) => s.language)).toEqual(["it", "es"]);
+    });
+
+    it("falls back when the contents of the domain are all excluded or at the wrong level", async () => {
+      const far = { it: [content("it", 1), content("it", 2, { topics: ["sport"], difficulty: "C2" })] };
+      const { store } = memoryStore({ pools: far, requests: { it: "sport" } });
+      const generator = aiGenerator();
+      await run(store, generator);
+      expect(generator.requests[0].sessions[0].candidates.map((c) => c.id).sort()).toEqual(["it-1", "it-2"]);
+      const used = memoryStore({ pools, requests: { it: "sport" }, used: ["it-2", "it-3"] });
+      const g2 = aiGenerator();
+      await run(used.store, g2);
+      expect(g2.requests[0].sessions[0].candidates.map((c) => c.id)).toEqual(["it-1"]);
+    });
+
+    it("changes nothing without a request, and still writes the mission when the requests cannot be read", async () => {
+      const plain = memoryStore({ pools });
+      const g1 = aiGenerator();
+      await run(plain.store, g1);
+      expect(g1.requests[0].sessions[0].candidates.map((c) => c.id).sort()).toEqual(["it-1", "it-2", "it-3"]);
+
+      const broken = memoryStore({ pools, requests: { it: "sport" } });
+      broken.store.listMissionRequests = async () => {
+        throw new Error("boom");
+      };
+      const g2 = aiGenerator();
+      expect(await run(broken.store, g2)).toMatchObject({ status: "ready" });
+      expect(g2.requests[0].sessions[0].candidates).toHaveLength(3);
     });
   });
 

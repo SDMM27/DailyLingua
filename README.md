@@ -196,6 +196,8 @@ auth.users 1─1 profiles 1─* user_languages *─1 languages
 
 Côté écran, `/mission` affiche « Préparation de ta mission… » et appelle l’action serveur `prepareTodayMission` ; le jour est toujours calculé sur le serveur, dans le fuseau de l’utilisateur. Ces fonctions SQL ne sont exécutables que par le rôle service : le serveur de l’app a donc besoin de `SUPABASE_SERVICE_ROLE_KEY`.
 
+**Domaine de la prochaine mission** (« Demain, plutôt », sur l’accueil et sur `/mission`) : par langue, l’utilisateur choisit un des `TOPICS` pour le prochain jour travaillé de cette langue. Le choix est une ligne de `mission_requests` (lecture seule pour le propriétaire, écriture par la fonction `set_mission_request` qui vérifie la langue, la fenêtre de dates demain à +7 jours et que la mission de ce jour n’existe pas encore ; les lignes de plus de 30 jours sont purgées). La génération essaie d’abord les contenus de ce domaine à un niveau utilisable, sinon retombe sur tous les contenus et la séance l’indique. Aucun appel au modèle de plus, et le domaine d’un contenu n’est jamais envoyé au modèle.
+
 **Configuration** (`.env.local`, jamais côté navigateur) : `ANTHROPIC_API_KEY` (sans clé, le générateur de secours est utilisé ; `ANTHROPIC_API_KEY_FALLBACK` optionnelle : seconde clé utilisée automatiquement quand la première est refusée), `MISSION_GENERATOR=claude|template`, `MISSION_MODEL` (défaut `claude-haiku-5-5`). Coût estimé avec Claude Haiku 5.5 : environ 0,002 $ par mission, soit quelques centimes par utilisateur et par mois.
 
 ```bash

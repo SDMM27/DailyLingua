@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { cefrLevelSchema, contentTypeSchema, dateKeySchema, languageSchema } from "./common";
-import { languagePurposeSchema } from "./preferences";
+import { languagePurposeSchema, topicSchema } from "./preferences";
 import { ACTIVITY_KINDS, exerciseSourceSchema, type ExerciseSource } from "./mission";
 
 /**
@@ -35,6 +35,8 @@ export const candidateContentSchema = z.object({
   difficulty: cefrLevelSchema,
   durationMinutes: z.number().int().positive(),
   categories: z.array(z.string()),
+  /** Domains of the content (`TOPICS`), to prefer the one the learner asked for. Never sent to the model. */
+  topics: z.array(topicSchema).default([]),
   publishedAt: z.iso.datetime({ offset: true }).nullable(),
   /** Catalogue key of the source, to look up its traits when ranking. Never sent to the model. */
   sourceKey: z.string().min(1).nullable().optional(),

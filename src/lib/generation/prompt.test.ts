@@ -12,6 +12,7 @@ const candidate: CandidateContent = {
   difficulty: "B1",
   durationMinutes: 5,
   categories: [],
+  topics: [],
   publishedAt: null,
 };
 

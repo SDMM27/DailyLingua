@@ -25,6 +25,7 @@ export function buildMockMission(today: DateKey): Mission {
           durationMinutes: 8,
           summary:
             "Un article de vulgarisation sur l'adaptation des oiseaux urbains au bruit : chants plus aigus, horaires décalés, et ce que les confinements de 2020 ont permis d'observer.",
+          topics: ["sciences"],
           transcriptAvailable: true,
         },
         activities: [
@@ -125,6 +126,7 @@ export function buildMockMission(today: DateKey): Mission {
           durationMinutes: 4,
           summary:
             "Un court épisode sur l'évolution du café au bar en Italie : prix, habitudes, et ce que le rituel dit du quotidien.",
+          topics: ["société", "gastronomie"],
           transcriptAvailable: false,
         },
         activities: [

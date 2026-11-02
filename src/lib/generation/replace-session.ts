@@ -16,6 +16,7 @@ import {
   buildSessionRequest,
   generateWithFallback,
   loadFrequencies,
+  loadMissionRequests,
   loadUsablePool,
   measureCoverage,
   planSession,
@@ -44,7 +45,10 @@ export interface ReplaceableSession {
 }
 
 export interface SessionReplacementStore
-  extends Pick<MissionStore, "getPreferences" | "listCandidates" | "listUsedContentIds" | "listRefusedContentIds" | "listDeclaredSourceIds"> {
+  extends Pick<
+      MissionStore,
+      "getPreferences" | "listCandidates" | "listMissionRequests" | "listUsedContentIds" | "listRefusedContentIds" | "listDeclaredSourceIds"
+    > {
   /** Null when the session does not exist or is not this user's. */
   getSessionForReplacement(userId: string, sessionId: string): Promise<ReplaceableSession | null>;
   /**
@@ -146,9 +150,11 @@ export async function replaceMissionSession(input: ReplaceSessionInput): Promise
     ]);
     const declaredSourceIds = await store.listDeclaredSourceIds(userId);
     const frequencies = await loadFrequencies([goal.language], { load: input.loadFrequency, log });
+    // The domain asked for that day's mission applies to its replacement too.
+    const requests = await loadMissionRequests(store, userId, old.missionDate, log);
     // Same inputs as in generateMission: the language's days and its position in the full list.
     const position = preferences.goals.indexOf(goal);
-    const options = { goal, preferences, declaredSourceIds, minutes: old.minutes, excludeIds, now: startedAt, frequency: frequencies.get(goal.language) };
+    const options = { goal, preferences, declaredSourceIds, minutes: old.minutes, excludeIds, now: startedAt, frequency: frequencies.get(goal.language), topic: requests[goal.language] };
     const pool = await loadUsablePool(store, options);
     if (!pool) {
       await release();

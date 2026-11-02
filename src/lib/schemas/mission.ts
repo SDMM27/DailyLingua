@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { cefrLevelSchema, contentTypeSchema, dateKeySchema, languageSchema } from "./common";
-import { INSTRUCTION_LANGUAGES, SOURCE_AUDIENCES } from "./content";
+import { INSTRUCTION_LANGUAGES, MAX_CONTENT_TOPICS, SOURCE_AUDIENCES } from "./content";
+import { topicSchema } from "./preferences";
 import { WRITING_FEEDBACK_LIMITS, writingFeedbackSchema, writingReviewStateSchema } from "./writing-feedback";
 
 export const contentSourceSchema = z.object({
@@ -24,6 +25,8 @@ export const contentSchema = z.object({
   difficulty: cefrLevelSchema,
   durationMinutes: z.number().int().positive(),
   summary: z.string().min(1),
+  /** Domains of the content (0 to 3 of `TOPICS`); empty while it has not been classified. */
+  topics: z.array(topicSchema).max(MAX_CONTENT_TOPICS).default([]),
   /** Podcasts: the episode's audio file (https), played in the app on demand. */
   audioUrl: z.url({ protocol: /^https$/ }).nullish(),
   /**

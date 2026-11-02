@@ -3,7 +3,7 @@ import { isSourceReadable } from "@/lib/content/policy";
 import type { SourceAccess } from "@/lib/schemas/content";
 import type { Language } from "@/lib/schemas/common";
 import type { CandidateContent, ExerciseGenerator, GenerationMeta, GenerationRequest } from "@/lib/schemas/generation";
-import type { Preferences } from "@/lib/schemas/preferences";
+import type { Preferences, Topic } from "@/lib/schemas/preferences";
 import { SessionNotFoundError, SessionReplacementInProgressError, SessionReplacementLimitError } from "./errors";
 import type { PlannedSession } from "./generate-mission";
 import {
@@ -36,6 +36,7 @@ const content = (language: Language, n: number): CandidateContent => ({
   difficulty: "B1",
   durationMinutes: 4,
   categories: [],
+  topics: [],
   publishedAt: "2026-10-13T08:00:00Z",
 });
 
@@ -59,6 +60,8 @@ function memoryStore(
     sourceAccess?: Record<string, SourceAccess>;
     /** Paid sources the user declared (source ids). */
     declared?: string[];
+    /** Domains asked for the mission, by language. */
+    requests?: Partial<Record<Language, Topic>>;
     /** Replacements already reserved on the mission. */
     reserved?: number;
     releaseError?: Error;
@@ -67,6 +70,7 @@ function memoryStore(
   const calls = {
     replaced: [] as { sessionId: string; userId: string; session: PlannedSession; meta: GenerationMeta }[],
     usedSince: [] as string[],
+    requestDates: [] as string[],
     reserved: options.reserved ?? 0,
     released: 0,
   };
@@ -80,12 +84,18 @@ function memoryStore(
     async getPreferences() {
       return options.prefs === undefined ? preferences : options.prefs;
     },
-    async listCandidates(language, { declaredSourceIds }) {
+    async listCandidates(language, { topics, declaredSourceIds }) {
       return language === "it"
-        ? pool.filter((c) =>
-            isSourceReadable({ id: `src-${c.id}`, access: options.sourceAccess?.[c.id] ?? "free" }, declaredSourceIds),
-          )
+        ? pool
+            .filter((c) => !topics || c.topics.some((t) => topics.includes(t)))
+            .filter((c) =>
+              isSourceReadable({ id: `src-${c.id}`, access: options.sourceAccess?.[c.id] ?? "free" }, declaredSourceIds),
+            )
         : [];
+    },
+    async listMissionRequests(_userId, date) {
+      calls.requestDates.push(date);
+      return options.requests ?? {};
     },
     async listDeclaredSourceIds() {
       return options.declared ?? [];
@@ -169,6 +179,20 @@ describe("replaceMissionSession", () => {
     expect(session.contentId).not.toBe("it-1");
     expect(total(session)).toBe(10);
     expect(meta).toMatchObject({ source: "ai", model: "claude-test", fallbackReason: null });
+  });
+
+  it("keeps the domain asked for the day of the mission, with the same fallback", async () => {
+    const pool = [content("it", 1), { ...content("it", 2), topics: ["sport" as const] }, content("it", 3)];
+    const asked = memoryStore({ pool, requests: { it: "sport" } });
+    const generator = aiGenerator();
+    await run(asked.store, generator);
+    expect(asked.calls.requestDates).toEqual(["2026-10-13"]);
+    expect(generator.requests[0].sessions[0].candidates.map((c) => c.id)).toEqual(["it-2"]);
+
+    const none = memoryStore({ pool, requests: { it: "voyage" } });
+    const g2 = aiGenerator();
+    expect(await run(none.store, g2)).toEqual({ status: "ready" });
+    expect(g2.requests[0].sessions[0].candidates).toHaveLength(3);
   });
 
   it("excludes the contents used in the last 30 days and the refused ones", async () => {

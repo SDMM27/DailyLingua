@@ -255,6 +255,32 @@ isOneToOne: false
       referencedColumns: ["id","user_id"]
     }
                   ]
+                },"mission_requests": {
+                  Row: {
+                    "created_at": string,"language": string,"mission_date": string,"topic": string,"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"language": string,"mission_date": string,"topic": string,"updated_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"language"?: string,"mission_date"?: string,"topic"?: string,"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "mission_requests_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "mission_requests_user_id_language_fkey"
+      columns: ["user_id","language"]
+isOneToOne: false
+      referencedRelation: "user_languages"
+      referencedColumns: ["user_id","language"]
+    }
+                  ]
                 },"mission_sessions": {
                   Row: {
                     "content_id": string,"created_at": string,"expressions": NonNullable<Json>,"id": string,"language": string,"mission_id": string,"position": number,"replacing_since": string | null,"production": NonNullable<Json>,"question_count": number | null,"questions": NonNullable<Json>,"user_id": string
@@ -669,6 +695,9 @@ isOneToOne: false
                            },
 "save_preferences":
 { Args: { "p_content_types": (string)[] | null,"p_daily_minutes": number,"p_difficulty": string,"p_generation_time": string,"p_goals": Json,"p_show_streak"?: boolean,"p_time_zone": string,"p_topics": (string)[] | null }; Returns: undefined
+                           },
+"set_mission_request":
+{ Args: { "p_language": string,"p_mission_date": string,"p_topic": string | null }; Returns: undefined
                            }
           }
           Enums: {

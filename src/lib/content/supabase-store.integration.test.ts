@@ -140,6 +140,18 @@ describe.skipIf(!stackIsUp)("content ingestion on Supabase (local database)", ()
     expect((await repo.listSources()).some((s) => s.key === TEST_SOURCE.key)).toBe(true);
   });
 
+  it("filters the list by domain with an overlap, and exposes the domains", async () => {
+    await admin.from("contents").update({ topics: ["culture", "sport"] }).eq("source_id", sourceId).like("url", "%/a");
+    const repo = createSupabaseRepository(userClient, userId, { contentPolicy: "all" });
+    const sport = (await repo.listContents(["it"], 200, { topics: ["sport", "cinéma"] })).filter((c) => c.url.includes(HOST));
+    expect(sport.map((c) => c.title)).toEqual(["Articolo di prova a"]);
+    expect(sport[0].topics).toEqual(["culture", "sport"]);
+    const none = (await repo.listContents(["it"], 200, { topics: ["histoire"] })).filter((c) => c.url.includes(HOST));
+    expect(none).toEqual([]);
+    const unclassified = (await repo.listContents(["it"], 200)).filter((c) => c.url.includes(HOST));
+    expect(unclassified.find((c) => c.title.endsWith(" b"))?.topics).toEqual([]);
+  });
+
   it("hides contents whose link is broken", async () => {
     // The local database may hold more than a page (1,000 rows) of real contents waiting for a
     // check after `content:ingest`; the oldest fetched come first, so date this run's rows back.

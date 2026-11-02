@@ -147,6 +147,8 @@ export const contentListItemSchema = z.object({
   audioUrl: z.url({ protocol: /^https$/ }).nullish(),
   author: z.string().optional(),
   publishedAt: z.iso.datetime({ offset: true }).nullable(),
+  /** Domains of the content (0 to 3 of `TOPICS`); empty while it has not been classified. */
+  topics: z.array(topicSchema).max(MAX_CONTENT_TOPICS),
   source: sourceInfoSchema.pick({ key: true, name: true, homepage: true, access: true, license: true }),
 });
 export type ContentListItem = z.infer<typeof contentListItemSchema>;

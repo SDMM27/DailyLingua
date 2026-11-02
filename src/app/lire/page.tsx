@@ -6,7 +6,9 @@ import { languageStyle } from "@/components/ui/language-style";
 import { Card, DemoNotice, PageHeader } from "@/components/ui/primitives";
 import { getRepository, requirePreferences } from "@/lib/data/repository";
 import { languageInfo } from "@/lib/domain/languages";
+import { topicLabel } from "@/lib/domain/labels";
 import type { ContentType, Language } from "@/lib/schemas/common";
+import { TOPICS, topicSchema, type Topic } from "@/lib/schemas/preferences";
 
 export const metadata: Metadata = { title: "Lire, regarder, écouter" };
 
@@ -22,10 +24,11 @@ const TYPE_FILTERS = [
 ] as const satisfies readonly { value: string; label: string; type: ContentType }[];
 
 /** `/lire` with the given filters; a missing filter is left out of the query string. */
-function readingHref(langue: Language | undefined, type: string | undefined): string {
+function readingHref(langue: Language | undefined, type: string | undefined, theme: Topic | undefined): string {
   const params = new URLSearchParams();
   if (langue) params.set("langue", langue);
   if (type) params.set("type", type);
+  if (theme) params.set("theme", theme);
   const query = params.toString();
   return query ? `/lire?${query}` : "/lire";
 }
@@ -33,20 +36,30 @@ function readingHref(langue: Language | undefined, type: string | undefined): st
 export default async function ReadingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ langue?: string; type?: string }>;
+  searchParams: Promise<{ langue?: string; type?: string; theme?: string }>;
 }) {
   await connection();
   const preferences = await requirePreferences();
   const repository = await getRepository();
   const languages = preferences.goals.map((g) => g.language);
-  const { langue, type } = await searchParams;
+  const { langue, type, theme } = await searchParams;
   const selected = languages.find((l) => l === langue);
   const selectedType = TYPE_FILTERS.find((f) => f.value === type);
+  const parsedTheme = topicSchema.safeParse(theme);
+  const selectedTheme = parsedTheme.success ? parsedTheme.data : undefined;
+  // The learner's own domains first (in the order of TOPICS), then the others.
+  const chosen = new Set(preferences.goals.flatMap((g) => g.topics));
+  const topicChips = [...TOPICS.filter((t) => chosen.has(t)), ...TOPICS.filter((t) => !chosen.has(t))];
 
   const items = await repository.listContents(
     selected ? [selected] : languages,
     selected ? PER_LANGUAGE_ONE : PER_LANGUAGE_ALL,
-    selectedType ? { types: [selectedType.type] } : undefined,
+    selectedType || selectedTheme
+      ? {
+          ...(selectedType && { types: [selectedType.type] }),
+          ...(selectedTheme && { topics: [selectedTheme] }),
+        }
+      : undefined,
   );
   // Newest first across languages; undated items last.
   items.sort((a, b) => (b.publishedAt ?? "").localeCompare(a.publishedAt ?? ""));
@@ -68,11 +81,11 @@ export default async function ReadingPage({
       {languages.length > 1 && (
         <nav aria-label="Filtrer par langue" className="-mx-4 mb-4 overflow-x-auto px-4">
           <ul className="flex gap-2">
-            <FilterChip href={readingHref(undefined, selectedType?.value)} active={!selected} label="Toutes" />
+            <FilterChip href={readingHref(undefined, selectedType?.value, selectedTheme)} active={!selected} label="Toutes" />
             {languages.map((language) => (
               <FilterChip
                 key={language}
-                href={readingHref(language, selectedType?.value)}
+                href={readingHref(language, selectedType?.value, selectedTheme)}
                 active={selected === language}
                 label={languageInfo(language).nameFr}
                 language={language}
@@ -84,11 +97,11 @@ export default async function ReadingPage({
 
       <nav aria-label="Filtrer par type" className="-mx-4 mb-4 overflow-x-auto px-4">
         <ul className="flex gap-2">
-          <FilterChip href={readingHref(selected, undefined)} active={!selectedType} label="Tout" />
+          <FilterChip href={readingHref(selected, undefined, selectedTheme)} active={!selectedType} label="Tout" />
           {TYPE_FILTERS.map((filter) => (
             <FilterChip
               key={filter.value}
-              href={readingHref(selected, filter.value)}
+              href={readingHref(selected, filter.value, selectedTheme)}
               active={selectedType?.value === filter.value}
               label={filter.label}
             />
@@ -96,13 +109,32 @@ export default async function ReadingPage({
         </ul>
       </nav>
 
+      <nav aria-label="Filtrer par domaine" className="-mx-4 mb-4 overflow-x-auto px-4">
+        <ul className="flex gap-2">
+          <FilterChip href={readingHref(selected, selectedType?.value, undefined)} active={!selectedTheme} label="Tous" />
+          {topicChips.map((topic) => (
+            <FilterChip
+              key={topic}
+              href={readingHref(selected, selectedType?.value, topic)}
+              active={selectedTheme === topic}
+              label={topicLabel(topic)}
+            />
+          ))}
+        </ul>
+      </nav>
+
       {items.length === 0 ? (
         <Card className="text-center">
-          {selectedType ? (
+          {selectedType || selectedTheme ? (
             <>
-              <p className="text-sm text-ink-soft">Rien à {selectedType.label.toLowerCase()} pour l’instant.</p>
+              <p className="text-sm text-ink-soft">
+                Rien{selectedType && ` à ${selectedType.label.toLowerCase()}`}
+                {selectedTheme && ` en ${selectedTheme}`} pour l’instant.
+              </p>
               <p className="mt-1 text-xs text-muted">
-                Essaie une autre langue, ou « Tout » : toutes les langues n’ont pas encore de source de ce type.
+                {selectedTheme
+                  ? "Essaie un autre domaine ou « Tous » : les contenus reçoivent leurs domaines au fil des relevés."
+                  : "Essaie une autre langue, ou « Tout » : toutes les langues n’ont pas encore de source de ce type."}
               </p>
             </>
           ) : (

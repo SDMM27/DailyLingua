@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { sourceDefinitionSchema } from "./content";
+import { contentListItemSchema, sourceDefinitionSchema } from "./content";
 
 const base = {
   key: "test-source",
@@ -35,5 +35,38 @@ describe("sourceDefinitionSchema defaultTopics", () => {
     expect(sourceDefinitionSchema.safeParse({ ...base, defaultTopics: ["cuisine"] }).success).toBe(false);
     expect(sourceDefinitionSchema.safeParse({ ...base, defaultTopics: ["culture", "histoire", "littérature", "sport"] }).success).toBe(false);
     expect(sourceDefinitionSchema.safeParse({ ...base, defaultTopics: [] }).success).toBe(false);
+  });
+});
+
+describe("contentListItemSchema topics", () => {
+  const item = {
+    id: "c1",
+    language: "it",
+    type: "article",
+    title: "Titolo",
+    url: "https://example.com/a",
+    difficulty: "B1",
+    durationMinutes: 4,
+    summary: "Sommario",
+    publishedAt: null,
+    topics: ["culture"],
+    source: {
+      key: "s",
+      name: "S",
+      homepage: "https://example.com",
+      access: "free",
+      license: { kind: "all-rights-reserved", name: "Tous droits réservés", termsUrl: "https://example.com/terms" },
+    },
+  };
+
+  it("accepts zero to three domains of the list", () => {
+    expect(contentListItemSchema.safeParse({ ...item, topics: [] }).success).toBe(true);
+    expect(contentListItemSchema.safeParse({ ...item, topics: ["culture", "histoire", "sport"] }).success).toBe(true);
+  });
+
+  it("rejects more than three domains, an unknown domain and a missing list", () => {
+    expect(contentListItemSchema.safeParse({ ...item, topics: ["culture", "histoire", "sport", "voyage"] }).success).toBe(false);
+    expect(contentListItemSchema.safeParse({ ...item, topics: ["cuisine"] }).success).toBe(false);
+    expect(contentListItemSchema.safeParse({ ...item, topics: undefined }).success).toBe(false);
   });
 });

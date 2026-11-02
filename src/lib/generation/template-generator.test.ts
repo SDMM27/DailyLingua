@@ -27,6 +27,7 @@ function request(): GenerationRequest {
           difficulty: "B1",
           durationMinutes: 5,
           categories: [],
+          topics: [],
           publishedAt: null,
         },
       ],

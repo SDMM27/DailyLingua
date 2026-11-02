@@ -1,7 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { fetchPreferences } from "@/lib/data/supabase-repository";
 import type { ContentLicensePolicy } from "@/lib/schemas/content";
-import { dateKeySchema, languageSchema } from "@/lib/schemas/common";
+import { dateKeySchema, languageSchema, type Language } from "@/lib/schemas/common";
+import { topicSchema, type Topic } from "@/lib/schemas/preferences";
 import { candidateContentSchema } from "@/lib/schemas/generation";
 import type { Database, Json } from "@/lib/supabase/database.types";
 import { SessionNotFoundError, SessionReplacementInProgressError, SessionReplacementLimitError } from "./errors";
@@ -25,13 +26,13 @@ export function createSupabaseMissionStore(
   return {
     getPreferences: (userId) => fetchPreferences(client, userId),
 
-    async listCandidates(language, { contentTypes, declaredSourceIds, limit }) {
+    async listCandidates(language, { contentTypes, topics, declaredSourceIds, limit }) {
       // Every filter but the access one, shared by the two queries below.
       const base = () => {
         let query = client
           .from("contents")
           .select(
-            `id, content_type, title, summary, difficulty, duration_minutes, categories, published_at,
+            `id, content_type, title, summary, difficulty, duration_minutes, categories, published_at, topics,
              sources!inner ( name, key )`,
           )
           .eq("language", language)
@@ -41,6 +42,7 @@ export function createSupabaseMissionStore(
           .not("sources.key", "is", null);
         if (options.policy === "commercial") query = query.eq("sources.commercial_use", true);
         if (contentTypes && contentTypes.length > 0) query = query.in("content_type", contentTypes);
+        if (topics && topics.length > 0) query = query.overlaps("topics", topics);
         return query.order("published_at", { ascending: false, nullsFirst: false }).limit(limit);
       };
       // Readable = free sources, plus the paid ones the user declared. Two queries rather than an
@@ -67,9 +69,27 @@ export function createSupabaseMissionStore(
           difficulty: row.difficulty,
           durationMinutes: row.duration_minutes,
           categories: row.categories,
+          topics: row.topics ?? [],
           publishedAt: row.published_at,
         }),
       );
+    },
+
+    async listMissionRequests(userId, date) {
+      const { data, error } = await client
+        .from("mission_requests")
+        .select("language, topic")
+        .eq("user_id", userId)
+        .eq("mission_date", date);
+      if (error) fail("domaines demandés", error);
+      const requests: Partial<Record<Language, Topic>> = {};
+      for (const row of data) {
+        // A row that no longer matches the app's lists (a retired domain) is ignored, not fatal.
+        const language = languageSchema.safeParse(row.language);
+        const topic = topicSchema.safeParse(row.topic);
+        if (language.success && topic.success) requests[language.data] = topic.data;
+      }
+      return requests;
     },
 
     async listDeclaredSourceIds(userId) {

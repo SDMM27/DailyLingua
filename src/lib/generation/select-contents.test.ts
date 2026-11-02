@@ -15,6 +15,7 @@ function candidate(id: string, overrides: Partial<CandidateContent> = {}): Candi
     difficulty: "B1",
     durationMinutes: 5,
     categories: [],
+    topics: [],
     publishedAt: "2026-10-13T08:00:00Z",
     ...overrides,
   };

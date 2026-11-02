@@ -1,5 +1,5 @@
 import type { DateKey } from "@/lib/schemas/common";
-import { diffInDays, isoWeekday } from "./dates";
+import { addDays, diffInDays, isoWeekday } from "./dates";
 
 /** ISO weekdays: 1 = Monday … 7 = Sunday. */
 export const ALL_WEEKDAYS = [1, 2, 3, 4, 5, 6, 7] as const;
@@ -15,6 +15,15 @@ interface Scheduled {
 export function goalsForDate<T extends Scheduled>(goals: readonly T[], date: DateKey): T[] {
   const weekday = isoWeekday(date);
   return goals.filter((g) => g.days.includes(weekday));
+}
+
+/** The first day strictly after `after` whose ISO weekday is in `days` (at most 7 days later). */
+export function nextWorkedDate(days: readonly number[], after: DateKey): DateKey {
+  for (let i = 1; i <= 7; i++) {
+    const date = addDays(after, i);
+    if (days.includes(isoWeekday(date))) return date;
+  }
+  throw new Error("nextWorkedDate: no valid weekday in `days`");
 }
 
 /** Minutes planned on a weekday: the sum of the `weight` (minutes) of the goals worked that day. */

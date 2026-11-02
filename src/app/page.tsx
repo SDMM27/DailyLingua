@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode } from "react";
+import { Fragment, Suspense, type ReactNode } from "react";
 import Link from "next/link";
 import { connection } from "next/server";
 import { GuestTrialBanner } from "@/components/auth/guest-trial-banner";
@@ -6,6 +6,7 @@ import { AlphabetPreview } from "@/components/dashboard/alphabet-preview";
 import { GrammarPreview } from "@/components/dashboard/grammar-preview";
 import { InstallBanner } from "@/components/install/install-banner";
 import { MissionSummaryCard } from "@/components/dashboard/mission-summary-card";
+import { NextTopicCard } from "@/components/mission/next-topic-card";
 import { RestDayCard } from "@/components/mission/rest-day-card";
 import { ReviewPreview } from "@/components/dashboard/review-preview";
 import { WeekCard } from "@/components/dashboard/week-card";
@@ -167,6 +168,11 @@ export default async function DashboardPage() {
           )}
         </Card>
       )}
+
+      {/* Streamed: the domains available per language are extra queries the page need not wait for. */}
+      <Suspense fallback={null}>
+        <NextTopicCard today={today} />
+      </Suspense>
 
       {unassessed && (
         <Link

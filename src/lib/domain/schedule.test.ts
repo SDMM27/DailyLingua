@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { addDays } from "./dates";
-import { ALL_WEEKDAYS, busiestDayMinutes, goalsForDate, minutesOnWeekday, workedDaysBefore } from "./schedule";
+import { ALL_WEEKDAYS, busiestDayMinutes, goalsForDate, minutesOnWeekday, nextWorkedDate, workedDaysBefore } from "./schedule";
 
 const ru = { language: "ru", weight: 20, days: [1, 2, 3, 4, 5, 6, 7] };
 const ita = { language: "it", weight: 10, days: [1, 3, 5] };
@@ -16,6 +16,26 @@ describe("goalsForDate", () => {
 
   it("is empty on a rest day", () => {
     expect(goalsForDate([ita, es], "2026-10-13")).toEqual([]);
+  });
+});
+
+describe("nextWorkedDate", () => {
+  it("is the next day when every day is worked", () => {
+    expect(nextWorkedDate([1, 2, 3, 4, 5, 6, 7], "2026-10-29")).toBe("2026-10-30");
+  });
+
+  it("skips the days that are not worked (Monday to Wednesday)", () => {
+    expect(nextWorkedDate([1, 2, 3], "2026-10-13")).toBe("2026-10-14"); // from Tuesday: Wednesday
+    expect(nextWorkedDate([1, 2, 3], "2026-10-14")).toBe("2026-10-19"); // from Wednesday: next Monday
+    expect(nextWorkedDate([1, 2, 3], "2026-10-18")).toBe("2026-10-19"); // from Sunday: Monday
+  });
+
+  it("never returns the day itself, even when it is the only one worked", () => {
+    expect(nextWorkedDate([3], "2026-10-14")).toBe("2026-10-21");
+  });
+
+  it("refuses an empty schedule", () => {
+    expect(() => nextWorkedDate([], "2026-10-14")).toThrow();
   });
 });
 

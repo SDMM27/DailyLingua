@@ -23,7 +23,8 @@ import {
   type RecordAlphabetPracticeInput,
 } from "@/lib/schemas/alphabet";
 import { grammarCardSchema, type GrammarCard, type RecordGrammarPracticeInput } from "@/lib/schemas/grammar";
-import { dateKeySchema, type ContentType, type DateKey, type Language } from "@/lib/schemas/common";
+import { dateKeySchema, type CefrLevel, type ContentType, type DateKey, type Language } from "@/lib/schemas/common";
+import { MISSION_READY_MESSAGE, missionRequestSchema, type MissionRequest } from "@/lib/schemas/mission-request";
 import {
   contentListItemSchema,
   paidSourceSchema,
@@ -55,7 +56,7 @@ import {
 } from "@/lib/schemas/correction-card";
 import { productionEntrySchema, type ProductionEntry } from "@/lib/schemas/production";
 import { placementSummarySchema, type PlacementRecord, type PlacementSummary } from "@/lib/schemas/placement";
-import { preferencesSchema, type Preferences } from "@/lib/schemas/preferences";
+import { preferencesSchema, topicSchema, type Preferences, type Topic } from "@/lib/schemas/preferences";
 import {
   reviewGradeSchema,
   reviewModeSchema,
@@ -98,6 +99,12 @@ const HISTORY_LIMIT = 30;
 const PRODUCTIONS_LIMIT = 300;
 /** A category seen in another review within this many days makes a correction a recurring error. */
 const RECURRING_ERROR_DAYS = 30;
+
+/** Contents are counted over this window and this many rows when offering a domain for the next mission. */
+const TOPIC_AVAILABILITY_DAYS = 14;
+const TOPIC_AVAILABILITY_ROWS = 500;
+/** SQLSTATE of set_mission_request: the mission of that day exists already. */
+const MISSION_ALREADY_GENERATED = "DL003";
 
 type Client = SupabaseClient<Database>;
 
@@ -160,6 +167,7 @@ const LIST_OTHER_LANGUAGE = "Cette liste est dans une autre langue.";
 const PAGE_SIZE = 1000;
 /** Raised by record_placement_test when the language is not one of the user's. */
 const NO_DATA_FOUND = "P0002";
+const INVALID_PARAMETER_VALUE = "22023";
 
 function toVocabularyItem(row: VocabularyRow): VocabularyItem {
   return vocabularyItemSchema.parse({
@@ -371,7 +379,7 @@ export function createSupabaseRepository(
         `id, mission_date, budget_minutes, generation_meta,
          mission_sessions (
            id, position, language, questions, expressions, production,
-           contents ( title, content_type, language, url, difficulty, duration_minutes, summary,
+           contents ( title, content_type, language, url, difficulty, duration_minutes, summary, topics,
                       audio_url, transcript_available, sources ( key, name, homepage_url ) ),
            mission_activities ( id, position, kind, title, estimated_minutes )
          )`,
@@ -413,6 +421,7 @@ export function createSupabaseRepository(
             difficulty: content.difficulty,
             durationMinutes: content.duration_minutes,
             summary: content.summary,
+            topics: content.topics ?? [],
             audioUrl: content.audio_url ?? undefined,
             transcriptAvailable: content.transcript_available,
           },
@@ -1411,14 +1420,14 @@ export function createSupabaseRepository(
   async function listContents(
     languages: Language[],
     perLanguage: number,
-    options?: { types?: ContentType[] },
+    options?: { types?: ContentType[]; topics?: Topic[] },
   ): Promise<ContentListItem[]> {
     const lists = await Promise.all(
       languages.map(async (language) => {
         let query = client
           .from("contents")
           .select(
-            `id, language, content_type, title, url, audio_url, difficulty, duration_minutes, summary, author, published_at,
+            `id, language, content_type, title, url, audio_url, difficulty, duration_minutes, summary, author, published_at, topics,
              sources!inner ( ${SOURCE_COLUMNS} )`,
           )
           .eq("language", language)
@@ -1428,6 +1437,7 @@ export function createSupabaseRepository(
           .not("sources.key", "is", null);
         if (contentPolicy === "commercial") query = query.eq("sources.commercial_use", true);
         if (options?.types) query = query.in("content_type", options.types);
+        if (options?.topics?.length) query = query.overlaps("topics", options.topics);
         const { data, error } = await query
           .order("published_at", { ascending: false, nullsFirst: false })
           .limit(perLanguage);
@@ -1449,6 +1459,7 @@ export function createSupabaseRepository(
         audioUrl: row.audio_url ?? undefined,
         author: row.author ?? undefined,
         publishedAt: row.published_at,
+        topics: row.topics ?? [],
         source: {
           key: source.key,
           name: source.name,
@@ -1458,6 +1469,55 @@ export function createSupabaseRepository(
         },
       });
     });
+  }
+
+  async function listMissionRequests(): Promise<MissionRequest[]> {
+    const today = await getToday();
+    const { data, error } = await client
+      .from("mission_requests")
+      .select("mission_date, language, topic")
+      .eq("user_id", userId)
+      .gte("mission_date", today)
+      .order("mission_date");
+    if (error) throw new Error(`Supabase (domaines demandés) : ${error.message}`);
+    return data.map((row) => missionRequestSchema.parse({ date: row.mission_date, language: row.language, topic: row.topic }));
+  }
+
+  async function setMissionRequest(input: { language: Language; date: DateKey; topic: Topic | null }): Promise<void> {
+    const { error } = await client.rpc("set_mission_request", {
+      p_language: input.language,
+      p_mission_date: input.date,
+      p_topic: input.topic,
+    });
+    if (error?.code === MISSION_ALREADY_GENERATED) {
+      throw new UserFacingError(MISSION_READY_MESSAGE);
+    }
+    if (error?.code === NO_DATA_FOUND) throw new UserFacingError("Cette langue ne fait pas partie de tes langues.");
+    if (error?.code === INVALID_PARAMETER_VALUE) throw new UserFacingError("Ce jour n’est pas disponible pour ce choix.");
+    if (error) throw new Error(`Supabase (domaine de la prochaine mission) : ${error.message}`);
+  }
+
+  async function listTopicAvailability(language: Language, levels: CefrLevel[]): Promise<Partial<Record<Topic, number>>> {
+    const since = new Date(Date.now() - TOPIC_AVAILABILITY_DAYS * 86_400_000).toISOString();
+    // Same filters as listContents: active feed sources, licence policy, links not broken.
+    let query = client
+      .from("contents")
+      .select("topics, sources!inner ( active, key, commercial_use )")
+      .eq("language", language)
+      .in("difficulty", levels)
+      .gte("published_at", since)
+      .not("topics", "is", null)
+      .neq("url_status", "broken")
+      .eq("sources.active", true)
+      .not("sources.key", "is", null);
+    if (contentPolicy === "commercial") query = query.eq("sources.commercial_use", true);
+    const { data, error } = await query.order("published_at", { ascending: false }).limit(TOPIC_AVAILABILITY_ROWS);
+    if (error) throw new Error(`Supabase (domaines disponibles) : ${error.message}`);
+    const counts: Partial<Record<Topic, number>> = {};
+    for (const row of data) {
+      for (const topic of topicSchema.array().catch([]).parse(row.topics)) counts[topic] = (counts[topic] ?? 0) + 1;
+    }
+    return counts;
   }
 
   async function listSources(): Promise<SourceInfo[]> {
@@ -1534,6 +1594,9 @@ export function createSupabaseRepository(
     getPreferences,
     savePreferences,
     getMission,
+    listMissionRequests,
+    setMissionRequest,
+    listTopicAvailability,
     getMissionProgress,
     prepareTodayMission,
     replaceInaccessibleContent,
