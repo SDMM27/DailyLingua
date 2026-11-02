@@ -208,6 +208,7 @@ export function buildSessionRequest(
     language: o.goal.language,
     level: o.goal.level,
     targetLevel: o.goal.targetLevel,
+    productionLevel: o.goal.productionLevel ?? o.goal.level,
     focus: o.goal.focus,
     purpose: o.goal.purpose,
     topics: o.goal.topics,

@@ -11,7 +11,7 @@ import { productionTargetLength } from "./plan-activities";
  * that varies goes in the user message. Feed titles and teasers come from third-party publishers:
  * they are wrapped in <content> tags and the model is told to treat them as data only.
  */
-export const PROMPT_VERSION = "2026-10-26.1";
+export const PROMPT_VERSION = "2026-11-02.1";
 
 const L = GENERATION_LIMITS;
 
@@ -101,9 +101,15 @@ teaser: ${escapeData(c.summary)}${frequent}
     })
     .join("\n");
   const topics = session.topics.length > 0 ? session.topics.join(", ") : "aucun en particulier";
+  // Only when the assessment set a production level that differs from the single level.
+  const productionLevel =
+    session.productionLevel && session.productionLevel !== session.level
+      ? `
+production level: ${session.productionLevel} (set the production task and its expected complexity at this level)`
+      : "";
   const focus = session.focus.trim() ? `\nlearner's own goal: <focus>${escapeData(session.focus.trim())}</focus>` : "";
   return `## Language "${session.language}" (${info.nativeName}, written ${info.dir})
-learner level: ${session.level}, target: ${session.targetLevel}
+learner level: ${session.level}, target: ${session.targetLevel}${productionLevel}
 learner's purpose: ${session.purpose} (${PURPOSE_REGISTERS[session.purpose]})${focus}
 learner's interests for this language (French labels): ${topics}
 time for this language today: ${session.minutes} minutes

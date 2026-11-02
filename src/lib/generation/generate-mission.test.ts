@@ -604,3 +604,30 @@ describe("vocabulary frequency", () => {
     expect(logs.some((m) => m.includes("no frequency list"))).toBe(true);
   });
 });
+
+describe("buildSessionRequest production level", () => {
+  const build = (goal: Preferences["goals"][number]) =>
+    buildSessionRequest({
+      goal,
+      preferences,
+      declaredSourceIds: [],
+      minutes: 10,
+      excludeIds: new Set(),
+      now: NOW,
+      pool: [content("it", 1, { difficulty: "B1" }), content("it", 2, { difficulty: "C1" })],
+      productionMode: "writing",
+    });
+
+  it("defaults to the level", () => {
+    expect(build(preferences.goals[0]).productionLevel).toBe("B1");
+    expect(build({ ...preferences.goals[0], productionLevel: null }).productionLevel).toBe("B1");
+  });
+
+  it("carries the production level without changing the choice of candidates", () => {
+    const plain = build(preferences.goals[0]);
+    const withProduction = build({ ...preferences.goals[0], productionLevel: "C1" });
+    expect(withProduction.productionLevel).toBe("C1");
+    expect(withProduction.candidates).toEqual(plain.candidates);
+    expect(withProduction.level).toBe("B1");
+  });
+});

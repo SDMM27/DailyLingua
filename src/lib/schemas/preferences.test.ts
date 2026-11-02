@@ -110,3 +110,15 @@ describe("preferencesSchema showStreak", () => {
     expect(preferencesSchema.safeParse({ ...MOCK_PREFERENCES, showStreak: "non" }).success).toBe(false);
   });
 });
+
+describe("production level", () => {
+  it("is optional: goals from before the assessment still parse", () => {
+    expect(languageGoalSchema.parse(goal).productionLevel).toBeUndefined();
+    expect(languageGoalSchema.parse({ ...goal, productionLevel: null }).productionLevel).toBeNull();
+    expect(languageGoalSchema.parse({ ...goal, productionLevel: "C1" }).productionLevel).toBe("C1");
+  });
+
+  it("must be a CEFR level", () => {
+    expect(languageGoalSchema.safeParse({ ...goal, productionLevel: "D1" }).success).toBe(false);
+  });
+});

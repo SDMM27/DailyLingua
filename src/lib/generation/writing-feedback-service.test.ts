@@ -4,6 +4,7 @@ import { GenerationError } from "./errors";
 import type { WritingReview, WritingReviewer } from "./writing-feedback";
 import {
   requestWritingFeedback,
+  reviewLevel,
   type FeedbackSession,
   type WritingFeedbackStore,
 } from "./writing-feedback-service";
@@ -122,5 +123,16 @@ describe("requestWritingFeedback", () => {
   it("accepts yesterday's mission (a text finished after midnight)", async () => {
     const { run } = setup(session({ missionDate: "2026-10-14" }));
     expect(await run()).toMatchObject({ status: "ready" });
+  });
+});
+
+describe("reviewLevel", () => {
+  it("judges the text at the production level when there is one", () => {
+    expect(reviewLevel({ level: "B1", production_level: "B2" }, "A2")).toBe("B2");
+  });
+
+  it("falls back on the single level, then on the content's level", () => {
+    expect(reviewLevel({ level: "B1", production_level: null }, "A2")).toBe("B1");
+    expect(reviewLevel(null, "A2")).toBe("A2");
   });
 });

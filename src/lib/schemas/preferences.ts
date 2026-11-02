@@ -34,6 +34,11 @@ export const languageGoalSchema = z.object({
   language: languageSchema,
   level: cefrLevelSchema,
   targetLevel: cefrLevelSchema,
+  /**
+   * Level of the production tasks (writing), set by the skills assessment; missing = `level`. Read-only for
+   * the preferences form: it is never sent to `save_preferences`, which leaves the stored value alone.
+   */
+  productionLevel: cefrLevelSchema.nullish(),
   focus: z.string().trim().max(200),
   /** Why the learner studies this language; missing = general, so rows/payloads from before the field still parse. */
   purpose: languagePurposeSchema.default("general"),

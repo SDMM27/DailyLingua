@@ -111,3 +111,20 @@ describe("frequent words of the teaser", () => {
     expect(message).not.toContain(candidate.id);
   });
 });
+
+describe("production level", () => {
+  const message = (overrides: Partial<SessionRequest>) =>
+    buildUserMessage({ date: "2026-11-02", sessions: [{ ...session("it", "general"), ...overrides }] });
+
+  it("leaves the message unchanged without a production level or when it equals the level", () => {
+    const base = message({});
+    expect(base).not.toContain("production level");
+    expect(message({ productionLevel: "B1" })).toBe(base);
+  });
+
+  it("adds a line when the production level differs from the level", () => {
+    const text = message({ productionLevel: "B2" });
+    expect(text).toContain("production level: B2 (set the production task and its expected complexity at this level)");
+    expect(text).toContain("learner level: B1, target: B2");
+  });
+});

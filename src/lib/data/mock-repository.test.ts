@@ -35,3 +35,13 @@ describe("demo repository listContents", () => {
     expect(await repo.listContents(["it", "ru"], 50, { types: ["podcast"], topics: ["voyage"] })).toEqual([]);
   });
 });
+
+describe("demo repository assessments", () => {
+  const repo = createMockRepository();
+
+  it("has no assessment and refuses to write", async () => {
+    expect(await repo.getCurrentAssessment("it")).toBeNull();
+    expect(await repo.listAssessments()).toEqual([]);
+    await expect(repo.startAssessment("it", "it-b1-1")).rejects.toThrow("Mode démonstration");
+  });
+});

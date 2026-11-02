@@ -61,6 +61,8 @@ export const sessionRequestSchema = z.object({
   language: languageSchema,
   level: cefrLevelSchema,
   targetLevel: cefrLevelSchema,
+  /** Level of the production task when it differs from `level` (skills assessment); missing = `level`. */
+  productionLevel: cefrLevelSchema.optional(),
   /** Free text from the preferences, e.g. "oral, vocabulaire actif". Untrusted user input. */
   focus: z.string(),
   /** Why the learner studies this language: sets the register and the kind of exercises. */

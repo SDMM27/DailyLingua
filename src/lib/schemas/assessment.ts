@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { LISTENING_MAX_PLAYS } from "@/lib/domain/assessment";
 import { cefrLevelSchema, dateKeySchema, languageSchema, type CefrLevel } from "./common";
 import { topicSchema } from "./preferences";
 
@@ -74,3 +75,50 @@ export const assessmentDossierSchema = z.object({
   reviewedOn: dateKeySchema.nullable(),
 });
 export type AssessmentDossier = z.infer<typeof assessmentDossierSchema>;
+
+/**
+ * What a learner has answered so far; every part may be partial (the assessment is resumed later).
+ * Question ids come from the dossier; `speaking` holds the self-assessment statements ticked or not.
+ */
+export const assessmentAnswersSchema = z.object({
+  questions: z.record(z.string(), z.string().max(1500)).default({}),
+  writing: z.string().max(2500).default(""),
+  speaking: z.record(z.string(), z.boolean()).default({}),
+});
+export type AssessmentAnswers = z.infer<typeof assessmentAnswersSchema>;
+
+export const ASSESSMENT_CONFIDENCES = ["low", "medium", "high"] as const;
+export const assessmentConfidenceSchema = z.enum(ASSESSMENT_CONFIDENCES);
+export type AssessmentConfidence = z.infer<typeof assessmentConfidenceSchema>;
+
+export const assessmentSkillResultSchema = z.object({
+  level: cefrLevelSchema,
+  confidence: assessmentConfidenceSchema,
+});
+export type AssessmentSkillResult = z.infer<typeof assessmentSkillResultSchema>;
+
+/** Per skill: a result, or null when the skill was not assessed (e.g. no recording published). */
+export const assessmentResultsSchema = z.object({
+  reading: assessmentSkillResultSchema.nullable(),
+  listening: assessmentSkillResultSchema.nullable(),
+  writing: assessmentSkillResultSchema.nullable(),
+  /** Self-declared by the learner, never graded. */
+  speaking: assessmentSkillResultSchema.extend({ declared: z.literal(true) }).nullable(),
+});
+export type AssessmentResults = z.infer<typeof assessmentResultsSchema>;
+
+export const ASSESSMENT_STATUSES = ["in_progress", "graded"] as const;
+
+/** An assessment as the app sees it (the grading bookkeeping stays on the server). */
+export const assessmentSchema = z.object({
+  id: z.string().min(1),
+  language: languageSchema,
+  dossierId: text(40),
+  status: z.enum(ASSESSMENT_STATUSES),
+  answers: assessmentAnswersSchema,
+  listeningPlays: z.number().int().min(0).max(LISTENING_MAX_PLAYS),
+  results: assessmentResultsSchema.nullable(),
+  startedAt: z.string().min(1),
+  gradedAt: z.string().min(1).nullable(),
+});
+export type Assessment = z.infer<typeof assessmentSchema>;

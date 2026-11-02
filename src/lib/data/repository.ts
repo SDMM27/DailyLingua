@@ -17,6 +17,7 @@ import { addDays, toDateKey } from "@/lib/domain/dates";
 import type { GuestTrialStatus } from "@/lib/domain/guest-trial";
 import { dateKeySchema, type CefrLevel, type ContentType, type DateKey, type Language } from "@/lib/schemas/common";
 import type { MissionRequest } from "@/lib/schemas/mission-request";
+import type { Assessment, AssessmentAnswers } from "@/lib/schemas/assessment";
 import {
   contentListItemSchema,
   paidSourceSchema,
@@ -119,6 +120,17 @@ export interface DailyLinguaRepository {
    * The date must be from tomorrow to 7 days ahead, and its mission not written yet (UserFacingError otherwise).
    */
   setMissionRequest(input: { language: Language; date: DateKey; topic: Topic | null }): Promise<void>;
+  /**
+   * Starts the skills assessment of a language with a dossier, or returns the one already in progress
+   * (whatever its dossier). Id of the assessment. Refused for a guest (UserFacingError).
+   */
+  startAssessment(language: Language, dossierId: string): Promise<string>;
+  /** The assessment in progress for a language, or null. */
+  getCurrentAssessment(language: Language): Promise<Assessment | null>;
+  /** The user's assessments, newest first, of one language or of all of them. */
+  listAssessments(language?: Language): Promise<Assessment[]>;
+  /** Saves the answers so far; the listening plays never go down. Only for an assessment in progress. */
+  saveAssessmentAnswers(assessmentId: string, answers: AssessmentAnswers, listeningPlays: number): Promise<void>;
   /**
    * Contents per domain for a language at the given levels: published in the last 14 days, link not
    * broken, active source allowed by the licence policy, classified. Counted over the newest 500.
@@ -291,6 +303,14 @@ export function createMockRepository(): DailyLinguaRepository {
       return [];
     },
     setMissionRequest: readOnly,
+    startAssessment: readOnly,
+    async getCurrentAssessment() {
+      return null;
+    },
+    async listAssessments() {
+      return [];
+    },
+    saveAssessmentAnswers: readOnly,
     async listTopicAvailability(language, levels) {
       const counts: Partial<Record<Topic, number>> = {};
       for (const c of buildMockContents(new Date())) {
