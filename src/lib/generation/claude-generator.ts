@@ -48,6 +48,8 @@ export function toGenerationError(error: unknown): GenerationError {
           : "api_error";
     return new GenerationError(reason, `Claude : erreur API (statut ${error.status ?? "inconnu"}, ${error.name})`);
   }
+  // Raised by the SDK when an answer does not fit the output schema (its message may quote the answer).
+  if (error instanceof Anthropic.AnthropicError) return new GenerationError("invalid_output", "Claude : réponse hors format");
   return new GenerationError("api_error", "Claude : erreur inattendue");
 }
 

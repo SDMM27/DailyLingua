@@ -39,7 +39,7 @@ export async function runIngestJob(input: IngestJobInput): Promise<IngestJobResu
 
   // A failed batch only leaves its contents for the next run: it does not make the job partial.
   const classified = topics
-    ? await classifyPendingContents(topics.store, topics.classifier, { limit: topics.limit })
+    ? await classifyPendingContents(topics.store, topics.classifier, { limit: topics.limit, log: console.warn })
     : { classified: 0, failedBatches: 0 };
 
   const count = (status: IngestReport["sources"][number]["status"]) =>

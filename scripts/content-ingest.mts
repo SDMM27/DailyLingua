@@ -71,6 +71,7 @@ if (topicsConfig.enabled) {
   const topics = await classifyPendingContents(
     store,
     createClaudeTopicClassifier({ apiKeys: topicsConfig.apiKeys, model: topicsConfig.model }),
+    { log: console.warn },
   );
   console.log(`Thèmes : ${topics.classified} contenus classés, ${topics.failedBatches} lots en échec.`);
 } else {

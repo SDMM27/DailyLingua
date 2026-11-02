@@ -1,4 +1,5 @@
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
+import { strictOutputFormat } from "./output-format";
 import {
   assessmentReviewSchema,
   wireAssessmentGradingSchema,
@@ -115,7 +116,7 @@ export function createClaudeAssessmentGrader(options: ClaudeAssessmentGraderOpti
           max_tokens: 8000,
           system: ASSESSMENT_GRADING_SYSTEM_PROMPT,
           messages: [{ role: "user", content: buildAssessmentGradingMessage(request) }],
-          output_config: { format: zodOutputFormat(wireAssessmentGradingSchema), effort: options.effort ?? "medium" },
+          output_config: { format: strictOutputFormat(wireAssessmentGradingSchema), effort: options.effort ?? "medium" },
         });
       } catch (error) {
         throw toGenerationError(error);

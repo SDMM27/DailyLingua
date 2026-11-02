@@ -1,4 +1,5 @@
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
+import { strictOutputFormat } from "./output-format";
 import {
   WRITING_CRITERIA,
   WRITING_FEEDBACK_LIMITS,
@@ -125,7 +126,7 @@ export function createClaudeWritingReviewer(options: ClaudeWritingReviewerOption
           max_tokens: 8000,
           system: WRITING_FEEDBACK_SYSTEM_PROMPT,
           messages: [{ role: "user", content: buildWritingFeedbackMessage(request) }],
-          output_config: { format: zodOutputFormat(wireWritingFeedbackSchema), effort: options.effort ?? "medium" },
+          output_config: { format: strictOutputFormat(wireWritingFeedbackSchema), effort: options.effort ?? "medium" },
         });
       } catch (error) {
         throw toGenerationError(error);

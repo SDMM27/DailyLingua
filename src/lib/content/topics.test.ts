@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { GenerationError } from "@/lib/generation/errors";
 import type { Topic } from "@/lib/schemas/preferences";
 import {
   TOPIC_BATCH_SIZE,
@@ -58,6 +59,23 @@ describe("classifyPendingContents", () => {
     expect(saved.has("c0")).toBe(true);
     expect(saved.has("c20")).toBe(false);
     expect(saved.has("c40")).toBe(true);
+  });
+
+  it("logs why a batch failed, without the raw error", async () => {
+    const { store } = fakeStore(contents(1));
+    const classifier = {
+      classify: vi.fn(async () => {
+        throw new GenerationError("invalid_output", "Claude : réponse hors format");
+      }),
+    };
+    const log = vi.fn();
+    await classifyPendingContents(store, classifier, { log });
+    expect(log).toHaveBeenCalledWith("topics: batch of 1 failed: invalid_output: Claude : réponse hors format");
+
+    log.mockClear();
+    classifier.classify.mockRejectedValueOnce(new Error("secret title"));
+    await classifyPendingContents(store, classifier, { log });
+    expect(log.mock.calls[0][0]).not.toContain("secret title");
   });
 
   it("keeps an unanswered item unclassified and saves an empty answer as classified", async () => {

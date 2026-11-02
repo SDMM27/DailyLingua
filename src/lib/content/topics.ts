@@ -1,4 +1,5 @@
 import type { Language } from "@/lib/domain/languages";
+import { GenerationError } from "@/lib/generation/errors";
 import type { Topic } from "@/lib/schemas/preferences";
 
 /** Contents sent to the classifier in one request. */
@@ -44,13 +45,13 @@ export interface ClassifyPendingResult {
 
 /**
  * Classifies up to `limit` unclassified contents, batch after batch. A failing batch is counted and
- * skipped, never thrown: the ingestion must not fail because the model is down. An item the model
- * did not answer stays unclassified.
+ * skipped and logged, never thrown: the ingestion must not fail because the model is down. An item the
+ * model did not answer stays unclassified.
  */
 export async function classifyPendingContents(
   store: ContentTopicStore,
   classifier: TopicClassifier,
-  { limit = 200 }: { limit?: number } = {},
+  { limit = 200, log = () => {} }: { limit?: number; log?: (message: string) => void } = {},
 ): Promise<ClassifyPendingResult> {
   const pending = await store.listUnclassifiedContents(limit);
   let classified = 0;
@@ -65,8 +66,10 @@ export async function classifyPendingContents(
       });
       if (updates.length > 0) await store.setContentTopics(updates);
       classified += updates.length;
-    } catch {
+    } catch (error) {
       failedBatches += 1;
+      // Our own message only (see GenerationError): never the raw error, which may quote the contents.
+      log(`topics: batch of ${batch.length} failed: ${error instanceof GenerationError ? `${error.reason}: ${error.message}` : "unexpected error"}`);
     }
   }
   return { classified, failedBatches };

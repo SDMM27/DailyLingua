@@ -1,4 +1,5 @@
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
+import { strictOutputFormat } from "./output-format";
 import { TOPIC_BATCH_SIZE, type TopicClassifier, type TopicClassifierItem } from "@/lib/content/topics";
 import { MAX_CONTENT_TOPICS } from "@/lib/schemas/content";
 import { wireContentTopicsSchema, type WireContentTopics } from "@/lib/schemas/content-topics";
@@ -108,7 +109,7 @@ export function createClaudeTopicClassifier(options: ClaudeTopicClassifierOption
           max_tokens: 4000,
           system: CONTENT_TOPICS_SYSTEM_PROMPT,
           messages: [{ role: "user", content: buildContentTopicsMessage(items) }],
-          output_config: { format: zodOutputFormat(wireContentTopicsSchema), effort: "low" },
+          output_config: { format: strictOutputFormat(wireContentTopicsSchema), effort: "low" },
         });
       } catch (error) {
         throw toGenerationError(error);
