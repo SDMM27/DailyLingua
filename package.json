@@ -25,6 +25,7 @@
     "mission:generate": "tsx --env-file-if-exists=.env.local scripts/mission-generate.mts",
     "cron:run": "tsx --env-file-if-exists=.env.local scripts/cron-run.mts",
     "feedback:eval": "tsx --env-file-if-exists=.env.local scripts/writing-feedback-eval.mts",
+    "assessment:eval": "tsx --env-file-if-exists=.env.local scripts/assessment-eval.mts",
     "placement:check": "tsx scripts/placement-check.mts",
     "grammar:check": "tsx scripts/grammar-check.mts",
     "assessment:check": "tsx scripts/assessment-check.mts",

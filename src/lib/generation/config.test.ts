@@ -3,6 +3,7 @@ import {
   DEFAULT_GUEST_DAILY_MISSION_CAP,
   DEFAULT_MISSION_MODEL,
   readApiKeys,
+  readAssessmentGradingConfig,
   readContentTopicsConfig,
   readGenerationConfig,
   readGuestDailyMissionCap,
@@ -102,6 +103,34 @@ describe("readWritingFeedbackConfig", () => {
       enabled: false,
     });
     expect(() => readWritingFeedbackConfig({ WRITING_FEEDBACK: "maybe" })).toThrow(/WRITING_FEEDBACK invalide/);
+  });
+});
+
+describe("readAssessmentGradingConfig", () => {
+  it("is off without a key", () => {
+    expect(readAssessmentGradingConfig({})).toEqual({ enabled: false });
+  });
+
+  it("is on with a key (or a fallback key alone), with the mission model by default", () => {
+    expect(readAssessmentGradingConfig({ ANTHROPIC_API_KEY: "sk-test" })).toEqual({
+      enabled: true,
+      apiKeys: ["sk-test"],
+      model: DEFAULT_MISSION_MODEL,
+    });
+    expect(readAssessmentGradingConfig({ ANTHROPIC_API_KEY_FALLBACK: "sk-b" })).toMatchObject({
+      enabled: true,
+      apiKeys: ["sk-b"],
+    });
+    expect(
+      readAssessmentGradingConfig({ ANTHROPIC_API_KEY: "sk-test", ASSESSMENT_GRADING_MODEL: "claude-sonnet-5-5" }),
+    ).toMatchObject({ model: "claude-sonnet-5-5" });
+  });
+
+  it("can be switched off, and refuses an unknown value", () => {
+    expect(readAssessmentGradingConfig({ ANTHROPIC_API_KEY: "sk-test", ASSESSMENT_GRADING: "off" })).toEqual({
+      enabled: false,
+    });
+    expect(() => readAssessmentGradingConfig({ ASSESSMENT_GRADING: "maybe" })).toThrow(/ASSESSMENT_GRADING invalide/);
   });
 });
 

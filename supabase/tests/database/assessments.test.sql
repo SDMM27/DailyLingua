@@ -1,12 +1,13 @@
 -- pgTAP tests for migration 20261102000100: skills assessments are read-only for their owner, started
 -- and saved through functions (guests refused, language and dossier checked, listening plays never
 -- go down), graded only by the service role (3 attempts per assessment, 5 per UTC day, a refused
--- attempt counts for neither), and production_level survives save_preferences.
+-- attempt counts for neither), and production_level survives save_preferences. Migration
+-- 20261102000200: completing a grading stores the answers that were graded.
 -- Run with `npm run db:test`. Everything is rolled back.
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(63);
+select plan(65);
 
 insert into auth.users (instance_id, id, aud, role, email, is_anonymous) values
   ('00000000-0000-0000-0000-000000000000', 'a0000000-0000-4000-8000-0000000000a3', 'authenticated', 'authenticated', 'as-a@test.invalid', false),
@@ -102,6 +103,7 @@ select throws_ok(
   '42501', null, 'the owner cannot claim a grading');
 select throws_ok(
   $$select public.complete_assessment_grading('11000000-0000-4000-8000-0000000000a3', 'a0000000-0000-4000-8000-0000000000a3',
+    '{"questions": {}, "writing": "", "speaking": {}}',
     '{"reading": null, "listening": null, "writing": null, "speaking": null}', 'C2', 'm', 'v', 1, 1)$$,
   '42501', null, 'nor complete one');
 
@@ -209,10 +211,12 @@ select is(
 
 select throws_ok(
   $$select public.complete_assessment_grading('11000000-0000-4000-8000-0000000000a3', 'b0000000-0000-4000-8000-0000000000a3',
+    '{"questions": {}, "writing": "", "speaking": {}}',
     '{"reading": null, "listening": null, "writing": null, "speaking": null}', null, 'm', 'v', 1, 1)$$,
   'P0002', null, 'another user cannot complete it');
 select throws_ok(
   $$select public.complete_assessment_grading('11000000-0000-4000-8000-0000000000a3', 'a0000000-0000-4000-8000-0000000000a3',
+    '{"questions": {}, "writing": "", "speaking": {}}',
     null, null, 'm', 'v', 1, 1)$$,
   '23514', null, 'a graded assessment needs its results');
 select is(
@@ -221,6 +225,7 @@ select is(
 
 select lives_ok(
   $$select public.complete_assessment_grading('11000000-0000-4000-8000-0000000000a3', 'a0000000-0000-4000-8000-0000000000a3',
+    '{"questions": {"q1": "graded answer"}, "writing": "graded text", "speaking": {}}',
     '{"reading": {"level": "B1", "confidence": "high"}, "listening": null, "writing": {"level": "B2", "confidence": "medium"},
       "speaking": {"level": "B1", "confidence": "low", "declared": true}}', 'B2', 'claude-test', '2026-11-02.1', 1200, 300)$$,
   'a grading is completed');
@@ -228,6 +233,10 @@ select is(
   (select status || ':' || (results->'writing'->>'level') || ':' || (graded_at is not null)::text
    from public.assessments where id = '11000000-0000-4000-8000-0000000000a3'),
   'graded:B2:true', 'the assessment is graded with its results');
+select is(
+  (select answers->'questions'->>'q1' || ':' || (answers->>'writing') from public.assessments
+   where id = '11000000-0000-4000-8000-0000000000a3'),
+  'graded answer:graded text', 'the answers graded replace the ones saved meanwhile');
 select is(
   (select production_level from public.user_languages
    where user_id = 'a0000000-0000-4000-8000-0000000000a3' and language = 'it'),
@@ -238,14 +247,22 @@ select is(
   null, 'other languages are untouched');
 select throws_ok(
   $$select public.complete_assessment_grading('11000000-0000-4000-8000-0000000000a3', 'a0000000-0000-4000-8000-0000000000a3',
+    '{"questions": {}, "writing": "", "speaking": {}}',
     '{"reading": null, "listening": null, "writing": null, "speaking": null}', null, 'm', 'v', 1, 1)$$,
   'P0002', null, 'an assessment is graded once');
+
+select throws_ok(
+  $$select public.complete_assessment_grading('21000000-0000-4000-8000-0000000000a3', 'b0000000-0000-4000-8000-0000000000a3',
+    '[]',
+    '{"reading": null, "listening": null, "writing": null, "speaking": null}', null, 'm', 'v', 1, 1)$$,
+  '22023', null, 'the answers graded must be an object');
 
 -- A language removed during the test: the grading still completes and the history stays.
 delete from public.user_languages
 where user_id = 'b0000000-0000-4000-8000-0000000000a3' and language = 'ru';
 select lives_ok(
   $$select public.complete_assessment_grading('21000000-0000-4000-8000-0000000000a3', 'b0000000-0000-4000-8000-0000000000a3',
+    '{"questions": {}, "writing": "", "speaking": {}}',
     '{"reading": null, "listening": null, "writing": null, "speaking": null}', 'C1', 'm', 'v', 1, 1)$$,
   'completing for a removed language does not fail');
 select is(

@@ -51,6 +51,24 @@ export function readWritingFeedbackConfig(
   return { enabled: true, apiKeys, model: source.WRITING_FEEDBACK_MODEL?.trim() || DEFAULT_MISSION_MODEL };
 }
 
+export type AssessmentGradingConfig = { enabled: true; apiKeys: string[]; model: string } | { enabled: false };
+
+/**
+ * Grading of the full skills assessment: on as soon as ANTHROPIC_API_KEY (or ANTHROPIC_API_KEY_FALLBACK) is set, unless
+ * ASSESSMENT_GRADING=off. ASSESSMENT_GRADING_MODEL picks the model (default: the mission model).
+ */
+export function readAssessmentGradingConfig(
+  source: Record<string, string | undefined> = process.env,
+): AssessmentGradingConfig {
+  const apiKeys = readApiKeys(source);
+  const setting = source.ASSESSMENT_GRADING?.trim() || "on";
+  if (setting !== "on" && setting !== "off") {
+    throw new Error(`ASSESSMENT_GRADING invalide : « ${setting} » (valeurs : on, off).`);
+  }
+  if (setting === "off" || !apiKeys.length) return { enabled: false };
+  return { enabled: true, apiKeys, model: source.ASSESSMENT_GRADING_MODEL?.trim() || DEFAULT_MISSION_MODEL };
+}
+
 /** Guest missions (all guests together) allowed per rolling 24 hours when GUEST_DAILY_MISSION_CAP is unset. */
 export const DEFAULT_GUEST_DAILY_MISSION_CAP = 300;
 

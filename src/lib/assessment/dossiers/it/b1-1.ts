@@ -25,7 +25,7 @@ export const dossier: AssessmentDossier = {
         id: "it-b1-1-r3",
         prompt: "Pourquoi certains habitants sont-ils sceptiques, et comment l’association des amis du théâtre leur répond-elle ?",
         referenceAnswer: "Ils craignent que les coûts dépassent les prévisions et que les impôts augmentent ; l’association répond que la culture est un investissement qui attirerait des visiteurs et créerait des emplois.",
-        expectedPoints: ["crainte de coûts et d’impôts en hausse", "autres priorités, comme les routes", "la culture vue comme un investissement"],
+        expectedPoints: ["crainte de coûts et d’impôts en hausse", "la culture vue comme un investissement"],
       },
     ],
   },

@@ -2,7 +2,16 @@ import "server-only";
 import type { DateKey } from "@/lib/schemas/common";
 import type { VocabularyTranslationResult } from "@/lib/schemas/vocabulary";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { readGuestDailyMissionCap, readVocabularyTranslationConfig, readWritingFeedbackConfig } from "./config";
+import { gradeAssessment, type GradeAssessmentOutcome } from "@/lib/assessment/grade-assessment";
+import { readAssessmentDraftPolicy } from "@/lib/assessment/policy";
+import { createSupabaseAssessmentStore } from "@/lib/assessment/supabase-store";
+import { createClaudeAssessmentGrader } from "./assessment-grading";
+import {
+  readAssessmentGradingConfig,
+  readGuestDailyMissionCap,
+  readVocabularyTranslationConfig,
+  readWritingFeedbackConfig,
+} from "./config";
 import type { GenerateMissionOutcome } from "./generate-mission";
 import { createMissionPreparer, createSessionReplacer } from "./preparer";
 import type { ReplaceSessionOutcome } from "./replace-session";
@@ -68,6 +77,22 @@ export function writingFeedbackReviewer():
     requestWritingFeedback(input, {
       store: createSupabaseWritingFeedbackStore(createSupabaseAdminClient()),
       reviewer: createClaudeWritingReviewer({ apiKeys: config.apiKeys, model: config.model }),
+      log: console.warn,
+    });
+}
+
+/**
+ * Grades a skills assessment with the service role, or null when the grading is off (no API key, or
+ * ASSESSMENT_GRADING=off). Same rule as `prepareMission`: only with the signed-in user's id.
+ */
+export function assessmentGrader(): ((input: { userId: string; assessmentId: string }) => Promise<GradeAssessmentOutcome>) | null {
+  const config = readAssessmentGradingConfig();
+  if (!config.enabled) return null;
+  return (input) =>
+    gradeAssessment(input, {
+      store: createSupabaseAssessmentStore(createSupabaseAdminClient()),
+      grader: createClaudeAssessmentGrader({ apiKeys: config.apiKeys, model: config.model }),
+      policy: readAssessmentDraftPolicy(),
       log: console.warn,
     });
 }

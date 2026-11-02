@@ -696,7 +696,7 @@ isOneToOne: false
 { Args: { "p_session_id": string,"p_user_id": string }; Returns: number
                            },
 "complete_assessment_grading":
-{ Args: { "p_assessment_id": string,"p_input_tokens": number,"p_model": string,"p_output_tokens": number,"p_production_level": string | null,"p_prompt_version": string,"p_results": Json,"p_user_id": string }; Returns: undefined
+{ Args: { "p_answers": Json,"p_assessment_id": string,"p_input_tokens": number | null,"p_model": string | null,"p_output_tokens": number | null,"p_production_level": string | null,"p_prompt_version": string | null,"p_results": Json,"p_user_id": string }; Returns: undefined
                            },
 "complete_mission_generation":
 { Args: { "p_meta": Json,"p_mission_id": string,"p_sessions": Json }; Returns: undefined

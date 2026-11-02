@@ -97,13 +97,39 @@ export const assessmentSkillResultSchema = z.object({
 });
 export type AssessmentSkillResult = z.infer<typeof assessmentSkillResultSchema>;
 
+/** A graded skill: the learner may also be offered a harder dossier (never at C2). */
+export const assessmentGradedSkillResultSchema = assessmentSkillResultSchema.extend({ offerHigher: z.boolean() });
+export type AssessmentGradedSkillResult = z.infer<typeof assessmentGradedSkillResultSchema>;
+
+export const ASSESSMENT_VERDICTS = ["correct", "partial", "wrong"] as const;
+export const assessmentVerdictSchema = z.enum(ASSESSMENT_VERDICTS);
+
+export const ASSESSMENT_WRITING_CRITERIA = ["grammar", "vocabulary", "syntax", "adequacy"] as const;
+export type AssessmentWritingCriterion = (typeof ASSESSMENT_WRITING_CRITERIA)[number];
+
+const writingScore = z.number().int().min(1).max(5);
+
+/** What the grader said, kept for the results screen: one verdict per question, four scores for the text. */
+export const assessmentReviewSchema = z.object({
+  /** By question id; only the questions of the dossier. */
+  questions: z.record(z.string(), z.object({ verdict: assessmentVerdictSchema, comment: text(300) })),
+  writing: z
+    .object({
+      scores: z.object({ grammar: writingScore, vocabulary: writingScore, syntax: writingScore, adequacy: writingScore }),
+      comment: text(300),
+    })
+    .nullable(),
+});
+export type AssessmentReview = z.infer<typeof assessmentReviewSchema>;
+
 /** Per skill: a result, or null when the skill was not assessed (e.g. no recording published). */
 export const assessmentResultsSchema = z.object({
-  reading: assessmentSkillResultSchema.nullable(),
-  listening: assessmentSkillResultSchema.nullable(),
-  writing: assessmentSkillResultSchema.nullable(),
+  reading: assessmentGradedSkillResultSchema.nullable(),
+  listening: assessmentGradedSkillResultSchema.nullable(),
+  writing: assessmentGradedSkillResultSchema.nullable(),
   /** Self-declared by the learner, never graded. */
   speaking: assessmentSkillResultSchema.extend({ declared: z.literal(true) }).nullable(),
+  review: assessmentReviewSchema,
 });
 export type AssessmentResults = z.infer<typeof assessmentResultsSchema>;
 
@@ -122,3 +148,47 @@ export const assessmentSchema = z.object({
   gradedAt: z.string().min(1).nullable(),
 });
 export type Assessment = z.infer<typeof assessmentSchema>;
+
+// Wire format: what the grader returns -----------------------------------------------------------
+//
+// Plain types only (no bounds) so it converts to the JSON schema of structured outputs; the bounds
+// are enforced afterwards by `assessmentReviewSchema` (see `validateAssessmentGrading`).
+
+const FRENCH = "In French, addressing the learner with « tu ». One sentence.";
+
+export const wireAssessmentGradingSchema = z.object({
+  questions: z.array(
+    z.object({
+      id: z.string().describe("The id of the question, copied exactly."),
+      verdict: z
+        .enum(ASSESSMENT_VERDICTS)
+        .describe("correct: every essential expected point; partial: some of them; wrong: none, vague, generic or off topic."),
+      comment_fr: z.string().describe(FRENCH),
+    }),
+  ),
+  writing: z
+    .object({
+      grammar: z.number().int().describe("Integer from 1 to 5, for the dossier level."),
+      vocabulary: z.number().int().describe("Integer from 1 to 5, for the dossier level."),
+      syntax: z.number().int().describe("Integer from 1 to 5, for the dossier level."),
+      adequacy: z.number().int().describe("Integer from 1 to 5: fit with the task and its length."),
+      comment_fr: z.string().describe(FRENCH),
+    })
+    .nullable()
+    .describe("null when no text was sent."),
+});
+export type WireAssessmentGrading = z.infer<typeof wireAssessmentGradingSchema>;
+
+/** Input of the server action (validated again on the server). */
+export const gradeAssessmentInputSchema = z.object({ assessmentId: z.string().min(1) });
+
+/** What grading an assessment gives back to the app. */
+export type AssessmentGradingResult =
+  | { status: "ready"; results: AssessmentResults }
+  /** The dossier is not available to grade (still a draft where drafts are hidden). */
+  | { status: "unavailable-dossier" }
+  /** Nothing to grade yet. */
+  | { status: "empty" }
+  | { status: "limit" }
+  /** The model failed or timed out; the attempt is counted. */
+  | { status: "unavailable"; attemptsLeft: number };

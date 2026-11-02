@@ -7,6 +7,7 @@ import { SOURCE_CATALOG } from "@/lib/content/catalog";
 import { LANGUAGE_CODES } from "@/lib/domain/languages";
 import { readContentLicensePolicy } from "@/lib/content/policy";
 import {
+  assessmentGrader,
   prepareMission,
   replaceSession,
   reserveGuestMission,
@@ -17,7 +18,7 @@ import { addDays, toDateKey } from "@/lib/domain/dates";
 import type { GuestTrialStatus } from "@/lib/domain/guest-trial";
 import { dateKeySchema, type CefrLevel, type ContentType, type DateKey, type Language } from "@/lib/schemas/common";
 import type { MissionRequest } from "@/lib/schemas/mission-request";
-import type { Assessment, AssessmentAnswers } from "@/lib/schemas/assessment";
+import type { Assessment, AssessmentAnswers, AssessmentGradingResult } from "@/lib/schemas/assessment";
 import {
   contentListItemSchema,
   paidSourceSchema,
@@ -131,6 +132,12 @@ export interface DailyLinguaRepository {
   listAssessments(language?: Language): Promise<Assessment[]>;
   /** Saves the answers so far; the listening plays never go down. Only for an assessment in progress. */
   saveAssessmentAnswers(assessmentId: string, answers: AssessmentAnswers, listeningPlays: number): Promise<void>;
+  /**
+   * Grades the assessment in progress: one model call, then the levels are decided in code. The
+   * answers graded are stored with the result. A failed or slow grading comes back as `unavailable`
+   * (the attempt counts); an assessment already graded returns its results.
+   */
+  gradeAssessment(assessmentId: string): Promise<AssessmentGradingResult>;
   /**
    * Contents per domain for a language at the given levels: published in the last 14 days, link not
    * broken, active source allowed by the licence policy, classified. Counted over the newest 500.
@@ -311,6 +318,7 @@ export function createMockRepository(): DailyLinguaRepository {
       return [];
     },
     saveAssessmentAnswers: readOnly,
+    gradeAssessment: readOnly,
     async listTopicAvailability(language, levels) {
       const counts: Partial<Record<Topic, number>> = {};
       for (const c of buildMockContents(new Date())) {
@@ -460,6 +468,7 @@ export const getRepository = cache(async (): Promise<DailyLinguaRepository> => {
     prepareMission,
     replaceSession,
     reviewWriting: writingFeedbackReviewer(),
+    gradeAssessment: assessmentGrader(),
     translateVocabulary: vocabularyTranslator(),
   });
 });

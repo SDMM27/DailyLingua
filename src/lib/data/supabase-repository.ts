@@ -24,7 +24,15 @@ import {
 } from "@/lib/schemas/alphabet";
 import { grammarCardSchema, type GrammarCard, type RecordGrammarPracticeInput } from "@/lib/schemas/grammar";
 import { dateKeySchema, type CefrLevel, type ContentType, type DateKey, type Language } from "@/lib/schemas/common";
-import { assessmentAnswersSchema, assessmentSchema, type Assessment, type AssessmentAnswers } from "@/lib/schemas/assessment";
+import {
+  assessmentAnswersSchema,
+  assessmentSchema,
+  type Assessment,
+  type AssessmentAnswers,
+  type AssessmentGradingResult,
+} from "@/lib/schemas/assessment";
+import type { GradeAssessmentOutcome } from "@/lib/assessment/grade-assessment";
+import { AssessmentNotFoundError } from "@/lib/assessment/supabase-store";
 import { MISSION_READY_MESSAGE, missionRequestSchema, type MissionRequest } from "@/lib/schemas/mission-request";
 import {
   contentListItemSchema,
@@ -360,6 +368,8 @@ export function createSupabaseRepository(
     replaceSession?: (userId: string, sessionId: string) => Promise<ReplaceSessionOutcome>;
     /** Reviews a written production (service role, server only). Absent: reviews are off. */
     reviewWriting?: ((input: RequestWritingFeedbackInput) => Promise<WritingFeedbackOutcome>) | null;
+    /** Grades a skills assessment (service role, server only). Absent: grading is off. */
+    gradeAssessment?: ((input: { userId: string; assessmentId: string }) => Promise<GradeAssessmentOutcome>) | null;
     /** Suggests French translations for imported words (service role, server only). Absent: translation is off. */
     translateVocabulary?: ((input: TranslateVocabularyRequest) => Promise<VocabularyTranslationResult>) | null;
   } = {},
@@ -1555,6 +1565,21 @@ export function createSupabaseRepository(
     if (error) throw new Error(`Supabase (réponses du bilan) : ${error.message}`);
   }
 
+  async function gradeAssessment(assessmentId: string): Promise<AssessmentGradingResult> {
+    if (!options.gradeAssessment) return { status: "unavailable", attemptsLeft: 0 };
+    let outcome: GradeAssessmentOutcome;
+    try {
+      outcome = await options.gradeAssessment({ userId, assessmentId });
+    } catch (error) {
+      // Graded by a concurrent request, or closed meanwhile.
+      if (error instanceof AssessmentNotFoundError) throw new UserFacingError(error.message);
+      console.error(error);
+      return { status: "unavailable", attemptsLeft: 0 };
+    }
+    if (outcome.status === "not-found") throw new UserFacingError("Ce bilan est introuvable.");
+    return outcome;
+  }
+
   async function listTopicAvailability(language: Language, levels: CefrLevel[]): Promise<Partial<Record<Topic, number>>> {
     const since = new Date(Date.now() - TOPIC_AVAILABILITY_DAYS * 86_400_000).toISOString();
     // Same filters as listContents: active feed sources, licence policy, links not broken.
@@ -1658,6 +1683,7 @@ export function createSupabaseRepository(
     getCurrentAssessment,
     listAssessments,
     saveAssessmentAnswers,
+    gradeAssessment,
     listTopicAvailability,
     getMissionProgress,
     prepareTodayMission,

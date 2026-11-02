@@ -47,11 +47,18 @@ const PREFERENCES: Preferences = {
 };
 
 const RESULTS = {
-  reading: { level: "B2", confidence: "high" },
+  reading: { level: "B2", confidence: "high", offerHigher: true },
   listening: null,
-  writing: { level: "B1", confidence: "medium" },
+  writing: { level: "B1", confidence: "medium", offerHigher: false },
   speaking: { level: "B2", confidence: "low", declared: true },
+  review: {
+    questions: { q1: { verdict: "correct", comment: "Bien vu." }, q2: { verdict: "partial", comment: "Il manque un point." } },
+    writing: { scores: { grammar: 3, vocabulary: 3, syntax: 3, adequacy: 4 }, comment: "Texte compréhensible." },
+  },
 } as const;
+
+// What the grader was sent; the user saves other answers while it works (see the test below).
+const GRADED_ANSWERS = { questions: { q1: "réponse", q2: "autre" }, writing: "Texte", speaking: { s1: true } };
 
 const stackIsUp = await localStackIsUp();
 
@@ -98,9 +105,16 @@ describe.skipIf(!stackIsUp)("Assessments (local database, throw-away data)", () 
     expect(saved?.answers.questions).toEqual({ q1: "réponse", q2: "autre" });
 
     expect(await store.claimGrading(id, userId)).toBe(1);
+    const loaded = await store.loadForGrading(userId, id);
+    expect(loaded).toMatchObject({ language: "ru", dossierId: "ru-b2-1", status: "in_progress", listeningPlays: 2, results: null });
+    expect(await store.loadForGrading("00000000-0000-4000-8000-000000000000", id)).toBeNull();
+
+    // Answers saved while the grader works: only the graded ones are kept with the result.
+    await repo.saveAssessmentAnswers(id, { questions: { q1: "modifiée après coup" }, writing: "Autre texte", speaking: {} }, 2);
     await store.completeGrading({
       assessmentId: id,
       userId,
+      answers: GRADED_ANSWERS,
       results: RESULTS,
       productionLevel: "B1",
       model: "test-model",
@@ -112,6 +126,8 @@ describe.skipIf(!stackIsUp)("Assessments (local database, throw-away data)", () 
     const [graded] = await repo.listAssessments("ru");
     expect(graded).toMatchObject({ id, status: "graded", results: RESULTS });
     expect(graded.gradedAt).not.toBeNull();
+    expect(graded.answers).toEqual(GRADED_ANSWERS);
+    expect(await store.loadForGrading(userId, id)).toMatchObject({ status: "graded", results: RESULTS });
     expect(await repo.listAssessments("it")).toEqual([]);
     expect((await repo.getPreferences())?.goals.find((g) => g.language === "ru")?.productionLevel).toBe("B1");
 

@@ -16,19 +16,41 @@ describe("assessment answers", () => {
 });
 
 describe("assessment results", () => {
-  const skill = { level: "B1", confidence: "medium" };
+  const skill = { level: "B1", confidence: "medium", offerHigher: false };
+  const review = { questions: { q1: { verdict: "partial", comment: "Presque." } }, writing: null };
+  const results = (overrides: Record<string, unknown> = {}) => ({
+    reading: skill,
+    listening: null,
+    writing: skill,
+    speaking: null,
+    review,
+    ...overrides,
+  });
 
   it("accepts a null skill (not assessed) and requires speaking to be declared", () => {
-    expect(assessmentResultsSchema.safeParse({ reading: skill, listening: null, writing: skill, speaking: null }).success).toBe(true);
-    expect(assessmentResultsSchema.safeParse({ reading: skill, listening: null, writing: skill, speaking: skill }).success).toBe(false);
-    expect(
-      assessmentResultsSchema.safeParse({ reading: skill, listening: null, writing: skill, speaking: { ...skill, declared: true } }).success,
-    ).toBe(true);
+    expect(assessmentResultsSchema.safeParse(results()).success).toBe(true);
+    expect(assessmentResultsSchema.safeParse(results({ speaking: skill })).success).toBe(false);
+    expect(assessmentResultsSchema.safeParse(results({ speaking: { level: "B1", confidence: "low", declared: true } })).success).toBe(true);
+  });
+
+  it("requires the review and a flag to offer a harder dossier on graded skills", () => {
+    expect(assessmentResultsSchema.safeParse({ ...results(), review: undefined }).success).toBe(false);
+    expect(assessmentResultsSchema.safeParse(results({ reading: { level: "B1", confidence: "low" } })).success).toBe(false);
+  });
+
+  it("checks the review: known verdicts, scores from 1 to 5, no blank comment", () => {
+    const withReview = (value: unknown) => assessmentResultsSchema.safeParse(results({ review: value })).success;
+    const scores = { grammar: 3, vocabulary: 3, syntax: 3, adequacy: 3 };
+    expect(withReview({ questions: {}, writing: { scores, comment: "Bien." } })).toBe(true);
+    expect(withReview({ questions: { q1: { verdict: "great", comment: "c" } }, writing: null })).toBe(false);
+    expect(withReview({ questions: { q1: { verdict: "wrong", comment: " " } }, writing: null })).toBe(false);
+    expect(withReview({ questions: {}, writing: { scores: { ...scores, syntax: 6 }, comment: "c" } })).toBe(false);
+    expect(withReview({ questions: {}, writing: { scores: { ...scores, syntax: 0 }, comment: "c" } })).toBe(false);
   });
 
   it("refuses an unknown level or confidence", () => {
-    expect(assessmentResultsSchema.safeParse({ reading: { level: "D1", confidence: "low" }, listening: null, writing: null, speaking: null }).success).toBe(false);
-    expect(assessmentResultsSchema.safeParse({ reading: { level: "B1", confidence: "sure" }, listening: null, writing: null, speaking: null }).success).toBe(false);
+    expect(assessmentResultsSchema.safeParse(results({ reading: { ...skill, level: "D1" } })).success).toBe(false);
+    expect(assessmentResultsSchema.safeParse(results({ reading: { ...skill, confidence: "sure" } })).success).toBe(false);
   });
 });
 
