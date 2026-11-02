@@ -23,3 +23,15 @@ export function isDossierVisible(dossier: AssessmentDossier, policy: AssessmentD
 export function visibleDossiers(language: Language, level: CefrLevel, policy: AssessmentDraftPolicy): AssessmentDossier[] {
   return (ASSESSMENT_DOSSIERS[language] ?? []).filter((d) => d.level === level && isDossierVisible(d, policy));
 }
+
+export type ListeningMode = "audio" | "draft-script" | "unavailable";
+
+/**
+ * How the listening test of a dossier is offered: the recording when there is one; the script,
+ * marked as a draft, only for a dossier without recording under the "show" policy (local work);
+ * otherwise not at all. The script never goes to a learner outside that last case.
+ */
+export function listeningMode(dossier: AssessmentDossier, policy: AssessmentDraftPolicy): ListeningMode {
+  if (dossier.audio !== null) return "audio";
+  return policy === "show" ? "draft-script" : "unavailable";
+}

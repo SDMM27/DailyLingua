@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { countWords } from "./assessment";
+import { canStartListening, countWords, LISTENING_MAX_PLAYS } from "./assessment";
 
 describe("countWords", () => {
   it("counts Russian words, not punctuation", () => {
@@ -15,5 +15,13 @@ describe("countWords", () => {
     // Observed with the runtime's ICU, not corrected: if it ever returns 2, limits are still fine.
     expect(countWords("l'amico", "it")).toBe(1);
     expect(countWords("Ho visto l'amico di Marco", "it")).toBe(5);
+  });
+});
+
+describe("canStartListening", () => {
+  it("allows listenings until the maximum is reached", () => {
+    expect(LISTENING_MAX_PLAYS).toBe(3);
+    expect([0, 1, 2].map(canStartListening)).toEqual([true, true, true]);
+    expect([3, 4].map(canStartListening)).toEqual([false, false]);
   });
 });

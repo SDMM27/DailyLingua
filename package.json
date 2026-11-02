@@ -28,6 +28,7 @@
     "placement:check": "tsx scripts/placement-check.mts",
     "grammar:check": "tsx scripts/grammar-check.mts",
     "assessment:check": "tsx scripts/assessment-check.mts",
+    "assessment:audio": "tsx scripts/assessment-audio.mts",
     "e2e": "playwright test",
     "e2e:install": "playwright install webkit"
   },

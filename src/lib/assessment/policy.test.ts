@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { AssessmentDossier } from "@/lib/schemas/assessment";
 import { FIXTURE_DOSSIER } from "@/test/assessment-fixtures";
-import { isDossierVisible, readAssessmentDraftPolicy, visibleDossiers } from "./policy";
+import { isDossierVisible, listeningMode, readAssessmentDraftPolicy, visibleDossiers } from "./policy";
 
 const AUDIO = { file: "/assessment/it/it-a1-1.m4a", speaker: "Giulia", licence: "granted-commercial", recordedOn: "2026-11-01" } as const;
 const draft: AssessmentDossier = { ...FIXTURE_DOSSIER, reviewedOn: null, audio: null };
@@ -44,5 +44,17 @@ describe("visibleDossiers", () => {
   it("lists the pilot dossiers of a level under the show policy only", () => {
     expect(visibleDossiers("ru", "B1", "show").map((d) => d.id)).toEqual(["ru-b1-1"]);
     expect(visibleDossiers("ru", "B1", "hide")).toEqual([]);
+  });
+});
+
+describe("listeningMode", () => {
+  it("plays the recording whenever there is one", () => {
+    expect(listeningMode({ ...draft, audio: AUDIO }, "hide")).toBe("audio");
+    expect(listeningMode({ ...draft, audio: AUDIO }, "show")).toBe("audio");
+  });
+
+  it("shows the script of an unrecorded dossier only under the show policy", () => {
+    expect(listeningMode(draft, "show")).toBe("draft-script");
+    expect(listeningMode(draft, "hide")).toBe("unavailable");
   });
 });

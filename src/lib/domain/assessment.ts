@@ -8,3 +8,11 @@ export function countWords(text: string, language: string): number {
   for (const segment of segmenter.segment(text)) if (segment.isWordLike) count++;
   return count;
 }
+
+/** A learner may hear the listening passage this many times (replays are not free: it is a test). */
+export const LISTENING_MAX_PLAYS = 3;
+
+/** Whether one more listening may start, given the listenings already started. */
+export function canStartListening(plays: number): boolean {
+  return plays < LISTENING_MAX_PLAYS;
+}

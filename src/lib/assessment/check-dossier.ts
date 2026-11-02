@@ -1,6 +1,7 @@
 import { countWords } from "@/lib/domain/assessment";
 import type { CefrLevel, Language } from "@/lib/schemas/common";
 import { ASSESSMENT_LIMITS, assessmentDossierSchema, type AssessmentDossier } from "@/lib/schemas/assessment";
+import { audioPublicPath } from "./audio";
 
 /**
  * Problems of a dossier against the mechanical authoring rules (AUTHORING.md); empty when it is
@@ -39,8 +40,9 @@ export function checkAssessmentDossier(language: Language, level: CefrLevel, raw
   const shared = commonSentences(dossier.reading.text, dossier.listening.script);
   if (shared.length > 0) problems.push(`listening.script repeats the reading text (« ${shared[0]} »): it must be the sequel`);
 
-  if (dossier.audio && dossier.audio.file !== `/assessment/${language}/${dossier.id}.m4a`) {
-    problems.push(`audio.file is ${dossier.audio.file}, expected /assessment/${language}/${dossier.id}.m4a`);
+  const expectedAudio = audioPublicPath(language, dossier.id);
+  if (dossier.audio && dossier.audio.file !== expectedAudio) {
+    problems.push(`audio.file is ${dossier.audio.file}, expected ${expectedAudio}`);
   }
 
   problems.push(...whitespaceProblems(dossier));
