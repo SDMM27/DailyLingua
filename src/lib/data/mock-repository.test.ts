@@ -43,5 +43,6 @@ describe("demo repository assessments", () => {
     expect(await repo.getCurrentAssessment("it")).toBeNull();
     expect(await repo.listAssessments()).toEqual([]);
     await expect(repo.startAssessment("it", "it-b1-1")).rejects.toThrow("Mode démonstration");
+    await expect(repo.applyAssessmentLevel("id", "B1")).rejects.toThrow("Mode démonstration");
   });
 });

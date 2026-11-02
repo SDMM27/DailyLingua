@@ -1,4 +1,5 @@
-import { CEFR_LEVELS, type CefrLevel } from "@/lib/schemas/common";
+import { CEFR_LEVELS, type CefrLevel, type DateKey } from "@/lib/schemas/common";
+import { diffInDays } from "./dates";
 
 /**
  * Number of words of a text in a language, by Unicode word segmentation (`Intl.Segmenter`), so that
@@ -84,4 +85,114 @@ export function receptionLevel(results: {
   const levels = [results.reading, results.listening].flatMap((r) => (r ? [r.level] : []));
   if (levels.length === 0) return null;
   return levels.reduce((lowest, level) => (CEFR_LEVELS.indexOf(level) < CEFR_LEVELS.indexOf(lowest) ? level : lowest));
+}
+
+// Steps of the assessment screen ------------------------------------------------------------------
+
+export const ASSESSMENT_STEPS = ["reading", "listening", "writing", "speaking"] as const;
+export type AssessmentStep = (typeof ASSESSMENT_STEPS)[number];
+
+/** What a step asks: the ids of its questions (reading, listening) or statements (speaking). */
+export interface AssessmentStepDefinition {
+  step: AssessmentStep;
+  ids: string[];
+}
+
+/** The answers as far as the steps are concerned (a structural subset of `AssessmentAnswers`). */
+export interface StepAnswers {
+  questions: Record<string, string>;
+  writing: string;
+  speaking: Record<string, boolean>;
+}
+
+const isFilled = (value: string | undefined) => value !== undefined && value.trim() !== "";
+
+/** Whether the learner did anything in a step, and whether they went through all of it. */
+function stepProgress(
+  { step, ids }: AssessmentStepDefinition,
+  answers: StepAnswers,
+  plays: number,
+): { touched: boolean; complete: boolean } {
+  switch (step) {
+    case "reading":
+    case "listening": {
+      const answered = ids.filter((id) => isFilled(answers.questions[id])).length;
+      const heard = step === "listening" && plays > 0;
+      return { touched: answered > 0 || heard, complete: ids.length > 0 && answered === ids.length };
+    }
+    case "writing":
+      return { touched: isFilled(answers.writing), complete: isFilled(answers.writing) };
+    case "speaking": {
+      const answered = ids.filter((id) => answers.speaking[id] !== undefined).length;
+      return { touched: answered > 0, complete: ids.length > 0 && answered === ids.length };
+    }
+  }
+}
+
+/**
+ * The step to resume: the one after the furthest step the learner went all the way through, or that
+ * furthest step itself when it is unfinished; the first step when nothing was touched. A step left
+ * empty on purpose does not bring the learner back to it. `steps` is in the order of the screen;
+ * the last step is returned once it is done (the learner then only has to finish).
+ */
+export function firstOpenStep(steps: AssessmentStepDefinition[], answers: StepAnswers, plays: number): AssessmentStep {
+  let furthest = -1;
+  steps.forEach((definition, index) => {
+    if (stepProgress(definition, answers, plays).touched) furthest = index;
+  });
+  if (furthest < 0) return steps[0].step;
+  const done = stepProgress(steps[furthest], answers, plays).complete;
+  return steps[Math.min(done ? furthest + 1 : furthest, steps.length - 1)].step;
+}
+
+// Invitations on the home screen ------------------------------------------------------------------
+
+/** The assessment is proposed again this many days after the last graded one. */
+export const ASSESSMENT_REDO_DAYS = 60;
+/** A dismissed invitation comes back once, this many days later. */
+export const INVITE_RETURN_DAYS = 14;
+/** Dismissed this many times, the invitation never comes back. */
+export const INVITE_MAX_DISMISSALS = 2;
+
+export type AssessmentInviteKind = "first" | "redo";
+
+/**
+ * What the home screen proposes for a language: the first assessment once the placement test is
+ * done, or a new one at least `ASSESSMENT_REDO_DAYS` days after the last graded one. Nothing when
+ * no dossier can be offered.
+ */
+export function assessmentInvite(input: {
+  hasCompletedPlacement: boolean;
+  hasVisibleDossier: boolean;
+  lastGradedOn: DateKey | null;
+  today: DateKey;
+}): AssessmentInviteKind | null {
+  if (!input.hasVisibleDossier) return null;
+  if (input.lastGradedOn === null) return input.hasCompletedPlacement ? "first" : null;
+  return diffInDays(input.lastGradedOn, input.today) >= ASSESSMENT_REDO_DAYS ? "redo" : null;
+}
+
+/**
+ * Whether a dismissable invitation shows: always when never dismissed; once dismissed, again after
+ * `INVITE_RETURN_DAYS` days; dismissed `INVITE_MAX_DISMISSALS` times, never.
+ */
+export function inviteVisible(input: { dismissedOn: DateKey | null; dismissCount: number; today: DateKey }): boolean {
+  const { dismissedOn, dismissCount, today } = input;
+  if (dismissCount <= 0 || dismissedOn === null) return true;
+  if (dismissCount >= INVITE_MAX_DISMISSALS) return false;
+  return diffInDays(dismissedOn, today) >= INVITE_RETURN_DAYS;
+}
+
+/**
+ * The levels of a second dossier to offer after a dossier of `level`: the one above when a skill
+ * confirmed the dossier's level with room to go (`offerHigher`), never past C2. Empty or one level.
+ */
+export function levelsToOffer(
+  level: CefrLevel,
+  results: { reading: { offerHigher: boolean } | null; listening: { offerHigher: boolean } | null; writing: { offerHigher: boolean } | null },
+): CefrLevel[] {
+  const above = CEFR_LEVELS[CEFR_LEVELS.indexOf(level) + 1];
+  if (!above) return [];
+  const offered = [results.reading, results.listening, results.writing].some((r) => r?.offerHigher === true);
+  return offered ? [above] : [];
 }

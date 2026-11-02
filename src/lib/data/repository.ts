@@ -139,6 +139,12 @@ export interface DailyLinguaRepository {
    */
   gradeAssessment(assessmentId: string): Promise<AssessmentGradingResult>;
   /**
+   * Sets the level of the assessment's language to `level` and raises the target level to it when it
+   * was lower. The caller computes `level` from the stored results (`receptionLevel`); the database
+   * checks it against them. Only for a graded assessment of the user.
+   */
+  applyAssessmentLevel(assessmentId: string, level: CefrLevel): Promise<void>;
+  /**
    * Contents per domain for a language at the given levels: published in the last 14 days, link not
    * broken, active source allowed by the licence policy, classified. Counted over the newest 500.
    */
@@ -319,6 +325,7 @@ export function createMockRepository(): DailyLinguaRepository {
     },
     saveAssessmentAnswers: readOnly,
     gradeAssessment: readOnly,
+    applyAssessmentLevel: readOnly,
     async listTopicAvailability(language, levels) {
       const counts: Partial<Record<Topic, number>> = {};
       for (const c of buildMockContents(new Date())) {

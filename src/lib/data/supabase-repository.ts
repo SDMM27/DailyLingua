@@ -1566,7 +1566,8 @@ export function createSupabaseRepository(
   }
 
   async function gradeAssessment(assessmentId: string): Promise<AssessmentGradingResult> {
-    if (!options.gradeAssessment) return { status: "unavailable", attemptsLeft: 0 };
+    // Grading off or failing unexpectedly: the attempts left are unknown, not none.
+    if (!options.gradeAssessment) return { status: "unavailable", attemptsLeft: null };
     let outcome: GradeAssessmentOutcome;
     try {
       outcome = await options.gradeAssessment({ userId, assessmentId });
@@ -1574,10 +1575,17 @@ export function createSupabaseRepository(
       // Graded by a concurrent request, or closed meanwhile.
       if (error instanceof AssessmentNotFoundError) throw new UserFacingError(error.message);
       console.error(error);
-      return { status: "unavailable", attemptsLeft: 0 };
+      return { status: "unavailable", attemptsLeft: null };
     }
     if (outcome.status === "not-found") throw new UserFacingError("Ce bilan est introuvable.");
     return outcome;
+  }
+
+  async function applyAssessmentLevel(assessmentId: string, level: CefrLevel): Promise<void> {
+    const { error } = await client.rpc("apply_assessment_reception_level", { p_assessment_id: assessmentId, p_level: level });
+    if (error?.code === NO_DATA_FOUND) throw new UserFacingError("Ce bilan est introuvable, ou cette langue ne fait plus partie de tes langues.");
+    if (error?.code === INVALID_PARAMETER_VALUE) throw new UserFacingError("Ce niveau ne correspond pas à ton bilan.");
+    if (error) throw new Error(`Supabase (niveau du bilan) : ${error.message}`);
   }
 
   async function listTopicAvailability(language: Language, levels: CefrLevel[]): Promise<Partial<Record<Topic, number>>> {
@@ -1684,6 +1692,7 @@ export function createSupabaseRepository(
     listAssessments,
     saveAssessmentAnswers,
     gradeAssessment,
+    applyAssessmentLevel,
     listTopicAvailability,
     getMissionProgress,
     prepareTodayMission,

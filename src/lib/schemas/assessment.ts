@@ -76,13 +76,17 @@ export const assessmentDossierSchema = z.object({
 });
 export type AssessmentDossier = z.infer<typeof assessmentDossierSchema>;
 
+/** Longest answer to a question, and longest writing, in characters. */
+export const ASSESSMENT_ANSWER_MAX = 1500;
+export const ASSESSMENT_WRITING_MAX = 2500;
+
 /**
  * What a learner has answered so far; every part may be partial (the assessment is resumed later).
  * Question ids come from the dossier; `speaking` holds the self-assessment statements ticked or not.
  */
 export const assessmentAnswersSchema = z.object({
-  questions: z.record(z.string(), z.string().max(1500)).default({}),
-  writing: z.string().max(2500).default(""),
+  questions: z.record(z.string(), z.string().max(ASSESSMENT_ANSWER_MAX)).default({}),
+  writing: z.string().max(ASSESSMENT_WRITING_MAX).default(""),
   speaking: z.record(z.string(), z.boolean()).default({}),
 });
 export type AssessmentAnswers = z.infer<typeof assessmentAnswersSchema>;
@@ -179,8 +183,20 @@ export const wireAssessmentGradingSchema = z.object({
 });
 export type WireAssessmentGrading = z.infer<typeof wireAssessmentGradingSchema>;
 
-/** Input of the server action (validated again on the server). */
+/** Input of the server actions (validated again on the server). */
 export const gradeAssessmentInputSchema = z.object({ assessmentId: z.string().min(1) });
+
+/** The server chooses the dossier: the learner only says which language, and whether to try the level above. */
+export const startAssessmentInputSchema = z.object({ language: languageSchema, higher: z.boolean().optional() });
+
+export const saveAssessmentAnswersInputSchema = z.object({
+  assessmentId: z.string().min(1),
+  answers: assessmentAnswersSchema,
+  listeningPlays: z.number().int().min(0).max(LISTENING_MAX_PLAYS),
+});
+
+/** No level in the input: the server computes it from the stored results. */
+export const applyAssessmentLevelInputSchema = z.object({ assessmentId: z.string().min(1) });
 
 /** What grading an assessment gives back to the app. */
 export type AssessmentGradingResult =
@@ -190,5 +206,8 @@ export type AssessmentGradingResult =
   /** Nothing to grade yet. */
   | { status: "empty" }
   | { status: "limit" }
-  /** The model failed or timed out; the attempt is counted. */
-  | { status: "unavailable"; attemptsLeft: number };
+  /**
+   * The model failed or timed out (the attempt is counted), or grading is off. `attemptsLeft` is null
+   * when it is unknown (grading off, unexpected error): the screen must not claim there is none left.
+   */
+  | { status: "unavailable"; attemptsLeft: number | null };

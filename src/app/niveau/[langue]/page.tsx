@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import { PlacementTest } from "@/components/placement/placement-test";
 import { alphabetLanguages } from "@/lib/alphabets";
 import { readAlphabetDraftPolicy, visibleAlphabet } from "@/lib/alphabets/policy";
+import { hasVisibleDossier, readAssessmentDraftPolicy } from "@/lib/assessment/policy";
 import { getRepository, requirePreferences } from "@/lib/data/repository";
 import { isAlphabetComplete } from "@/lib/domain/alphabet";
 import { placementItems } from "@/lib/placement/banks";
@@ -25,6 +26,11 @@ export default async function PlacementPage({ params }: { params: Promise<{ lang
   const cards = alphabet ? (await repo.listAlphabetCards()).filter((c) => c.language === goal.language) : [];
   const needsAlphabet = alphabet && !isAlphabetComplete(alphabet, cards);
 
+  // The full assessment is proposed after the test when a dossier is published for the language (at any
+  // level: the level is only known once the learner has chosen it). Not in the demo, nor for a guest.
+  const assessmentAvailable =
+    !repo.isDemo && (await repo.getGuestTrial()) === null && hasVisibleDossier(goal.language, readAssessmentDraftPolicy());
+
   // Only the questions of this language reach the browser, never the whole map of banks.
   return (
     <PlacementTest
@@ -33,6 +39,7 @@ export default async function PlacementPage({ params }: { params: Promise<{ lang
       startLevel={goal.level}
       persist={!repo.isDemo}
       alphabet={needsAlphabet ? { script: alphabet.script } : undefined}
+      assessmentAvailable={assessmentAvailable}
     />
   );
 }

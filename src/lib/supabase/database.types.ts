@@ -681,7 +681,10 @@ isOneToOne: false
                 }
           }
           Functions: {
-            "claim_assessment_grading":
+            "apply_assessment_reception_level":
+{ Args: { "p_assessment_id": string,"p_level": string }; Returns: undefined
+                           },
+"claim_assessment_grading":
 { Args: { "p_assessment_id": string,"p_user_id": string }; Returns: number | null
                            },
 "claim_mission_generation":

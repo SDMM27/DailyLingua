@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import { ArrowRightIcon } from "@/components/icons";
 import { SkipPlacementButton } from "@/components/placement/skip-placement-button";
 import { Card, DemoNotice, LanguageTag, PageHeader } from "@/components/ui/primitives";
+import { readAssessmentDraftPolicy, visibleDossiers } from "@/lib/assessment/policy";
 import { getRepository, requirePreferences } from "@/lib/data/repository";
 import { formatLongDate, toDateKey } from "@/lib/domain/dates";
 import { LANGUAGE_PURPOSE_LABELS, PLACEMENT_CONFIDENCE_LABELS } from "@/lib/domain/labels";
@@ -17,7 +18,8 @@ export default async function LevelPage({ searchParams }: { searchParams: Promis
   const onboarding = bienvenue === "1";
   const repo = await getRepository();
   const preferences = await requirePreferences();
-  const tests = await repo.listPlacementTests();
+  const [tests, assessments] = await Promise.all([repo.listPlacementTests(), repo.listAssessments()]);
+  const assessmentPolicy = readAssessmentDraftPolicy();
   const dateOf = (test: PlacementSummary) =>
     formatLongDate(toDateKey(new Date(test.takenAt), preferences.timeZone));
 
@@ -32,6 +34,9 @@ export default async function LevelPage({ searchParams }: { searchParams: Promis
       <ul className="space-y-4">
         {preferences.goals.map((goal) => {
           const test = tests.find((t) => t.language === goal.language);
+          // The full assessment is offered only where a dossier is published; a result already there stays reachable.
+          const hasDossier = visibleDossiers(goal.language, goal.level, assessmentPolicy).length > 0;
+          const hasResult = assessments.some((a) => a.language === goal.language && a.status === "graded");
           return (
             <li key={goal.language}>
               <Card>
@@ -64,6 +69,14 @@ export default async function LevelPage({ searchParams }: { searchParams: Promis
                     <ArrowRightIcon width={14} height={14} />
                   </Link>
                   {!test && <SkipPlacementButton language={goal.language} persist={!repo.isDemo} />}
+                  {(hasDossier || hasResult) && (
+                    <Link
+                      href={`/niveau/${goal.language}/bilan`}
+                      className="inline-flex min-h-11 items-center gap-2 rounded-full border border-line px-5 text-sm font-semibold text-ink hover:bg-surface-sunk"
+                    >
+                      {hasResult ? "Voir mon bilan" : "Faire mon bilan complet"}
+                    </Link>
+                  )}
                 </div>
               </Card>
             </li>

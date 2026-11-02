@@ -24,6 +24,16 @@ export function visibleDossiers(language: Language, level: CefrLevel, policy: As
   return (ASSESSMENT_DOSSIERS[language] ?? []).filter((d) => d.level === level && isDossierVisible(d, policy));
 }
 
+/** A dossier of a language by its id, visible or not (server side only). */
+export function findDossier(language: Language, id: string): AssessmentDossier | undefined {
+  return (ASSESSMENT_DOSSIERS[language] ?? []).find((d) => d.id === id);
+}
+
+/** Whether the language has at least one visible dossier, at any level. */
+export function hasVisibleDossier(language: Language, policy: AssessmentDraftPolicy): boolean {
+  return (ASSESSMENT_DOSSIERS[language] ?? []).some((d) => isDossierVisible(d, policy));
+}
+
 export type ListeningMode = "audio" | "draft-script" | "unavailable";
 
 /**
