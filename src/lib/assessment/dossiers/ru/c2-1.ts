@@ -53,7 +53,7 @@ export const dossier: AssessmentDossier = {
     ],
   },
   writing: {
-    prompt: "Écrivez six phrases en russe : dites s’il vaut mieux connaître un grand livre par sa réputation ou le lire soi-même, en nuançant votre avis et, si vous le souhaitez, avec une pointe d’ironie.",
+    prompt: "Écris six phrases en russe : dis s’il vaut mieux connaître un grand livre par sa réputation ou le lire soi-même, en nuançant ton avis et, si tu le souhaites, avec une pointe d’ironie.",
   },
   audio: null,
   reviewedOn: null,

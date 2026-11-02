@@ -53,7 +53,7 @@ export const dossier: AssessmentDossier = {
     ],
   },
   writing: {
-    prompt: "Écrivez trois phrases en russe : racontez un voyage ou une sortie que vous avez faits, puis dites où vous irez la prochaine fois.",
+    prompt: "Écris trois phrases en russe : raconte un voyage ou une sortie que tu as faits, puis dis où tu iras la prochaine fois.",
   },
   audio: null,
   reviewedOn: null,

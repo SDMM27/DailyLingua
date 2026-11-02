@@ -53,7 +53,7 @@ export const dossier: AssessmentDossier = {
     ],
   },
   writing: {
-    prompt: "Vous écrivez au journal local d’une ville qui a installé des capteurs dans ses rues. En 5 phrases en italien, dites si vous soutenez ce projet, quel risque vous inquiète le plus et quelle garantie vous demanderiez à la mairie.",
+    prompt: "Tu écris au journal local d’une ville qui a installé des capteurs dans ses rues. En 5 phrases en italien, dis si tu soutiens ce projet, quel risque t’inquiète le plus et quelle garantie tu demanderais à la mairie.",
   },
   audio: null,
   reviewedOn: null,

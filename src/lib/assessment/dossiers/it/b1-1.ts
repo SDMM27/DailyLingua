@@ -53,7 +53,7 @@ export const dossier: AssessmentDossier = {
     ],
   },
   writing: {
-    prompt: "Un journal local vous demande votre avis : un ancien théâtre de votre ville va rouvrir. Écrivez 4 phrases en italien : si le projet vous semble utile, quelle activité vous y proposeriez et pourquoi.",
+    prompt: "Un journal local te demande ton avis : un ancien théâtre de ta ville va rouvrir. Écris 4 phrases en italien : si le projet te semble utile, quelle activité tu y proposerais et pourquoi.",
   },
   audio: null,
   reviewedOn: null,

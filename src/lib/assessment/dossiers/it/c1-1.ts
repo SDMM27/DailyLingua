@@ -53,7 +53,7 @@ export const dossier: AssessmentDossier = {
     ],
   },
   writing: {
-    prompt: "Dans un texte argumenté de 6 phrases en italien, dites si, selon vous, un seul indicateur peut mesurer le bien-être d’un pays. Défendez votre position avec un argument et réfutez une objection.",
+    prompt: "Dans un texte argumenté de 6 phrases en italien, dis si, selon toi, un seul indicateur peut mesurer le bien-être d’un pays. Défends ta position avec un argument et réfute une objection.",
   },
   audio: null,
   reviewedOn: null,

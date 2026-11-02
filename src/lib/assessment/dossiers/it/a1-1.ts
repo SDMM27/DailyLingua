@@ -53,7 +53,7 @@ export const dossier: AssessmentDossier = {
     ],
   },
   writing: {
-    prompt: "Vous partez en voyage. Écrivez 3 phrases en italien : où vous allez, comment vous voyagez et ce que vous mettez dans votre valise.",
+    prompt: "Tu pars en voyage. Écris 3 phrases en italien : où tu vas, comment tu voyages et ce que tu mets dans ta valise.",
   },
   audio: null,
   reviewedOn: null,

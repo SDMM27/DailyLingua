@@ -53,7 +53,7 @@ export const dossier: AssessmentDossier = {
     ],
   },
   writing: {
-    prompt: "Écrivez cinq phrases en russe : donnez votre opinion sur la nécessité de vérifier les résultats scientifiques avant de les croire, avec au moins un argument et un exemple possible.",
+    prompt: "Écris cinq phrases en russe : donne ton opinion sur la nécessité de vérifier les résultats scientifiques avant de les croire, avec au moins un argument et un exemple possible.",
   },
   audio: null,
   reviewedOn: null,

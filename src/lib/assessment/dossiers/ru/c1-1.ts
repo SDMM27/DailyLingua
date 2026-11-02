@@ -53,7 +53,7 @@ export const dossier: AssessmentDossier = {
     ],
   },
   writing: {
-    prompt: "Écrivez six phrases en russe : à partir de ce que dit le texte, expliquez pourquoi il est risqué de se fier à une seule source pour comprendre une époque, en illustrant par une situation de votre choix, réelle ou imaginaire.",
+    prompt: "Écris six phrases en russe : à partir de ce que dit le texte, explique pourquoi il est risqué de se fier à une seule source pour comprendre une époque, en illustrant par une situation de ton choix, réelle ou imaginaire.",
   },
   audio: null,
   reviewedOn: null,

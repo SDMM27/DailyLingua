@@ -53,7 +53,7 @@ export const dossier: AssessmentDossier = {
     ],
   },
   writing: {
-    prompt: "Écrivez quatre phrases en russe : décrivez un problème de votre quartier ou de votre ville et proposez ce que les habitants pourraient faire eux-mêmes pour le résoudre.",
+    prompt: "Écris quatre phrases en russe : décris un problème de ton quartier ou de ta ville et propose ce que les habitants pourraient faire eux-mêmes pour le résoudre.",
   },
   audio: null,
   reviewedOn: null,

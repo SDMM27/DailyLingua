@@ -50,6 +50,7 @@ Les mots sont comptés par `countWords` (segmentation Unicode) ; la source de v�
   - C1-C2 : l'implicite, le ton, l'intention de l'auteur.
 - À partir de B1, aucune question ne se répond en recopiant une phrase du texte.
 - Chaque élément de `expectedPoints` doit être essentiel et figurer dans `referenceAnswer` : le correcteur compte comme partielle une réponse à laquelle il en manque un.
+- Consignes, énoncés et réponses de référence s'adressent à l'apprenant en le tutoyant, comme le reste de l'app.
 - `referenceAnswer` : la réponse complète, en français. `expectedPoints` : 1 à 4 éléments notables,
   séparés, en français ; c'est ce que le correcteur cherche dans la réponse.
 

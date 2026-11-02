@@ -53,7 +53,7 @@ export const dossier: AssessmentDossier = {
     ],
   },
   writing: {
-    prompt: "Racontez un repas que vous avez apprécié. Écrivez 3 phrases en italien, au passé : où vous étiez, avec qui, et ce que vous avez mangé.",
+    prompt: "Raconte un repas que tu as apprécié. Écris 3 phrases en italien, au passé : où tu étais, avec qui, et ce que tu as mangé.",
   },
   audio: null,
   reviewedOn: null,

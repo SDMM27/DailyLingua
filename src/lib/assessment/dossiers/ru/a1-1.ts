@@ -53,7 +53,7 @@ export const dossier: AssessmentDossier = {
     ],
   },
   writing: {
-    prompt: "Écrivez trois phrases en russe : dites ce que vous aimez manger et boire le matin, et ce que vous préparez ou mangez le dimanche.",
+    prompt: "Écris trois phrases en russe : dis ce que tu aimes manger et boire le matin, et ce que tu prépares ou manges le dimanche.",
   },
   audio: null,
   reviewedOn: null,

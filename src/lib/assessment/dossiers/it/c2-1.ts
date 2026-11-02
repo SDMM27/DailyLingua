@@ -53,7 +53,7 @@ export const dossier: AssessmentDossier = {
     ],
   },
   writing: {
-    prompt: "Dans un court texte de 6 phrases en italien, défendez ou contestez l’idée qu’un film exigeant mérite plus de patience de la part du spectateur. Appuyez-vous sur un exemple général ou imaginaire, sans citer d’œuvre réelle.",
+    prompt: "Dans un court texte de 6 phrases en italien, défends ou conteste l’idée qu’un film exigeant mérite plus de patience de la part du spectateur. Appuie-toi sur un exemple général ou imaginaire, sans citer d’œuvre réelle.",
   },
   audio: null,
   reviewedOn: null,
