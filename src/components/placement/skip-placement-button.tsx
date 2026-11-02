@@ -33,7 +33,7 @@ export function SkipPlacementButton({ language, persist }: { language: Language;
         disabled={pending}
         className="min-h-11 rounded-full px-4 text-sm font-medium text-muted hover:text-ink disabled:opacity-60"
       >
-        {pending ? "Enregistrement…" : "Passer"}
+        {pending ? "Enregistrement…" : "Plus tard"}
       </button>
       {error && (
         <p role="alert" className="basis-full rounded-2xl bg-danger-soft px-4 py-3 text-sm text-danger">

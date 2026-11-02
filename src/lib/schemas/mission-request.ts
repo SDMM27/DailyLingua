@@ -11,7 +11,7 @@ export const missionRequestSchema = z.object({
 export type MissionRequest = z.infer<typeof missionRequestSchema>;
 
 /** Said when the mission of the day is already written: shown as is, and how the form knows to freeze the choice. */
-export const MISSION_READY_MESSAGE = "La mission de ce jour est déjà prête : son domaine ne peut plus changer.";
+export const MISSION_READY_MESSAGE = "La mission de ce jour est déjà prête : son thème ne peut plus changer.";
 
 /** Input of the server action: the date is never sent, the server works it out from the schedule. */
 export const setNextTopicInputSchema = z.object({

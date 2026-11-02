@@ -27,7 +27,7 @@ export default async function LevelPage({ searchParams }: { searchParams: Promis
     <>
       <PageHeader eyebrow={onboarding ? "Dernière étape" : "Niveau"} title="Où en es-tu ?">
         {onboarding
-          ? "Avant ta première mission, un test rapide pour régler le niveau de chaque langue. Tu peux aussi le passer et le faire plus tard."
+          ? "Avant ta première mission, un test rapide pour régler le niveau de chaque langue. Tu peux aussi le faire plus tard."
           : "Un test court par langue pour estimer ton niveau. Tu peux corriger le résultat avant de l’enregistrer."}
       </PageHeader>
       {repo.isDemo && <DemoNotice>Mode démonstration : tu peux faire un test, rien n’est enregistré.</DemoNotice>}
@@ -55,7 +55,7 @@ export default async function LevelPage({ searchParams }: { searchParams: Promis
                       {test.chosenLevel !== test.estimatedLevel && <> (niveau retenu : {test.chosenLevel})</>}
                     </>
                   ) : test?.status === "skipped" ? (
-                    <>Test passé le {dateOf(test)}</>
+                    <>Test reporté le {dateOf(test)}</>
                   ) : (
                     "Pas encore évalué"
                   )}

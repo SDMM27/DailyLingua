@@ -29,7 +29,7 @@ export function NextTopicCardView({ rows, today }: { rows: NextTopicRow[]; today
   return (
     <Card>
       <Eyebrow>Demain, plutôt</Eyebrow>
-      <p className="mt-2 text-sm text-ink-soft">Choisis le domaine de ta prochaine mission, langue par langue.</p>
+      <p className="mt-2 text-sm text-ink-soft">Choisis le thème de ta prochaine mission, langue par langue.</p>
       <ul className="mt-4 space-y-4">
         {rows.map((row) => {
           const day = dayLabel(row.date, today);
@@ -39,12 +39,16 @@ export function NextTopicCardView({ rows, today }: { rows: NextTopicRow[]; today
                 <LanguageTag language={row.language} />
                 <span className="text-ink-soft">{day}</span>
               </div>
-              <NextTopicForm
-                language={row.language}
-                label={`Domaine de la mission de ${day} en ${languageInfo(row.language).nameFr}`}
-                saved={row.saved}
-                available={row.available}
-              />
+              {row.available.length === 0 && !row.saved ? (
+                <p className="text-sm text-muted">Pas encore assez de contenus récents pour choisir un thème.</p>
+              ) : (
+                <NextTopicForm
+                  language={row.language}
+                  label={`Thème de la mission de ${day} en ${languageInfo(row.language).nameFr}`}
+                  saved={row.saved}
+                  available={row.available}
+                />
+              )}
             </li>
           );
         })}
@@ -76,5 +80,7 @@ export async function NextTopicCard({ today, requests }: { today: DateKey; reque
       };
     }),
   );
+  // Nothing to choose from in any language: a card of empty lists would only be noise.
+  if (rows.every((row) => row.available.length === 0 && !row.saved)) return null;
   return <NextTopicCardView rows={rows} today={today} />;
 }

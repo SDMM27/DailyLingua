@@ -49,6 +49,12 @@ describe("NextTopicCardView", () => {
     expect((within(select).getByRole("option", { name: "Cinéma" }) as HTMLOptionElement).disabled).toBe(false);
   });
 
+  it("shows no list for a language without any theme to choose", () => {
+    render(<NextTopicCardView rows={[row({ available: [] })]} today="2026-10-29" />);
+    expect(screen.queryByRole("combobox")).toBeNull();
+    expect(screen.getByText(/Pas encore assez de contenus récents/)).toBeTruthy();
+  });
+
   it("names the day: demain, or the weekday", () => {
     render(
       <NextTopicCardView rows={[row(), row({ language: "ru", date: "2026-11-02" })]} today="2026-10-29" />,

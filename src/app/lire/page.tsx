@@ -79,8 +79,8 @@ export default async function ReadingPage({
       )}
 
       {languages.length > 1 && (
-        <nav aria-label="Filtrer par langue" className="-mx-4 mb-4 overflow-x-auto px-4">
-          <ul className="flex gap-2">
+        <nav aria-label="Filtrer par langue" className="-mx-4 mb-4 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <ul className="flex gap-2 sm:flex-wrap">
             <FilterChip href={readingHref(undefined, selectedType?.value, selectedTheme)} active={!selected} label="Toutes" />
             {languages.map((language) => (
               <FilterChip
@@ -95,8 +95,8 @@ export default async function ReadingPage({
         </nav>
       )}
 
-      <nav aria-label="Filtrer par type" className="-mx-4 mb-4 overflow-x-auto px-4">
-        <ul className="flex gap-2">
+      <nav aria-label="Filtrer par type" className="-mx-4 mb-4 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <ul className="flex gap-2 sm:flex-wrap">
           <FilterChip href={readingHref(selected, undefined, selectedTheme)} active={!selectedType} label="Tout" />
           {TYPE_FILTERS.map((filter) => (
             <FilterChip
@@ -109,8 +109,8 @@ export default async function ReadingPage({
         </ul>
       </nav>
 
-      <nav aria-label="Filtrer par domaine" className="-mx-4 mb-4 overflow-x-auto px-4">
-        <ul className="flex gap-2">
+      <nav aria-label="Filtrer par thème" className="-mx-4 mb-4 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <ul className="flex gap-2 sm:flex-wrap">
           <FilterChip href={readingHref(selected, selectedType?.value, undefined)} active={!selectedTheme} label="Tous" />
           {topicChips.map((topic) => (
             <FilterChip
@@ -133,7 +133,7 @@ export default async function ReadingPage({
               </p>
               <p className="mt-1 text-xs text-muted">
                 {selectedTheme
-                  ? "Essaie un autre domaine ou « Tous » : les contenus reçoivent leurs domaines au fil des relevés."
+                  ? "Essaie un autre thème ou « Tous » : les contenus reçoivent leurs thèmes au fil des relevés."
                   : "Essaie une autre langue, ou « Tout » : toutes les langues n’ont pas encore de source de ce type."}
               </p>
             </>
