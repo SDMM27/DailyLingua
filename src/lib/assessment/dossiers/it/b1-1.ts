@@ -30,13 +30,13 @@ export const dossier: AssessmentDossier = {
     ],
   },
   listening: {
-    script: "Intanto i volontari del teatro di Valbruna non aspettano. Sabato scorso hanno aperto il palcoscenico per una giornata di pulizia. Una signora ha raccontato di aver visto lì il suo primo spettacolo, da bambina, e di sognare il giorno in cui potrà portarci i nipoti. Se i fondi arriveranno in tempo, dicono gli organizzatori, la prima rappresentazione sarà una commedia scritta da un gruppo di studenti del liceo. Sarebbe un bel modo di ricominciare, perché il teatro tornerebbe a parlare alla generazione che lo erediterà.",
+    script: "Intanto i volontari del teatro di Valbruna non aspettano. Sabato scorso hanno aperto il teatro per una giornata di pulizie. Una signora ha raccontato di aver visto lì il suo primo spettacolo, da bambina, e di sognare il giorno in cui potrà portarci i nipoti. Se i fondi arriveranno in tempo, dicono gli organizzatori, la prima rappresentazione sarà una commedia scritta da un gruppo di studenti del liceo. Sarebbe un bel modo di ricominciare, perché il teatro tornerebbe a parlare alla generazione che lo erediterà.",
     questions: [
       {
         id: "it-b1-1-l1",
         prompt: "Qu’ont fait les bénévoles samedi dernier ?",
-        referenceAnswer: "Ils ont participé à une journée de nettoyage de la scène.",
-        expectedPoints: ["journée de nettoyage", "de la scène du théâtre"],
+        referenceAnswer: "Ils ont participé à une journée de nettoyage du théâtre.",
+        expectedPoints: ["journée de nettoyage", "du théâtre"],
       },
       {
         id: "it-b1-1-l2",
@@ -56,5 +56,5 @@ export const dossier: AssessmentDossier = {
     prompt: "Un journal local te demande ton avis : un ancien théâtre de ta ville va rouvrir. Écris 4 phrases en italien : si le projet te semble utile, quelle activité tu y proposerais et pourquoi.",
   },
   audio: null,
-  reviewedOn: null,
+  reviewedOn: "2026-11-03",
 };

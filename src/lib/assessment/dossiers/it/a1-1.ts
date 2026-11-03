@@ -30,7 +30,7 @@ export const dossier: AssessmentDossier = {
     ],
   },
   listening: {
-    script: "Siamo in albergo. La camera è al secondo piano. C’è un letto grande e un balcone. Chiedo alla signora: «Dov’è il museo?». Lei risponde: «È vicino, a dieci minuti a piedi». Che bello! Andiamo subito.",
+    script: "Siamo in albergo. La camera è al secondo piano. C’è un letto grande e un balcone. Chiedo alla receptionist: «Dov’è il museo?». Lei risponde: «È a dieci minuti a piedi da qui». Che bello! Andiamo subito.",
     questions: [
       {
         id: "it-a1-1-l1",
@@ -56,5 +56,5 @@ export const dossier: AssessmentDossier = {
     prompt: "Tu pars en voyage. Écris 3 phrases en italien : où tu vas, comment tu voyages et ce que tu mets dans ta valise.",
   },
   audio: null,
-  reviewedOn: null,
+  reviewedOn: "2026-11-03",
 };

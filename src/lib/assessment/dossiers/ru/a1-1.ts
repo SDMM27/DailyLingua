@@ -7,7 +7,7 @@ export const dossier: AssessmentDossier = {
   topic: "gastronomie",
   title: "Вкусные выходные",
   reading: {
-    text: "Меня зовут Анна. Я живу в маленьком городе. Каждое утро я иду на рынок. Там я покупаю хлеб, сыр и яблоки. Хлеб свежий и тёплый. Он очень вкусный. Моя бабушка любит суп. Она готовит борщ. В борще есть мясо, свёкла и капуста. Мы едим вместе в воскресенье. Я пью чай с лимоном. Бабушка пьёт чай с молоком. Нам хорошо дома. Я люблю воскресенье. Потом мы гуляем в парке.",
+    text: "Меня зовут Анна. Я живу в маленьком городе. Каждое утро я иду на рынок. Там я покупаю хлеб, сыр и яблоки. Хлеб свежий и тёплый. Он очень вкусный. Моя бабушка любит суп. Она готовит борщ. В борще есть мясо, свёкла и капуста. Мы едим вместе в воскресенье. Я пью чай с лимоном. Бабушка пьёт чай с молоком. Дома нам хорошо. Я люблю воскресенье. Потом мы гуляем в парке.",
     questions: [
       {
         id: "ru-a1-1-r1",
@@ -30,25 +30,25 @@ export const dossier: AssessmentDossier = {
     ],
   },
   listening: {
-    script: "Сегодня суббота. Мы идём в кафе. Мой брат Иван заказывает пиццу. Я заказываю салат и воду. Салат маленький, но вкусный. Иван говорит: «Пицца горячая!» Мы смеёмся. Потом мы пьём кофе и едим торт. Торт очень сладкий.",
+    script: "Сегодня воскресенье. Мы обедаем у бабушки. Она приготовила борщ, а я помогаю накрывать на стол. Мы едим вместе и разговариваем. После обеда бабушка пьёт чай с молоком, а я — чай с лимоном. Потом мы идём гулять в парк. Мне нравится проводить воскресенье с семьёй.",
     questions: [
       {
         id: "ru-a1-1-l1",
-        prompt: "Où vont-ils aujourd’hui ?",
-        referenceAnswer: "Ils vont au café.",
-        expectedPoints: ["au café"],
+        prompt: "Où déjeunent-ils aujourd’hui ?",
+        referenceAnswer: "Ils déjeunent chez leur grand-mère.",
+        expectedPoints: ["chez leur grand-mère"],
       },
       {
         id: "ru-a1-1-l2",
-        prompt: "Que commande Ivan ?",
-        referenceAnswer: "Il commande une pizza.",
-        expectedPoints: ["une pizza"],
+        prompt: "Que prépare la grand-mère ?",
+        referenceAnswer: "Elle prépare du bortsch.",
+        expectedPoints: ["du bortsch"],
       },
       {
         id: "ru-a1-1-l3",
-        prompt: "Que prennent-ils à la fin du repas ?",
-        referenceAnswer: "Ils boivent du café et mangent un gâteau très sucré.",
-        expectedPoints: ["du café", "un gâteau"],
+        prompt: "Que boivent-ils après le repas ?",
+        referenceAnswer: "La grand-mère boit du thé au lait et Anna boit du thé au citron.",
+        expectedPoints: ["thé au lait", "thé au citron"],
       },
     ],
   },
@@ -56,5 +56,5 @@ export const dossier: AssessmentDossier = {
     prompt: "Écris trois phrases en russe : dis ce que tu aimes manger et boire le matin, et ce que tu prépares ou manges le dimanche.",
   },
   audio: null,
-  reviewedOn: null,
+  reviewedOn: "2026-11-03",
 };
