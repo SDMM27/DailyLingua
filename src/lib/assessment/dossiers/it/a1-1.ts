@@ -30,6 +30,7 @@ export const dossier: AssessmentDossier = {
     ],
   },
   listening: {
+    source: "script",
     script: "Siamo in albergo. La camera è al secondo piano. C’è un letto grande e un balcone. Chiedo alla receptionist: «Dov’è il museo?». Lei risponde: «È a dieci minuti a piedi da qui». Che bello! Andiamo subito.",
     questions: [
       {

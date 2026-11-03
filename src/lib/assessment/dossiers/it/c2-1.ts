@@ -30,6 +30,7 @@ export const dossier: AssessmentDossier = {
     ],
   },
   listening: {
+    source: "script",
     script: "Si dirà che è un ragionamento comodo, e in parte lo è: elogiare l’opacità non costa nulla a chi non ha mai dovuto pagare un biglietto per sopportarla. Ma l’obiezione, a pensarci bene, colpisce meno di quanto sembri. Non si tratta di difendere la noia, che resta un difetto come un altro, bensì di difendere l’attesa, quella pazienza un po’ fuori moda con cui un tempo si lasciava che un’immagine facesse il proprio lavoro. Oggi pretendiamo che ogni scena si giustifichi in pochi secondi, come un candidato a un colloquio, e ci stupiamo poi che nulla ci resti in mente. Forse la sala buia serviva proprio a questo: a sottrarci, per un paio d’ore, al tribunale permanente delle opinioni. Il nostro cineasta immaginario, interrogato alla fine su che cosa intendesse dire, rispose con un’alzata di spalle. Fu, a detta di molti, la sua battuta migliore.",
     questions: [
       {

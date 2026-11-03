@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { AssessmentDossier } from "@/lib/schemas/assessment";
-import { FIXTURE_DOSSIER } from "@/test/assessment-fixtures";
+import { FIXTURE_DOSSIER, FIXTURE_YOUTUBE_DOSSIER } from "@/test/assessment-fixtures";
 import { isDossierVisible, listeningMode, readAssessmentDraftPolicy, visibleDossiers } from "./policy";
 
 const AUDIO = { file: "/assessment/it/it-a1-1.m4a", speaker: "Giulia", licence: "granted-commercial", recordedOn: "2026-11-01" } as const;
@@ -36,6 +36,27 @@ describe("isDossierVisible", () => {
   });
 });
 
+describe("isDossierVisible, YouTube listening", () => {
+  const video = FIXTURE_YOUTUBE_DOSSIER.listening.source === "youtube" ? FIXTURE_YOUTUBE_DOSSIER.listening.video : null!;
+  const youtube = (reviewedOn: string | null, checkedOn: string | null, audio: AssessmentDossier["audio"] = null): AssessmentDossier => ({
+    ...FIXTURE_YOUTUBE_DOSSIER,
+    reviewedOn,
+    audio,
+    listening: { ...FIXTURE_YOUTUBE_DOSSIER.listening, video: { ...video, checkedOn } } as AssessmentDossier["listening"],
+  });
+
+  it("needs both a review and a listened-to passage under the hide policy, no recording", () => {
+    expect(isDossierVisible(youtube(null, null), "hide")).toBe(false);
+    expect(isDossierVisible(youtube("2026-11-01", null), "hide")).toBe(false);
+    expect(isDossierVisible(youtube(null, "2026-11-02"), "hide")).toBe(false);
+    expect(isDossierVisible(youtube("2026-11-01", "2026-11-02"), "hide")).toBe(true);
+  });
+
+  it("shows everything under the show policy", () => {
+    expect(isDossierVisible(youtube(null, null), "show")).toBe(true);
+  });
+});
+
 describe("visibleDossiers", () => {
   it("is empty for a language without dossiers", () => {
     expect(visibleDossiers("ja", "A1", "show")).toEqual([]);
@@ -48,6 +69,11 @@ describe("visibleDossiers", () => {
 });
 
 describe("listeningMode", () => {
+  it("plays a YouTube passage whatever the policy", () => {
+    expect(listeningMode(FIXTURE_YOUTUBE_DOSSIER, "hide")).toBe("youtube");
+    expect(listeningMode(FIXTURE_YOUTUBE_DOSSIER, "show")).toBe("youtube");
+  });
+
   it("plays the recording whenever there is one", () => {
     expect(listeningMode({ ...draft, audio: AUDIO }, "hide")).toBe("audio");
     expect(listeningMode({ ...draft, audio: AUDIO }, "show")).toBe("audio");

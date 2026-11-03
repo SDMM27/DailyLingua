@@ -32,13 +32,23 @@ export function checkAssessmentDossier(language: Language, level: CefrLevel, raw
   if (textWords < limits.text.min || textWords > limits.text.max) {
     problems.push(`reading.text has ${textWords} words, expected ${limits.text.min}-${limits.text.max}`);
   }
-  const scriptWords = countWords(dossier.listening.script, language);
-  if (scriptWords < limits.script.min || scriptWords > limits.script.max) {
-    problems.push(`listening.script has ${scriptWords} words, expected ${limits.script.min}-${limits.script.max}`);
-  }
+  if (dossier.listening.source === "script") {
+    const scriptWords = countWords(dossier.listening.script, language);
+    if (scriptWords < limits.script.min || scriptWords > limits.script.max) {
+      problems.push(`listening.script has ${scriptWords} words, expected ${limits.script.min}-${limits.script.max}`);
+    }
 
-  const shared = commonSentences(dossier.reading.text, dossier.listening.script);
-  if (shared.length > 0) problems.push(`listening.script repeats the reading text (« ${shared[0]} »): it must be the sequel`);
+    const shared = commonSentences(dossier.reading.text, dossier.listening.script);
+    if (shared.length > 0) problems.push(`listening.script repeats the reading text (« ${shared[0]} »): it must be the sequel`);
+  } else {
+    const { start, end } = dossier.listening.video;
+    const seconds = end - start;
+    if (seconds < limits.video.min || seconds > limits.video.max) {
+      problems.push(`listening.video lasts ${seconds} s, expected ${limits.video.min}-${limits.video.max}`);
+    }
+    // A recording without a script makes no sense.
+    if (dossier.audio !== null) problems.push("audio must be null for a YouTube listening (there is no script to record)");
+  }
 
   const expectedAudio = audioPublicPath(language, dossier.id);
   if (dossier.audio && dossier.audio.file !== expectedAudio) {
@@ -66,7 +76,12 @@ function whitespaceProblems(dossier: AssessmentDossier): string[] {
   const fields: [string, string][] = [
     ["title", dossier.title],
     ["reading.text", dossier.reading.text],
-    ["listening.script", dossier.listening.script],
+    ...(dossier.listening.source === "script"
+      ? [["listening.script", dossier.listening.script] as [string, string]]
+      : [
+          ["listening.video.title", dossier.listening.video.title] as [string, string],
+          ["listening.video.channel", dossier.listening.video.channel] as [string, string],
+        ]),
     ["writing.prompt", dossier.writing.prompt],
   ];
   return fields.filter(([, value]) => value !== value.trim()).map(([name]) => `${name}: leading or trailing whitespace`);

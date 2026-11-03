@@ -105,8 +105,9 @@ export default function PrivacyPage() {
             entraîner ses modèles.
           </li>
           <li>
-            <strong>Google (YouTube)</strong> : le lecteur vidéo n’est chargé que lorsque tu touches « lecture »,
-            depuis youtube-nocookie.com. À partir de là, Google reçoit ton adresse IP et les données de lecture, selon
+            <strong>Google (YouTube)</strong> : le lecteur vidéo n’est chargé que lorsque tu touches « lecture »
+            (ou « Écouter », pour l’épreuve de compréhension orale du bilan, quand elle porte sur un extrait de
+            vidéo), depuis youtube-nocookie.com. À partir de là, Google reçoit ton adresse IP et les données de lecture, selon
             ses propres règles ; rien ne lui est envoyé avant (pas de miniature, pas de cookie).
           </li>
           <li>

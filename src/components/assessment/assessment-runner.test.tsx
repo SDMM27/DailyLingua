@@ -6,7 +6,7 @@ import { toPublicDossier } from "@/lib/assessment/public-dossier";
 import { SPEAKING_CLAIMS } from "@/lib/assessment/speaking-claims";
 import type { ActionResult } from "@/app/actions/result";
 import type { AssessmentAnswers, AssessmentGradingResult } from "@/lib/schemas/assessment";
-import { FIXTURE_DOSSIER } from "@/test/assessment-fixtures";
+import { FIXTURE_DOSSIER, FIXTURE_YOUTUBE_DOSSIER } from "@/test/assessment-fixtures";
 import { AssessmentRunner, SAVE_DELAY_MS } from "./assessment-runner";
 
 const { refresh, save, grade } = vi.hoisted(() => ({ refresh: vi.fn(), save: vi.fn(), grade: vi.fn() }));
@@ -17,6 +17,14 @@ vi.mock("@/components/assessment/listening-player", () => ({
   ListeningPlayer: ({ src, onPlaysChange, initialPlays }: { src: string; onPlaysChange: (n: number) => void; initialPlays: number }) => (
     <button type="button" data-src={src} onClick={() => onPlaysChange(initialPlays + 1)}>
       Écouter le passage
+    </button>
+  ),
+}));
+
+vi.mock("@/components/assessment/youtube-listening-player", () => ({
+  YouTubeListeningPlayer: ({ video, title, onPlaysChange, initialPlays }: { video: { youtubeId: string }; title: string; onPlaysChange: (n: number) => void; initialPlays: number }) => (
+    <button type="button" data-video={video.youtubeId} onClick={() => onPlaysChange(initialPlays + 1)}>
+      {title}
     </button>
   ),
 }));
@@ -109,6 +117,17 @@ describe("AssessmentRunner steps", () => {
     expect(screen.getByText(/3 fois au plus/)).toBeTruthy();
     expect(screen.queryByText(/Brouillon/)).toBeNull();
     expect(screen.queryByText(/Al parco/)).toBeNull();
+  });
+
+  it("plays the video passage for a YouTube listening, and records the plays", async () => {
+    const user = setup({ dossier: toPublicDossier(FIXTURE_YOUTUBE_DOSSIER, "youtube") });
+    await next(user);
+    const button = screen.getByRole("button", { name: "Regarde et écoute le passage" });
+    expect(button.getAttribute("data-video")).toBe("dQw4w9WgXcQ");
+    expect(screen.getByText(/3 fois au plus/)).toBeTruthy();
+    expect(screen.queryByText(/n’est pas disponible/)).toBeNull();
+    await user.click(button);
+    expect(savedWith(0).listeningPlays).toBe(1);
   });
 
   it("shows the marked draft script when there is no recording", async () => {

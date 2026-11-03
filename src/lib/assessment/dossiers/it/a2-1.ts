@@ -30,6 +30,7 @@ export const dossier: AssessmentDossier = {
     ],
   },
   listening: {
+    source: "script",
     script: "Prima di partire, abbiamo comprato delle tagliatelle fresche per la nonna. Lei era felice e ha invitato tutti a cena sabato. Ha detto: «Porto io il dolce!». Ho chiesto la ricetta del ragù, ma lei ha risposto che non esiste: bisogna affidarsi al profumo e assaggiare di tanto in tanto.",
     questions: [
       {

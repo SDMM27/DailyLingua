@@ -10,19 +10,28 @@ import { topicSchema } from "./preferences";
  *
  * The listening script and the reference answers must never be sent to the browser before the end of
  * the test: a page passes the learner only the text, the prompts and, once recorded, the audio URL.
+ * A listening test may instead rest on a passage of a YouTube video: its identifier and bounds are
+ * public (the learner's player needs them), the rest of the dossier stays on the server.
  */
 
 /** Per CEFR level: word counts, target audio length and number of sentences expected in the writing task. */
 export const ASSESSMENT_LIMITS: Record<
   CefrLevel,
-  { text: { min: number; max: number }; script: { min: number; max: number }; seconds: number; sentences: number }
+  {
+    text: { min: number; max: number };
+    script: { min: number; max: number };
+    /** Length in seconds of a video passage. */
+    video: { min: number; max: number };
+    seconds: number;
+    sentences: number;
+  }
 > = {
-  A1: { text: { min: 60, max: 90 }, script: { min: 25, max: 45 }, seconds: 20, sentences: 3 },
-  A2: { text: { min: 100, max: 140 }, script: { min: 30, max: 50 }, seconds: 20, sentences: 3 },
-  B1: { text: { min: 160, max: 220 }, script: { min: 60, max: 90 }, seconds: 35, sentences: 4 },
-  B2: { text: { min: 230, max: 300 }, script: { min: 100, max: 150 }, seconds: 50, sentences: 5 },
-  C1: { text: { min: 300, max: 400 }, script: { min: 120, max: 175 }, seconds: 55, sentences: 6 },
-  C2: { text: { min: 350, max: 450 }, script: { min: 140, max: 200 }, seconds: 60, sentences: 6 },
+  A1: { text: { min: 60, max: 90 }, script: { min: 25, max: 45 }, video: { min: 15, max: 60 }, seconds: 20, sentences: 3 },
+  A2: { text: { min: 100, max: 140 }, script: { min: 30, max: 50 }, video: { min: 20, max: 75 }, seconds: 20, sentences: 3 },
+  B1: { text: { min: 160, max: 220 }, script: { min: 60, max: 90 }, video: { min: 30, max: 90 }, seconds: 35, sentences: 4 },
+  B2: { text: { min: 230, max: 300 }, script: { min: 100, max: 150 }, video: { min: 45, max: 120 }, seconds: 50, sentences: 5 },
+  C1: { text: { min: 300, max: 400 }, script: { min: 120, max: 175 }, video: { min: 45, max: 150 }, seconds: 55, sentences: 6 },
+  C2: { text: { min: 350, max: 450 }, script: { min: 140, max: 200 }, video: { min: 45, max: 150 }, seconds: 60, sentences: 6 },
 };
 
 /** Open questions per test (reading, listening). */
@@ -49,6 +58,22 @@ export const assessmentAudioSchema = z.object({
 });
 export type AssessmentAudio = z.infer<typeof assessmentAudioSchema>;
 
+/** A passage of a YouTube video, played in the official embedded player; no transcript is kept. */
+export const assessmentVideoSchema = z
+  .object({
+    youtubeId: z.string().regex(/^[A-Za-z0-9_-]{11}$/),
+    /** Shown under the player as attribution. */
+    title: text(200),
+    channel: text(80),
+    /** Whole seconds from the start of the video. */
+    start: z.number().int().min(0),
+    end: z.number().int(),
+    /** Date a human listened to the passage and validated bounds, level, questions and the absence of on-screen text giving the answers; null = not yet. */
+    checkedOn: dateKeySchema.nullable(),
+  })
+  .refine((v) => v.end > v.start, { message: "end must be after start", path: ["end"] });
+export type AssessmentVideo = z.infer<typeof assessmentVideoSchema>;
+
 export const assessmentDossierSchema = z.object({
   /** `<language>-<level lower case>-<n>`, stable: results point to it. */
   id: text(40),
@@ -61,11 +86,19 @@ export const assessmentDossierSchema = z.object({
     text: z.string().min(1).max(4000),
     questions: z.array(assessmentQuestionSchema).length(ASSESSMENT_QUESTIONS),
   }),
-  listening: z.object({
-    /** Exact text of the recording: the sequel of the reading text, understandable on its own. */
-    script: z.string().min(1).max(3000),
-    questions: z.array(assessmentQuestionSchema).length(ASSESSMENT_QUESTIONS),
-  }),
+  listening: z.discriminatedUnion("source", [
+    z.object({
+      source: z.literal("script"),
+      /** Exact text of the recording: the sequel of the reading text, understandable on its own. */
+      script: z.string().min(1).max(3000),
+      questions: z.array(assessmentQuestionSchema).length(ASSESSMENT_QUESTIONS),
+    }),
+    z.object({
+      source: z.literal("youtube"),
+      video: assessmentVideoSchema,
+      questions: z.array(assessmentQuestionSchema).length(ASSESSMENT_QUESTIONS),
+    }),
+  ]),
   writing: z.object({
     /** In French, tied to the dossier; the sentence count comes from `ASSESSMENT_LIMITS`. */
     prompt: text(400),

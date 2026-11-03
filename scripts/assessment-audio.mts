@@ -45,6 +45,11 @@ if (values.brief !== undefined) {
   const dossiers = (ASSESSMENT_DOSSIERS as Record<string, typeof ASSESSMENT_DOSSIERS.it>)[values.brief];
   if (!dossiers || dossiers.length === 0) fail(`aucun dossier pour la langue « ${values.brief} »`);
   for (const d of dossiers) {
+    if (d.listening.source === "youtube") {
+      console.log(`=== ${d.id} (${d.level}) : passage YouTube, rien à enregistrer ===`);
+      console.log("");
+      continue;
+    }
     console.log(`=== ${d.id} (${d.level}) ===`);
     console.log(`Durée visée : environ ${ASSESSMENT_LIMITS[d.level].seconds} secondes`);
     console.log(`Débit : ${speakingPace(d.level)}`);
@@ -61,6 +66,7 @@ if (!input || !id || positionals.length !== 2) {
 }
 const dossier = Object.values(ASSESSMENT_DOSSIERS).flat().find((d) => d.id === id);
 if (!dossier) fail(`dossier inconnu : « ${id} »`);
+if (dossier.listening.source === "youtube") fail(`${id} a pour épreuve d'écoute un passage YouTube : il n'y a ni script ni enregistrement à préparer`);
 if (!existsSync(input)) fail(`fichier introuvable : ${input}`);
 
 const file = audioPublicPath(dossier.language, dossier.id);

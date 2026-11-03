@@ -30,6 +30,7 @@ export const dossier: AssessmentDossier = {
     ],
   },
   listening: {
+    source: "script",
     script: "Intanto i volontari del teatro di Valbruna non aspettano. Sabato scorso hanno aperto il teatro per una giornata di pulizie. Una signora ha raccontato di aver visto lì il suo primo spettacolo, da bambina, e di sognare il giorno in cui potrà portarci i nipoti. Se i fondi arriveranno in tempo, dicono gli organizzatori, la prima rappresentazione sarà una commedia scritta da un gruppo di studenti del liceo. Sarebbe un bel modo di ricominciare, perché il teatro tornerebbe a parlare alla generazione che lo erediterà.",
     questions: [
       {

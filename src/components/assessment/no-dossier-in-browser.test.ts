@@ -9,6 +9,7 @@ const CLIENT_ENTRIES = [
   "components/assessment/assessment-invite-card.tsx",
   "components/assessment/start-assessment-button.tsx",
   "components/assessment/listening-player.tsx",
+  "components/assessment/youtube-listening-player.tsx",
   "components/assessment/draft-script.tsx",
   "components/placement/placement-test.tsx",
 ];

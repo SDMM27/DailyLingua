@@ -1,12 +1,13 @@
 # Plan — répartition du temps, thèmes, bilan par compétence
 
-Statut : phases M et N implémentées ; O1 à O4 implémentées (écrans inclus), 12 dossiers pilotes en attente de relecture native et d’enregistrement ; O5 à faire. Date : 2026-10-27. Ce plan fait suite à [learning-paths.md](learning-paths.md) (phases H à K) ; ses phases portent les lettres M à O. Il part de notes brutes de l'utilisateur. Les choix ont été tranchés le 2026-10-27 (section « Décisions » de chaque phase) ; les points encore ouverts sont marqués **À trancher**, avec une option par défaut (*défaut*) : si l'utilisateur n'a pas répondu, l'implémentation part de celle-là et le signale.
+Statut : phases M et N implémentées ; O1 à O4 implémentées (écrans inclus), 12 dossiers pilotes relus le 2026-11-03, sans audio ; compréhension orale sur extraits YouTube en pilote ([youtube-listening-pilot.md](../assessment/youtube-listening-pilot.md)) ; O5 à faire. Date : 2026-10-27. Ce plan fait suite à [learning-paths.md](learning-paths.md) (phases H à K) ; ses phases portent les lettres M à O. Il part de notes brutes de l'utilisateur. Les choix ont été tranchés le 2026-10-27 (section « Décisions » de chaque phase) ; les points encore ouverts sont marqués **À trancher**, avec une option par défaut (*défaut*) : si l'utilisateur n'a pas répondu, l'implémentation part de celle-là et le signale.
 
 Décisions de l'utilisateur (2026-10-27) :
 
 - M : minutes saisies par langue ; possibilité d'alterner les langues selon les jours de la semaine.
 - N : le tri voulu est par **domaine** (sport, politique, sciences…) ; le thème se choisit **pour le lendemain** seulement.
 - O : bilan complet **facultatif après le QCM, mais recommandé** ; compréhension orale sur **enregistrements de natifs** ; l'utilisateur trouve les relecteurs (et voix) pour le pilote.
+- O, révisé le 2026-11-03 : la compréhension orale peut aussi porter sur un **passage de vidéo YouTube** lu dans le lecteur intégré (sous-titres désactivés, publicités acceptées), pour ne pas dépendre des voix. Pilote : ru A2, ru B2, it B2.
 
 Règles du projet à respecter dans chaque phase (rappel, voir `CLAUDE.md`) : mobile d'abord (largeur téléphone, zones sûres, champs ≥ 16 px) ; aucune langue codée en dur (registre `src/lib/domain/languages.ts`) ; `src/lib/domain` et `src/lib/schemas` sans import Next.js/React ; données lues seulement par `getRepository()` ; `await connection()` pour les pages qui dépendent du jour ; `npm run check` et `npm run build` avant de rendre. Une phase à la fois, validée avant la suivante ; chaque phase se termine par les fichiers modifiés, les commandes lancées, les tests réellement exécutés et leurs résultats. Le dépôt est surtout en LF : vérifier `git diff --stat` après délégation (réécritures complètes en CRLF).
 

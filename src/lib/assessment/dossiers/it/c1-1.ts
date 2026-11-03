@@ -30,6 +30,7 @@ export const dossier: AssessmentDossier = {
     ],
   },
   listening: {
+    source: "script",
     script: "Si pensi a un paese immaginario, che chiameremo Altavia. Per vent’anni la sua economia crebbe senza interruzione, e i governi si vantarono di ogni nuovo record. Poi, un giorno, un’inchiesta rivelò ciò che nessuna statistica aveva mai mostrato: la gente lavorava di più, dormiva di meno e si fidava sempre meno dei vicini. Il ministro dell’economia, uomo prudente, esitò a lungo prima di commentare; infine ammise che i numeri erano esatti ma che, forse, avevano risposto a una domanda sbagliata. Non ne derivò alcuna rivoluzione, com’è naturale. Ne derivò qualcosa di più modesto e, a ben vedere, di più durevole: l’abitudine di affiancare alle cifre un racconto, e di diffidare di chi pretende di bastare a se stesso con un solo dato. Ogni indicatore, in fondo, è una scorciatoia; l’importante è ricordarsi che di scorciatoia si tratta.",
     questions: [
       {
