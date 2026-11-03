@@ -78,3 +78,8 @@ export function formatTimeAgo(instant: Date, now: Date, timeZone: string = DEFAU
   if (days < 7) return relative.format(-days, "day");
   return formatShortDate(toDateKey(instant, timeZone), locale);
 }
+
+/** ISO weekday of a local day: 1 = Monday … 7 = Sunday. Computed in UTC, the key is already a local day. */
+export function isoWeekday(key: DateKey): number {
+  return ((new Date(keyToUtcMs(key)).getUTCDay() + 6) % 7) + 1;
+}

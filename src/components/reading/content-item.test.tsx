@@ -19,6 +19,7 @@ const ITEM: ContentListItem = {
   durationMinutes: 5,
   summary: "ملخص قصير للمقال.",
   publishedAt: "2026-10-13T07:00:00Z",
+  topics: [],
   source: {
     key: "bbc-ar",
     name: "بي بي سي عربي",
@@ -118,5 +119,12 @@ describe("ContentItem", () => {
     cleanup();
     render(<ContentItem item={{ ...ITEM, type: "video", url: "https://www.youtube.com/channel/UCbxb2fqe9oNgglAoYqsYOtQ" }} now={NOW} timeZone="Europe/Paris" />);
     expect(screen.queryByRole("button", { name: "Regarder ici" })).toBeNull();
+  });
+  it("shows the domains of the content after its duration, and nothing when unclassified", () => {
+    const { rerender } = render(<ContentItem item={{ ...ITEM, topics: ["économie", "société"] }} now={NOW} timeZone="Europe/Paris" />);
+    expect(screen.getByText("Économie")).toBeTruthy();
+    expect(screen.getByText("Société")).toBeTruthy();
+    rerender(<ContentItem item={{ ...ITEM, topics: [] }} now={NOW} timeZone="Europe/Paris" />);
+    expect(screen.queryByText("Économie")).toBeNull();
   });
 });

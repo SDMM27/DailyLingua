@@ -7,6 +7,7 @@ import { SOURCE_CATALOG } from "@/lib/content/catalog";
 import { LANGUAGE_CODES } from "@/lib/domain/languages";
 import { readContentLicensePolicy } from "@/lib/content/policy";
 import {
+  assessmentGrader,
   prepareMission,
   replaceSession,
   reserveGuestMission,
@@ -15,7 +16,9 @@ import {
 } from "@/lib/generation/server";
 import { addDays, toDateKey } from "@/lib/domain/dates";
 import type { GuestTrialStatus } from "@/lib/domain/guest-trial";
-import { dateKeySchema, type ContentType, type DateKey, type Language } from "@/lib/schemas/common";
+import { dateKeySchema, type CefrLevel, type ContentType, type DateKey, type Language } from "@/lib/schemas/common";
+import type { MissionRequest } from "@/lib/schemas/mission-request";
+import type { Assessment, AssessmentAnswers, AssessmentGradingResult } from "@/lib/schemas/assessment";
 import {
   contentListItemSchema,
   paidSourceSchema,
@@ -45,7 +48,7 @@ import {
 import { grammarCardSchema, type GrammarCard, type RecordGrammarPracticeInput } from "@/lib/schemas/grammar";
 import { productionEntrySchema, type ProductionEntry } from "@/lib/schemas/production";
 import { placementSummarySchema, type PlacementRecord, type PlacementSummary } from "@/lib/schemas/placement";
-import { preferencesSchema, type Preferences } from "@/lib/schemas/preferences";
+import { preferencesSchema, type Preferences, type Topic } from "@/lib/schemas/preferences";
 import {
   vocabularyItemSchema,
   vocabularyListSchema,
@@ -77,8 +80,8 @@ import type { WritingFeedbackResult } from "@/lib/schemas/writing-feedback";
 
 /** Outcome of asking for today's mission; internal reasons never leave the server. */
 export interface PrepareMissionResult {
-  /** pending: another request is writing it, ask again shortly; signup-required: the guest trial is over. */
-  status: "ready" | "pending" | "failed" | "no-content" | "signup-required";
+  /** pending: another request is writing it, ask again shortly; signup-required: the guest trial is over; rest-day: none of the languages is worked today. */
+  status: "ready" | "pending" | "failed" | "no-content" | "signup-required" | "rest-day";
 }
 
 /** Outcome of replacing the content of a session the user cannot read. */
@@ -111,6 +114,41 @@ export interface DailyLinguaRepository {
   savePreferences(preferences: Preferences): Promise<void>;
 
   getMission(date: DateKey): Promise<Mission | null>;
+  /** The domains the user asked for their missions from today on (« Demain, plutôt »), one per language and day. */
+  listMissionRequests(): Promise<MissionRequest[]>;
+  /**
+   * Asks for a domain for the mission of `date` in a language (`topic` null: no preference again).
+   * The date must be from tomorrow to 7 days ahead, and its mission not written yet (UserFacingError otherwise).
+   */
+  setMissionRequest(input: { language: Language; date: DateKey; topic: Topic | null }): Promise<void>;
+  /**
+   * Starts the skills assessment of a language with a dossier, or returns the one already in progress
+   * (whatever its dossier). Id of the assessment. Refused for a guest (UserFacingError).
+   */
+  startAssessment(language: Language, dossierId: string): Promise<string>;
+  /** The assessment in progress for a language, or null. */
+  getCurrentAssessment(language: Language): Promise<Assessment | null>;
+  /** The user's assessments, newest first, of one language or of all of them. */
+  listAssessments(language?: Language): Promise<Assessment[]>;
+  /** Saves the answers so far; the listening plays never go down. Only for an assessment in progress. */
+  saveAssessmentAnswers(assessmentId: string, answers: AssessmentAnswers, listeningPlays: number): Promise<void>;
+  /**
+   * Grades the assessment in progress: one model call, then the levels are decided in code. The
+   * answers graded are stored with the result. A failed or slow grading comes back as `unavailable`
+   * (the attempt counts); an assessment already graded returns its results.
+   */
+  gradeAssessment(assessmentId: string): Promise<AssessmentGradingResult>;
+  /**
+   * Sets the level of the assessment's language to `level` and raises the target level to it when it
+   * was lower. The caller computes `level` from the stored results (`receptionLevel`); the database
+   * checks it against them. Only for a graded assessment of the user.
+   */
+  applyAssessmentLevel(assessmentId: string, level: CefrLevel): Promise<void>;
+  /**
+   * Contents per domain for a language at the given levels: published in the last 14 days, link not
+   * broken, active source allowed by the licence policy, classified. Counted over the newest 500.
+   */
+  listTopicAvailability(language: Language, levels: CefrLevel[]): Promise<Partial<Record<Topic, number>>>;
   /**
    * Writes today's mission if it does not exist yet (idempotent; today is the user's, computed
    * server side). Can take several seconds: it calls the language model.
@@ -224,9 +262,14 @@ export interface DailyLinguaRepository {
   /**
    * Latest authentic contents of `languages` (at most `perLanguage` each, newest first), from the
    * active sources allowed by the licence policy. Broken links are left out. `types` keeps only
-   * those content types (all of them when absent).
+   * those content types (all of them when absent); `topics` keeps contents sharing at least one of
+   * those domains.
    */
-  listContents(languages: Language[], perLanguage: number, options?: { types?: ContentType[] }): Promise<ContentListItem[]>;
+  listContents(
+    languages: Language[],
+    perLanguage: number,
+    options?: { types?: ContentType[]; topics?: Topic[] },
+  ): Promise<ContentListItem[]>;
   /** Sources of the catalogue allowed by the licence policy, with their licence. */
   listSources(): Promise<SourceInfo[]>;
   /** Languages that can be chosen: at least one source allowed by the licence policy. */
@@ -244,7 +287,7 @@ export interface DailyLinguaRepository {
   setSourceAccess(sourceId: string, hasAccess: boolean): Promise<void>;
 }
 
-function createMockRepository(): DailyLinguaRepository {
+export function createMockRepository(): DailyLinguaRepository {
   const today = () => toDateKey(new Date(), MOCK_PREFERENCES.timeZone);
   const readOnly = async (): Promise<never> => {
     throw new UserFacingError("Mode démonstration : rien n’est enregistré.");
@@ -268,6 +311,28 @@ function createMockRepository(): DailyLinguaRepository {
     async getMission(date) {
       // The demo only has a mission for the current day.
       return date === today() ? missionSchema.parse(buildMockMission(date)) : null;
+    },
+    async listMissionRequests() {
+      return [];
+    },
+    setMissionRequest: readOnly,
+    startAssessment: readOnly,
+    async getCurrentAssessment() {
+      return null;
+    },
+    async listAssessments() {
+      return [];
+    },
+    saveAssessmentAnswers: readOnly,
+    gradeAssessment: readOnly,
+    applyAssessmentLevel: readOnly,
+    async listTopicAvailability(language, levels) {
+      const counts: Partial<Record<Topic, number>> = {};
+      for (const c of buildMockContents(new Date())) {
+        if (c.language !== language || !levels.includes(c.difficulty)) continue;
+        for (const topic of c.topics) counts[topic] = (counts[topic] ?? 0) + 1;
+      }
+      return counts;
     },
     async getMissionProgress() {
       return EMPTY_MISSION_PROGRESS;
@@ -356,8 +421,12 @@ function createMockRepository(): DailyLinguaRepository {
     sendFeedback: readOnly,
     async listContents(languages, perLanguage, options) {
       const types = options?.types;
+      const topics = options?.topics?.length ? options.topics : undefined;
       const items = buildMockContents(new Date()).filter(
-        (c) => languages.includes(c.language) && (!types || types.includes(c.type)),
+        (c) =>
+          languages.includes(c.language) &&
+          (!types || types.includes(c.type)) &&
+          (!topics || c.topics.some((t) => topics.includes(t))),
       );
       const kept = languages.flatMap((l) => items.filter((c) => c.language === l).slice(0, perLanguage));
       return z.array(contentListItemSchema).parse(kept);
@@ -406,6 +475,7 @@ export const getRepository = cache(async (): Promise<DailyLinguaRepository> => {
     prepareMission,
     replaceSession,
     reviewWriting: writingFeedbackReviewer(),
+    gradeAssessment: assessmentGrader(),
     translateVocabulary: vocabularyTranslator(),
   });
 });

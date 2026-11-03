@@ -7,6 +7,16 @@
       "runtimeArgs": ["run", "dev"],
       "port": 3000,
       "autoPort": true
+    },
+    {
+      "name": "daily-lingua-dev-nocaptcha",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "-e",
+        "process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY=' '; require('child_process').spawn('npm', ['run', 'dev'], { stdio: 'inherit', shell: true }).on('exit', (code) => process.exit(code ?? 0))"
+      ],
+      "port": 3000,
+      "autoPort": true
     }
   ]
 }

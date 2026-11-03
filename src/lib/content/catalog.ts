@@ -104,6 +104,15 @@ import type { SourceDefinition, SourceLicense } from "@/lib/schemas/content";
  * and Thmanyah shows are inactive).
  * Still without a simple-language article source (no official easy-language feed found): it, pt,
  * pl, cs, ro, el, ko, tr, ar, ja, id, uk, ru.
+ *
+ * Domains (2026-10-29). A source may carry `defaultTopics` (1 to 3 of the app's domains, `TOPICS`):
+ * every item then gets them and is not sent to the classifier. Only for a source whose every item
+ * clearly belongs to the same one or two domains: science popularisation (ПостНаука, Quarks,
+ * QuantumFracture, Kurzgesagt, Manual do Mundo, Drauzio Varella, Evrim Ağacı, Kok Bisa?, Věda 24), a
+ * history series (Terra X History), the humanities of Arzamas (culture, history). General news,
+ * learners' and children's channels, Wikipedia, Global Voices, The Conversation, TED and every
+ * channel that covers many subjects have none: Claude Haiku reads their titles and teasers
+ * (src/lib/generation/content-topics.ts). When in doubt, no default.
  */
 
 const VERIFIED_ON = "2026-10-13";
@@ -336,6 +345,8 @@ interface YoutubeOptions {
   audience?: SourceDefinition["audience"];
   /** Keeps only the videos whose title matches (channels that also post off-topic videos). */
   titleFilter?: SourceDefinition["titleFilter"];
+  /** Domains every video of the channel belongs to (see the header comment, 2026-10-29). */
+  defaultTopics?: SourceDefinition["defaultTopics"];
 }
 
 /** A YouTube channel, read from its public Atom feed. `channelId` is the `UC…` id of the channel. */
@@ -346,7 +357,7 @@ function youtube(
   channelId: string,
   difficulty: SourceDefinition["difficulty"],
   defaultMinutes: number,
-  { levelRules, instructionLanguage, audience, titleFilter }: YoutubeOptions = {},
+  { levelRules, instructionLanguage, audience, titleFilter, defaultTopics }: YoutubeOptions = {},
 ): SourceDefinition {
   return {
     key: `youtube-${slug}`,
@@ -362,6 +373,7 @@ function youtube(
     ...(instructionLanguage ? { instructionLanguage } : {}),
     ...(audience ? { audience } : {}),
     ...(titleFilter ? { titleFilter } : {}),
+    ...(defaultTopics ? { defaultTopics } : {}),
     hosts: ["youtube.com"],
     itemFormat: "youtube",
     license: YOUTUBE_LICENSE,
@@ -454,6 +466,7 @@ export const SOURCE_CATALOG: SourceDefinition[] = [
     difficulty: "C1",
     defaultMinutes: 10,
     hosts: ["postnauka.org", "postnauka.ru"],
+    defaultTopics: ["sciences"],
     license: allRightsReserved(
       "https://postnauka.org/about",
       "Footer: « © ПостНаука. Все права защищены ». Official RSS feed.",
@@ -469,6 +482,7 @@ export const SOURCE_CATALOG: SourceDefinition[] = [
     difficulty: "C1",
     defaultMinutes: 10,
     hosts: ["arzamas.academy"],
+    defaultTopics: ["culture", "histoire"],
     license: allRightsReserved(
       "https://arzamas.academy/rules",
       "Magazine feed linked from the site's <head>. Site rules: protected material, no reuse grant to visitors.",
@@ -732,7 +746,7 @@ export const SOURCE_CATALOG: SourceDefinition[] = [
 
   youtube("es", "espanol-con-juan", "Español con Juan", "UCoHJ7PkM6T92LwgJgrnDhWA", "B1", 12),
   youtube("es", "hablando", "¡Hablando!", "UCv8Finl3foOCkvcC9FOUDhA", "A2", 20),
-  youtube("es", "quantum-fracture", "QuantumFracture", "UCbdSYaPD-lr1kW27UJuk8Pw", "B2", 15),
+  youtube("es", "quantum-fracture", "QuantumFracture", "UCbdSYaPD-lr1kW27UJuk8Pw", "B2", 15, { defaultTopics: ["sciences"] }),
   youtube("es", "dw-espanol", "DW Español", "UCT4Jg8h03dD0iN3Pb5L0PMA", "B2", 8),
   youtube("it", "italiano-automatico", "Italiano Automatico", "UChJtl-bJFgQit_BmjL5axtg", "B1", 12),
   youtube("it", "geopop", "Geopop", "UCx7EWheHmjCW3vX8K2d09vg", "B2", 10),
@@ -742,12 +756,12 @@ export const SOURCE_CATALOG: SourceDefinition[] = [
   youtube("de", "deutsch-mit-rieke", "Deutsch mit Rieke", "UCthmoIZKvuR1-KuwednkjHg", "C1", 10, {
     levelRules: [{ pattern: /B2\s*[/,-]\s*C1/i, difficulty: "B2" }],
   }),
-  youtube("de", "quarks", "Quarks", "UC1Y7onDsPyfP-lu--SXF-ew", "B2", 12),
-  youtube("de", "terra-x-history", "Terra X History", "UCA3mpqm67CpJ13YfA8qAnow", "B2", 25),
+  youtube("de", "quarks", "Quarks", "UC1Y7onDsPyfP-lu--SXF-ew", "B2", 12, { defaultTopics: ["sciences"] }),
+  youtube("de", "terra-x-history", "Terra X History", "UCA3mpqm67CpJ13YfA8qAnow", "B2", 25, { defaultTopics: ["histoire"] }),
   youtube("en", "learn-english-with-bob", "Learn English with Bob the Canadian", "UCZJJTxA36ZPNTJ1WFIByaeA", "A2", 15),
   youtube("en", "easy-english", "Easy English", "UCvgLaFuTGGRXl0eyvBRCifA", "B1", 12),
   youtube("en", "crash-course", "CrashCourse", "UCX6b17PVsYBQ0ip5gyeme-Q", "B2", 12),
-  youtube("en", "kurzgesagt", "Kurzgesagt – In a Nutshell", "UCsXVk37bltHxD1rDPwtNM8Q", "B2", 10),
+  youtube("en", "kurzgesagt", "Kurzgesagt – In a Nutshell", "UCsXVk37bltHxD1rDPwtNM8Q", "B2", 10, { defaultTopics: ["sciences"] }),
   youtube("en", "ted", "TED", "UCAuUUnT6oDeKwE6v1NGQxug", "C1", 15),
   youtube("nl", "dutchdialogue", "DutchDialogue", "UCQzCGgbB9hBtgsuxkqtLOdg", "A1", 25),
   youtube("nl", "nos-journaal-makkelijke-taal", "NOS Journaal in Makkelijke Taal", "UCch2JvY2ZSwcjf5gb93HGQw", "A2", 5),
@@ -760,10 +774,10 @@ export const SOURCE_CATALOG: SourceDefinition[] = [
   youtube("pl", "polski-dla-obcokrajowcow", "Polski dla obcokrajowców", "UCuqJctV8A8XTTZFuK1lAynA", "B1", 8),
   youtube("pl", "polskie-radio-dwojka", "Polskie Radio Dwójka", "UCGX6SKFDlbE3MLbENmNO9mQ", "B2", 20),
   youtube("ru", "russkiy-v-dialogakh", "Русский в диалогах", "UCDVnEZrGwrA2RLkr9tcrxRQ", "A2", 12),
-  youtube("ru", "postnauka", "ПостНаука", "UCSPd93is2UQsd_jZ6yHBfqQ", "C1", 12),
+  youtube("ru", "postnauka", "ПостНаука", "UCSPd93is2UQsd_jZ6yHBfqQ", "C1", 12, { defaultTopics: ["sciences"] }),
   youtube("ru", "dw-reportazhi", "DW репортажи", "UCm5glKgewJHdzk77qhpXNMw", "B2", 8),
-  youtube("pt", "manual-do-mundo", "Manual do Mundo", "UCKHhA5hN2UohhFDfNXB_cvQ", "B1", 15),
-  youtube("pt", "drauzio-varella", "Drauzio Varella", "UC9zqTTVeClpqMQ5CLuJdWtw", "B2", 8),
+  youtube("pt", "manual-do-mundo", "Manual do Mundo", "UCKHhA5hN2UohhFDfNXB_cvQ", "B1", 15, { defaultTopics: ["sciences"] }),
+  youtube("pt", "drauzio-varella", "Drauzio Varella", "UC9zqTTVeClpqMQ5CLuJdWtw", "B2", 8, { defaultTopics: ["sciences"] }),
   youtube("pt", "euronews-pt", "Euronews em Português", "UCUmEPYxmnyQDeRUcFkslmQw", "B2", 3),
   youtube("pt", "bbc-news-brasil", "BBC News Brasil (vídeos)", "UCthbIFAxbXTTQEC7EcQvP1Q", "B2", 5),
   youtube("ro", "tvr", "TVR", "UChdrIsYOHZXgEyCLaOHc2Ew", "B2", 5),
@@ -771,7 +785,7 @@ export const SOURCE_CATALOG: SourceDefinition[] = [
   youtube("el", "ert", "ΕΡΤ", "UC0jVU-mK53vDQZcSZB5mVHg", "B2", 5),
   youtube("el", "euronews-gr", "euronews (στα ελληνικά)", "UC8HJZNfDPoySgW9DN3YGNaA", "B2", 4),
   youtube("tr", "trt-cocuk", "TRT Çocuk", "UCrFf5dtMe6M1XJHqbKJ4X6Q", "A2", 10, { audience: "children" }),
-  youtube("tr", "evrim-agaci", "Evrim Ağacı", "UCatnasFAiXUvWwH8NlSdd3A", "B2", 15),
+  youtube("tr", "evrim-agaci", "Evrim Ağacı", "UCatnasFAiXUvWwH8NlSdd3A", "B2", 15, { defaultTopics: ["sciences"] }),
   youtube("tr", "euronews-tr", "euronews (Türkçe)", "UC7nLr-rPOKYhRE4wRZoLxkg", "B2", 3),
   youtube("ar", "arabicles", "لكل من يريد تعلم العربية", "UC0Js0rww-JwkFY2UGzXcw3w", "A2", 8),
   youtube("ar", "dw-arabic", "DW عربية", "UC30ditU5JI16o5NbFsHde_Q", "B2", 8),
@@ -783,7 +797,7 @@ export const SOURCE_CATALOG: SourceDefinition[] = [
   youtube("ja", "tbs-news-dig", "TBS NEWS DIG", "UC6AG81pAkf6Lbi_1VC5NmPA", "B2", 10),
   youtube("ko", "speaking-korean", "한국어로 말해요", "UCwgUzX2ey4FaxJU-pVw3ZtA", "A2", 8),
   youtube("ko", "ebs-jisikchaenel-e", "EBS 지식채널e", "UCL44YGs2BXxtM4GZRH-wnrQ", "B2", 5),
-  youtube("id", "kok-bisa", "Kok Bisa?", "UCu0yQD7NFMyLu_-TmKa4Hqg", "B1", 8),
+  youtube("id", "kok-bisa", "Kok Bisa?", "UCu0yQD7NFMyLu_-TmKa4Hqg", "B1", 8, { defaultTopics: ["sciences"] }),
   youtube("id", "alamaya", "Alamaya", "UCq8Mzf2SMb_KpMgRiNdaP3g", "B2", 10),
   youtube("id", "narasi-newsroom", "Narasi Newsroom", "UCnOf30K0d0e8M7mc4FUzR0A", "B2", 10),
   youtube("cs", "ct24", "ČT24", "UC0HQLHvU5_MMUJxLz6yl0GA", "B2", 8),
@@ -929,7 +943,7 @@ export const SOURCE_CATALOG: SourceDefinition[] = [
   youtube("sv", "kva", "Kungl. Vetenskapsakademien", "UC_rlZQ1QRdp6cgW9-Wt9gTQ", "C2", 60),
   youtube("pl", "polskie-radio-24", "Polskie Radio 24", "UCTKxkwZp-aWyNsV3vdV2EpA", "C1", 20),
   youtube("pl", "uniwersytet-warszawski", "Uniwersytet Warszawski", "UCYS8pMgw36ILNPw3XXxx6tg", "C2", 30),
-  youtube("cs", "veda-24", "Věda 24 (ČT24)", "UC2wsyTwB2DxTMWd0ezFd4JQ", "C1", 15),
+  youtube("cs", "veda-24", "Věda 24 (ČT24)", "UC2wsyTwB2DxTMWd0ezFd4JQ", "C1", 15, { defaultTopics: ["sciences"] }),
   youtube("cs", "cesky-rozhlas-plus", "Český rozhlas Plus", "UCfDmmHLG-H5mpTF1kt0mT6w", "C2", 40),
   youtube("uk", "hromadske-talk", "hromadske talk", "UCpxXjZGmWWP8jLCrLhBvxSA", "C1", 40),
   youtube("ro", "radio-romania-cultural", "Radio România Cultural", "UCqyDU8hGwMW8_t0CWUHGA_g", "C1", 30),
@@ -1687,6 +1701,7 @@ export const SOURCE_CATALOG: SourceDefinition[] = [
     learners: true,
     hosts: ["arzamas.academy"],
     audioHosts: ["arzamas.academy"],
+    defaultTopics: ["culture", "histoire"],
     license: checkedNow(
       "https://arzamas.academy/rules",
       "Same rules as the Arzamas magazine: protected material, no reuse grant. Lecture courses do not age " +

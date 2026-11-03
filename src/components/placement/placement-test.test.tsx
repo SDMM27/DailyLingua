@@ -146,6 +146,65 @@ describe("PlacementTest", () => {
   });
 });
 
+describe("PlacementTest full assessment", () => {
+  beforeEach(() => {
+    completePlacementTest.mockResolvedValue({ ok: true, data: { estimate: "A1", confidence: "high" } });
+  });
+
+  /** A test ended at once: everything wrong from A1. */
+  async function finish(props: Partial<Parameters<typeof PlacementTest>[0]> = {}) {
+    const user = setup({ startLevel: "A1", ...props });
+    await user.click(screen.getByRole("button", { name: "Commencer" }));
+    for (let i = 0; i < 5; i += 1) await dontKnow(user);
+    return user;
+  }
+
+  it("proposes the full assessment as the main button, and `Plus tard` as the other", async () => {
+    await finish({ assessmentAvailable: true });
+    expect(screen.getByRole("button", { name: "Faire mon bilan complet" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Plus tard" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Enregistrer ce niveau" })).toBeNull();
+  });
+
+  it("saves the level, then opens the assessment of the language", async () => {
+    const user = await finish({ assessmentAvailable: true });
+    await user.click(screen.getByRole("button", { name: "Faire mon bilan complet" }));
+    expect(completePlacementTest).toHaveBeenCalledTimes(1);
+    expect(push).toHaveBeenCalledWith("/niveau/it/bilan");
+  });
+
+  it("saves the level and goes back to the levels on `Plus tard`", async () => {
+    const user = await finish({ assessmentAvailable: true });
+    await user.click(screen.getByRole("button", { name: "Plus tard" }));
+    expect(completePlacementTest).toHaveBeenCalledTimes(1);
+    expect(push).toHaveBeenCalledWith("/niveau");
+  });
+
+  it("proposes nothing when the assessment is not available, which is the default", async () => {
+    await finish();
+    expect(screen.queryByRole("button", { name: "Faire mon bilan complet" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Plus tard" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Enregistrer ce niveau" })).toBeTruthy();
+    cleanup();
+    await finish({ assessmentAvailable: false });
+    expect(screen.queryByRole("button", { name: "Faire mon bilan complet" })).toBeNull();
+  });
+
+  it("proposes nothing in the demo even if told the assessment exists", async () => {
+    await finish({ assessmentAvailable: true, persist: false });
+    expect(screen.queryByRole("button", { name: "Faire mon bilan complet" })).toBeNull();
+    expect(screen.getByText("Mode démonstration : rien n’est enregistré.")).toBeTruthy();
+  });
+
+  it("shows the server error and stays on the result", async () => {
+    completePlacementTest.mockResolvedValue({ ok: false, error: "Boom" });
+    const user = await finish({ assessmentAvailable: true });
+    await user.click(screen.getByRole("button", { name: "Faire mon bilan complet" }));
+    expect((await screen.findByRole("alert")).textContent).toBe("Boom");
+    expect(push).not.toHaveBeenCalled();
+  });
+});
+
 describe("PlacementTest alphabet note", () => {
   it("points to the alphabet and its reading check when the script is not mastered", () => {
     setup({ language: "ru", alphabet: { script: "cyrillic" } });

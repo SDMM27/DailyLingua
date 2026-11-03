@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { prepareTodayMission } from "@/app/actions/mission";
 import { TrialOverCard } from "@/components/auth/trial-over-card";
+import { RestDayCard } from "@/components/mission/rest-day-card";
 import { Card, Eyebrow } from "@/components/ui/primitives";
 
 /** Another request is writing the mission: ask again after this delay, at most this many times. */
@@ -15,6 +16,7 @@ type State =
   | { kind: "working" }
   | { kind: "failed"; message: string }
   | { kind: "no-content" }
+  | { kind: "rest-day" }
   | { kind: "signup-required" };
 
 const BUTTON =
@@ -44,6 +46,8 @@ export function MissionPreparing() {
           return setState({ kind: "failed", message: "La mission n’a pas pu être préparée." });
         case "no-content":
           return setState({ kind: "no-content" });
+        case "rest-day":
+          return setState({ kind: "rest-day" });
         case "signup-required":
           return setState({ kind: "signup-required" });
         case "pending":
@@ -67,6 +71,7 @@ export function MissionPreparing() {
   }, [run]);
 
   if (state.kind === "signup-required") return <TrialOverCard />;
+  if (state.kind === "rest-day") return <RestDayCard homeLink />;
 
   return (
     <Card>

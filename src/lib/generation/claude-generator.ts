@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { wireMissionSchema, type ExerciseGenerator, type WireMission } from "@/lib/schemas/generation";
 import { DEFAULT_MISSION_MODEL } from "./config";
+import { createFailoverParseClient } from "./anthropic-client";
 import { GenerationError } from "./errors";
 import { PROMPT_VERSION, SYSTEM_PROMPT, buildUserMessage } from "./prompt";
 
@@ -23,7 +24,7 @@ export interface ParseClient {
 }
 
 export interface ClaudeGeneratorOptions {
-  apiKey?: string;
+  apiKeys?: string[];
   model?: string;
   client?: ParseClient;
   /** Default 60 s. */
@@ -47,6 +48,8 @@ export function toGenerationError(error: unknown): GenerationError {
           : "api_error";
     return new GenerationError(reason, `Claude : erreur API (statut ${error.status ?? "inconnu"}, ${error.name})`);
   }
+  // Raised by the SDK when an answer does not fit the output schema (its message may quote the answer).
+  if (error instanceof Anthropic.AnthropicError) return new GenerationError("invalid_output", "Claude : réponse hors format");
   return new GenerationError("api_error", "Claude : erreur inattendue");
 }
 
@@ -56,11 +59,10 @@ export function createClaudeGenerator(options: ClaudeGeneratorOptions = {}): Exe
   let client: ParseClient | undefined = options.client;
 
   function getClient(): ParseClient {
-    client ??= new Anthropic({
-      apiKey: options.apiKey,
-      timeout: options.timeoutMs ?? 60_000,
-      maxRetries: 1,
-    }) as unknown as ParseClient;
+    client ??= createFailoverParseClient<ParseClient>({
+      apiKeys: options.apiKeys ?? [],
+      timeoutMs: options.timeoutMs ?? 60_000,
+    });
     return client;
   }
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addDays, diffInDays, formatLongDate, formatTimeAgo, toDateKey } from "./dates";
+import { addDays, diffInDays, formatLongDate, formatTimeAgo, isoWeekday, toDateKey } from "./dates";
 
 describe("toDateKey", () => {
   it("uses the Paris calendar day, not UTC", () => {
@@ -55,5 +55,16 @@ describe("formatTimeAgo", () => {
   it("shows the date beyond a week, and never a time in the future", () => {
     expect(formatTimeAgo(new Date("2026-09-30T10:00:00Z"), now)).toBe("30 sept.");
     expect(formatTimeAgo(new Date("2026-10-13T11:00:00Z"), now)).toBe("à l’instant");
+  });
+});
+
+describe("isoWeekday", () => {
+  it("numbers Monday 1 to Sunday 7", () => {
+    expect([0, 1, 2, 3, 4, 5, 6].map((i) => isoWeekday(addDays("2026-10-12", i)))).toEqual([1, 2, 3, 4, 5, 6, 7]);
+  });
+
+  it("works around year ends and before 1970", () => {
+    expect(isoWeekday("2026-01-01")).toBe(4); // Thursday
+    expect(isoWeekday("1969-12-31")).toBe(3); // Wednesday
   });
 });

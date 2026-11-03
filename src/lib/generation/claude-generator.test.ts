@@ -31,6 +31,7 @@ const request: GenerationRequest = {
           difficulty: "B1",
           durationMinutes: 5,
           categories: [],
+          topics: [],
           publishedAt: null,
         },
       ],
@@ -66,7 +67,7 @@ const ok = (overrides: Partial<Response> = {}): Response => ({
 
 async function failure(client: ParseClient): Promise<GenerationError> {
   try {
-    await createClaudeGenerator({ client, apiKey: API_KEY }).generate(request);
+    await createClaudeGenerator({ client, apiKeys: [API_KEY] }).generate(request);
   } catch (error) {
     expect(error).toBeInstanceOf(GenerationError);
     return error as GenerationError;

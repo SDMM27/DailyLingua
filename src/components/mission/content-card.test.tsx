@@ -15,6 +15,7 @@ const CONTENT: Content = {
   difficulty: "A1",
   durationMinutes: 8,
   summary: "Les premières phrases.",
+  topics: [],
   transcriptAvailable: false,
 };
 

@@ -70,4 +70,13 @@ describe("MissionPreparing", () => {
     const link = await screen.findByRole("link", { name: "Voir les lectures" });
     expect(link.getAttribute("href")).toBe("/lire");
   });
+
+  it("shows the rest day message with a link home when no language is worked today", async () => {
+    prepare.mockResolvedValue({ ok: true, data: { status: "rest-day" } });
+    render(<MissionPreparing />);
+    expect(await screen.findByText(/c’est un jour de repos/)).toBeTruthy();
+    expect(screen.getByText(/Les révisions restent disponibles/)).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Retour à l’accueil" }).getAttribute("href")).toBe("/");
+    expect(prepare).toHaveBeenCalledTimes(1);
+  });
 });

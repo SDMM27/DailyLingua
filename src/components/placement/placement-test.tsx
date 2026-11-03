@@ -55,6 +55,7 @@ export function PlacementTest({
   startLevel,
   persist,
   alphabet,
+  assessmentAvailable = false,
 }: {
   language: Language;
   /** The questions of the language; shuffled once per test, the engine picks which to ask. */
@@ -64,6 +65,8 @@ export function PlacementTest({
   persist: boolean;
   /** Set when the language has an alphabet the learner has not completed: the intro points to it. */
   alphabet?: { script: AlphabetScript };
+  /** A full assessment (a dossier per skill) can be taken for this language: the result proposes it. */
+  assessmentAvailable?: boolean;
 }) {
   const router = useRouter();
   const info = languageInfo(language);
@@ -106,7 +109,8 @@ export function PlacementTest({
     setPhase("intro");
   }
 
-  async function save() {
+  /** Saves the level, then goes to the level list, or on to the full assessment. */
+  async function save(next: "levels" | "assessment" = "levels") {
     if (!result) return;
     setSaving(true);
     setError(null);
@@ -122,7 +126,7 @@ export function PlacementTest({
       return;
     }
     // Stay on "saving" while the list loads.
-    router.push("/niveau");
+    router.push(next === "assessment" ? `/niveau/${language}/bilan` : "/niveau");
     router.refresh();
   }
 
@@ -215,10 +219,33 @@ export function PlacementTest({
           </p>
         </Card>
         <div className="mt-6 space-y-3">
-          {persist ? (
+          {persist && assessmentAvailable ? (
+            <>
+              <p className="text-sm leading-relaxed text-ink-soft">
+                Pour aller plus loin, le bilan complet mesure chaque compétence (lire, écouter, écrire, parler) : compte 20 à 25
+                minutes. Ton niveau est enregistré dans les deux cas.
+              </p>
+              <button
+                type="button"
+                onClick={() => save("assessment")}
+                disabled={saving}
+                className="w-full rounded-2xl bg-ink px-5 py-3.5 text-[15px] font-semibold text-paper transition-transform active:scale-[0.98] disabled:opacity-60"
+              >
+                {saving ? "Enregistrement…" : "Faire mon bilan complet"}
+              </button>
+              <button
+                type="button"
+                onClick={() => save()}
+                disabled={saving}
+                className="flex min-h-11 w-full items-center justify-center rounded-2xl border border-line px-5 text-[15px] font-semibold text-ink-soft hover:text-ink disabled:opacity-60"
+              >
+                Plus tard
+              </button>
+            </>
+          ) : persist ? (
             <button
               type="button"
-              onClick={save}
+              onClick={() => save()}
               disabled={saving}
               className="w-full rounded-2xl bg-ink px-5 py-3.5 text-[15px] font-semibold text-paper transition-transform active:scale-[0.98] disabled:opacity-60"
             >

@@ -8,7 +8,7 @@ import type {
 } from "@/lib/schemas/generation";
 import { isSourceReadable } from "@/lib/content/policy";
 import type { SourceAccess } from "@/lib/schemas/content";
-import type { Preferences } from "@/lib/schemas/preferences";
+import type { Preferences, Topic } from "@/lib/schemas/preferences";
 import { GenerationError } from "./errors";
 import { productionTargetLength } from "./plan-activities";
 import { buildRanks } from "@/lib/domain/frequency";
@@ -20,8 +20,8 @@ const NOW = new Date("2026-10-13T12:00:00Z");
 
 const preferences: Preferences = {
   goals: [
-    { language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 1, topics: ["société"], contentTypes: ["article"] },
-    { language: "es", level: "A2", targetLevel: "B1", focus: "oral", purpose: "conversational", weight: 1, topics: ["société"], contentTypes: ["article"] },
+    { language: "it", level: "B1", targetLevel: "B2", focus: "", purpose: "general", weight: 10, days: [1, 2, 3, 4, 5, 6, 7], topics: ["société"], contentTypes: ["article"] },
+    { language: "es", level: "A2", targetLevel: "B1", focus: "oral", purpose: "conversational", weight: 10, days: [1, 2, 3, 4, 5, 6, 7], topics: ["société"], contentTypes: ["article"] },
   ],
   dailyMinutes: 20,
   difficulty: "matched",
@@ -40,6 +40,7 @@ function content(language: Language, n: number, overrides: Partial<CandidateCont
     difficulty: "B1",
     durationMinutes: 4,
     categories: [],
+    topics: [],
     publishedAt: "2026-10-13T08:00:00Z",
     ...overrides,
   };
@@ -50,6 +51,8 @@ interface Calls {
   failed: { missionId: string; error: string }[];
   candidateQueries: { language: Language; contentTypes?: ContentType[] }[];
   usedSince: string[];
+  /** Budget (minutes) of each `claim`. */
+  claims: number[];
 }
 
 function memoryStore(
@@ -64,19 +67,26 @@ function memoryStore(
     sourceAccess?: Record<string, SourceAccess>;
     /** Paid sources the user declared (source ids). */
     declared?: string[];
+    /** Domains asked for the mission, by language. */
+    requests?: Partial<Record<Language, Topic>>;
   } = {},
 ) {
-  const calls: Calls = { completed: [], failed: [], candidateQueries: [], usedSince: [] };
+  const calls: Calls = { completed: [], failed: [], candidateQueries: [], usedSince: [], claims: [] };
   const pools = options.pools ?? { it: [content("it", 1), content("it", 2)], es: [content("es", 1)] };
   const store: MissionStore = {
     async getPreferences() {
       return options.prefs === undefined ? preferences : options.prefs;
     },
-    async listCandidates(language, { contentTypes, declaredSourceIds }) {
+    async listCandidates(language, { contentTypes, topics, declaredSourceIds }) {
       calls.candidateQueries.push({ language, contentTypes });
-      return (pools[language] ?? []).filter((c) =>
-        isSourceReadable({ id: `src-${c.id}`, access: options.sourceAccess?.[c.id] ?? "free" }, declaredSourceIds),
-      );
+      return (pools[language] ?? [])
+        .filter((c) => !topics || c.topics.some((t) => topics.includes(t)))
+        .filter((c) =>
+          isSourceReadable({ id: `src-${c.id}`, access: options.sourceAccess?.[c.id] ?? "free" }, declaredSourceIds),
+        );
+    },
+    async listMissionRequests() {
+      return options.requests ?? {};
     },
     async listDeclaredSourceIds() {
       return options.declared ?? [];
@@ -88,7 +98,8 @@ function memoryStore(
     async listRefusedContentIds() {
       return options.refused ?? [];
     },
-    async claim() {
+    async claim(_userId, _date, budgetMinutes) {
+      calls.claims.push(budgetMinutes);
       return { missionId: "m1", ...(options.claim ?? { status: "generating", claimed: true }) };
     },
     async complete(missionId, sessions, meta) {
@@ -180,6 +191,65 @@ describe("generateMission", () => {
       const { store, calls } = memoryStore({ pools: { it: [content("it", 1)] }, sourceAccess: { "it-1": "metered" } });
       expect(await run(store, aiGenerator())).toEqual({ status: "no-content" });
       expect(calls.failed).toHaveLength(1);
+    });
+  });
+
+  describe("requested domain", () => {
+    const pools = {
+      it: [content("it", 1), content("it", 2, { topics: ["sport"] }), content("it", 3, { topics: ["sport", "culture"] })],
+      es: [content("es", 1)],
+    };
+
+    it("prefers the contents of the domain asked for that language", async () => {
+      const { store, calls } = memoryStore({ pools, requests: { it: "sport" } });
+      const generator = aiGenerator();
+      await run(store, generator);
+      expect(generator.requests[0].sessions[0].candidates.map((c) => c.id).sort()).toEqual(["it-2", "it-3"]);
+      expect(["it-2", "it-3"]).toContain(calls.completed[0].sessions[0].contentId);
+      // Another language without a request is untouched.
+      expect(generator.requests[0].sessions[1].candidates.map((c) => c.id)).toEqual(["es-1"]);
+    });
+
+    it("never sends the domains of the candidates to the model", async () => {
+      const { store } = memoryStore({ pools, requests: { it: "sport" } });
+      const generator = aiGenerator();
+      await run(store, generator);
+      expect(buildUserMessage(generator.requests[0])).not.toContain("sport");
+    });
+
+    it("falls back to every content when the domain has none", async () => {
+      const { store, calls } = memoryStore({ pools, requests: { it: "voyage" } });
+      const generator = aiGenerator();
+      expect(await run(store, generator)).toMatchObject({ status: "ready" });
+      expect(generator.requests[0].sessions[0].candidates.map((c) => c.id).sort()).toEqual(["it-1", "it-2", "it-3"]);
+      expect(calls.completed[0].sessions.map((s) => s.language)).toEqual(["it", "es"]);
+    });
+
+    it("falls back when the contents of the domain are all excluded or at the wrong level", async () => {
+      const far = { it: [content("it", 1), content("it", 2, { topics: ["sport"], difficulty: "C2" })] };
+      const { store } = memoryStore({ pools: far, requests: { it: "sport" } });
+      const generator = aiGenerator();
+      await run(store, generator);
+      expect(generator.requests[0].sessions[0].candidates.map((c) => c.id).sort()).toEqual(["it-1", "it-2"]);
+      const used = memoryStore({ pools, requests: { it: "sport" }, used: ["it-2", "it-3"] });
+      const g2 = aiGenerator();
+      await run(used.store, g2);
+      expect(g2.requests[0].sessions[0].candidates.map((c) => c.id)).toEqual(["it-1"]);
+    });
+
+    it("changes nothing without a request, and still writes the mission when the requests cannot be read", async () => {
+      const plain = memoryStore({ pools });
+      const g1 = aiGenerator();
+      await run(plain.store, g1);
+      expect(g1.requests[0].sessions[0].candidates.map((c) => c.id).sort()).toEqual(["it-1", "it-2", "it-3"]);
+
+      const broken = memoryStore({ pools, requests: { it: "sport" } });
+      broken.store.listMissionRequests = async () => {
+        throw new Error("boom");
+      };
+      const g2 = aiGenerator();
+      expect(await run(broken.store, g2)).toMatchObject({ status: "ready" });
+      expect(g2.requests[0].sessions[0].candidates).toHaveLength(3);
     });
   });
 
@@ -337,6 +407,59 @@ describe("generateMission", () => {
     expect(generator.requests).toEqual([]);
   });
 
+  describe("weekdays", () => {
+    // 2026-10-13 is a Tuesday. Italian: Monday and Tuesday (10 min); Spanish: Wednesday only (15 min).
+    const week: Preferences = {
+      ...preferences,
+      goals: [
+        { ...preferences.goals[0], days: [1, 2], weight: 10 },
+        { ...preferences.goals[1], days: [3], weight: 15 },
+      ],
+    };
+
+    it("makes no mission on a rest day: no claim, no model call", async () => {
+      const { store, calls } = memoryStore({ prefs: { ...week, goals: [{ ...week.goals[0], days: [1, 5] }, { ...week.goals[1], days: [3] }] } });
+      const generator = aiGenerator();
+      expect(await run(store, generator)).toEqual({ status: "rest-day" });
+      expect(calls.claims).toEqual([]);
+      expect(calls.candidateQueries).toEqual([]);
+      expect(calls.completed).toEqual([]);
+      expect(generator.requests).toEqual([]);
+    });
+
+    it("only plans the languages of the day, with their minutes as the budget", async () => {
+      const { store, calls } = memoryStore({ prefs: week });
+      const generator = aiGenerator();
+      expect(await run(store, generator)).toMatchObject({ status: "ready" });
+      expect(calls.claims).toEqual([10]);
+      expect(calls.candidateQueries.map((q) => q.language)).not.toContain("es");
+      expect(calls.completed[0].sessions.map((s) => s.language)).toEqual(["it"]);
+      expect(generator.requests[0].sessions).toHaveLength(1);
+      expect(generator.requests[0].sessions[0].minutes).toBe(10);
+    });
+
+    it("sums the minutes of the languages of the day", async () => {
+      const { store, calls } = memoryStore({ prefs: { ...week, goals: [{ ...week.goals[0], weight: 25 }, { ...week.goals[1], days: [2], weight: 15 }] } });
+      const generator = aiGenerator();
+      await run(store, generator);
+      expect(calls.claims).toEqual([40]);
+      expect(generator.requests[0].sessions.map((s) => s.minutes)).toEqual([25, 15]);
+    });
+
+    it("keeps a language's production mode tied to its position in the whole list", async () => {
+      const everyDay = [1, 2, 3, 4, 5, 6, 7];
+      const both = { ...preferences, goals: preferences.goals.map((g) => ({ ...g, days: everyDay })) };
+      const first = aiGenerator();
+      await run(memoryStore({ prefs: both }).store, first);
+      // Spanish alone that day (Italian rests): it keeps position 1, hence the other mode than Italian had.
+      const alone = { ...both, goals: [{ ...both.goals[0], days: [1] }, both.goals[1]] };
+      const second = aiGenerator();
+      await run(memoryStore({ prefs: alone }).store, second);
+      expect(second.requests[0].sessions[0].language).toBe("es");
+      expect(second.requests[0].sessions[0].productionMode).toBe(first.requests[0].sessions[1].productionMode);
+    });
+  });
+
   it("needs preferences", async () => {
     const { store } = memoryStore({ prefs: null });
     expect(await run(store, aiGenerator())).toEqual({ status: "no-preferences" });
@@ -479,5 +602,32 @@ describe("vocabulary frequency", () => {
     expect(outcome).toMatchObject({ status: "ready" });
     expect(calls.completed[0].meta.coverage).toEqual([]);
     expect(logs.some((m) => m.includes("no frequency list"))).toBe(true);
+  });
+});
+
+describe("buildSessionRequest production level", () => {
+  const build = (goal: Preferences["goals"][number]) =>
+    buildSessionRequest({
+      goal,
+      preferences,
+      declaredSourceIds: [],
+      minutes: 10,
+      excludeIds: new Set(),
+      now: NOW,
+      pool: [content("it", 1, { difficulty: "B1" }), content("it", 2, { difficulty: "C1" })],
+      productionMode: "writing",
+    });
+
+  it("defaults to the level", () => {
+    expect(build(preferences.goals[0]).productionLevel).toBe("B1");
+    expect(build({ ...preferences.goals[0], productionLevel: null }).productionLevel).toBe("B1");
+  });
+
+  it("carries the production level without changing the choice of candidates", () => {
+    const plain = build(preferences.goals[0]);
+    const withProduction = build({ ...preferences.goals[0], productionLevel: "C1" });
+    expect(withProduction.productionLevel).toBe("C1");
+    expect(withProduction.candidates).toEqual(plain.candidates);
+    expect(withProduction.level).toBe("B1");
   });
 });

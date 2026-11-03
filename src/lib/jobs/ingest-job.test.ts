@@ -1,6 +1,7 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { FetchLike } from "@/lib/content/http";
 import type { ContentStore } from "@/lib/content/ingest";
+import type { ContentTopicStore, TopicClassifier } from "@/lib/content/topics";
 import type { SourceDefinition } from "@/lib/schemas/content";
 import { runIngestJob } from "./ingest-job";
 
@@ -84,6 +85,20 @@ const fakeWeb: FetchLike = async (url, init) => {
   throw new Error(`unexpected ${url}`);
 };
 
+function topicStore(count: number): ContentTopicStore & { saved: Map<string, string[]> } {
+  const saved = new Map<string, string[]>();
+  return {
+    saved,
+    listUnclassifiedContents: vi.fn(async (limit: number) =>
+      Array.from({ length: Math.min(count, limit) }, (_, i) => ({ id: `t${i}`, language: "it" as const, title: `T${i}`, summary: `S${i}` })),
+    ),
+    setContentTopics: vi.fn(async (updates) => {
+      for (const { id, topics } of updates) saved.set(id, topics);
+    }),
+    applySourceTopics: vi.fn(async () => 0),
+  };
+}
+
 describe("runIngestJob", () => {
   it("is partial when a feed fails, with counters", async () => {
     const result = await runIngestJob({
@@ -102,6 +117,8 @@ describe("runIngestJob", () => {
       inserted: 3,
       linksChecked: 3,
       linksBroken: 0,
+      topicsClassified: 0,
+      topicsFailedBatches: 0,
     });
     expect(result.report.sources).toHaveLength(3);
   });
@@ -117,5 +134,40 @@ describe("runIngestJob", () => {
     });
     expect(result.status).toBe("ok");
     expect(result.stats).toMatchObject({ sources: 2, sourcesOk: 1, sourcesError: 0, sourcesSkipped: 1, inserted: 2, linksChecked: 0 });
+  });
+  it("classifies the contents without domain after the ingestion, and counts them", async () => {
+    const store = topicStore(25);
+    const classify = vi.fn(async (items: unknown[]) => items.map(() => ["société"] as ("société")[]));
+    const classifier: TopicClassifier = { classify };
+    const result = await runIngestJob({
+      store: memoryStore(),
+      policy: "all",
+      catalog: [definition("open", true)],
+      fetch: fakeWeb,
+      now: NOW,
+      topics: { store, classifier },
+    });
+    expect(result.status).toBe("ok");
+    expect(result.stats).toMatchObject({ topicsClassified: 25, topicsFailedBatches: 0 });
+    expect(classify).toHaveBeenCalledTimes(2);
+    expect(store.saved.size).toBe(25);
+  });
+
+  it("stays ok when a classification batch fails, and reports it", async () => {
+    const classifier: TopicClassifier = {
+      classify: vi.fn(async () => {
+        throw new Error("model down");
+      }),
+    };
+    const result = await runIngestJob({
+      store: memoryStore(),
+      policy: "all",
+      catalog: [definition("open", true)],
+      fetch: fakeWeb,
+      now: NOW,
+      topics: { store: topicStore(5), classifier },
+    });
+    expect(result.status).toBe("ok");
+    expect(result.stats).toMatchObject({ topicsClassified: 0, topicsFailedBatches: 1 });
   });
 });

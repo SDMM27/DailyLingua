@@ -7,19 +7,20 @@ const DATE = "2026-10-15" as DateKey;
 const users = (n: number): DueUser[] => Array.from({ length: n }, (_, i) => ({ userId: `u${i}`, date: DATE }));
 
 describe("runDailyMissions", () => {
-  it("counts every outcome and stays ok when only no-content / no-preferences / pending happen", async () => {
+  it("counts every outcome and stays ok when only no-content / no-preferences / rest-day / pending happen", async () => {
     const outcomes: Record<string, GenerateMissionOutcome> = {
       u0: { status: "ready", missionId: "m0", source: "ai" },
       u1: { status: "pending", missionId: "m1" },
       u2: { status: "no-content" },
       u3: { status: "no-preferences" },
+      u4: { status: "rest-day" },
     };
     const report = await runDailyMissions({
-      listDueUsers: async () => users(4),
+      listDueUsers: async () => users(5),
       prepare: async (id) => outcomes[id],
       deadlineMs: 10_000,
     });
-    expect(report).toMatchObject({ status: "ok", due: 4, ready: 1, pending: 1, failed: 0, noContent: 1, noPreferences: 1, errors: 0, skipped: 0 });
+    expect(report).toMatchObject({ status: "ok", due: 5, ready: 1, pending: 1, failed: 0, noContent: 1, noPreferences: 1, restDays: 1, errors: 0, skipped: 0 });
   });
 
   it("is partial when a mission failed, and logs its id and reason only", async () => {

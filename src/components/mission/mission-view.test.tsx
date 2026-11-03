@@ -247,3 +247,28 @@ describe("MissionView", () => {
     });
   });
 });
+
+describe("MissionView requested domain", () => {
+  const view = (requestedTopics: Parameters<typeof MissionView>[0]["requestedTopics"]) =>
+    render(
+      <MissionView
+        mission={buildMockMission("2026-10-13")}
+        progress={EMPTY_MISSION_PROGRESS}
+        persist={false}
+        requestedTopics={requestedTopics}
+      />,
+    );
+
+  it("says so when a session could not follow the domain asked for", () => {
+    view({ ru: "sport" });
+    expect(screen.getAllByText("Pas de contenu sport à ton niveau aujourd’hui : voici un autre sujet.")).toHaveLength(1);
+  });
+
+  it("says nothing when the content has the domain, or when none was asked", () => {
+    view({ ru: "sciences", it: "gastronomie" });
+    expect(screen.queryByText(/Pas de contenu/)).toBeNull();
+    cleanup();
+    view({});
+    expect(screen.queryByText(/Pas de contenu/)).toBeNull();
+  });
+});

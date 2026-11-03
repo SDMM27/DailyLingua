@@ -96,10 +96,12 @@ export default function PrivacyPage() {
             exercices, le modèle reçoit le titre, l’accroche, le média, le type, le niveau habituel et la durée des
             contenus proposés, ainsi que ton niveau, ton niveau visé, ton objectif libre s’il est renseigné, tes
             centres d’intérêt, le temps prévu et la date. Pour la correction, il reçoit le texte que tu as écrit, la
-            consigne, la langue, ton niveau, ton niveau visé et ton objectif. Pour la traduction, il reçoit les mots
+            consigne, la langue, ton niveau, ton niveau visé et ton objectif. Pour le bilan complet, qui est facultatif, il
+            reçoit tes réponses aux questions et le texte que tu écris, avec les questions, les réponses attendues, la
+            consigne, la langue et le niveau du bilan, de la même façon que pour les productions écrites. Pour la traduction, il reçoit les mots
             que tu demandes à traduire automatiquement (sans leur exemple ni le reste de ton vocabulaire) et leur
             langue, et seulement si ton compte est complet. Il ne reçoit jamais ton adresse e-mail, ni le reste de
-            ton vocabulaire, ni tes réponses aux quiz. Anthropic n’utilise pas les données reçues par son API pour
+            ton vocabulaire, ni tes réponses aux quiz des missions. Anthropic n’utilise pas les données reçues par son API pour
             entraîner ses modèles.
           </li>
           <li>

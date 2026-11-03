@@ -16,13 +16,13 @@ select is((select show_streak from public.profiles), true, 'the streak is shown 
 
 select lives_ok(
   $$select public.save_preferences(30, null, null, 'matched', '07:00', 'Europe/Paris',
-    '[{"language": "ru", "level": "B2", "target_level": "C1", "focus": "", "weight": 2}]', false)$$,
+    '[{"language": "ru", "level": "B2", "target_level": "C1", "focus": "", "weight": 20}]', false)$$,
   'save_preferences accepts p_show_streak');
 select is((select show_streak from public.profiles), false, 'the streak can be switched off');
 
 select lives_ok(
   $$select public.save_preferences(30, null, null, 'matched', '07:00', 'Europe/Paris',
-    '[{"language": "ru", "level": "B2", "target_level": "C1", "focus": "", "weight": 2}]')$$,
+    '[{"language": "ru", "level": "B2", "target_level": "C1", "focus": "", "weight": 20}]')$$,
   'p_show_streak is optional (old clients)');
 select is((select show_streak from public.profiles), true, 'omitting p_show_streak shows the streak again');
 

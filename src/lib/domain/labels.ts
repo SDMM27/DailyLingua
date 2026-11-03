@@ -2,7 +2,7 @@ import type { SourceAccess } from "@/lib/schemas/content";
 import type { ContentType } from "@/lib/schemas/common";
 import type { ActivityKind } from "@/lib/schemas/mission";
 import type { PlacementConfidence } from "@/lib/schemas/placement";
-import type { DifficultyMode, LanguagePurpose } from "@/lib/schemas/preferences";
+import type { DifficultyMode, LanguagePurpose, Topic } from "@/lib/schemas/preferences";
 import type { ReviewMode } from "@/lib/schemas/vocabulary";
 
 export const CONTENT_TYPE_LABELS: Record<ContentType, string> = {
@@ -55,3 +55,13 @@ export const REVIEW_MODE_LABELS: Record<ReviewMode, string> = {
   listen: "Écouter",
   cloze: "Phrase à trou",
 };
+
+/** Weekdays by ISO number (index 0 = Monday): initial, short name and full name. */
+export const WEEKDAY_INITIALS = ["L", "M", "M", "J", "V", "S", "D"] as const;
+export const WEEKDAY_SHORT_NAMES = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"] as const;
+export const WEEKDAY_NAMES = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"] as const;
+
+/** A domain as shown to the learner: the stored lowercase label with a leading capital (« Économie »). */
+export function topicLabel(topic: Topic): string {
+  return topic.charAt(0).toLocaleUpperCase("fr") + topic.slice(1);
+}

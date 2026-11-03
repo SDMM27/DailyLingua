@@ -1,7 +1,9 @@
 import { addDays } from "@/lib/domain/dates";
 import { coverageTarget, frequentWords, lexicalCoverage, type FrequencyRanks } from "@/lib/domain/frequency";
 import { loadFrequencyRanks } from "@/lib/frequency";
-import { splitBudget } from "@/lib/domain/time-budget";
+import { wantedLevels } from "@/lib/domain/levels";
+import { goalsForDate } from "@/lib/domain/schedule";
+import { splitBudget, totalMinutes } from "@/lib/domain/time-budget";
 import type { ContentType, DateKey, Language } from "@/lib/schemas/common";
 import {
   GENERATION_LIMITS,
@@ -22,7 +24,7 @@ import type {
   Expression,
   ProductionTask,
 } from "@/lib/schemas/mission";
-import type { Preferences } from "@/lib/schemas/preferences";
+import type { Preferences, Topic } from "@/lib/schemas/preferences";
 import { GenerationError } from "./errors";
 import { chooseProductionMode, planActivities, productionActivityKind, productionTargetLength } from "./plan-activities";
 import { rankCandidates } from "./select-contents";
@@ -40,8 +42,13 @@ const MAX_FREQUENT_WORDS = 10;
 /** Storage used by the orchestrator; implemented on Supabase by the app, in memory by the tests. */
 export interface MissionStore {
   getPreferences(userId: string): Promise<Preferences | null>;
-  /** Recent usable contents of a language (licence policy, active sources, not broken), newest first. `contentTypes` undefined = any type; `declaredSourceIds` = the paid sources the user declared they can read (free sources are always readable). */
-  listCandidates(language: Language, options: { contentTypes?: ContentType[]; declaredSourceIds: readonly string[]; limit: number }): Promise<CandidateContent[]>;
+  /** Recent usable contents of a language (licence policy, active sources, not broken), newest first. `contentTypes` undefined = any type; `declaredSourceIds` = the paid sources the user declared they can read (free sources are always readable). `topics` undefined = any domain; otherwise only the contents sharing at least one of them. */
+  listCandidates(
+    language: Language,
+    options: { contentTypes?: ContentType[]; topics?: Topic[]; declaredSourceIds: readonly string[]; limit: number },
+  ): Promise<CandidateContent[]>;
+  /** The domain the user asked for the mission of `date`, per language (« Demain, plutôt : sport »). */
+  listMissionRequests(userId: string, date: DateKey): Promise<Partial<Record<Language, Topic>>>;
   /** Paid sources this user declared they have access to (`user_source_access`). */
   listDeclaredSourceIds(userId: string): Promise<string[]>;
   /** Contents already used in this user's missions since `since` (inclusive). */
@@ -71,7 +78,9 @@ export type GenerateMissionOutcome =
   | { status: "pending"; missionId: string } // another request is generating it
   | { status: "failed"; missionId: string | null; reason: string }
   | { status: "no-preferences" }
-  | { status: "no-content" };
+  | { status: "no-content" }
+  /** None of the learner's languages is worked on that weekday: no mission, no row, no model call. */
+  | { status: "rest-day" };
 
 export interface GenerateMissionInput {
   userId: string;
@@ -116,6 +125,8 @@ interface PoolOptions {
   now: Date;
   /** Word-frequency ranks of the goal's language: the vocabulary of the contents counts at A1–A2. */
   frequency?: FrequencyRanks;
+  /** Domain the learner asked for this language and day: tried first, any content when none is usable. */
+  topic?: Topic;
 }
 
 /** The options of `rankCandidates` for one goal. */
@@ -131,10 +142,38 @@ function rankOptions(o: PoolOptions) {
   };
 }
 
+/**
+ * The requests of the day, or none when they cannot be read: the domain is a preference and must
+ * never keep a mission from being written.
+ */
+export async function loadMissionRequests(
+  store: Pick<MissionStore, "listMissionRequests">,
+  userId: string,
+  date: DateKey,
+  log: (message: string) => void = () => {},
+): Promise<Partial<Record<Language, Topic>>> {
+  try {
+    return await store.listMissionRequests(userId, date);
+  } catch (error) {
+    log(`generation: no mission requests for ${date}: ${describeError(error).message}`);
+    return {};
+  }
+}
+
 /** Candidates of a goal's language, or null when none is usable. */
 export async function loadUsablePool(store: Pick<MissionStore, "listCandidates">, o: PoolOptions): Promise<CandidateContent[] | null> {
   const usable = (pool: CandidateContent[]) =>
     rankCandidates(pool, rankOptions(o)).length > 0;
+  if (o.topic) {
+    // The requested domain, at a level the learner can use (the one aimed at and its neighbours), so
+    // that the fallback note « pas de contenu à ton niveau » is true. Preferred types first, then any.
+    const levels = wantedLevels(o.goal.level, o.preferences.difficulty);
+    const inTopic = (pool: CandidateContent[]) => pool.some((c) => !o.excludeIds.has(c.id) && levels.includes(c.difficulty));
+    const base = { topics: [o.topic], declaredSourceIds: o.declaredSourceIds, limit: CANDIDATE_POOL };
+    let topical = await store.listCandidates(o.goal.language, { ...base, contentTypes: o.goal.contentTypes });
+    if (!inTopic(topical)) topical = await store.listCandidates(o.goal.language, base);
+    if (inTopic(topical)) return topical;
+  }
   // Preferred content types first; any type when none is left (all used, or none published).
   let pool = await store.listCandidates(o.goal.language, {
     contentTypes: o.goal.contentTypes,
@@ -169,6 +208,7 @@ export function buildSessionRequest(
     language: o.goal.language,
     level: o.goal.level,
     targetLevel: o.goal.targetLevel,
+    productionLevel: o.goal.productionLevel ?? o.goal.level,
     focus: o.goal.focus,
     purpose: o.goal.purpose,
     topics: o.goal.topics,
@@ -277,7 +317,12 @@ export async function generateMission(input: GenerateMissionInput): Promise<Gene
   const preferences = await store.getPreferences(userId);
   if (!preferences) return { status: "no-preferences" };
 
-  const claim = await store.claim(userId, date, preferences.dailyMinutes);
+  // Only the languages worked on this weekday count; their minutes are the day's budget.
+  const todays = goalsForDate(preferences.goals, date);
+  if (todays.length === 0) return { status: "rest-day" };
+  const budgetMinutes = totalMinutes(todays);
+
+  const claim = await store.claim(userId, date, budgetMinutes);
   if (!claim.claimed) {
     if (claim.status === "ready") return { status: "ready", missionId: claim.missionId, source: null };
     if (claim.status === "generating") return { status: "pending", missionId: claim.missionId };
@@ -292,14 +337,15 @@ export async function generateMission(input: GenerateMissionInput): Promise<Gene
       ...(await store.listRefusedContentIds(userId)),
     ]);
     const declaredSourceIds = await store.listDeclaredSourceIds(userId);
-    const provisional = splitBudget(preferences.dailyMinutes, preferences.goals);
+    const requests = await loadMissionRequests(store, userId, date, log);
+    const provisional = splitBudget(budgetMinutes, todays);
 
     const frequencies = await loadFrequencies(
-      preferences.goals.map((g) => g.language),
+      todays.map((g) => g.language),
       { load: input.loadFrequency, log },
     );
     const pools = new Map<Language, CandidateContent[]>();
-    for (const [i, goal] of preferences.goals.entries()) {
+    for (const [i, goal] of todays.entries()) {
       const pool = await loadUsablePool(store, {
         goal,
         preferences,
@@ -308,18 +354,19 @@ export async function generateMission(input: GenerateMissionInput): Promise<Gene
         minutes: provisional[i].minutes,
         excludeIds,
         now: startedAt,
+        topic: requests[goal.language],
       });
       if (pool) pools.set(goal.language, pool);
     }
 
-    const goals = preferences.goals.filter((g) => pools.has(g.language));
+    const goals = todays.filter((g) => pools.has(g.language));
     if (goals.length === 0) {
       await store.fail(missionId, "no content");
       return { status: "no-content" };
     }
 
     // The whole budget goes to the languages that have content.
-    const shares = splitBudget(preferences.dailyMinutes, goals);
+    const shares = splitBudget(budgetMinutes, goals);
     const request: GenerationRequest = generationRequestSchema.parse({
       date,
       sessions: goals.map((goal, index) =>
@@ -332,7 +379,7 @@ export async function generateMission(input: GenerateMissionInput): Promise<Gene
           excludeIds,
           now: startedAt,
           pool: pools.get(goal.language) ?? [],
-          productionMode: chooseProductionMode(date, index),
+          productionMode: chooseProductionMode(date, goal.days, preferences.goals.indexOf(goal)),
         }),
       ),
     });

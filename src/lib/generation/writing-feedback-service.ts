@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { addDays } from "@/lib/domain/dates";
-import { cefrLevelSchema, languageSchema, type DateKey } from "@/lib/schemas/common";
+import { cefrLevelSchema, languageSchema, type CefrLevel, type DateKey } from "@/lib/schemas/common";
 import { productionTaskSchema, type ProductionTask } from "@/lib/schemas/mission";
 import { languagePurposeSchema } from "@/lib/schemas/preferences";
 import {
@@ -47,6 +47,17 @@ export interface RequestWritingFeedbackInput {
 }
 
 const MAX = WRITING_FEEDBACK_LIMITS.attemptsPerSession;
+
+/**
+ * Level a text is judged against: the production level when the assessment set one, else the single
+ * level. The language may have been removed from the preferences since: fall back on the content's level.
+ */
+export function reviewLevel(
+  goal: { level: string; production_level: string | null } | null,
+  contentLevel: string,
+): CefrLevel {
+  return cefrLevelSchema.parse(goal?.production_level ?? goal?.level ?? contentLevel);
+}
 
 /**
  * Reviews the written production of a session. Never throws for a model failure: the review is
@@ -117,7 +128,7 @@ export function createSupabaseWritingFeedbackStore(client: Client): WritingFeedb
       const [goal, existing] = await Promise.all([
         client
           .from("user_languages")
-          .select("level, target_level, purpose")
+          .select("level, production_level, target_level, purpose")
           .eq("user_id", userId)
           .eq("language", row.language)
           .maybeSingle(),
@@ -132,8 +143,7 @@ export function createSupabaseWritingFeedbackStore(client: Client): WritingFeedb
       if (existing.error) throw new Error(`Supabase (correction existante) : ${existing.error.message}`);
 
       const production = productionTaskSchema.parse(row.production);
-      // The language may have been removed from the preferences since: fall back on the content's level.
-      const level = cefrLevelSchema.parse(goal.data?.level ?? row.contents.difficulty);
+      const level = reviewLevel(goal.data, row.contents.difficulty);
       const stored = existing.data?.feedback ? writingFeedbackSchema.safeParse(existing.data.feedback) : null;
       return {
         missionDate: row.missions.mission_date,

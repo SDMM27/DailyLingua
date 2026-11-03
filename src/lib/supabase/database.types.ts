@@ -69,6 +69,52 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"assessment_grading_quota": {
+                  Row: {
+                    "attempts": number,"day": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "attempts": number,"day": string,"user_id": string
+                  }
+                  Update: {
+                    "attempts"?: number,"day"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "assessment_grading_quota_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"assessments": {
+                  Row: {
+                    "answers": NonNullable<Json>,"dossier_id": string,"graded_at": string | null,"grading_attempts": number,"id": string,"input_tokens": number | null,"language": string,"listening_plays": number,"model": string | null,"output_tokens": number | null,"prompt_version": string | null,"results": Json | null,"started_at": string,"status": string,"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "answers"?: NonNullable<Json>,"dossier_id": string,"graded_at"?: string | null,"grading_attempts"?: number,"id"?: string,"input_tokens"?: number | null,"language": string,"listening_plays"?: number,"model"?: string | null,"output_tokens"?: number | null,"prompt_version"?: string | null,"results"?: Json | null,"started_at"?: string,"status"?: string,"updated_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "answers"?: NonNullable<Json>,"dossier_id"?: string,"graded_at"?: string | null,"grading_attempts"?: number,"id"?: string,"input_tokens"?: number | null,"language"?: string,"listening_plays"?: number,"model"?: string | null,"output_tokens"?: number | null,"prompt_version"?: string | null,"results"?: Json | null,"started_at"?: string,"status"?: string,"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "assessments_language_fkey"
+      columns: ["language"]
+isOneToOne: false
+      referencedRelation: "languages"
+      referencedColumns: ["code"]
+    },{
+      foreignKeyName: "assessments_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"content_refusals": {
                   Row: {
                     "content_id": string,"created_at": string,"reason": string,"user_id": string
@@ -97,14 +143,14 @@ isOneToOne: false
                   ]
                 },"contents": {
                   Row: {
-                    "audio_url": string | null,"author": string | null,"categories": (string)[],"content_type": string,"created_at": string,"difficulty": string,"duration_minutes": number,"excerpt": string | null,"fetched_at": string,"id": string,"language": string,"published_at": string | null,"source_id": string,"summary": string,"title": string,"transcript_available": boolean,"updated_at": string,"url": string,"url_checked_at": string | null,"url_normalized": string | null,"url_status": string
+                    "audio_url": string | null,"author": string | null,"categories": (string)[],"content_type": string,"created_at": string,"difficulty": string,"duration_minutes": number,"excerpt": string | null,"fetched_at": string,"id": string,"language": string,"published_at": string | null,"source_id": string,"summary": string,"title": string,"topics": (string)[] | null,"transcript_available": boolean,"updated_at": string,"url": string,"url_checked_at": string | null,"url_normalized": string | null,"url_status": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "audio_url"?: string | null,"author"?: string | null,"categories"?: (string)[],"content_type": string,"created_at"?: string,"difficulty": string,"duration_minutes": number,"excerpt"?: string | null,"fetched_at"?: string,"id"?: string,"language": string,"published_at"?: string | null,"source_id": string,"summary": string,"title": string,"transcript_available"?: boolean,"updated_at"?: string,"url": string,"url_checked_at"?: string | null,"url_normalized"?: never,"url_status"?: string
+                    "audio_url"?: string | null,"author"?: string | null,"categories"?: (string)[],"content_type": string,"created_at"?: string,"difficulty": string,"duration_minutes": number,"excerpt"?: string | null,"fetched_at"?: string,"id"?: string,"language": string,"published_at"?: string | null,"source_id": string,"summary": string,"title": string,"topics"?: (string)[] | null,"transcript_available"?: boolean,"updated_at"?: string,"url": string,"url_checked_at"?: string | null,"url_normalized"?: never,"url_status"?: string
                   }
                   Update: {
-                    "audio_url"?: string | null,"author"?: string | null,"categories"?: (string)[],"content_type"?: string,"created_at"?: string,"difficulty"?: string,"duration_minutes"?: number,"excerpt"?: string | null,"fetched_at"?: string,"id"?: string,"language"?: string,"published_at"?: string | null,"source_id"?: string,"summary"?: string,"title"?: string,"transcript_available"?: boolean,"updated_at"?: string,"url"?: string,"url_checked_at"?: string | null,"url_normalized"?: never,"url_status"?: string
+                    "audio_url"?: string | null,"author"?: string | null,"categories"?: (string)[],"content_type"?: string,"created_at"?: string,"difficulty"?: string,"duration_minutes"?: number,"excerpt"?: string | null,"fetched_at"?: string,"id"?: string,"language"?: string,"published_at"?: string | null,"source_id"?: string,"summary"?: string,"title"?: string,"topics"?: (string)[] | null,"transcript_available"?: boolean,"updated_at"?: string,"url"?: string,"url_checked_at"?: string | null,"url_normalized"?: never,"url_status"?: string
                   }
                   Relationships: [
                     {
@@ -253,6 +299,32 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "mission_sessions"
       referencedColumns: ["id","user_id"]
+    }
+                  ]
+                },"mission_requests": {
+                  Row: {
+                    "created_at": string,"language": string,"mission_date": string,"topic": string,"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"language": string,"mission_date": string,"topic": string,"updated_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"language"?: string,"mission_date"?: string,"topic"?: string,"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "mission_requests_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "mission_requests_user_id_language_fkey"
+      columns: ["user_id","language"]
+isOneToOne: false
+      referencedRelation: "user_languages"
+      referencedColumns: ["user_id","language"]
     }
                   ]
                 },"mission_sessions": {
@@ -415,14 +487,14 @@ isOneToOne: false
                   ]
                 },"user_languages": {
                   Row: {
-                    "content_types": (string)[],"created_at": string,"focus": string,"id": string,"language": string,"level": string,"purpose": string,"target_level": string,"topics": (string)[],"updated_at": string,"user_id": string,"weight": number
+                    "content_types": (string)[],"created_at": string,"days": (number)[],"focus": string,"id": string,"language": string,"level": string,"production_level": string | null,"purpose": string,"target_level": string,"topics": (string)[],"updated_at": string,"user_id": string,"weight": number
                   }
                   ComputedFields: never
                   Insert: {
-                    "content_types"?: (string)[],"created_at"?: string,"focus"?: string,"id"?: string,"language": string,"level": string,"purpose"?: string,"target_level": string,"topics"?: (string)[],"updated_at"?: string,"user_id": string,"weight"?: number
+                    "content_types"?: (string)[],"created_at"?: string,"days"?: (number)[],"focus"?: string,"id"?: string,"language": string,"level": string,"production_level"?: string | null,"purpose"?: string,"target_level": string,"topics"?: (string)[],"updated_at"?: string,"user_id": string,"weight"?: number
                   }
                   Update: {
-                    "content_types"?: (string)[],"created_at"?: string,"focus"?: string,"id"?: string,"language"?: string,"level"?: string,"purpose"?: string,"target_level"?: string,"topics"?: (string)[],"updated_at"?: string,"user_id"?: string,"weight"?: number
+                    "content_types"?: (string)[],"created_at"?: string,"days"?: (number)[],"focus"?: string,"id"?: string,"language"?: string,"level"?: string,"production_level"?: string | null,"purpose"?: string,"target_level"?: string,"topics"?: (string)[],"updated_at"?: string,"user_id"?: string,"weight"?: number
                   }
                   Relationships: [
                     {
@@ -609,7 +681,13 @@ isOneToOne: false
                 }
           }
           Functions: {
-            "claim_mission_generation":
+            "apply_assessment_reception_level":
+{ Args: { "p_assessment_id": string,"p_level": string }; Returns: undefined
+                           },
+"claim_assessment_grading":
+{ Args: { "p_assessment_id": string,"p_user_id": string }; Returns: number | null
+                           },
+"claim_mission_generation":
 { Args: { "p_budget_minutes": number,"p_max_attempts"?: number,"p_mission_date": string,"p_stale_after"?: string,"p_user_id": string }; Returns: {
               "claimed": boolean,"mission_id": string,"status": string
             }[]
@@ -620,6 +698,9 @@ isOneToOne: false
 "claim_writing_feedback_attempt":
 { Args: { "p_session_id": string,"p_user_id": string }; Returns: number
                            },
+"complete_assessment_grading":
+{ Args: { "p_answers": Json,"p_assessment_id": string,"p_input_tokens": number | null,"p_model": string | null,"p_output_tokens": number | null,"p_production_level": string | null,"p_prompt_version": string | null,"p_results": Json,"p_user_id": string }; Returns: undefined
+                           },
 "complete_mission_generation":
 { Args: { "p_meta": Json,"p_mission_id": string,"p_sessions": Json }; Returns: undefined
                            },
@@ -628,6 +709,9 @@ isOneToOne: false
                            },
 "fail_mission_generation":
 { Args: { "p_error": string,"p_mission_id": string }; Returns: undefined
+                           },
+"is_valid_weekdays":
+{ Args: { "p_days": (number)[] }; Returns: boolean
                            },
 "list_due_mission_users":
 { Args: { "p_active_within"?: string,"p_limit"?: number,"p_max_attempts"?: number,"p_now"?: string }; Returns: {
@@ -664,8 +748,17 @@ isOneToOne: false
 "reserve_session_replacement":
 { Args: { "p_max_per_day"?: number,"p_session_id": string,"p_stale_after"?: string,"p_user_id": string }; Returns: undefined
                            },
+"save_assessment_answers":
+{ Args: { "p_answers": Json,"p_assessment_id": string,"p_listening_plays": number }; Returns: undefined
+                           },
 "save_preferences":
 { Args: { "p_content_types": (string)[] | null,"p_daily_minutes": number,"p_difficulty": string,"p_generation_time": string,"p_goals": Json,"p_show_streak"?: boolean,"p_time_zone": string,"p_topics": (string)[] | null }; Returns: undefined
+                           },
+"set_mission_request":
+{ Args: { "p_language": string,"p_mission_date": string,"p_topic": string | null }; Returns: undefined
+                           },
+"start_assessment":
+{ Args: { "p_dossier_id": string,"p_language": string }; Returns: string
                            }
           }
           Enums: {

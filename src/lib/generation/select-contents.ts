@@ -1,4 +1,5 @@
 import { sourceTraits, type SourceTraits } from "@/lib/content/source-traits";
+import { targetLevel } from "@/lib/domain/levels";
 import { coveragePenalty, coverageTarget, lexicalCoverage, type FrequencyRanks } from "@/lib/domain/frequency";
 import type { CandidateContent } from "@/lib/schemas/generation";
 import { CEFR_LEVELS, type CefrLevel, type ContentType, type Language } from "@/lib/schemas/common";
@@ -9,12 +10,8 @@ const MAX_AGE_DAYS = 14;
 /** Points off a source made for learners (explained in French or English, or for children), at A1–A2. */
 const LEARNER_SOURCE_BONUS = 3;
 
-/** Level the content should have: one below (comfortable), the same (matched) or above (challenge). */
-export function targetLevel(level: CefrLevel, mode: DifficultyMode): CefrLevel {
-  const offset = mode === "comfortable" ? -1 : mode === "challenge" ? 1 : 0;
-  const index = CEFR_LEVELS.indexOf(level) + offset;
-  return CEFR_LEVELS[Math.min(CEFR_LEVELS.length - 1, Math.max(0, index))];
-}
+// Lives in the domain (the topic choice needs it too); re-exported for the callers of this module.
+export { targetLevel };
 
 export interface RankOptions {
   level: CefrLevel;

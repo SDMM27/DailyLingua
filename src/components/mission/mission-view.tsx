@@ -11,7 +11,9 @@ import {
 import { CheckIcon } from "@/components/icons";
 import { languageStyle } from "@/components/ui/language-style";
 import { Card, Eyebrow, LanguageTag, ProgressBar } from "@/components/ui/primitives";
-import { ACTIVITY_LABELS } from "@/lib/domain/labels";
+import { ACTIVITY_LABELS, topicLabel } from "@/lib/domain/labels";
+import type { Language } from "@/lib/schemas/common";
+import type { Topic } from "@/lib/schemas/preferences";
 import { completedMinutes, missionMinutes, sessionMinutes } from "@/lib/domain/time-budget";
 import type { LanguageSession, Mission, MissionProgress } from "@/lib/schemas/mission";
 import type { WritingFeedbackResult, WritingReviewState } from "@/lib/schemas/writing-feedback";
@@ -39,11 +41,14 @@ export function MissionView({
   progress,
   persist,
   canReviewWriting = false,
+  requestedTopics = {},
 }: {
   mission: Mission;
   progress: MissionProgress;
   persist: boolean;
   canReviewWriting?: boolean;
+  /** Domain asked for today, per language (« Demain, plutôt » of the day before). */
+  requestedTopics?: Partial<Record<Language, Topic>>;
 }) {
   const [done, setDone] = useState<ReadonlySet<string>>(() => new Set(progress.completedActivityIds));
   const [answers, setAnswers] = useState<Answers>(progress.answers);
@@ -156,6 +161,7 @@ export function MissionView({
             }
             review={progress.writingReviews[session.id]}
             canReportNoAccess={persist}
+            requestedTopic={requestedTopics[session.language]}
           />
         ))}
 
@@ -185,6 +191,7 @@ function SessionSection({
   onRequestFeedback,
   review,
   canReportNoAccess,
+  requestedTopic,
 }: {
   session: LanguageSession;
   done: ReadonlySet<string>;
@@ -199,6 +206,8 @@ function SessionSection({
   review?: WritingReviewState;
   /** Offers « Je n’ai pas accès »; false in the demo, where nothing can be replaced. */
   canReportNoAccess: boolean;
+  /** Domain the learner asked for today in this language, if any. */
+  requestedTopic?: Topic;
 }) {
   const { language } = session;
   const style = languageStyle(language);
@@ -213,6 +222,12 @@ function SessionSection({
       </div>
 
       <ContentCard content={session.content} sessionId={canReportNoAccess ? session.id : undefined} />
+
+      {requestedTopic && !session.content.topics.includes(requestedTopic) && (
+        <p className="px-1 text-[13px] leading-relaxed text-muted">
+          Pas de contenu {topicLabel(requestedTopic).toLocaleLowerCase("fr")} à ton niveau aujourd’hui : voici un autre sujet.
+        </p>
+      )}
 
       <Card>
         <Eyebrow className="mb-3">Étapes</Eyebrow>

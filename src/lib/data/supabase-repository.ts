@@ -9,6 +9,7 @@ import { guestTrialStatus, type GuestTrialStatus } from "@/lib/domain/guest-tria
 import { LANGUAGE_CODES } from "@/lib/domain/languages";
 import { RETENTION_MIN_DELAY_DAYS, RETENTION_WINDOW_DAYS, retentionByMode, type RetentionRow } from "@/lib/domain/review-modes";
 import { applyReview, initialReviewState } from "@/lib/domain/spaced-repetition";
+import { busiestDayMinutes } from "@/lib/domain/schedule";
 import type { Database } from "@/lib/supabase/database.types";
 import { availableLanguages } from "@/lib/content/availability";
 import { SOURCE_CATALOG } from "@/lib/content/catalog";
@@ -22,7 +23,17 @@ import {
   type RecordAlphabetPracticeInput,
 } from "@/lib/schemas/alphabet";
 import { grammarCardSchema, type GrammarCard, type RecordGrammarPracticeInput } from "@/lib/schemas/grammar";
-import { dateKeySchema, type ContentType, type DateKey, type Language } from "@/lib/schemas/common";
+import { dateKeySchema, type CefrLevel, type ContentType, type DateKey, type Language } from "@/lib/schemas/common";
+import {
+  assessmentAnswersSchema,
+  assessmentSchema,
+  type Assessment,
+  type AssessmentAnswers,
+  type AssessmentGradingResult,
+} from "@/lib/schemas/assessment";
+import type { GradeAssessmentOutcome } from "@/lib/assessment/grade-assessment";
+import { AssessmentNotFoundError } from "@/lib/assessment/supabase-store";
+import { MISSION_READY_MESSAGE, missionRequestSchema, type MissionRequest } from "@/lib/schemas/mission-request";
 import {
   contentListItemSchema,
   paidSourceSchema,
@@ -54,7 +65,7 @@ import {
 } from "@/lib/schemas/correction-card";
 import { productionEntrySchema, type ProductionEntry } from "@/lib/schemas/production";
 import { placementSummarySchema, type PlacementRecord, type PlacementSummary } from "@/lib/schemas/placement";
-import { preferencesSchema, type Preferences } from "@/lib/schemas/preferences";
+import { preferencesSchema, topicSchema, type Preferences, type Topic } from "@/lib/schemas/preferences";
 import {
   reviewGradeSchema,
   reviewModeSchema,
@@ -97,6 +108,14 @@ const HISTORY_LIMIT = 30;
 const PRODUCTIONS_LIMIT = 300;
 /** A category seen in another review within this many days makes a correction a recurring error. */
 const RECURRING_ERROR_DAYS = 30;
+
+/** Contents are counted over this window and this many rows when offering a domain for the next mission. */
+const TOPIC_AVAILABILITY_DAYS = 14;
+const TOPIC_AVAILABILITY_ROWS = 500;
+/** SQLSTATE of set_mission_request: the mission of that day exists already. */
+const MISSION_ALREADY_GENERATED = "DL003";
+/** SQLSTATE of start_assessment: guests cannot take the assessment. */
+const GUEST_NOT_ALLOWED = "DL004";
 
 type Client = SupabaseClient<Database>;
 
@@ -159,6 +178,7 @@ const LIST_OTHER_LANGUAGE = "Cette liste est dans une autre langue.";
 const PAGE_SIZE = 1000;
 /** Raised by record_placement_test when the language is not one of the user's. */
 const NO_DATA_FOUND = "P0002";
+const INVALID_PARAMETER_VALUE = "22023";
 
 function toVocabularyItem(row: VocabularyRow): VocabularyItem {
   return vocabularyItemSchema.parse({
@@ -303,9 +323,11 @@ export async function fetchPreferences(client: Client, userId: string): Promise<
       language: row.language,
       level: row.level,
       targetLevel: row.target_level,
+      productionLevel: row.production_level ?? undefined,
       focus: row.focus,
       purpose: row.purpose,
       weight: row.weight,
+      days: row.days,
       topics: row.topics,
       contentTypes: row.content_types,
     })),
@@ -346,6 +368,8 @@ export function createSupabaseRepository(
     replaceSession?: (userId: string, sessionId: string) => Promise<ReplaceSessionOutcome>;
     /** Reviews a written production (service role, server only). Absent: reviews are off. */
     reviewWriting?: ((input: RequestWritingFeedbackInput) => Promise<WritingFeedbackOutcome>) | null;
+    /** Grades a skills assessment (service role, server only). Absent: grading is off. */
+    gradeAssessment?: ((input: { userId: string; assessmentId: string }) => Promise<GradeAssessmentOutcome>) | null;
     /** Suggests French translations for imported words (service role, server only). Absent: translation is off. */
     translateVocabulary?: ((input: TranslateVocabularyRequest) => Promise<VocabularyTranslationResult>) | null;
   } = {},
@@ -369,7 +393,7 @@ export function createSupabaseRepository(
         `id, mission_date, budget_minutes, generation_meta,
          mission_sessions (
            id, position, language, questions, expressions, production,
-           contents ( title, content_type, language, url, difficulty, duration_minutes, summary,
+           contents ( title, content_type, language, url, difficulty, duration_minutes, summary, topics,
                       audio_url, transcript_available, sources ( key, name, homepage_url ) ),
            mission_activities ( id, position, kind, title, estimated_minutes )
          )`,
@@ -411,6 +435,7 @@ export function createSupabaseRepository(
             difficulty: content.difficulty,
             durationMinutes: content.duration_minutes,
             summary: content.summary,
+            topics: content.topics ?? [],
             audioUrl: content.audio_url ?? undefined,
             transcriptAvailable: content.transcript_available,
           },
@@ -470,6 +495,7 @@ export function createSupabaseRepository(
       case "pending":
       case "failed":
       case "no-content":
+      case "rest-day":
         return { status: outcome.status };
       case "no-preferences":
         throw new UserFacingError("Choisis d’abord tes langues.");
@@ -673,7 +699,7 @@ export function createSupabaseRepository(
 
   async function savePreferences(preferences: Preferences): Promise<void> {
     const { error } = await client.rpc("save_preferences", {
-      p_daily_minutes: preferences.dailyMinutes,
+      p_daily_minutes: busiestDayMinutes(preferences.goals),
       // Topics and formats travel per language; the profile's own columns are left as they are.
       p_topics: null,
       p_content_types: null,
@@ -688,6 +714,7 @@ export function createSupabaseRepository(
         focus: g.focus,
         purpose: g.purpose,
         weight: g.weight,
+        days: g.days,
         topics: g.topics,
         content_types: g.contentTypes,
       })),
@@ -1407,14 +1434,14 @@ export function createSupabaseRepository(
   async function listContents(
     languages: Language[],
     perLanguage: number,
-    options?: { types?: ContentType[] },
+    options?: { types?: ContentType[]; topics?: Topic[] },
   ): Promise<ContentListItem[]> {
     const lists = await Promise.all(
       languages.map(async (language) => {
         let query = client
           .from("contents")
           .select(
-            `id, language, content_type, title, url, audio_url, difficulty, duration_minutes, summary, author, published_at,
+            `id, language, content_type, title, url, audio_url, difficulty, duration_minutes, summary, author, published_at, topics,
              sources!inner ( ${SOURCE_COLUMNS} )`,
           )
           .eq("language", language)
@@ -1424,6 +1451,7 @@ export function createSupabaseRepository(
           .not("sources.key", "is", null);
         if (contentPolicy === "commercial") query = query.eq("sources.commercial_use", true);
         if (options?.types) query = query.in("content_type", options.types);
+        if (options?.topics?.length) query = query.overlaps("topics", options.topics);
         const { data, error } = await query
           .order("published_at", { ascending: false, nullsFirst: false })
           .limit(perLanguage);
@@ -1445,6 +1473,7 @@ export function createSupabaseRepository(
         audioUrl: row.audio_url ?? undefined,
         author: row.author ?? undefined,
         publishedAt: row.published_at,
+        topics: row.topics ?? [],
         source: {
           key: source.key,
           name: source.name,
@@ -1454,6 +1483,132 @@ export function createSupabaseRepository(
         },
       });
     });
+  }
+
+  async function listMissionRequests(): Promise<MissionRequest[]> {
+    const today = await getToday();
+    const { data, error } = await client
+      .from("mission_requests")
+      .select("mission_date, language, topic")
+      .eq("user_id", userId)
+      .gte("mission_date", today)
+      .order("mission_date");
+    if (error) throw new Error(`Supabase (domaines demandés) : ${error.message}`);
+    return data.map((row) => missionRequestSchema.parse({ date: row.mission_date, language: row.language, topic: row.topic }));
+  }
+
+  async function setMissionRequest(input: { language: Language; date: DateKey; topic: Topic | null }): Promise<void> {
+    const { error } = await client.rpc("set_mission_request", {
+      p_language: input.language,
+      p_mission_date: input.date,
+      p_topic: input.topic,
+    });
+    if (error?.code === MISSION_ALREADY_GENERATED) {
+      throw new UserFacingError(MISSION_READY_MESSAGE);
+    }
+    if (error?.code === NO_DATA_FOUND) throw new UserFacingError("Cette langue ne fait pas partie de tes langues.");
+    if (error?.code === INVALID_PARAMETER_VALUE) throw new UserFacingError("Ce jour n’est pas disponible pour ce choix.");
+    if (error) throw new Error(`Supabase (domaine de la prochaine mission) : ${error.message}`);
+  }
+
+  async function startAssessment(language: Language, dossierId: string): Promise<string> {
+    const { data, error } = await client.rpc("start_assessment", { p_language: language, p_dossier_id: dossierId });
+    if (error?.code === GUEST_NOT_ALLOWED) {
+      throw new UserFacingError("Le bilan complet demande un compte. Crée le tien pour le faire.");
+    }
+    if (error?.code === NO_DATA_FOUND) throw new UserFacingError("Cette langue ne fait pas partie de tes langues.");
+    if (error?.code === INVALID_PARAMETER_VALUE) throw new UserFacingError("Ce bilan n’existe pas pour cette langue.");
+    if (error) throw new Error(`Supabase (démarrage du bilan) : ${error.message}`);
+    return data;
+  }
+
+  async function selectAssessments(language: Language | undefined, inProgressOnly: boolean): Promise<Assessment[]> {
+    let query = client
+      .from("assessments")
+      .select("id, language, dossier_id, status, answers, listening_plays, results, started_at, graded_at")
+      .eq("user_id", userId);
+    if (language) query = query.eq("language", language);
+    if (inProgressOnly) query = query.eq("status", "in_progress");
+    const { data, error } = await query.order("started_at", { ascending: false });
+    if (error) throw new Error(`Supabase (bilans) : ${error.message}`);
+    return data.map((row) =>
+      assessmentSchema.parse({
+        id: row.id,
+        language: row.language,
+        dossierId: row.dossier_id,
+        status: row.status,
+        answers: row.answers,
+        listeningPlays: row.listening_plays,
+        results: row.results,
+        startedAt: row.started_at,
+        gradedAt: row.graded_at,
+      }),
+    );
+  }
+
+  async function getCurrentAssessment(language: Language): Promise<Assessment | null> {
+    return (await selectAssessments(language, true))[0] ?? null;
+  }
+
+  async function listAssessments(language?: Language): Promise<Assessment[]> {
+    return selectAssessments(language, false);
+  }
+
+  async function saveAssessmentAnswers(assessmentId: string, answers: AssessmentAnswers, listeningPlays: number): Promise<void> {
+    const { error } = await client.rpc("save_assessment_answers", {
+      p_assessment_id: assessmentId,
+      p_answers: assessmentAnswersSchema.parse(answers),
+      p_listening_plays: listeningPlays,
+    });
+    if (error?.code === NO_DATA_FOUND) throw new UserFacingError("Ce bilan est introuvable ou déjà terminé.");
+    if (error?.code === INVALID_PARAMETER_VALUE) throw new UserFacingError("Ces réponses ne peuvent pas être enregistrées.");
+    if (error) throw new Error(`Supabase (réponses du bilan) : ${error.message}`);
+  }
+
+  async function gradeAssessment(assessmentId: string): Promise<AssessmentGradingResult> {
+    // Grading off or failing unexpectedly: the attempts left are unknown, not none.
+    if (!options.gradeAssessment) return { status: "unavailable", attemptsLeft: null };
+    let outcome: GradeAssessmentOutcome;
+    try {
+      outcome = await options.gradeAssessment({ userId, assessmentId });
+    } catch (error) {
+      // Graded by a concurrent request, or closed meanwhile.
+      if (error instanceof AssessmentNotFoundError) throw new UserFacingError(error.message);
+      console.error(error);
+      return { status: "unavailable", attemptsLeft: null };
+    }
+    if (outcome.status === "not-found") throw new UserFacingError("Ce bilan est introuvable.");
+    return outcome;
+  }
+
+  async function applyAssessmentLevel(assessmentId: string, level: CefrLevel): Promise<void> {
+    const { error } = await client.rpc("apply_assessment_reception_level", { p_assessment_id: assessmentId, p_level: level });
+    if (error?.code === NO_DATA_FOUND) throw new UserFacingError("Ce bilan est introuvable, ou cette langue ne fait plus partie de tes langues.");
+    if (error?.code === INVALID_PARAMETER_VALUE) throw new UserFacingError("Ce niveau ne correspond pas à ton bilan.");
+    if (error) throw new Error(`Supabase (niveau du bilan) : ${error.message}`);
+  }
+
+  async function listTopicAvailability(language: Language, levels: CefrLevel[]): Promise<Partial<Record<Topic, number>>> {
+    const since = new Date(Date.now() - TOPIC_AVAILABILITY_DAYS * 86_400_000).toISOString();
+    // Same filters as listContents: active feed sources, licence policy, links not broken.
+    let query = client
+      .from("contents")
+      .select("topics, sources!inner ( active, key, commercial_use )")
+      .eq("language", language)
+      .in("difficulty", levels)
+      .gte("published_at", since)
+      .not("topics", "is", null)
+      .neq("url_status", "broken")
+      .eq("sources.active", true)
+      .not("sources.key", "is", null);
+    if (contentPolicy === "commercial") query = query.eq("sources.commercial_use", true);
+    const { data, error } = await query.order("published_at", { ascending: false }).limit(TOPIC_AVAILABILITY_ROWS);
+    if (error) throw new Error(`Supabase (domaines disponibles) : ${error.message}`);
+    const counts: Partial<Record<Topic, number>> = {};
+    for (const row of data) {
+      for (const topic of topicSchema.array().catch([]).parse(row.topics)) counts[topic] = (counts[topic] ?? 0) + 1;
+    }
+    return counts;
   }
 
   async function listSources(): Promise<SourceInfo[]> {
@@ -1530,6 +1685,15 @@ export function createSupabaseRepository(
     getPreferences,
     savePreferences,
     getMission,
+    listMissionRequests,
+    setMissionRequest,
+    startAssessment,
+    getCurrentAssessment,
+    listAssessments,
+    saveAssessmentAnswers,
+    gradeAssessment,
+    applyAssessmentLevel,
+    listTopicAvailability,
     getMissionProgress,
     prepareTodayMission,
     replaceInaccessibleContent,

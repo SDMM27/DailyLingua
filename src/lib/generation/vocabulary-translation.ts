@@ -1,4 +1,3 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { languageInfo } from "@/lib/domain/languages";
@@ -15,6 +14,7 @@ import {
 import type { Database } from "@/lib/supabase/database.types";
 import { toGenerationError } from "./claude-generator";
 import { DEFAULT_MISSION_MODEL } from "./config";
+import { createFailoverParseClient } from "./anthropic-client";
 import { GenerationError } from "./errors";
 import { escapeData } from "./prompt";
 
@@ -88,7 +88,7 @@ export function validateVocabularyTranslation(
 }
 
 export interface ClaudeVocabularyTranslatorOptions {
-  apiKey?: string;
+  apiKeys?: string[];
   model?: string;
   client?: TranslationParseClient;
   /** Per attempt; the SDK retries once. Default 20 s: the user is waiting on the screen. */
@@ -101,11 +101,10 @@ export function createClaudeVocabularyTranslator(options: ClaudeVocabularyTransl
   let client: TranslationParseClient | undefined = options.client;
 
   function getClient(): TranslationParseClient {
-    client ??= new Anthropic({
-      apiKey: options.apiKey,
-      timeout: options.timeoutMs ?? 20_000,
-      maxRetries: 1,
-    }) as unknown as TranslationParseClient;
+    client ??= createFailoverParseClient<TranslationParseClient>({
+      apiKeys: options.apiKeys ?? [],
+      timeoutMs: options.timeoutMs ?? 20_000,
+    });
     return client;
   }
 

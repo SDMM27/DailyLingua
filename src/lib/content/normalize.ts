@@ -1,6 +1,7 @@
 import { languageInfo } from "@/lib/domain/languages";
 import type { CefrLevel, ContentType, Language } from "@/lib/schemas/common";
 import type { ParsedSourceDefinition } from "@/lib/schemas/content";
+import type { Topic } from "@/lib/schemas/preferences";
 import type { RawFeedItem } from "./feed-parser";
 import {
   MAX_SUMMARY_LENGTH,
@@ -29,6 +30,8 @@ export interface ContentDraft {
   publishedAt: Date | null;
   /** Podcasts only: the episode's audio file, when the feed's enclosure passed the checks. */
   audioUrl: string | null;
+  /** Domains from the source's `defaultTopics`; null: not classified yet (the classifier will read it). */
+  topics: Topic[] | null;
 }
 
 export type RejectReason =
@@ -205,6 +208,7 @@ export function normalizeItem(rawItem: RawFeedItem, source: ParsedSourceDefiniti
       categories,
       publishedAt,
       audioUrl: audio?.toString() ?? null,
+      topics: source.defaultTopics ?? null,
     },
   };
 }

@@ -1,7 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { ParsedSourceDefinition } from "@/lib/schemas/content";
 import type { Database } from "@/lib/supabase/database.types";
+import type { Language } from "@/lib/domain/languages";
+import type { Topic } from "@/lib/schemas/preferences";
 import type { ContentStore } from "./ingest";
+import type { ContentTopicStore } from "./topics";
 
 type Client = SupabaseClient<Database>;
 type SourceInsert = Database["public"]["Tables"]["sources"]["Insert"];
@@ -17,7 +20,7 @@ function fail(what: string, error: { message: string }): never {
  * Content store on Supabase. `client` must use the service role key: sources and contents are
  * shared tables that signed-in users can only read (RLS, migration 5).
  */
-export function createSupabaseContentStore(client: Client): ContentStore {
+export function createSupabaseContentStore(client: Client): ContentStore & ContentTopicStore {
   return {
     async syncSources(sources, active) {
       const rows: SourceInsert[] = sources.map((s: ParsedSourceDefinition) => ({
@@ -74,6 +77,7 @@ export function createSupabaseContentStore(client: Client): ContentStore {
             categories: d.categories,
             published_at: d.publishedAt?.toISOString() ?? null,
             audio_url: d.audioUrl,
+            topics: d.topics,
             transcript_available: false,
           })),
           // Known URLs are left untouched: a content may already be used by a mission.
@@ -118,6 +122,50 @@ export function createSupabaseContentStore(client: Client): ContentStore {
         .update({ url_checked_at: new Date().toISOString(), ...(status ? { url_status: status } : {}) })
         .eq("id", id);
       if (error) fail("statut du lien", error);
+    },
+
+    async listUnclassifiedContents(limit) {
+      const { data, error } = await client
+        .from("contents")
+        .select("id, language, title, summary, sources!inner ( active )")
+        .is("topics", null)
+        .neq("url_status", "broken")
+        .eq("sources.active", true)
+        .order("fetched_at", { ascending: false })
+        .limit(limit);
+      if (error) fail("contenus à classer", error);
+      return data.map((row) => ({
+        id: row.id,
+        language: row.language as Language,
+        title: row.title,
+        summary: row.summary,
+      }));
+    },
+
+    async setContentTopics(updates: { id: string; topics: Topic[] }[]) {
+      // One update per row: the batches are small (20) and each row has its own value.
+      for (const { id, topics } of updates) {
+        const { error } = await client.from("contents").update({ topics }).eq("id", id);
+        if (error) fail("thèmes du contenu", error);
+      }
+    },
+
+    async applySourceTopics(sourceKey, topics) {
+      const { data: source, error: sourceError } = await client
+        .from("sources")
+        .select("id")
+        .eq("key", sourceKey)
+        .maybeSingle();
+      if (sourceError) fail("source", sourceError);
+      if (!source) return 0;
+      const { data, error } = await client
+        .from("contents")
+        .update({ topics })
+        .eq("source_id", source.id)
+        .is("topics", null)
+        .select("id");
+      if (error) fail("thèmes de la source", error);
+      return data.length;
     },
   };
 }
