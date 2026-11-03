@@ -44,20 +44,32 @@ export interface ClassifyPendingResult {
 }
 
 /**
- * Classifies up to `limit` unclassified contents, batch after batch. A failing batch is counted and
+ * Classifies up to `limit` unclassified contents, `concurrency` batches at a time. A failing batch is counted and
  * skipped and logged, never thrown: the ingestion must not fail because the model is down. An item the
  * model did not answer stays unclassified.
  */
 export async function classifyPendingContents(
   store: ContentTopicStore,
   classifier: TopicClassifier,
-  { limit = 200, log = () => {} }: { limit?: number; log?: (message: string) => void } = {},
+  {
+    limit = 200,
+    concurrency = 1,
+    log = () => {},
+  }: { limit?: number; concurrency?: number; log?: (message: string) => void } = {},
 ): Promise<ClassifyPendingResult> {
   const pending = await store.listUnclassifiedContents(limit);
+  const batches: UnclassifiedContent[][] = [];
+  for (let from = 0; from < pending.length; from += TOPIC_BATCH_SIZE) batches.push(pending.slice(from, from + TOPIC_BATCH_SIZE));
   let classified = 0;
   let failedBatches = 0;
-  for (let from = 0; from < pending.length; from += TOPIC_BATCH_SIZE) {
-    const batch = pending.slice(from, from + TOPIC_BATCH_SIZE);
+  let next = 0;
+  async function worker() {
+    while (next < batches.length) {
+      const batch = batches[next++];
+      await classifyBatch(batch);
+    }
+  }
+  async function classifyBatch(batch: UnclassifiedContent[]) {
     try {
       const answers = await classifier.classify(batch.map(({ language, title, summary }) => ({ language, title, summary })));
       const updates = batch.flatMap((content, index) => {
@@ -72,5 +84,6 @@ export async function classifyPendingContents(
       log(`topics: batch of ${batch.length} failed: ${error instanceof GenerationError ? `${error.reason}: ${error.message}` : "unexpected error"}`);
     }
   }
+  await Promise.all(Array.from({ length: Math.max(1, Math.min(concurrency, batches.length)) }, worker));
   return { classified, failedBatches };
 }

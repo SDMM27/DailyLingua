@@ -61,6 +61,24 @@ describe("classifyPendingContents", () => {
     expect(saved.has("c40")).toBe(true);
   });
 
+  it("runs batches concurrently and still classifies each content once", async () => {
+    const { store, saved } = fakeStore(contents(90));
+    let running = 0;
+    let peak = 0;
+    const classify = vi.fn(async (items: unknown[]) => {
+      running += 1;
+      peak = Math.max(peak, running);
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      running -= 1;
+      return items.map(() => ["sport"] as Topic[]);
+    });
+    const result = await classifyPendingContents(store, { classify }, { limit: 90, concurrency: 3 });
+    expect(result).toEqual({ classified: 90, failedBatches: 0 });
+    expect(classify).toHaveBeenCalledTimes(5);
+    expect(peak).toBe(3);
+    expect(saved.size).toBe(90);
+  });
+
   it("logs why a batch failed, without the raw error", async () => {
     const { store } = fakeStore(contents(1));
     const classifier = {

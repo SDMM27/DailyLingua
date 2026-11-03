@@ -19,9 +19,11 @@ export async function GET(request: Request) {
         ? {
             store,
             classifier: createClaudeTopicClassifier({ apiKeys: topicsConfig.apiKeys, model: topicsConfig.model }),
-            // 5 sequential batches at most, so the run stays well inside maxDuration after the feeds;
-            // the backlog goes through `npm run content:topics -- --backfill`.
-            limit: 100,
+            // About 1,200 contents arrive a day (4 runs): 400 a run keeps up. 20 batches, 4 at a time,
+            // take about 20 s, well inside maxDuration after the feeds; a backlog goes through
+            // `npm run content:topics -- --backfill`.
+            limit: 400,
+            concurrency: 4,
           }
         : undefined,
     });
