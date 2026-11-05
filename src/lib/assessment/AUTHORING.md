@@ -79,7 +79,7 @@ L'épreuve d'écoute peut porter sur un passage d'une vidéo YouTube au lieu d'u
 
 - Lecture par le lecteur intégré seulement (`youtube-nocookie.com`) : pas de téléchargement, pas de son
   seul, lecteur jamais masqué. Sous-titres YouTube coupés pendant l'épreuve (`cc_load_policy=0`,
-  contrôles masqués) : choisir des passages sans texte incrusté qui donne les réponses.
+  contrôles masqués, module de sous-titres déchargé à chaque lecture) : choisir des passages sans texte incrusté qui donne les réponses.
 - **Pas de transcription stockée** : seulement l'identifiant, `title` et `channel` (attribution affichée
   sous le lecteur), `start` et `end` en secondes entières, nos questions et nos réponses de référence.
   Il n'y a pas de script : `audio` reste `null`.

@@ -5,7 +5,7 @@ Décision du 2026-11-03 : l’épreuve de compréhension orale du bilan peut s�
 Règles :
 
 - Lecture par le lecteur intégré seulement (youtube-nocookie) : pas de téléchargement, pas de son seul, lecteur jamais masqué.
-- Sous-titres YouTube désactivés pendant l’épreuve (`cc_load_policy=0`, contrôles masqués) ; choisir des passages sans texte incrusté qui donne les réponses.
+- Sous-titres YouTube désactivés pendant l’épreuve (`cc_load_policy=0`, contrôles masqués, et module de sous-titres déchargé à chaque lecture : `cc_load_policy=0` ne suffit pas quand le spectateur a activé les sous-titres sur YouTube, constaté le 2026-11-05) ; choisir des passages sans texte incrusté qui donne les réponses.
 - On ne stocke pas la transcription : seulement l’identifiant de la vidéo, le début, la fin, nos questions et nos réponses de référence.
 - Une vidéo supprimée, privée ou non intégrable rend le dossier indisponible : à contrôler par `assessment:check`.
 - Prévenir l’apprenant avant l’épreuve qu’une publicité peut précéder l’extrait, à chaque écoute (constaté : pub avant la vidéo, et pubs au milieu quand on saute au début du passage).
@@ -19,6 +19,7 @@ Les questions ci-dessous sont rédigées d’après les sous-titres manuels de l
 - Vidéo : https://www.youtube.com/watch?v=8OlKzxWUlBk (`8OlKzxWUlBk`), intégrable.
 - Passage : 5:17 → 6:04 (≈ 47 s), de « После зарядки… » à « …Ну или просто сэндвичи. ».
 - Débit lent et articulé, un seul locuteur.
+- **Étiquette incrustée « Завтрак / Breakfast »** vers 5:40 : elle donne la réponse à la question 1. Changer de passage ou de question.
 
 1. **Selon Max, quelle est la partie la plus agréable du matin ?**
    Réponse : le petit-déjeuner.
@@ -64,7 +65,7 @@ Les questions ci-dessous sont rédigées d’après les sous-titres manuels de l
 
 ## Les neuf autres passages (2026-11-05)
 
-Choisis d’après les sous-titres de la chaîne (manuels, sauf mention) ; questions, réponses de référence et éléments attendus dans chaque dossier (`src/lib/assessment/dossiers/<langue>/<niveau>-1.ts`). Mêmes points à valider à l’écoute, `checkedOn: null` partout. Aucune image du passage n’a pu être vérifiée (YouTube place une publicité à chaque saut dans la vidéo) : le texte incrusté reste à contrôler pour tous.
+Choisis d’après les sous-titres de la chaîne (manuels, sauf mention) ; questions, réponses de référence et éléments attendus dans chaque dossier (`src/lib/assessment/dossiers/<langue>/<niveau>-1.ts`). Mêmes points à valider à l’écoute, `checkedOn: null` partout. Une image de chaque passage a été vue le 2026-11-05, sous-titres YouTube coupés : visages face caméra (ru A1, B1, C1, C2, it C1), scène de conférence (it C2), image fixe de titre sans réponse (it A1, A2), plan de pizza (it B1). Une seule image par passage : le reste du passage reste à contrôler à l’écoute.
 
 | Dossier | Vidéo | Passage | Contenu, remarques |
 | ------- | ----- | ------- | ------------------ |

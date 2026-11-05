@@ -10,6 +10,7 @@ interface YTPlayer {
   playVideo(): void;
   pauseVideo(): void;
   getCurrentTime(): number;
+  unloadModule(name: string): void;
   destroy(): void;
 }
 interface YTNamespace {
@@ -150,6 +151,9 @@ export function YouTubeListeningPlayer({
             onStateChange: ({ data }) => {
               if (cancelled || !player) return;
               if (data === STATE_PLAYING) {
+                // cc_load_policy=0 does not override a viewer who turned subtitles on in YouTube: the
+                // captions module loads with each video, so it is unloaded every time playback starts.
+                player.unloadModule("captions");
                 // An advert may play before the passage: it only counts once the passage itself plays.
                 const time = player.getCurrentTime();
                 if (sessionRef.current === "starting" && Number.isFinite(time) && time < start - 2) return;

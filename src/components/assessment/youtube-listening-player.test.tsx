@@ -19,6 +19,7 @@ class FakePlayer {
   loadVideoById = vi.fn();
   playVideo = vi.fn();
   pauseVideo = vi.fn();
+  unloadModule = vi.fn();
   destroy = vi.fn();
   constructor(
     public element: HTMLElement,
@@ -136,6 +137,18 @@ describe("YouTubeListeningPlayer", () => {
     expect(onPlaysChange).toHaveBeenCalledWith(1);
     expect(button().textContent).toBe("Pause");
     expect(screen.getByRole("status").textContent).toBe("Écoute 1 sur 3");
+  });
+
+  it("turns subtitles off whenever playback starts, even if the viewer enabled them on YouTube", async () => {
+    const { user } = setup();
+    const p = await startListening(user);
+    p.ready();
+    p.time = 2;
+    p.state(PLAYING);
+    p.time = 30;
+    p.state(PLAYING);
+    expect(p.unloadModule).toHaveBeenCalledTimes(2);
+    expect(p.unloadModule).toHaveBeenCalledWith("captions");
   });
 
   it("does not count an advert playing before the passage", async () => {
