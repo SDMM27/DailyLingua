@@ -17,19 +17,18 @@ Les questions ci-dessous sont rédigées d’après les sous-titres manuels de l
 ## ru A2 : Russian With Max, « Slow Russian - My Morning Routine »
 
 - Vidéo : https://www.youtube.com/watch?v=8OlKzxWUlBk (`8OlKzxWUlBk`), intégrable.
-- Passage : 5:17 → 6:04 (≈ 47 s), de « После зарядки… » à « …Ну или просто сэндвичи. ».
+- Passage : 5:34 → 6:12 (≈ 38 s), de la phrase sur le café du petit-déjeuner à « il faut s’habiller ». Déplacé le 2026-11-05 : l’ancien passage (5:17 → 6:04) demandait « la partie la plus agréable du matin », réponse donnée par l’étiquette incrustée « Завтрак / Breakfast ». L’étiquette reste à l’écran vers 5:40, mais aucune question ne porte plus sur elle. Bornes établies d’après la transcription de YouTube : **à vérifier à l’écoute**, en particulier la fin (couper après « s’habiller », avant les t-shirts).
 - Débit lent et articulé, un seul locuteur.
-- **Étiquette incrustée « Завтрак / Breakfast »** vers 5:40 : elle donne la réponse à la question 1. Changer de passage ou de question.
 
-1. **Selon Max, quelle est la partie la plus agréable du matin ?**
-   Réponse : le petit-déjeuner.
-   Éléments attendus : le petit-déjeuner.
-2. **Que se prépare-t-il toujours au petit-déjeuner, et qui d’autre aime ça ?**
+1. **Que se prépare-t-il toujours au petit-déjeuner, et qui d’autre aime ça ?**
    Réponse : du café ; Sabrina aussi aime le café.
    Éléments attendus : du café ; Sabrina aussi.
-3. **Que mange-t-il le plus souvent au petit-déjeuner, et quoi d’autre parfois ?**
+2. **Que mange-t-il le plus souvent au petit-déjeuner, et quoi d’autre parfois ?**
    Réponse : le plus souvent des œufs ; parfois des blinis, de la kacha (bouillie) ou simplement des sandwichs.
    Éléments attendus : des œufs le plus souvent ; parfois blinis, kacha ou sandwichs (au moins un).
+3. **Que font-ils le plus souvent le matin, et qu’est-ce que cela les oblige à faire ?**
+   Réponse : le plus souvent, ils sortent le matin, ils vont quelque part ; il faut donc s’habiller.
+   Éléments attendus : ils sortent / vont quelque part ; il faut s’habiller.
 
 ## ru B2 : Russian With Max, « Russian Listening Practice (B2+) - Our Life as Parents »
 
