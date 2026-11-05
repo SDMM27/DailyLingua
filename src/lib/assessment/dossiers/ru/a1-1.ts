@@ -7,7 +7,7 @@ export const dossier: AssessmentDossier = {
   topic: "gastronomie",
   title: "Вкусные выходные",
   reading: {
-    text: "Меня зовут Анна. Я живу в маленьком городе. Каждое утро я иду на рынок. Там я покупаю хлеб, сыр и яблоки. Хлеб свежий и тёплый. Он очень вкусный. Моя бабушка любит суп. Она готовит борщ. В борще есть мясо, свёкла и капуста. Мы едим вместе в воскресенье. Я пью чай с лимоном. Бабушка пьёт чай с молоком. Нам хорошо дома. Я люблю воскресенье. Потом мы гуляем в парке.",
+    text: "Меня зовут Анна. Я живу в маленьком городе. Каждое утро я иду на рынок. Там я покупаю хлеб, сыр и яблоки. Хлеб свежий и тёплый. Он очень вкусный. Моя бабушка любит суп. Она готовит борщ. В борще есть мясо, свёкла и капуста. Мы едим вместе в воскресенье. Я пью чай с лимоном. Бабушка пьёт чай с молоком. Дома нам хорошо. Я люблю воскресенье. Потом мы гуляем в парке.",
     questions: [
       {
         id: "ru-a1-1-r1",
@@ -30,25 +30,33 @@ export const dossier: AssessmentDossier = {
     ],
   },
   listening: {
-    script: "Сегодня суббота. Мы идём в кафе. Мой брат Иван заказывает пиццу. Я заказываю салат и воду. Салат маленький, но вкусный. Иван говорит: «Пицца горячая!» Мы смеёмся. Потом мы пьём кофе и едим торт. Торт очень сладкий.",
+    source: "youtube",
+    video: {
+      youtubeId: "it19zi5Fs2A",
+      title: "Super Slow Russian | Talking about my hometown | Comprehensible Input | Listening practice Level A1",
+      channel: "Sergey Storyteller",
+      start: 63,
+      end: 118,
+      checkedOn: null,
+    },
     questions: [
       {
         id: "ru-a1-1-l1",
-        prompt: "Où vont-ils aujourd’hui ?",
-        referenceAnswer: "Ils vont au café.",
-        expectedPoints: ["au café"],
+        prompt: "Dans quelle ville Sergueï est-il né, et où se trouve-t-elle ?",
+        referenceAnswer: "Il est né à Irkoutsk, une ville au centre de la Sibérie.",
+        expectedPoints: ["Irkoutsk", "au centre de la Sibérie"],
       },
       {
         id: "ru-a1-1-l2",
-        prompt: "Que commande Ivan ?",
-        referenceAnswer: "Il commande une pizza.",
-        expectedPoints: ["une pizza"],
+        prompt: "Combien d’habitants y a-t-il à peu près dans cette ville ?",
+        referenceAnswer: "Environ 600 000 habitants.",
+        expectedPoints: ["environ 600 000"],
       },
       {
         id: "ru-a1-1-l3",
-        prompt: "Que prennent-ils à la fin du repas ?",
-        referenceAnswer: "Ils boivent du café et mangent un gâteau très sucré.",
-        expectedPoints: ["du café", "un gâteau"],
+        prompt: "Que font les gens sur la rivière en hiver ?",
+        referenceAnswer: "L’eau de la rivière gèle et les gens y font du patin à glace.",
+        expectedPoints: ["la rivière gèle", "ils font du patin à glace"],
       },
     ],
   },
@@ -56,5 +64,5 @@ export const dossier: AssessmentDossier = {
     prompt: "Écris trois phrases en russe : dis ce que tu aimes manger et boire le matin, et ce que tu prépares ou manges le dimanche.",
   },
   audio: null,
-  reviewedOn: null,
+  reviewedOn: "2026-11-03",
 };

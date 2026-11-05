@@ -14,9 +14,14 @@ export function readAssessmentDraftPolicy(source: Record<string, string | undefi
   return readDraftPolicy("ASSESSMENT_DRAFTS", source);
 }
 
-/** Visible when shown as drafts, or reviewed by a native speaker AND recorded. */
+/**
+ * Visible when shown as drafts, or reviewed by a native speaker AND its listening is ready: recorded
+ * (script source), or its video passage listened to by a human (YouTube source).
+ */
 export function isDossierVisible(dossier: AssessmentDossier, policy: AssessmentDraftPolicy): boolean {
-  return policy === "show" || (dossier.reviewedOn !== null && dossier.audio !== null);
+  if (policy === "show") return true;
+  if (dossier.reviewedOn === null) return false;
+  return dossier.listening.source === "youtube" ? dossier.listening.video.checkedOn !== null : dossier.audio !== null;
 }
 
 /** The dossiers of a language and level the learner may see. */
@@ -34,14 +39,16 @@ export function hasVisibleDossier(language: Language, policy: AssessmentDraftPol
   return (ASSESSMENT_DOSSIERS[language] ?? []).some((d) => isDossierVisible(d, policy));
 }
 
-export type ListeningMode = "audio" | "draft-script" | "unavailable";
+export type ListeningMode = "audio" | "draft-script" | "youtube" | "unavailable";
 
 /**
  * How the listening test of a dossier is offered: the recording when there is one; the script,
  * marked as a draft, only for a dossier without recording under the "show" policy (local work);
- * otherwise not at all. The script never goes to a learner outside that last case.
+ * otherwise not at all. The script never goes to a learner outside that last case. A dossier whose
+ * listening is a YouTube passage is always played from the video, whatever the policy.
  */
 export function listeningMode(dossier: AssessmentDossier, policy: AssessmentDraftPolicy): ListeningMode {
+  if (dossier.listening.source === "youtube") return "youtube";
   if (dossier.audio !== null) return "audio";
   return policy === "show" ? "draft-script" : "unavailable";
 }

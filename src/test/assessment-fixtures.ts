@@ -1,7 +1,7 @@
 import type { AssessmentDossier } from "@/lib/schemas/assessment";
 
 /** A small Italian A1 dossier for tests: the real dossiers are content, not fixtures. */
-export const FIXTURE_DOSSIER: AssessmentDossier = {
+export const FIXTURE_DOSSIER: AssessmentDossier & { listening: { source: "script"; script: string } } = {
   id: "it-a1-1",
   language: "it",
   level: "A1",
@@ -16,6 +16,7 @@ export const FIXTURE_DOSSIER: AssessmentDossier = {
     ],
   },
   listening: {
+    source: "script",
     script: "Al parco i bambini corrono e giocano con il pallone. Mia madre si siede su una panchina e parla con una signora. Io compro un gelato per tutti. Alle cinque torniamo a casa, stanchi e contenti.",
     questions: [
       { id: "it-a1-1-l1", prompt: "Que font les enfants au parc ?", referenceAnswer: "Ils courent et jouent au ballon.", expectedPoints: ["ils jouent au ballon"] },
@@ -26,4 +27,14 @@ export const FIXTURE_DOSSIER: AssessmentDossier = {
   writing: { prompt: "Décris en trois phrases ce que tu fais le dimanche." },
   audio: null,
   reviewedOn: null,
+};
+
+/** The same dossier with a listening test on a YouTube passage (A1: 15-60 s). */
+export const FIXTURE_YOUTUBE_DOSSIER: AssessmentDossier = {
+  ...FIXTURE_DOSSIER,
+  listening: {
+    source: "youtube",
+    video: { youtubeId: "dQw4w9WgXcQ", title: "Una domenica a Torino", channel: "Canale di prova", start: 30, end: 70, checkedOn: null },
+    questions: FIXTURE_DOSSIER.listening.questions,
+  },
 };

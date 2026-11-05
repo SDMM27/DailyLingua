@@ -5,6 +5,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { gradeAssessment, saveAssessmentAnswers } from "@/app/actions/assessment";
 import { DraftScript } from "@/components/assessment/draft-script";
 import { ListeningPlayer } from "@/components/assessment/listening-player";
+import { YouTubeListeningPlayer } from "@/components/assessment/youtube-listening-player";
 import { ArrowRightIcon } from "@/components/icons";
 import { Card, Eyebrow, LanguageTag, ProgressBar } from "@/components/ui/primitives";
 import type { PublicDossier, PublicQuestion } from "@/lib/assessment/public-dossier";
@@ -492,7 +493,14 @@ export function AssessmentRunner({
       {step === "listening" && (
         <section className="mt-4 space-y-5">
           <Card>
-            {dossier.listening.audioSrc ? (
+            {dossier.listening.video ? (
+              <YouTubeListeningPlayer
+                video={dossier.listening.video}
+                title="Regarde et écoute le passage"
+                initialPlays={plays}
+                onPlaysChange={(n) => change({ plays: n }, "now")}
+              />
+            ) : dossier.listening.audioSrc ? (
               <ListeningPlayer
                 src={dossier.listening.audioSrc}
                 title="Écoute le passage"
@@ -506,7 +514,7 @@ export function AssessmentRunner({
                 L’enregistrement n’est pas disponible pour le moment. Tu peux passer cette étape.
               </p>
             )}
-            {dossier.listening.audioSrc && (
+            {(dossier.listening.audioSrc || dossier.listening.video) && (
               <p className="mt-3 text-xs leading-relaxed text-muted">
                 Tu peux écouter le passage {LISTENING_MAX_PLAYS} fois au plus, puis répondre aux questions.
               </p>

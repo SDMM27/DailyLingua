@@ -42,7 +42,7 @@ describe("assessment eval set", () => {
       const message = buildAssessmentGradingMessage(request);
       expect(request.questions.map((q) => q.id), evalCase.id).toEqual(Object.keys(evalCase.answers));
       expect(message).not.toContain(dossier.reading.text.slice(0, 80));
-      expect(message).not.toContain(dossier.listening.script.slice(0, 80));
+      if (dossier.listening.source === "script") expect(message).not.toContain(dossier.listening.script.slice(0, 80));
     }
   });
 });

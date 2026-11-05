@@ -51,7 +51,7 @@ if (values.backfill) {
 let classified = 0;
 let failedBatches = 0;
 for (let round = 1; ; round++) {
-  const result = await classifyPendingContents(store, classifier, { limit: ROUND_LIMIT, log: console.warn });
+  const result = await classifyPendingContents(store, classifier, { limit: ROUND_LIMIT, concurrency: 4, log: console.warn });
   classified += result.classified;
   failedBatches += result.failedBatches;
   console.log(`Tour ${round} : ${result.classified} contenus classés, ${result.failedBatches} lots en échec.`);

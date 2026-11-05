@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { FIXTURE_DOSSIER } from "@/test/assessment-fixtures";
+import type { AssessmentDossier } from "@/lib/schemas/assessment";
+import { FIXTURE_DOSSIER, FIXTURE_YOUTUBE_DOSSIER } from "@/test/assessment-fixtures";
 import { checkAssessmentDossier } from "./check-dossier";
 
-const AUDIO = { file: "/assessment/it/it-a1-1.m4a", speaker: "Giulia", licence: "granted-commercial", recordedOn: "2026-11-01" };
+const AUDIO = { file: "/assessment/it/it-a1-1.m4a", speaker: "Giulia", licence: "granted-commercial", recordedOn: "2026-11-01" } as const;
 
 describe("checkAssessmentDossier", () => {
   it("accepts a valid dossier, with or without recording", () => {
@@ -63,5 +64,32 @@ describe("checkAssessmentDossier", () => {
     const reading = { ...FIXTURE_DOSSIER.reading, text: ` ${FIXTURE_DOSSIER.reading.text}` };
     // The schema trims nothing on these fields, so the check reports it.
     expect(checkAssessmentDossier("it", "A1", { ...FIXTURE_DOSSIER, reading }).join("\n")).toMatch(/reading\.text: leading or trailing whitespace/);
+  });
+});
+
+describe("checkAssessmentDossier, YouTube listening", () => {
+  const withVideo = (video: Record<string, unknown>, rest: Partial<AssessmentDossier> = {}) => {
+    const listening = FIXTURE_YOUTUBE_DOSSIER.listening;
+    if (listening.source !== "youtube") throw new Error("fixture");
+    return { ...FIXTURE_YOUTUBE_DOSSIER, ...rest, listening: { ...listening, video: { ...listening.video, ...video } } };
+  };
+
+  it("accepts a valid passage, with no word count nor comparison with the text", () => {
+    expect(checkAssessmentDossier("it", "A1", FIXTURE_YOUTUBE_DOSSIER)).toEqual([]);
+  });
+
+  it("checks the length of the passage against the level", () => {
+    expect(checkAssessmentDossier("it", "A1", withVideo({ start: 10, end: 20 })).join("\n")).toMatch(/lasts 10 s, expected 15-60/);
+    expect(checkAssessmentDossier("it", "A1", withVideo({ start: 0, end: 61 })).join("\n")).toMatch(/lasts 61 s, expected 15-60/);
+    expect(checkAssessmentDossier("it", "A1", withVideo({ start: 0, end: 60 }))).toEqual([]);
+  });
+
+  it("rejects bounds out of order and a malformed video id", () => {
+    expect(checkAssessmentDossier("it", "A1", withVideo({ start: 50, end: 50 })).join("\n")).toMatch(/end must be after start/);
+    expect(checkAssessmentDossier("it", "A1", withVideo({ youtubeId: "short" })).join("\n")).toMatch(/youtubeId/);
+  });
+
+  it("rejects a recording, which makes no sense without a script", () => {
+    expect(checkAssessmentDossier("it", "A1", withVideo({}, { audio: AUDIO })).join("\n")).toMatch(/audio must be null/);
   });
 });

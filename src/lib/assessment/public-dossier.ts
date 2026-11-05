@@ -11,7 +11,7 @@ export interface PublicQuestion {
 /**
  * What the browser may know of a dossier. Built by `toPublicDossier` and passed to client components
  * instead of the dossier: it has no reference answer, no expected point, and the listening script
- * only for a draft without recording (local work).
+ * only for a draft without recording (local work). A YouTube listening gives its video id and bounds.
  */
 export interface PublicDossier {
   id: string;
@@ -25,6 +25,8 @@ export interface PublicDossier {
     audioSrc: string | null;
     /** The script, only when `mode` is "draft-script". */
     draftScript: string | null;
+    /** The video passage, only when `mode` is "youtube" (never the date it was checked). */
+    video: { youtubeId: string; start: number; end: number; title: string; channel: string } | null;
   };
   writing: { prompt: string; sentences: number };
 }
@@ -47,7 +49,17 @@ export function toPublicDossier(dossier: AssessmentDossier, mode: ListeningMode)
     listening: {
       questions: dossier.listening.questions.map(publicQuestion),
       audioSrc: mode === "audio" && dossier.audio ? dossier.audio.file : null,
-      draftScript: mode === "draft-script" ? dossier.listening.script : null,
+      draftScript: mode === "draft-script" && dossier.listening.source === "script" ? dossier.listening.script : null,
+      video:
+        mode === "youtube" && dossier.listening.source === "youtube"
+          ? {
+              youtubeId: dossier.listening.video.youtubeId,
+              start: dossier.listening.video.start,
+              end: dossier.listening.video.end,
+              title: dossier.listening.video.title,
+              channel: dossier.listening.video.channel,
+            }
+          : null,
     },
     writing: { prompt: dossier.writing.prompt, sentences: ASSESSMENT_LIMITS[dossier.level].sentences },
   };

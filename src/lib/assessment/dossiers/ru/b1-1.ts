@@ -7,7 +7,7 @@ export const dossier: AssessmentDossier = {
   topic: "société",
   title: "Двор, который починили соседи",
   reading: {
-    text: "Жители одного из спальных районов нашего города уже второй год собираются по субботам во дворе старой школы. Всё началось, когда соседи заметили, что детская площадка почти разрушена, а городские службы не спешат её ремонтировать. Вместо того чтобы жаловаться, несколько человек решили действовать сами. Они создали чат, где обсуждали, какие материалы нужны и кто может помочь. Оказалось, что среди жителей есть плотник, два студента-архитектора и пенсионерка, которая раньше преподавала рисование. Сначала многие сомневались, что из этой затеи что-то получится, однако уже через месяц площадка выглядела совсем иначе. Мэрия, узнав об инициативе, предложила выделить краску и инструменты. Жители, впрочем, не хотят зависеть от чужих решений. Теперь инициативная группа занимается не только ремонтом: она организует ярмарки, на которых соседи обмениваются ненужными вещами, и вечера, где старшие учат молодых готовить и шить. Организаторы подчёркивают, что главная ценность проекта не в покрашенных скамейках, а в том, что люди наконец узнали друг друга. Правда, не все довольны: некоторые жильцы жалуются на шум по выходным. Поэтому участники пообещали, что будут заканчивать работу до обеда.",
+    text: "Жители одного из спальных районов нашего города уже второй год собираются по субботам во дворе старой школы. Всё началось, когда соседи заметили, что детская площадка почти разрушена, а городские службы не спешат её ремонтировать. Вместо того чтобы жаловаться, несколько человек решили действовать сами. Они создали чат, где обсуждали, какие материалы нужны и кто может помочь. Оказалось, что среди жителей есть плотник, два студента-архитектора и пенсионерка, которая раньше преподавала рисование. Сначала многие сомневались, что из этой затеи что-то получится, однако уже через месяц площадка выглядела совсем иначе. Узнав об инициативе, мэрия предложила предоставить краску и инструменты. Жители, впрочем, не хотят, чтобы дальнейшая судьба двора зависела только от решений властей. Теперь инициативная группа занимается не только ремонтом: она организует ярмарки, на которых соседи обмениваются ненужными вещами, и вечера, на которых старшие учат молодых готовить и шить. Организаторы подчёркивают, что главная ценность проекта не в покрашенных скамейках, а в том, что люди наконец узнали друг друга. Правда, не все довольны: некоторые жильцы жалуются на шум по выходным. Поэтому участники пообещали, что будут заканчивать работу до обеда.",
     questions: [
       {
         id: "ru-b1-1-r1",
@@ -30,25 +30,33 @@ export const dossier: AssessmentDossier = {
     ],
   },
   listening: {
-    script: "Соседи, которые сами отремонтировали детскую площадку, теперь говорят о новой цели. Они хотят, чтобы похожие группы появились и в других районах. Для этого они подготовили небольшую инструкцию: как найти единомышленников, с чего начать и как договориться с властями. По словам одной из участниц, главное — не бояться первого шага. Если бы она тогда, когда проект только начинался, промолчала, то площадка до сих пор оставалась бы сломанной. Сегодня к ним приезжают гости из соседних городов, чтобы перенять опыт.",
+    source: "youtube",
+    video: {
+      youtubeId: "OSnJIAqVkkk",
+      title: "Выпуск 33 – Прочитал 10 книг, мой топ - Intermediate Russian podcast (sub)",
+      channel: "Russian Progress",
+      start: 700,
+      end: 770,
+      checkedOn: null,
+    },
     questions: [
       {
         id: "ru-b1-1-l1",
-        prompt: "Quel nouvel objectif les voisins se fixent-ils ?",
-        referenceAnswer: "Que des groupes semblables apparaissent dans d’autres quartiers.",
-        expectedPoints: ["des groupes semblables dans d’autres quartiers"],
+        prompt: "Pourquoi a-t-il choisi ce livre juste après Sapiens ?",
+        referenceAnswer: "Il voulait lire quelque chose de plus simple, parce que Sapiens était très long : 17 heures d’écoute.",
+        expectedPoints: ["quelque chose de plus simple / plus léger", "Sapiens était très long (17 heures)"],
       },
       {
         id: "ru-b1-1-l2",
-        prompt: "Que contient le petit guide qu’ils ont préparé ?",
-        referenceAnswer: "Des conseils pour trouver des personnes motivées, savoir par où commencer et s’entendre avec les autorités.",
-        expectedPoints: ["trouver des gens motivés", "par où commencer", "s’entendre avec les autorités"],
+        prompt: "De quoi parle ce livre ?",
+        referenceAnswer: "De la philosophie de vie des Suédois, le lagom : tout faire avec mesure, chercher le juste milieu.",
+        expectedPoints: ["l’approche suédoise de la vie", "tout avec mesure / le juste milieu"],
       },
       {
         id: "ru-b1-1-l3",
-        prompt: "Selon une participante, qu’est-ce qui est le plus important, et que se serait-il passé sans cela ?",
-        referenceAnswer: "Le plus important est de ne pas avoir peur du premier pas ; sans cela, l’aire de jeux serait encore cassée.",
-        expectedPoints: ["ne pas craindre le premier pas", "l’aire de jeux serait encore cassée"],
+        prompt: "Que fait l’écologiste qui suit le lagom quand il ne peut pas trier ses déchets, et pourquoi ?",
+        referenceAnswer: "Il jette tout dans une seule poubelle au lieu de chercher pendant des heures : il n’est pas fanatique, il fait ce qui est raisonnable quand c’est possible.",
+        expectedPoints: ["il jette tout dans un seul conteneur", "il ne passe pas des heures à chercher", "il n’est pas fanatique / il reste raisonnable"],
       },
     ],
   },
@@ -56,5 +64,5 @@ export const dossier: AssessmentDossier = {
     prompt: "Écris quatre phrases en russe : décris un problème de ton quartier ou de ta ville et propose ce que les habitants pourraient faire eux-mêmes pour le résoudre.",
   },
   audio: null,
-  reviewedOn: null,
+  reviewedOn: "2026-11-03",
 };

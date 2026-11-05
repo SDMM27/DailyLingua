@@ -69,3 +69,27 @@ nombre de phrases du niveau (3, 3, 4, 5, 6, 6). Ce nombre n'est pas stocké : il
 - Un dossier est visible en production quand `reviewedOn` ET `audio` sont renseignés ; les brouillons
   sont visibles ailleurs, ou avec `ASSESSMENT_DRAFTS=show`.
 - Le script et les réponses de référence ne partent jamais vers le navigateur avant la fin de l'épreuve.
+
+## Passages YouTube (épreuve d'écoute)
+
+L'épreuve d'écoute peut porter sur un passage d'une vidéo YouTube au lieu d'un script enregistré :
+`listening: { source: "youtube", video: { youtubeId, title, channel, start, end, checkedOn }, questions }`
+(les dossiers à script ont `source: "script"`). Règles (décision et passages pilotes :
+`docs/assessment/youtube-listening-pilot.md`) :
+
+- Lecture par le lecteur intégré seulement (`youtube-nocookie.com`) : pas de téléchargement, pas de son
+  seul, lecteur jamais masqué. Sous-titres YouTube coupés pendant l'épreuve (`cc_load_policy=0`,
+  contrôles masqués, module de sous-titres déchargé à chaque lecture) : choisir des passages sans texte incrusté qui donne les réponses.
+- **Pas de transcription stockée** : seulement l'identifiant, `title` et `channel` (attribution affichée
+  sous le lecteur), `start` et `end` en secondes entières, nos questions et nos réponses de référence.
+  Il n'y a pas de script : `audio` reste `null`.
+- Durée du passage (`end - start`) par niveau, contrôlée par `assessment:check` (`ASSESSMENT_LIMITS[niveau].video`) :
+  A1 15–60 s, A2 20–75 s, B1 30–90 s, B2 45–120 s, C1 45–150 s, C2 45–150 s.
+- `checkedOn` : date à laquelle un humain a **écouté** le passage et validé les bornes, le niveau, les
+  questions et l'absence de texte à l'écran qui donne les réponses. Ne jamais l'inventer ; `null` = pas
+  encore validé.
+- Publication (politique « hide ») : `reviewedOn` ET `video.checkedOn` renseignés (au lieu de `audio`).
+- Une vidéo supprimée, privée ou non intégrable rend le dossier indisponible : `npm run assessment:check`
+  le contrôle en ligne (oEmbed), `--offline` pour sauter ce contrôle.
+- Une publicité peut précéder l'extrait : l'écran le dit, et une écoute ne compte qu'au moment où le
+  passage se lit.
