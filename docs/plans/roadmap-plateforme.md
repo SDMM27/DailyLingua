@@ -1,6 +1,6 @@
 # Plan — de Daily Lingua à une plateforme qui rend bilingue
 
-Statut : **proposition**, rédigée le 2026-11-05 après une revue complète du code (branche `dev`, commit `a1ba264`) et de l'app. Rien n'est implémenté. Ce plan complète [product-features.md](product-features.md), [learning-paths.md](learning-paths.md) et [skills-assessment-and-choices.md](skills-assessment-and-choices.md) sans les remplacer. Les lettres A à O sont déjà prises : les phases ci-dessous vont de **P à Z**.
+Statut : **proposition validée dans ses grandes lignes** (décisions du §5, 2026-11-05), rédigée le 2026-11-05 après une revue complète du code (branche `dev`, commit `a1ba264`) et de l'app. Rien n'est implémenté. Ce plan complète [product-features.md](product-features.md), [learning-paths.md](learning-paths.md) et [skills-assessment-and-choices.md](skills-assessment-and-choices.md) sans les remplacer. Les lettres A à O sont déjà prises : les phases ci-dessous vont de **P à Z**.
 
 ---
 
@@ -14,7 +14,8 @@ Ce plan est fait pour être découpé : chaque phase peut être confiée à une 
    - `CLAUDE.md` : mobile d'abord (largeur iPhone, safe areas, champs ≥ 16 px) ; aucune langue en dur (registre `src/lib/domain/languages.ts`) ; `src/lib/domain` et `src/lib/schemas` sans Next.js ni React ; données lues via `getRepository()` ; `await connection()` pour les pages qui dépendent du jour ; `npm run check` et `npm run build` avant de finir.
    - Une phase à la fois, validée par l'utilisateur avant la suivante. Fin de phase : fichiers modifiés, commandes lancées, tests réellement exécutés et résultats, commande pour lancer, problèmes ouverts, étape suivante. En français.
    - Licences : RSS = métadonnées + accroche courte, jamais le texte intégral d'une source « tous droits réservés » ; licence vérifiée et notée par source ; `CONTENT_LICENSE_POLICY=commercial` avant toute vente.
-   - Contenu pédagogique rédigé par un modèle = **brouillon** tant qu'un natif ne l'a pas relu (`reviewedOn` / `checkedOn`), comme pour la grammaire et le bilan.
+   - Contenu pédagogique rédigé par un modèle = **brouillon** tant que les agents relecteurs ne l'ont pas approuvé (statut `ai-reviewed`, phase X0) ; `reviewedOn` / `checkedOn` restent réservés à une relecture humaine.
+   - Budget : 10 € par mois au plus pour l'API (§6). Haiku 5.5 à l'exécution ; tout nouvel appel enregistre ses tokens.
 3. Chaque phase ci-dessous donne : objectif, justification pédagogique, périmètre, conception proposée, critères d'acceptation, dépendances, points à trancher. Les points « à trancher » se posent à l'utilisateur **avant** de coder.
 
 ---
@@ -80,12 +81,17 @@ Repères de vocabulaire (ordre de grandeur, familles de mots, d'après Milton & 
 
 ## 3. Feuille de route
 
-Ordre recommandé : **gains rapides → P → Q → U → T → S → V → R → W → X (en continu) → Y → Z**. P passe en premier parce que toute nouvelle fonction doit naître multilingue : la refaire après coûterait plus cher. Q est le plus gros gain pédagogique.
+Ordre retenu (décision du 2026-11-05, voir §5) : **gains rapides → X0 (agents relecteurs) → P → Q → U → T → V → S → R → W → X (en continu) → Y → Z**.
+
+- **X0 d'abord** : peu coûteux, et il rend visibles en production 342 points de grammaire déjà écrits. Il sert ensuite à toutes les phases qui produisent du contenu (P4, Q, R).
+- **P ensuite** : toute nouvelle fonction doit naître multilingue ; la reprendre après coûterait plus cher.
+- **Q** est le plus gros gain pédagogique ; U, T et V s'appuient dessus.
+- **S** après V : l'oral demande des services vocaux (voir §6), à ouvrir quand le budget le permet.
 
 ```
-Jalon 1 « Fondations »     : gains rapides, P (langue de l'apprenant), X1 (relecture grammaire)
+Jalon 1 « Fondations »     : gains rapides, X0 (agents relecteurs), P (langue de l'apprenant)
 Jalon 2 « Vraie lecture »  : Q (lecteur + textes gradués), U (séance guidée), T (mémorisation v2)
-Jalon 3 « Parler, jouer »  : S (oral), V (gamification)
+Jalon 3 « Jouer, parler »  : V (gamification sobre), S (oral)
 Jalon 4 « Tout niveau »    : R (parcours débutant), W (progrès et niveau continu)
 Jalon 5 « Plateforme »     : Y (communauté), Z (apps, économie, mesure d'efficacité)
 ```
@@ -133,7 +139,13 @@ Jalon 5 « Plateforme »     : Y (communauté), Z (apps, économie, mesure d'eff
 
 **Critères d'acceptation** : un compte avec `native_language = en` voit l'UI, les explications de mission, la correction et les traductions de vocabulaire en anglais ; un compte `es` → `fr` peut apprendre le français ; aucune chaîne française en dur ne reste (test qui scanne les composants) ; évaluations de correction ≥ au niveau actuel en fr et en en.
 
-**À trancher** : bibliothèque i18n ; liste des langues d'interface au lancement ; langue pivot des contenus curés (fr ou en ; en touche plus de monde).
+**Décidé le 2026-11-05** : l'apprentissage doit fonctionner depuis **n'importe quelle langue maternelle**. Concrètement :
+- `native_language` accepte toute langue (liste ISO 639-1 complète), pas seulement les 19 langues cibles ;
+- les explications générées (mission, correction, traductions) sont produites dans la L1 par le modèle, quelle qu'elle soit ;
+- l'interface est traduite pour les langues les plus demandées ; pour une L1 sans traduction de l'interface, l'interface s'affiche en anglais, mais les explications restent dans la L1 ;
+- les contenus curés existants restent rédigés en français (langue pivot, déjà écrite) ; leur traduction dans la L1 est générée une fois, mise en cache, relue par les agents (X0).
+
+**À trancher** : bibliothèque i18n ; ordre de traduction de l'interface au-delà de fr et en.
 
 ---
 
@@ -236,28 +248,29 @@ Jalon 5 « Plateforme »     : Y (communauté), Z (apps, économie, mesure d'eff
 
 **Critères** : un utilisateur fait un jeu de rôle de 3 minutes en italien et reçoit un bilan ; shadowing fonctionnel sur iPhone (Safari et PWA installée) ; coût par minute mesuré.
 
+**Budget (voir §6)** : commencer par ce qui est gratuit. La reconnaissance vocale du navigateur (`webkitSpeechRecognition` de Safari) est gratuite ; son fonctionnement dans la PWA installée sur iPhone est à vérifier en S1. Les paliers payants (évaluation de prononciation, voix neuronales au-delà du gratuit) viennent ensuite.
+
 **À trancher** : fournisseurs (transcription, prononciation, voix) ; conservation des enregistrements ; quota gratuit.
 
 ---
 
-### Phase V — Gamification et motivation
+### Phase V — Gamification sobre et motivation
 
 **Objectif** : rendre l'app ludique et donner envie de revenir chaque jour, **sans récompenser ce qui n'apprend rien**.
 
+**Ton retenu : sobre** (décision du 2026-11-05). Ni ligues, ni mascotte, ni classement entre utilisateurs, ni monnaie virtuelle. Le jeu porte sur **soi-même** : objectifs, régularité, étapes réelles franchies.
+
 **Principes** : récompenser l'effort utile (rappels réussis, minutes d'input, productions réécrites), pas les clics ; montrer la compétence qui grandit ; laisser l'utilisateur choisir (autonomie) ; ne jamais culpabiliser.
 
-- **XP** : barème transparent par activité (ex. texte lu + compris, production corrigée puis réécrite, minute de conversation, révision réussie) ; bonus pour la difficulté réelle, pas pour la quantité de cartes faciles.
-- **Objectif du jour** en anneau (minutes ou XP, choisi par l'utilisateur), objectif de la semaine.
-- **Série** améliorée : jour de gel (gagné ou offert), réparation dans les 24 h, série de semaine en option pour ceux qui ne veulent pas de pression quotidienne.
-- **Quêtes** hebdomadaires variées (« dis 3 phrases à voix haute », « lis 2 textes jusqu'au bout », « réutilise 5 mots de la semaine ») : elles orientent vers les volets négligés.
-- **Badges de vraies étapes** : 100/500/1 000/2 000 mots connus, premier texte sans aide, première conversation de 5 min, niveau CECR franchi, 10 h d'écoute.
-- **Niveau de joueur** + **carte du parcours** (les jalons A1 → C1 visibles, comme un chemin) ; animations, sons et retour haptique (désactivables) ; écran de fin de séance qui fête ce qui a été appris.
-- **Notifications push** : service worker + Web Push (iOS ≥ 16.4 pour une PWA installée) ; rappel à l'heure choisie, rappel « série en danger », résumé hebdomadaire ; plafond strict (1/jour).
-- **Social en option** (plus tard, avec Y) : amis, défis à deux, ligues hebdomadaires **sur l'XP d'effort utile**, désactivables.
+- **Objectif du jour** en anneau (minutes utiles, choisies par l'utilisateur) et objectif de la semaine. Les « minutes utiles » ne comptent que le travail fait (texte lu jusqu'au bout, exercice répondu, production envoyée), pas le temps d'écran.
+- **Série** améliorée : jour de gel (un par semaine, automatique), réparation possible dans les 24 h, et une **série de semaines** en option pour ceux qui ne veulent pas de pression quotidienne. La série reste désactivable.
+- **Défis de la semaine** : 3 défis courts choisis selon les volets négligés (« dis 3 phrases à voix haute », « lis 2 textes jusqu'au bout », « réutilise 5 mots de la semaine »).
+- **Étapes réelles** (badges discrets, sans collection à compléter) : 100 / 500 / 1 000 / 2 000 mots connus, premier texte lu sans aide, première conversation de 5 min, niveau CECR franchi par compétence, 10 / 50 / 100 h de pratique.
+- **Carte du parcours** : les paliers A1 → C1 de chaque langue sous forme de chemin, avec la position actuelle par compétence (relié à W).
+- **Fin de séance** : écran court qui montre ce qui a été appris (mots, erreur corrigée, minutes), avec une animation légère ; sons et vibrations désactivables, coupés par défaut.
+- **Notifications push** : service worker + Web Push (iOS ≥ 16.4, PWA installée) ; un rappel par jour au plus, à l'heure choisie ; résumé hebdomadaire ; tout est désactivable.
 
-**Critères** : XP calculée côté domaine (pur, testée) et côté serveur (pas de triche par le client) ; notifications fonctionnelles sur un iPhone avec l'app installée ; tout peut être désactivé dans les préférences.
-
-**À trancher** : ligues oui/non ; mascotte ou identité visuelle plus sobre ; barème XP.
+**Critères** : minutes utiles et étapes calculées dans le domaine (pur, testé) et validées côté serveur (pas de triche par le client) ; notifications fonctionnelles sur un iPhone avec l'app installée ; chaque élément peut être désactivé dans les préférences ; le texte des préférences est mis à jour (« pas de classement » reste vrai).
 
 ---
 
@@ -295,9 +308,39 @@ Jalon 5 « Plateforme »     : Y (communauté), Z (apps, économie, mesure d'eff
 
 **Objectif** : rendre visible en production le contenu déjà écrit, puis tenir la qualité quand on passe à des dizaines de langues.
 
-- **X1 — Débloquer la grammaire** : 342 points en brouillon, invisibles en production. Organiser la relecture (natifs rémunérés ou communauté, voir Y) ; outil de relecture interne (page cachée : point, exercices, bouton « approuvé » / commentaire → met `reviewedOn`).
-- **X2 — Double vérification automatique** : avant relecture humaine, un second passage par un modèle plus fort que celui de la génération signale les erreurs probables ; les relecteurs commencent par ces signalements.
-- **X3 — Signalement par les utilisateurs** : bouton « il y a une erreur » sur chaque exercice, explication et correction ; file de traitement.
+**Contexte (décision du 2026-11-05)** : pas de relecteurs natifs, pas de budget pour en payer, pas encore de communauté. La relecture est donc confiée à des **agents IA relecteurs**, et la relecture humaine devient un niveau supérieur, facultatif, pour plus tard (Y).
+
+**Ce qu'un agent relecteur peut et ne peut pas faire** : un modèle fort, avec des consignes précises, repère la grande majorité des fautes de langue, des exercices ambigus et des règles fausses. Il partage cependant certains angles morts avec le modèle qui a rédigé le contenu (tournures peu naturelles mais correctes, usages régionaux, nuances culturelles). D'où les garde-fous ci-dessous : agents indépendants, modèle plus fort que le rédacteur, désaccords tranchés à part, et signalements des utilisateurs (X3) comme boucle humaine.
+
+#### X0 — Agents relecteurs (à faire en premier)
+
+1. **Nouveau statut de relecture**, commun à la grammaire, aux banques du test de niveau, aux dossiers du bilan, aux alphabets et plus tard aux unités (R) et aux traductions (P4) :
+   - `draft` : écrit par un modèle, non relu ;
+   - `ai-reviewed` : relu et approuvé par les agents (date, modèle, version des consignes) ;
+   - `native-reviewed` : relu par un humain natif (le `reviewedOn` actuel).
+   - La politique d'affichage (`GRAMMAR_DRAFTS`, `src/lib/draft-policy.ts`) montre en production `ai-reviewed` et `native-reviewed`, avec une mention discrète « relu par IA » et le bouton de signalement (X3).
+2. **Agent « relecteur natif » par langue**, défini comme agent Claude Code dans le dépôt (`.claude/agents/relecteur-natif.md`) : il joue un enseignant natif de la langue, certifié, qui relit un fichier de contenu selon une grille écrite :
+   - langue : orthographe, accents, accord, naturel de chaque phrase, registre ;
+   - pédagogie : la règle est juste et complète au niveau visé, les exemples l'illustrent, une seule bonne réponse par exercice, distracteurs plausibles mais faux, explication juste ;
+   - règles propres à la langue déjà écrites dans `src/lib/grammar/AUTHORING.md`, `src/lib/placement/banks/AUTHORING.md`, `src/lib/assessment/AUTHORING.md` (accent tonique, pinyin, kana, harakat…) ;
+   - sortie : un rapport par élément (`ok` / `corrigé` / `à revoir`), avec la correction proposée et sa justification, dans `docs/reviews/<langue>/<fichier>.md`.
+3. **Deux passes indépendantes** : deux agents relisent sans voir le rapport de l'autre. Un élément est `ai-reviewed` seulement si les deux l'approuvent (après correction). En cas de désaccord, un troisième agent tranche ; s'il ne peut pas trancher, l'élément reste `draft`.
+4. **Contrôles automatiques avant les agents** (gratuits) : `grammar:check`, `placement:check`, `assessment:check`, plus de nouvelles vérifications simples (mots absents des listes de fréquence ou de Tatoeba → à regarder de près).
+5. **Où tournent les agents** :
+   - **Contenu versionné dans le dépôt** (grammaire, banques, dossiers, alphabets, unités R) : dans des sessions **Claude Code**, un agent par langue en parallèle. Cette relecture ne consomme pas le budget de l'API de l'app (voir §6). Ordre : grammaire (342 points), puis banques du test de niveau, puis dossiers du bilan.
+   - **Contenu généré à la volée** (textes gradués Q3, traductions P4) : un script `content:review` qui appelle l'API en **Batch** (−50 %), avec un modèle plus fort que celui qui a rédigé (Sonnet 5.5 relit ce que Haiku 5.5 écrit), puis une vérification par échantillon.
+6. **Limites assumées** :
+   - l'écoute des passages YouTube du bilan ne peut pas être vérifiée par un agent : elle reste à `draft`, ou passe par une transcription automatique comparée au script quand l'audio vient de nos propres fichiers ;
+   - la mention « relu par IA » reste visible tant qu'aucun humain n'a relu ;
+   - on mesure : taux de signalements par élément, et taux d'erreurs trouvées par la seconde passe (si la seconde passe trouve encore beaucoup, on renforce la grille).
+
+**Critères d'acceptation** : les 18 points de grammaire russes et italiens relus par deux agents, rapports dans `docs/reviews/`, statut `ai-reviewed` posé, points visibles en production avec la mention ; même chose ensuite pour les 17 autres langues.
+
+#### Suite de la phase X
+
+- **X1 — Outil de relecture humaine** (pour plus tard) : page cachée qui affiche l'élément, les rapports des agents et un bouton « approuvé par un natif » (→ `native-reviewed`).
+- **X2 — Relecture continue** : à chaque nouveau contenu, les agents relisent avant publication ; la CI refuse un contenu publié sans statut `ai-reviewed`.
+- **X3 — Signalement par les utilisateurs** : bouton « il y a une erreur » sur chaque exercice, explication et correction ; file de traitement ; un élément signalé plusieurs fois repasse en relecture par les agents.
 - **X4 — Évaluations par langue** : étendre `feedback:eval` et `assessment:eval` à chaque langue ajoutée et à chaque L1.
 - **X5 — Grammaire au-delà de B1** : B2-C1 en « fiches de référence » courtes (registre, connecteurs, nuances) reliées aux erreurs.
 - **X6 — Écritures restantes** : pinyin et tons pour le chinois, puis hanzi/kanji les plus fréquents (module « caractères » avec cartes et composants).
@@ -330,12 +373,13 @@ Jalon 5 « Plateforme »     : Y (communauté), Z (apps, économie, mesure d'eff
 | Phase | Effet attendu | Taille | Dépend de |
 |---|---|---|---|
 | Gains rapides | Confort, cohérence | S | — |
+| X0 — Agents relecteurs | Grammaire visible en production, qualité tenue sans natifs | M | — |
 | P — Langue de l'apprenant | Ouvre l'app à toutes les L1 | L | — |
 | Q — Lecteur et input | Le plus gros gain d'apprentissage | L | P1-P2 |
 | U — Séance guidée | Les quatre volets chaque jour | M | Q |
 | T — Mémorisation v2 | Moins de révisions, plus de rétention | M | — (mieux après Q) |
 | S — Oral | Parler et comprendre à l'oral | L | Q4 |
-| V — Gamification | Régularité, plaisir | M | U (XP sur les vraies activités) |
+| V — Gamification sobre | Régularité, plaisir | M | U (minutes utiles mesurées) |
 | R — Parcours débutant | Retenir les débutants | L | Q4, S1, X |
 | W — Progrès et niveau | Preuve de progrès, difficulté juste | M | U, T |
 | X — Qualité | Contenu visible et fiable | continu | — |
@@ -346,17 +390,75 @@ S ≈ quelques heures, M ≈ quelques jours, L ≈ une à plusieurs semaines, d�
 
 ---
 
-## 5. Décisions à prendre avant de commencer
+## 5. Décisions (2026-11-05)
 
-1. Ordre : valider « gains rapides → P → Q → U → T → S → V → R → W », ou préférer commencer par Q (gain pédagogique immédiat, en français seulement) et faire P juste après.
-2. Langue pivot des contenus curés : français (existant) ou anglais (portée plus large).
-3. Budget mensuel acceptable par utilisateur actif pour l'IA, la voix et la transcription : il détermine S4 et le quota de textes générés.
-4. Ton de la gamification : sobre (objectifs, badges, série) ou complet (ligues, mascotte, défis entre amis).
-5. Relecture native : budget pour des relecteurs rémunérés, ou communauté (Y) d'abord.
+1. **Ordre** : laissé au choix du plan. Ordre retenu : gains rapides → X0 → P → Q → U → T → V → S → R → W → Y → Z (justification au §3).
+2. **Langue maternelle** : n'importe laquelle (détail dans la phase P). Le français reste la langue pivot des contenus curés déjà écrits.
+3. **Budget** : 10 € par mois au plus, de la poche de l'utilisateur. Paliers et répartition au §6 ; palier 1 retenu par défaut.
+4. **Gamification** : ton **sobre** (phase V réécrite en ce sens : ni ligues, ni mascotte, ni classement).
+5. **Relecture** : par des **agents IA relecteurs** (phase X0), faute de relecteurs natifs et de budget. La relecture humaine devient facultative et ultérieure.
 
 ---
 
-## 6. Gabarit pour lancer une phase dans une autre conversation
+## 6. Budget : paliers et répartition
+
+### 6.1 Prix utilisés (vérifiés le 2026-11-05)
+
+| Service | Prix | Remarque |
+|---|---|---|
+| Claude Haiku 5.5 | 0,10 $ / 0,50 $ par million de tokens (entrée / sortie) | modèle actuel de l'app |
+| Claude Sonnet 5.5 | 2 $ / 10 $ | 20 × Haiku |
+| Claude Opus 5.5 | 4 $ / 20 $ | 40 × Haiku |
+| API Batch | −50 % | réponses en différé (jusqu'à 24 h), parfait pour les missions préparées la nuit et les relectures |
+| Cache de prompt | lecture ≈ 10 % du prix d'entrée | le long prompt système des missions se met en cache |
+| Voix neuronale Azure (offre gratuite F0) | 0,5 million de caractères par mois gratuits | ≈ 500 textes gradués de 1 000 caractères |
+| Transcription Azure (offre gratuite) | 5 h par mois gratuites | |
+| Voix et reconnaissance du navigateur | gratuit | qualité et disponibilité variables selon l'appareil |
+
+Les offres gratuites de Google Cloud TTS sont décrites de façon contradictoire selon les sources : à vérifier sur la page officielle avant de s'en servir. Les prix des fournisseurs changent : les revérifier avant chaque phase qui en dépend.
+
+### 6.2 Consommation estimée de l'app
+
+Estimation à partir de la taille des prompts actuels (`prompt.ts` ≈ 3 000 tokens de consignes) ; à confirmer en enregistrant les tokens de chaque appel (voir 6.4).
+
+| Appel | Entrée | Sortie (réflexion comprise) | Coût Haiku 5.5 |
+|---|---|---|---|
+| Mission d'une langue | ≈ 5 000 tokens | ≈ 5 000 tokens | ≈ 0,003 $ |
+| Correction d'une production | ≈ 3 000 | ≈ 3 000 | ≈ 0,002 $ |
+| Texte gradué (Q3) | ≈ 3 000 | ≈ 3 000 | ≈ 0,002 $, **partagé** entre tous les apprenants de même langue, niveau et thème |
+| Conversation IA (S4), 5 min en texte | ≈ 15 000 (cumul) | ≈ 3 000 | ≈ 0,003 $ |
+
+**Ordre de grandeur** : un apprenant actif chaque jour (mission + une correction) coûte environ **0,15 $ par mois** avec Haiku 5.5. Le même usage coûterait environ 3 $ avec Sonnet 5.5 et 6 $ avec Opus 5.5. Pour l'usage quotidien, Haiku reste donc le bon choix ; les modèles plus forts sont à réserver aux tâches ponctuelles où la qualité compte (relecture, rédaction de contenus curés).
+
+### 6.3 Paliers
+
+| Palier | Coût mensuel | Ce que ça permet |
+|---|---|---|
+| **0 — Actuel** | ≈ 0 € (crédit restant de 5 €) | Haiku pour les missions et les corrections ; voix de l'appareil. Suffit pour toi et une dizaine de testeurs pendant des mois. Pas de textes gradués audio, pas d'oral réel. |
+| **1 — Recommandé** | **10 €** | Tout le palier 0, plus : missions préparées la nuit en Batch (−50 %) ; textes gradués générés et partagés (Q) ; voix neuronales pour ces textes via l'offre gratuite Azure ; relecture des contenus générés à la volée par Sonnet 5.5 en Batch ; conversation IA en texte avec Haiku. Capacité : environ **30 à 50 apprenants actifs par jour**. |
+| **2 — Oral complet** | ≈ 25-30 € | Palier 1, plus : conversation **vocale** (transcription + voix au-delà du gratuit), évaluation de la prononciation. Environ 30 apprenants actifs. |
+| **3 — Produit payant** | proportionnel aux utilisateurs | Les abonnements financent l'usage : compter ≈ 0,20 $ par apprenant et par mois sans oral, ≈ 1 à 2 $ avec l'oral vocal quotidien. |
+
+**Répartition proposée du palier 1 (10 €)** :
+- environ 4 € pour l'usage quotidien des apprenants (missions, corrections, textes gradués, conversation écrite), tous en Haiku 5.5 ;
+- environ 5 € pour la qualité : relecture en Batch par Sonnet 5.5 des textes générés à la volée, et rédaction de contenus curés quand Claude Code ne suffit pas ;
+- environ 1 € de marge, avec une alerte de dépense dans la console Anthropic.
+
+**Ce qui ne coûte rien sur l'API** : la relecture des contenus versionnés dans le dépôt (grammaire, banques, dossiers, unités R) et leur rédaction se font dans des sessions Claude Code, dans le cadre de ton abonnement Claude, pas sur le crédit de l'API de l'app. C'est le plus gros poste évité.
+
+### 6.4 Règles pour tenir le budget
+
+1. **Mesurer avant d'optimiser** : enregistrer `input_tokens` / `output_tokens` / modèle pour **chaque** appel (c'est déjà fait pour la correction et le bilan, pas pour les missions ni les thèmes), et afficher le coût du mois dans un script (`npm run cost:report`).
+2. **Haiku 5.5 partout à l'exécution**, effort `low` quand c'est possible (thèmes, traductions, textes gradués) ; `medium` seulement là où l'éval montre une différence (correction).
+3. **Batch pour tout ce qui n'est pas immédiat** : missions préparées la nuit, thèmes des contenus, relectures, traductions de contenus curés.
+4. **Mettre en cache** : prompts système (cache de prompt), et surtout les **résultats** partagés (textes gradués, audio, traductions des fiches) : générés une fois, servis à tous.
+5. **Plafonds par utilisateur** (comme le quota de traduction du vocabulaire) : corrections, minutes de conversation et textes à la demande par jour ; refus propre quand le plafond est atteint.
+6. **Gratuit d'abord** pour la voix : voix neuronales dans l'offre gratuite Azure (mises en cache), voix de l'appareil en secours.
+7. **Alerte** : plafond de dépense mensuel dans la console Anthropic à 10 €, et bascule automatique vers le générateur de secours quand le crédit est épuisé (le mécanisme de clé de secours existe déjà dans `anthropic-client.ts`).
+
+---
+
+## 7. Gabarit pour lancer une phase dans une autre conversation
 
 ```
 Contexte : projet Daily Lingua (C:\Users\Administrateur\Documents\DailyLingua, branche dev).
