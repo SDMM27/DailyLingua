@@ -5,6 +5,7 @@ import { Card, PageHeader, SectionTitle } from "@/components/ui/primitives";
 import { GRAMMAR_LEVELS, grammarPointState } from "@/lib/domain/grammar";
 import type { GrammarSuggestion } from "@/lib/domain/grammar-suggestions";
 import { languageInfo } from "@/lib/domain/languages";
+import { grammarReviewStatus } from "@/lib/grammar/policy";
 import { STATS_WINDOW_DAYS } from "@/lib/domain/production-stats";
 import { dueItems, relativeDueLabel } from "@/lib/domain/spaced-repetition";
 import type { CefrLevel, DateKey, Language } from "@/lib/schemas/common";
@@ -217,7 +218,7 @@ function PointRow({
           {card && (
             <span className="text-[11px] text-muted">Révision {relativeDueLabel(card.review.dueOn, today)}</span>
           )}
-          {point.reviewedOn === null && (
+          {grammarReviewStatus(point) === "draft" && (
             <span className="rounded-full border border-line px-2 py-0.5 text-[11px] font-medium text-muted">
               Non relue
             </span>

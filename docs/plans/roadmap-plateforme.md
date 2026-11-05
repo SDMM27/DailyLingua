@@ -336,6 +336,12 @@ Jalon 5 « Plateforme »     : Y (communauté), Z (apps, économie, mesure d'eff
 
 **Critères d'acceptation** : les 18 points de grammaire russes et italiens relus par deux agents, rapports dans `docs/reviews/`, statut `ai-reviewed` posé, points visibles en production avec la mention ; même chose ensuite pour les 17 autres langues.
 
+**Réalisé le 2026-11-05 (pilote ru/it)** :
+- statut `aiReview` (schéma `src/lib/schemas/grammar.ts`, `grammarReviewStatus` dans `src/lib/grammar/policy.ts`) ; les points relus par IA sont visibles en production avec « Relu par IA, pas encore par un natif. Signaler une erreur » (lien vers `/retour`) ; `grammar:check` compte les statuts ;
+- agents `.claude/agents/relecteur-natif.md` et `.claude/agents/arbitre-relecture.md` (Opus) ; grille `x0-2026-11-05` ;
+- ru : 18/18 approuvés, 43 corrections (dont l'accent tonique de tous les tableaux et exemples B1, 3 bonnes réponses qui étaient refusées) ; it : 18/18 approuvés, 31 corrections (dont une règle fausse sur les verbes pronominaux, 2 exercices à deux bonnes réponses). Rapports et décisions dans `docs/reviews/grammar/{ru,it}/` ;
+- reste : les 17 autres langues (306 points), puis les banques du test de niveau et les dossiers du bilan.
+
 #### Suite de la phase X
 
 - **X1 — Outil de relecture humaine** (pour plus tard) : page cachée qui affiche l'élément, les rapports des agents et un bouton « approuvé par un natif » (→ `native-reviewed`).

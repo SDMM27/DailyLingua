@@ -81,6 +81,13 @@ export type GrammarTable = z.infer<typeof grammarTableSchema>;
 /** Stable id `<lang>-<level>-<slug>`, e.g. `ru-a2-genitive`. Never reuse or rename one: cards point to it. */
 export const grammarPointIdSchema = z.string().regex(/^[a-z]{2,3}-(a1|a2|b1|b2|c1|c2)-[a-z0-9]+(?:-[a-z0-9]+)*$/);
 
+/**
+ * Approved by two independent passes of the reviewer agents, then the arbiter
+ * (.claude/agents/relecteur-natif.md, arbitre-relecture.md); `rubric` = version of the grid.
+ */
+export const aiReviewSchema = z.object({ on: dateKeySchema, model: text(60), rubric: text(40) });
+export type AiReview = z.infer<typeof aiReviewSchema>;
+
 export const grammarPointSchema = z.object({
   id: grammarPointIdSchema,
   level: cefrLevelSchema,
@@ -95,8 +102,10 @@ export const grammarPointSchema = z.object({
   exercises: z.array(grammarExerciseSchema).min(GRAMMAR_LIMITS.exercises.min).max(GRAMMAR_LIMITS.exercises.max),
   /** Correction categories this point helps with (used to suggest it after repeated errors). */
   categories: z.array(z.enum(CORRECTION_CATEGORIES)).min(1),
-  /** Day a native speaker approved the point; null = draft, hidden in production. */
+  /** Day a native speaker approved the point; null and no `aiReview` = draft, hidden in production. */
   reviewedOn: dateKeySchema.nullable(),
+  /** Set by the arbiter agent only: reviewed by AI, not yet by a native speaker (visible, with a notice). */
+  aiReview: aiReviewSchema.optional(),
 });
 export type GrammarPoint = z.infer<typeof grammarPointSchema>;
 

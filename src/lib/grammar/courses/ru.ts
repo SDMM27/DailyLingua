@@ -2,7 +2,7 @@ import type { GrammarCourse } from "@/lib/schemas/grammar";
 
 export const ruCourse = {
   language: "ru",
-  version: "2026-10-21",
+  version: "2026-11-05",
   points: [
     {
       id: "ru-a1-gender",
@@ -11,7 +11,7 @@ export const ruCourse = {
       summary: "Deviner le genre d’un nom d’après sa terminaison et choisir он, она ou оно.",
       rule: [
         "Tout nom russe a un genre, et la terminaison le révèle presque toujours : consonne ou -й → masculin (стол, музе́й) ; -а ou -я → féminin (кни́га, неде́ля) ; -о ou -е → neutre (окно́, мо́ре).",
-        "Le -ь est le piège : il peut être masculin (день, слова́рь) ou féminin (дверь, тетра́дь), et seul le dictionnaire te le dit. Quelques noms masculins finissent en -а ou -я (па́па, дя́дя) : ils s’accordent comme des masculins.",
+        "Le -ь est le piège : il peut être masculin (день, слова́рь) ou féminin (дверь, тетра́дь), et seul le dictionnaire te le dit. Quelques noms masculins finissent en -а ou -я (па́па, дя́дя) : ils s’accordent comme des masculins. Les noms en -мя (и́мя, вре́мя) sont neutres.",
         "Le genre te permet de choisir le pronom : он (masculin), она́ (féminin), оно́ (neutre). N’aligne jamais le genre sur le français : « le livre » est кни́га (féminin), « la table » est стол (masculin), « la fenêtre » est окно́ (neutre).",
       ],
       table: {
@@ -68,6 +68,7 @@ export const ruCourse = {
       ],
       categories: ["agreement", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "ru-a1-present-first",
@@ -76,7 +77,7 @@ export const ruCourse = {
       summary: "Former le présent des verbes de 1re conjugaison (-у/-ю, -ешь, -ет, -ем, -ете, -ут/-ют).",
       rule: [
         "Au présent, on part du radical du verbe et on ajoute les terminaisons de la personne. 1re conjugaison : -у/-ю, -ешь, -ет, -ем, -ете, -ут/-ют. Exemple : чита́ть → я чита́ю, ты чита́ешь, они́ чита́ют. Il n’y a qu’un seul présent : « je lis » et « je suis en train de lire » se disent tous deux я чита́ю.",
-        "Après une voyelle on écrit -ю / -ют (де́лать → я де́лаю, они́ де́лают) ; après une consonne -у / -ут (жить → я живу́, они́ живу́т). Quand la terminaison est accentuée, -е- devient -ё- : ты живёшь, он живёт, мы живём.",
+        "Après une voyelle on écrit -ю / -ют (де́лать → я де́лаю, они́ де́лают) ; après une consonne -у / -ут. Le radical du présent n’est pas toujours celui de l’infinitif : жить → жив- (я живу́, они́ живу́т). Quand la terminaison est accentuée, -е- devient -ё- : ты живёшь, он живёт, мы живём.",
         "Pièges : ne garde pas l’infinitif (я чита́ть est faux) et n’ajoute pas de verbe « être ». Le russe distingue aussi ты (une personne familière) et вы (politesse ou pluriel) : вы чита́ете.",
       ],
       table: {
@@ -135,6 +136,7 @@ export const ruCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "ru-a1-present-second",
@@ -142,7 +144,7 @@ export const ruCourse = {
       title: "Conjuguer au présent : говорить, смотреть et l’alternance",
       summary: "Former le présent de la 2e conjugaison (-ишь, -ит, -им, -ите, -ят/-ат) et repérer les alternances en я.",
       rule: [
-        "2e conjugaison : les verbes en -ить et quelques verbes en -еть ou -ать (смотре́ть, слы́шать) ont les terminaisons -ю/-у, -ишь, -ит, -им, -ите, -ят/-ат. Exemple : говори́ть → я говорю́, ты говори́шь, они́ говоря́т. Retiens -ят plutôt que -ут : c’est le signe de cette conjugaison.",
+        "2e conjugaison : la plupart des verbes en -ить et quelques verbes en -еть ou -ать (смотре́ть, слы́шать) ont les terminaisons -ю/-у, -ишь, -ит, -им, -ите, -ят/-ат. Exemple : говори́ть → я говорю́, ты говори́шь, они́ говоря́т. Retiens -ят plutôt que -ут : c’est le signe de cette conjugaison. Attention : жить, vu au point précédent, reste de la 1re conjugaison (ты живёшь, они́ живу́т).",
         "Alternance : à la 1re personne du singulier seulement, certaines consonnes changent. б, п, в, м, ф prennent un л (люби́ть → люблю́, mais ты лю́бишь) ; т → ч (плати́ть → плачу́) ; д → ж (ходи́ть → хожу́) ; с → ш (носи́ть → ношу́). Les autres personnes gardent la consonne d’origine.",
         "Piège : « j’aime » est я люблю́, jamais я любю́. Attention aussi à l’accent, qui change de place dans plusieurs verbes : я смотрю́, mais ты смо́тришь.",
       ],
@@ -202,6 +204,7 @@ export const ruCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "ru-a1-plural",
@@ -271,6 +274,7 @@ export const ruCourse = {
       ],
       categories: ["agreement", "spelling"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "ru-a1-prepositional",
@@ -280,7 +284,7 @@ export const ruCourse = {
       rule: [
         "Pour dire où l’on est (« где ? »), on emploie в ou на suivi du prépositionnel. La terminaison est presque toujours -е : стол → на столе́, го́род → в го́роде, Москва́ → в Москве́, музе́й → в музе́е.",
         "Cas particuliers : les noms en -ие / -ия font -ии (зда́ние → в зда́нии, Росси́я → в Росси́и) ; les féminins en -ь font -и (пло́щадь → на пло́щади) ; les masculins en -ь font -е (слова́рь → в словаре́). Quelques masculins prennent -у́ : в саду́, в лесу́, в шкафу́, на мосту́.",
-        "в = à l’intérieur (в ба́нке, в шко́ле, в магази́не) ; на = sur une surface, un espace ouvert ou une activité (на столе́, на у́лице, на вокза́ле, на рабо́те, на по́чте). Piège : le français dit toujours « à », mais le russe choisit mot par mot : на рабо́те, mais в о́фисе.",
+        "в = à l’intérieur (в ба́нке, в шко́ле, в магази́не) ; на = sur une surface, un espace ouvert ou une activité (на столе́, на у́лице, на вокза́ле, на рабо́те, на по́чте). Piège : le français dit souvent « à » dans les deux cas, mais le russe choisit mot par mot : на рабо́те, mais в о́фисе.",
       ],
       table: {
         caption: "Nominatif → « где ? »",
@@ -325,7 +329,7 @@ export const ruCourse = {
         },
         {
           type: "fill",
-          prompt: "Мы были в ___ вчера.",
+          prompt: "Сейчас мы в ___.",
           hint: "музей",
           answers: ["музее"],
           explanation: "Les noms en -й prennent -е au prépositionnel : в музее.",
@@ -333,13 +337,14 @@ export const ruCourse = {
         {
           type: "fill",
           prompt: "Моя сестра живёт в ___.",
-          hint: "Россия",
-          answers: ["России"],
-          explanation: "Les noms en -ия font -ии au prépositionnel : в России.",
+          hint: "Германия",
+          answers: ["Германии"],
+          explanation: "Les noms en -ия font -ии au prépositionnel : в Германии.",
         },
       ],
       categories: ["agreement", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "ru-a1-possessives",
@@ -385,8 +390,9 @@ export const ruCourse = {
         {
           type: "fill",
           prompt: "Это Иван, а это ___ жена.",
+          hint: "он",
           answers: ["его"],
-          explanation: "Le possesseur est un homme : его, invariable, même devant жена (féminin).",
+          explanation: "Le possesseur est Иван (он) : его, invariable, même devant жена (féminin).",
         },
         {
           type: "fill",
@@ -405,6 +411,7 @@ export const ruCourse = {
       ],
       categories: ["agreement", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "ru-a2-accusative",
@@ -413,7 +420,7 @@ export const ruCourse = {
       summary: "Mettre l’objet direct à l’accusatif et dire où l’on va avec в ou на.",
       rule: [
         "L’accusatif sert à l’objet direct (« qui ? quoi ? ») et à la direction après в / на (« куда́ ? »). Féminin : -а → -у, -я → -ю (кни́га → кни́гу, неде́ля → неде́лю). Neutre et masculin inanimé : aucun changement (стол, окно́). Féminin en -ь : aucun changement (дверь).",
-        "Pour un masculin animé (personne, animal), l’accusatif est identique au génitif : -а / -я. Ви́жу бра́та, Ива́на, дру́га, учи́теля. Les féminins restent réguliers : Ви́жу А́нну, ма́му.",
+        "Pour un masculin animé (personne, animal), l’accusatif est identique au génitif : -а / -я. Ви́жу бра́та, Ива́на, дру́га, учи́теля. Les féminins restent réguliers : Ви́жу А́нну, ма́му. Les masculins en -а suivent ce modèle : па́па → Ви́жу па́пу.",
         "Piège : en français, « je suis à l’école » et « je vais à l’école » utilisent la même préposition ; en russe, la question change le cas. Где ? → в шко́ле (prépositionnel) ; куда́ ? → в шко́лу (accusatif). De même на рабо́те / на рабо́ту.",
       ],
       table: {
@@ -465,14 +472,15 @@ export const ruCourse = {
         },
         {
           type: "transform",
-          instruction: "Dis que tu vas à cet endroit (remplace « где ? » par « куда ? »).",
+          instruction: "Dis que tu y vas à pied en ce moment : utilise иду et remplace « где ? » par « куда ? ».",
           source: "Я сейчас в школе.",
-          answers: ["Я сейчас иду в школу.", "Сейчас я иду в школу."],
+          answers: ["Я сейчас иду в школу.", "Сейчас я иду в школу.", "Я иду сейчас в школу.", "Я иду в школу сейчас.", "Я иду в школу."],
           explanation: "Pour dire où l’on va, on emploie в + accusatif : в школу.",
         },
       ],
       categories: ["agreement", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "ru-a2-genitive",
@@ -480,7 +488,7 @@ export const ruCourse = {
       title: "Le génitif : у меня есть / нет, absence, quantité",
       summary: "Utiliser le génitif pour dire ce qu’on a ou n’a pas, l’appartenance et la quantité.",
       rule: [
-        "Le génitif répond à « de qui ? de quoi ? ». Masculin : consonne → -а, -й / -ь → -я ; féminin : -а → -ы (-и après г, к, х, ж, ш, ч, щ), -я → -и ; neutre : -о → -а, -е → -я. Voir le tableau.",
+        "Le génitif répond à « de qui ? de quoi ? ». Masculin : consonne → -а, -й / -ь → -я ; féminin : -а → -ы (-и après г, к, х, ж, ш, ч, щ), -я et -ь → -и (тетра́дь → тетра́ди) ; neutre : -о → -а, -е → -я. Voir le tableau.",
         "Trois emplois essentiels. L’absence : у меня́ нет сестры́, в го́роде нет метро́. La possession : кни́га дру́га, ко́мната Ива́на (le possesseur suit le nom). La quantité : мно́го, ма́ло, не́сколько, буты́лка, ча́шка + génitif (мно́го вре́мени, буты́лка воды́).",
         "Piège : le russe n’a pas de verbe « avoir ». On dit у меня́ есть + nominatif (« chez moi il y a »), et à la négation le nom passe au génitif : У меня́ есть сестра́ → У меня́ нет сестры́. En français, seul l’article change (« une sœur » / « pas de sœur »).",
       ],
@@ -493,6 +501,8 @@ export const ruCourse = {
           ["сестра́", "сестры́", "-а → -ы"],
           ["кни́га", "кни́ги", "-а → -и après г"],
           ["неде́ля", "неде́ли", "-я → -и"],
+          ["тетра́дь", "тетра́ди", "féminin en -ь → -и"],
+          ["слова́рь", "словаря́", "masculin en -ь → -я"],
           ["окно́", "окна́", "-о → -а"],
           ["мо́ре", "мо́ря", "-е → -я"],
         ],
@@ -542,6 +552,7 @@ export const ruCourse = {
       ],
       categories: ["agreement", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "ru-a2-past",
@@ -549,7 +560,7 @@ export const ruCourse = {
       title: "Le passé : -л, -ла, -ло, -ли",
       summary: "Former le passé et l’accorder avec le genre et le nombre du sujet.",
       rule: [
-        "Le passé se forme à partir de l’infinitif : on retire -ть et on ajoute -л (masculin), -ла (féminin), -ло (neutre) ou -ли (pluriel) : чита́ть → чита́л, чита́ла, чита́ло, чита́ли. Il n’y a pas de conjugaison par personne : seul le genre du sujet compte.",
+        "Le passé se forme à partir de l’infinitif : on retire -ть et on ajoute -л (masculin), -ла (féminin), -ло (neutre) ou -ли (pluriel) : чита́ть → чита́л, чита́ла, чита́ло, чита́ли. Il n’y a pas de conjugaison par personne : seuls le genre et le nombre du sujet comptent.",
         "Un homme dit я рабо́тал, une femme я рабо́тала. Pour ты, tout dépend de la personne : ты рабо́тал (à un homme), ты рабо́тала (à une femme). Avec вы, on met toujours le pluriel, même pour une seule personne : вы рабо́тали.",
         "Pas de passé composé ni d’imparfait : « j’ai lu » et « je lisais » se traduisent par un seul passé (le choix de l’aspect viendra au niveau B1). À retenir : быть → был, была́, бы́ло, бы́ли ; идти́ → шёл, шла, шло, шли ; мочь → мог, могла́.",
       ],
@@ -608,6 +619,7 @@ export const ruCourse = {
       ],
       categories: ["verb", "agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "ru-a2-motion",
@@ -664,14 +676,15 @@ export const ruCourse = {
         },
         {
           type: "fill",
-          prompt: "Мы ___ в Москву на поезде.",
+          prompt: "Сейчас мы ___ в Москву на поезде.",
           hint: "ехать",
           answers: ["едем"],
-          explanation: "Trajet précis en train, donc véhicule : едем.",
+          explanation: "Сейчас : trajet précis en cours, en train, donc véhicule : едем.",
         },
       ],
       categories: ["verb", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "ru-a2-dative",
@@ -679,9 +692,9 @@ export const ruCourse = {
       title: "Le datif : мне нравится, l’âge, к + datif",
       summary: "Utiliser le datif pour la personne à qui l’on donne, qui aime, qui a tel âge, ou chez qui l’on va.",
       rule: [
-        "Le datif répond à « à qui ? ». Masculin : -у / -ю (брат → бра́ту) ; féminin : -а / -я → -е (сестра́ → сестре́), -ия → -ии ; neutre : -о → -у. Pronoms : я → мне, ты → тебе́, он → ему́, она́ → ей, мы → нам, вы → вам, они́ → им.",
-        "Нра́виться se construit à l’envers de « aimer » : la personne qui apprécie est au datif, ce qui plaît est le sujet. Мне нра́вится э́тот го́род (« cette ville me plaît ») ; au pluriel, Мне нра́вятся э́ти цены́. Piège : le verbe s’accorde avec la chose qui plaît, pas avec toi.",
-        "Âge : мне 20 лет, avec la personne au datif. Rappel : 1 → год, 2 à 4 → го́да, 5 et plus → лет (Ей 23 го́да, Ему́ 31 год). К + datif signifie « chez, vers » : Я иду́ к врачу́.",
+        "Le datif répond à « à qui ? ». Masculin : -у / -ю (брат → бра́ту) ; féminin : -а / -я → -е (сестра́ → сестре́), -ия → -ии, -ь → -и (дверь → две́ри) ; neutre : -о → -у. Pronoms : я → мне, ты → тебе́, он → ему́, она́ → ей, мы → нам, вы → вам, они́ → им.",
+        "Нра́виться se construit à l’envers de « aimer » : la personne qui apprécie est au datif, ce qui plaît est le sujet. Мне нра́вится э́тот го́род (« cette ville me plaît ») ; au pluriel, Мне нра́вятся э́ти фи́льмы. Piège : le verbe s’accorde avec la chose qui plaît, pas avec toi.",
+        "Âge : мне 20 лет, avec la personne au datif. Le mot dépend du dernier chiffre : 1 → год, 2 à 4 → го́да, 0 et 5 à 9 → лет, et toujours лет de 11 à 14 (Ей 23 го́да, Ему́ 31 год, Мне 12 лет). К + datif signifie « chez, vers » : Я иду́ к врачу́.",
       ],
       table: {
         caption: "Pronoms au datif",
@@ -741,6 +754,7 @@ export const ruCourse = {
       ],
       categories: ["agreement", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "ru-a2-instrumental",
@@ -769,7 +783,7 @@ export const ruCourse = {
       examples: [
         { text: "Я обе́даю с колле́гой.", translation: "Je déjeune avec un collègue.", note: "Колле́га → с колле́гой." },
         { text: "Мой брат рабо́тает инжене́ром.", translation: "Mon frère travaille comme ingénieur.", note: "Métier : instrumental, sans préposition." },
-        { text: "Мы идём в кино́ с не́й.", translation: "Nous allons au cinéma avec elle.", note: "С не́й : н- après la préposition." },
+        { text: "Сего́дня я иду́ с не́й в кино́.", translation: "Aujourd’hui, je vais au cinéma avec elle.", note: "С не́й : н- après la préposition." },
         { text: "Она́ хо́чет стать врачо́м.", translation: "Elle veut devenir médecin.", note: "Стать + instrumental." },
       ],
       exercises: [
@@ -796,7 +810,7 @@ export const ruCourse = {
         },
         {
           type: "fill",
-          prompt: "Она хочет стать ___.",
+          prompt: "Мой брат хочет стать ___.",
           hint: "учитель",
           answers: ["учителем"],
           explanation: "Après стать, l’instrumental : учитель → учителем (-ь → -ем).",
@@ -811,6 +825,7 @@ export const ruCourse = {
       ],
       categories: ["agreement", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "ru-b1-aspect",
@@ -826,19 +841,19 @@ export const ruCourse = {
         caption: "Quelques couples de verbes",
         headers: ["Imperfectif", "Perfectif", "Sens"],
         rows: [
-          ["делать", "сделать", "faire"],
-          ["читать", "прочитать", "lire"],
-          ["писать", "написать", "écrire"],
-          ["покупать", "купить", "acheter"],
-          ["решать", "решить", "résoudre, décider"],
-          ["открывать", "открыть", "ouvrir"],
+          ["де́лать", "сде́лать", "faire"],
+          ["чита́ть", "прочита́ть", "lire"],
+          ["писа́ть", "написа́ть", "écrire"],
+          ["покупа́ть", "купи́ть", "acheter"],
+          ["реша́ть", "реши́ть", "résoudre, décider"],
+          ["открыва́ть", "откры́ть", "ouvrir"],
         ],
       },
       examples: [
-        { text: "Весь день я писал отчёт.", translation: "J’ai passé la journée à écrire le rapport.", note: "Durée, déroulement : imperfectif." },
-        { text: "Наконец я написал отчёт и отправил его начальнику.", translation: "J’ai enfin écrit le rapport et je l’ai envoyé à mon chef.", note: "Résultat acquis : perfectif." },
-        { text: "Раньше мы часто обедали в этом кафе.", translation: "Avant, nous déjeunions souvent dans ce café.", note: "Répétition : imperfectif." },
-        { text: "Вчера я купил билеты на поезд.", translation: "Hier j’ai acheté les billets de train.", note: "Action ponctuelle, achevée : perfectif." },
+        { text: "Весь день я писа́л отчёт.", translation: "J’ai passé la journée à écrire le rapport.", note: "Durée, déroulement : imperfectif." },
+        { text: "Наконе́ц я написа́л отчёт и отпра́вил его́ нача́льнику.", translation: "J’ai enfin écrit le rapport et je l’ai envoyé à mon chef.", note: "Résultat acquis : perfectif." },
+        { text: "Ра́ньше мы ча́сто обе́дали в э́том кафе́.", translation: "Avant, nous déjeunions souvent dans ce café.", note: "Répétition : imperfectif." },
+        { text: "Вчера́ я купи́л биле́ты на по́езд.", translation: "Hier j’ai acheté les billets de train.", note: "Action ponctuelle, achevée : perfectif." },
       ],
       exercises: [
         {
@@ -850,7 +865,7 @@ export const ruCourse = {
         },
         {
           type: "choose",
-          prompt: "Наконец-то я ___ этот сложный отчёт!",
+          prompt: "Вчера вечером я наконец-то ___ этот сложный отчёт!",
           options: ["написал", "писал", "пишу", "напишу"],
           answer: 0,
           explanation: "Наконец-то annonce un résultat atteint : perfectif au passé, написал.",
@@ -873,12 +888,13 @@ export const ruCourse = {
           type: "fill",
           prompt: "Когда я жил в Москве, я каждый день ___ по-русски.",
           hint: "говорить",
-          answers: ["говорил"],
-          explanation: "Каждый день exprime une habitude : imperfectif, говорил.",
+          answers: ["говорил", "говорила"],
+          explanation: "Каждый день exprime une habitude : imperfectif, говорил (ou говорила).",
         },
       ],
       categories: ["verb", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "ru-b1-future",
@@ -888,25 +904,25 @@ export const ruCourse = {
       rule: [
         "Imperfectif : futur composé, буду, будешь, будет, будем, будете, будут + infinitif (я буду читать). Perfectif : futur simple, avec les terminaisons du présent ajoutées au radical perfectif (я прочитаю, ты прочитаешь). Le perfectif n’a pas de présent : sa forme conjuguée est toujours un futur.",
         "Choisis selon le sens : déroulement, durée ou répétition → буду + infinitif (Завтра я буду писать отчёт весь день) ; résultat, action unique → perfectif (Завтра я напишу отчёт : il sera terminé).",
-        "Pièges : on n’écrit jamais буду + perfectif (я буду прочитать est faux). Et après если et когда, le russe garde le futur, là où le français met le présent : Если ты напишешь, я отвечу (« si tu écris, je répondrai »).",
+        "Pièges : on n’écrit jamais буду + perfectif (я буду прочитать est faux). Après если, le russe met le futur là où le français met le présent : Если ты напишешь, я отвечу (« si tu écris, je répondrai »). Après когда, le futur, comme en français : Когда я приеду, я позвоню (« quand j’arriverai, j’appellerai »).",
       ],
       table: {
-        caption: "Futur de читать (imperfectif) et de прочитать (perfectif)",
+        caption: "Futur de чита́ть (imperfectif) et de прочита́ть (perfectif)",
         headers: ["Personne", "Imperfectif", "Perfectif"],
         rows: [
-          ["я", "буду читать", "прочитаю"],
-          ["ты", "будешь читать", "прочитаешь"],
-          ["он / она", "будет читать", "прочитает"],
-          ["мы", "будем читать", "прочитаем"],
-          ["вы", "будете читать", "прочитаете"],
-          ["они", "будут читать", "прочитают"],
+          ["я", "бу́ду чита́ть", "прочита́ю"],
+          ["ты", "бу́дешь чита́ть", "прочита́ешь"],
+          ["он / она́", "бу́дет чита́ть", "прочита́ет"],
+          ["мы", "бу́дем чита́ть", "прочита́ем"],
+          ["вы", "бу́дете чита́ть", "прочита́ете"],
+          ["они́", "бу́дут чита́ть", "прочита́ют"],
         ],
       },
       examples: [
-        { text: "Завтра я буду работать дома.", translation: "Demain je travaillerai à la maison.", note: "Durée : буду + infinitif." },
-        { text: "Я позвоню тебе, когда приеду в офис.", translation: "Je t’appellerai quand j’arriverai au bureau.", note: "Позвоню et приеду sont deux perfectifs au futur." },
-        { text: "Если ты напишешь мне, я сразу отвечу.", translation: "Si tu m’écris, je répondrai tout de suite.", note: "Après если, futur (напишешь) ; le français met le présent." },
-        { text: "На следующей неделе мы будем обсуждать новый проект.", translation: "La semaine prochaine nous discuterons du nouveau projet.", note: "Processus qui prendra du temps : imperfectif." },
+        { text: "За́втра я бу́ду рабо́тать до́ма.", translation: "Demain je travaillerai à la maison.", note: "Durée : буду + infinitif." },
+        { text: "Я позвоню́ тебе́, когда́ прие́ду в о́фис.", translation: "Je t’appellerai quand j’arriverai au bureau.", note: "Позвоню et приеду sont deux perfectifs au futur." },
+        { text: "Е́сли ты напи́шешь мне, я сра́зу отве́чу.", translation: "Si tu m’écris, je répondrai tout de suite.", note: "Après если, futur (напишешь) ; le français met le présent." },
+        { text: "На сле́дующей неде́ле мы бу́дем обсужда́ть но́вый прое́кт.", translation: "La semaine prochaine nous discuterons du nouveau projet.", note: "Processus qui prendra du temps : imperfectif." },
       ],
       exercises: [
         {
@@ -926,7 +942,7 @@ export const ruCourse = {
         {
           type: "choose",
           prompt: "Если ты ___ мне сообщение, я сразу отвечу.",
-          options: ["пишешь", "написал", "напишешь", "писал"],
+          options: ["пишешь", "написать", "напишешь", "писал"],
           answer: 2,
           explanation: "Après если, on garde le futur, et ici l’action est ponctuelle : напишешь.",
         },
@@ -947,6 +963,7 @@ export const ruCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "ru-b1-imperative",
@@ -955,26 +972,26 @@ export const ruCourse = {
       summary: "Former l’impératif (ты / вы) et choisir entre ordre ponctuel (perfectif) et invitation ou interdiction (imperfectif).",
       rule: [
         "On part du radical de la 3e personne du pluriel : après une voyelle, -й (читают → читай) ; après une consonne, -и si l’accent tombe sur la terminaison du « я » (говорю → говори, пишу → пиши), sinon -ь (ответь, поставь). Pour вы, on ajoute -те : читайте, говорите, ответьте.",
-        "Perfectif : un ordre ou une demande pour un résultat, une seule fois (Открой окно, пожалуйста). Imperfectif : une invitation polie ou une action à répéter (Проходите, садитесь !), et presque toujours l’interdiction avec не (Не открывай окно !).",
-        "Piège : le français a un seul impératif, le russe en a deux. « Ne fais pas ça ! » est presque toujours Не делай этого. Le perfectif négatif existe, mais comme avertissement d’un accident : Осторожно, не упади ! (« attention de ne pas tomber »).",
+        "Perfectif : un ordre ou une demande pour un résultat, une seule fois (Открой окно, пожалуйста). Imperfectif : une invitation polie ou une action à répéter (Проходите, садитесь!), et presque toujours l’interdiction avec не (Не открывай окно!).",
+        "Piège : le français a un seul impératif, le russe en a deux. « Ne fais pas ça ! » est presque toujours Не делай этого. Le perfectif négatif existe, mais comme avertissement d’un accident : Осторожно, не упади! (« attention de ne pas tomber »).",
       ],
       table: {
         caption: "Impératif : ты et вы",
         headers: ["Infinitif", "ты", "вы"],
         rows: [
-          ["читать", "читай", "читайте"],
-          ["говорить", "говори", "говорите"],
-          ["писать", "пиши", "пишите"],
-          ["открыть", "открой", "откройте"],
-          ["сказать", "скажи", "скажите"],
-          ["ответить", "ответь", "ответьте"],
+          ["чита́ть", "чита́й", "чита́йте"],
+          ["говори́ть", "говори́", "говори́те"],
+          ["писа́ть", "пиши́", "пиши́те"],
+          ["откры́ть", "откро́й", "откро́йте"],
+          ["сказа́ть", "скажи́", "скажи́те"],
+          ["отве́тить", "отве́ть", "отве́тьте"],
         ],
       },
       examples: [
-        { text: "Открой, пожалуйста, окно: здесь душно.", translation: "Ouvre la fenêtre, s’il te plaît : il fait lourd ici.", note: "Demande ponctuelle, résultat attendu : perfectif." },
-        { text: "Проходите, садитесь, чувствуйте себя как дома!", translation: "Entrez, asseyez-vous, faites comme chez vous !", note: "Invitation polie : imperfectif." },
-        { text: "Не открывай эту дверь, там сквозняк.", translation: "N’ouvre pas cette porte, il y a un courant d’air.", note: "Interdiction avec не : imperfectif." },
-        { text: "Осторожно, не упади!", translation: "Attention, ne tombe pas !", note: "Perfectif négatif : mise en garde contre un accident." },
+        { text: "Откро́й, пожа́луйста, окно́: здесь ду́шно.", translation: "Ouvre la fenêtre, s’il te plaît : on étouffe ici.", note: "Demande ponctuelle, résultat attendu : perfectif." },
+        { text: "Проходи́те, сади́тесь, чу́вствуйте себя́ как до́ма!", translation: "Entrez, asseyez-vous, faites comme chez vous !", note: "Invitation polie : imperfectif." },
+        { text: "Не открыва́й окно́, бу́дет сквозня́к.", translation: "N’ouvre pas la fenêtre, ça va faire un courant d’air.", note: "Interdiction avec не : imperfectif." },
+        { text: "Осторо́жно, не упади́!", translation: "Attention, ne tombe pas !", note: "Perfectif négatif : mise en garde contre un accident." },
       ],
       exercises: [
         {
@@ -994,7 +1011,7 @@ export const ruCourse = {
         {
           type: "choose",
           prompt: "Ребята, ___ внимательно!",
-          options: ["слушай", "слушайте", "слушаем"],
+          options: ["слушай", "слушайте", "слушают"],
           answer: 1,
           explanation: "On s’adresse à plusieurs personnes : -те s’ajoute, слушайте.",
         },
@@ -1015,6 +1032,7 @@ export const ruCourse = {
       ],
       categories: ["verb", "register"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "ru-b1-numbers",
@@ -1023,25 +1041,25 @@ export const ruCourse = {
       summary: "Accorder le nom au nombre : nominatif après 1, génitif singulier après 2-4, génitif pluriel après 5 et plus.",
       rule: [
         "Le nom change selon le dernier chiffre du nombre. 1, 21, 101 : nominatif singulier (один стол, двадцать один стол). 2, 3, 4 (22, 33, 104) : génitif singulier (два стола, три книги). 5 à 20, 25, 30 : génitif pluriel (пять столов, десять книг). 11 à 14 suivent la règle de 5 et plus (одиннадцать столов).",
-        "Genre : один / одна / одно, mais seulement два / две pour le féminin (две книги, два окна). Génitif pluriel : masculin → -ов (-ев après -й : музеев ; -ей après -ь, ж, ш, ч, щ : словарей) ; féminin et neutre → on retire la terminaison (книга → книг, окно → окон), souvent avec une voyelle fugitive (сестра → сестёр).",
+        "Genre : один / одна / одно ; два a un féminin, две (две книги, mais два окна, два стола) ; три et четыре ne changent pas. Génitif pluriel : masculin → -ов (-ев après -й : музеев ; -ей après -ь, ж, ш, ч, щ : словарей) ; féminin en -а et neutre en -о → on retire la terminaison (книга → книг, окно → окон), parfois avec une voyelle mobile (сестра → сестёр) ; féminin en -ь → -ей (тетрадь → тетрадей).",
         "Piège : le français met le pluriel partout (« deux tables », « cinq tables »). Retiens le trio один стол, два стола, пять столов. Même logique pour l’âge : один год, два года, пять лет.",
       ],
       table: {
         caption: "Quel cas après quel nombre ?",
         headers: ["Nombre", "Nom au…", "Exemple"],
         rows: [
-          ["1, 21, 101", "nominatif singulier", "один стол"],
-          ["2, 3, 4, 22…", "génitif singulier", "два стола, три книги"],
-          ["2 (féminin)", "génitif singulier", "две недели"],
-          ["5 à 20, 25, 30…", "génitif pluriel", "пять столов, десять книг"],
-          ["11 à 14", "génitif pluriel", "одиннадцать столов"],
+          ["1, 21, 101", "nominatif singulier", "оди́н стол"],
+          ["2, 3, 4, 22…", "génitif singulier", "два стола́, три кни́ги"],
+          ["2 (féminin)", "génitif singulier", "две неде́ли"],
+          ["5 à 20, 25, 30…", "génitif pluriel", "пять столо́в, де́сять книг"],
+          ["11 à 14", "génitif pluriel", "оди́ннадцать столо́в"],
         ],
       },
       examples: [
-        { text: "У меня два брата и три сестры.", translation: "J’ai deux frères et trois sœurs.", note: "Два / три + génitif singulier : брата, сестры." },
-        { text: "В нашей комнате пять окон и один большой стол.", translation: "Dans notre pièce il y a cinq fenêtres et une grande table.", note: "Пять + génitif pluriel : окон ; один + nominatif." },
-        { text: "Мы работаем вместе уже двадцать один год.", translation: "Nous travaillons ensemble depuis vingt et un ans.", note: "21 se termine par 1 : год, comme après один." },
-        { text: "Я купил две бутылки воды и десять яблок.", translation: "J’ai acheté deux bouteilles d’eau et dix pommes.", note: "Две (féminin) + génitif singulier ; десять + génitif pluriel." },
+        { text: "У меня́ два бра́та и три сестры́.", translation: "J’ai deux frères et trois sœurs.", note: "Два / три + génitif singulier : брата, сестры." },
+        { text: "В на́шей ко́мнате пять о́кон и оди́н большо́й стол.", translation: "Dans notre pièce il y a cinq fenêtres et une grande table.", note: "Пять + génitif pluriel : окон ; один + nominatif." },
+        { text: "Мы рабо́таем вме́сте уже́ два́дцать оди́н год.", translation: "Nous travaillons ensemble depuis vingt et un ans.", note: "21 se termine par 1 : год, comme après один." },
+        { text: "Я купи́л две буты́лки воды́ и де́сять я́блок.", translation: "J’ai acheté deux bouteilles d’eau et dix pommes.", note: "Две (féminin) + génitif singulier ; десять + génitif pluriel." },
       ],
       exercises: [
         {
@@ -1082,6 +1100,7 @@ export const ruCourse = {
       ],
       categories: ["agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "ru-b1-relative",
@@ -1089,27 +1108,27 @@ export const ruCourse = {
       title: "Le pronom relatif который",
       summary: "Accorder который en genre et en nombre avec l’antécédent, et en cas avec sa fonction dans la relative.",
       rule: [
-        "Который (« qui, que, dont, où, à qui… ») introduit une relative et remplace tous les relatifs français. Il suit deux règles : son genre et son nombre sont ceux du mot qu’il remplace (мужчина, который… ; книга, которая… ; письмо, которое… ; люди, которые…), mais son cas dépend de sa fonction dans la relative.",
+        "Который (« qui, que, dont, où, à qui… ») introduit une relative et peut traduire tous les relatifs français ; pour un lieu, on dit aussi souvent где (город, где я живу). Il suit deux règles : son genre et son nombre sont ceux du mot qu’il remplace (мужчина, который… ; книга, которая… ; письмо, которое… ; люди, которые…), mais son cas dépend de sa fonction dans la relative.",
         "Méthode : 1) trouve l’antécédent et recopie son genre et son nombre ; 2) demande-toi quel cas exige le verbe ou la préposition dans la relative. Это книга, которую я читаю (objet direct : accusatif féminin). Город, в котором я живу (в + prépositionnel masculin). Девушка, с которой ты говорил (с + instrumental féminin).",
-        "Piège : le français distingue qui / que / dont / où ; le russe garde un seul mot et change sa terminaison. Une virgule précède toujours который. Pour un masculin animé, l’accusatif est identique au génitif : человек, которого я вижу.",
+        "Piège : le français distingue qui / que / dont / où ; le russe garde un seul mot et change sa terminaison. Une virgule ouvre toujours la relative : devant который, ou devant la préposition qui le précède (город, в котором я живу). Pour un masculin animé, l’accusatif est identique au génitif : человек, которого я вижу.",
       ],
       table: {
-        caption: "Который selon le cas (neutre : comme le masculin, sauf которое)",
+        caption: "Кото́рый selon le cas (neutre : comme le masculin, sauf кото́рое)",
         headers: ["Cas", "Masculin", "Féminin", "Pluriel"],
         rows: [
-          ["Nominatif", "который", "которая", "которые"],
-          ["Accusatif (inanimé)", "который", "которую", "которые"],
-          ["Génitif", "которого", "которой", "которых"],
-          ["Datif", "которому", "которой", "которым"],
-          ["Instrumental", "которым", "которой", "которыми"],
-          ["Prépositionnel", "котором", "которой", "которых"],
+          ["Nominatif", "кото́рый", "кото́рая", "кото́рые"],
+          ["Accusatif (inanimé)", "кото́рый", "кото́рую", "кото́рые"],
+          ["Génitif", "кото́рого", "кото́рой", "кото́рых"],
+          ["Datif", "кото́рому", "кото́рой", "кото́рым"],
+          ["Instrumental", "кото́рым", "кото́рой", "кото́рыми"],
+          ["Prépositionnel", "кото́ром", "кото́рой", "кото́рых"],
         ],
       },
       examples: [
-        { text: "Это коллега, который работает со мной в одном отделе.", translation: "C’est un collègue qui travaille avec moi dans le même service.", note: "Sujet de la relative : nominatif masculin." },
-        { text: "Книга, которую я читаю, очень интересная.", translation: "Le livre que je lis est très intéressant.", note: "Книга : féminin ; читаю demande l’accusatif : которую." },
-        { text: "Мы живём в городе, в котором много парков.", translation: "Nous habitons dans une ville où il y a beaucoup de parcs.", note: "В + prépositionnel masculin : в котором." },
-        { text: "Девушка, с которой ты говорил, наш новый директор.", translation: "La jeune femme à qui tu parlais est notre nouvelle directrice.", note: "С + instrumental féminin : с которой." },
+        { text: "Э́то колле́га, кото́рый рабо́тает со мно́й в одно́м отде́ле.", translation: "C’est un collègue qui travaille avec moi dans le même service.", note: "Sujet de la relative : nominatif masculin." },
+        { text: "Кни́га, кото́рую я чита́ю, о́чень интере́сная.", translation: "Le livre que je lis est très intéressant.", note: "Книга : féminin ; читаю demande l’accusatif : которую." },
+        { text: "Мы живём в го́роде, в кото́ром мно́го па́рков.", translation: "Nous habitons dans une ville où il y a beaucoup de parcs.", note: "В + prépositionnel masculin : в котором." },
+        { text: "Де́вушка, с кото́рой ты говори́л, — наш но́вый дире́ктор.", translation: "La jeune femme à qui tu parlais est notre nouvelle directrice.", note: "С + instrumental féminin : с которой." },
       ],
       exercises: [
         {
@@ -1150,6 +1169,7 @@ export const ruCourse = {
       ],
       categories: ["agreement", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "ru-b1-prefixed-motion",
@@ -1165,19 +1185,19 @@ export const ruCourse = {
         caption: "Préfixes et verbes de mouvement",
         headers: ["Préfixe", "Sens", "Perfectif", "Imperfectif"],
         rows: [
-          ["при-", "arriver", "прийти, приехать", "приходить, приезжать"],
-          ["у-", "partir", "уйти, уехать", "уходить, уезжать"],
-          ["в-", "entrer", "войти, въехать", "входить, въезжать"],
-          ["вы-", "sortir", "выйти, выехать", "выходить, выезжать"],
-          ["пере-", "traverser, déménager", "перейти, переехать", "переходить, переезжать"],
-          ["за-", "passer, faire un détour", "зайти, заехать", "заходить, заезжать"],
+          ["при-", "arriver", "прийти́, прие́хать", "приходи́ть, приезжа́ть"],
+          ["у-", "partir", "уйти́, уе́хать", "уходи́ть, уезжа́ть"],
+          ["в-", "entrer", "войти́, въе́хать", "входи́ть, въезжа́ть"],
+          ["вы-", "sortir", "вы́йти, вы́ехать", "выходи́ть, выезжа́ть"],
+          ["пере-", "traverser, déménager", "перейти́, перее́хать", "переходи́ть, переезжа́ть"],
+          ["за-", "passer, faire un détour", "зайти́, зае́хать", "заходи́ть, заезжа́ть"],
         ],
       },
       examples: [
-        { text: "Я приду в офис в девять часов.", translation: "J’arriverai au bureau à neuf heures.", note: "При- = arriver, à pied ; приду est un futur perfectif." },
-        { text: "Вчера Анна ушла с работы раньше.", translation: "Hier Anna est partie plus tôt du travail.", note: "Уйти с работы : на работе → с работы." },
-        { text: "Когда я вошёл в комнату, все замолчали.", translation: "Quand je suis entré dans la pièce, tout le monde s’est tu.", note: "Войти в + accusatif." },
-        { text: "По дороге домой я зайду в магазин.", translation: "En rentrant, je passerai au magasin.", note: "Зайти в : s’arrêter brièvement quelque part." },
+        { text: "Я приду́ в о́фис в де́вять часо́в.", translation: "J’arriverai au bureau à neuf heures.", note: "При- = arriver, à pied ; приду est un futur perfectif." },
+        { text: "Вчера́ А́нна ушла́ с рабо́ты ра́ньше.", translation: "Hier Anna est partie plus tôt du travail.", note: "Уйти с работы : на работе → с работы." },
+        { text: "Когда́ я вошёл в ко́мнату, все замолча́ли.", translation: "Quand je suis entré dans la pièce, tout le monde s’est tu.", note: "Войти в + accusatif." },
+        { text: "По доро́ге домо́й я зайду́ в магази́н.", translation: "En rentrant, je passerai au magasin.", note: "Зайти в : s’arrêter brièvement quelque part." },
       ],
       exercises: [
         {
@@ -1203,7 +1223,7 @@ export const ruCourse = {
         },
         {
           type: "fill",
-          prompt: "Он ___ с работы в шесть часов.",
+          prompt: "Вчера он ___ с работы в шесть часов.",
           hint: "уйти",
           answers: ["ушёл"],
           explanation: "Уйти (partir, à pied) au passé masculin : ушёл. On dit уйти с работы.",
@@ -1218,6 +1238,7 @@ export const ruCourse = {
       ],
       categories: ["verb", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
   ],
 } satisfies GrammarCourse;
