@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { FIXTURE_YOUTUBE_DOSSIER } from "@/test/assessment-fixtures";
+import { FIXTURE_DOSSIER, FIXTURE_YOUTUBE_DOSSIER } from "@/test/assessment-fixtures";
 import { ASSESSMENT_LIMITS, type AssessmentDossier } from "@/lib/schemas/assessment";
 import { audioPublicPath } from "./audio";
 import { ASSESSMENT_DOSSIERS } from "./dossiers";
@@ -7,8 +7,8 @@ import { listeningMode } from "./policy";
 import { toPublicDossier } from "./public-dossier";
 
 const real = Object.values(ASSESSMENT_DOSSIERS).flat();
-/** Real dossiers whose listening is a script, with the script typed. */
-const scripted = real.flatMap((d) => (d.listening.source === "script" ? [{ ...d, script: d.listening.script }] : []));
+/** Dossiers whose listening is a script, with the script typed: the fixture, since the pilot dossiers all use videos. */
+const scripted = [FIXTURE_DOSSIER, ...real].flatMap((d) => (d.listening.source === "script" ? [{ ...d, script: d.listening.script }] : []));
 const questions = (d: AssessmentDossier) => [...d.reading.questions, ...d.listening.questions];
 
 /** The text the learner is meant to see, to tell an expected point leaking from one that is in a prompt. */

@@ -12,7 +12,7 @@ export const dossier: AssessmentDossier = {
       {
         id: "it-a1-1-r1",
         prompt: "Comment Giulia voyage-t-elle, et avec qui ?",
-        referenceAnswer: "Giulia viaggia in treno, con sua sorella.",
+        referenceAnswer: "Giulia voyage en train, avec sa sœur.",
         expectedPoints: ["en train", "avec sa sœur"],
       },
       {
@@ -30,26 +30,33 @@ export const dossier: AssessmentDossier = {
     ],
   },
   listening: {
-    source: "script",
-    script: "Siamo in albergo. La camera è al secondo piano. C’è un letto grande e un balcone. Chiedo alla receptionist: «Dov’è il museo?». Lei risponde: «È a dieci minuti a piedi da qui». Che bello! Andiamo subito.",
+    source: "youtube",
+    video: {
+      youtubeId: "8JGpPHBx7-k",
+      title: "La storia di Italo, capitolo 1 - Short stories for beginners in Italian",
+      channel: "Podcast Italiano",
+      start: 35,
+      end: 71,
+      checkedOn: null,
+    },
     questions: [
       {
         id: "it-a1-1-l1",
-        prompt: "À quel étage se trouve la chambre ?",
-        referenceAnswer: "La chambre est au deuxième étage.",
-        expectedPoints: ["au deuxième étage"],
+        prompt: "Quel âge a Italo ?",
+        referenceAnswer: "Il a 30 ans.",
+        expectedPoints: ["30 ans"],
       },
       {
         id: "it-a1-1-l2",
-        prompt: "Qu’y a-t-il dans la chambre ?",
-        referenceAnswer: "Il y a un grand lit et un balcon.",
-        expectedPoints: ["un grand lit", "un balcon"],
+        prompt: "Que demande Italo à sa mère ?",
+        referenceAnswer: "Il lui demande de lui raconter son enfance, la vérité : il sait qu’elle n’est pas sa vraie mère.",
+        expectedPoints: ["raconter son enfance / la vérité", "elle n’est pas sa vraie mère"],
       },
       {
         id: "it-a1-1-l3",
-        prompt: "Où est le musée, d’après la dame ?",
-        referenceAnswer: "Le musée est tout près, à dix minutes à pied.",
-        expectedPoints: ["tout près", "dix minutes à pied"],
+        prompt: "Où Italo est-il né, et pourquoi s’appelle-t-il Italo ?",
+        referenceAnswer: "Il est né en Italie, c’est pour cela qu’il s’appelle Italo.",
+        expectedPoints: ["en Italie", "son prénom vient de l’Italie"],
       },
     ],
   },

@@ -10,7 +10,7 @@ Règles :
 - Une vidéo supprimée, privée ou non intégrable rend le dossier indisponible : à contrôler par `assessment:check`.
 - Prévenir l’apprenant avant l’épreuve qu’une publicité peut précéder l’extrait, à chaque écoute (constaté : pub avant la vidéo, et pubs au milieu quand on saute au début du passage).
 
-Les trois passages (ru A2, ru B2, it B2) sont maintenant dans les dossiers `ru-a2-1`, `ru-b2-1` et `it-b2-1` (`src/lib/assessment/dossiers/`), avec `checkedOn: null` : à renseigner (date du jour) après avoir écouté le passage et validé les points ci-dessous. Tant que `checkedOn` est null, le dossier n’est pas publié sous la politique « hide ».
+Les douze dossiers pilotes ont maintenant un passage YouTube : les trois premiers (ru A2, ru B2, it B2) dans `ru-a2-1`, `ru-b2-1` et `it-b2-1`, les neuf autres plus bas (`src/lib/assessment/dossiers/`), avec `checkedOn: null` : à renseigner (date du jour) après avoir écouté le passage et validé les points ci-dessous. Tant que `checkedOn` est null, le dossier n’est pas publié sous la politique « hide ».
 
 Les questions ci-dessous sont rédigées d’après les sous-titres manuels de la chaîne. **À valider à l’écoute** : bornes exactes du passage, niveau, texte affiché à l’écran pendant le passage.
 
@@ -62,8 +62,20 @@ Les questions ci-dessous sont rédigées d’après les sous-titres manuels de l
    Réponse : en installant les sages de l’Antiquité dans le palais du pape, Raphaël réconcilie culture classique et culture chrétienne, ce qui est à la base de la pensée humaniste.
    Éléments attendus : réconciliation entre culture classique et culture chrétienne ; fondement de la pensée humaniste.
 
-## Restent à faire
+## Les neuf autres passages (2026-11-05)
 
-- **it A2** : passage non choisi. Candidate : Elisa’s Italian School, « Morning Routine in Easy Italian » (`40ao6UQlx1o`, sous-titres automatiques seulement).
-- **it B1** (en réserve) : Italy Made Easy, « The Story of Italy Made Easy » (`TrzHZynKNvs`), 3:15 → 4:19, les premières vidéos de prononciation.
-- Autres niveaux (A1, B1, C1, C2) pour les deux langues.
+Choisis d’après les sous-titres de la chaîne (manuels, sauf mention) ; questions, réponses de référence et éléments attendus dans chaque dossier (`src/lib/assessment/dossiers/<langue>/<niveau>-1.ts`). Mêmes points à valider à l’écoute, `checkedOn: null` partout. Aucune image du passage n’a pu être vérifiée (YouTube place une publicité à chaque saut dans la vidéo) : le texte incrusté reste à contrôler pour tous.
+
+| Dossier | Vidéo | Passage | Contenu, remarques |
+| ------- | ----- | ------- | ------------------ |
+| `ru-a1-1` | Sergey Storyteller, « Super Slow Russian – Talking about my hometown » (`it19zi5Fs2A`) | 1:03 → 1:58 (55 s) | Irkoutsk : Sibérie, 600 000 habitants, maisons en bois, patin sur l’Angara gelé. Débit très lent. |
+| `ru-b1-1` | Russian Progress, « Выпуск 33 – Прочитал 10 книг » (`OSnJIAqVkkk`) | 11:40 → 12:50 (70 s) | Le livre « Lagom » : plus léger après Sapiens, juste milieu suédois, l’exemple du tri des déchets. Présentateur face caméra (vu à 11:40). |
+| `ru-c1-1` | ПостНаука, « Естественные и гуманитарные науки — Григорий Юдин » (`taOi3Zm-H8g`) | 15:29 → 17:06 (97 s) | Conclusion : le naturalisme comme phénomène à expliquer, manque de solidarité, litote sur les « conséquences pas très gaies ». |
+| `ru-c2-1` | Tamara Eidelman, « Пушкин: наше все? » (`BBotskuyw_M`) | 3:41 → 5:45 (124 s) | Anecdote des enseignantes néerlandaises : récitation, « Mozart et Salieri », « Is there anybody else… except Pushkin? ». |
+| `it-a1-1` | Podcast Italiano, « La storia di Italo, capitolo 1 » (`8JGpPHBx7-k`) | 0:35 → 1:11 (36 s) | Italo, 30 ans, demande la vérité à sa mère ; né en Italie, d’où son prénom. **Sous-titres automatiques seulement.** |
+| `it-a2-1` | Podcast Italiano, « La storia di Italo, capitolo 2 » (`lBOlnDV8aJg`) | 1:20 → 2:05 (45 s) | Départ le 5 août, pas un mot d’italien, six mois, la professeure Patrizia. **Sous-titres automatiques seulement.** |
+| `it-b1-1` | Italiano Automatico, « La Storia Della Pizza in Italia In Pochi Minuti » (`BNF7uSEayzk`) | 3:04 → 4:01 (57 s) | Pizza blanche pendant des siècles, tomate venue d’Amérique et crue toxique, les Napolitains au XVIIIe siècle. Vidéo illustrée : texte incrusté possible (dates). |
+| `it-c1-1` | Podcast Italiano, « Perché DANTE è il padre dell’italiano? » (`uotspWVrGVs`) | 0:49 → 1:52 (63 s) | 700 ans de la mort de Dante, mise en garde modeste, seul « père » (pas Cavour ni Garibaldi). Texte incrusté possible. |
+| `it-c2-1` | Festival del Medioevo, « Alessandro Barbero – La rivoluzione di Francesco d’Assisi » (`BCZDcZ8ueGA`) | 7:40 → 9:15 (95 s) | Rome refuse la prédication aux Vaudois : ignorance, discours rapporté ironique, « parfaite bonne foi » du clergé. Conférence filmée. |
+
+Les anciens scripts de ces neuf dossiers (jamais enregistrés) sont retirés. Le jeu `assessment:eval` a de nouvelles réponses pour les questions d’écoute de `ru-b1-1`.
