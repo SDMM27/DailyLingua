@@ -23,6 +23,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # migrations:check reads the whole history
       - uses: actions/setup-node@v4
         with:
           node-version: 22 # supabase-js needs the native WebSocket of Node 22+

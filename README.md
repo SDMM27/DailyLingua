@@ -167,6 +167,7 @@ auth.users 1─1 profiles 1─* user_languages *─1 languages
 - **Ajouter une langue** : l’ajouter dans `src/lib/domain/languages.ts` **et** insérer son code dans `public.languages` (une migration d’une ligne). Un test d’intégration vérifie que les deux listes concordent.
 - **Contenus** : seules des métadonnées, un résumé (≤ 1000 caractères) et un extrait optionnel (≤ 500) sont stockés, jamais le texte intégral. L’URL est dédoublonnée après normalisation (casse, fragment, paramètres `utm_*`, slash final).
 - **Nouvelle table** : les privilèges par défaut sont retirés à `anon` et `authenticated` ; une migration doit donc `grant` explicitement et créer ses politiques RLS.
+- **Migration commitée = figée** : `supabase db push` ne rejoue jamais une migration déjà appliquée, donc une correction va dans une **nouvelle** migration. `npm run migrations:check` (inclus dans `npm run check`) refuse toute modification d’une migration commitée.
 
 ### Déploiement sur un vrai projet Supabase
 
