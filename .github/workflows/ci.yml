@@ -36,7 +36,9 @@ jobs:
 
   database:
     name: Database (pgTAP, integration, E2E)
-    runs-on: ubuntu-latest
+    # Pinned: Playwright's WebKit build follows the Ubuntu release, and ubuntu-latest moved to
+    # 26.04 (Nov 2026) before our Playwright supported it (missing libicudata.so.74).
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
@@ -86,7 +88,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-webkit-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+          # ImageOS (ubuntu24, ubuntu26…): a WebKit built for one Ubuntu release fails on another.
+          key: playwright-webkit-${{ env.ImageOS }}-${{ steps.playwright.outputs.version }}
       # Browsers come from the cache when present; the system libraries are always installed.
       # The runners' Azure apt mirror sometimes crawls (~20 kB/s): use the main Ubuntu
       # archive first, keep Azure as fallback, and retry once instead of hanging the job.
