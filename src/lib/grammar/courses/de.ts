@@ -2,7 +2,7 @@ import type { GrammarCourse } from "@/lib/schemas/grammar";
 
 export const deCourse = {
   language: "de",
-  version: "2026-10-25",
+  version: "2026-11-09",
   points: [
     {
       id: "de-a1-gender-articles",
@@ -24,7 +24,7 @@ export const deCourse = {
       },
       examples: [
         { text: "Der Tisch ist neu.", translation: "La table est neuve.", note: "Tisch est masculin : der, alors que « table » est féminin en français." },
-        { text: "Die Lehrerin heißt Anna.", translation: "La professeure s’appelle Anna.", note: "Les noms en -in sont féminins." },
+        { text: "Die Lehrerin heißt Anna.", translation: "La professeure s’appelle Anna.", note: "Les noms de personnes en -in sont féminins : der Lehrer → die Lehrerin." },
         { text: "Das ist ein Buch und das ist eine Tasche.", translation: "Ça, c’est un livre et ça, c’est un sac.", note: "ein pour le neutre, eine pour le féminin." },
       ],
       exercises: [
@@ -59,13 +59,14 @@ export const deCourse = {
         {
           type: "transform",
           instruction: "Remplace l’article défini par l’article indéfini.",
-          source: "Der Mann ist nett.",
-          answers: ["Ein Mann ist nett."],
+          source: "Das ist der Mann.",
+          answers: ["Das ist ein Mann."],
           explanation: "Mann est masculin : der devient ein.",
         },
       ],
       categories: ["function_word", "agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "de-a1-present",
@@ -74,7 +75,7 @@ export const deCourse = {
       summary: "Conjuguer un verbe régulier au présent et employer sein (être) et haben (avoir).",
       rule: [
         "Au présent, tu retires -en de l’infinitif et tu ajoutes les terminaisons : -e, -st, -t, -en, -t, -en. Exemple : machen → ich mache, du machst, er macht, wir machen, ihr macht, sie machen. Un seul présent : « je fais » et « je suis en train de faire » se disent ich mache.",
-        "Si le radical finit par -t ou -d, on intercale un e : du arbeitest, er arbeitet, ihr arbeitet. Sein et haben sont irréguliers et à connaître par cœur.",
+        "Si le radical finit par -t ou -d, on intercale un e : du arbeitest, er arbeitet. S’il finit par -s, -ß ou -z, du prend seulement -t : du heißt. Certains verbes changent de voyelle avec du et er / sie / es : fahren → du fährst, er fährt ; sehen → du siehst, er sieht. Apprends-les avec le verbe. Sein et haben sont irréguliers et à connaître par cœur.",
         "Pièges : Sie (majuscule) est le vous de politesse et se conjugue comme sie (ils). Pour l’âge, l’allemand utilise sein, pas haben : ich bin 25 Jahre alt (et non « ich habe 25 Jahre »).",
       ],
       table: {
@@ -133,6 +134,7 @@ export const deCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "de-a1-word-order",
@@ -152,7 +154,6 @@ export const deCourse = {
           ["Heute", "arbeite", "ich in Köln."],
           ["In Köln", "arbeite", "ich heute."],
           ["Wo", "arbeitest", "du heute?"],
-          ["Arbeitest", "du", "heute in Köln?"],
         ],
       },
       examples: [
@@ -180,7 +181,7 @@ export const deCourse = {
           prompt: "___ du Hunger?",
           options: ["Hast", "Hat", "Habt"],
           answer: 0,
-          explanation: "Question oui / non : le verbe vient en premier, et il s’accorde avec du : Hast du Hunger ?",
+          explanation: "Question oui / non : le verbe vient en premier, et il s’accorde avec du : Hast du Hunger?",
         },
         {
           type: "fill",
@@ -199,6 +200,7 @@ export const deCourse = {
       ],
       categories: ["word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "de-a1-accusative",
@@ -264,6 +266,7 @@ export const deCourse = {
       ],
       categories: ["agreement", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "de-a1-negation",
@@ -273,7 +276,7 @@ export const deCourse = {
       rule: [
         "Kein nie un nom accompagné de ein ou sans article : Ich habe keinen Hund, Ich habe kein Geld. Il se décline comme ein (keine au pluriel). C’est l’équivalent de « pas de / pas un » : n’écris jamais « nicht ein ».",
         "Nicht nie tout le reste : le verbe (Ich komme nicht), un adjectif (Das ist nicht gut) ou un nom avec article défini ou possessif (Ich kenne den Mann nicht).",
-        "Place de nicht : à la fin de la phrase quand il nie le verbe (Er kommt heute nicht), et juste devant l’adjectif ou le complément qu’il nie (nicht gut, nicht in Berlin).",
+        "Place de nicht : quand il nie toute la phrase, il va en fin de phrase (Er kommt heute nicht), mais avant la particule ou l’infinitif final (Ich rufe dich nicht an, Ich kann heute nicht kommen) et avant un complément de direction (Ich fahre nicht nach Berlin). Quand il nie un seul élément, il se place juste devant (nicht gut, nicht heute).",
       ],
       table: {
         caption: "Déclinaison de kein",
@@ -314,6 +317,7 @@ export const deCourse = {
         {
           type: "fill",
           prompt: "Er kommt heute ___.",
+          hint: "nicht ou kein",
           answers: ["nicht"],
           explanation: "On nie le verbe avec nicht, placé en fin de phrase.",
         },
@@ -327,6 +331,7 @@ export const deCourse = {
       ],
       categories: ["function_word", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "de-a1-plural",
@@ -336,7 +341,7 @@ export const deCourse = {
       rule: [
         "Il n’y a pas une seule règle comme le -s français : l’allemand a plusieurs types de pluriel. Au pluriel, l’article défini est toujours die, et les trois genres se confondent.",
         "Principaux types : -e (Tag → Tage), -e avec tréma (Stuhl → Stühle), -(e)n (Frau → Frauen, Lampe → Lampen), -er (Kind → Kinder, Haus → Häuser), sans terminaison (Lehrer, ou avec tréma : Apfel → Äpfel) et -s (Auto → Autos).",
-        "Repère : les noms féminins prennent surtout -(e)n ; les mots d’origine étrangère récents prennent souvent -s. Apprends le pluriel en même temps que le nom : le dictionnaire écrit Tag, -e ou Haus, -er.",
+        "Repère : les noms féminins prennent surtout -(e)n ; les mots d’origine étrangère récents prennent souvent -s. Apprends le pluriel en même temps que le nom : le dictionnaire écrit der Tag, -e ou das Haus, ¨-er (le ¨ signale le tréma).",
       ],
       table: {
         caption: "Les types de pluriel",
@@ -344,7 +349,7 @@ export const deCourse = {
         rows: [
           ["-e", "der Tag", "die Tage"],
           ["tréma + -e", "der Stuhl", "die Stühle"],
-          ["-(e)n", "die Frau", "die Frauen"],
+          ["-en", "die Frau", "die Frauen"],
           ["-n", "die Lampe", "die Lampen"],
           ["-er", "das Kind", "die Kinder"],
           ["tréma + -er", "das Haus", "die Häuser"],
@@ -397,6 +402,7 @@ export const deCourse = {
       ],
       categories: ["agreement", "spelling"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "de-a2-separable",
@@ -405,7 +411,7 @@ export const deCourse = {
       summary: "Détacher la particule et la placer en fin de phrase, ou la garder collée à l’infinitif.",
       rule: [
         "Beaucoup de verbes ont une particule accentuée (auf-, an-, ein-, mit-, ab-, zu-, aus-, vor-, zurück-, fern-). Au présent, la particule se détache et va en fin de phrase : aufstehen → Ich stehe um sieben Uhr auf.",
-        "À l’infinitif (après un verbe de modalité par exemple) et dans une subordonnée, le verbe reste d’un bloc : Ich muss früh aufstehen. Wann stehst du auf ? Le français n’a pas ce mécanisme : le piège est d’oublier la particule à la fin.",
+        "À l’infinitif (après un verbe de modalité par exemple) et dans une subordonnée, le verbe reste d’un bloc : Ich muss früh aufstehen ; …, weil ich früh aufstehe. Ailleurs, la particule va à la fin, même dans une question : Wann stehst du auf? Le français n’a pas ce mécanisme : le piège est d’oublier la particule à la fin.",
         "Les préfixes be-, ge-, er-, ver-, zer-, ent-, emp- ne se séparent jamais (ich bestelle, ich verstehe). La particule change souvent le sens : kommen (venir), ankommen (arriver), mitkommen (venir avec).",
       ],
       table: {
@@ -455,7 +461,7 @@ export const deCourse = {
         },
         {
           type: "transform",
-          instruction: "Mets Morgen au début de la phrase.",
+          instruction: "Ajoute Morgen au début de la phrase.",
           source: "Ich rufe dich an.",
           answers: ["Morgen rufe ich dich an."],
           explanation: "Le verbe rufe reste en 2e position et la particule an reste à la fin.",
@@ -463,6 +469,7 @@ export const deCourse = {
       ],
       categories: ["verb", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "de-a2-modals",
@@ -470,7 +477,7 @@ export const deCourse = {
       title: "Verbes de modalité : können, müssen, wollen, möchten",
       summary: "Exprimer capacité, obligation, volonté et permission avec le verbe de modalité et l’infinitif en fin de phrase.",
       rule: [
-        "Le verbe de modalité est conjugué en 2e position, l’autre verbe reste à l’infinitif, sans zu, en fin de phrase : Ich kann gut schwimmen. Aux formes ich et er / sie / es, il n’a pas de terminaison : ich kann, er kann.",
+        "Le verbe de modalité est conjugué en 2e position, l’autre verbe reste à l’infinitif, sans zu, en fin de phrase : Ich kann gut schwimmen. Aux formes ich et er / sie / es, la forme est la même, sans -t : ich kann, er kann ; ich möchte, er möchte.",
         "Sens : können (pouvoir, savoir), müssen (devoir, nécessité), wollen (vouloir), dürfen (avoir la permission : ich darf), sollen (devoir, sur ordre d’un tiers : ich soll), möchten (aimerais, forme polie : ich möchte).",
         "Piège : nicht müssen veut dire « ne pas avoir besoin de » (Du musst nicht kommen), alors que « ne pas devoir » (interdiction) se dit nicht dürfen (Du darfst nicht kommen).",
       ],
@@ -530,6 +537,7 @@ export const deCourse = {
       ],
       categories: ["verb", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "de-a2-dative",
@@ -594,6 +602,7 @@ export const deCourse = {
       ],
       categories: ["agreement", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "de-a2-perfekt",
@@ -602,8 +611,8 @@ export const deCourse = {
       summary: "Raconter ce qui s’est passé avec l’auxiliaire conjugué et le participe passé en fin de phrase.",
       rule: [
         "Le Perfekt est le passé de la conversation (là où le français dit « j’ai fait »). L’auxiliaire haben ou sein est en 2e position, le participe passé en fin de phrase : Gestern habe ich einen Film gesehen.",
-        "Participe : ge- + radical + -t pour les verbes réguliers (gemacht), ge- + radical + -en pour les forts (gesehen, gegangen). Avec particule séparable, ge- s’intercale : aufgestanden. Pas de ge- pour les verbes en -ieren ni pour be-, ver-, er- : telefoniert, bestellt, verstanden.",
-        "Sein s’emploie avec les verbes de mouvement ou de changement d’état (gehen, fahren, kommen, aufstehen) et avec bleiben et passieren. Tous les autres prennent haben. Piège : la liste des verbes en sein ne recoupe pas celle du français (être) : apprends l’auxiliaire avec le verbe.",
+        "Participe : ge- + radical + -t pour les verbes réguliers (gemacht), ge- + radical + -en pour les forts, souvent avec un changement de voyelle (gesehen, mais gehen → gegangen, trinken → getrunken) : apprends-les par cœur. Avec particule séparable, ge- s’intercale : aufgestanden. Pas de ge- pour les verbes en -ieren ni pour be-, ver-, er- : telefoniert, bestellt, verstanden.",
+        "Sein s’emploie avec les verbes de mouvement ou de changement d’état (gehen, fahren, kommen, aufstehen) et avec sein, werden, bleiben et passieren : ich bin gewesen. Tous les autres prennent haben. Piège : la liste des verbes en sein ne recoupe pas celle du français (être) : apprends l’auxiliaire avec le verbe.",
       ],
       table: {
         caption: "Participes passés fréquents",
@@ -623,7 +632,7 @@ export const deCourse = {
       },
       examples: [
         { text: "Gestern habe ich einen Film gesehen.", translation: "Hier, j’ai vu un film.", note: "Auxiliaire en 2e position, participe en fin de phrase." },
-        { text: "Wir sind nach Wien gefahren.", translation: "Nous sommes allés à Vienne en voiture.", note: "fahren : verbe de mouvement, donc sein." },
+        { text: "Wir sind nach Wien gefahren.", translation: "Nous sommes allés à Vienne.", note: "fahren : verbe de mouvement, donc sein." },
         { text: "Hast du schon gegessen?", translation: "As-tu déjà mangé ?" },
       ],
       exercises: [
@@ -637,7 +646,7 @@ export const deCourse = {
         {
           type: "choose",
           prompt: "Wir ___ nach Hamburg gefahren.",
-          options: ["haben", "sind", "waren"],
+          options: ["haben", "sind", "seid"],
           answer: 1,
           explanation: "Fahren est un verbe de mouvement : sein. Wir sind gefahren.",
         },
@@ -665,6 +674,7 @@ export const deCourse = {
       ],
       categories: ["verb", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "de-a2-two-way",
@@ -711,7 +721,7 @@ export const deCourse = {
           prompt: "Die Katze schläft auf ___ Sofa.",
           options: ["dem", "das", "der"],
           answer: 0,
-          explanation: "La chatte est déjà sur le canapé : position, datif. Sofa est neutre, donc dem Sofa.",
+          explanation: "Le chat est déjà sur le canapé : position, datif. Sofa est neutre, donc dem Sofa.",
         },
         {
           type: "fill",
@@ -722,7 +732,7 @@ export const deCourse = {
         },
         {
           type: "transform",
-          instruction: "Dis où tu vas au lieu de dire où tu es.",
+          instruction: "Dis où tu vas, avec le verbe gehen, au lieu de dire où tu es.",
           source: "Ich bin im Garten.",
           answers: ["Ich gehe in den Garten."],
           explanation: "Direction : accusatif. Garten est masculin, donc in den Garten.",
@@ -730,6 +740,7 @@ export const deCourse = {
       ],
       categories: ["agreement", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "de-a2-subordinate",
@@ -796,6 +807,7 @@ export const deCourse = {
       ],
       categories: ["word_order", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "de-b1-adjective-endings",
@@ -861,6 +873,7 @@ export const deCourse = {
       ],
       categories: ["agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "de-b1-praeteritum",
@@ -870,6 +883,7 @@ export const deCourse = {
       rule: [
         "Le Präteritum est le passé de l’écrit et du récit. À l’oral, on préfère le Perfekt, sauf pour sein, haben et les verbes de modalité, qu’on met presque toujours au prétérit : ich war, ich hatte, ich konnte, ich musste.",
         "Verbes faibles (réguliers) : radical + -te : machen → ich machte, wohnen → ich wohnte (arbeiten → arbeitete). Verbes forts : la voyelle du radical change et il n’y a pas de -te : gehen → ging, kommen → kam, sehen → sah, fahren → fuhr. À apprendre dans la liste des verbes forts.",
+        "Les modaux prennent -te comme les verbes faibles, mais perdent leur tréma : können → ich konnte, müssen → ich musste. Ne confonds pas avec könnte (« pourrait », Konjunktiv II).",
         "Terminaisons : ich et er / sie / es sans terminaison (ich kam, er kam), du -st (du kamst), wir -en, ihr -t. Le prétérit allemand sert de passé simple et d’imparfait : Als Kind wohnte ich in Lyon (« j’habitais »).",
       ],
       table: {
@@ -915,7 +929,7 @@ export const deCourse = {
         },
         {
           type: "fill",
-          prompt: "Als Kind ___ ich in Lyon.",
+          prompt: "Früher ___ ich in einer kleinen Stadt.",
           hint: "wohnen",
           answers: ["wohnte"],
           explanation: "Verbe faible : radical wohn + -te, sans autre terminaison avec ich.",
@@ -930,6 +944,7 @@ export const deCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "de-b1-konjunktiv-ii",
@@ -939,7 +954,7 @@ export const deCourse = {
       rule: [
         "Le Konjunktiv II joue en allemand le rôle du conditionnel : politesse (Ich hätte gern einen Tee), conseil (An deiner Stelle würde ich ihn anrufen), souhait et hypothèse (Wenn ich Zeit hätte, würde ich reisen).",
         "Pour la plupart des verbes, on utilise würde + infinitif en fin de phrase : Ich würde gern kommen. Pour sein, haben, les verbes de modalité et quelques verbes fréquents, on préfère la forme simple : wäre, hätte, könnte, müsste, dürfte.",
-        "Piège : évite würde avec sein et haben (on dit Wenn ich reich wäre, pas « würde sein ») et n’emploie pas würde dans la proposition en wenn. Könnten Sie… ? et Würden Sie… ? sont plus polis que Können Sie… ?.",
+        "Piège : évite würde avec sein et haben (on dit Wenn ich reich wäre, pas « würde sein »). Dans la proposition en wenn, préfère la forme simple quand elle existe (wenn ich Zeit hätte) ; avec les autres verbes, würde y est correct : Wenn du mitkommen würdest, wäre ich froh. Könnten Sie…? et Würden Sie…? sont plus polis que Können Sie…?",
       ],
       table: {
         caption: "Konjunktiv II de quatre verbes",
@@ -979,7 +994,7 @@ export const deCourse = {
           prompt: "An deiner Stelle ___ ich das nicht tun.",
           options: ["werde", "würde", "wurde"],
           answer: 1,
-          explanation: "Conseil : würde + infinitif. Wurde est le prétérit de werden (passif).",
+          explanation: "Conseil : würde + infinitif. Werde est le présent et wurde le prétérit de werden ; seul würde exprime le conditionnel.",
         },
         {
           type: "fill",
@@ -992,12 +1007,13 @@ export const deCourse = {
           type: "transform",
           instruction: "Rends la demande plus polie.",
           source: "Kannst du mir helfen?",
-          answers: ["Könntest du mir helfen?", "Würdest du mir helfen?"],
+          answers: ["Könntest du mir helfen?", "Würdest du mir helfen?", "Könntest du mir bitte helfen?", "Würdest du mir bitte helfen?"],
           explanation: "Le Konjunktiv II de können (könntest) ou würdest + infinitif adoucit la demande.",
         },
       ],
       categories: ["verb", "register"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "de-b1-relative",
@@ -1040,7 +1056,7 @@ export const deCourse = {
         },
         {
           type: "choose",
-          prompt: "Das ist der Kollege, mit ___ ich oft Mittag esse.",
+          prompt: "Das ist der Kollege, mit ___ ich oft zu Mittag esse.",
           options: ["den", "dem", "der"],
           answer: 1,
           explanation: "Mit est suivi du datif ; Kollege est masculin : dem.",
@@ -1049,7 +1065,7 @@ export const deCourse = {
           type: "fill",
           prompt: "Das Auto, ___ ich kaufen möchte, ist teuer.",
           hint: "neutre, accusatif",
-          answers: ["das"],
+          answers: ["das", "welches"],
           explanation: "Auto est neutre et objet direct : das (accusatif neutre).",
         },
         {
@@ -1062,6 +1078,7 @@ export const deCourse = {
       ],
       categories: ["function_word", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "de-b1-passive",
@@ -1081,7 +1098,7 @@ export const deCourse = {
           ["Prétérit", "Man reparierte das Auto.", "Das Auto wurde repariert."],
           ["Perfekt", "Man hat das Auto repariert.", "Das Auto ist repariert worden."],
           ["Avec modal", "Man muss das Auto reparieren.", "Das Auto muss repariert werden."],
-          ["Avec agent", "Der Mechaniker repariert es.", "Das Auto wird vom Mechaniker repariert."],
+          ["Avec agent", "Der Mechaniker repariert das Auto.", "Das Auto wird vom Mechaniker repariert."],
         ],
       },
       examples: [
@@ -1093,7 +1110,7 @@ export const deCourse = {
         {
           type: "choose",
           prompt: "Das Essen ___ jeden Tag von meiner Mutter gekocht.",
-          options: ["hat", "wird", "wurde"],
+          options: ["hat", "wird", "werden"],
           answer: 1,
           explanation: "Habitude présente : werden au présent, donc wird … gekocht.",
         },
@@ -1115,8 +1132,8 @@ export const deCourse = {
           type: "fill",
           prompt: "Die Tür ___ um acht Uhr geöffnet.",
           hint: "werden",
-          answers: ["wird"],
-          explanation: "Passif présent à la 3e personne du singulier : wird … geöffnet.",
+          answers: ["wird", "wurde"],
+          explanation: "Passif : werden à la 3e personne du singulier, wird (présent) ou wurde (prétérit), et le participe geöffnet en fin de phrase.",
         },
         {
           type: "transform",
@@ -1128,6 +1145,7 @@ export const deCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "de-b1-zu-infinitive",
@@ -1143,7 +1161,7 @@ export const deCourse = {
         caption: "Avec ou sans zu",
         headers: ["Cas", "Forme", "Exemple"],
         rows: [
-          ["Infinitif simple", "zu + infinitif", "Ich versuche, früh zu schlafen."],
+          ["Infinitif simple", "zu + infinitif", "Ich versuche, früh ins Bett zu gehen."],
           ["Verbe séparable", "particule + zu + verbe", "Es ist schwer, früh aufzustehen."],
           ["But", "um … zu", "Ich lerne, um die Prüfung zu bestehen."],
           ["Après un modal", "sans zu", "Ich muss früh aufstehen."],
@@ -1187,12 +1205,13 @@ export const deCourse = {
           type: "transform",
           instruction: "Relie les phrases avec um … zu.",
           source: "Ich fahre nach Berlin. Ich besuche meine Schwester.",
-          answers: ["Ich fahre nach Berlin, um meine Schwester zu besuchen."],
+          answers: ["Ich fahre nach Berlin, um meine Schwester zu besuchen.", "Um meine Schwester zu besuchen, fahre ich nach Berlin."],
           explanation: "Le but s’exprime avec um … zu : l’infinitif avec zu est à la fin.",
         },
       ],
       categories: ["verb", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
   ],
 } satisfies GrammarCourse;

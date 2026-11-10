@@ -100,6 +100,57 @@ describe("VocabularyView", () => {
     expect(screen.queryByLabelText("Mot ou expression")).toBeNull();
   });
 
+  describe("automatic translation of a new word", () => {
+    const translateButton = () => screen.queryByRole("button", { name: "Traduire automatiquement" });
+
+    it("is offered only when it is on and not to guests", async () => {
+      let user = setup({ canTranslate: false });
+      await user.click(screen.getByRole("button", { name: "Ajouter" }));
+      expect(translateButton()).toBeNull();
+      cleanup();
+
+      user = setup({ canTranslate: true, isGuest: true });
+      await user.click(screen.getByRole("button", { name: "Ajouter" }));
+      expect(translateButton()).toBeNull();
+    });
+
+    it("fills the translation, marked to be checked until edited, then adds the word", async () => {
+      actions.translateWords.mockResolvedValue({
+        ok: true,
+        data: { status: "ready", translations: [{ term: "вдобавок", translation: "en plus", uncertain: true }] },
+      });
+      const user = setup({ canTranslate: true });
+      await user.click(screen.getByRole("button", { name: "Ajouter" }));
+      expect((translateButton() as HTMLButtonElement).disabled).toBe(true); // no word yet
+
+      await user.type(screen.getByLabelText("Mot ou expression"), " вдобавок ");
+      await user.click(translateButton()!);
+      expect(actions.translateWords).toHaveBeenCalledWith({ language: "ru", terms: ["вдобавок"] });
+      expect((screen.getByLabelText("Traduction") as HTMLInputElement).value).toBe("en plus");
+      expect(screen.getByText("à vérifier · incertain")).toBeTruthy();
+
+      await user.type(screen.getByLabelText("Traduction"), ", de plus");
+      expect(screen.queryByText(/à vérifier/)).toBeNull();
+      await user.click(screen.getAllByRole("button", { name: "Ajouter" }).at(-1)!);
+      expect(wordList().getByText("en plus, de plus")).toBeTruthy();
+    });
+
+    it("explains when the model gives nothing", async () => {
+      const user = setup({ canTranslate: true });
+      await user.click(screen.getByRole("button", { name: "Ajouter" }));
+      await user.type(screen.getByLabelText("Mot ou expression"), "вдобавок");
+
+      actions.translateWords.mockResolvedValueOnce({ ok: true, data: { status: "ready", translations: [] } });
+      await user.click(translateButton()!);
+      expect((await screen.findByRole("status")).textContent).toMatch(/Pas de suggestion/);
+
+      actions.translateWords.mockResolvedValueOnce({ ok: true, data: { status: "limit" } });
+      await user.click(translateButton()!);
+      expect((await screen.findByRole("status")).textContent).toMatch(/limite de 200 traductions/);
+      expect((screen.getByLabelText("Traduction") as HTMLInputElement).value).toBe("");
+    });
+  });
+
   it("filters by language and status", async () => {
     const user = setup();
     expect(wordList().getByText("впро́чем")).toBeTruthy();

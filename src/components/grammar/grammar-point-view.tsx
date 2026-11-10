@@ -4,6 +4,7 @@ import { Card, Eyebrow, LanguageTag } from "@/components/ui/primitives";
 import { languageInfo } from "@/lib/domain/languages";
 import type { DateKey, Language } from "@/lib/schemas/common";
 import type { GrammarCard, GrammarPoint } from "@/lib/schemas/grammar";
+import { grammarReviewStatus } from "@/lib/grammar/policy";
 import { GrammarPractice } from "./grammar-practice";
 
 /** One grammar point: the lesson (rule, table, examples), then its exercises. */
@@ -23,6 +24,7 @@ export function GrammarPointView({
   const style = languageStyle(language);
   const { dir } = languageInfo(language);
   const { table } = point;
+  const status = grammarReviewStatus(point);
 
   return (
     <div className="space-y-6">
@@ -35,7 +37,7 @@ export function GrammarPointView({
         </Link>
         <div className="flex items-center gap-2">
           <LanguageTag language={language} />
-          {point.reviewedOn === null && (
+          {status === "draft" && (
             <span className="rounded-full border border-line px-2 py-0.5 text-[11px] font-medium text-muted">
               Non relue
             </span>
@@ -106,6 +108,18 @@ export function GrammarPointView({
 
       {/* Remounted per point: the exercise state belongs to it. */}
       <GrammarPractice key={point.id} point={point} language={language} card={card} today={today} persist={persist} />
+
+      {status === "ai" && (
+        <p className="text-xs text-muted">
+          Relu par IA, pas encore par un natif.{" "}
+          <Link
+            href={`/retour?depuis=/grammaire/${language}/${point.id}`}
+            className="inline-flex min-h-11 items-center font-medium underline underline-offset-2 hover:text-ink"
+          >
+            Signaler une erreur
+          </Link>
+        </p>
+      )}
     </div>
   );
 }

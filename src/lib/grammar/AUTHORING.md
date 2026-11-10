@@ -46,6 +46,10 @@ Check a course with `npm run grammar:check -- <code>`.
   and conjugation are `verb`).
 - `reviewedOn`: `null` while the point is a draft. A native speaker sets the date when they approve
   it; drafts are hidden in production.
+- `aiReview` (optional: `{ on, model, rubric }`): set only by the `arbitre-relecture` agent, never
+  by hand, once two independent passes of `relecteur-natif` and the arbiter approved the point.
+  Points reviewed by AI (`reviewedOn: null` + `aiReview`) are visible in production, with a notice
+  saying no native speaker has reviewed them yet.
 
 ## Content
 

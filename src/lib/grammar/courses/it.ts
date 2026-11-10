@@ -2,7 +2,7 @@ import type { GrammarCourse } from "@/lib/schemas/grammar";
 
 export const itCourse = {
   language: "it",
-  version: "2026-10-21",
+  version: "2026-11-05",
   points: [
     {
       id: "it-a1-articles",
@@ -62,6 +62,7 @@ export const itCourse = {
       ],
       categories: ["function_word", "agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "it-a1-nouns",
@@ -70,7 +71,7 @@ export const itCourse = {
       summary: "Former le pluriel en -i / -e et accorder l’adjectif avec le nom.",
       rule: [
         "Les noms en -o sont en général masculins (pluriel -i : ragazzo, ragazzi), ceux en -a féminins (pluriel -e : ragazza, ragazze). Les noms en -e peuvent être masculins ou féminins et font leur pluriel en -i : il nome, i nomi ; la notte, le notti. Les mots terminés par une voyelle accentuée ou par une consonne ne changent pas : la città, le città.",
-        "Les noms en -ca et -ga gardent le son dur : amica, amiche ; collega (féminin), colleghe. Attention aux genres différents du français : il fiore (la fleur), il dente (la dent), la sera (le soir). Quelques noms en -a sont masculins : il problema, i problemi.",
+        "Les noms féminins en -ca et -ga gardent le son dur : amica, amiche ; collega (féminin), colleghe. Au masculin, c’est variable : parco, parchi ; albergo, alberghi ; mais amico, amici. Attention aux genres différents du français : il fiore (la fleur), il dente (la dent), la sera (le soir). Quelques noms en -a sont masculins : il problema, i problemi.",
         "L’adjectif s’accorde en genre et en nombre : alto, alta, alti, alte. Les adjectifs en -e n’ont qu’une forme au singulier pour les deux genres et font -i au pluriel : un uomo gentile, una donna gentile, due amici gentili.",
       ],
       table: {
@@ -121,6 +122,7 @@ export const itCourse = {
       ],
       categories: ["agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "it-a1-present",
@@ -128,7 +130,7 @@ export const itCourse = {
       title: "Le présent des verbes en -are, -ere, -ire",
       summary: "Conjuguer au présent les verbes réguliers, dont ceux en -ire qui prennent -isc-.",
       rule: [
-        "Les trois groupes se distinguent à l’infinitif : parlare, scrivere, dormire. On enlève -are, -ere ou -ire et on ajoute les terminaisons. Elles sont presque identiques pour les trois groupes ; seules changent la 2e personne du pluriel (-ate, -ete, -ite) et la 3e personne du singulier (-a, -e, -e).",
+        "Les trois groupes se distinguent à l’infinitif : parlare, scrivere, dormire. On enlève -are, -ere ou -ire et on ajoute les terminaisons. Elles sont presque identiques pour les trois groupes ; seules changent la 3e personne du singulier (-a, -e, -e), la 2e personne du pluriel (-ate, -ete, -ite) et la 3e personne du pluriel (-ano, -ono, -ono).",
         "Beaucoup de verbes en -ire (finire, capire, preferire, pulire) intercalent -isc- aux personnes io, tu, lui/lei et loro : finisco, finisci, finisce, finiscono. Pas aux formes noi et voi : finiamo, finite. D’autres, comme dormire ou partire, n’ont pas -isc-.",
         "Le pronom sujet est le plus souvent omis, puisque la terminaison suffit : parlo italiano. Piège : la 3e personne du pluriel est en -ano / -ono, pas de terminaison muette comme en français : parlano, scrivono, dormono, finiscono. Les verbes en -care et -gare ajoutent un h devant -i : cercare, cerchi, cerchiamo.",
       ],
@@ -166,7 +168,7 @@ export const itCourse = {
         },
         {
           type: "fill",
-          prompt: "Io ___ molto la musica italiana.",
+          prompt: "Io ___ il tè al caffè.",
           hint: "preferire",
           answers: ["preferisco"],
           explanation: "Preferire est un verbe en -isc- : io preferisco.",
@@ -188,6 +190,7 @@ export const itCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "it-a1-essere-avere",
@@ -255,6 +258,7 @@ export const itCourse = {
       ],
       categories: ["verb", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "it-a1-prepositions",
@@ -321,6 +325,7 @@ export const itCourse = {
       ],
       categories: ["function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "it-a1-possessives",
@@ -329,7 +334,7 @@ export const itCourse = {
       summary: "Employer le possessif avec l’article, sauf devant un nom de parenté au singulier.",
       rule: [
         "En italien, le possessif s’emploie normalement avec l’article défini : il mio libro, la mia casa, i miei libri, le mie amiche. Il s’accorde avec le nom possédé (pas avec le possesseur) : sua madre = sa mère, qu’il s’agisse de lui ou d’elle.",
-        "Piège : devant un nom de parenté au singulier, on omet l’article : mia madre, tuo fratello, nostra zia. Mais l’article revient au pluriel (i miei genitori, le mie sorelle), avec un diminutif (la mia mamma, il mio papà) ou quand le nom est modifié (il mio fratello maggiore).",
+        "Piège : devant un nom de parenté au singulier, on omet l’article : mia madre, tuo fratello, nostra zia. Mais l’article revient au pluriel (i miei genitori, le mie sorelle), avec un diminutif (la mia sorellina) ou quand le nom est précédé d’un adjectif (il mio caro zio). Avec mamma et papà, l’article est fréquent mais pas obligatoire.",
         "Loro est invariable et garde toujours l’article : la loro casa, il loro cane. Suo est aussi la forme de politesse envers une personne que l’on vouvoie (Lei) : la sua firma, per favore, pour « votre signature ».",
       ],
       table: {
@@ -388,6 +393,7 @@ export const itCourse = {
       ],
       categories: ["function_word", "agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "it-a2-passato-prossimo",
@@ -396,8 +402,8 @@ export const itCourse = {
       summary: "Former le passé composé avec le bon auxiliaire et accorder le participe.",
       rule: [
         "Le passato prossimo se forme avec le présent de avere ou de essere + le participe passé : ho mangiato, sono andato. Participes réguliers : -are → -ato, -ere → -uto, -ire → -ito. Irréguliers fréquents : fatto, detto, scritto, preso, visto, aperto, messo, stato.",
-        "Avec avere, le participe ne s’accorde pas avec le sujet : Maria ha mangiato. Avec essere, il s’accorde comme un adjectif : Maria è arrivata, noi siamo partiti. Essere est utilisé pour les verbes de mouvement et de changement (andare, venire, partire, arrivare, uscire, entrare, nascere, restare), pour les verbes pronominaux et pour essere lui-même.",
-        "Piège : « j’ai été » se dit sono stato (essere, jamais avere), alors que le français emploie avoir. De même, « j’ai eu » se dit ho avuto. Attention aussi à ne pas écrire ho andato : on dit sono andato.",
+        "Avec avere, le participe ne s’accorde pas avec le sujet : Maria ha mangiato. Avec essere, il s’accorde comme un adjectif : Maria è arrivata, noi siamo partiti. Essere est utilisé pour la plupart des verbes de déplacement et de changement d’état (andare, venire, partire, arrivare, uscire, entrare, nascere, restare), pour les verbes pronominaux et pour essere lui-même.",
+        "Piège : « j’ai été » se dit sono stato (essere, jamais avere), alors que le français emploie avoir ; « j’ai eu » se dit ho avuto. D’autres verbes prennent essere en italien mais avoir en français : sono riuscito, è piaciuto, è costato, è durato. À l’inverse, camminare et viaggiare gardent avere, comme en français : ho camminato, ho viaggiato.",
       ],
       table: {
         caption: "Participes et auxiliaires",
@@ -457,6 +463,7 @@ export const itCourse = {
       ],
       categories: ["verb", "agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "it-a2-reflexive",
@@ -466,7 +473,7 @@ export const itCourse = {
       rule: [
         "Les verbes pronominaux se conjuguent avec mi, ti, si, ci, vi, si placés avant le verbe : mi alzo, ti lavi, si chiama. À l’infinitif, le pronom se soude au verbe, qui perd son -e final : devo alzarmi (ou mi devo alzare).",
         "Au passato prossimo, l’auxiliaire est toujours essere et le participe s’accorde avec le sujet : mi sono alzato (homme), mi sono alzata (femme), ci siamo divertiti. Même avec un complément d’objet : mi sono lavata le mani.",
-        "Piège : avec les parties du corps, l’italien emploie l’article et non le possessif : mi lavo le mani, mi fa male la testa. Certains verbes sont pronominaux en italien sans l’être en français : dimenticarsi di (oublier), arrabbiarsi (se fâcher), sedersi (s’asseoir), ricordarsi (se souvenir).",
+        "Comme en français, avec les parties du corps, on emploie l’article et non le possessif : mi lavo le mani. Piège : certains verbes sont pronominaux en italien sans l’être en français : dimenticarsi di (oublier), innamorarsi di (tomber amoureux de), laurearsi (obtenir son diplôme), ammalarsi (tomber malade).",
       ],
       table: {
         caption: "Alzarsi au présent et au passé",
@@ -524,15 +531,16 @@ export const itCourse = {
       ],
       categories: ["verb", "agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "it-a2-imperfetto",
       level: "A2",
-      title: "L'imperfetto et son opposition au passato prossimo",
+      title: "L’imperfetto et son opposition au passato prossimo",
       summary: "Décrire, évoquer des habitudes passées et distinguer ce qui dure de ce qui arrive.",
       rule: [
         "L’imperfetto se forme en retirant -re de l’infinitif et en ajoutant -vo, -vi, -va, -vamo, -vate, -vano : parlavo, scrivevo, dormivo. Irréguliers : essere (ero, eri, era, eravamo, eravate, erano), fare (facevo), dire (dicevo), bere (bevevo).",
-        "Comme en français, l’imperfetto décrit le décor, une habitude ou une action en cours : Da bambino giocavo a calcio. Le passato prossimo exprime un événement précis, terminé : Ieri ho giocato a calcio. Les mots di solito, ogni giorno, sempre, spesso, mentre appellent l’imperfetto ; improvvisamente, ieri, una volta, alle otto (moment précis) appellent le passato prossimo.",
+        "Comme en français, l’imperfetto décrit le décor, une habitude ou une action en cours : Da bambino giocavo a calcio. Le passato prossimo exprime un événement précis, terminé : Ieri ho giocato a calcio. Di solito, ogni giorno, sempre, spesso, mentre appellent le plus souvent l’imperfetto ; improvvisamente, un giorno, alle otto (moment précis), le passato prossimo.",
         "Les deux temps s’associent : Mentre camminavo, ho visto Luca. Le fond est à l’imperfetto, l’événement qui l’interrompt au passato prossimo. Piège : un verbe d’état (essere, avere, sapere, volere) est le plus souvent à l’imperfetto pour décrire : Era tardi.",
       ],
       table: {
@@ -591,11 +599,12 @@ export const itCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "it-a2-direct-pronouns",
       level: "A2",
-      title: "Les pronoms COD : lo, la, li, le et l'accord au passé",
+      title: "Les pronoms COD : lo, la, li, le et l’accord au passé",
       summary: "Remplacer un complément direct par un pronom et accorder le participe.",
       rule: [
         "Les pronoms compléments d’objet direct sont lo (masculin singulier), la (féminin singulier), li (masculin pluriel), le (féminin pluriel). Ils se placent avant le verbe conjugué : Il caffè? Lo prendo. Contrairement au français « les », li et le distinguent le genre.",
@@ -656,6 +665,7 @@ export const itCourse = {
       ],
       categories: ["function_word", "agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "it-a2-piacere",
@@ -718,12 +728,19 @@ export const itCourse = {
           type: "transform",
           instruction: "Réécris avec le verbe « piacere ».",
           source: "Amo la musica classica.",
-          answers: ["Mi piace la musica classica.", "La musica classica mi piace."],
+          answers: [
+            "Mi piace la musica classica.",
+            "La musica classica mi piace.",
+            "Mi piace molto la musica classica.",
+            "La musica classica mi piace molto.",
+            "A me piace la musica classica.",
+          ],
           explanation: "On dit mi piace + la chose aimée, au singulier ici : mi piace la musica classica.",
         },
       ],
       categories: ["verb", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "it-a2-futuro",
@@ -731,9 +748,9 @@ export const itCourse = {
       title: "Le futur simple et le futur de probabilité",
       summary: "Parler de l’avenir et faire une supposition avec le futur.",
       rule: [
-        "On forme le futur sur l’infinitif sans -e final, avec les terminaisons -ò, -ai, -à, -emo, -ete, -anno. Les verbes en -are changent le a en e : parlare → parlerò. Les verbes en -care et -gare gardent le son dur : cercherò, pagherò.",
-        "Irréguliers fréquents (radical contracté) : essere → sarò, avere → avrò, andare → andrò, fare → farò, venire → verrò, potere → potrò, dovere → dovrò, volere → vorrò, vedere → vedrò, sapere → saprò, stare → starò, dare → darò.",
-        "Piège : après se et quando, l’italien garde le futur quand l’action est à venir : Quando arriverò, ti chiamerò ; Se avrò tempo, verrò (le français dit « si j’ai le temps »). Le présent suffit souvent pour un avenir proche : Domani vado a Roma.",
+        "On forme le futur sur l’infinitif sans -e final, avec les terminaisons -ò, -ai, -à, -emo, -ete, -anno. Les verbes en -are changent le a en e : parlare → parlerò. Les verbes en -care et -gare gardent le son dur : cercherò, pagherò ; ceux en -ciare et -giare perdent le i : comincerò, mangerò.",
+        "Irréguliers fréquents : essere → sarò ; fare → farò, stare → starò, dare → darò (le a reste) ; radical contracté : avere → avrò, andare → andrò, potere → potrò, dovere → dovrò, vedere → vedrò, sapere → saprò ; avec rr : venire → verrò, volere → vorrò.",
+        "Piège : après se, l’italien met le futur quand l’action est à venir, là où le français met le présent : Se avrò tempo, verrò (« si j’ai le temps, je viendrai »). À l’oral, le présent est aussi courant : Se ho tempo, vengo. Après quando, le futur s’emploie comme en français : Quando arriverò, ti chiamerò. Le présent suffit souvent pour un avenir proche : Domani vado a Roma.",
         "Le futur exprime aussi la supposition : Dov'è Luca? Sarà in ufficio. (Il doit être au bureau.) Che ore saranno? (Quelle heure peut-il bien être ?)",
       ],
       table: {
@@ -771,14 +788,14 @@ export const itCourse = {
         {
           type: "fill",
           prompt: "Domani noi ___ la riunione alle dieci.",
-          hint: "iniziare",
+          hint: "iniziare, au futur",
           answers: ["inizieremo"],
-          explanation: "Verbe en -are : iniziare → inizieremo (le i du radical ne se double pas).",
+          explanation: "Verbe en -are : le a devient e, iniziare → inizieremo. Le i se garde ici : seuls les verbes en -ciare et -giare le perdent (mangerò).",
         },
         {
           type: "fill",
-          prompt: "Tra un mese voi ___ qui?",
-          hint: "essere",
+          prompt: "Tra un mese voi ___ ancora qui?",
+          hint: "essere, au futur",
           answers: ["sarete"],
           explanation: "Essere est irrégulier au futur : sarete.",
         },
@@ -792,6 +809,7 @@ export const itCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "it-b1-combined-pronouns",
@@ -800,7 +818,7 @@ export const itCourse = {
       summary: "Combiner pronom indirect et pronom direct, et savoir où les placer.",
       rule: [
         "Quand deux pronoms se suivent, l’indirect vient en premier. Mi, ti, ci, vi deviennent me, te, ce, ve devant lo, la, li, le, ne : me lo dai, te la mando, ce li porta, ve ne parlo. Gli et le (à lui, à elle) fusionnent avec le pronom direct : glielo, gliela, glieli, gliele, gliene.",
-        "Piège : le français met le direct d’abord pour la 3e personne (« je le lui dis »). L’italien met l’indirect d’abord et soude tout : glielo dico. Glielo est invariable : il sert pour lui, elle, Lei, et loro est remplacé par glielo aussi.",
+        "Piège : le français met le direct d’abord à la 3e personne (« je le lui dis »). L’italien met l’indirect d’abord et soude tout : glielo dico. Le glie- ne change pas selon le destinataire : glielo sert pour lui, elle et Lei, et remplace aussi loro dans la langue courante (glielo dico = je le leur dis).",
         "Avec un infinitif ou un impératif, les pronoms se soudent à la fin : devo dirglielo, dammelo, portamelo. Au passato prossimo, le participe s’accorde avec le pronom direct : Me l'ha detta, Me li ha dati, Gliele ho date.",
       ],
       table: {
@@ -816,7 +834,7 @@ export const itCourse = {
       },
       examples: [
         { text: "Il documento? Te lo mando stasera.", translation: "Le document ? Je te l’envoie ce soir." },
-        { text: "Marta ha chiesto le chiavi e io gliele ho date.", translation: "Marta a demandé les clés et je les lui ai données.", note: "date s’accorde avec le (les chiavi)." },
+        { text: "Marta ha chiesto le chiavi e io gliele ho date.", translation: "Marta a demandé les clés et je les lui ai données.", note: "date s’accorde avec le (le chiavi)." },
         { text: "Se hai il numero, dammelo.", translation: "Si tu as le numéro, donne-le-moi.", note: "Avec l’impératif, les pronoms sont soudés au verbe." },
       ],
       exercises: [
@@ -844,7 +862,7 @@ export const itCourse = {
         {
           type: "fill",
           prompt: "Il contratto? ___ già spedito.",
-          hint: "à lui + le + avere",
+          hint: "à lui + lo + avere (io)",
           answers: ["gliel'ho", "glielo ho"],
           explanation: "Glielo s’élide devant ho : gliel'ho spedito.",
         },
@@ -858,6 +876,7 @@ export const itCourse = {
       ],
       categories: ["function_word", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "it-b1-ci-ne",
@@ -877,7 +896,7 @@ export const itCourse = {
           ["ci", "a + chose", "Pensi al lavoro? Ci penso."],
           ["ne", "di + chose", "Parli del progetto? Ne parlo."],
           ["ne", "quantité", "Quante mele vuoi? Ne voglio due."],
-          ["ne", "da + lieu", "Esci dall'ufficio? Ne esco alle sei."],
+          ["ne", "di + infinitif", "Hai voglia di uscire? No, non ne ho voglia."],
         ],
       },
       examples: [
@@ -924,6 +943,7 @@ export const itCourse = {
       ],
       categories: ["function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "it-b1-condizionale",
@@ -932,8 +952,8 @@ export const itCourse = {
       summary: "Formuler un souhait, une demande polie ou un conseil, et exprimer un regret.",
       rule: [
         "Le conditionnel présent se forme sur le radical du futur avec -ei, -esti, -ebbe, -emmo, -este, -ebbero : parlerei, vorrei, potrei, dovrei, andrei, farei, sarei, avrei. Il sert à demander poliment (Vorrei un caffè, Potresti aiutarmi?), à conseiller (Dovresti riposare) et à exprimer un souhait.",
-        "Le conditionnel passé = conditionnel de avere ou essere + participe : avrei voluto, sarei andato. Il exprime un regret (Avrei voluto partecipare) ou un futur dans le passé : Ha detto che sarebbe venuto.",
-        "Piège : après se, l’italien n’utilise jamais le conditionnel. Le français « si j’avais le temps, je voyagerais » donne Se avessi tempo, viaggerei (subjonctif imparfait dans la condition, conditionnel dans la conséquence). Ne dis donc jamais se avrei.",
+        "Le conditionnel passé = conditionnel de avere ou essere + participe : avrei voluto, sarei andato. Il exprime un regret : Avrei voluto partecipare. Piège : pour un futur vu du passé, le français emploie le conditionnel présent (« il a dit qu’il viendrait »), l’italien le conditionnel passé : Ha detto che sarebbe venuto (jamais che verrebbe).",
+        "Piège : dans une phrase hypothétique, l’italien n’utilise jamais le conditionnel après se. Le français « si j’avais le temps, je voyagerais » donne Se avessi tempo, viaggerei (subjonctif imparfait dans la condition, conditionnel dans la conséquence). Ne dis donc pas se avrei tempo.",
       ],
       table: {
         caption: "Conditionnel présent",
@@ -969,7 +989,7 @@ export const itCourse = {
         },
         {
           type: "fill",
-          prompt: "Noi ___ un caffè, per favore.",
+          prompt: "Noi ___ due caffè, per favore.",
           hint: "volere",
           answers: ["vorremmo"],
           explanation: "Volere au conditionnel : vorremmo (radical irrégulier vorr-).",
@@ -991,6 +1011,7 @@ export const itCourse = {
       ],
       categories: ["verb", "register"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "it-b1-congiuntivo",
@@ -999,7 +1020,7 @@ export const itCourse = {
       summary: "Employer le subjonctif après les verbes d’opinion, de souhait et les expressions d’importance.",
       rule: [
         "Le subjonctif présent se forme en -i pour les verbes en -are (che io parli) et en -a pour les autres (che io scriva, che io dorma, che io finisca). Les trois personnes du singulier sont identiques, d’où l’habitude d’ajouter le pronom : che lui parli. Irréguliers : essere → sia, avere → abbia, andare → vada, fare → faccia, venire → venga, potere → possa, volere → voglia, dire → dica.",
-        "Piège : penso che, credo che, mi sembra che, spero che, voglio che, è importante che, bisogna che demandent le subjonctif, alors que le français dit « je pense que » + indicatif : Penso che Marco abbia ragione. Après une certitude (so che, sono sicuro che, è vero che), on garde l’indicatif : So che Paola è in ufficio.",
+        "Piège : penso che, credo che, mi sembra che, spero che demandent le subjonctif, alors que le français dit « je pense que », « j’espère que » + indicatif : Penso che Marco abbia ragione. Comme en français, voglio che, è importante che, bisogna che le demandent aussi. Après une certitude (so che, sono sicuro che, è vero che), on garde l’indicatif : So che Paola è in ufficio.",
         "Quand le sujet est le même, on emploie l’infinitif et non che + subjonctif : Penso di avere ragione, Voglio andare. On utilise che + subjonctif seulement si les sujets diffèrent : Voglio che tu vada.",
       ],
       table: {
@@ -1020,8 +1041,8 @@ export const itCourse = {
       exercises: [
         {
           type: "choose",
-          prompt: "Penso che Luisa ___ molto stanca oggi.",
-          options: ["sarà", "è", "sia", "fosse"],
+          prompt: "Penso che Luisa ___ molto stanca in questo momento.",
+          options: ["siano", "è", "sia", "fosse"],
           answer: 2,
           explanation: "Après penso che, on emploie le subjonctif présent : sia.",
         },
@@ -1056,6 +1077,7 @@ export const itCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "it-b1-relatives",
@@ -1063,7 +1085,7 @@ export const itCourse = {
       title: "Les pronoms relatifs : che, cui, il quale",
       summary: "Relier deux phrases avec che, cui (après préposition) ou il quale.",
       rule: [
-        "Che remplace un sujet ou un complément direct, comme « qui » et « que » en français : La persona che lavora qui; Il libro che leggo. Il ne prend jamais de préposition : on ne dit pas « con che ».",
+        "Che remplace un sujet ou un complément direct, comme « qui » et « que » en français : la persona che lavora qui ; il libro che leggo. Il ne prend jamais de préposition : on ne dit pas « con che ».",
         "Après une préposition, on utilise cui, invariable : la ragazza con cui parlo, il posto in cui lavoro, il film di cui parlo (« dont »). Avec l’article, la cui = dont le / la : un collega la cui moglie è medico. « Où » se dit in cui ou dove.",
         "Il quale, la quale, i quali, le quali s’accordent avec le nom et s’emploient surtout à l’écrit ou pour éviter une ambiguïté : il cliente al quale scrivo. Piège : ne répète jamais le complément après le relatif : Il libro che ho letto, pas « che l'ho letto ».",
       ],
@@ -1121,15 +1143,16 @@ export const itCourse = {
       ],
       categories: ["function_word", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "it-b1-imperativo",
       level: "B1",
-      title: "L'impératif : tu, Lei, voi, avec pronoms",
+      title: "L’impératif : tu, Lei, voi, avec pronoms",
       summary: "Donner un ordre ou un conseil, avec ou sans pronoms (dimmi, fallo).",
       rule: [
         "Pour tu, l’impératif est la forme de la 3e personne du singulier pour les verbes en -are (parla!) et la forme tu du présent pour les autres (scrivi!, dormi!, finisci!). Pour voi, c’est la forme du présent (parlate, scrivete, dormite). Pour Lei (politesse), on emploie le subjonctif : parli, scriva, dorma, finisca. À la forme négative tu, on met non + infinitif : Non parlare!",
-        "Irréguliers pour tu : va', fa', di', da', sta', sii, abbi. Pour Lei : vada, faccia, dica, dia, stia, sia, abbia.",
+        "Irréguliers pour tu : va' (ou vai), fa' (ou fai), di', da' (ou dai), sta' (ou stai), sii, abbi. Pour Lei : vada, faccia, dica, dia, stia, sia, abbia.",
         "Les pronoms se soudent à l’impératif affirmatif de tu, noi, voi : dimmi, fallo, portatelo, dammelo. Avec va', fa', di', da', sta', la consonne se double (dimmi, dalle, stammi, fallo), sauf avec gli. À la forme Lei, le pronom précède : mi dica, lo faccia. À la forme négative, il peut précéder ou suivre : non lo fare / non farlo.",
       ],
       table: {
@@ -1178,8 +1201,8 @@ export const itCourse = {
           type: "fill",
           prompt: "Non ___, ce la farai!",
           hint: "preoccuparsi (tu)",
-          answers: ["preoccuparti"],
-          explanation: "Négatif tu : non + infinitif, avec le pronom soudé : non preoccuparti.",
+          answers: ["preoccuparti", "ti preoccupare"],
+          explanation: "Négatif tu : non + infinitif ; le pronom se soude à l’infinitif (non preoccuparti) ou se place devant (non ti preoccupare).",
         },
         {
           type: "transform",
@@ -1191,6 +1214,7 @@ export const itCourse = {
       ],
       categories: ["verb", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-05", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
   ],
 } satisfies GrammarCourse;
