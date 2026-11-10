@@ -2,7 +2,7 @@ import type { GrammarCourse } from "@/lib/schemas/grammar";
 
 export const koCourse = {
   language: "ko",
-  version: "2026-10-25",
+  version: "2026-11-10",
   points: [
     {
       id: "ko-a1-copula",
@@ -10,9 +10,9 @@ export const koCourse = {
       title: "Dire « A est B » : 이에요 / 예요 et 아니에요",
       summary: "Se présenter et identifier quelque chose avec 이에요 / 예요, et nier avec 아니에요.",
       rule: [
-        "Pour dire « A est B », le coréen colle la forme polie du verbe être à la fin du nom : -이에요 après une consonne finale (학생이에요), -예요 après une voyelle (의사예요). Pas d’article, pas de genre, et le verbe ne change pas selon la personne : 저는 학생이에요 = « je suis étudiant(e) », 선생님이에요 = « il est professeur » ou « tu es professeur » selon le contexte.",
+        "Pour dire « A est B », soude la forme polie 이에요 au nom : 학생이에요. Après une voyelle, on la contracte couramment en 예요 : 의사예요. La forme ne dépend pas de la personne, et le sujet peut rester implicite : 선생님이에요 se comprend selon le contexte.",
         "Pour nier, on n’ajoute pas de « ne… pas » : on place 이 (après une consonne) ou 가 (après une voyelle) collé au nom, puis 아니에요 après une espace : 학생이 아니에요, 의사가 아니에요.",
-        "Piège pour un francophone : la phrase se termine toujours par le verbe, et le sujet évident est souvent omis : 의사예요 seul se comprend très bien. La même forme sert à l’affirmation et à la question : seule l’intonation change (학생이에요? en montant).",
+        "Dans l’ordre courant, le prédicat termine la phrase. Le sujet évident peut être omis : 의사예요 suffit dans le bon contexte. En conversation, la même forme permet une affirmation ou une question, selon l’intonation : 학생이에요?",
       ],
       table: {
         caption: "Être / ne pas être (poli)",
@@ -27,17 +27,17 @@ export const koCourse = {
         ],
       },
       examples: [
-        { text: "저는 프랑스 사람이에요.", translation: "Je suis français(e).", note: "사람 finit par une consonne : 이에요." },
-        { text: "친구는 의사예요.", translation: "Mon ami est médecin.", note: "의사 finit par une voyelle : 예요." },
-        { text: "이것은 커피가 아니에요.", translation: "Ce n’est pas du café.", note: "커피 finit par une voyelle : 가 아니에요." },
+        { text: "저는 프랑스 사람이에요.", translation: "Je suis français(e).", note: "사람 finit par une consonne : 이에요." },
+        { text: "친구는 의사예요.", translation: "Mon ami est médecin.", note: "의사 finit par une voyelle : 예요." },
+        { text: "이것은 커피가 아니에요.", translation: "Ce n’est pas du café.", note: "커피 finit par une voyelle : 가 아니에요." },
       ],
       exercises: [
         {
           type: "choose",
-          prompt: "저는 의사___.",
+          prompt: "저는 의사___. (Forme affirmative contractée.)",
           options: ["이에요", "이 아니에요", "예요", "가 아니에요"],
           answer: 2,
-          explanation: "의사 finit par la voyelle 사 : on emploie 예요. 이에요 ne s’utilise qu’après une consonne finale.",
+          explanation: "의사 finit par la voyelle ㅏ. 이에요 se contracte ici en 예요 : 의사예요.",
         },
         {
           type: "choose",
@@ -48,13 +48,13 @@ export const koCourse = {
         },
         {
           type: "fill",
-          prompt: "저는 학생___.",
-          answers: ["이에요"],
-          explanation: "학생 finit par la consonne ㅇ : 학생이에요.",
+          prompt: "저는 학생___. (Affirmation au présent poli courant.)",
+          answers: ["이에요", "이어요"],
+          explanation: "학생 finit par la consonne ㅇ. On dit 학생이에요. La forme polie 학생이어요 est aussi standard.",
         },
         {
           type: "transform",
-          instruction: "Mets la phrase à la forme négative.",
+          instruction: "Mets la phrase à la forme négative avec « 이 / 가 아니에요 ». Le thème « 저는 » est facultatif.",
           source: "저는 선생님이에요.",
           answers: ["저는 선생님이 아니에요.", "선생님이 아니에요."],
           explanation: "On remplace 이에요 par 이 아니에요 : 선생님이 아니에요. Le sujet 저는 peut être omis.",
@@ -62,6 +62,7 @@ export const koCourse = {
       ],
       categories: ["function_word", "spelling"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ko-a1-topic-subject",
@@ -71,7 +72,7 @@ export const koCourse = {
       rule: [
         "Le coréen marque la fonction d’un mot par une particule collée à lui, là où le français joue sur la place ou l’article. 은 / 는 marque le thème (« quant à… », ce dont on parle) ; 이 / 가 marque le sujet grammatical, surtout quand l’information est nouvelle.",
         "Forme : après une voyelle, 는 et 가 (저는, 의사가) ; après une consonne finale, 은 et 이 (선생님은, 선생님이). Exceptions à retenir : 저 devient 제 devant 가 (제가), 나 devient 내가.",
-        "Emplois : 은 / 는 pour se présenter, décrire ou opposer (저는 학생이에요) ; 이 / 가 pour annoncer un fait nouveau (비가 와요 : il pleut) et toujours après un mot interrogatif (누가, 뭐가). Piège : le français n’a rien d’équivalent, et les deux particules ne sont pas interchangeables.",
+        "은 / 는 introduit un thème ou marque un contraste : 저는 학생이에요. 이 / 가 identifie souvent le sujet d’un fait nouveau : 비가 와요. Avec un interrogatif sujet, on dit 누가 ou 뭐가. Pour « que manges-tu ? », quoi est objet : 뭐를 먹어요?",
       ],
       table: {
         caption: "Choisir la particule",
@@ -82,41 +83,42 @@ export const koCourse = {
         ],
       },
       examples: [
-        { text: "저는 회사원이에요.", translation: "Moi, je suis employé(e) de bureau.", note: "저 finit par une voyelle : 는." },
-        { text: "비가 와요.", translation: "Il pleut.", note: "Fait nouveau : 이 / 가. 비 finit par une voyelle : 가." },
-        { text: "이 가방은 비싸요.", translation: "Ce sac est cher.", note: "가방 finit par une consonne : 은." },
+        { text: "저는 회사원이에요.", translation: "Moi, je suis employé(e) de bureau.", note: "저 finit par une voyelle : 는." },
+        { text: "비가 와요.", translation: "Il pleut.", note: "Fait nouveau : 이 / 가. 비 finit par une voyelle : 가." },
+        { text: "이 가방은 비싸요.", translation: "Ce sac est cher.", note: "가방 finit par une consonne : 은." },
       ],
       exercises: [
         {
           type: "choose",
-          prompt: "저___ 민수예요.",
+          prompt: "저___ 민수예요. (Présente-toi avec la particule de thème.)",
           options: ["은", "이", "는", "가"],
           answer: 2,
           explanation: "저 finit par une voyelle et on se présente : 저는. (Le sujet de 저 est 제가, jamais 저가.)",
         },
         {
           type: "choose",
-          prompt: "선생님___ 한국 사람이에요.",
+          prompt: "선생님___ 한국 사람이에요. (Marque le thème.)",
           options: ["는", "은", "가", "를"],
           answer: 1,
           explanation: "선생님 finit par la consonne ㅁ : on emploie 은 (thème) ; 는 et 가 sont réservés aux mots finissant par une voyelle.",
         },
         {
           type: "choose",
-          prompt: "저기 의자___ 있어요.",
+          prompt: "저기 의자___ 있어요. (Marque le sujet.)",
           options: ["이", "가", "은", "을"],
           answer: 1,
           explanation: "의자 finit par une voyelle : le sujet est 가. 이 et 은 sont réservés aux consonnes finales, et 을 est la particule d’objet.",
         },
         {
           type: "fill",
-          prompt: "A: 뭐___ 있어요? B: 책이 있어요.",
+          prompt: "A: 뭐___ 있어요? B: 책이 있어요. (Particule de sujet.)",
           answers: ["가"],
-          explanation: "Après un mot interrogatif, on met 이 / 가. 뭐 finit par une voyelle : 뭐가.",
+          explanation: "Dans cette question, 뭐 est le sujet de 있어요. Il finit par une voyelle et prend 가 : 뭐가.",
         },
       ],
       categories: ["function_word", "spelling"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ko-a1-object-particle",
@@ -125,7 +127,7 @@ export const koCourse = {
       summary: "Marquer le complément d’objet avec 을 / 를 et placer le verbe en fin de phrase.",
       rule: [
         "La particule 을 / 를 marque le complément d’objet direct, celui que le français reconnaît à sa place après le verbe. Après une consonne finale, on met 을 (밥을, 물을) ; après une voyelle, 를 (커피를, 영화를).",
-        "L’ordre est sujet – objet – verbe, avec le verbe toujours en dernière position : 저는 커피를 마셔요 (littéralement « moi café boire »). Piège : en français le verbe précède l’objet ; en coréen, jamais.",
+        "L’ordre courant est sujet, objet, puis verbe : 저는 커피를 마셔요. Les particules permettent de reconnaître le rôle des mots même si l’ordre change. Pour une phrase simple, place l’objet avant le verbe.",
         "À l’oral, on omet parfois la particule quand le sens est clair (커피 마셔요), mais à l’écrit garde-la. Le coréen met aussi 을 / 를 après des verbes que le français construit avec une préposition : 버스를 타요 (monter dans le bus).",
       ],
       table: {
@@ -142,14 +144,14 @@ export const koCourse = {
       },
       examples: [
         { text: "저는 밥을 먹어요.", translation: "Je mange du riz (un repas).", note: "Le verbe 먹어요 est en fin de phrase." },
-        { text: "친구가 영화를 봐요.", translation: "Mon ami regarde un film.", note: "영화 finit par une voyelle : 를." },
+        { text: "친구가 영화를 봐요.", translation: "Mon ami regarde un film.", note: "영화 finit par une voyelle : 를." },
         { text: "저는 한국어를 공부해요.", translation: "J’étudie le coréen.", note: "공부해요 est le verbe, l’objet est 한국어를." },
       ],
       exercises: [
         {
           type: "choose",
           prompt: "저는 커피___ 마셔요.",
-          options: ["을", "를", "는", "에서"],
+          options: ["을", "를", "의", "에서"],
           answer: 1,
           explanation: "커피 finit par une voyelle : on met 를. 을 s’emploie après une consonne.",
         },
@@ -162,13 +164,13 @@ export const koCourse = {
         },
         {
           type: "fill",
-          prompt: "저는 영화___ 봐요.",
+          prompt: "저는 영화___ 봐요. (Particule d’objet direct.)",
           answers: ["를"],
           explanation: "영화 finit par une voyelle : 영화를.",
         },
         {
           type: "transform",
-          instruction: "Remplace « 커피 » par « 물 » (l’eau) et corrige la particule.",
+          instruction: "Remplace « 커피 » par « 물 » et garde la particule d’objet. Le thème « 저는 » est facultatif.",
           source: "저는 커피를 마셔요.",
           answers: ["저는 물을 마셔요.", "물을 마셔요."],
           explanation: "물 finit par la consonne ㄹ : la particule devient 을.",
@@ -176,6 +178,7 @@ export const koCourse = {
       ],
       categories: ["function_word", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ko-a1-place-particles",
@@ -184,7 +187,7 @@ export const koCourse = {
       summary: "Dire où l’on va, où l’on est, où l’on agit, à qui l’on donne, et ce que l’on a ou non.",
       rule: [
         "Le coréen utilise trois particules là où le français dit surtout « à » ou « dans ». 에 indique la destination ou le lieu où l’on est : 학교에 가요, 집에 있어요. 에서 indique le lieu où se déroule une action : 도서관에서 공부해요. 에게 (oral : 한테) indique la personne qui reçoit : 친구에게 전화해요.",
-        "Piège : il faut se demander s’il y a une action ou non. Avec être / exister (있어요) et aller / venir, on emploie 에 ; avec une action (étudier, manger, travailler), le lieu prend 에서. 에 s’emploie aussi pour l’heure ou le jour : 일요일에 쉬어요.",
+        "Pour situer une personne ou un objet avec 있다, emploie 에 : 집에 있어요. Avec 가다, 에 indique la destination. Pour le lieu où tu fais une activité, comme étudier ou manger, emploie généralement 에서. 에 peut aussi situer un moment : 일요일에 쉬어요.",
         "있어요 signifie « il y a », « être (quelque part) » et « avoir » ; 없어요 est son contraire. Ce qui existe ou ce qu’on possède est sujet (이 / 가) : 동생이 있어요 (j’ai un petit frère), 시간이 없어요 (je n’ai pas le temps).",
       ],
       table: {
@@ -198,15 +201,15 @@ export const koCourse = {
         ],
       },
       examples: [
-        { text: "저는 매일 도서관에서 공부해요.", translation: "J’étudie tous les jours à la bibliothèque.", note: "Action (공부해요) : le lieu prend 에서." },
-        { text: "내일 부산에 가요.", translation: "Demain, je vais à Busan.", note: "Aller : 에 marque la destination." },
-        { text: "친구에게 편지를 써요.", translation: "J’écris une lettre à un ami.", note: "에게 : la personne qui reçoit." },
+        { text: "저는 매일 도서관에서 공부해요.", translation: "J’étudie tous les jours à la bibliothèque.", note: "Action (공부해요) : le lieu prend 에서." },
+        { text: "내일 부산에 가요.", translation: "Demain, je vais à Busan.", note: "Aller : 에 marque la destination." },
+        { text: "친구에게 편지를 써요.", translation: "J’écris une lettre à un ami.", note: "에게 : la personne qui reçoit." },
         { text: "지금 시간이 없어요.", translation: "Je n’ai pas le temps maintenant.", note: "Ce qu’on n’a pas est marqué par 이 / 가." },
       ],
       exercises: [
         {
           type: "choose",
-          prompt: "도서관___ 공부해요.",
+          prompt: "도서관___ 공부해요. (J’étudie à la bibliothèque.)",
           options: ["에", "에서", "에게", "를"],
           answer: 1,
           explanation: "공부해요 est une action : le lieu où elle se déroule prend 에서.",
@@ -220,20 +223,21 @@ export const koCourse = {
         },
         {
           type: "fill",
-          prompt: "친구___ 선물을 줘요.",
+          prompt: "친구___ 선물을 줘요. (Particule de destinataire, sans honorifique.)",
           answers: ["에게", "한테"],
           explanation: "La personne qui reçoit est marquée par 에게 (ou 한테 à l’oral).",
         },
         {
           type: "fill",
           prompt: "A: 오늘 시간이 있어요? B: 아니요, 시간이 ___.",
-          hint: "없다",
+          hint: "없다, au présent poli",
           answers: ["없어요"],
           explanation: "« Non, je n’ai pas le temps » : 없다 à la forme polie, 없어요.",
         },
       ],
       categories: ["function_word", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ko-a1-present-polite",
@@ -242,8 +246,8 @@ export const koCourse = {
       summary: "Conjuguer un verbe au présent poli (해요체) à partir de son radical.",
       rule: [
         "Le coréen ne conjugue pas selon la personne : 가요 veut dire « je vais », « tu vas », « il va »… Le dictionnaire donne le verbe en -다 (가다, 먹다) ; on retire 다 pour obtenir le radical, puis on ajoute la terminaison polie.",
-        "Si la dernière voyelle du radical est ㅏ ou ㅗ, on ajoute 아요 (좋다 → 좋아요) ; sinon 어요 (먹다 → 먹어요). Les verbes en 하다 font 해요 (공부하다 → 공부해요).",
-        "Quand le radical finit par une voyelle, la voyelle de 아 / 어 se contracte : 가+아요 → 가요, 보+아요 → 봐요, 마시+어요 → 마셔요, 주+어요 → 줘요. Piège : on n’écrit pas *가아요 ; apprends les contractions comme des mots. Une même forme sert pour l’affirmation, la question (intonation montante) et pour tous les sujets.",
+        "Dans le modèle régulier, ajoute 아요 si la dernière voyelle du radical est ㅏ ou ㅗ, et 어요 sinon : 좋다 → 좋아요, 먹다 → 먹어요. 하다 et ses composés prennent 여요 : 하여요 se contracte couramment en 해요.",
+        "La rencontre de deux voyelles donne souvent une contraction : 가요, 봐요, 마셔요, 줘요. Certaines formes pleines restent correctes, comme 보아요 et 마시어요. En conversation, l’intonation peut distinguer l’affirmation de la question.",
       ],
       table: {
         caption: "Du dictionnaire au présent poli",
@@ -275,25 +279,26 @@ export const koCourse = {
           prompt: "저는 매일 책을 ___.",
           options: ["읽아요", "읽요", "읽어요", "읽해요"],
           answer: 2,
-          explanation: "Le radical 읽- se termine par ㅣ (ni ㅏ ni ㅗ) : on ajoute 어요.",
+          explanation: "La voyelle du radical 읽- est ㅣ. Comme elle n’est ni ㅏ ni ㅗ, on ajoute 어요 : 읽어요.",
         },
         {
           type: "fill",
           prompt: "저는 한국어를 ___.",
-          hint: "공부하다",
-          answers: ["공부해요"],
-          explanation: "Les verbes en 하다 font 해요 : 공부해요.",
+          hint: "공부하다, au présent poli",
+          answers: ["공부해요", "공부하여요"],
+          explanation: "공부하- + 여요 donne 공부하여요. La forme usuelle à l’oral est la contraction 공부해요.",
         },
         {
           type: "fill",
           prompt: "저는 커피를 ___.",
-          hint: "마시다",
+          hint: "마시다, au présent poli",
           answers: ["마셔요", "마시어요"],
           explanation: "마시-+어요 se contracte en 마셔요 (la forme non contractée 마시어요 est correcte mais rare).",
         },
       ],
       categories: ["verb", "spelling"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ko-a1-numbers-counters",
@@ -302,8 +307,8 @@ export const koCourse = {
       summary: "Compter des objets, des personnes, dire l’heure, l’âge et un prix avec le bon système de nombres.",
       rule: [
         "Le coréen a deux systèmes de nombres. Les nombres coréens (하나, 둘, 셋…) servent à compter les objets et les personnes, à dire l’âge et les heures. Les nombres sino-coréens (일, 이, 삼…) servent pour les minutes, les dates, les prix, les numéros de téléphone.",
-        "Ordre : nom + nombre + compteur, avec une espace entre le nombre et le compteur : 사과 두 개 (deux pommes). Compteurs : 개 (objets), 명 (personnes), 살 (âge, nombre coréen), 시 (heure, nombre coréen), 분 (minute, sino-coréen), 원 (wons, sino-coréen).",
-        "Piège : devant un compteur, 하나, 둘, 셋, 넷 et 스물 deviennent 한, 두, 세, 네 et 스무. On dit donc 세 개, jamais 셋 개. Pour l’heure, 두 시 삼십 분 = 2 h 30 : coréen pour l’heure, sino-coréen pour les minutes.",
+        "Pour compter, place souvent le nom avant le nombre et son compteur : 사과 두 개. Écris le nombre en hangeul et le compteur séparément. 개 compte des objets, 명 des personnes, 살 des années d’âge et 시 les heures. 분 compte ici les minutes, 원 les wons.",
+        "Devant un compteur, 하나, 둘, 셋 et 넷 deviennent 한, 두, 세 et 네, y compris en fin de nombre composé. Pour vingt exactement, 스물 devient 스무, comme dans 스무 살. Pour l’heure, 두 시 삼십 분 signifie 2 h 30.",
       ],
       table: {
         caption: "Les deux systèmes",
@@ -324,7 +329,7 @@ export const koCourse = {
       },
       examples: [
         { text: "사과가 세 개 있어요.", translation: "Il y a trois pommes.", note: "셋 devient 세 devant le compteur 개." },
-        { text: "지금 두 시 삼십 분이에요.", translation: "Il est deux heures et demie.", note: "시 : nombre coréen ; 분 : nombre sino-coréen." },
+        { text: "지금 두 시 삼십 분이에요.", translation: "Il est deux heures et demie.", note: "시 : nombre coréen ; 분 : nombre sino-coréen." },
         { text: "저는 스물다섯 살이에요.", translation: "J’ai vingt-cinq ans.", note: "L’âge s’exprime avec les nombres coréens." },
         { text: "이 책은 만 원이에요.", translation: "Ce livre coûte dix mille wons.", note: "Les prix utilisent les nombres sino-coréens." },
       ],
@@ -341,7 +346,7 @@ export const koCourse = {
           prompt: "지금 ___ 시예요. (7 h)",
           options: ["칠", "일", "일곱", "열"],
           answer: 2,
-          explanation: "L’heure se dit avec un nombre coréen : 일곱 시. 칠 serait sino-coréen (réservé aux minutes).",
+          explanation: "On utilise le nombre coréen pour l’heure : 일곱 시. 칠 est sino-coréen et peut servir pour les minutes, les dates ou les prix.",
         },
         {
           type: "fill",
@@ -360,6 +365,7 @@ export const koCourse = {
       ],
       categories: ["word_choice", "agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ko-a2-past",
@@ -367,7 +373,7 @@ export const koCourse = {
       title: "Parler au passé : -았어요 / -었어요 / 했어요",
       summary: "Former le passé poli à partir du radical, avec les contractions courantes.",
       rule: [
-        "Le coréen n’a qu’un seul passé, qui traduit à la fois le passé composé et l’imparfait du français. On l’obtient en ajoutant 았어요 / 었어요 au radical, avec la même règle d’harmonie vocalique que le présent : 았어요 après ㅏ ou ㅗ, 었어요 sinon, 했어요 pour les verbes en 하다.",
+        "Pour le passé courant en style poli, ajoute 았어요 si la dernière voyelle du radical est ㅏ ou ㅗ, et 었어요 sinon. Cette forme traduit souvent le passé composé ou l’imparfait français. Avec 하다, on emploie 하였어요 ou sa contraction 했어요.",
         "Les contractions du présent se retrouvent : 가다 → 갔어요, 보다 → 봤어요, 마시다 → 마셨어요. Après une consonne, rien ne se contracte : 먹다 → 먹었어요, 좋다 → 좋았어요.",
         "Le verbe être se met aussi au passé : 이에요 devient 이었어요 après une consonne, 였어요 après une voyelle (학생이었어요, 의사였어요). Piège : le passé de 이에요 se construit avec ㅆ comme les autres verbes ; ne l’oublie pas.",
       ],
@@ -388,12 +394,12 @@ export const koCourse = {
       examples: [
         { text: "어제 친구를 만났어요.", translation: "Hier, j’ai rencontré un ami.", note: "만나-+았어요 se contracte en 만났어요." },
         { text: "주말에 영화를 봤어요.", translation: "Le week-end, j’ai regardé un film.", note: "보-+았어요 → 봤어요." },
-        { text: "작년에 저는 학생이었어요.", translation: "L’année dernière, j’étais étudiant(e).", note: "학생 finit par une consonne : 이었어요." },
+        { text: "작년에 저는 학생이었어요.", translation: "L’année dernière, j’étais étudiant(e).", note: "학생 finit par une consonne : 이었어요." },
       ],
       exercises: [
         {
           type: "choose",
-          prompt: "어제 친구를 ___.",
+          prompt: "어제 친구를 ___. (Au passé poli.)",
           options: ["만나요", "만나었어요", "만났어요", "만날 거예요"],
           answer: 2,
           explanation: "만나-+았어요 se contracte en 만났어요. 만나요 est le présent, 만날 거예요 le futur.",
@@ -408,20 +414,20 @@ export const koCourse = {
         {
           type: "fill",
           prompt: "어제 영화를 ___.",
-          hint: "보다",
+          hint: "보다, au passé poli",
           answers: ["봤어요", "보았어요"],
           explanation: "보-+았어요 se contracte en 봤어요 (la forme 보았어요 est correcte mais rare).",
         },
         {
           type: "fill",
           prompt: "저는 어제 일을 ___.",
-          hint: "하다",
-          answers: ["했어요"],
-          explanation: "하다 donne 했어요 au passé.",
+          hint: "하다, au passé poli",
+          answers: ["했어요", "하였어요"],
+          explanation: "하다 donne 하였어요 au passé. 했어요 en est la contraction courante.",
         },
         {
           type: "transform",
-          instruction: "Mets la phrase au passé.",
+          instruction: "Mets « 이다 » au passé poli en -었어요. Le thème « 저는 » est facultatif.",
           source: "저는 학생이에요.",
           answers: ["저는 학생이었어요.", "학생이었어요."],
           explanation: "이에요 devient 이었어요 après une consonne (학생). Le sujet 저는 peut être omis.",
@@ -429,6 +435,7 @@ export const koCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ko-a2-future",
@@ -438,7 +445,7 @@ export const koCourse = {
       rule: [
         "Pour le futur, on ajoute au radical ㄹ 거예요 (après une voyelle) ou 을 거예요 (après une consonne) : 가다 → 갈 거예요, 먹다 → 먹을 거예요. Attention à l’espace : 거 est un mot à part (갈 거예요).",
         "Les radicaux en ㄹ prennent simplement 거예요, sans 을 : 만들다 → 만들 거예요, 살다 → 살 거예요. Le coréen emploie aussi le présent pour un futur proche avec une indication de temps (내일 가요), mais -(으)ㄹ 거예요 est la forme sûre pour annoncer un projet.",
-        "Cette forme exprime aussi une supposition à la 3e personne : 내일 비가 올 거예요 (il pleuvra sans doute demain). Piège : le français distingue « je vais » et « je ferai » ; le coréen a une seule forme.",
+        "-(으)ㄹ 거예요 peut annoncer un projet ou exprimer une prévision : 내일 비가 올 거예요 (« Il pleuvra sans doute demain »). Le français peut traduire cette construction par « aller + infinitif » ou par le futur simple, selon le contexte.",
       ],
       table: {
         caption: "Futur",
@@ -454,8 +461,8 @@ export const koCourse = {
         ],
       },
       examples: [
-        { text: "주말에 친구를 만날 거예요.", translation: "Ce week-end, je verrai un ami.", note: "만나- finit par une voyelle : ㄹ 거예요." },
-        { text: "저녁에 밥을 먹을 거예요.", translation: "Ce soir, je mangerai.", note: "먹- finit par une consonne : 을 거예요." },
+        { text: "주말에 친구를 만날 거예요.", translation: "Ce week-end, je verrai un ami.", note: "만나- finit par une voyelle : ㄹ 거예요." },
+        { text: "저녁에 밥을 먹을 거예요.", translation: "Ce soir, je mangerai.", note: "먹- finit par une consonne : 을 거예요." },
         { text: "내일 비가 올 거예요.", translation: "Il pleuvra sans doute demain.", note: "Supposition à la 3e personne." },
       ],
       exercises: [
@@ -476,20 +483,20 @@ export const koCourse = {
         {
           type: "fill",
           prompt: "저는 내일 학교에 ___.",
-          hint: "가다",
+          hint: "가다, avec -(으)ㄹ 거예요",
           answers: ["갈 거예요"],
           explanation: "가- finit par une voyelle : 갈 거예요, avec une espace avant 거예요.",
         },
         {
           type: "fill",
           prompt: "저녁에 뭐 ___?",
-          hint: "하다",
+          hint: "하다, avec -(으)ㄹ 거예요",
           answers: ["할 거예요"],
           explanation: "« Que feras-tu ce soir ? » : 하- + ㄹ 거예요 = 할 거예요.",
         },
         {
           type: "transform",
-          instruction: "Mets la phrase au futur.",
+          instruction: "Exprime le futur avec « -(으)ㄹ 거예요 ». Garde l’ordre des autres mots. « 저는 » est facultatif.",
           source: "저는 내일 커피를 마셔요.",
           answers: ["저는 내일 커피를 마실 거예요.", "내일 커피를 마실 거예요."],
           explanation: "마시- finit par une voyelle : 마실 거예요.",
@@ -497,6 +504,7 @@ export const koCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ko-a2-negation",
@@ -505,8 +513,8 @@ export const koCourse = {
       summary: "Dire qu’on ne fait pas ou qu’on ne peut pas faire quelque chose.",
       rule: [
         "Le coréen a deux négations devant le verbe : 안 (ne pas, par choix ou simplement) et 못 (ne pas pouvoir, par incapacité ou empêchement). 안 가요 = « je ne vais pas » ; 못 가요 = « je ne peux pas y aller ». On les place juste avant le verbe, avec une espace.",
-        "Pour les verbes en 하다, la négation s’intercale : 공부 안 해요, 공부 못 해요 (pas *안 공부해요). Piège : en français « ne… pas » entoure le verbe ; en coréen la négation précède simplement le verbe.",
-        "Il existe une forme longue, plus soutenue : radical + 지 않아요 (가지 않아요) pour 안, radical + 지 못해요 (가지 못해요) pour 못. Le sens est le même ; on la trouve à l’écrit et avec les verbes longs.",
+        "Dans des expressions comme 운동하다 et 공부하다, on sépare l’activité et 하다 pour la négation courte : 운동 안 해요, 공부를 못 해요. On peut garder la particule d’objet. Avec d’autres verbes, 안 précède le verbe entier : 안 좋아해요.",
+        "Pour la négation longue, emploie radical + 지 않아요 (가지 않아요) ou radical + 지 못해요 (가지 못해요). On rencontre les deux constructions à l’oral comme à l’écrit.",
       ],
       table: {
         caption: "Négation courte et longue",
@@ -520,16 +528,16 @@ export const koCourse = {
       },
       examples: [
         { text: "저는 커피를 안 마셔요.", translation: "Je ne bois pas de café.", note: "안 se place juste avant le verbe." },
-        { text: "오늘은 바빠서 못 가요.", translation: "Aujourd’hui, je suis occupé, je ne peux pas y aller.", note: "못 : empêchement." },
-        { text: "저는 일요일에 공부 안 해요.", translation: "Le dimanche, je n’étudie pas.", note: "Verbe en 하다 : 공부 안 해요." },
+        { text: "오늘은 바빠서 못 가요.", translation: "Aujourd’hui, je suis occupé, je ne peux pas y aller.", note: "못 : empêchement." },
+        { text: "저는 일요일에 공부 안 해요.", translation: "Le dimanche, je n’étudie pas.", note: "Verbe en 하다 : 공부 안 해요." },
       ],
       exercises: [
         {
           type: "choose",
           prompt: "저는 운동을 ___. (Je ne fais pas de sport.)",
-          options: ["안 운동해요", "운동 안 해요", "운동 해요 안", "안 운동 해요"],
+          options: ["운동 안 해요", "안 해요", "해요 안", "안 운동 해요"],
           answer: 1,
-          explanation: "Avec un verbe en 하다, 안 s’intercale entre le nom et 해요 : 운동 안 해요.",
+          explanation: "L’énoncé contient déjà 운동을. Place 안 devant 해요 : 저는 운동을 안 해요.",
         },
         {
           type: "choose",
@@ -547,7 +555,7 @@ export const koCourse = {
         },
         {
           type: "transform",
-          instruction: "Mets la phrase à la forme négative avec 안.",
+          instruction: "Ajoute « 안 » avant le verbe. Garde « 커피를 ». Le thème « 저는 » est facultatif.",
           source: "저는 커피를 마셔요.",
           answers: ["저는 커피를 안 마셔요.", "커피를 안 마셔요."],
           explanation: "안 se place juste avant le verbe : 안 마셔요.",
@@ -562,6 +570,7 @@ export const koCourse = {
       ],
       categories: ["verb", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ko-a2-want-can",
@@ -569,7 +578,7 @@ export const koCourse = {
       title: "Vouloir et pouvoir : -고 싶다 et -(으)ㄹ 수 있다",
       summary: "Exprimer un désir avec -고 싶어요 et une capacité ou possibilité avec -(으)ㄹ 수 있어요.",
       rule: [
-        "-고 싶어요 exprime le désir (« je veux… ») : on ajoute 고 싶어요 au radical, sans aucun changement, quelle que soit la dernière lettre : 가고 싶어요, 먹고 싶어요. Il s’emploie à la 1re personne en phrase affirmative et à la 2e en question ; pour la 3e personne, on dit -고 싶어 해요.",
+        "Pour exprimer un désir, ajoute 고 싶어요 au radical : 가고 싶어요, 먹고 싶어요. On l’emploie couramment pour parler de soi ou demander à quelqu’un ce qu’il veut. Pour décrire le désir apparent d’une autre personne, emploie souvent -고 싶어 해요, avec une espace avant 해요.",
         "-(으)ㄹ 수 있어요 exprime la capacité ou la possibilité (« je peux », « je sais ») : ㄹ 수 après une voyelle (갈 수 있어요), 을 수 après une consonne (먹을 수 있어요). Le contraire est 수 없어요 : 갈 수 없어요. Les radicaux en ㄹ prennent simplement 수 : 만들 수 있어요.",
         "Piège : le français a des verbes distincts (vouloir, pouvoir, savoir) ; le coréen utilise deux constructions et 수 est un mot séparé (écrit avec une espace). Note que 못 가요 et 갈 수 없어요 se traduisent tous deux par « je ne peux pas y aller ».",
       ],
@@ -587,7 +596,7 @@ export const koCourse = {
       },
       examples: [
         { text: "저는 한국에 가고 싶어요.", translation: "Je veux aller en Corée.", note: "-고 싶어요 s’ajoute directement au radical." },
-        { text: "매운 음식을 먹을 수 있어요?", translation: "Tu peux manger des plats épicés ?", note: "먹- finit par une consonne : 을 수." },
+        { text: "매운 음식을 먹을 수 있어요?", translation: "Tu peux manger des plats épicés ?", note: "먹- finit par une consonne : 을 수." },
         { text: "저는 피아노를 칠 수 있어요.", translation: "Je sais jouer du piano.", note: "-(으)ㄹ 수 있다 exprime aussi un savoir-faire." },
       ],
       exercises: [
@@ -615,13 +624,13 @@ export const koCourse = {
         {
           type: "fill",
           prompt: "저는 피아노를 칠 ___ 있어요.",
-          hint: "pouvoir",
+          hint: "Nom dépendant dans la construction de capacité",
           answers: ["수"],
           explanation: "La construction est -(으)ㄹ 수 있어요 : 칠 수 있어요.",
         },
         {
           type: "transform",
-          instruction: "Dis que tu ne peux pas, avec -(으)ㄹ 수 없다.",
+          instruction: "Dis que tu ne peux pas nager avec « -(으)ㄹ 수 없다 » au présent poli. « 저는 » est facultatif.",
           source: "저는 수영해요.",
           answers: ["저는 수영할 수 없어요.", "수영할 수 없어요."],
           explanation: "수영하- + ㄹ 수 없어요 = 수영할 수 없어요.",
@@ -629,6 +638,7 @@ export const koCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ko-a2-honorific-request",
@@ -637,7 +647,7 @@ export const koCourse = {
       summary: "Demander poliment, s’adresser à une personne qu’on respecte et connaître les verbes honorifiques.",
       rule: [
         "-(으)세요 s’ajoute au radical : 세요 après une voyelle (가세요), 으세요 après une consonne (읽으세요). Il joue deux rôles : honorifique (on parle d’une personne qu’on respecte : 선생님이 책을 읽으세요) et demande polie, proche de l’impératif (여기에 앉으세요 : asseyez-vous). Les radicaux en ㄹ la perdent : 만들다 → 만드세요.",
-        "Quelques verbes ont une forme honorifique à part : 먹다 / 마시다 → 드세요 (ou 잡수세요), 있다 → 계세요 (être, pour une personne), 자다 → 주무세요, 말하다 → 말씀하세요. Le sujet honorifique prend aussi 께서 au lieu de 이 / 가.",
+        "Certains verbes ont une forme honorifique particulière : 먹다 / 마시다 → 드세요, 있다 → 계세요 pour situer une personne, 자다 → 주무세요, 말하다 → 말씀하세요. Pour « manger », on dit aussi 잡수세요. Avec un sujet honoré, 께서 peut remplacer 이 / 가.",
         "Pour demander un objet, on dit N 주세요 (« donnez-moi N ») : 물 주세요. Piège : le français distingue tu / vous ; le coréen exprime le respect dans le verbe et le vocabulaire. Ne mets jamais -(으)세요 pour parler de toi-même.",
       ],
       table: {
@@ -654,10 +664,10 @@ export const koCourse = {
         ],
       },
       examples: [
-        { text: "여기에 앉으세요.", translation: "Asseyez-vous ici.", note: "앉- finit par une consonne : 으세요." },
+        { text: "여기에 앉으세요.", translation: "Asseyez-vous ici.", note: "앉- finit par une consonne : 으세요." },
         { text: "안녕히 가세요.", translation: "Au revoir (à celui qui part).", note: "Formule figée avec 가세요." },
         { text: "물 좀 주세요.", translation: "Donnez-moi de l’eau, s’il vous plaît.", note: "N 주세요 pour demander." },
-        { text: "할머니는 지금 주무세요.", translation: "Ma grand-mère dort en ce moment.", note: "주무세요 : honorifique de 자요." },
+        { text: "할머니는 지금 주무세요.", translation: "Ma grand-mère dort en ce moment.", note: "주무세요 : honorifique de 자요." },
       ],
       exercises: [
         {
@@ -669,7 +679,7 @@ export const koCourse = {
         },
         {
           type: "choose",
-          prompt: "할머니는 집에 ___. (forme honorifique)",
+          prompt: "할머니는 집에 ___. (Grand-mère est à la maison, en forme honorifique.)",
           options: ["있어요", "계세요", "주무세요", "드세요"],
           answer: 1,
           explanation: "Pour dire qu’une personne respectée est quelque part, on emploie 계세요, honorifique de 있어요.",
@@ -677,20 +687,20 @@ export const koCourse = {
         {
           type: "fill",
           prompt: "여기에 이름을 ___. (Écrivez votre nom ici.)",
-          hint: "쓰다",
+          hint: "쓰다, avec -(으)세요",
           answers: ["쓰세요"],
           explanation: "쓰- finit par une voyelle : 쓰세요.",
         },
         {
           type: "fill",
-          prompt: "많이 ___. (Mangez bien.)",
-          hint: "먹다, honorifique",
+          prompt: "많이 ___. (Mangez à votre faim.)",
+          hint: "Remplace 먹다 par un verbe honorifique et termine en -세요.",
           answers: ["드세요", "잡수세요"],
-          explanation: "L’honorifique de 먹다 est 드세요 (ou 잡수세요, plus soutenu).",
+          explanation: "드세요 et 잡수세요 (plus soutenu) emploient un verbe honorifique distinct de 먹다.",
         },
         {
           type: "transform",
-          instruction: "Rends la phrase honorifique (le sujet est un professeur).",
+          instruction: "Mets le verbe à la forme honorifique en -(으)세요. Tu peux garder « 이 » ou employer « 께서 ».",
           source: "선생님이 책을 읽어요.",
           answers: ["선생님이 책을 읽으세요.", "선생님께서 책을 읽으세요."],
           explanation: "On remplace 어요 par 으세요 ; on peut aussi remplacer 이 par 께서.",
@@ -698,6 +708,7 @@ export const koCourse = {
       ],
       categories: ["register", "verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ko-a2-connectors",
@@ -705,9 +716,9 @@ export const koCourse = {
       title: "Relier des phrases : -고 et -아서 / -어서",
       summary: "Enchaîner des actions avec -고, expliquer une cause ou une suite avec -아서 / -어서.",
       rule: [
-        "-고 se colle au radical sans rien changer et signifie « et » ou « puis » : 밥을 먹고 커피를 마셔요. Il relie deux actions ou deux qualités (음식이 맛있고 싸요). Le temps ne se marque que sur le dernier verbe.",
+        "Ajoute 고 au radical pour coordonner deux actions ou deux qualités : 밥을 먹고 커피를 마셔요, 음식이 맛있고 싸요. Dans un récit simple, le temps peut être marqué sur le dernier verbe. Il peut aussi apparaître avant 고 quand le contexte le demande.",
         "-아서 / -어서 suit la même harmonie vocalique que 아요 / 어요 (먹어서, 좋아서, 해서, 와서). Il donne la cause (비가 와서 집에 있어요 : il pleut, donc je reste) ou une suite d’actions liées (시장에 가서 과일을 샀어요 : je suis allé au marché et j’y ai acheté des fruits).",
-        "Pièges : on ne met jamais le passé dans -아서 / -어서 (pas *왔어서) ; et la fin de phrase ne peut pas être une demande ou une proposition (pas *피곤해서 쉬세요). Pour une cause, -고 est faux : il signifie seulement « et ».",
+        "Pour une cause simple au passé, marque le passé sur le dernier verbe : 피곤해서 일찍 잤어요. Pour justifier un ordre ou une suggestion, -(으)니까 est un choix naturel. Avec un enchaînement d’actions, -아서 / -어서 peut précéder une demande : 여기에 와서 앉으세요.",
       ],
       table: {
         caption: "-고 et -아서 / -어서",
@@ -723,9 +734,9 @@ export const koCourse = {
         ],
       },
       examples: [
-        { text: "저는 밥을 먹고 커피를 마셔요.", translation: "Je mange, puis je bois un café.", note: "-고 : deux actions à la suite." },
-        { text: "비가 와서 집에 있어요.", translation: "Il pleut, donc je reste à la maison.", note: "-아서 : cause. 오다 → 와서." },
-        { text: "어제 시장에 가서 과일을 샀어요.", translation: "Hier, je suis allé au marché et j’y ai acheté des fruits.", note: "-아서 : enchaînement d’actions liées." },
+        { text: "저는 밥을 먹고 커피를 마셔요.", translation: "Je mange, puis je bois un café.", note: "-고 : deux actions à la suite." },
+        { text: "비가 와서 집에 있어요.", translation: "Il pleut, donc je reste à la maison.", note: "-아서 : cause. 오다 → 와서." },
+        { text: "어제 시장에 가서 과일을 샀어요.", translation: "Hier, je suis allé au marché et j’y ai acheté des fruits.", note: "-아서 : enchaînement d’actions liées." },
       ],
       exercises: [
         {
@@ -738,26 +749,26 @@ export const koCourse = {
         {
           type: "choose",
           prompt: "저는 ___ 일찍 잤어요. (parce que j’étais fatigué)",
-          options: ["피곤해서", "피곤했어서", "피곤하서", "피곤하고"],
+          options: ["피곤해서", "피곤아서", "피곤하서", "피곤하고"],
           answer: 0,
-          explanation: "-아서 / -어서 n’accepte pas le passé : 피곤해서 (pas 피곤했어서). Le passé est marqué à la fin, par 잤어요.",
+          explanation: "Pour cette cause simple, 피곤하다 donne 피곤해서. Le passé est marqué par 잤어요.",
         },
         {
           type: "fill",
           prompt: "어제 시장에 ___ 과일을 샀어요. (je suis allé au marché, puis j’y ai acheté des fruits)",
-          hint: "가다",
+          hint: "가다, avec -아서 / -어서",
           answers: ["가서"],
           explanation: "Pour deux actions liées (aller puis acheter là-bas), on emploie -아서 : 가서.",
         },
         {
           type: "fill",
-          prompt: "이 식당은 음식이 맛있___ 싸요. (bon et pas cher)",
+          prompt: "이 식당은 음식이 맛있___ 싸요. (Relie les qualités avec le suffixe de coordination.)",
           answers: ["고"],
           explanation: "On relie deux qualités avec -고 : 맛있고 싸요.",
         },
         {
           type: "transform",
-          instruction: "Relie les deux phrases avec -고.",
+          instruction: "Relie les deux actions avec « -고 », dans le même ordre. Garde les particules d’objet. « 저는 » est facultatif.",
           source: "저는 밥을 먹어요. 그리고 커피를 마셔요.",
           answers: ["저는 밥을 먹고 커피를 마셔요.", "밥을 먹고 커피를 마셔요."],
           explanation: "Le premier verbe perd sa terminaison polie : 먹어요 → 먹고.",
@@ -765,6 +776,7 @@ export const koCourse = {
       ],
       categories: ["function_word", "verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ko-b1-formal-polite",
@@ -773,8 +785,8 @@ export const koCourse = {
       summary: "Employer le registre formel (합니다체) dans une présentation, un courriel ou une réunion.",
       rule: [
         "Le 합니다체 est le niveau de politesse formel : réunions, présentations, informations, service client, courriers officiels. Après un radical qui finit par une voyelle, on ajoute ㅂ니다 (가다 → 갑니다) ; après une consonne, 습니다 (먹다 → 먹습니다). Le verbe 하다 donne 합니다, et 이다 donne 입니다.",
-        "La question se fait avec ㅂ니까 / 습니까 (갑니까? 먹습니까?), jamais avec le point d’interrogation seul comme au 해요체. Le passé est 았습니다 / 었습니다 (갔습니다, 먹었습니다), le futur -(으)ㄹ 겁니다. Les radicaux en ㄹ perdent ㄹ : 만들다 → 만듭니다.",
-        "Piège : ne mélange pas les deux niveaux dans une même situation. Le 해요체 est chaleureux et quotidien ; le 합니다체 est sérieux et distant. Dans le doute, un étranger qui parle à un supérieur ou à des inconnus peut utiliser le 합니다체 sans risque.",
+        "Pour une question directe au style formel, emploie ㅂ니까 ou 습니까 : 갑니까? 먹습니까? Au passé, on dit 갔습니다, 먹었습니다. Au futur, on peut dire 갈 겁니다. Les radicaux en ㄹ perdent ㄹ devant la terminaison formelle : 만들다 → 만듭니다.",
+        "Le 해요체 est courant dans les échanges polis du quotidien. Le 합니다체 est fréquent dans les présentations, les annonces et les échanges qui demandent un ton formel. Le choix dépend de la situation et du rôle de la phrase.",
       ],
       table: {
         caption: "Du 해요체 au 합니다체",
@@ -791,10 +803,10 @@ export const koCourse = {
         ],
       },
       examples: [
-        { text: "저는 김민수입니다.", translation: "Je m’appelle Kim Minsu.", note: "입니다 : forme formelle de 이에요 / 예요." },
+        { text: "저는 김민수입니다.", translation: "Je m’appelle Kim Minsu.", note: "입니다 : forme formelle de 이에요 / 예요." },
         { text: "회의는 세 시에 시작합니다.", translation: "La réunion commence à trois heures.", note: "하다 → 합니다." },
-        { text: "지금 시간이 있습니까?", translation: "Avez-vous du temps maintenant ?", note: "있- finit par une consonne : 습니까." },
-        { text: "어제 책을 읽었습니다.", translation: "Hier, j’ai lu un livre.", note: "Passé : 었습니다." },
+        { text: "지금 시간이 있습니까?", translation: "Avez-vous du temps maintenant ?", note: "있- finit par une consonne : 습니까." },
+        { text: "어제 책을 읽었습니다.", translation: "Hier, j’ai lu un livre.", note: "Passé : 었습니다." },
       ],
       exercises: [
         {
@@ -814,20 +826,20 @@ export const koCourse = {
         {
           type: "fill",
           prompt: "저는 매일 아침 커피를 ___. (style formel)",
-          hint: "마시다",
+          hint: "마시다, au présent formel",
           answers: ["마십니다"],
           explanation: "마시- finit par une voyelle : ㅂ니다 → 마십니다.",
         },
         {
           type: "transform",
-          instruction: "Mets la phrase en style formel (합니다체).",
+          instruction: "Passe au style formel en gardant le présent et les particules. Le thème « 저는 » est facultatif.",
           source: "저는 학교에 가요.",
           answers: ["저는 학교에 갑니다.", "학교에 갑니다."],
           explanation: "가- finit par une voyelle : 가요 devient 갑니다.",
         },
         {
           type: "transform",
-          instruction: "Mets la phrase en style formel (합니다체).",
+          instruction: "Passe au style formel en gardant le passé et les particules. Le thème « 저는 » est facultatif.",
           source: "저는 책을 읽었어요.",
           answers: ["저는 책을 읽었습니다.", "책을 읽었습니다."],
           explanation: "Au passé formel, 었어요 devient 었습니다.",
@@ -835,6 +847,7 @@ export const koCourse = {
       ],
       categories: ["register", "verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ko-b1-contrast",
@@ -843,42 +856,42 @@ export const koCourse = {
       summary: "Exprimer une opposition avec -지만 ou introduire une situation avec -는데 / -(으)ㄴ데.",
       rule: [
         "-지만 s’ajoute au radical sans changement et signifie « mais » : 이 가방은 예쁘지만 비싸요. Le temps peut se marquer dans la première partie : 갔지만 (j’y suis allé, mais…).",
-        "-는데 / -(으)ㄴ데 est plus souple : il pose un contexte ou une opposition douce (« or », « et pourtant »). Pour un verbe et pour 있다 / 없다 : -는데 (가는데, 있는데). Pour un adjectif : -(으)ㄴ데, avec ㄴ après une voyelle (비싼데) et 은 après une consonne (작은데, 좋은데). Pour 이다 : 인데. Passé : 았는데 / 었는데.",
-        "Piège : le français a un seul « mais » ; le coréen choisit entre une opposition nette (-지만) et une transition (-는데), souvent suivie d’une question ou d’une demande : 비가 오는데 우산 있어요? Les radicaux en ㄹ perdent ㄹ devant ㄴ : 살다 → 사는데.",
+        "-는데 / -(으)ㄴ데 donne un contexte ou introduit un contraste. Avec un verbe ou avec 있다 / 없다, emploie -는데 : 가는데, 있는데. Avec les adjectifs ordinaires, ajoute ㄴ데 après une voyelle (비싼데) ou 은데 après une consonne (작은데). Avec 이다, on obtient 인데. Au passé, emploie 았는데 ou 었는데.",
+        "Compare -지만 pour un contraste explicite et -는데 pour un contexte ou un contraste moins direct : 비가 오는데 우산 있어요? Un ㄹ final tombe devant le ㄴ de la terminaison : 살다 → 사는데, 길다 → 긴데.",
       ],
       table: {
         caption: "-지만 et -는데 / -(으)ㄴ데",
         headers: ["Type", "-지만", "-는데 / -(으)ㄴ데"],
         rows: [
-          ["Verbe : 가다", "가지만", "가는데"],
-          ["Verbe : 먹다", "먹지만", "먹는데"],
+          ["Verbe : 가다", "가지만", "가는데"],
+          ["Verbe : 먹다", "먹지만", "먹는데"],
           ["있다", "있지만", "있는데"],
-          ["Adjectif : 작다", "작지만", "작은데"],
-          ["Adjectif : 비싸다", "비싸지만", "비싼데"],
-          ["Adjectif : 좋다", "좋지만", "좋은데"],
-          ["이다 : 학생", "학생이지만", "학생인데"],
-          ["Passé : 가다", "갔지만", "갔는데"],
+          ["Adjectif : 작다", "작지만", "작은데"],
+          ["Adjectif : 비싸다", "비싸지만", "비싼데"],
+          ["Adjectif : 좋다", "좋지만", "좋은데"],
+          ["이다 : 학생", "학생이지만", "학생인데"],
+          ["Passé : 가다", "갔지만", "갔는데"],
         ],
       },
       examples: [
-        { text: "한국어는 어렵지만 재미있어요.", translation: "Le coréen est difficile, mais amusant.", note: "-지만 : opposition nette." },
-        { text: "비가 오는데 우산이 없어요.", translation: "Il pleut et je n’ai pas de parapluie.", note: "오다 (verbe) : -는데." },
-        { text: "친구는 키가 큰데 저는 작아요.", translation: "Mon ami est grand, alors que moi je suis petit.", note: "크다 (adjectif) : 큰데." },
+        { text: "한국어는 어렵지만 재미있어요.", translation: "Le coréen est difficile, mais amusant.", note: "-지만 : opposition nette." },
+        { text: "비가 오는데 우산이 없어요.", translation: "Il pleut et je n’ai pas de parapluie.", note: "오다 (verbe) : -는데." },
+        { text: "친구는 키가 큰데 저는 작아요.", translation: "Mon ami est grand, alors que moi je suis petit.", note: "크다 (adjectif) : 큰데." },
       ],
       exercises: [
         {
           type: "choose",
-          prompt: "이 가방은 예쁘___ 비싸요. (mais)",
-          options: ["고", "어서", "지만", "니까"],
+          prompt: "이 가방은 예쁘___ 비싸요. (Opposition avec -지만.)",
+          options: ["고", "아서", "지만", "는데"],
           answer: 2,
           explanation: "« Mais » se dit -지만, directement après le radical.",
         },
         {
           type: "choose",
-          prompt: "비가 ___ 우산이 없어요.",
-          options: ["온데", "오는데", "오은데", "오지는데"],
+          prompt: "비가 ___ 우산이 없어요. (Il pleut, et je n’ai pas de parapluie.)",
+          options: ["오은데", "오는데", "오인데", "오는데요"],
           answer: 1,
-          explanation: "오다 est un verbe : -는데 → 오는데. 온데 serait la forme d’un adjectif.",
+          explanation: "Avec le verbe 오다 au présent, ajoute -는데 au radical 오- : 오는데.",
         },
         {
           type: "fill",
@@ -889,13 +902,13 @@ export const koCourse = {
         },
         {
           type: "fill",
-          prompt: "저는 대학생___ 아르바이트도 해요. (étudiant, mais je travaille aussi)",
+          prompt: "저는 대학생___ 아르바이트도 해요. (Emploie l’une des deux formes de contraste de cette fiche.)",
           answers: ["인데", "이지만"],
           explanation: "Avec 이다, on emploie 인데 (ou 이지만) : 대학생인데.",
         },
         {
           type: "transform",
-          instruction: "Relie les deux phrases avec -지만.",
+          instruction: "Relie les deux phrases avec « -지만 », dans le même ordre. Le thème « 이 책은 » est facultatif.",
           source: "이 책은 어려워요. 그런데 재미있어요.",
           answers: ["이 책은 어렵지만 재미있어요.", "어렵지만 재미있어요."],
           explanation: "On retire la terminaison polie : 어렵+지만. Le radical ne change pas devant une consonne.",
@@ -903,6 +916,7 @@ export const koCourse = {
       ],
       categories: ["function_word", "verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ko-b1-conditional",
@@ -912,7 +926,7 @@ export const koCourse = {
       rule: [
         "-(으)면 s’ajoute au radical : 면 après une voyelle (오면), 으면 après une consonne (먹으면, 좋으면). Les radicaux en ㄹ gardent simplement 면 : 만들면, 살면. Il traduit « si » (condition) ou « quand / chaque fois que » (habitude).",
         "La proposition principale est libre : on peut y mettre un présent (시간이 있으면 가요), un futur (비가 오면 집에 있을 거예요), une demande (모르면 물어보세요) ou une proposition. Avec 이다, on obtient 이면 / 면 : 학생이면.",
-        "Piège : en français, « si » est suivi du présent pour un futur (« s’il pleut demain… ») ; en coréen, -(으)면 s’accorde avec le sens, et le verbe principal peut être au futur. Un passé comme 갔으면 exprime l’hypothèse ou le regret (« si j’y étais allé »).",
+        "Comme dans « s’il pleut demain », la condition peut rester sans marque de futur alors que la principale parle de l’avenir : 내일 비가 오면 집에 있을 거예요. 갔으면 peut poser une condition sur le passé ou exprimer un souhait selon ce qui suit : 갔으면 좋았을 거예요.",
       ],
       table: {
         caption: "-(으)면",
@@ -930,7 +944,7 @@ export const koCourse = {
         ],
       },
       examples: [
-        { text: "날씨가 좋으면 공원에 가요.", translation: "S’il fait beau, je vais au parc.", note: "좋- finit par une consonne : 으면." },
+        { text: "날씨가 좋으면 공원에 가요.", translation: "S’il fait beau, je vais au parc.", note: "좋- finit par une consonne : 으면." },
         { text: "모르면 물어보세요.", translation: "Si vous ne savez pas, demandez.", note: "La principale peut être une demande." },
         { text: "내일 비가 오면 집에 있을 거예요.", translation: "S’il pleut demain, je resterai à la maison.", note: "Principale au futur." },
       ],
@@ -951,19 +965,19 @@ export const koCourse = {
         },
         {
           type: "fill",
-          prompt: "날씨가 좋___ 공원에 가요. (s’il fait beau)",
+          prompt: "날씨가 좋___ 공원에 가요. (Avec la terminaison de condition étudiée.)",
           answers: ["으면"],
           explanation: "좋- finit par une consonne : 으면 → 좋으면.",
         },
         {
           type: "fill",
-          prompt: "피곤하___ 쉬세요. (si vous êtes fatigué)",
+          prompt: "피곤하___ 쉬세요. (Avec la terminaison de condition étudiée.)",
           answers: ["면"],
           explanation: "피곤하- finit par une voyelle : 면 → 피곤하면.",
         },
         {
           type: "transform",
-          instruction: "Relie les deux phrases avec -(으)면.",
+          instruction: "Commence par la condition avec « -(으)면 ». Garde ensuite « 전화하세요 » tel quel.",
           source: "시간이 있어요. 전화하세요.",
           answers: ["시간이 있으면 전화하세요."],
           explanation: "있- finit par une consonne : 있으면, puis la demande 전화하세요.",
@@ -971,6 +985,7 @@ export const koCourse = {
       ],
       categories: ["function_word", "verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ko-b1-adnominal",
@@ -979,7 +994,7 @@ export const koCourse = {
       summary: "Former une proposition relative placée avant le nom, sans pronom relatif.",
       rule: [
         "Le coréen n’a pas de pronom relatif (qui, que, où) : la proposition qui décrit le nom se place avant lui et le verbe prend une forme adnominale. Piège : en français on dit « l’ami qui habite à Séoul » ; en coréen « Séoul-habite ami » : 서울에 사는 친구.",
-        "Présent d’un verbe : -는 (먹는 사람, 가는 사람). Passé : -(으)ㄴ (ㄴ après une voyelle, 은 après une consonne : 간 사람, 먹은 사람). Futur ou intention : -(으)ㄹ (갈 사람, 먹을 음식). Avec les verbes en ㄹ, le ㄹ tombe devant ㄴ : 만들다 → 만드는 / 만든 / 만들.",
+        "Pour une situation actuelle, une habitude ou une action en cours, emploie -는 (먹는 사람). Pour une action achevée, emploie -(으)ㄴ (간 사람, 먹은 사람). Pour une action à venir, emploie -(으)ㄹ (갈 사람, 먹을 음식). Avec un radical en ㄹ, observe 만들다 → 만드는 / 만든 / 만들.",
         "Les adjectifs ont une seule forme au présent : -(으)ㄴ (큰 집, 좋은 집, 예쁜 꽃). 있다 / 없다 prennent -는 (재미있는 영화, 맛없는 음식). Pour 이다 : 인 (학생인 친구).",
       ],
       table: {
@@ -996,10 +1011,10 @@ export const koCourse = {
         ],
       },
       examples: [
-        { text: "어제 먹은 음식이 맛있었어요.", translation: "La nourriture que j’ai mangée hier était bonne.", note: "먹은 : passé, devant 음식." },
-        { text: "제가 좋아하는 가수가 서울에 와요.", translation: "Le chanteur que j’aime vient à Séoul.", note: "좋아하는 : présent, devant 가수." },
+        { text: "어제 먹은 음식이 맛있었어요.", translation: "La nourriture que j’ai mangée hier était bonne.", note: "먹은 : passé, devant 음식." },
+        { text: "제가 좋아하는 가수가 서울에 와요.", translation: "Le chanteur que j’aime vient à Séoul.", note: "좋아하는 : présent, devant 가수." },
         { text: "저는 큰 집에서 살고 싶어요.", translation: "Je voudrais vivre dans une grande maison.", note: "크다 (adjectif) → 큰." },
-        { text: "내일 할 일이 많아요.", translation: "Demain, j’ai beaucoup de choses à faire.", note: "할 : futur, devant 일." },
+        { text: "내일 할 일이 많아요.", translation: "Demain, j’ai beaucoup de choses à faire.", note: "할 : futur, devant 일." },
       ],
       exercises: [
         {
@@ -1018,21 +1033,21 @@ export const koCourse = {
         },
         {
           type: "choose",
-          prompt: "저는 ___ 집에서 살고 싶어요. (grande)",
+          prompt: "저는 ___ 집에서 살고 싶어요. (Adjectif « grand » au présent.)",
           options: ["크는", "큰", "클", "크은"],
           answer: 1,
-          explanation: "Un adjectif prend -(으)ㄴ au présent : 크다 → 큰 (ㅡ tombe devant ㄴ).",
+          explanation: "크다 a pour radical 크-. Ajoute ㄴ sans retirer la voyelle ㅡ : 큰.",
         },
         {
           type: "fill",
           prompt: "내일 ___ 일이 많아요. (Demain, j’ai beaucoup à faire.)",
-          hint: "하다",
+          hint: "하다, forme adnominale à venir",
           answers: ["할"],
           explanation: "Une chose à faire (futur) se dit avec -(으)ㄹ devant le nom : 할 일.",
         },
         {
           type: "transform",
-          instruction: "Fusionne les deux phrases en une proposition relative.",
+          instruction: "Mets « 서울에 살아요 » à la forme adnominale devant « 친구 ». Garde ensuite « 친구가 있어요 ».",
           source: "친구가 있어요. 그 친구는 서울에 살아요.",
           answers: ["서울에 사는 친구가 있어요."],
           explanation: "서울에 살아요 devient 서울에 사는 devant 친구 ; le ㄹ de 살- tombe devant ㄴ.",
@@ -1040,6 +1055,7 @@ export const koCourse = {
       ],
       categories: ["verb", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ko-b1-obligation-cause",
@@ -1049,7 +1065,7 @@ export const koCourse = {
       rule: [
         "-아야 / -어야 해요 signifie « il faut / je dois ». Il se forme avec la même harmonie vocalique que 아요 / 어요 : 가야 해요, 먹어야 해요, 해야 해요, 와야 해요, 써야 해요. 해요 peut être remplacé par 돼요 : 가야 돼요.",
         "-기 때문에 donne la cause : on ajoute 기 때문에 au radical, sans changement (가기 때문에, 바쁘기 때문에). Le passé peut se placer avant : 바빴기 때문에. Avec un nom, on dit N 때문에 (비 때문에 : à cause de la pluie).",
-        "Piège : -기 때문에 est plus soutenu et plus insistant que -아서 / -어서. Contrairement à lui, il peut être suivi d’une demande ou d’une proposition, et il accepte le passé. Il sert aussi bien à justifier qu’à expliquer un fait désagréable.",
+        "-기 때문에 explicite une cause : 지금 바쁘기 때문에 전화를 못 받아요. Le passé peut être marqué avant 기. Pour justifier une demande ou une suggestion, on emploie couramment -(으)니까.",
       ],
       table: {
         caption: "Devoir et cause",
@@ -1066,8 +1082,8 @@ export const koCourse = {
       },
       examples: [
         { text: "오늘은 회사에 가야 해요.", translation: "Aujourd’hui, je dois aller au bureau.", note: "가+아야 → 가야." },
-        { text: "약을 먹어야 해요.", translation: "Je dois prendre un médicament.", note: "먹- : 어야 해요." },
-        { text: "지금 바쁘기 때문에 전화를 못 받아요.", translation: "Je suis occupé, donc je ne peux pas répondre au téléphone.", note: "Cause : 바쁘다 → 바쁘기 때문에." },
+        { text: "약을 먹어야 해요.", translation: "Je dois prendre un médicament.", note: "먹- : 어야 해요." },
+        { text: "지금 바쁘기 때문에 전화를 못 받아요.", translation: "Je suis occupé, donc je ne peux pas répondre au téléphone.", note: "Cause : 바쁘다 → 바쁘기 때문에." },
       ],
       exercises: [
         {
@@ -1087,9 +1103,9 @@ export const koCourse = {
         {
           type: "fill",
           prompt: "내일 시험이 있어요. 그래서 공부를 ___ 해요.",
-          hint: "하다",
-          answers: ["해야"],
-          explanation: "하다 donne 해야 devant 해요 : 공부를 해야 해요.",
+          hint: "하다, forme d’obligation avant 해요",
+          answers: ["해야", "하여야"],
+          explanation: "하다 donne 하여야 dans cette construction. 해야 est la forme contractée courante : 공부를 해야 해요.",
         },
         {
           type: "fill",
@@ -1099,7 +1115,7 @@ export const koCourse = {
         },
         {
           type: "transform",
-          instruction: "Dis que tu dois le faire (-아야 / -어야 하다).",
+          instruction: "Dis que tu dois rentrer avec « -아야 / -어야 해요 » ou « 돼요 ». Le thème « 저는 » est facultatif.",
           source: "저는 집에 가요.",
           answers: ["저는 집에 가야 해요.", "저는 집에 가야 돼요.", "집에 가야 해요.", "집에 가야 돼요."],
           explanation: "가+아야 → 가야, puis 해요 (ou 돼요) : 가야 해요.",
@@ -1107,6 +1123,7 @@ export const koCourse = {
       ],
       categories: ["verb", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ko-b1-irregular-verbs",
@@ -1114,9 +1131,9 @@ export const koCourse = {
       title: "Les verbes irréguliers : ㅂ, ㄷ et 르",
       summary: "Reconnaître et conjuguer les trois grandes familles de verbes irréguliers en coréen.",
       rule: [
-        "Irréguliers en ㅂ : la consonne ㅂ finale du radical devient 우 devant une voyelle : 어렵다 → 어려워요, 덥다 → 더워요, 맵다 → 매워요, 쉽다 → 쉬워요. Exception : 돕다 → 도와요. Beaucoup de verbes en ㅂ sont réguliers : 입다 → 입어요, 좁다 → 좁아요.",
-        "Irréguliers en ㄷ : le ㄷ final devient ㄹ devant une voyelle : 듣다 → 들어요, 걷다 → 걸어요, 묻다 → 물어요. Mais 받다 → 받아요 et 닫다 → 닫아요 sont réguliers. Irréguliers en 르 : 르 devient ㄹ라 ou ㄹ러 : 모르다 → 몰라요, 다르다 → 달라요 (ㅏ ou ㅗ avant 르 : ㄹ라) ; 부르다 → 불러요 (sinon ㄹ러).",
-        "Piège : le dictionnaire donne une forme qui ne montre pas l’irrégularité ; il faut apprendre chaque verbe. L’irrégularité ne se produit que devant une voyelle (아요 / 어요, 았어요 / 었어요, 으면…) : devant une consonne, on ne change rien (어렵고, 듣고, 모르지만).",
+        "Dans le modèle irrégulier en ㅂ, la consonne finale devient généralement 우 devant une terminaison à voyelle : 어렵다 → 어려워요, 덥다 → 더워요. Retiens aussi 돕다 → 도와요 et 곱다 → 고와요. Des mots comme 입다 et 좁다 gardent ㅂ : 입어요, 좁아요.",
+        "Dans le modèle irrégulier en ㄷ, ㄷ devient ㄹ devant une voyelle : 듣다 → 들어요, 걷다 → 걸어요. 받다 et 닫다 gardent ㄷ. Pour les verbes du modèle en 르, ajoute un ㄹ à la syllabe précédente et emploie 라요 ou 러요 : 모르다 → 몰라요, 다르다 → 달라요, 부르다 → 불러요.",
+        "Les modèles irréguliers dépendent du mot et de la terminaison. Dans ces exemples, le radical reste inchangé devant -고 ou -지만 : 어렵고, 듣고, 모르지만. Le modèle en 르 se manifeste avec les terminaisons en 아 ou 어, comme dans 몰라요 et 몰랐어요.",
       ],
       table: {
         caption: "Irréguliers",
@@ -1157,20 +1174,20 @@ export const koCourse = {
         {
           type: "fill",
           prompt: "저는 음악을 ___.",
-          hint: "듣다",
+          hint: "듣다, au présent poli",
           answers: ["들어요"],
           explanation: "듣다 est irrégulier en ㄷ : ㄷ → ㄹ devant une voyelle, donc 들어요.",
         },
         {
           type: "fill",
           prompt: "어제는 날씨가 정말 ___.",
-          hint: "덥다, passé",
+          hint: "덥다, au passé poli en -았어요 / -었어요",
           answers: ["더웠어요"],
           explanation: "덥다 : ㅂ → 우 devant 었어요, donc 더웠어요.",
         },
         {
           type: "transform",
-          instruction: "Mets la phrase au passé.",
+          instruction: "Mets seulement le prédicat au passé poli en -았어요 / -었어요.",
           source: "김치가 매워요.",
           answers: ["김치가 매웠어요."],
           explanation: "맵다 est irrégulier en ㅂ : 매워요 devient 매웠어요.",
@@ -1178,6 +1195,7 @@ export const koCourse = {
       ],
       categories: ["verb", "spelling"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
   ],
 } satisfies GrammarCourse;

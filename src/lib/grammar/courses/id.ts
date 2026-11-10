@@ -2,7 +2,7 @@ import type { GrammarCourse } from "@/lib/schemas/grammar";
 
 export const idCourse = {
   language: "id",
-  version: "2026-10-25",
+  version: "2026-11-10",
   points: [
     {
       id: "id-a1-basic-sentences",
@@ -10,9 +10,9 @@ export const idCourse = {
       title: "Faire une phrase simple sans le verbe « être »",
       summary: "Dire qui on est ou comment on est en juxtaposant simplement le sujet et ce qu’on en dit.",
       rule: [
-        "L’indonésien n’a pas de verbe « être » au présent : on pose le sujet, puis ce qu’on en dit. Saya guru = « Je suis enseignant ». Dia sibuk = « Il / elle est occupé(e) ». L’ordre de base reste sujet + verbe + complément : Saya makan nasi.",
-        "Piège : un francophone ajoute volontiers un verbe. Ne dis pas « Saya adalah guru » à l’oral : adalah n’apparaît qu’à l’écrit soutenu, pour définir (Jakarta adalah ibu kota Indonesia), et jamais devant un adjectif.",
-        "Le verbe ne se conjugue jamais : makan veut dire mange, manges, mangent ou ai mangé, selon le contexte. Pour situer l’action, on ajoute un mot de temps : kemarin (hier), sekarang (maintenant), besok (demain). Sangat devant un adjectif = « très ».",
+        "Pour dire qui on est ou donner une qualité, juxtapose le sujet et ce qu’on en dit : Saya guru (« Je suis enseignant »), Dia sibuk (« Il ou elle est occupé(e) »). Avec un verbe et un objet, l’ordre de base est sujet + verbe + objet : Saya makan nasi.",
+        "Dans une présentation ordinaire, Saya guru suffit. Adalah peut relier le sujet à un nom dans une définition ou une formulation plus formelle, à l’écrit comme à l’oral. Pour une qualité simple, dis Dia sibuk, sans ajouter de copule.",
+        "La forme du verbe ne change pas avec la personne ou le temps : makan peut se comprendre comme « mange » ou « a mangé ». Un repère comme kemarin (hier), sekarang (maintenant) ou besok (demain) précise le moment. Sangat devant un adjectif signifie « très ».",
       ],
       table: {
         caption: "Structures de base",
@@ -43,19 +43,20 @@ export const idCourse = {
           type: "fill",
           prompt: "Kami ___ kopi setiap pagi.",
           hint: "boire",
-          answers: ["minum"],
-          explanation: "Le verbe ne se conjugue pas : minum convient pour kami comme pour n’importe quel sujet.",
+          answers: ["minum", "meminum"],
+          explanation: "Minum et meminum signifient « boire » dans cette phrase. La personne kami ne change pas la forme du verbe.",
         },
         {
           type: "transform",
           instruction: "Mets la phrase au passé en ajoutant « kemarin » au début.",
           source: "Saya makan nasi.",
-          answers: ["Kemarin saya makan nasi.", "Saya makan nasi kemarin."],
-          explanation: "Le verbe ne change pas : c’est kemarin (hier) qui place l’action dans le passé. Il peut aussi aller en fin de phrase.",
+          answers: ["Kemarin saya makan nasi."],
+          explanation: "Ici, place kemarin en tête. Ce mot situe l’action dans le passé sans modifier makan.",
         },
       ],
       categories: ["verb", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "id-a1-pronouns",
@@ -63,7 +64,7 @@ export const idCourse = {
       title: "Dire je, tu, nous et rester poli : saya, Anda, Bapak, Ibu",
       summary: "Choisir le bon pronom selon la situation : neutre, familier ou respectueux.",
       rule: [
-        "Il n’y a pas de conjugaison, mais plusieurs « je » et « tu ». Saya est le « je » neutre et poli ; aku est familier (amis, famille). Pour « tu / vous » : Anda est neutre et formel, kamu est amical entre égaux. Dia = il / elle (pas de genre) ; mereka = ils / elles.",
+        "Saya est un « je » neutre ou poli, et aku s’emploie dans un cadre familier. Anda, avec une majuscule, est un « vous » neutre dans un échange formel. Kamu s’emploie entre personnes proches ou quand le contexte s’y prête. Dia désigne « il » ou « elle », mereka « ils » ou « elles ».",
         "Piège : « nous » a deux formes. Kita inclut la personne à qui tu parles (toi et moi), kami l’exclut (moi et d’autres, mais pas toi). Le français ne fait pas cette distinction.",
         "Avec une personne plus âgée ou respectée, on évite kamu et on emploie un titre à la place de « vous » : Bapak (monsieur) ou Ibu (madame), seul ou suivi du prénom : Bapak Budi, Ibu Sari. Ibu dokter? = « Vous êtes médecin, madame ? »",
       ],
@@ -104,14 +105,14 @@ export const idCourse = {
         },
         {
           type: "fill",
-          prompt: "Ani, Budi dan Sari: ___ guru.",
+          prompt: "Ani, Budi, dan Sari mengajar. ___ guru. (Ils sont enseignants.)",
           hint: "ils / elles",
           answers: ["mereka"],
           explanation: "Mereka désigne plusieurs personnes (ils / elles).",
         },
         {
           type: "transform",
-          instruction: "Remplace saya par la forme familière.",
+          instruction: "Remplace seulement « Saya » par le pronom familier étudié dans cette fiche.",
           source: "Saya lapar.",
           answers: ["Aku lapar."],
           explanation: "Aku est le « je » familier, utilisé entre amis et en famille.",
@@ -119,6 +120,7 @@ export const idCourse = {
       ],
       categories: ["function_word", "register"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "id-a1-negation",
@@ -126,9 +128,9 @@ export const idCourse = {
       title: "Nier : tidak ou bukan",
       summary: "Choisir la bonne négation selon qu’on nie un verbe, un adjectif ou un nom.",
       rule: [
-        "L’indonésien a deux négations. Tidak nie un verbe ou un adjectif et se place devant lui : Saya tidak makan, Dia tidak sibuk. Bukan nie un nom ou un groupe nominal : Dia bukan guru.",
-        "Bukan sert aussi à corriger : Bukan saya, tetapi Budi (pas moi, mais Budi). En fin de phrase, bukan? équivaut à « n’est-ce pas ? » Pour « pas encore », on emploie belum (voir plus loin).",
-        "Piège : ne dis pas « Dia tidak guru » ni « Dia bukan sibuk ». À l’oral, tu entendras nggak ou gak à la place de tidak (Aku nggak tahu) : c’est familier, garde tidak à l’écrit et en situation formelle.",
+        "Pour une négation simple, place tidak devant un verbe ou un adjectif : Saya tidak makan, dia tidak sibuk. Devant un nom ou un groupe nominal, emploie bukan : Dia bukan guru.",
+        "Bukan sert aussi à corriger un élément mis en contraste : Bukan saya, tetapi Budi (« pas moi, mais Budi »). Ce contraste est aussi possible avec un verbe. En fin de phrase, bukan? peut se traduire par « n’est-ce pas ? ». Belum signifie « pas encore ».",
+        "Pour dire simplement « il n’est pas occupé », dis Dia tidak sibuk. Pour « il n’est pas enseignant », dis Dia bukan guru. À l’oral familier, tu peux entendre nggak ou gak à la place de tidak. Emploie tidak dans l’écrit standard.",
       ],
       table: {
         caption: "Tidak ou bukan",
@@ -152,7 +154,7 @@ export const idCourse = {
           prompt: "Dia ___ dokter, dia perawat.",
           options: ["tidak", "jangan", "bukan"],
           answer: 2,
-          explanation: "Dokter est un nom : on emploie bukan. Tidak est réservé aux verbes et aux adjectifs.",
+          explanation: "Dokter est ici le nom de la profession. On le nie avec bukan.",
         },
         {
           type: "choose",
@@ -163,13 +165,13 @@ export const idCourse = {
         },
         {
           type: "fill",
-          prompt: "Itu ___ kopi, itu teh.",
+          prompt: "Itu ___ kopi, melainkan teh. (Ce n’est pas du café, mais du thé.)",
           answers: ["bukan"],
           explanation: "Kopi est un nom : bukan.",
         },
         {
           type: "transform",
-          instruction: "Mets la phrase à la forme négative.",
+          instruction: "Ajoute « tidak » devant le verbe sans déplacer les autres mots.",
           source: "Mereka makan nasi.",
           answers: ["Mereka tidak makan nasi."],
           explanation: "Makan est un verbe : tidak se place juste devant lui.",
@@ -177,6 +179,7 @@ export const idCourse = {
       ],
       categories: ["function_word", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "id-a1-noun-phrase",
@@ -184,9 +187,9 @@ export const idCourse = {
       title: "Décrire et posséder : nom + adjectif, possesseur, ini / itu",
       summary: "Former un groupe nominal dans le bon ordre : nom, adjectif, possesseur, démonstratif.",
       rule: [
-        "En indonésien, tout ce qui précise le nom vient après lui, sans accord ni article : rumah besar (une grande maison), rumah saya (ma maison), buku Budi (le livre de Budi), mobil ibu saya (la voiture de ma mère). Ini (ce, celui-ci) et itu (ce, celui-là) se placent aussi après le nom : rumah ini, buku itu.",
-        "Piège : l’ordre change le sens. Rumah besar saya = ma grande maison ; Rumah saya besar = ma maison est grande. Quand l’adjectif suit directement le possesseur, il devient une phrase. Seuls, ini et itu forment une phrase : Ini buku.",
-        "Pour « son, sa, ses, leur » on colle souvent -nya au nom : rumahnya (sa maison), bukunya (son livre). Le possesseur est alors connu par le contexte.",
+        "Dans les groupes étudiés ici, l’adjectif, le possesseur et le démonstratif viennent après le nom : rumah besar, rumah saya, buku Budi, rumah ini. Ils ne s’accordent pas avec lui. Un nombre, en revanche, vient avant le nom : dua rumah.",
+        "Compare rumah besar saya (« ma grande maison ») et Rumah saya besar (« Ma maison est grande »). Dans la seconde phrase, besar dit quelque chose sur rumah saya. Ini et itu peuvent aussi servir de sujet : Ini buku (« Ceci est un livre »).",
+        "Pour un possesseur de troisième personne, on peut coller -nya au nom : rumahnya (« sa maison »), bukunya (« son livre »). Le contexte dit de qui il s’agit. Pour nommer explicitement plusieurs possesseurs, on peut dire rumah mereka (« leur maison »).",
       ],
       table: {
         caption: "Ordre des mots dans le groupe nominal",
@@ -224,9 +227,9 @@ export const idCourse = {
         },
         {
           type: "fill",
-          prompt: "La maison de mon père : rumah ayah ___",
-          answers: ["saya", "aku"],
-          explanation: "Le possesseur suit le possédé : rumah ayah saya. Aku est aussi possible, en registre familier.",
+          prompt: "La maison de mon père (avec le pronom poli étudié) : rumah ayah ___",
+          answers: ["saya"],
+          explanation: "Le possesseur suit le possédé : rumah ayah saya. En registre familier, on peut dire rumah ayahku, avec -ku soudé à ayah.",
         },
         {
           type: "transform",
@@ -238,6 +241,7 @@ export const idCourse = {
       ],
       categories: ["word_order", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "id-a1-ada-prepositions",
@@ -247,7 +251,7 @@ export const idCourse = {
       rule: [
         "Ada signifie « il y a » et « être présent » : Ada kopi di dapur (il y a du café dans la cuisine), Ibu ada di rumah (maman est à la maison). Pour « avoir » on emploie plutôt punya : Saya punya mobil. La négation est tidak ada : Pak Budi tidak ada di sini.",
         "Trois prépositions de lieu : di (position : à, dans, sur), ke (direction : vers, à), dari (origine : de). Saya di kantor (je suis au bureau), Saya ke kantor (je vais au bureau), Saya dari kantor (je viens du bureau).",
-        "Piège : le français emploie le même « à » pour « je suis à » et « je vais à » ; en indonésien, di et ke ne se remplacent jamais. Avec sini (ici), situ (là) et sana (là-bas) : di sini, ke sana, dari situ.",
+        "Le français dit « à » dans « être à la maison » et « aller à la maison ». En indonésien, di indique le lieu et ke la direction. Les prépositions s’écrivent séparément : di sini, ke sana, dari situ.",
       ],
       table: {
         caption: "Ada et les prépositions de lieu",
@@ -268,7 +272,7 @@ export const idCourse = {
       exercises: [
         {
           type: "choose",
-          prompt: "Mereka pergi ___ pasar.",
+          prompt: "Mereka pergi ___ pasar. (Ils vont au marché.)",
           options: ["di", "ke", "dari"],
           answer: 1,
           explanation: "Pergi indique un mouvement vers un lieu : ke.",
@@ -290,12 +294,12 @@ export const idCourse = {
         {
           type: "fill",
           prompt: "___ teh di dapur. (Il y a du thé dans la cuisine.)",
-          answers: ["Ada"],
-          explanation: "Ada au début de la phrase signifie « il y a ».",
+          answers: ["Ada", "Terdapat"],
+          explanation: "Ada teh di dapur veut dire « Il y a du thé dans la cuisine ». Terdapat exprime aussi la présence, dans un registre plus formel.",
         },
         {
           type: "transform",
-          instruction: "Dis que maman n’est pas à la maison.",
+          instruction: "Nie la présence de maman en gardant le verbe « ada ».",
           source: "Ibu ada di rumah.",
           answers: ["Ibu tidak ada di rumah."],
           explanation: "On nie ada avec tidak : tidak ada.",
@@ -303,6 +307,7 @@ export const idCourse = {
       ],
       categories: ["function_word", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "id-a1-questions",
@@ -310,8 +315,8 @@ export const idCourse = {
       title: "Poser des questions : apa, siapa, di mana, kapan, berapa",
       summary: "Demander une information ou répondre par oui / non avec les mots interrogatifs.",
       rule: [
-        "La phrase interrogative garde l’ordre de l’affirmative : pas d’inversion, pas d’équivalent de « est-ce que ». Le mot interrogatif prend la place de la réponse, ou se met en tête : Siapa nama Anda? Kamu tinggal di mana? Apa itu? (Qu’est-ce que c’est ?)",
-        "Pour une question oui / non, ajoute apakah en début de phrase (soutenu), ou garde la phrase telle quelle en montant la voix : Apakah Anda guru? / Anda guru? On répond Ya, ou bien Bukan (devant un nom) ou Tidak (devant un verbe, un adjectif).",
+        "Dans les questions simples, tu peux garder l’ordre de l’affirmation et mettre le mot interrogatif à la place de la réponse, ou le placer en tête : Kamu tinggal di mana? Siapa nama Anda? Apa itu? (« Qu’est-ce que c’est ? »).",
+        "Pour une question fermée, ajoute apakah en tête, surtout dans un registre formel, ou emploie l’intonation interrogative : Apakah Anda guru? Anda guru? Ya signifie « oui ». Pour une réponse négative simple, emploie généralement bukan avec un nom, et tidak avec un verbe ou un adjectif.",
         "Les mots utiles : apa (quoi), siapa (qui), di mana (où), ke mana (vers où), dari mana (d’où), kapan (quand), berapa (combien), kenapa ou mengapa (pourquoi), bagaimana (comment).",
       ],
       table: {
@@ -351,6 +356,7 @@ export const idCourse = {
         {
           type: "fill",
           prompt: "Kamu tinggal ___? – Di Jakarta.",
+          hint: "où, sans nom de lieu",
           answers: ["di mana"],
           explanation: "La réponse donne un lieu de résidence : di mana (où).",
         },
@@ -370,6 +376,7 @@ export const idCourse = {
       ],
       categories: ["function_word", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "id-a2-numbers-classifiers",
@@ -377,9 +384,9 @@ export const idCourse = {
       title: "Compter : nombres et classificateurs (orang, ekor, buah)",
       summary: "Dire combien d’objets, de personnes ou d’animaux en choisissant le bon classificateur.",
       rule: [
-        "Nombres : satu, dua, tiga, empat, lima, enam, tujuh, delapan, sembilan, sepuluh ; sebelas (11), dua belas (12), dua puluh (20), seratus (100), seribu (1000). Le nom reste au singulier après un nombre.",
-        "Entre le nombre et le nom, on met un classificateur qui dépend de la nature du nom : orang pour les personnes, ekor pour les animaux, buah pour les objets, fruits, maisons, lembar pour les feuilles : dua orang guru, tiga ekor kucing, lima buah apel. Buah est le plus général.",
-        "Pour « un seul » on soude se- au classificateur : seorang, seekor, sebuah. Piège : le français met le nombre directement devant le nom. À l’oral, on entend tiga kucing, mais la forme standard garde le classificateur. Pas de classificateur avec le temps : tiga hari, dua jam.",
+        "Nombres : satu, dua, tiga, empat, lima, enam, tujuh, delapan, sembilan, sepuluh ; sebelas (11), dua belas (12), dua puluh (20), seratus (100), seribu (1000). Après un nombre, le nom garde sa forme simple, sans redoublement.",
+        "Un classificateur peut s’intercaler entre le nombre et le nom : orang pour les personnes, ekor pour les animaux, buah pour de nombreux objets et fruits, lembar pour les feuilles et les billets. Compare dua orang guru, tiga ekor kucing et lima buah apel.",
+        "Le préfixe se- équivaut à satu devant un classificateur : seorang, seekor, sebuah. Quand le sens est clair, tiga kucing est aussi correct. Les unités comme hari et jam viennent directement après le nombre : tiga hari, dua jam.",
       ],
       table: {
         caption: "Classificateurs courants",
@@ -389,7 +396,7 @@ export const idCourse = {
           ["ekor", "animaux", "dua ekor ayam"],
           ["buah", "objets, fruits, maisons", "lima buah apel"],
           ["lembar", "feuilles, billets", "sepuluh lembar kertas"],
-          ["se- + classificateur", "un seul", "sebuah rumah, seorang guru"],
+          ["se- + classificateur", "un, une", "sebuah rumah, seorang guru"],
         ],
       },
       examples: [
@@ -416,12 +423,13 @@ export const idCourse = {
         {
           type: "fill",
           prompt: "Saya punya lima ___ apel.",
+          hint: "classificateur général pour les fruits",
           answers: ["buah"],
           explanation: "Buah est le classificateur des fruits et des objets.",
         },
         {
           type: "transform",
-          instruction: "Remplace « satu buah » par la forme courte (un seul).",
+          instruction: "Remplace seulement « satu buah » par la forme avec le préfixe se-.",
           source: "Ada satu buah rumah di sini.",
           answers: ["Ada sebuah rumah di sini."],
           explanation: "Satu + classificateur devient se- + classificateur : sebuah.",
@@ -429,6 +437,7 @@ export const idCourse = {
       ],
       categories: ["function_word", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "id-a2-plural-quantity",
@@ -436,16 +445,16 @@ export const idCourse = {
       title: "Marquer le pluriel : redoublement, banyak, beberapa, semua",
       summary: "Savoir quand redoubler un nom et quand le laisser seul.",
       rule: [
-        "Le nom est invariable : buku peut être un livre ou des livres. Pour insister sur la pluralité, on redouble le nom avec un trait d’union : buku-buku (des livres, divers livres), anak-anak (les enfants).",
-        "Quand le sens est déjà pluriel, on ne redouble pas : banyak buku (beaucoup de livres), beberapa teman (quelques amis), semua orang (tout le monde), dua buku. Para s’ajoute devant un groupe de personnes : para guru (les enseignants).",
-        "Piège : le français marque le pluriel partout (les, des, -s). En indonésien, redoubler après un nombre ou banyak est une faute : « dua buku-buku » est faux. Certains redoublements ont un sens propre : mata-mata (espion) n’est pas le pluriel de mata (œil).",
+        "La forme simple buku peut désigner un livre ou plusieurs. Le redoublement peut signaler la pluralité : buku-buku, anak-anak. À l’écrit, relie les deux éléments par un trait d’union.",
+        "Un nombre ou un quantificateur indique souvent déjà la pluralité. Dans les expressions usuelles, garde le nom sous sa forme simple : banyak buku, beberapa teman, semua orang, dua buku. Para introduit un groupe de personnes : para guru.",
+        "En français, on marque souvent le pluriel sur le déterminant ou le nom. En indonésien, dua buku suffit. Certains redoublements constituent un mot de sens différent : mata-mata signifie « espion » et ne désigne pas plusieurs yeux.",
       ],
       table: {
         caption: "Exprimer plusieurs",
         headers: ["Forme", "Sens", "Exemple"],
         rows: [
-          ["nom seul", "un ou plusieurs", "Saya baca buku."],
-          ["nom redoublé", "pluriel varié", "Buku-buku itu mahal."],
+          ["nom seul", "un ou plusieurs", "Saya membaca buku."],
+          ["nom redoublé", "pluriel", "Buku-buku itu mahal."],
           ["banyak + nom", "beaucoup de", "banyak buku"],
           ["beberapa + nom", "quelques", "beberapa buku"],
           ["semua + nom", "tous les", "semua buku"],
@@ -455,13 +464,13 @@ export const idCourse = {
       examples: [
         { text: "Anak-anak ada di taman.", translation: "Les enfants sont au parc.", note: "Redoublement : pluriel." },
         { text: "Banyak orang datang ke pasar.", translation: "Beaucoup de gens viennent au marché.", note: "Pas de redoublement après banyak." },
-        { text: "Semua teman saya suka kopi.", translation: "Tous mes amis aiment le café.", note: "Semua + nom singulier." },
+        { text: "Semua teman saya suka kopi.", translation: "Tous mes amis aiment le café.", note: "Semua indique déjà la totalité du groupe." },
         { text: "Saya punya beberapa buku.", translation: "J’ai quelques livres.", note: "Beberapa + nom, sans redoublement." },
       ],
       exercises: [
         {
           type: "choose",
-          prompt: "Banyak ___ datang ke sini.",
+          prompt: "Banyak ___ datang ke sini. (Choisis la forme simple du nom.)",
           options: ["orang-orang", "orang", "orang orang"],
           answer: 1,
           explanation: "Après banyak, le nom reste simple : banyak orang.",
@@ -471,19 +480,19 @@ export const idCourse = {
           prompt: "Tiga ___ ada di kelas.",
           options: ["murid-murid", "para murid", "murid"],
           answer: 2,
-          explanation: "Après un nombre, le nom reste au singulier et sans redoublement.",
+          explanation: "Tiga donne le nombre. Murid garde sa forme simple et désigne ici trois personnes.",
         },
         {
           type: "fill",
           prompt: "Saya punya ___ teman di Bali.",
           hint: "quelques",
-          answers: ["beberapa"],
-          explanation: "Beberapa signifie « quelques ».",
+          answers: ["beberapa", "sejumlah"],
+          explanation: "Beberapa teman signifie « quelques amis ». Sejumlah teman indique aussi un nombre non précisé d’amis.",
         },
         {
           type: "fill",
           prompt: "___ orang di kantor ini ramah.",
-          hint: "tous / tout le monde",
+          hint: "Quantificateur de la fiche pour « tout le monde »",
           answers: ["Semua"],
           explanation: "Semua orang = tout le monde.",
         },
@@ -497,6 +506,7 @@ export const idCourse = {
       ],
       categories: ["agreement", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "id-a2-aspect",
@@ -504,12 +514,12 @@ export const idCourse = {
       title: "Situer l’action : sudah, belum, sedang, akan, pernah",
       summary: "Dire qu’une action est faite, pas encore faite, en cours, à venir ou déjà vécue.",
       rule: [
-        "Le verbe ne change pas : on ajoute un petit mot devant. Sudah = déjà, c’est fait (Saya sudah makan). Belum = pas encore (Saya belum makan). Sedang = en train de (Saya sedang makan). Akan = futur (Saya akan makan). Pernah = déjà, au moins une fois dans la vie (Saya pernah ke Bali).",
+        "Pour préciser le déroulement ou le moment, ajoute un marqueur devant le prédicat : sudah (déjà), belum (pas encore), sedang (en train de), akan (à venir), pernah (déjà, au moins une fois). Compare Saya sudah makan et Saya belum makan.",
         "Ces mots sont facultatifs quand un mot de temps suffit : Kemarin saya makan nasi, Besok saya makan nasi. On les ajoute pour préciser ou lever un doute.",
-        "Piège : à la question Sudah makan?, on répond Sudah. ou Belum., jamais Tidak. Pernah concerne une expérience, pas un moment précis ; « jamais » se dit tidak pernah, et belum pernah signifie « jamais jusqu’ici ».",
+        "À Sudah makan?, réponds Sudah si tu as mangé ou Belum si tu n’as pas encore mangé. Pernah présente un fait comme une expérience : Saya pernah ke Bali pada tahun 2018. Tidak pernah signifie « jamais » et belum pernah « jamais jusqu’ici ».",
       ],
       table: {
-        caption: "Marqueurs d’aspect",
+        caption: "Marqueurs de temps et d’aspect",
         headers: ["Mot", "Sens", "Exemple"],
         rows: [
           ["sudah", "déjà, accompli", "Saya sudah makan."],
@@ -529,7 +539,7 @@ export const idCourse = {
       exercises: [
         {
           type: "choose",
-          prompt: "Kamu sudah makan? – ___, saya lapar.",
+          prompt: "Kamu sudah makan? – ___, saya lapar. (Pas encore.)",
           options: ["Tidak", "Belum", "Bukan"],
           answer: 1,
           explanation: "La réponse naturelle à une question en sudah est Sudah ou Belum (pas encore).",
@@ -543,10 +553,10 @@ export const idCourse = {
         },
         {
           type: "choose",
-          prompt: "Besok kami ___ ke Bali.",
+          prompt: "Besok kami ___ ke Bali. (Nous partirons à Bali demain.)",
           options: ["sudah", "pernah", "akan"],
           answer: 2,
-          explanation: "Besok (demain) appelle akan, le marqueur du futur.",
+          explanation: "Akan indique que le départ est à venir. Avec un repère comme besok, il peut aussi être omis hors de cet exercice.",
         },
         {
           type: "fill",
@@ -557,7 +567,7 @@ export const idCourse = {
         },
         {
           type: "transform",
-          instruction: "Dis que tu n’as pas encore mangé.",
+          instruction: "Garde « Saya » et remplace « sudah » par le marqueur signifiant « pas encore ».",
           source: "Saya sudah makan.",
           answers: ["Saya belum makan."],
           explanation: "Belum remplace sudah pour dire « pas encore ».",
@@ -565,6 +575,7 @@ export const idCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "id-a2-yang",
@@ -573,8 +584,8 @@ export const idCourse = {
       summary: "Relier un nom à une description et désigner « le rouge », « celui qui… ».",
       rule: [
         "Yang relie un nom à ce qui le précise ; il traduit « qui » et « que » : Orang yang tinggal di sini ramah (la personne qui habite ici est aimable). Buku yang saya baca bagus (le livre que je lis est bon). Il est invariable.",
-        "Yang sert aussi à désigner sans répéter le nom : Saya mau yang merah (je veux le rouge). Avec un adjectif, il marque un contraste : rumah besar = une grande maison ; rumah yang besar = la maison qui est grande, la grande.",
-        "Piège : le français distingue qui, que, dont, où. L’indonésien garde yang et la phrase suit son ordre normal : buku yang saya baca, sans pronom de rappel.",
+        "Yang peut reprendre un nom sous-entendu : Saya mau yang merah (« Je veux le rouge »). Avec un nom, rumah besar décrit une grande maison. Rumah yang besar permet notamment de distinguer la grande maison d’une autre.",
+        "Pour dire « le livre que je lis », dis buku yang saya baca. Dans cette construction, saya précède la base baca, sans le préfixe meN- et sans pronom qui reprendrait buku. Cette fiche se concentre sur « qui » et « que ».",
       ],
       table: {
         caption: "Les emplois de yang",
@@ -587,7 +598,7 @@ export const idCourse = {
         ],
       },
       examples: [
-        { text: "Anak yang ada di taman itu adik saya.", translation: "L’enfant qui est au parc est mon petit frère.", note: "Yang = qui." },
+        { text: "Anak yang bermain di taman adalah adik saya.", translation: "L’enfant qui joue au parc est mon petit frère ou ma petite sœur.", note: "Yang introduit la relative. Adik ne précise pas le genre." },
         { text: "Buku yang saya baca kemarin bagus.", translation: "Le livre que j’ai lu hier est bon.", note: "Yang = que, le sujet saya suit." },
         { text: "Saya mau yang merah.", translation: "Je veux le rouge.", note: "Yang remplace le nom sous-entendu." },
         { text: "Mobil yang baru itu mahal.", translation: "La voiture neuve est chère.", note: "Yang + adjectif : celle qui est neuve." },
@@ -610,6 +621,7 @@ export const idCourse = {
         {
           type: "fill",
           prompt: "Orang ___ tinggal di sini ramah.",
+          hint: "marqueur de la relative pour « qui »",
           answers: ["yang"],
           explanation: "Yang traduit « qui » devant tinggal di sini.",
         },
@@ -623,6 +635,7 @@ export const idCourse = {
       ],
       categories: ["function_word", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "id-a2-ber",
@@ -630,9 +643,9 @@ export const idCourse = {
       title: "Le préfixe ber- : bekerja, belajar, bermain, berenang",
       summary: "Former des verbes d’activité ou d’état à partir d’un nom ou d’une racine.",
       rule: [
-        "Ber- forme des verbes sans complément d’objet direct à partir d’une racine : main (jeu) → bermain (jouer), jalan (route) → berjalan (marcher), bicara (parole) → berbicara (parler). Avec un nom, il signifie souvent « pratiquer, porter, avoir » : sepeda → bersepeda (faire du vélo).",
-        "Orthographe : ber- devient be- devant r- et dans quelques mots où la racine a un r à la première syllabe : renang → berenang, kerja → bekerja. Cas à retenir : ajar → belajar (apprendre).",
-        "Piège : ne dis pas « berkerja » ni « berajar ». À l’oral, on entend la racine nue (Dia kerja di bank), mais à l’écrit et en situation formelle on garde le verbe en ber-. Ber- ne marque pas le temps.",
+        "Ber- forme souvent des verbes d’activité, d’état ou de possession : main → bermain (« jouer »), jalan → berjalan (« marcher »), bicara → berbicara (« parler »), sepeda → bersepeda (« faire du vélo »). Beaucoup sont intransitifs. Certains ont un complément, comme belajar bahasa Indonesia.",
+        "Devant une base commençant par r, on écrit be- : renang → berenang. Be- s’emploie aussi avec certaines bases, par exemple kerja → bekerja. Avec ajar, retiens la forme belajar (« apprendre »).",
+        "À l’oral familier, on peut entendre Dia kerja di bank. Dans l’écrit standard, emploie ici Dia bekerja di bank. Le préfixe ber- ne marque pas le temps.",
       ],
       table: {
         caption: "Exemples de verbes en ber-",
@@ -672,20 +685,20 @@ export const idCourse = {
         {
           type: "fill",
           prompt: "Anak-anak ___ di taman.",
-          hint: "main",
+          hint: "main, avec le préfixe étudié",
           answers: ["bermain"],
           explanation: "Ber- + main = bermain.",
         },
         {
           type: "fill",
           prompt: "Saya ___ di kolam setiap pagi.",
-          hint: "renang",
+          hint: "renang, avec le préfixe étudié",
           answers: ["berenang"],
           explanation: "Ber- + renang = berenang (un seul r).",
         },
         {
           type: "transform",
-          instruction: "Mets le verbe en ber- (jalan → berjalan).",
+          instruction: "Ajoute le préfixe d’activité ber- au verbe « jalan » sans changer le reste.",
           source: "Mereka jalan di taman.",
           answers: ["Mereka berjalan di taman."],
           explanation: "À l’écrit, on emploie la forme complète berjalan.",
@@ -693,6 +706,7 @@ export const idCourse = {
       ],
       categories: ["verb", "spelling"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "id-a2-comparison",
@@ -701,8 +715,8 @@ export const idCourse = {
       summary: "Dire plus, moins, le plus et aussi avec l’adjectif invariable.",
       rule: [
         "Supériorité : lebih + adjectif, et daripada pour « que » : Rumah ini lebih besar daripada rumah itu. Infériorité : kurang + adjectif (moins, pas assez) : kurang mahal. Superlatif : paling + adjectif ou ter- collé à l’adjectif : paling besar ou terbesar.",
-        "Égalité : se- soudé à l’adjectif (Dia setinggi saya = il est aussi grand que moi) ou sama + adjectif + dengan (Dia sama tinggi dengan saya). Se- ne s’emploie qu’avec un adjectif.",
-        "Piège : l’adjectif ne change jamais. Le français a des formes spéciales (meilleur, pire) ; l’indonésien dit simplement lebih baik, lebih buruk. Dans la langue standard, « que » se rend par daripada.",
+        "Pour comparer deux degrés égaux, soude se- à l’adjectif : Dia setinggi saya (« Il est aussi grand que moi »). Tu peux aussi employer sama + adjectif + dengan : Dia sama tinggi dengan saya.",
+        "Le français a des comparatifs particuliers comme « meilleur » et « pire ». En indonésien, on forme ces comparatifs avec lebih : lebih baik, lebih buruk. Pour introduire le second terme d’une comparaison de supériorité, le modèle enseigné ici emploie daripada.",
       ],
       table: {
         caption: "Les degrés de comparaison",
@@ -752,16 +766,17 @@ export const idCourse = {
       ],
       categories: ["function_word", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "id-b1-men-active",
       level: "B1",
       title: "Le préfixe meN- : verbes actifs et changements de son",
-      summary: "Former le verbe actif transitif : mem-, men-, meng-, meny-, me- selon la première lettre.",
+      summary: "Former des verbes actifs avec mem-, men-, meng-, meny- ou me- et repérer les changements de consonne.",
       rule: [
-        "Le préfixe meN- (la majuscule N note la nasale qui varie) forme des verbes actifs transitifs : baca → membaca, tulis → menulis. Il est obligatoire à l’écrit soutenu ; à l’oral, on dit souvent Saya baca buku. Le préfixe ne marque pas le temps.",
-        "Sa forme dépend de la première lettre de la racine : b, f, v → mem- ; d, c, j, z → men- ; voyelle, g, h → meng- ; l, m, n, r, w, y → me- ; devant p, t, k, s, la consonne tombe et se fond dans la nasale : p → mem-, t → men-, k → meng-, s → meny-.",
-        "Piège : on ne garde pas la consonne : pilih → memilih (pas « mempilih »), tulis → menulis, kirim → mengirim, sapu → menyapu. Une racine d’une seule syllabe prend menge- : cat → mengecat.",
+        "MeN- note un préfixe dont la consonne nasale varie. Il sert à former de nombreux verbes actifs : baca → membaca, tulis → menulis. À l’oral familier, on entend Saya baca buku. Des verbes comme makan s’emploient sans ce préfixe, même à l’écrit. MeN- ne marque pas le temps.",
+        "Modèles courants selon l’initiale : b, f, v → mem- ; d, c, j, z → men- ; voyelle, g, h → meng- ; l, m, n, r, w, y → me-. Dans de nombreuses bases, p → mem-, t → men-, k → meng- et s → meny-, avec disparition de la consonne initiale.",
+        "Retiens pilih → memilih, tulis → menulis, kirim → mengirim et sapu → menyapu. Dans certains groupes de consonnes, l’initiale se maintient : proses → memproses. Une base d’une syllabe prend souvent menge- : cat → mengecat.",
       ],
       table: {
         caption: "Changements de son avec meN-",
@@ -802,14 +817,14 @@ export const idCourse = {
         {
           type: "fill",
           prompt: "Dia ___ paket ke Medan.",
-          hint: "kirim",
+          hint: "kirim, à l’actif en meN-",
           answers: ["mengirim"],
           explanation: "Devant k, on emploie meng- et le k tombe : mengirim.",
         },
         {
           type: "fill",
           prompt: "Ibu ___ nasi di dapur.",
-          hint: "masak",
+          hint: "masak, à l’actif en meN-",
           answers: ["memasak"],
           explanation: "Masak commence par m : on ajoute me- sans changer la racine, d’où memasak.",
         },
@@ -823,33 +838,34 @@ export const idCourse = {
       ],
       categories: ["verb", "spelling"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "id-b1-passive",
       level: "B1",
       title: "Le passif en di- et la construction « objet + saya + verbe »",
-      summary: "Mettre l’objet en tête : di- pour un agent à la 3e personne, pronom + racine pour saya et kamu.",
+      summary: "Mettre l’objet en tête avec le passif en di- ou avec un pronom suivi de la base verbale.",
       rule: [
-        "Pour passer au passif, on remplace meN- par di- (la nasale disparaît) et l’agent suit avec oleh, facultatif : Ani membaca buku itu → Buku itu dibaca (oleh) Ani. Ce passif est très fréquent à l’écrit.",
-        "Quand l’agent est saya, aku, kamu ou Anda, on n’emploie pas di- : on met l’objet en tête, puis le pronom, puis la racine nue : Buku itu saya baca. Dis donc « Buku itu saya baca », jamais « Buku itu saya dibaca ».",
-        "Avec dia, mereka ou un nom, on garde di- : Buku itu dibaca dia, dibaca mereka. Cette construction met l’objet en valeur, comme en français « ce livre, je l’ai lu ».",
+        "Dans le passif en di-, l’objet de l’active vient en tête. Remplace meN- par di- et conserve les suffixes éventuels : membaca → dibaca, mengirimkan → dikirimkan. L’agent peut suivre le verbe avec oleh. S’il le suit directement, oleh est souvent facultatif : Buku itu dibaca (oleh) Ani.",
+        "Avec un agent comme saya ou kamu, le modèle courant est objet + pronom + verbe sans meN- ni di- : Buku itu saya baca. Dans Aku membeli buku itu, la forme correspondante peut être Buku itu kubeli. Ku- s’écrit soudé au verbe.",
+        "Avec un agent de troisième personne, le passif en di- convient : Buku itu dibaca oleh dia. Avec un pronom comme dia ou mereka, on rencontre aussi l’ordre objet + pronom + base, surtout dans l’usage courant : Buku itu dia baca.",
       ],
       table: {
         caption: "Actif et passif",
         headers: ["Agent", "Actif", "Passif"],
         rows: [
           ["Ani", "Ani membaca buku itu.", "Buku itu dibaca (oleh) Ani."],
-          ["dia / mereka", "Dia membaca buku itu.", "Buku itu dibaca dia."],
+          ["dia", "Dia membaca buku itu.", "Buku itu dibaca oleh dia. / Buku itu dia baca."],
           ["saya", "Saya membaca buku itu.", "Buku itu saya baca."],
           ["kamu", "Kamu membaca buku itu.", "Buku itu kamu baca."],
           ["non nommé", "—", "Buku itu dibaca."],
         ],
       },
       examples: [
-        { text: "Surat itu ditulis oleh kakak saya.", translation: "Cette lettre a été écrite par mon frère aîné.", note: "Di- + tulis, agent avec oleh." },
+        { text: "Surat itu ditulis oleh kakak saya.", translation: "Cette lettre a été écrite par mon frère aîné ou ma sœur aînée.", note: "Di- + tulis, agent avec oleh." },
         { text: "Buku ini saya beli di Bandung.", translation: "Ce livre, je l’ai acheté à Bandung.", note: "Objet + saya + racine nue." },
-        { text: "Nasi goreng dimasak oleh ibu.", translation: "Le riz sauté est préparé par maman.", note: "Di- + masak." },
-        { text: "Pintu sudah dibuka.", translation: "La porte est déjà ouverte.", note: "Agent non nommé." },
+        { text: "Nasi goreng dimasak oleh Ibu.", translation: "Le riz sauté est préparé par maman.", note: "Di- + masak. Ibu désigne ici maman." },
+        { text: "Pintu sudah dibuka.", translation: "On a déjà ouvert la porte.", note: "Agent non nommé." },
       ],
       exercises: [
         {
@@ -875,14 +891,14 @@ export const idCourse = {
         },
         {
           type: "transform",
-          instruction: "Mets la phrase au passif.",
+          instruction: "Mets le verbe au passif en di- et garde l’agent « Ibu » après le verbe.",
           source: "Ibu memasak nasi.",
-          answers: ["Nasi dimasak oleh ibu.", "Nasi dimasak ibu."],
+          answers: ["Nasi dimasak oleh Ibu.", "Nasi dimasak Ibu."],
           explanation: "Memasak devient dimasak ; l’agent suit, avec ou sans oleh.",
         },
         {
           type: "transform",
-          instruction: "Mets l’objet en tête de phrase.",
+          instruction: "Mets « buku ini » en tête, puis écris « saya » et le verbe sans meN-.",
           source: "Saya membeli buku ini.",
           answers: ["Buku ini saya beli."],
           explanation: "Avec saya, on met l’objet en tête puis saya et la racine nue : saya beli.",
@@ -890,6 +906,7 @@ export const idCourse = {
       ],
       categories: ["verb", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "id-b1-kan-i",
@@ -897,9 +914,9 @@ export const idCourse = {
       title: "Les suffixes -kan et -i : faire, trouver, se rendre chez",
       summary: "Distinguer menemukan / menemui, mengirimkan / mengirimi : le suffixe change le sens et le complément.",
       rule: [
-        "-kan et -i se collent à la racine, avec meN-, et changent le complément du verbe. -kan a souvent un sens causatif (« faire devenir » : besar → membesarkan, agrandir, élever) ou bénéfactif (« pour quelqu’un »), ou met en avant la chose : mengirimkan surat (envoyer une lettre).",
+        "Les suffixes -kan et -i modifient le sens du verbe ou le rôle de ses compléments. À l’actif, on les rencontre avec meN-. -Kan peut exprimer le fait de provoquer un changement (besar → membesarkan, « agrandir ») ou de faire une action pour quelqu’un. Dans mengirimkan surat, surat est la chose envoyée.",
         "-i met en avant le lieu, la personne ou la cible : mengirimi Ani surat (envoyer à Ani une lettre). C’est aussi : datang → mendatangi (se rendre chez), temu → menemui (rencontrer quelqu’un), hadir → menghadiri (assister à).",
-        "Piège : les deux suffixes ne sont pas interchangeables : menemukan dompet (trouver un portefeuille) mais menemui Pak Budi (rencontrer Monsieur Budi). Un seul suffixe donne le bon sens : apprends le verbe avec son suffixe.",
+        "Compare menemukan dompet (« trouver un portefeuille ») et menemui Pak Budi (« aller voir Monsieur Budi »). Menemukan peut aussi s’employer pour une personne que l’on retrouve. Le choix du suffixe dépend du sens et de la construction du verbe.",
       ],
       table: {
         caption: "Un même radical, deux sens",
@@ -909,12 +926,12 @@ export const idCourse = {
           ["datang", "mendatangkan (faire venir)", "mendatangi (aller chez)"],
           ["duduk", "mendudukkan (asseoir qn)", "menduduki (occuper)"],
           ["kirim", "mengirimkan surat", "mengirimi Ani"],
-          ["hadir", "—", "menghadiri (assister à)"],
+          ["hadir", "menghadirkan (faire venir)", "menghadiri (assister à)"],
         ],
       },
       examples: [
-        { text: "Saya menemukan dompet di taman.", translation: "J’ai trouvé un portefeuille au parc.", note: "Menemukan : une chose." },
-        { text: "Dia menemui kepala sekolah kemarin.", translation: "Il a rencontré le directeur d’école hier.", note: "Menemui : une personne, par rendez-vous." },
+        { text: "Saya menemukan dompet di taman.", translation: "J’ai trouvé un portefeuille au parc.", note: "Menemukan signifie ici « trouver »." },
+        { text: "Dia menemui kepala sekolah kemarin.", translation: "Il est allé voir le directeur de l’école hier.", note: "Menemui peut signifier « aller voir quelqu’un »." },
         { text: "Kami mendatangi rumah teman kami.", translation: "Nous sommes allés chez notre ami.", note: "Mendatangi : on se rend chez quelqu’un." },
         { text: "Ibu membesarkan lima orang anak.", translation: "Maman a élevé cinq enfants.", note: "Besar → membesarkan." },
       ],
@@ -928,10 +945,10 @@ export const idCourse = {
         },
         {
           type: "choose",
-          prompt: "Kemarin saya ___ Pak Budi di kantor. (rencontré)",
+          prompt: "Kemarin saya ___ Pak Budi di kantornya. (Je suis allé le voir.)",
           options: ["menemukan", "mendatangkan", "menemui"],
           answer: 2,
-          explanation: "Pour rencontrer quelqu’un, on emploie menemui.",
+          explanation: "Menemui convient pour « aller voir quelqu’un ». Menemukan voudrait dire « trouver » ou « retrouver ».",
         },
         {
           type: "choose",
@@ -949,7 +966,7 @@ export const idCourse = {
         },
         {
           type: "transform",
-          instruction: "Réécris avec -i (envoyer à Ani).",
+          instruction: "Emploie le verbe avec -i, en gardant « Saya » et en mettant « Ani » avant « surat ».",
           source: "Saya mengirimkan surat kepada Ani.",
           answers: ["Saya mengirimi Ani surat."],
           explanation: "Avec -i, la personne devient le complément direct, suivi de l’objet envoyé.",
@@ -957,16 +974,17 @@ export const idCourse = {
       ],
       categories: ["verb", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "id-b1-noun-derivation",
       level: "B1",
-      title: "Former des noms : ke-…-an, pe-…-an, per-…-an, peN-",
+      title: "Former des noms : ke-…-an, peN-…-an, per-…-an, peN-",
       summary: "Passer d’un adjectif ou d’un verbe à un nom : kesehatan, pembangunan, perjalanan, penulis.",
       rule: [
         "Ke-…-an tire un nom abstrait d’un adjectif ou d’une racine : sehat (en bonne santé) → kesehatan (la santé), bersih → kebersihan (la propreté), indah → keindahan (la beauté).",
-        "Pe-…-an et per-…-an désignent l’action, son résultat ou le domaine : didik → pendidikan (éducation), bangun → pembangunan (construction), jalan → perjalanan (voyage), temu → pertemuan (réunion). Per-…-an va souvent avec un verbe en ber- ; pe-…-an avec un verbe en meN-. Cas irrégulier : kerja → pekerjaan (emploi), ajar → pelajaran (leçon).",
-        "PeN- seul désigne la personne qui fait l’action, avec les mêmes changements de son que meN- : tulis → penulis (écrivain), jual → penjual (vendeur), baca → pembaca (lecteur), main → pemain (joueur).",
+        "PeN-…-an et per-…-an peuvent nommer une action, son résultat ou un domaine : didik → pendidikan, bangun → pembangunan, jalan → perjalanan, temu → pertemuan. Compare mendidik avec pendidikan et berjalan avec perjalanan. Retiens aussi pekerjaan (« travail ») et pelajaran (« leçon »).",
+        "PeN- peut désigner la personne qui accomplit une action. La consonne nasale varie selon la base : tulis → penulis (« écrivain »), jual → penjual (« vendeur »), baca → pembaca (« lecteur »).",
       ],
       table: {
         caption: "Noms dérivés",
@@ -974,20 +992,20 @@ export const idCourse = {
         rows: [
           ["ke-…-an", "sehat", "kesehatan", "santé"],
           ["ke-…-an", "bersih", "kebersihan", "propreté"],
-          ["pe-…-an", "didik", "pendidikan", "éducation"],
-          ["pe-…-an", "bangun", "pembangunan", "construction"],
+          ["peN-…-an", "didik", "pendidikan", "éducation"],
+          ["peN-…-an", "bangun", "pembangunan", "construction"],
           ["per-…-an", "jalan", "perjalanan", "voyage"],
           ["per-…-an", "temu", "pertemuan", "réunion"],
-          ["irrégulier", "kerja", "pekerjaan", "emploi, travail"],
+          ["pe-…-an", "kerja", "pekerjaan", "emploi, travail"],
           ["peN-", "tulis", "penulis", "écrivain"],
           ["peN-", "jual", "penjual", "vendeur"],
-          ["peN-", "main", "pemain", "joueur"],
+          ["peN-", "baca", "pembaca", "lecteur"],
         ],
       },
       examples: [
         { text: "Kesehatan lebih penting daripada uang.", translation: "La santé est plus importante que l’argent.", note: "Ke-…-an : nom abstrait." },
         { text: "Perjalanan ke Bali sangat panjang.", translation: "Le voyage jusqu’à Bali est très long.", note: "Per-…-an : action, voyage." },
-        { text: "Pendidikan anak-anak itu penting.", translation: "L’éducation des enfants est importante.", note: "Pe-…-an : domaine." },
+        { text: "Pendidikan anak-anak itu penting.", translation: "L’éducation des enfants est importante.", note: "PeN-…-an forme ici le nom d’une activité ou d’un domaine." },
         { text: "Penjual buah itu ramah.", translation: "Le vendeur de fruits est aimable.", note: "Jual commence par j : pen- + jual." },
       ],
       exercises: [
@@ -1008,13 +1026,13 @@ export const idCourse = {
         {
           type: "fill",
           prompt: "___ itu membaca buku di perpustakaan. (le lecteur)",
-          hint: "baca → pe-",
+          hint: "baca → peN-",
           answers: ["Pembaca"],
           explanation: "Baca commence par b : pem- + baca = pembaca.",
         },
         {
           type: "fill",
-          prompt: "Kami ada ___ jam dua. (une réunion)",
+          prompt: "Kami akan mengadakan ___ pukul dua. (une réunion)",
           hint: "temu",
           answers: ["pertemuan"],
           explanation: "Per-…-an : pertemuan, la réunion.",
@@ -1022,6 +1040,7 @@ export const idCourse = {
       ],
       categories: ["spelling", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "id-b1-connectors",
@@ -1031,7 +1050,7 @@ export const idCourse = {
       rule: [
         "Cause : karena (parce que, à cause de). Conséquence : sehingga (si bien que). But : supaya ou agar (pour que). Condition : kalau ou jika (si). Concession : walaupun ou meskipun (bien que, même si). Le verbe reste à la forme habituelle, sans subjonctif ni concordance des temps.",
         "Piège : walaupun se traduit par « bien que », qui demande un subjonctif en français, mais ici le verbe est ordinaire. On n’ajoute pas tetapi dans la même phrase : « Walaupun hujan, tetapi dia pergi » est à éviter.",
-        "La subordonnée peut venir au début (avec une virgule) ou à la fin : Kalau hujan, saya tinggal di rumah = Saya tinggal di rumah kalau hujan. Pour exprimer le but, on peut aussi dire untuk + verbe, quand le sujet est le même : Saya belajar untuk lulus.",
+        "En tête de phrase, sépare la subordonnée de la principale par une virgule : Kalau hujan, saya tetap di rumah. Quand la principale vient en premier, on écrit généralement sans virgule : Saya tetap di rumah kalau hujan. Avec le même sujet, untuk peut aussi marquer le but : Saya belajar untuk lulus.",
       ],
       table: {
         caption: "Connecteurs de B1",
@@ -1040,14 +1059,14 @@ export const idCourse = {
           ["cause", "karena", "Dia terlambat karena hujan."],
           ["conséquence", "sehingga", "Hujan deras sehingga jalan banjir."],
           ["but", "supaya, agar", "Saya belajar supaya lulus."],
-          ["condition", "kalau, jika", "Kalau hujan, saya tinggal."],
+          ["condition", "kalau, jika", "Kalau hujan, saya tetap di rumah."],
           ["concession", "walaupun, meskipun", "Walaupun lelah, dia bekerja."],
         ],
       },
       examples: [
         { text: "Dia terlambat karena hujan deras.", translation: "Il est en retard à cause de la forte pluie.", note: "Karena donne la cause." },
         { text: "Saya belajar setiap hari supaya lulus ujian.", translation: "J’étudie tous les jours pour réussir l’examen.", note: "Supaya : but, sans subjonctif." },
-        { text: "Kalau besok hujan, kami tinggal di rumah.", translation: "S’il pleut demain, nous restons à la maison.", note: "Kalau, avec le verbe tel quel." },
+        { text: "Kalau besok hujan, kami tetap di rumah.", translation: "S’il pleut demain, nous resterons à la maison.", note: "Kalau introduit la condition." },
         { text: "Walaupun lelah, dia tetap bekerja.", translation: "Bien que fatigué, il continue de travailler.", note: "Walaupun sans tetapi." },
       ],
       exercises: [
@@ -1060,14 +1079,14 @@ export const idCourse = {
         },
         {
           type: "choose",
-          prompt: "Dia belajar keras ___ lulus ujian. (pour que)",
+          prompt: "Dia belajar keras ___ lulus ujian. (pour réussir l’examen)",
           options: ["karena", "kalau", "supaya"],
           answer: 2,
           explanation: "Supaya introduit le but.",
         },
         {
           type: "choose",
-          prompt: "___ besok hujan, kami tinggal di rumah. (si)",
+          prompt: "___ besok hujan, kami tetap di rumah. (si)",
           options: ["Kalau", "Supaya", "Walaupun"],
           answer: 0,
           explanation: "Kalau introduit une condition.",
@@ -1075,20 +1094,21 @@ export const idCourse = {
         {
           type: "fill",
           prompt: "___ lelah, dia tetap bekerja.",
-          hint: "bien que",
+          hint: "« bien que », avec un connecteur du tableau",
           answers: ["Walaupun", "Meskipun"],
           explanation: "Walaupun et meskipun expriment la concession.",
         },
         {
           type: "transform",
-          instruction: "Place la subordonnée en tête de phrase.",
-          source: "Saya tinggal di rumah kalau hujan.",
-          answers: ["Kalau hujan, saya tinggal di rumah.", "Kalau hujan saya tinggal di rumah."],
-          explanation: "La subordonnée peut précéder la principale, généralement avec une virgule.",
+          instruction: "Place la subordonnée en tête et ajoute la virgule de l’écrit standard.",
+          source: "Saya tetap di rumah kalau hujan.",
+          answers: ["Kalau hujan, saya tetap di rumah."],
+          explanation: "Quand la subordonnée vient en tête, on la sépare de la principale par une virgule.",
         },
       ],
       categories: ["function_word", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "id-b1-time-clauses",
@@ -1096,15 +1116,15 @@ export const idCourse = {
       title: "Situer dans le temps : ketika, sebelum, setelah, sambil, sampai, sejak",
       summary: "Enchaîner deux actions : quand, avant, après, pendant que, jusqu’à ce que, depuis.",
       rule: [
-        "Ketika (aussi waktu, saat) = quand, au moment où. Sebelum = avant (de), setelah ou sesudah = après : Sebelum makan, kami cuci tangan. Le verbe reste à la forme de base ; si le sujet est le même, on ne le répète pas : Setelah bekerja, saya pulang.",
+        "Ketika, waktu ou saat peuvent signifier « quand ». Sebelum signifie « avant (de) », setelah ou sesudah « après ». Le connecteur ne change pas la forme du verbe. Si le sujet est partagé, on peut l’omettre dans la subordonnée : Setelah bekerja, saya pulang.",
         "Sambil = tout en, pendant que (deux actions simultanées, même sujet) : Dia makan sambil membaca. Sampai = jusqu’à ce que : Tunggu sampai saya kembali. Sejak = depuis : Saya tinggal di sini sejak 2018.",
-        "Piège : pas de gérondif ni d’infinitif passé. « Après avoir mangé » devient setelah makan. Et kapan est interrogatif (Kapan kamu datang?), pas une conjonction : pour « quand » dans une phrase, dis ketika.",
+        "« Après avoir mangé » se rend par setelah makan. Pour introduire un événement dans le temps, emploie ketika. Kapan sert à demander quand, directement (Kapan kamu datang?) ou dans une question indirecte (Saya tidak tahu kapan dia tiba).",
       ],
       table: {
         caption: "Connecteurs de temps",
         headers: ["Mot", "Sens", "Exemple"],
         rows: [
-          ["ketika", "quand, lorsque", "Ketika saya tiba, hujan turun."],
+          ["ketika", "quand, lorsque", "Ketika saya tiba, hujan sedang turun."],
           ["sebelum", "avant (de)", "Sebelum makan, cuci tangan."],
           ["setelah", "après", "Setelah bekerja, saya pulang."],
           ["sambil", "tout en", "Dia makan sambil membaca."],
@@ -1113,15 +1133,15 @@ export const idCourse = {
         ],
       },
       examples: [
-        { text: "Ketika saya tiba, hujan turun.", translation: "Quand je suis arrivé, il pleuvait.", note: "Ketika, avec un verbe inchangé." },
-        { text: "Sebelum makan, kami cuci tangan.", translation: "Avant de manger, nous nous lavons les mains.", note: "Sebelum + verbe, sans infinitif." },
+        { text: "Ketika saya tiba, hujan sedang turun.", translation: "Quand je suis arrivé, il pleuvait.", note: "Sedang indique que la pluie était déjà en cours." },
+        { text: "Sebelum makan, kami mencuci tangan.", translation: "Avant de manger, nous nous lavons les mains.", note: "Le sujet kami est aussi celui de makan." },
         { text: "Dia menelepon sambil berjalan.", translation: "Il téléphone en marchant.", note: "Sambil remplace le gérondif." },
-        { text: "Setelah bekerja, saya pulang ke rumah.", translation: "Après le travail, je rentre à la maison.", note: "Setelah + verbe nu." },
+        { text: "Setelah bekerja, saya pulang ke rumah.", translation: "Après le travail, je rentre à la maison.", note: "Bekerja garde le préfixe be- après setelah." },
       ],
       exercises: [
         {
           type: "choose",
-          prompt: "___ makan, kami cuci tangan. (avant de)",
+          prompt: "___ makan, kami mencuci tangan. (avant de)",
           options: ["Setelah", "Sebelum", "Sambil"],
           answer: 1,
           explanation: "Sebelum signifie « avant (de) ».",
@@ -1144,12 +1164,12 @@ export const idCourse = {
           type: "fill",
           prompt: "Tunggu di sini ___ saya kembali.",
           hint: "jusqu’à ce que",
-          answers: ["sampai"],
-          explanation: "Sampai signifie « jusqu’à ce que ».",
+          answers: ["sampai", "hingga"],
+          explanation: "Sampai et hingga peuvent introduire l’événement jusqu’auquel l’attente dure.",
         },
         {
           type: "transform",
-          instruction: "Relie les deux actions avec sambil.",
+          instruction: "Garde « Dia makan » au début et relie la seconde action avec « sambil », sans répéter le sujet.",
           source: "Dia makan dan dia membaca.",
           answers: ["Dia makan sambil membaca."],
           explanation: "Sambil évite de répéter le sujet et marque la simultanéité.",
@@ -1157,6 +1177,7 @@ export const idCourse = {
       ],
       categories: ["function_word", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
   ],
 } satisfies GrammarCourse;

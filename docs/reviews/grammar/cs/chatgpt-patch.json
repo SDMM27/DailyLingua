@@ -1,0 +1,1022 @@
+{
+  "language": "cs",
+  "approved": [
+    "cs-a1-gender",
+    "cs-a1-byt",
+    "cs-a1-present-am",
+    "cs-a1-present-im",
+    "cs-a1-accusative",
+    "cs-a1-locative",
+    "cs-a2-present-e",
+    "cs-a2-possessives",
+    "cs-a2-genitive",
+    "cs-a2-past",
+    "cs-a2-instrumental",
+    "cs-a2-dative",
+    "cs-b1-aspect",
+    "cs-b1-future",
+    "cs-b1-motion",
+    "cs-b1-clitics",
+    "cs-b1-conditional",
+    "cs-b1-imperative"
+  ],
+  "drafts": [],
+  "patches": [
+    {
+      "id": "cs-a1-gender",
+      "field": "summary",
+      "find": "      summary: \"Deviner le genre d’un nom d’après sa terminaison et choisir ten, ta, to ou on, ona, ono.\",",
+      "replace": "      summary: \"Repérer le genre d’un nom à l’aide de sa terminaison et choisir ten, ta, to ou on, ona, ono.\","
+    },
+    {
+      "id": "cs-a1-gender",
+      "field": "rule[0]",
+      "find": "        \"Le tchèque n’a pas d’article : kniha veut dire à la fois « un livre » et « le livre ». Chaque nom a pourtant un genre, que la terminaison révèle presque toujours : consonne → masculin (stůl, pes) ; -a → féminin (kniha, žena) ; -o → neutre (okno, auto).\",",
+      "replace": "        \"Le tchèque n’a pas d’article : kniha peut vouloir dire « un livre » ou « le livre ». La terminaison donne souvent un indice sur le genre : consonne pour beaucoup de masculins (stůl, pes), -a pour de nombreux féminins (kniha, žena) et -o pour les neutres comme okno ou auto.\","
+    },
+    {
+      "id": "cs-a1-gender",
+      "field": "rule[1]",
+      "find": "        \"Les terminaisons -e / -ě et -í sont moins sûres : -e / -ě est le plus souvent féminin (růže, země) mais parfois neutre (moře, srdce) ; -í est neutre (nádraží). Certains féminins finissent par une consonne (noc, věc, kancelář) : seul le dictionnaire le dit.\",",
+      "replace": "        \"Les terminaisons -e et -ě existent dans les trois genres : soudce (masculin), růže et země (féminin), moře et srdce (neutre). Nádraží est neutre, mais paní est féminin. Certains féminins finissent par une consonne (noc, věc). Apprends le genre avec le mot.\","
+    },
+    {
+      "id": "cs-a1-gender",
+      "field": "rule[2]",
+      "find": "        \"Au masculin, le tchèque distingue l’animé (personnes, animaux : muž, pes) de l’inanimé (stůl, dům). Rien ne change au nominatif, mais cela compte dès l’accusatif. Pour désigner un nom, on emploie ten (masculin), ta (féminin), to (neutre) ; on, ona, ono le reprennent.\",",
+      "replace": "        \"Au masculin, le tchèque distingue l’animé (muž, pes) de l’inanimé (stůl, dům). Au singulier, les deux prennent ten au nominatif et se distinguent souvent à l’accusatif. Ta accompagne un féminin et to un neutre. Les pronoms correspondants sont on, ona, ono, mais on omet souvent le pronom sujet.\","
+    },
+    {
+      "id": "cs-a1-gender",
+      "field": "table.rows[0]",
+      "find": "          [\"Masculin animé\", \"consonne\", \"muž, pes\", \"ten\"],",
+      "replace": "          [\"Masculin animé\",\"consonne, -a, -e\",\"muž, kolega, soudce\",\"ten\"],"
+    },
+    {
+      "id": "cs-a1-gender",
+      "field": "examples[0]",
+      "find": "        { text: \"Ten muž je lékař. On bydlí v Praze.\", translation: \"Cet homme est médecin. Il habite à Prague.\", note: \"Muž est un masculin animé : ten muž, repris par on.\" },",
+      "replace": "        { text: \"Ten muž je lékař. Bydlí v Praze.\", translation: \"Cet homme est médecin. Il habite à Prague.\", note: \"Muž est masculin animé, d’où ten muž. Le sujet de bydlí se déduit du contexte.\" },"
+    },
+    {
+      "id": "cs-a1-gender",
+      "field": "exercises[2].prompt",
+      "find": "          prompt: \"Kde je ten stůl? — ___ je v kuchyni.\",",
+      "replace": "          prompt: \"A co Eva a Petr? ___ bydlí v Praze, on v Brně.\","
+    },
+    {
+      "id": "cs-a1-gender",
+      "field": "exercises[2].answer",
+      "find": "          options: [\"On\", \"Ona\", \"Ono\", \"Oni\"],\n          answer: 0,",
+      "replace": "          options: [\"On\", \"Ona\", \"Ono\", \"Oni\"],\n          answer: 1,"
+    },
+    {
+      "id": "cs-a1-gender",
+      "field": "exercises[2].explanation",
+      "find": "          explanation: \"Stůl est masculin : on le reprend par on.\",",
+      "replace": "          explanation: \"Eva est reprise par ona. Ici le pronom marque le contraste entre les deux sujets.\","
+    },
+    {
+      "id": "cs-a1-gender",
+      "field": "exercises[3]",
+      "find": "        {\n          type: \"fill\",\n          prompt: \"___ pes je velký.\",\n          answers: [\"Ten\"],\n          explanation: \"Pes est un masculin animé : ten pes.\",\n        },",
+      "replace": "        {\n          type: \"fill\",\n          prompt: \"___ pes je velký.\",\n          hint: \"ten, ta ou to\",\n          answers: [\"Ten\"],\n          explanation: \"Pes est un masculin animé : ten pes.\",\n        },"
+    },
+    {
+      "id": "cs-a1-gender",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Remplace le nom sujet par le pronom qui convient.\",",
+      "replace": "          instruction: \"Remplace seulement « Učitelka » par le pronom sujet qui convient.\","
+    },
+    {
+      "id": "cs-a1-byt",
+      "field": "rule[0]",
+      "find": "        \"« Être » se dit být. Au présent : jsem, jsi, je, jsme, jste, jsou. Comme en italien, le pronom sujet est le plus souvent omis, car la forme du verbe suffit : Jsem student = « Je suis étudiant ». On dit já jsem seulement pour insister.\",",
+      "replace": "        \"« Être » se dit být. Au présent : jsem, jsi, je, jsme, jste, jsou. La forme du verbe suffit souvent à indiquer la personne : Jsem student signifie « Je suis étudiant ». Tu peux dire já jsem pour exprimer le sujet, par exemple pour marquer un contraste.\","
+    },
+    {
+      "id": "cs-a1-byt",
+      "field": "rule[1]",
+      "find": "        \"Après být, le nom ou l’adjectif reste au nominatif, sans article : Jsem student, To je dobrý film. Pour « c’est », on dit simplement to je : To je Petr.\",",
+      "replace": "        \"Pour dire qui tu es, le nom ou l’adjectif est souvent au nominatif, sans article : Jsem student, Jsem unavený. Un nom de rôle ou de profession peut aussi être à l’instrumental : Je lékařem. Pour présenter quelqu’un, emploie to je : To je Petr.\","
+    },
+    {
+      "id": "cs-a1-byt",
+      "field": "rule[2]",
+      "find": "        \"Négation : ne- se soude au verbe : nejsem, nejsi, není, nejsme, nejste, nejsou. Attention : « il / elle n’est pas » est není, pas nejse. Une question garde l’ordre de l’affirmation, la voix monte : Jsi unavený?\",",
+      "replace": "        \"Négation : ne- se soude au verbe : nejsem, nejsi, nejsme, nejste, nejsou. La 3e personne du singulier est irrégulière : není. Pour une question fermée, l’ordre peut rester le même et c’est l’intonation qui signale la question : Jsi unavený?\","
+    },
+    {
+      "id": "cs-a1-byt",
+      "field": "exercises[3].hint",
+      "find": "          hint: \"být (négation)\",",
+      "replace": "          hint: \"být, présent négatif\","
+    },
+    {
+      "id": "cs-a1-byt",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Mets la phrase à la forme négative.\",\n          source: \"Jsem unavený.\",",
+      "replace": "          instruction: \"Mets seulement le verbe à la forme négative.\",\n          source: \"Jsem unavený.\","
+    },
+    {
+      "id": "cs-a1-byt",
+      "field": "exercises[4].answers",
+      "find": "          answers: [\"Nejsem unavený.\", \"Já nejsem unavený.\"],",
+      "replace": "          answers: [\"Nejsem unavený.\"],"
+    },
+    {
+      "id": "cs-a1-present-am",
+      "field": "summary",
+      "find": "      summary: \"Former le présent des verbes en -at et de mít : dělám, děláš, dělá, děláme, děláte, dělají.\",",
+      "replace": "      summary: \"Former le présent de dělat et des verbes du même type, puis conjuguer mít.\","
+    },
+    {
+      "id": "cs-a1-present-am",
+      "field": "rule[0]",
+      "find": "        \"Le présent tchèque a plusieurs familles. Les verbes en -at comme dělat (faire), znát (connaître), hledat (chercher), ainsi que mít (avoir), ont les terminaisons -ám, -áš, -á, -áme, -áte, -ají : dělám, děláš, dělá, děláme, děláte, dělají.\",",
+      "replace": "        \"Beaucoup de verbes en -at suivent le modèle dělat (faire) : dělám, děláš, dělá, děláme, děláte, dělají. Hledat (chercher) et znát (connaître) suivent ce modèle. Mít (avoir) a des terminaisons semblables, avec des formes à retenir : mám, máš, má, máme, máte, mají.\","
+    },
+    {
+      "id": "cs-a1-present-am",
+      "field": "rule[1]",
+      "find": "        \"Il n’y a qu’un seul présent : Dělám úkol veut dire « je fais mon devoir » comme « je suis en train de le faire ». Le sujet est omis, sauf pour insister : Já dělám úkol, ty hledáš práci.\",",
+      "replace": "        \"La même forme peut décrire une action en cours ou une habitude. Dělám úkol peut signifier « Je fais mon devoir » ou « Je suis en train de le faire ». On omet souvent le sujet. Pour opposer deux personnes, on peut dire Já dělám úkol, ty hledáš práci.\","
+    },
+    {
+      "id": "cs-a1-present-am",
+      "field": "examples[1]",
+      "find": "        { text: \"Mám dva bratry a jednu sestru.\", translation: \"J’ai deux frères et une sœur.\", note: \"Mít se conjugue comme dělat : mám, máš, má…\" },",
+      "replace": "        { text: \"Mám dva bratry a jednu sestru.\", translation: \"J’ai deux frères et une sœur.\", note: \"Avec mít, la 1re personne du singulier est mám.\" },"
+    },
+    {
+      "id": "cs-a1-present-am",
+      "field": "exercises[2].hint",
+      "find": "          hint: \"dělat (vy)\",",
+      "replace": "          hint: \"dělat, présent, vy\","
+    },
+    {
+      "id": "cs-a1-present-am",
+      "field": "exercises[3].hint",
+      "find": "          hint: \"mít\",",
+      "replace": "          hint: \"mít, au présent\","
+    },
+    {
+      "id": "cs-a1-present-am",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Mets la phrase à la forme négative.\",\n          source: \"Dělám úkol.\",",
+      "replace": "          instruction: \"Ajoute la négation au verbe et garde les autres mots dans le même ordre.\",\n          source: \"Dělám úkol.\","
+    },
+    {
+      "id": "cs-a1-present-am",
+      "field": "exercises[4].answers",
+      "find": "          answers: [\"Nedělám úkol.\", \"Já nedělám úkol.\"],",
+      "replace": "          answers: [\"Nedělám úkol.\"],"
+    },
+    {
+      "id": "cs-a1-present-im",
+      "field": "summary",
+      "find": "      summary: \"Former le présent des verbes en -it et -et : mluvím, mluvíš, mluví, mluvíme, mluvíte, mluví.\",",
+      "replace": "      summary: \"Former le présent des verbes comme mluvit, bydlet et vidět avec les terminaisons en -í.\","
+    },
+    {
+      "id": "cs-a1-present-im",
+      "field": "rule[0]",
+      "find": "        \"Les verbes en -it et -et comme mluvit (parler), bydlet (habiter), vidět (voir), slyšet (entendre) ont les terminaisons -ím, -íš, -í, -íme, -íte, -í : mluvím, mluvíš, mluví, mluvíme, mluvíte, mluví.\",",
+      "replace": "        \"Les verbes comme mluvit (parler), bydlet (habiter) et vidět (voir) suivent souvent ce modèle au singulier : -ím, -íš, -í. Avec mluvit, on obtient au pluriel mluvíme, mluvíte, mluví. Les infinitifs de cette famille se terminent souvent par -it, -et ou -ět.\","
+    },
+    {
+      "id": "cs-a1-present-im",
+      "field": "rule[1]",
+      "find": "        \"À cette conjugaison, la 3e personne du singulier et celle du pluriel sont identiques (Eva mluví, Eva a Petr mluví), alors qu’avec dělat on a dělá / dělají.\",",
+      "replace": "        \"Mluví sert au singulier et au pluriel : Eva mluví, Eva a Petr mluví. Certains verbes ont aussi une variante au pluriel : oni bydlí ou oni bydlejí, oni rozumí ou oni rozumějí. Compare dělá et dělají, qui distinguent toujours le singulier du pluriel.\","
+    },
+    {
+      "id": "cs-a1-present-im",
+      "field": "rule[2]",
+      "find": "        \"Piège : l’accent aigu du tchèque marque la longueur de la voyelle, pas l’accent tonique, qui tombe toujours sur la première syllabe (BYDlíme). N’oublie pas de l’écrire : mluvim est faux.\",",
+      "replace": "        \"L’accent aigu du tchèque marque une voyelle longue. Prononce l’accent de mot sur la première syllabe de bydlíme, et garde le í long sur la deuxième. Écris mluvím avec í.\","
+    },
+    {
+      "id": "cs-a1-present-im",
+      "field": "rule[3]",
+      "find": "        \"Pour trouver la famille, regarde l’infinitif : -at → dělám, -it / -et → mluvím. Les verbes en -ovat ou comme číst suivent un autre modèle, vu plus loin.\",",
+      "replace": "        \"L’infinitif donne un indice, mais apprends aussi la première personne avec chaque verbe : dělat → dělám, mluvit → mluvím, jet → jedu. Les verbes en -ovat et les verbes comme číst sont présentés plus loin.\","
+    },
+    {
+      "id": "cs-a1-present-im",
+      "field": "table.rows[5]",
+      "find": "          [\"oni\", \"mluví\", \"bydlí\", \"vidí\"],",
+      "replace": "          [\"oni\",\"mluví\",\"bydlí / bydlejí\",\"vidí\"],"
+    },
+    {
+      "id": "cs-a1-present-im",
+      "field": "exercises[0].explanation",
+      "find": "          explanation: \"Sujet pluriel (ils) : la forme est bydlí, identique au singulier.\",",
+      "replace": "          explanation: \"Bydlí est possible au singulier comme au pluriel. Au pluriel, on dit aussi bydlejí.\","
+    },
+    {
+      "id": "cs-a1-present-im",
+      "field": "exercises[2].hint",
+      "find": "          hint: \"mluvit\",",
+      "replace": "          hint: \"mluvit, au présent\","
+    },
+    {
+      "id": "cs-a1-present-im",
+      "field": "exercises[3].hint",
+      "find": "          hint: \"vidět\",",
+      "replace": "          hint: \"vidět, au présent\","
+    },
+    {
+      "id": "cs-a1-present-im",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Mets la phrase à la forme « my » (nous).\",",
+      "replace": "          instruction: \"Passe de « je » à « nous ». Change seulement le verbe.\","
+    },
+    {
+      "id": "cs-a1-present-im",
+      "field": "exercises[4].answers",
+      "find": "          answers: [\"Bydlíme v Praze.\", \"My bydlíme v Praze.\"],",
+      "replace": "          answers: [\"Bydlíme v Praze.\"],"
+    },
+    {
+      "id": "cs-a1-accusative",
+      "field": "rule[1]",
+      "find": "        \"Féminin : -a → -u (kniha → knihu, Eva → Evu) ; -e / -ě → -i (růže → růži, země → zemi) ; les noms en consonne ne changent pas (noc → noc). Neutre : identique au nominatif (okno → okno).\",",
+      "replace": "        \"Au singulier, les féminins comme kniha et Eva passent de -a à -u (knihu, Evu). Des noms en -e ou -ě prennent -i : růže → růži, země → zemi. D’autres restent identiques au nominatif, comme noc. Les neutres gardent leur forme du nominatif : okno → okno.\","
+    },
+    {
+      "id": "cs-a1-accusative",
+      "field": "rule[2]",
+      "find": "        \"Masculin inanimé : identique au nominatif (stůl → stůl). Masculin animé : -a ou -e (pes → psa, bratr → bratra, muž → muže). Le démonstratif suit : ten → toho (animé), ten (inanimé), ta → tu, to → to.\",",
+      "replace": "        \"Au masculin inanimé, l’accusatif singulier ressemble au nominatif : stůl. Au masculin animé, il prend souvent -a ou -e (psa, bratra, muže), parfois -u (kolegu). Le démonstratif change selon le genre et l’animé : ten → toho pour un animé, ten pour un inanimé, ta → tu et to → to.\","
+    },
+    {
+      "id": "cs-a1-accusative",
+      "field": "rule[3]",
+      "find": "        \"Piège : on dit Vidím toho psa (animé) mais Vidím ten stůl (inanimé). Ne mets pas -a à un objet : « je vois la table » est Vidím stůl.\",",
+      "replace": "        \"Compare Vidím toho psa (animé) et Vidím ten stůl (inanimé). Tu peux aussi dire Vidím stůl : le tchèque n’a pas besoin d’un article ou d’un démonstratif pour traduire « Je vois la table ».\","
+    },
+    {
+      "id": "cs-a1-accusative",
+      "field": "exercises[0].prompt",
+      "find": "          prompt: \"Čtu tu ___ .\",",
+      "replace": "          prompt: \"Čtu tu ___.\","
+    },
+    {
+      "id": "cs-a1-accusative",
+      "field": "exercises[1].options",
+      "find": "          options: [\"ten\", \"tu\", \"toho\", \"to\"],",
+      "replace": "          options: [\"ten\",\"té\",\"toho\",\"to\"],"
+    },
+    {
+      "id": "cs-a1-accusative",
+      "field": "exercises[2].prompt",
+      "find": "          prompt: \"Hledám ___ .\",",
+      "replace": "          prompt: \"Hledám ___.\","
+    },
+    {
+      "id": "cs-a1-accusative",
+      "field": "exercises[2].hint",
+      "find": "          hint: \"kočka\",",
+      "replace": "          hint: \"kočka, au singulier\","
+    },
+    {
+      "id": "cs-a1-accusative",
+      "field": "exercises[3].prompt",
+      "find": "          prompt: \"Mám ___ .\",",
+      "replace": "          prompt: \"Mám ___.\","
+    },
+    {
+      "id": "cs-a1-accusative",
+      "field": "exercises[3].hint",
+      "find": "          hint: \"bratr\",",
+      "replace": "          hint: \"bratr, au singulier\","
+    },
+    {
+      "id": "cs-a1-accusative",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Remplace Petr par Eva.\",",
+      "replace": "          instruction: \"Remplace seulement « Petra » par la forme de « Eva » qui convient.\","
+    },
+    {
+      "id": "cs-a1-locative",
+      "field": "rule[0]",
+      "find": "        \"Le locatif répond à « où ? » (kde ?) et ne s’emploie qu’après une préposition. Pour être quelque part : v / ve + locatif (espace fermé, ville : v Praze, v domě) ou na + locatif (surface, lieu ouvert, événement : na stole, na nádraží).\",",
+      "replace": "        \"Le locatif s’emploie après une préposition. Pour dire où tu es (kde ?), utilise souvent v / ve avec un intérieur ou une ville (v domě, v Praze), et na avec une surface ou certains lieux et événements (na stole, na nádraží). Apprends la préposition avec le lieu.\","
+    },
+    {
+      "id": "cs-a1-locative",
+      "field": "rule[1]",
+      "find": "        \"Terminaisons : masculin et neutre → -e / -ě (dům → v domě, stůl → na stole, město → ve městě, Brno → v Brně) ; féminin en -a → -e / -ě (škola → ve škole) ; féminin en -e ou en consonne → -i (kuchyně → v kuchyni, kancelář → v kanceláři) ; neutre en -í : inchangé (nádraží).\",",
+      "replace": "        \"Au singulier, certains masculins et neutres prennent -e ou -ě (na stole, v domě, ve městě). D’autres prennent -u (v parku, v hotelu). Le féminin en -a prend souvent -e ou -ě (ve škole). Kancelář et kuchyně prennent -i : v kanceláři, v kuchyni. Nádraží reste inchangé.\","
+    },
+    {
+      "id": "cs-a1-locative",
+      "field": "rule[2]",
+      "find": "        \"Avant -e, certaines consonnes changent : h → z (Praha → v Praze), k → c (matka → v matce), g → z, ch → š. Devant un groupe de consonnes, v devient ve : ve škole, ve městě.\",",
+      "replace": "        \"La consonne peut changer devant la terminaison du locatif : h → z dans Praha → v Praze, k → c dans matka → o matce. La forme ve facilite la prononciation dans certains groupes : ve škole, ve městě, mais v Praze.\","
+    },
+    {
+      "id": "cs-a1-locative",
+      "field": "rule[3]",
+      "find": "        \"Piège : le français dit « à » partout ; choisis v ou na. Quelques lieux prennent na par usage : na nádraží, na poště (à la poste), na univerzitě, na ulici (dans la rue).\",",
+      "replace": "        \"Le français utilise souvent « à » là où le tchèque distingue v et na. Retiens quelques expressions avec na : na nádraží (à la gare), na poště (à la poste), na univerzitě (à l’université), na ulici (dans la rue).\","
+    },
+    {
+      "id": "cs-a1-locative",
+      "field": "examples[2]",
+      "find": "        { text: \"Čekám na nádraží.\", translation: \"J’attends à la gare.\", note: \"Na avec un lieu ouvert ; nádraží ne change pas.\" },",
+      "replace": "        { text: \"Čekám na nádraží.\", translation: \"J’attends à la gare.\", note: \"Avec nádraží, on dit couramment na nádraží. Le nom ne change pas.\" },"
+    },
+    {
+      "id": "cs-a1-locative",
+      "field": "exercises[0].explanation",
+      "find": "          explanation: \"Une pièce ou un bureau est un espace fermé : v. Ve ne sert que devant certains groupes de consonnes.\",",
+      "replace": "          explanation: \"Pour dire qu’Eva travaille à l’intérieur du bureau, on dit v kanceláři. Devant k- seul, on emploie ici v.\","
+    },
+    {
+      "id": "cs-a1-locative",
+      "field": "exercises[1].options",
+      "find": "          options: [\"ve\", \"v\", \"na\"],",
+      "replace": "          options: [\"do\",\"ze\",\"na\"],"
+    },
+    {
+      "id": "cs-a1-locative",
+      "field": "exercises[2].prompt",
+      "find": "          prompt: \"Kniha je na ___ .\",",
+      "replace": "          prompt: \"Kniha je na ___.\","
+    },
+    {
+      "id": "cs-a1-locative",
+      "field": "exercises[2].answers",
+      "find": "          answers: [\"stole\"],",
+      "replace": "          answers: [\"stole\",\"stolu\"],"
+    },
+    {
+      "id": "cs-a1-locative",
+      "field": "exercises[2].explanation",
+      "find": "          explanation: \"Masculin : -e au locatif, et ů devient o : stole.\",",
+      "replace": "          explanation: \"Stůl prend souvent la forme stole pour situer un objet sur la table. La variante stolu existe aussi au locatif.\","
+    },
+    {
+      "id": "cs-a1-locative",
+      "field": "exercises[3].prompt",
+      "find": "          prompt: \"Děti jsou ve ___ .\",",
+      "replace": "          prompt: \"Děti jsou ve ___.\","
+    },
+    {
+      "id": "cs-a1-locative",
+      "field": "exercises[3].hint",
+      "find": "          hint: \"škola\",",
+      "replace": "          hint: \"škola, au singulier\","
+    },
+    {
+      "id": "cs-a1-locative",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Remplace Praze par Brno.\",",
+      "replace": "          instruction: \"Remplace seulement « Praze » par la forme de « Brno » qui convient.\","
+    },
+    {
+      "id": "cs-a1-locative",
+      "field": "exercises[4].answers",
+      "find": "          answers: [\"Bydlím v Brně.\"],",
+      "replace": "          answers: [\"Bydlím v Brně.\",\"Bydlím v Brnu.\"],"
+    },
+    {
+      "id": "cs-a1-locative",
+      "field": "exercises[4].explanation",
+      "find": "          explanation: \"Brno est un neutre : le locatif est Brně.\",",
+      "replace": "          explanation: \"Après v, Brno est au locatif. La forme usuelle est Brně, et Brnu est aussi admis.\","
+    },
+    {
+      "id": "cs-a2-present-e",
+      "field": "rule[0]",
+      "find": "        \"Troisième famille du présent : -u, -eš, -e, -eme, -ete, -ou. Exemple : číst (lire) → čtu, čteš, čte, čteme, čtete, čtou. Les verbes en -ovat (pracovat, kupovat, potřebovat) font -uji, -uješ, -uje, -ujeme, -ujete, -ují.\",",
+      "replace": "        \"Avec číst (lire), le présent est čtu, čteš, čte, čteme, čtete, čtou. Le radical čt- s’apprend avec le verbe. Les verbes comme pracovat, kupovat et potřebovat suivent un autre modèle : pracuji, pracuješ, pracuje, pracujeme, pracujete, pracují.\","
+    },
+    {
+      "id": "cs-a2-present-e",
+      "field": "rule[1]",
+      "find": "        \"Les verbes en -ovat sont très nombreux et tous réguliers. À l’oral, on dit plutôt pracuju et pracujou ; par écrit, soigné, pracuji et pracují. Les deux formes de la 1re personne sont acceptées ici.\",",
+      "replace": "        \"Pracovat admet aussi pracuju à la 1re personne du singulier et pracujou à la 3e du pluriel. Ces variantes sont courantes à l’oral. Dans un écrit soigné, on préfère pracuji et pracují.\","
+    },
+    {
+      "id": "cs-a2-present-e",
+      "field": "rule[3]",
+      "find": "        \"Ces verbes se construisent directement avec l’infinitif, sans « de » ni « à » : Chci pracovat, Můžu jít = « Je veux travailler », « Je peux y aller ».\",",
+      "replace": "        \"Chci et můžu peuvent être suivis directement d’un infinitif : Chci pracovat, Můžu jít. Le français peut aussi employer un infinitif direct dans ces exemples : « Je veux travailler », « Je peux y aller ».\","
+    },
+    {
+      "id": "cs-a2-present-e",
+      "field": "table.rows[5]",
+      "find": "          [\"oni\", \"čtou\", \"pracují\", \"chtějí\"],",
+      "replace": "          [\"oni\",\"čtou\",\"pracují (pracujou)\",\"chtějí\"],"
+    },
+    {
+      "id": "cs-a2-present-e",
+      "field": "exercises[2].hint",
+      "find": "          hint: \"pracovat\",",
+      "replace": "          hint: \"pracovat, au présent\","
+    },
+    {
+      "id": "cs-a2-present-e",
+      "field": "exercises[3].hint",
+      "find": "          hint: \"chtít\",",
+      "replace": "          hint: \"chtít, au présent\","
+    },
+    {
+      "id": "cs-a2-present-e",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Remplace « já » par « oni » (ils).\",",
+      "replace": "          instruction: \"Remplace « Já » par « Oni » en tête de phrase et accorde le verbe.\","
+    },
+    {
+      "id": "cs-a2-present-e",
+      "field": "exercises[4].answers",
+      "find": "          answers: [\"Oni čtou knihu.\", \"Čtou knihu.\"],",
+      "replace": "          answers: [\"Oni čtou knihu.\"],"
+    },
+    {
+      "id": "cs-a2-possessives",
+      "field": "summary",
+      "find": "      summary: \"Choisir le possessif qui s’accorde avec la chose possédée ou avec le possesseur.\",",
+      "replace": "      summary: \"Choisir le possessif selon le possesseur, puis accorder les formes variables avec le nom.\","
+    },
+    {
+      "id": "cs-a2-possessives",
+      "field": "rule[0]",
+      "find": "        \"Můj (mon), tvůj (ton), náš (notre) et váš (votre) s’accordent avec le nom, comme ten / ta / to : můj bratr, moje sestra, moje auto. Au nominatif, les formes en -e (moje, tvoje, naše, vaše) valent pour le féminin et le neutre.\",",
+      "replace": "        \"Můj (mon), tvůj (ton), náš (notre) et váš (votre) s’accordent avec le nom. Au nominatif singulier : můj bratr, moje sestra, moje auto. Tu peux aussi dire má sestra et mé auto. Tvůj a les variantes tvá et tvé au féminin et au neutre.\","
+    },
+    {
+      "id": "cs-a2-possessives",
+      "field": "rule[1]",
+      "find": "        \"Jeho (son, à lui), její (son, à elle) et jejich (leur) ne changent jamais, et s’accordent avec le possesseur, non avec la chose possédée : Petr a jeho sestra, Eva a její bratr.\",",
+      "replace": "        \"Jeho marque un possesseur masculin ou neutre, její un possesseur féminin, et jejich plusieurs possesseurs. Jeho et jejich sont invariables. Její a la même forme aux trois genres du nominatif singulier, mais se décline : její bratr → s jejím bratrem.\","
+    },
+    {
+      "id": "cs-a2-possessives",
+      "field": "rule[2]",
+      "find": "        \"Il n’y a pas d’article : můj dům = « ma maison » ou « la maison ». On place le possessif avant le nom.\",",
+      "replace": "        \"Il n’y a pas d’article. Můj dům veut dire « ma maison ». Dans un groupe nominal courant, le possessif précède le nom : náš dům, její auto.\","
+    },
+    {
+      "id": "cs-a2-possessives",
+      "field": "rule[3]",
+      "find": "        \"Piège : le français dit son / sa selon l’objet, le tchèque selon le possesseur. « Sa maison » est jeho dům si le possesseur est un homme, její dům si c’est une femme, jejich dům s’ils sont plusieurs. Ne confonds pas její (à elle) et jejich (à eux).\",",
+      "replace": "        \"En français, « sa maison » ne précise pas qui possède. Le tchèque distingue jeho dům (sa maison à lui), její dům (sa maison à elle) et jejich dům (leur maison). Pour dire que le sujet possède lui-même ce dont on parle, on emploie souvent svůj : Petr má svůj dům.\","
+    },
+    {
+      "id": "cs-a2-possessives",
+      "field": "table.rows[0]",
+      "find": "          [\"já (mon)\", \"můj\", \"moje\", \"moje\"],",
+      "replace": "          [\"já (mon)\",\"můj\",\"moje / má\",\"moje / mé\"],"
+    },
+    {
+      "id": "cs-a2-possessives",
+      "field": "table.rows[1]",
+      "find": "          [\"ty (ton)\", \"tvůj\", \"tvoje\", \"tvoje\"],",
+      "replace": "          [\"ty (ton)\",\"tvůj\",\"tvoje / tvá\",\"tvoje / tvé\"],"
+    },
+    {
+      "id": "cs-a2-possessives",
+      "field": "table.rows[4]",
+      "find": "          [\"on (son)\", \"jeho\", \"jeho\", \"jeho\"],",
+      "replace": "          [\"on / ono (son)\",\"jeho\",\"jeho\",\"jeho\"],"
+    },
+    {
+      "id": "cs-a2-possessives",
+      "field": "exercises[3]",
+      "find": "        {\n          type: \"fill\",\n          prompt: \"Petr a ___ sestra jsou doma. (sa, à lui)\",\n          answers: [\"jeho\"],\n          explanation: \"Le possesseur est Petr, un homme : jeho, invariable.\",\n        },",
+      "replace": "        {\n          type: \"fill\",\n          prompt: \"Petr a ___ sestra jsou doma. (sa sœur à lui)\",\n          hint: \"pronom possessif\",\n          answers: [\"jeho\"],\n          explanation: \"Le possesseur est Petr, un homme : jeho, invariable.\",\n        },"
+    },
+    {
+      "id": "cs-a2-genitive",
+      "field": "rule[1]",
+      "find": "        \"Singulier : masculin animé -a (Petr → Petra), inanimé le plus souvent -u (cukr → cukru, dům → domu) ; neutre -o → -a (mléko → mléka), -í inchangé ; féminin -a → -y (škola → školy, Praha → Prahy), féminin en consonne → -e ou -i (kancelář → kanceláře, noc → noci).\",",
+      "replace": "        \"Au singulier, le génitif prend souvent -a ou -e au masculin animé (Petra, muže), -u ou -a au masculin inanimé (cukru, lesa). Mléko donne mléka et nádraží reste inchangé. Au féminin : škola → školy, růže → růže, kancelář → kanceláře, noc → noci.\","
+    },
+    {
+      "id": "cs-a2-genitive",
+      "field": "rule[2]",
+      "find": "        \"Le français met « de » devant n’importe quel nom ; le tchèque change la terminaison du nom : sklenice vody, káva bez mléka.\",",
+      "replace": "        \"En français, on dit « un verre d’eau » avec « de ». En tchèque, voda change de forme dans sklenice vody. Après bez, c’est aussi le génitif : káva bez mléka.\","
+    },
+    {
+      "id": "cs-a2-genitive",
+      "field": "rule[3]",
+      "find": "        \"Z devient ze devant certains groupes de consonnes : ze školy, ze Slovenska. Après les prépositions de lieu, tu entends aussi do školy, do práce, do Prahy : le génitif dit alors la destination.\",",
+      "replace": "        \"La forme ze facilite la prononciation : ze školy, ze Slovenska, mais z Prahy. Après do, le génitif indique une destination dans do školy, do práce ou do Prahy. Avec z ou ze, il indique au contraire la provenance.\","
+    },
+    {
+      "id": "cs-a2-genitive",
+      "field": "exercises[0].prompt",
+      "find": "          prompt: \"Káva je bez ___ .\",",
+      "replace": "          prompt: \"Káva je bez ___.\","
+    },
+    {
+      "id": "cs-a2-genitive",
+      "field": "exercises[1].prompt",
+      "find": "          prompt: \"Dám si sklenici ___ .\",",
+      "replace": "          prompt: \"Dám si sklenici ___.\","
+    },
+    {
+      "id": "cs-a2-genitive",
+      "field": "exercises[2].prompt",
+      "find": "          prompt: \"Jsem z ___ .\",",
+      "replace": "          prompt: \"Jsem z ___.\","
+    },
+    {
+      "id": "cs-a2-genitive",
+      "field": "exercises[3].prompt",
+      "find": "          prompt: \"Dnes jedu do ___ .\",",
+      "replace": "          prompt: \"Dnes jedu do ___.\","
+    },
+    {
+      "id": "cs-a2-genitive",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Remplace « s » par « bez ».\",",
+      "replace": "          instruction: \"Remplace « s mlékem » par l’équivalent de « sans lait ». Garde « Čaj » en tête.\","
+    },
+    {
+      "id": "cs-a2-past",
+      "field": "summary",
+      "find": "      summary: \"Former le passé avec le participe en -l et l’auxiliaire jsem, qui varie selon le genre.\",",
+      "replace": "      summary: \"Former le passé avec l’auxiliaire být et accorder le participe en -l en genre et en nombre.\","
+    },
+    {
+      "id": "cs-a2-past",
+      "field": "rule[0]",
+      "find": "        \"Le tchèque a un seul passé (il couvre passé composé et imparfait). Il se forme avec le participe en -l, qui s’accorde en genre et en nombre, et avec l’auxiliaire být au présent aux 1re et 2e personnes seulement : dělal jsem, dělala jsi, dělali jsme.\",",
+      "replace": "        \"Le passé courant se forme avec le participe en -l. Il correspond selon le contexte au passé composé ou à l’imparfait français. Le participe s’accorde en genre et en nombre. Aux 1re et 2e personnes, ajoute l’auxiliaire být au présent : dělal jsem, dělala jsi, dělali jsme.\","
+    },
+    {
+      "id": "cs-a2-past",
+      "field": "rule[1]",
+      "find": "        \"Participe : infinitif sans -t + -l : dělat → dělal, mluvit → mluvil, pracovat → pracoval. Terminaisons : -l (masculin), -la (féminin), -lo (neutre), -li (masculin animé pluriel), -ly (autres pluriels). Irréguliers : být → byl, mít → měl, číst → četl.\",",
+      "replace": "        \"Pour les verbes comme dělat et mluvit, remplace le -t final de l’infinitif par -l : dělal, mluvil. Au singulier, les formes en -l, -la, -lo marquent le masculin, le féminin et le neutre. Au pluriel : -li (masculin animé), -ly (féminin et masculin inanimé), -la (neutre). Retiens byl, měl, četl.\","
+    },
+    {
+      "id": "cs-a2-past",
+      "field": "rule[2]",
+      "find": "        \"À la 3e personne, il n’y a pas d’auxiliaire : Petr dělal, Eva dělala, oni dělali. Le sujet est omis : Dělal jsem, pas Já dělal jsem. Négation : Nedělal jsem.\",",
+      "replace": "        \"À la 3e personne, il n’y a pas d’auxiliaire : Petr dělal, Eva dělala, oni dělali. Le sujet est souvent omis (Dělal jsem), mais tu peux l’exprimer (Já jsem dělal). Pour nier, ajoute ne- au participe : Nedělal jsem.\","
+    },
+    {
+      "id": "cs-a2-past",
+      "field": "table.rows",
+      "find": "          [\"já (homme)\", \"dělal jsem\"],\n          [\"já (femme)\", \"dělala jsem\"],\n          [\"ty (homme)\", \"dělal jsi\"],\n          [\"ty (femme)\", \"dělala jsi\"],\n          [\"on\", \"dělal\"],\n          [\"ona\", \"dělala\"],\n          [\"ono\", \"dělalo\"],\n          [\"my\", \"dělali jsme\"],\n          [\"vy\", \"dělali jste\"],\n          [\"oni\", \"dělali\"],\n          [\"ony\", \"dělaly\"],",
+      "replace": "          [\"já (homme)\", \"dělal jsem\"],\n          [\"já (femme)\", \"dělala jsem\"],\n          [\"ty (homme)\", \"dělal jsi\"],\n          [\"ty (femme)\", \"dělala jsi\"],\n          [\"on\", \"dělal\"],\n          [\"ona\", \"dělala\"],\n          [\"ono\", \"dělalo\"],\n          [\"my\", \"dělali jsme / dělaly jsme\"],\n          [\"vy (pluriel)\", \"dělali jste / dělaly jste\"],\n          [\"oni\", \"dělali\"],\n          [\"ony\", \"dělaly\"],\n          [\"děvčata (neutre pl.)\", \"dělala\"],"
+    },
+    {
+      "id": "cs-a2-past",
+      "field": "examples[1]",
+      "find": "        { text: \"Eva byla v Praze.\", translation: \"Eva a été à Prague.\", note: \"3e personne : pas d’auxiliaire, participe féminin byla.\" },",
+      "replace": "        { text: \"Eva byla v Praze.\", translation: \"Eva était à Prague.\", note: \"3e personne : pas d’auxiliaire, participe féminin byla.\" },"
+    },
+    {
+      "id": "cs-a2-past",
+      "field": "exercises[1].prompt",
+      "find": "          prompt: \"Včera jsme ___ film.\",",
+      "replace": "          prompt: \"Včera jsme ___ film. (groupe mixte)\","
+    },
+    {
+      "id": "cs-a2-past",
+      "field": "exercises[1].explanation",
+      "find": "          explanation: \"Sujet pluriel (nous) : participe en -li, viděli, avec jsme.\",",
+      "replace": "          explanation: \"Pour un groupe mixte, le participe prend ici -li : viděli. L’auxiliaire jsme indique « nous ».\","
+    },
+    {
+      "id": "cs-a2-past",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Mets la phrase au passé.\",",
+      "replace": "          instruction: \"Mets la phrase au passé. Commence par le participe et garde « knihu » en fin de phrase.\","
+    },
+    {
+      "id": "cs-a2-past",
+      "field": "exercises[4].answers",
+      "find": "          answers: [\"Četl jsem knihu.\", \"Četla jsem knihu.\", \"Knihu jsem četl.\", \"Knihu jsem četla.\"],",
+      "replace": "          answers: [\"Četl jsem knihu.\",\"Četla jsem knihu.\"],"
+    },
+    {
+      "id": "cs-a2-instrumental",
+      "field": "rule[0]",
+      "find": "        \"L’instrumental répond à « avec qui ? avec quoi ? » (kým ? čím ?). On l’emploie après s / se (avec) : s kamarádem, pour le moyen de transport (jet autobusem, vlakem) et après před, za, nad, pod, mezi (devant, derrière, au-dessus, sous, entre).\",",
+      "replace": "        \"L’instrumental répond à kým ? ou čím ? On l’emploie avec s / se (« avec ») et pour le moyen de transport, sans préposition : s kamarádem, jet autobusem. Il indique aussi la position après před, za, nad, pod et mezi : pod stolem (« sous la table »). Pour un déplacement vers cette position : pod stůl, à l’accusatif.\","
+    },
+    {
+      "id": "cs-a2-instrumental",
+      "field": "rule[1]",
+      "find": "        \"Terminaisons : masculin et neutre → -em (kamarád → kamarádem, auto → autem, mléko → mlékem) ; neutre en -í → -ím (nádraží → nádražím) ; féminin -a → -ou (Eva → Evou, káva → kávou) ; féminin en consonne ou en -e → -í (noc → nocí, kancelář → kanceláří).\",",
+      "replace": "        \"Au singulier, beaucoup de masculins et neutres prennent -em (kamarádem, autem, mlékem). Nádraží prend -ím. Les féminins en -a comme Eva prennent -ou, de même que kolega (kolegou), qui est masculin. D’autres féminins prennent -í : růže → růží, noc → nocí, kancelář → kanceláří.\","
+    },
+    {
+      "id": "cs-a2-instrumental",
+      "field": "rule[2]",
+      "find": "        \"S devient se devant s, z, š, ž ou un groupe de consonnes : se sestrou, se Zuzanou. « Avec moi » est se mnou, « avec toi » est s tebou.\",",
+      "replace": "        \"Se facilite la prononciation : se sestrou et souvent se Zuzanou ou se ženou. Certains groupes gardent s : s bratrem. « Avec moi » se dit se mnou, et « avec toi », s tebou.\","
+    },
+    {
+      "id": "cs-a2-instrumental",
+      "field": "exercises[0].prompt",
+      "find": "          prompt: \"Jedu do práce ___ .\",",
+      "replace": "          prompt: \"Jedu do práce ___.\","
+    },
+    {
+      "id": "cs-a2-instrumental",
+      "field": "exercises[1].prompt",
+      "find": "          prompt: \"Pracuji s ___ .\",",
+      "replace": "          prompt: \"Pracuji s ___. (avec un collègue)\","
+    },
+    {
+      "id": "cs-a2-instrumental",
+      "field": "exercises[2].prompt",
+      "find": "          prompt: \"Pijeme kávu s ___ .\",",
+      "replace": "          prompt: \"Pijeme kávu s ___.\","
+    },
+    {
+      "id": "cs-a2-instrumental",
+      "field": "exercises[3].prompt",
+      "find": "          prompt: \"Mluvím s ___ .\",",
+      "replace": "          prompt: \"Mluvím s ___.\","
+    },
+    {
+      "id": "cs-a2-instrumental",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Remplace « autobus » par « vlak ».\",",
+      "replace": "          instruction: \"Remplace seulement « autobusem » par la forme de « vlak » qui convient.\","
+    },
+    {
+      "id": "cs-a2-dative",
+      "field": "rule[1]",
+      "find": "        \"Terminaisons : masculin et neutre → -u (bratr → bratru ; masculin animé souvent -ovi : Petrovi) ; féminin en -a → -e / -ě (Eva → Evě, sestra → sestře, kniha → knize) ; féminin en consonne ou -e → -i (kancelář → kanceláři).\",",
+      "replace": "        \"Au singulier, le datif peut prendre -u (bratru), -i (učiteli, moři) ou -ovi pour un masculin animé (Petrovi). Les féminins en -a prennent souvent -e ou -ě : Eva → Evě, sestra → sestře, kniha → knize. D’autres féminins prennent -i : kancelář → kanceláři, růže → růži.\","
+    },
+    {
+      "id": "cs-a2-dative",
+      "field": "rule[2]",
+      "find": "        \"Pronoms : formes courtes mi, ti, mu, jí, nám, vám, jim (atones, en 2e position) et formes longues mně, tobě, jemu… (pour insister ou après une préposition : ke mně).\",",
+      "replace": "        \"Sans préposition, emploie les formes atones mi, ti, mu, jí, nám, vám, jim. Pour insister, il existe notamment mně, tobě et jemu. Après une préposition, certaines formes changent : ke mně, k tobě, k němu, k ní, k nim.\","
+    },
+    {
+      "id": "cs-a2-dative",
+      "field": "rule[3]",
+      "find": "        \"Piège : « Prague me plaît » se dit Líbí se mi Praha. Ce qui plaît est le sujet, le verbe s’accorde avec lui : Líbí se mi ten film, Líbí se mi ty filmy. De même Je mi zima (j’ai froid), Je mi dvacet let (j’ai vingt ans).\",",
+      "replace": "        \"Dans Líbí se mi ten film (« Ce film me plaît »), le film est le sujet et mi désigne la personne à qui il plaît. Compare Líbíš se mi (« Tu me plais ») : le verbe change avec le sujet. Le datif sert aussi dans Je mi zima (« J’ai froid ») et Je mi dvacet let (« J’ai vingt ans »).\","
+    },
+    {
+      "id": "cs-a2-dative",
+      "field": "table.headers",
+      "find": "        headers: [\"Personne\", \"Forme courte\", \"Forme longue\"],",
+      "replace": "        headers: [\"Personne\",\"Forme atone\",\"Forme accentuée\",\"Avec k / ke\"],"
+    },
+    {
+      "id": "cs-a2-dative",
+      "field": "table.rows",
+      "find": "          [\"já\", \"mi\", \"mně\"],\n          [\"ty\", \"ti\", \"tobě\"],\n          [\"on\", \"mu\", \"jemu\"],\n          [\"ona\", \"jí\", \"jí\"],\n          [\"my\", \"nám\", \"nám\"],\n          [\"vy\", \"vám\", \"vám\"],\n          [\"oni\", \"jim\", \"jim\"],",
+      "replace": "          [\"já\", \"mi\", \"mně\", \"ke mně\"],\n          [\"ty\", \"ti\", \"tobě\", \"k tobě\"],\n          [\"on / ono\", \"mu\", \"jemu\", \"k němu\"],\n          [\"ona\", \"jí\", \"jí\", \"k ní\"],\n          [\"my\", \"nám\", \"nám\", \"k nám\"],\n          [\"vy\", \"vám\", \"vám\", \"k vám\"],\n          [\"oni / ony\", \"jim\", \"jim\", \"k nim\"],"
+    },
+    {
+      "id": "cs-a2-dative",
+      "field": "examples[0]",
+      "find": "        { text: \"Líbí se mi Praha.\", translation: \"J’aime Prague (Prague me plaît).\", note: \"Praha est le sujet, mi le destinataire.\" },",
+      "replace": "        { text: \"Líbí se mi Praha.\", translation: \"J’aime Prague (Prague me plaît).\", note: \"Praha est le sujet. Mi est la personne à qui Prague plaît.\" },"
+    },
+    {
+      "id": "cs-a2-dative",
+      "field": "exercises[0].explanation",
+      "find": "          explanation: \"Líbit se se construit avec le datif : mi (ou mně). Mě est l’accusatif.\",",
+      "replace": "          explanation: \"Líbit se prend le datif : mi, forme atone, ou mně pour insister. Mě est une forme de l’accusatif et du génitif.\","
+    },
+    {
+      "id": "cs-a2-dative",
+      "field": "exercises[2].prompt",
+      "find": "          prompt: \"Dám dárek ___ .\",",
+      "replace": "          prompt: \"Dám dárek ___.\","
+    },
+    {
+      "id": "cs-a2-dative",
+      "field": "exercises[3].prompt",
+      "find": "          prompt: \"Dám to ___ .\",",
+      "replace": "          prompt: \"Dám to ___.\","
+    },
+    {
+      "id": "cs-a2-dative",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Remplace « Evě » par le pronom « lui (elle) ».\",",
+      "replace": "          instruction: \"Remplace « Evě » par le pronom datif atone. Commence par « Dám » et garde « knihu » sans ajout.\","
+    },
+    {
+      "id": "cs-a2-dative",
+      "field": "exercises[4].answers",
+      "find": "          answers: [\"Dám jí knihu.\", \"Knihu jí dám.\", \"Dám jí tu knihu.\"],",
+      "replace": "          answers: [\"Dám jí knihu.\"],"
+    },
+    {
+      "id": "cs-b1-aspect",
+      "field": "rule[0]",
+      "find": "        \"Presque tous les verbes tchèques existent en deux aspects. L’imperfectif présente l’action comme un processus, une habitude ou un fait général : psát, číst, dělat. Le perfectif la présente comme terminée, avec un résultat : napsat, přečíst, udělat.\",",
+      "replace": "        \"De nombreux verbes tchèques forment une paire d’aspect. L’imperfectif présente le déroulement, l’habitude ou le fait de faire l’action : psát, číst, dělat. Le perfectif présente l’action comme un tout avec une limite : napsat, přečíst, udělat. Au passé, cela peut mettre l’accent sur le résultat atteint.\","
+    },
+    {
+      "id": "cs-b1-aspect",
+      "field": "rule[3]",
+      "find": "        \"Indices : « tous les jours », « longtemps », « en train de » → imperfectif ; « enfin », « en dix minutes », « en entier » → perfectif. Le présent d’un perfectif n’a pas de sens de présent : il parle du futur (point suivant).\",",
+      "replace": "        \"Les indications de durée ou d’habitude favorisent souvent l’imperfectif. Si tu veux dire qu’un résultat a été atteint, choisis le perfectif : Za deset minut jsem napsal celý e-mail. La forme du présent d’un perfectif sert généralement à exprimer un événement futur, comme dans Zítra ti napíšu.\","
+    },
+    {
+      "id": "cs-b1-aspect",
+      "field": "exercises[0].prompt",
+      "find": "          prompt: \"Včera jsem celý večer ___ knihu.\",",
+      "replace": "          prompt: \"Včera jsem celý večer ___ knihu. (lecture en cours, livre non terminé)\","
+    },
+    {
+      "id": "cs-b1-aspect",
+      "field": "exercises[1].prompt",
+      "find": "          prompt: \"Za deset minut jsem ___ celý e-mail.\",",
+      "replace": "          prompt: \"Za deset minut jsem ___ celý e-mail. (L’e-mail était prêt au bout de dix minutes.)\","
+    },
+    {
+      "id": "cs-b1-aspect",
+      "field": "exercises[1].explanation",
+      "find": "          explanation: \"« En dix minutes » indique un résultat atteint : perfectif, napsal.\",",
+      "replace": "          explanation: \"Napsal présente l’écriture comme achevée : l’e-mail est prêt au bout de dix minutes.\","
+    },
+    {
+      "id": "cs-b1-aspect",
+      "field": "exercises[3].explanation",
+      "find": "          explanation: \"« Tous les devoirs » : l’action est terminée, donc perfectif udělal / udělala.\",",
+      "replace": "          explanation: \"L’infinitif udělat est perfectif. Ici, udělal ou udělala indique que les tâches ont toutes été faites.\","
+    },
+    {
+      "id": "cs-b1-aspect",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Mets le verbe au perfectif : le dopis est terminé.\",",
+      "replace": "          instruction: \"Remplace seulement « Psal » par son équivalent perfectif.\","
+    },
+    {
+      "id": "cs-b1-aspect",
+      "field": "exercises[4].answers",
+      "find": "          answers: [\"Napsal jsem dopis.\", \"Dopis jsem napsal.\"],",
+      "replace": "          answers: [\"Napsal jsem dopis.\"],"
+    },
+    {
+      "id": "cs-b1-future",
+      "field": "rule[0]",
+      "find": "        \"Pour un verbe imperfectif, le futur se forme avec budu + infinitif : budu dělat, budeš dělat, bude dělat, budeme dělat, budete dělat, budou dělat. Pour « être », on dit simplement budu, budeš… : Zítra budu doma.\",",
+      "replace": "        \"Le futur de beaucoup de verbes imperfectifs se forme avec budu et l’infinitif : budu dělat, budeš dělat, bude dělat, budeme dělat, budete dělat, budou dělat. Pour být, emploie budu, budeš… seuls : Zítra budu doma. Certains verbes de mouvement ont un futur particulier : jít → půjdu.\","
+    },
+    {
+      "id": "cs-b1-future",
+      "field": "rule[1]",
+      "find": "        \"Pour un verbe perfectif, le présent a un sens de futur : napíšu (j’écrirai, et ce sera fini), koupím, přečtu, udělám. On n’écrit jamais budu + perfectif : budu napsat est faux.\",",
+      "replace": "        \"La forme du présent d’un perfectif sert généralement à parler du futur : Zítra napíšu dopis (« Demain, j’écrirai une lettre »), Zítra to udělám (« Demain, je le ferai »). Pour former ce futur, emploie napíšu seul. Budu napsat est incorrect.\","
+    },
+    {
+      "id": "cs-b1-future",
+      "field": "rule[3]",
+      "find": "        \"Négation : ne- se soude à budu : Zítra nebudu pracovat. Piège : tu ne peux pas former un futur avec budu + perfectif, tandis que le français a toujours « je ferai ».\",",
+      "replace": "        \"Dans le futur construit avec budu, la négation se soude à l’auxiliaire : Zítra nebudu pracovat. Avec un perfectif, la négation se soude directement au verbe : Zítra to neudělám.\","
+    },
+    {
+      "id": "cs-b1-future",
+      "field": "exercises[3].prompt",
+      "find": "          prompt: \"Zítra to ___ .\",",
+      "replace": "          prompt: \"Zítra to ___.\","
+    },
+    {
+      "id": "cs-b1-future",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Mets la phrase au futur.\",\n          source: \"Čtu knihu.\",",
+      "replace": "          instruction: \"Mets « číst » au futur en gardant le même aspect. Commence par l’auxiliaire et laisse « knihu » en fin de phrase.\",\n          source: \"Čtu knihu.\","
+    },
+    {
+      "id": "cs-b1-future",
+      "field": "exercises[4].answers",
+      "find": "          answers: [\"Budu číst knihu.\", \"Knihu budu číst.\"],",
+      "replace": "          answers: [\"Budu číst knihu.\"],"
+    },
+    {
+      "id": "cs-b1-motion",
+      "field": "summary",
+      "find": "      summary: \"Choisir entre trajet précis (jdu, jedu) et habitude ou aller-retour (chodím, jezdím).\",",
+      "replace": "      summary: \"Distinguer le trajet précis des déplacements répétés et choisir le verbe adapté au moyen de transport.\","
+    },
+    {
+      "id": "cs-b1-motion",
+      "field": "rule[0]",
+      "find": "        \"Le tchèque a deux verbes pour « aller » à pied (jít / chodit) et deux en véhicule (jet / jezdit). Le premier de chaque paire : un trajet précis, dans une direction, en ce moment ou à une date donnée (jdu, jedu). Le second : l’habitude, le trajet répété ou l’aller-retour (chodím, jezdím).\",",
+      "replace": "        \"Pour un déplacement à pied, compare jít et chodit. En véhicule, compare jet et jezdit. Jít et jet désignent un trajet dans une direction (jdu, jedu). Chodit et jezdit s’emploient notamment pour des trajets habituels ou répétés (chodím, jezdím).\","
+    },
+    {
+      "id": "cs-b1-motion",
+      "field": "rule[1]",
+      "find": "        \"Présent : jít → jdu, jdeš, jde, jdeme, jdete, jdou ; jet → jedu, jedeš, jede… ; chodit et jezdit → chodím, jezdím (famille -ím). Passé : šel, šla / jel, jela. Futur : půjdu, pojedu (préfixe po-).\",",
+      "replace": "        \"Présent : jít → jdu, jdeš, jde, jdeme, jdete, jdou ; jet → jedu, jedeš, jede… Chodit et jezdit donnent chodím et jezdím. Passé : šel, šla / jel, jela. Futur : půjdu pour jít, pojedu pour jet.\","
+    },
+    {
+      "id": "cs-b1-motion",
+      "field": "rule[2]",
+      "find": "        \"Après ces verbes : do + génitif (lieu fermé : do školy, do Prahy), na + accusatif (na poštu, na nádraží), k + datif (chez quelqu’un : k lékaři). Le transport est à l’instrumental : jedu vlakem. « À pied » se dit pěšky.\",",
+      "replace": "        \"Pour la destination, retiens do + génitif (do školy, do Prahy), na + accusatif (na poštu, na nádraží) et k + datif (k lékaři, k moři). Le moyen de transport se met à l’instrumental, sans préposition : jedu vlakem. « À pied » se dit pěšky.\","
+    },
+    {
+      "id": "cs-b1-motion",
+      "field": "rule[3]",
+      "find": "        \"Piège : pour un aller-retour déjà fait, on dit plutôt Byl jsem v Praze (j’y suis allé et revenu) que Šel jsem. Et ne dis pas jdu pour un trajet en train : c’est jedu.\",",
+      "replace": "        \"Šel jsem do práce décrit le trajet à pied, et Jel jsem do práce vlakem le trajet en train. Byl jsem v Praze (« J’ai été à Prague ») indique un séjour, sans préciser comment tu y es allé ni le trajet de retour.\","
+    },
+    {
+      "id": "cs-b1-motion",
+      "field": "exercises[0].prompt",
+      "find": "          prompt: \"Právě ___ do školy. (pěšky)\",",
+      "replace": "          prompt: \"Právě ___ do školy pěšky. (Je suis en chemin à cet instant.)\","
+    },
+    {
+      "id": "cs-b1-motion",
+      "field": "exercises[1].prompt",
+      "find": "          prompt: \"Každý den ___ do práce autobusem.\",",
+      "replace": "          prompt: \"Každý den ___ do práce autobusem. (Choisis le verbe des trajets répétés.)\","
+    },
+    {
+      "id": "cs-b1-motion",
+      "field": "exercises[2].answers",
+      "find": "          answers: [\"jezdili\"],",
+      "replace": "          answers: [\"jezdili\",\"jezdily\"],"
+    },
+    {
+      "id": "cs-b1-motion",
+      "field": "exercises[2].explanation",
+      "find": "          explanation: \"Habitude passée en véhicule : jezdili, avec jsme.\",",
+      "replace": "          explanation: \"Jezdit décrit une habitude en véhicule. Au passé, jezdili convient à un groupe masculin animé ou mixte, jezdily à un groupe féminin.\","
+    },
+    {
+      "id": "cs-b1-motion",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Mets la phrase au futur.\",\n          source: \"Jdu do školy.\",",
+      "replace": "          instruction: \"Remplace seulement « Jdu » par son futur.\",\n          source: \"Jdu do školy.\","
+    },
+    {
+      "id": "cs-b1-motion",
+      "field": "exercises[4].explanation",
+      "find": "          explanation: \"Le futur de jít se forme avec le préfixe pů- : půjdu.\",",
+      "replace": "          explanation: \"Le futur de jít est půjdu.\","
+    },
+    {
+      "id": "cs-b1-clitics",
+      "field": "rule[0]",
+      "find": "        \"Se et si sont les pronoms réfléchis. Beaucoup de verbes sont toujours réfléchis : učit se (apprendre), dívat se (regarder), bát se (avoir peur), těšit se (se réjouir). Si est un datif : dát si kávu (prendre un café), koupit si knihu (s’acheter un livre).\",",
+      "replace": "        \"Se et si sont des formes réfléchies. Se entre dans des constructions comme učit se (« apprendre »), dívat se (« regarder ») et bát se (« avoir peur »). Compare učit (« enseigner ») et učit se. Si est la forme réfléchie du datif : koupit si knihu (« s’acheter un livre »).\","
+    },
+    {
+      "id": "cs-b1-clitics",
+      "field": "rule[1]",
+      "find": "        \"Ce sont des clitiques : de petits mots atones qui ne peuvent jamais ouvrir la phrase et se placent en 2e position, après le premier mot ou groupe : Učím se česky, jamais Se učím. Včera jsem se učil : jsem puis se.\",",
+      "replace": "        \"Ces formes sont atones. Dans une phrase simple, elles se placent généralement après le premier mot ou groupe : Učím se česky. Včera jsem se učil. À la 2e personne du singulier du passé, jsi et se ou si se combinent en ses ou sis : Včera ses učil.\","
+    },
+    {
+      "id": "cs-b1-clitics",
+      "field": "rule[2]",
+      "find": "        \"Ordre de plusieurs clitiques : 1 l’auxiliaire (jsem, jsi, jsme, jste) ; 2 se / si ; 3 le datif (mi, ti, mu, jí, nám, vám, jim) ; 4 l’accusatif (ho, ji, to, je). Exemple : Včera jsem si to koupil. Včera jsem mu to řekl.\",",
+      "replace": "        \"Dans les suites étudiées, l’auxiliaire vient d’abord, puis se ou si, puis les pronoms compléments courts, avec le datif avant l’accusatif. Compare Včera jsem si to koupil et Včera jsem mu to řekl.\","
+    },
+    {
+      "id": "cs-b1-clitics",
+      "field": "rule[3]",
+      "find": "        \"Piège : en français, le pronom précède le verbe (je me lave). En tchèque, il suit le premier élément de la phrase : Umývám se, et Včera jsem se myl.\",",
+      "replace": "        \"Dans « je me lave », le français met le pronom devant le verbe. Compare Umývám se et Včera jsem se myl : en tchèque, la place du pronom dépend du premier groupe et des autres clitiques.\","
+    },
+    {
+      "id": "cs-b1-clitics",
+      "field": "examples[2]",
+      "find": "        { text: \"Těším se na víkend.\", translation: \"Je me réjouis du week-end.\", note: \"Těšit se na + accusatif.\" },",
+      "replace": "        { text: \"Těším se na víkend.\", translation: \"J’ai hâte d’être en week-end.\", note: \"Těšit se na est suivi de l’accusatif.\" },"
+    },
+    {
+      "id": "cs-b1-clitics",
+      "field": "exercises[0].prompt",
+      "find": "          prompt: \"Já ___ učím česky.\",",
+      "replace": "          prompt: \"Já ___ učím česky. (J’apprends le tchèque.)\","
+    },
+    {
+      "id": "cs-b1-clitics",
+      "field": "exercises[0].explanation",
+      "find": "          explanation: \"Učit se est toujours réfléchi, avec se.\",",
+      "replace": "          explanation: \"Učit se signifie « apprendre ». Učit sans se signifie « enseigner ».\","
+    },
+    {
+      "id": "cs-b1-clitics",
+      "field": "exercises[3]",
+      "find": "        {\n          type: \"fill\",\n          prompt: \"Těším ___ na prázdniny.\",\n          answers: [\"se\"],\n          explanation: \"Těšit se na… est toujours réfléchi, avec se.\",\n        },",
+      "replace": "        {\n          type: \"fill\",\n          prompt: \"Těším ___ na prázdniny.\",\n          hint: \"J’ai hâte d’être en vacances.\",\n          answers: [\"se\"],\n          explanation: \"Těšit se na signifie « avoir hâte de ». La construction emploie se.\",\n        },"
+    },
+    {
+      "id": "cs-b1-clitics",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Remplace « knihu » par le pronom « ji ».\",",
+      "replace": "          instruction: \"Remplace « knihu » par « ji ». Garde « Včera » en tête et « koupil » à la fin.\","
+    },
+    {
+      "id": "cs-b1-clitics",
+      "field": "exercises[4].answers",
+      "find": "          answers: [\"Včera jsem si ji koupil.\", \"Koupil jsem si ji včera.\"],",
+      "replace": "          answers: [\"Včera jsem si ji koupil.\"],"
+    },
+    {
+      "id": "cs-b1-conditional",
+      "field": "rule[2]",
+      "find": "        \"Piège : le français met l’imparfait après « si » (si j’avais le temps). Le tchèque met le conditionnel dans les deux propositions : kdybych (kdy + bych) měl, šel bych. Ne dis pas dělal jsem bych.\",",
+      "replace": "        \"En français, « si j’avais le temps » est à l’imparfait. En tchèque, on dit Kdybych měl čas. Pour dire ensuite ce qui se passerait, emploie le conditionnel : šel bych. Garde l’auxiliaire du conditionnel seul : dělal bych.\","
+    },
+    {
+      "id": "cs-b1-conditional",
+      "field": "table.rows[2]",
+      "find": "          [\"on / ona\", \"by\", \"chtěl by\"],",
+      "replace": "          [\"on\",\"by\",\"chtěl by\"],"
+    },
+    {
+      "id": "cs-b1-conditional",
+      "field": "exercises[2].prompt",
+      "find": "          prompt: \"Kdybych měl čas, ___ s vámi.\",",
+      "replace": "          prompt: \"Kdybych měl čas, ___ s vámi. (Conséquence au conditionnel.)\","
+    },
+    {
+      "id": "cs-b1-conditional",
+      "field": "exercises[2].explanation",
+      "find": "          explanation: \"Après kdybych, la principale est aussi au conditionnel : šel bych.\",",
+      "replace": "          explanation: \"Šel bych est le conditionnel à la première personne du singulier, attendu pour cette conséquence hypothétique.\","
+    },
+    {
+      "id": "cs-b1-conditional",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Mets la phrase au conditionnel de politesse.\",",
+      "replace": "          instruction: \"Mets le verbe au conditionnel de politesse. Commence par le participe et garde « kávu » à la fin.\","
+    },
+    {
+      "id": "cs-b1-imperative",
+      "field": "rule[0]",
+      "find": "        \"On forme l’impératif à partir de la 3e personne du pluriel du présent, sans la terminaison : dělají → dělej, pracují → pracuj, mluví → mluv, píšou → piš, čtou → čti. Radical en voyelle : + j (dělej) ; une consonne : rien (mluv, piš) ; deux consonnes : + i (čti).\",",
+      "replace": "        \"Apprends l’impératif de ty avec le verbe. Quelques modèles : dělat → dělej, pracovat → pracuj, mluvit → mluv, psát → piš et číst → čti. Le radical peut changer (psát → piš). Certaines formes ajoutent -i, comme čti ou jezdi.\","
+    },
+    {
+      "id": "cs-b1-imperative",
+      "field": "rule[1]",
+      "find": "        \"Pour vy, on ajoute -te : dělejte, mluvte, pište, čtěte (ě après t). Pour « faisons », -me : dělejme. Irréguliers utiles : být → buď / buďte, mít → měj / mějte, dát → dej / dejte, jít → jdi / jděte.\",",
+      "replace": "        \"Pour vy, on trouve souvent -te : dělejte, mluvte, pište. Avec čti, le pluriel est čtěte. Pour « faisons », retiens dělejme. Quelques formes utiles : být → buď / buďte, mít → měj / mějte, dát → dej / dejte, jít → jdi / jděte.\","
+    },
+    {
+      "id": "cs-b1-imperative",
+      "field": "rule[2]",
+      "find": "        \"Aspect : pour un ordre ponctuel, on préfère le perfectif (Otevři okno! Napiš mi!). Pour un conseil général ou répété, l’imperfectif (Piš mi často!). À la forme négative, on emploie toujours l’imperfectif : Nedělej to! Neotvírej okno!\",",
+      "replace": "        \"Pour demander une action ponctuelle, le perfectif est courant : Otevři okno! Pour une consigne répétée, choisis souvent l’imperfectif : Piš mi často! Pour interdire une action, l’imperfectif est habituel : Neotvírej okno!\","
+    },
+    {
+      "id": "cs-b1-imperative",
+      "field": "rule[3]",
+      "find": "        \"Piège : le français garde le même verbe pour « ouvre » et « n’ouvre pas ». En tchèque, ne + perfectif à l’impératif est impossible : Neotevři est faux, il faut Neotvírej.\",",
+      "replace": "        \"Un avertissement peut prendre un perfectif négatif : Nezapomeň na klíče! (« N’oublie pas tes clés ! »). Le perfectif marque ici le résultat indésirable qu’il faut éviter. Dans les deux aspects, ne- se soude au verbe.\","
+    },
+    {
+      "id": "cs-b1-imperative",
+      "field": "examples[1]",
+      "find": "        { text: \"Nedělej to!\", translation: \"Ne fais pas ça !\", note: \"La négation reste à l’imperfectif : ne + dělej.\" },",
+      "replace": "        { text: \"Nedělej to!\", translation: \"Ne fais pas ça !\", note: \"Dans cette interdiction, on emploie l’imperfectif dělat avec ne-.\" },"
+    },
+    {
+      "id": "cs-b1-imperative",
+      "field": "exercises[0].prompt",
+      "find": "          prompt: \"___ okno, prosím! (ty)\",",
+      "replace": "          prompt: \"___ okno, prosím! (impératif de ty)\","
+    },
+    {
+      "id": "cs-b1-imperative",
+      "field": "exercises[1].prompt",
+      "find": "          prompt: \"___ pomaleji, prosím! (vy)\",",
+      "replace": "          prompt: \"___ pomaleji, prosím! (impératif de vy)\","
+    },
+    {
+      "id": "cs-b1-imperative",
+      "field": "exercises[2].hint",
+      "find": "          hint: \"dát\",",
+      "replace": "          hint: \"dát, impératif affirmatif\","
+    },
+    {
+      "id": "cs-b1-imperative",
+      "field": "exercises[3].hint",
+      "find": "          hint: \"být\",",
+      "replace": "          hint: \"být, impératif affirmatif\","
+    },
+    {
+      "id": "cs-b1-imperative",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Mets l’ordre à la forme négative.\",",
+      "replace": "          instruction: \"Mets seulement le verbe à la forme négative.\","
+    },
+    {
+      "id": "cs-b1-conditional",
+      "field": "exercises[3].hint",
+      "find": "          prompt: \"Vy ___ mi mohli pomoct?\",",
+      "replace": "          prompt: \"Vy ___ mi mohli pomoct?\",\n          hint: \"Auxiliaire du conditionnel\","
+    }
+  ]
+}

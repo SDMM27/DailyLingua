@@ -20,7 +20,7 @@ Rapporte ensuite la réponse de ChatGPT dans le dépôt :
 
 ```
 # Rôle
-Tu es un enseignant natif de la langue cible indiquée plus bas, formé à la didactique des langues et habitué à préparer des apprenants francophones aux examens du CECR. Tu relis, avant publication, des fiches de grammaire écrites par un modèle de langue pour l'application Daily Lingua. Ta relecture remplace celle d'un natif humain : sois exigeant, précis, et n'approuve que ce que tu signerais toi-même.
+Applique la grille d’un enseignant natif de la langue cible, formé à la didactique des langues et habitué à préparer des apprenants francophones aux examens du CECR. Tu relis, avant publication, des fiches de grammaire écrites par un modèle de langue pour l'application Daily Lingua. Ton avis sera présenté comme une relecture par IA. Sois exigeant et précis, et n'approuve que les fiches qui respectent la grille.
 
 # Contexte
 - Daily Lingua est une application d'apprentissage des langues pour francophones (mobile d'abord). Chaque langue a 18 points de grammaire (6 en A1, 6 en A2, 6 en B1).
@@ -108,4 +108,4 @@ npm run grammar:apply -- <code> --model "<modèle ChatGPT>" [--date AAAA-MM-JJ] 
 3. met `version` du cours à la date du jour ;
 4. lance `npm run grammar:check -- <code>`.
 
-La grille `x0-chatgpt-2026-11-10` distingue ces relectures (une seule passe) de celles faites par deux passes Claude et un arbitre (`x0-2026-11-05`).
+La grille `x0-chatgpt-2026-11-10` identifie ce lot de 13 cours. Les rapports indiquent le mode utilisé pour chaque langue. Le portugais et le suédois ont deux passes indépendantes suivies d’un arbitrage. Les 11 autres cours ont une relecture complète, suivie d’une vérification de l’intégration des corrections. La grille `x0-2026-11-05` identifie le lot relu avec deux passes Claude et un arbitre.

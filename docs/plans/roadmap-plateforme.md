@@ -334,13 +334,19 @@ Jalon 5 « Plateforme »     : Y (communauté), Z (apps, économie, mesure d'eff
    - la mention « relu par IA » reste visible tant qu'aucun humain n'a relu ;
    - on mesure : taux de signalements par élément, et taux d'erreurs trouvées par la seconde passe (si la seconde passe trouve encore beaucoup, on renforce la grille).
 
-**Critères d'acceptation** : les 18 points de grammaire russes et italiens relus par deux agents, rapports dans `docs/reviews/`, statut `ai-reviewed` posé, points visibles en production avec la mention ; même chose ensuite pour les 17 autres langues.
+**Critères d'acceptation pour la grammaire** : 18 fiches contrôlées par langue, des rapports dans `docs/reviews/grammar/` et des fiches approuvées visibles avec la mention « Relu par IA ». Le pilote russe et italien suit la procédure à deux passes. La procédure suivie pour chaque langue figure ci-dessous.
 
 **Réalisé le 2026-11-05 (pilote ru/it)** :
 - statut `aiReview` (schéma `src/lib/schemas/grammar.ts`, `grammarReviewStatus` dans `src/lib/grammar/policy.ts`) ; les points relus par IA sont visibles en production avec « Relu par IA, pas encore par un natif. Signaler une erreur » (lien vers `/retour`) ; `grammar:check` compte les statuts ;
 - agents `.claude/agents/relecteur-natif.md` et `.claude/agents/arbitre-relecture.md` (Opus) ; grille `x0-2026-11-05` ;
 - ru : 18/18 approuvés, 43 corrections (dont l'accent tonique de tous les tableaux et exemples B1, 3 bonnes réponses qui étaient refusées) ; it : 18/18 approuvés, 31 corrections (dont une règle fausse sur les verbes pronominaux, 2 exercices à deux bonnes réponses). Rapports et décisions dans `docs/reviews/grammar/{ru,it}/` ;
-- reste : les 17 autres langues (306 points), puis les banques du test de niveau et les dossiers du bilan.
+
+**Volet grammaire — état au 2026-11-10** :
+- 19 langues et 342 fiches A1–B1 couvertes par la relecture IA. Les fiches approuvées portent `aiReview` et restent distinctes des fiches relues par un humain.
+- Russe, italien, allemand, espagnol, anglais et néerlandais : deux passes indépendantes et un arbitrage. Portugais et suédois : deux passes indépendantes et un arbitrage documenté dans `chatgpt.md`.
+- Arabe, tchèque, grec, indonésien, japonais, coréen, polonais, roumain, turc, ukrainien et chinois : une relecture complète documentée dans `chatgpt.md`, suivie d'une vérification des corrections et des ambiguïtés restantes.
+- Rapports et correctifs dans `docs/reviews/grammar/`. La grille `x0-chatgpt-2026-11-10` identifie le lot de 13 langues qui suit le parcours décrit dans `docs/reviews/prompt-chatgpt.md`.
+- Suite de X0 : relire les banques du test de niveau, puis les parties textuelles des dossiers du bilan. Garder les passages d'écoute en brouillon jusqu'à leur vérification audio.
 
 #### Suite de la phase X
 

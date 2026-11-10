@@ -46,8 +46,9 @@ Check a course with `npm run grammar:check -- <code>`.
   and conjugation are `verb`).
 - `reviewedOn`: `null` while the point is a draft. A native speaker sets the date when they approve
   it; drafts are hidden in production.
-- `aiReview` (optional: `{ on, model, rubric }`): set only by the `arbitre-relecture` agent, never
-  by hand, once two independent passes of `relecteur-natif` and the arbiter approved the point.
+- `aiReview` (optional: `{ on, model, rubric }`): record approval by the `arbitre-relecture` agent
+  after two independent reviews, or use the documented X0 import process for the 13 courses reviewed
+  under `x0-chatgpt-2026-11-10` (see `docs/reviews/prompt-chatgpt.md`).
   Points reviewed by AI (`reviewedOn: null` + `aiReview`) are visible in production, with a notice
   saying no native speaker has reviewed them yet.
 

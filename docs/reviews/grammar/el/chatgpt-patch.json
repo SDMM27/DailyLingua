@@ -1,0 +1,830 @@
+{
+  "language": "el",
+  "approved": [
+    "el-a1-gender-articles",
+    "el-a1-eimai-echo",
+    "el-a1-present-a",
+    "el-a1-present-b",
+    "el-a1-plural",
+    "el-a1-accusative",
+    "el-a2-possessives",
+    "el-a2-aorist",
+    "el-a2-future",
+    "el-a2-subjunctive-na",
+    "el-a2-object-pronouns",
+    "el-a2-comparatives",
+    "el-b1-imperfect",
+    "el-b1-imperative",
+    "el-b1-genitive",
+    "el-b1-middle-verbs",
+    "el-b1-relative",
+    "el-b1-perfect"
+  ],
+  "drafts": [],
+  "patches": [
+    {
+      "id": "el-a1-gender-articles",
+      "field": "rule[1]",
+      "find": "\"La terminaison aide : -ος est le plus souvent masculin (ο δρόμος), -α et -η sont féminins (η μητέρα, η φίλη), -ο, -ι et -μα sont neutres (το βιβλίο, το παιδί, το όνομα). Le genre ne suit pas toujours le français : το παιδί (l’enfant) est neutre.\",",
+      "replace": "\"La terminaison donne un indice. Beaucoup de noms masculins finissent en -ος (ο δρόμος), de féminins en -α ou -η (η μητέρα, η φίλη), et de neutres en -ο, -ι ou -μα (το βιβλίο, το παιδί, το όνομα). Il existe des exceptions, comme η οδός (la rue). Le genre peut différer du français : το παιδί (l’enfant) est neutre.\","
+    },
+    {
+      "id": "el-a1-gender-articles",
+      "field": "rule[2]",
+      "find": "\"L’article se place même devant un prénom : ο Νίκος, η Μαρία. Le nominatif est la forme du sujet : Η μητέρα είναι εδώ. Piège : il n’y a pas d’article partitif comme du / de la ; on dit simplement Θέλω καφέ.\",",
+      "replace": "\"Le prénom peut être précédé d’un article : ο Νίκος, η Μαρία. Le sujet est au nominatif : Η μητέρα είναι εδώ. Pour dire « je veux du café », on peut employer le nom sans article : Θέλω καφέ.\","
+    },
+    {
+      "id": "el-a1-gender-articles",
+      "field": "examples[1].note",
+      "find": "{ text: \"Η μητέρα είναι εδώ.\", translation: \"La mère est ici.\", note: \"Les noms féminins en -α prennent η.\" },",
+      "replace": "{ text: \"Η μητέρα είναι εδώ.\", translation: \"La mère est ici.\", note: \"Μητέρα est féminin et sujet, d’où l’article η.\" },"
+    },
+    {
+      "id": "el-a1-eimai-echo",
+      "field": "rule[1]",
+      "find": "\"Έχω (avoir) est régulier : έχω, έχεις, έχει, έχουμε, έχετε, έχουν. Piège : pour l’âge, le grec dit « être » là où le français dit « avoir » : Είμαι τριάντα χρονών.\",",
+      "replace": "\"Le présent de έχω (avoir) suit le modèle en -ω : έχω, έχεις, έχει, έχουμε, έχετε, έχουν. Pour l’âge, le grec emploie είμαι : Είμαι τριάντα χρονών (« J’ai trente ans »).\","
+    },
+    {
+      "id": "el-a1-eimai-echo",
+      "field": "rule[2]",
+      "find": "\"Pour nier, on place δεν juste devant le verbe : Δεν έχω χρόνο. Il n’y a pas de second mot comme le pas français. La question garde l’ordre de l’affirmation, avec l’intonation, et se termine par le point d’interrogation grec (;) : Έχεις χρόνο;\",",
+      "replace": "\"Place δεν devant le groupe verbal : Δεν έχω χρόνο. On rencontre aussi δε devant certaines consonnes, par exemple Δε θέλω. Pour une question à laquelle on répond par oui ou non, tu peux garder l’ordre de l’affirmation : Έχεις χρόνο; Le point d’interrogation grec s’écrit ;.\","
+    },
+    {
+      "id": "el-a1-eimai-echo",
+      "field": "exercises[2].hint",
+      "find": "hint: \"έχω\",",
+      "replace": "hint: \"έχω, au présent\","
+    },
+    {
+      "id": "el-a1-eimai-echo",
+      "field": "exercises[3].hint",
+      "find": "hint: \"είμαι\",",
+      "replace": "hint: \"είμαι, au présent\","
+    },
+    {
+      "id": "el-a1-eimai-echo",
+      "field": "exercises[4].instruction",
+      "find": "instruction: \"Mets la phrase à la forme négative.\",\n          source: \"Έχω χρόνο.\",",
+      "replace": "instruction: \"Ajoute « δεν » pour nier la phrase, en gardant le reste.\",\n          source: \"Έχω χρόνο.\","
+    },
+    {
+      "id": "el-a1-present-a",
+      "field": "rule[0]",
+      "find": "\"La plupart des verbes grecs se terminent en -ω à la 1re personne du singulier, et c’est cette forme que donne le dictionnaire : le grec moderne n’a pas d’infinitif. Terminaisons du présent : -ω, -εις, -ει, -ουμε, -ετε, -ουν.\",",
+      "replace": "\"Le dictionnaire donne le verbe à la 1re personne du singulier du présent : γράφω. Le grec moderne emploie souvent un verbe conjugué avec να là où le français emploie un infinitif. Pour les verbes comme γράφω, les terminaisons du présent sont -ω, -εις, -ει, -ουμε, -ετε, -ουν.\","
+    },
+    {
+      "id": "el-a1-present-a",
+      "field": "rule[1]",
+      "find": "\"On garde le radical et on change seulement la terminaison : γράφω, γράφεις, γράφει, γράφουμε, γράφετε, γράφουν. L’accent écrit reste sur la même syllabe dans tout le paradigme ; copie-le avec le mot. Le pronom sujet est omis, sauf pour insister.\",",
+      "replace": "\"Pour γράφω, le radical et l’accent restent en place : γράφω, γράφεις, γράφει, γράφουμε, γράφετε, γράφουν. À la 3e personne du pluriel, on entend aussi γράφουνε. Tu peux omettre le pronom sujet quand la personne est claire.\","
+    },
+    {
+      "id": "el-a1-present-a",
+      "field": "exercises[2].hint",
+      "find": "prompt: \"Εμείς ___ ελληνικά.\",\n          hint: \"διαβάζω\",",
+      "replace": "prompt: \"Εμείς ___ ελληνικά.\",\n          hint: \"διαβάζω, au présent\","
+    },
+    {
+      "id": "el-a1-present-a",
+      "field": "exercises[3].hint",
+      "find": "hint: \"δουλεύω\",",
+      "replace": "hint: \"δουλεύω, au présent\","
+    },
+    {
+      "id": "el-a1-present-a",
+      "field": "exercises[4].instruction",
+      "find": "instruction: \"Mets la phrase à la 1re personne du pluriel (nous).\",",
+      "replace": "instruction: \"Conjugue « διαβάζω » au présent avec « nous ». Garde « ένα βιβλίο » à la fin. Tu peux commencer par « Εμείς ».\","
+    },
+    {
+      "id": "el-a1-present-b",
+      "field": "rule[0]",
+      "find": "\"Un second groupe de verbes se termine en -άω ou -ώ : μιλάω ou μιλώ (parler), ρωτάω (demander), περπατάω (marcher), γελάω (rire). Les deux formes de la 1re personne sont correctes ; dans la langue de tous les jours, on emploie surtout -άω.\",",
+      "replace": "\"Dans le groupe à finale accentuée, certains verbes ont deux formes au présent à la 1re personne : μιλάω ou μιλώ, ρωτάω ou ρωτώ, περπατάω ou περπατώ. La forme en -άω est courante dans la conversation. D’autres verbes en -ώ, comme μπορώ, suivent un autre modèle.\","
+    },
+    {
+      "id": "el-a1-present-b",
+      "field": "rule[1]",
+      "find": "\"Terminaisons en -άω : -άω, -άς, -άει, -άμε, -άτε, -άνε (μιλάω, μιλάς, μιλάει, μιλάμε, μιλάτε, μιλάνε). En -ώ : μιλώ, μιλάς, μιλά, μιλούμε, μιλάτε, μιλούν. On ne devine pas le groupe : apprends le verbe avec sa terminaison.\",",
+      "replace": "\"Pour μιλάω, retiens μιλάω, μιλάς, μιλάει, μιλάμε, μιλάτε, μιλάνε. D’autres formes existent : μιλώ, μιλά ou μιλεί, μιλούμε, μιλούν. À la 3e personne du pluriel, on rencontre aussi μιλάν et μιλούνε.\","
+    },
+    {
+      "id": "el-a1-present-b",
+      "field": "rule[2]",
+      "find": "\"Piège pour un francophone : πεινάω (avoir faim) et διψάω (avoir soif) sont des verbes, pas « avoir » + nom. On dit Πεινάω et non « έχω πείνα ».\",",
+      "replace": "\"Pour dire simplement « j’ai faim » et « j’ai soif », emploie les verbes πεινάω et διψάω : Πεινάω πολύ, Διψάω. En français, les équivalents usuels associent « avoir » et un nom.\","
+    },
+    {
+      "id": "el-a1-present-b",
+      "field": "exercises[2].hint",
+      "find": "hint: \"περπατάω\",",
+      "replace": "hint: \"περπατάω, au présent\","
+    },
+    {
+      "id": "el-a1-present-b",
+      "field": "exercises[3].hint",
+      "find": "hint: \"γελάω\",",
+      "replace": "hint: \"γελάω, au présent\","
+    },
+    {
+      "id": "el-a1-present-b",
+      "field": "exercises[4].instruction",
+      "find": "instruction: \"Mets la phrase à la 3e personne du singulier.\",",
+      "replace": "instruction: \"Passe à « il » ou « elle » au présent. Garde « ελληνικά » à la fin. Tu peux commencer par « Αυτός » ou « Αυτή ».\","
+    },
+    {
+      "id": "el-a1-present-b",
+      "field": "exercises[4].answers",
+      "find": "          answers: [\"Μιλάει ελληνικά.\", \"Μιλά ελληνικά.\", \"Αυτός μιλάει ελληνικά.\", \"Αυτός μιλά ελληνικά.\", \"Αυτή μιλάει ελληνικά.\", \"Αυτή μιλά ελληνικά.\"],",
+      "replace": "          answers: [\"Μιλάει ελληνικά.\", \"Μιλά ελληνικά.\", \"Μιλεί ελληνικά.\", \"Αυτός μιλάει ελληνικά.\", \"Αυτός μιλά ελληνικά.\", \"Αυτός μιλεί ελληνικά.\", \"Αυτή μιλάει ελληνικά.\", \"Αυτή μιλά ελληνικά.\", \"Αυτή μιλεί ελληνικά.\"],"
+    },
+    {
+      "id": "el-a1-present-b",
+      "field": "exercises[4].explanation",
+      "find": "explanation: \"Μιλάω devient μιλάει (ou μιλά) ; le pronom sujet est facultatif.\",",
+      "replace": "explanation: \"À la 3e personne du singulier, tu peux écrire μιλάει, μιλά ou μιλεί. Le pronom sujet est facultatif.\","
+    },
+    {
+      "id": "el-a1-plural",
+      "field": "rule[0]",
+      "find": "\"Au pluriel, l’article défini est οι pour le masculin et le féminin, τα pour le neutre. Masculin : -ος → -οι (ο φίλος, οι φίλοι). Féminin : -α et -η → -ες (η μητέρα, οι μητέρες ; η φίλη, οι φίλες). Neutre : -ο → -α (το βιβλίο, τα βιβλία), -ι → -ια (το παιδί, τα παιδιά), -μα → -ματα (το όνομα, τα ονόματα).\",",
+      "replace": "\"Au nominatif pluriel, emploie οι pour le masculin et le féminin, et τα pour le neutre. Parmi les modèles fréquents : ο φίλος → οι φίλοι, η μητέρα → οι μητέρες, η φίλη → οι φίλες, το βιβλίο → τα βιβλία, το παιδί → τα παιδιά, το όνομα → τα ονόματα.\","
+    },
+    {
+      "id": "el-a1-plural",
+      "field": "rule[2]",
+      "find": "\"Pièges : l’accent peut se déplacer (το παιδί, τα παιδιά) et le neutre pluriel finit toujours en -α, jamais en -ς. Retiens aussi que οι sert pour les deux premiers genres.\",",
+      "replace": "\"L’accent peut se déplacer : το παιδί → τα παιδιά. Beaucoup de pluriels neutres finissent en -α, mais certains finissent en -η : το λάθος → τα λάθη. Observe que οι sert à la fois pour le masculin et le féminin.\","
+    },
+    {
+      "id": "el-a1-plural",
+      "field": "exercises[2].explanation",
+      "find": "explanation: \"Les noms masculins en -ος font leur pluriel en -οι.\",",
+      "replace": "explanation: \"Le nominatif pluriel de ο φίλος est οι φίλοι.\","
+    },
+    {
+      "id": "el-a1-plural",
+      "field": "exercises[3].explanation",
+      "find": "explanation: \"Les noms neutres en -ο font leur pluriel en -α.\",",
+      "replace": "explanation: \"Βιβλίο suit le modèle en -ο qui donne -α au pluriel : βιβλία.\","
+    },
+    {
+      "id": "el-a1-plural",
+      "field": "exercises[4].instruction",
+      "find": "instruction: \"Mets la phrase au pluriel.\",\n          source: \"Ο καλός φίλος μένει εδώ.\",",
+      "replace": "instruction: \"Mets tous les mots qui s’accordent au pluriel et garde l’ordre des mots.\",\n          source: \"Ο καλός φίλος μένει εδώ.\","
+    },
+    {
+      "id": "el-a1-plural",
+      "field": "exercises[4].answers",
+      "find": "          answers: [\"Οι καλοί φίλοι μένουν εδώ.\"],",
+      "replace": "          answers: [\"Οι καλοί φίλοι μένουν εδώ.\", \"Οι καλοί φίλοι μένουνε εδώ.\"],"
+    },
+    {
+      "id": "el-a1-accusative",
+      "field": "rule[0]",
+      "find": "\"L’objet direct et les noms après une préposition se mettent à l’accusatif. Au masculin, l’article ο devient τον et le nom perd son -ς : ο φίλος → τον φίλο. Le féminin garde le nom et prend την : η φίλη → την φίλη (τη devant la plupart des consonnes). Le neutre ne change pas : το παιδί.\",",
+      "replace": "\"Un complément direct est à l’accusatif. Dans ο φίλος → τον φίλο, le nom perd son -ς. Le féminin η φίλη devient τη φίλη, et le neutre το παιδί reste το παιδί. Écris την devant une voyelle ou κ, π, τ, μπ, ντ, γκ, τσ, τζ, ξ, ψ, et τη devant les autres consonnes. Le masculin τον garde son ν à l’écrit.\","
+    },
+    {
+      "id": "el-a1-accusative",
+      "field": "rule[1]",
+      "find": "\"Après la préposition σε (à, dans, en), l’article fusionne avec elle : σε + τον = στον, σε + την = στην, σε + το = στο ; au pluriel, στους, στις, στα. Μένω στην Αθήνα : j’habite à Athènes. Après από (de, depuis), on garde l’accusatif : από την Ελλάδα.\",",
+      "replace": "\"Σε (à, dans, en) prend l’accusatif et fusionne avec l’article : στον, στη(ν), στο, et au pluriel στους, στις, στα. Le féminin garde son ν dans στην Αθήνα et le perd dans στη φίλη μου. Με et από prennent aussi l’accusatif dans les constructions courantes : από την Ελλάδα.\","
+    },
+    {
+      "id": "el-a1-accusative",
+      "field": "rule[2]",
+      "find": "\"Piège : un seul mot, σε, couvre à, au, dans, en, sur, selon le contexte. Et le prénom reste précédé de l’article : Βλέπω τον Νίκο.\",",
+      "replace": "\"Σε peut correspondre à « à », « au », « dans », « en » ou « sur » selon le contexte. Un prénom peut prendre l’article à l’accusatif quand il est complément direct : Βλέπω τον Νίκο.\","
+    },
+    {
+      "id": "el-a1-accusative",
+      "field": "table.rows[1]",
+      "find": "[\"Féminin\", \"η φίλη\", \"τη(ν) φίλη\", \"τις φίλες\"],",
+      "replace": "[\"Féminin\", \"η φίλη\", \"τη φίλη\", \"τις φίλες\"],"
+    },
+    {
+      "id": "el-a1-accusative",
+      "field": "exercises[4].instruction",
+      "find": "instruction: \"Mets la phrase au pluriel.\",\n          source: \"Βλέπω τον φίλο.\",",
+      "replace": "instruction: \"Remplace seulement « τον φίλο » par sa forme au pluriel.\",\n          source: \"Βλέπω τον φίλο.\","
+    },
+    {
+      "id": "el-a2-possessives",
+      "field": "rule[0]",
+      "find": "\"Le grec place un petit mot après le nom : το σπίτι μου (ma maison), ο φίλος σου (ton ami). Les formes sont μου, σου, του (à lui), της (à elle), μας, σας, τους. Elles s’accordent avec le possesseur, pas avec le nom : Το σπίτι του est la maison d’un homme, το σπίτι της celle d’une femme.\",",
+      "replace": "\"Pour marquer la possession, le grec emploie souvent un pronom faible après le nom : το σπίτι μου, ο φίλος σου. Choisis la forme selon le possesseur : μου, σου, του (possesseur masculin ou neutre), της (féminin), μας, σας, τους. Compare το σπίτι του et το σπίτι της.\","
+    },
+    {
+      "id": "el-a2-possessives",
+      "field": "table.rows[2]",
+      "find": "[\"αυτός\", \"του\", \"το σπίτι του\"],",
+      "replace": "[\"αυτός / αυτό\", \"του\", \"το σπίτι του\"],"
+    },
+    {
+      "id": "el-a2-possessives",
+      "field": "table.rows[6]",
+      "find": "[\"αυτοί / αυτές\", \"τους\", \"το σπίτι τους\"],",
+      "replace": "[\"αυτοί / αυτές / αυτά\", \"τους\", \"το σπίτι τους\"],"
+    },
+    {
+      "id": "el-a2-possessives",
+      "field": "exercises[0].prompt",
+      "find": "prompt: \"Ο Γιάννης έχει ένα σπίτι. Το σπίτι ___ είναι μεγάλο.\",",
+      "replace": "prompt: \"Ο Γιάννης έχει ένα σπίτι. Το σπίτι ___ είναι μεγάλο. (La maison de Giannis.)\","
+    },
+    {
+      "id": "el-a2-possessives",
+      "field": "exercises[1].prompt",
+      "find": "prompt: \"Η Ελένη έχει μια αδελφή. Η αδελφή ___ μένει εδώ.\",",
+      "replace": "prompt: \"Η Ελένη έχει μια αδελφή. Η αδελφή ___ μένει εδώ. (La sœur d’Eleni.)\","
+    },
+    {
+      "id": "el-a2-possessives",
+      "field": "exercises[2].prompt",
+      "find": "prompt: \"Εμείς έχουμε ένα σπίτι. Το σπίτι ___ είναι κοντά.\",",
+      "replace": "prompt: \"Εμείς έχουμε ένα σπίτι. Το σπίτι ___ είναι κοντά. (Notre maison.)\","
+    },
+    {
+      "id": "el-a2-possessives",
+      "field": "exercises[3].hint",
+      "find": "hint: \"à toi\",",
+      "replace": "hint: \"pronom possessif faible, à toi\","
+    },
+    {
+      "id": "el-a2-possessives",
+      "field": "exercises[4].instruction",
+      "find": "instruction: \"Le possesseur devient « moi ».\",",
+      "replace": "instruction: \"Change seulement le possessif pour dire que la maison est à moi.\","
+    },
+    {
+      "id": "el-a2-aorist",
+      "field": "title",
+      "find": "title: \"Le passé simple (aoriste) : έγραψα, μίλησα, διάβασα\",",
+      "replace": "title: \"L’aoriste (passé) : έγραψα, μίλησα, διάβασα\","
+    },
+    {
+      "id": "el-a2-aorist",
+      "field": "rule[0]",
+      "find": "\"L’aoriste (αόριστος) exprime une action passée et terminée : Χθες έγραψα ένα μήνυμα. Il traduit le passé composé comme le passé simple du français. Les terminaisons sont -α, -ες, -ε, -αμε, -ατε, -αν.\",",
+      "replace": "\"L’aoriste (αόριστος) présente un fait passé comme un tout : Χθες έγραψα ένα μήνυμα. Le français le traduit souvent par un passé composé et parfois par un passé simple. Dans les modèles actifs de cette fiche, les terminaisons sont -α, -ες, -ε, -αμε, -ατε, -αν.\","
+    },
+    {
+      "id": "el-a2-aorist",
+      "field": "rule[1]",
+      "find": "\"Le radical prend un -σ- (ou -ψ- après -φ-, -π-, -β-) : διαβάζω → διάβασα, δουλεύω → δούλεψα, γράφω → έγραψα. Les verbes en -άω ont -ησ- : μιλάω → μίλησα, ρωτάω → ρώτησα.\",",
+      "replace": "\"Beaucoup de radicaux d’aoriste ont -σ- : διαβάζω → διάβασα. La consonne peut changer : γράφω → έγραψα, δουλεύω → δούλεψα. Parmi les verbes en -άω, certains prennent -ησ- (μιλάω → μίλησα, ρωτάω → ρώτησα), d’autres -ασ- (γελάω → γέλασα).\","
+    },
+    {
+      "id": "el-a2-aorist",
+      "field": "rule[2]",
+      "find": "\"L’accent recule d’une syllabe au passé. Si le verbe est trop court pour cela, on ajoute ε- devant : γράφω → έγραψα. Cet augment tombe aux formes en -αμε et -ατε : γράψαμε, γράψατε. Quelques verbes courants sont irréguliers : πάω → πήγα, βλέπω → είδα, τρώω → έφαγα, έχω → είχα.\",",
+      "replace": "\"Dans les modèles actifs de cette fiche, l’accent est souvent sur la troisième syllabe à partir de la fin. Un ε- initial peut porter l’accent : γράφω → έγραψα, mais γράψαμε, γράψατε. Apprends aussi les formes irrégulières πάω → πήγα, βλέπω → είδα, τρώω → έφαγα.\","
+    },
+    {
+      "id": "el-a2-aorist",
+      "field": "examples[3].text",
+      "find": "{ text: \"Δεν διάβασες το βιβλίο;\", translation: \"Tu n’as pas lu le livre ?\", note: \"δεν se place devant l’aoriste.\" },",
+      "replace": "{ text: \"Δε διάβασες το βιβλίο;\", translation: \"Tu n’as pas lu le livre ?\", note: \"Ici, δε précède l’aoriste.\" },"
+    },
+    {
+      "id": "el-a2-aorist",
+      "field": "exercises[0].prompt",
+      "find": "prompt: \"Χθες ___ ένα βιβλίο.\",",
+      "replace": "prompt: \"Χθες ___ ένα βιβλίο. (À l’aoriste.)\","
+    },
+    {
+      "id": "el-a2-aorist",
+      "field": "exercises[0].explanation",
+      "find": "explanation: \"Χθες demande un temps du passé : l’aoriste διάβασα.\",",
+      "replace": "explanation: \"À l’aoriste, διαβάζω devient διάβασα.\","
+    },
+    {
+      "id": "el-a2-aorist",
+      "field": "exercises[2].hint",
+      "find": "prompt: \"Εγώ ___ ένα μήνυμα χθες.\",\n          hint: \"γράφω\",",
+      "replace": "prompt: \"Εγώ ___ ένα μήνυμα χθες.\",\n          hint: \"γράφω, à l’aoriste\","
+    },
+    {
+      "id": "el-a2-aorist",
+      "field": "exercises[3].hint",
+      "find": "hint: \"ρωτάω\",",
+      "replace": "hint: \"ρωτάω, à l’aoriste\","
+    },
+    {
+      "id": "el-a2-aorist",
+      "field": "exercises[3].explanation",
+      "find": "explanation: \"Les verbes en -άω prennent -ησ- à l’aoriste : ρώτησε à la 3e personne du singulier.\",",
+      "replace": "explanation: \"À l’aoriste, ρωτάω devient ρώτησε à la 3e personne du singulier.\","
+    },
+    {
+      "id": "el-a2-aorist",
+      "field": "exercises[4].instruction",
+      "find": "instruction: \"Mets la phrase à l’aoriste (passé simple).\",",
+      "replace": "instruction: \"Conjugue « μιλάς » à l’aoriste. Garde « ελληνικά » à la fin. Tu peux commencer par « Εσύ ».\","
+    },
+    {
+      "id": "el-a2-future",
+      "field": "summary",
+      "find": "summary: \"Parler de l’avenir avec θα et choisir entre l’action répétée et l’action ponctuelle.\",",
+      "replace": "summary: \"Former le futur avec θα et distinguer l’action vue comme un tout de l’action en cours ou habituelle.\","
+    },
+    {
+      "id": "el-a2-future",
+      "field": "rule[0]",
+      "find": "\"Le futur se forme avec la particule invariable θα devant le verbe conjugué : Θα μιλήσω. Il n’y a pas de terminaison de futur comme en français. La négation se place avant θα : Δεν θα έρθω.\",",
+      "replace": "\"Pour former le futur, place la particule θα devant la forme verbale : Θα μιλήσω. La négation vient avant θα : Δε θα έρθω. En français, le futur simple se marque par une terminaison.\","
+    },
+    {
+      "id": "el-a2-future",
+      "field": "rule[1]",
+      "find": "\"Il y a deux formes. Le futur simple (θα + radical de l’aoriste, terminaisons du présent) exprime une action ponctuelle : Αύριο θα γράψω ένα μήνυμα. Le futur continu (θα + présent) exprime une action répétée ou durable : Κάθε μέρα θα γράφω.\",",
+      "replace": "\"Compare deux façons de présenter une action future. Le futur simple présente le fait comme un tout : Αύριο θα γράψω ένα μήνυμα. Le futur continu garde le radical du présent et peut présenter une action en cours ou une habitude : Κάθε μέρα θα γράφω.\","
+    },
+    {
+      "id": "el-a2-future",
+      "field": "rule[2]",
+      "find": "\"Pour trouver le futur simple, pars de l’aoriste sans augment ni -α : έγραψα → θα γράψω, μίλησα → θα μιλήσω. Verbes courants irréguliers : θα πάω, θα φάω, θα δω, θα πω, θα έρθω.\",",
+      "replace": "\"Dans des verbes comme γράφω ou μιλάω, reprends le radical de l’aoriste sans l’augment et ajoute les terminaisons : έγραψα → θα γράψω, μίλησα → θα μιλήσω. Mémorise aussi θα πάω, θα φάω, θα δω, θα πω et θα έρθω.\","
+    },
+    {
+      "id": "el-a2-future",
+      "field": "examples[2].translation",
+      "find": "{ text: \"Κάθε μέρα θα διαβάζω ελληνικά.\", translation: \"Chaque jour, je lirai du grec.\", note: \"Futur continu : une action répétée.\" },",
+      "replace": "{ text: \"Κάθε μέρα θα διαβάζω ελληνικά.\", translation: \"Chaque jour, je lirai en grec.\", note: \"Futur continu : l’action est présentée comme une habitude.\" },"
+    },
+    {
+      "id": "el-a2-future",
+      "field": "examples[3].text",
+      "find": "{ text: \"Δεν θα έρθει αύριο.\", translation: \"Il ne viendra pas demain.\", note: \"δεν se place devant θα.\" },",
+      "replace": "{ text: \"Δε θα έρθει αύριο.\", translation: \"Il ne viendra pas demain.\", note: \"La négation précède θα.\" },"
+    },
+    {
+      "id": "el-a2-future",
+      "field": "exercises[0].explanation",
+      "find": "explanation: \"Αύριο (demain) demande le futur : θα πάω.\",",
+      "replace": "explanation: \"Θα πάω place l’action dans l’avenir. Αύριο signifie « demain ».\","
+    },
+    {
+      "id": "el-a2-future",
+      "field": "exercises[1].prompt",
+      "find": "prompt: \"Κάθε βράδυ ___ ελληνικά.\",",
+      "replace": "prompt: \"Κάθε βράδυ ___ ελληνικά. (Habitude, au futur continu.)\","
+    },
+    {
+      "id": "el-a2-future",
+      "field": "exercises[1].explanation",
+      "find": "explanation: \"Une action répétée (chaque soir) prend le futur continu : θα διαβάζω.\",",
+      "replace": "explanation: \"Pour présenter l’action comme une habitude à venir, utilise le futur continu θα διαβάζω.\","
+    },
+    {
+      "id": "el-a2-future",
+      "field": "exercises[2].hint",
+      "find": "prompt: \"Αύριο εγώ ___ ένα μήνυμα.\",\n          hint: \"γράφω\",",
+      "replace": "prompt: \"Αύριο εγώ ___ ένα μήνυμα.\",\n          hint: \"γράφω, au futur simple\","
+    },
+    {
+      "id": "el-a2-future",
+      "field": "exercises[3].hint",
+      "find": "hint: \"πάω\",",
+      "replace": "hint: \"πάω, au futur simple\","
+    },
+    {
+      "id": "el-a2-future",
+      "field": "exercises[4].instruction",
+      "find": "instruction: \"Mets la phrase au futur simple (action ponctuelle).\",",
+      "replace": "instruction: \"Conjugue « γράφω » au futur simple. Garde « ένα μήνυμα » à la fin. Tu peux commencer par « Εγώ ».\","
+    },
+    {
+      "id": "el-a2-subjunctive-na",
+      "field": "rule[0]",
+      "find": "\"Le grec moderne n’a plus d’infinitif. Là où le français dit « je veux partir », le grec dit « je veux que je parte » : Θέλω να φύγω. Le verbe après να est conjugué et s’accorde avec le sujet : Θέλουμε να φύγουμε.\",",
+      "replace": "\"Dans les constructions de cette fiche, le grec emploie να et une forme conjuguée là où le français emploie souvent l’infinitif : Θέλω να φύγω (« Je veux partir »). Le verbe après να prend la personne de son propre sujet : Θέλουμε να φύγουμε (« Nous voulons partir »).\","
+    },
+    {
+      "id": "el-a2-subjunctive-na",
+      "field": "rule[1]",
+      "find": "\"Après να, on emploie le radical de l’aoriste pour une action ponctuelle (Θέλω να γράψω ένα μήνυμα) ou celui du présent pour une action durable ou répétée (Θέλω να γράφω καλά). Les terminaisons sont celles du présent.\",",
+      "replace": "\"Après να, la forme de γράψω présente le fait comme un tout : Θέλω να γράψω ένα μήνυμα. La forme de γράφω peut présenter une activité en cours ou habituelle : Θέλω να γράφω κάθε μέρα. La différence porte sur la manière de présenter l’action.\","
+    },
+    {
+      "id": "el-a2-subjunctive-na",
+      "field": "rule[2]",
+      "find": "\"Même construction avec μπορώ (pouvoir), ξέρω (savoir), αρχίζω (commencer) et πρέπει (devoir). Piège : πρέπει est invariable, c’est le verbe après να qui porte la personne : Πρέπει να φύγουμε. La négation du verbe principal se met devant lui : Δεν μπορώ να έρθω.\",",
+      "replace": "\"Tu peux employer να après μπορώ, ξέρω, αρχίζω ou πρέπει. Πρέπει est impersonnel au présent : dans Πρέπει να φύγουμε, la personne apparaît sur φύγουμε. Pour nier le verbe principal, place δεν devant lui : Δεν μπορώ να έρθω.\","
+    },
+    {
+      "id": "el-a2-subjunctive-na",
+      "field": "table.rows[2]",
+      "find": "[\"πρέπει\", \"devoir (invariable)\", \"Πρέπει να δουλέψω.\"],",
+      "replace": "[\"πρέπει\", \"devoir (impersonnel)\", \"Πρέπει να δουλέψω.\"],"
+    },
+    {
+      "id": "el-a2-subjunctive-na",
+      "field": "examples[2].note",
+      "find": "{ text: \"Πρέπει να φύγουμε τώρα.\", translation: \"Nous devons partir maintenant.\", note: \"πρέπει ne change pas ; φύγουμε porte la personne.\" },",
+      "replace": "{ text: \"Πρέπει να φύγουμε τώρα.\", translation: \"Nous devons partir maintenant.\", note: \"Πρέπει est impersonnel. Φύγουμε porte la marque de « nous ».\" },"
+    },
+    {
+      "id": "el-a2-subjunctive-na",
+      "field": "exercises[3].explanation",
+      "find": "explanation: \"Le verbe après να s’accorde avec le sujet : μάθουμε (ponctuel) ou μαθαίνουμε (durable).\",",
+      "replace": "explanation: \"Μάθουμε présente l’apprentissage comme un but à atteindre. Μαθαίνουμε présente le processus ou une activité habituelle.\","
+    },
+    {
+      "id": "el-a2-subjunctive-na",
+      "field": "exercises[4].instruction",
+      "find": "instruction: \"Mets la phrase à la forme négative.\",\n          source: \"Μπορώ να έρθω.\",",
+      "replace": "instruction: \"Ajoute « δεν » devant « Μπορώ » et garde le reste de la phrase.\",\n          source: \"Μπορώ να έρθω.\","
+    },
+    {
+      "id": "el-a2-object-pronouns",
+      "field": "rule[0]",
+      "find": "\"Le pronom complément se place avant le verbe conjugué : Βλέπω τον Νίκο → Τον βλέπω (je le vois). Formes directes : με, σε, τον, την, το, μας, σας, τους, τις, τα. Pour « à moi, à toi… », on emploie μου, σου, του, της, μας, σας, τους : Μου δίνεις το βιβλίο;\",",
+      "replace": "\"Dans une affirmation ordinaire, le pronom faible précède le verbe : Βλέπω τον Νίκο → Τον βλέπω. Formes directes : με, σε, τον, τη(ν), το, μας, σας, τους, τις, τα. Pour un complément indirect comme « à moi », emploie μου, σου, του, της, μας, σας, τους : Μου δίνεις το βιβλίο;\","
+    },
+    {
+      "id": "el-a2-object-pronouns",
+      "field": "rule[1]",
+      "find": "\"Le pronom reste collé au verbe, même après la négation, θα ou να : Δεν σε ακούω, Θέλω να σας δω. Quand il y en a deux, l’indirect passe d’abord : Μου το δίνει (il me le donne). Devant une consonne, την s’écrit souvent τη (τη βλέπω).\",",
+      "replace": "\"La négation, θα ou να viennent avant le pronom faible : Δε σε ακούω, Θέλω να σας δω. Avec deux pronoms faibles avant le verbe, l’indirect vient d’abord : Μου το δίνει. Le féminin direct suit la règle du ν final : τη βλέπω, την ακούω.\","
+    },
+    {
+      "id": "el-a2-object-pronouns",
+      "field": "rule[2]",
+      "find": "\"Piège : les formes τον, την, το ressemblent à l’article, mais elles se placent devant un verbe. Comme en français, le pronom précède le verbe ; il ne passe derrière qu’à l’impératif affirmatif.\",",
+      "replace": "\"Τον, τη(ν) et το peuvent ressembler à des articles. Compare Βλέπω τον Νίκο (article devant le nom) et Τον βλέπω (pronom devant le verbe). À l’impératif affirmatif, le pronom vient après : Πάρτε το.\","
+    },
+    {
+      "id": "el-a2-object-pronouns",
+      "field": "examples[1].text",
+      "find": "{ text: \"Δεν σε ακούω.\", translation: \"Je ne t’entends pas.\", note: \"δεν + pronom + verbe.\" },",
+      "replace": "{ text: \"Δε σε ακούω.\", translation: \"Je ne t’entends pas.\", note: \"Négation + pronom faible + verbe.\" },"
+    },
+    {
+      "id": "el-a2-object-pronouns",
+      "field": "exercises[2].prompt",
+      "find": "prompt: \"Δεν ___ ακούω, μιλάς πολύ σιγά.\",",
+      "replace": "prompt: \"Δε ___ ακούω, μιλάς πολύ σιγά.\","
+    },
+    {
+      "id": "el-a2-object-pronouns",
+      "field": "exercises[2].answers",
+      "find": "          answers: [\"σε\"],",
+      "replace": "          answers: [\"σε\", \"σ’\"],"
+    },
+    {
+      "id": "el-a2-object-pronouns",
+      "field": "exercises[2].explanation",
+      "find": "explanation: \"Le pronom direct de la 2e personne est σε, placé entre δεν et le verbe.\",",
+      "replace": "explanation: \"Le pronom est σε. Devant ακούω, il peut s’élider : Δε σ’ ακούω.\","
+    },
+    {
+      "id": "el-a2-object-pronouns",
+      "field": "exercises[4].instruction",
+      "find": "instruction: \"Remplace le complément par un pronom.\",",
+      "replace": "instruction: \"Remplace « τα παιδιά » par un pronom faible. Écris le pronom puis le verbe au présent (1re personne).\","
+    },
+    {
+      "id": "el-a2-object-pronouns",
+      "field": "exercises[4].answers",
+      "find": "          answers: [\"Τα αγαπάω.\"],",
+      "replace": "          answers: [\"Τα αγαπάω.\", \"Τα αγαπώ.\"],"
+    },
+    {
+      "id": "el-a2-object-pronouns",
+      "field": "exercises[4].explanation",
+      "find": "explanation: \"Τα παιδιά devient τα, placé devant le verbe.\",",
+      "replace": "explanation: \"Τα παιδιά est repris par τα devant le verbe. Les formes αγαπάω et αγαπώ sont possibles.\","
+    },
+    {
+      "id": "el-a2-comparatives",
+      "field": "rule[0]",
+      "find": "\"Le comparatif se forme avec πιο devant l’adjectif, qui s’accorde toujours avec le nom. Le second terme est introduit par από : Η Ελένη είναι πιο ψηλή από τον Νίκο.\",",
+      "replace": "\"Pour comparer deux personnes ou choses, tu peux mettre πιο devant l’adjectif accordé : Η Ελένη είναι πιο ψηλή από τον Νίκο. Certains adjectifs ont aussi une forme en un seul mot : ψηλότερη correspond à πιο ψηλή.\","
+    },
+    {
+      "id": "el-a2-comparatives",
+      "field": "rule[1]",
+      "find": "\"Le superlatif ajoute l’article, qui s’accorde lui aussi : ο πιο ψηλός, η πιο ψηλή, το πιο ψηλό. Le français emploie le plus, la plus : le grec répète l’article devant πιο. Après un superlatif, « de » se traduit par από όλους : Είναι ο πιο ψηλός από όλους.\",",
+      "replace": "\"Pour dire « le plus haut » ou « la plus grande », ajoute l’article accordé : ο πιο ψηλός, η πιο ψηλή, το πιο ψηλό. Tu peux préciser le groupe avec un génitif : ο πιο ψηλός της τάξης. Από όλους signifie « que tout le monde ».\","
+    },
+    {
+      "id": "el-a2-comparatives",
+      "field": "exercises[3].answers",
+      "find": "          answers: [\"καλύτερα\"],",
+      "replace": "          answers: [\"καλύτερα\", \"πιο καλά\"],"
+    },
+    {
+      "id": "el-a2-comparatives",
+      "field": "exercises[3].explanation",
+      "find": "explanation: \"Après un verbe, « mieux » est un adverbe : καλύτερα.\",",
+      "replace": "explanation: \"Dans cette phrase, « mieux » se rend par l’adverbe καλύτερα ou la tournure πιο καλά.\","
+    },
+    {
+      "id": "el-b1-imperfect",
+      "field": "rule[1]",
+      "find": "\"Formation : radical du présent + augment + -α, -ες, -ε, -αμε, -ατε, -αν : γράφω → έγραφα. À nous et vous, l’augment tombe : γράφαμε, γράφατε. Les verbes en -άω ont -ούσα : μιλάω → μιλούσα, μιλούσες… Verbes à connaître : έχω → είχα, πηγαίνω → πήγαινα, είμαι → ήμουν.\",",
+      "replace": "\"Dans le modèle de γράφω, l’imparfait garde le radical du présent et prend -α, -ες, -ε, -αμε, -ατε, -αν. L’augment ε- précède le radical dans έγραφα, mais disparaît dans γράφαμε et γράφατε. Retiens aussi μιλούσα (μιλάω), είχα (έχω), πήγαινα (πηγαίνω) et ήμουν (είμαι).\","
+    },
+    {
+      "id": "el-b1-imperfect",
+      "field": "rule[2]",
+      "find": "\"Piège : le critère n’est pas la durée mais le point de vue. Une action unique et terminée est à l’aoriste, même si elle a été longue : Έμεινα δύο ώρες. L’imparfait sert pour l’habitude et le décor.\",",
+      "replace": "\"La durée seule ne choisit pas le temps. Έμεινα δύο ώρες présente le séjour de deux heures comme un tout. L’imparfait peut montrer une action unique en train de se dérouler, comme Διάβαζα όταν χτύπησε το τηλέφωνο. Il sert aussi pour le décor et les habitudes.\","
+    },
+    {
+      "id": "el-b1-imperfect",
+      "field": "exercises[0].prompt",
+      "find": "prompt: \"Όταν ήμουν παιδί, ___ κάθε μέρα στο πάρκο.\",",
+      "replace": "prompt: \"Όταν ήμουν παιδί, ___ κάθε μέρα στο πάρκο. (Décris l’habitude à l’imparfait.)\","
+    },
+    {
+      "id": "el-b1-imperfect",
+      "field": "exercises[0].explanation",
+      "find": "explanation: \"Une habitude dans le passé demande l’imparfait : έπαιζα.\",",
+      "replace": "explanation: \"Pour décrire cette habitude à l’imparfait, emploie έπαιζα.\","
+    },
+    {
+      "id": "el-b1-imperfect",
+      "field": "exercises[1].prompt",
+      "find": "prompt: \"Εγώ μια φορά ___ στην Ιταλία.\",",
+      "replace": "prompt: \"Εγώ μια φορά ___ στην Ιταλία. (Un voyage achevé, à l’aoriste.)\","
+    },
+    {
+      "id": "el-b1-imperfect",
+      "field": "exercises[1].explanation",
+      "find": "explanation: \"Une seule fois : aoriste, πήγα. Avec εγώ, πήγαμε ne convient pas.\",",
+      "replace": "explanation: \"Pour présenter ce voyage comme un fait achevé, emploie πήγα avec εγώ.\","
+    },
+    {
+      "id": "el-b1-imperfect",
+      "field": "exercises[2].hint",
+      "find": "hint: \"μένω\",",
+      "replace": "hint: \"μένω, à l’imparfait\","
+    },
+    {
+      "id": "el-b1-imperfect",
+      "field": "exercises[3].hint",
+      "find": "hint: \"μιλάω\",",
+      "replace": "hint: \"μιλάω, à l’imparfait\","
+    },
+    {
+      "id": "el-b1-imperfect",
+      "field": "exercises[3].answers",
+      "find": "          answers: [\"μιλούσες\"],",
+      "replace": "          answers: [\"μιλούσες\", \"μίλαγες\"],"
+    },
+    {
+      "id": "el-b1-imperfect",
+      "field": "exercises[3].explanation",
+      "find": "explanation: \"Les verbes en -άω ont l’imparfait en -ούσα : μιλούσες.\",",
+      "replace": "explanation: \"Avec εσύ, μιλούσες est la forme neutre de l’imparfait de μιλάω. La variante μίλαγες est familière.\","
+    },
+    {
+      "id": "el-b1-imperfect",
+      "field": "exercises[4].instruction",
+      "find": "instruction: \"Mets la phrase à l’imparfait (habitude dans le passé).\",",
+      "replace": "instruction: \"Mets « διαβάζω » à l’imparfait. Tu peux placer « κάθε μέρα » au début, après le verbe ou à la fin.\","
+    },
+    {
+      "id": "el-b1-imperfect",
+      "field": "exercises[4].answers",
+      "find": "          answers: [\"Κάθε μέρα διάβαζα ένα βιβλίο.\", \"Διάβαζα ένα βιβλίο κάθε μέρα.\"],",
+      "replace": "          answers: [\"Κάθε μέρα διάβαζα ένα βιβλίο.\", \"Διάβαζα ένα βιβλίο κάθε μέρα.\", \"Διάβαζα κάθε μέρα ένα βιβλίο.\"],"
+    },
+    {
+      "id": "el-b1-imperative",
+      "field": "rule[0]",
+      "find": "\"L’impératif a deux formes : le singulier (tu) et le pluriel (vous, ou politesse). Il se tire du radical de l’aoriste : γράφω → γράψε / γράψτε, κάνω → κάνε / κάντε. Beaucoup de verbes courants sont irréguliers : έλα / ελάτε, πες / πείτε, δες / δείτε, πάρε / πάρτε.\",",
+      "replace": "\"L’impératif a une forme pour « tu » et une pour « vous ». Le radical dépend de l’aspect : γράψε (un ordre portant sur un acte) ou γράφε (écris régulièrement ou continue à écrire). Pour les ordres présentés comme un tout, retiens γράψε / γράψτε, έλα / ελάτε, πες / πείτε, δες / δείτε et πάρε / πάρτε.\","
+    },
+    {
+      "id": "el-b1-imperative",
+      "field": "rule[1]",
+      "find": "\"À l’affirmatif, le pronom suit le verbe : Πες μου (dis-moi), Πάρτε το (prenez-le). Pour interdire, on n’utilise pas l’impératif mais μην suivi de la 2e personne du subjonctif, avec le pronom devant le verbe : Μην πας εκεί, Μην το κάνεις.\",",
+      "replace": "\"À l’impératif affirmatif, le pronom suit le verbe : Πες μου, Πάρτε το. Pour interdire, on emploie μη(ν) suivi de la 2e personne du subjonctif : Μην πας εκεί, Μη μιλάς. Le pronom vient alors avant le verbe : Μην το κάνεις.\","
+    },
+    {
+      "id": "el-b1-imperative",
+      "field": "rule[2]",
+      "find": "\"Pour être poli, ajoute παρακαλώ et emploie le pluriel. Piège : comme en français, le pronom suit le verbe à l’affirmatif, mais il le précède dès que la phrase est négative : Πάρε το, mais Μην το πάρεις.\",",
+      "replace": "\"Pour t’adresser poliment à quelqu’un, tu peux employer la forme en « vous » et ajouter παρακαλώ : Πείτε μου, παρακαλώ. Compare Πάρε το et Μην το πάρεις : la place du pronom change quand on passe de l’ordre à l’interdiction.\","
+    },
+    {
+      "id": "el-b1-imperative",
+      "field": "table.rows[6]",
+      "find": "[\"ακούω\", \"άκου\", \"ακούστε\", \"écouter\"],",
+      "replace": "[\"ακούω\", \"άκου / άκουσε\", \"ακούστε\", \"écouter\"],"
+    },
+    {
+      "id": "el-b1-imperative",
+      "field": "exercises[0].prompt",
+      "find": "prompt: \"___ εδώ, Νίκο!\",",
+      "replace": "prompt: \"___ εδώ, Νίκο! (Emploie l’impératif.)\","
+    },
+    {
+      "id": "el-b1-imperative",
+      "field": "exercises[2].hint",
+      "find": "hint: \"περιμένω\",",
+      "replace": "hint: \"περιμένω, à l’impératif (tu)\","
+    },
+    {
+      "id": "el-b1-imperative",
+      "field": "exercises[3].hint",
+      "find": "hint: \"λέω (vous)\",",
+      "replace": "hint: \"λέω, à l’impératif (vous)\","
+    },
+    {
+      "id": "el-b1-imperative",
+      "field": "exercises[4].instruction",
+      "find": "instruction: \"Mets la phrase à l’impératif négatif (tu).\",",
+      "replace": "instruction: \"Formule l’interdiction à la 2e personne du singulier. Commence par « Μην » et garde « εκεί » à la fin.\","
+    },
+    {
+      "id": "el-b1-imperative",
+      "field": "exercises[4].explanation",
+      "find": "explanation: \"L’interdiction se forme avec μην + subjonctif : Μην πας εκεί.\",",
+      "replace": "explanation: \"Après μην, πας présente un départ comme un tout. Πηγαίνεις peut convenir pour une action en cours ou une habitude.\","
+    },
+    {
+      "id": "el-b1-genitive",
+      "field": "rule[1]",
+      "find": "\"Formes des noms : -ος → -ου (του φίλου), -ης → -η (του μαθητή), -α et -η → -ας et -ης (της μητέρας, της φίλης), -ο → -ου (του βιβλίου), -ι → -ιού (του παιδιού). Au pluriel, la terminaison est en -ων : των φίλων, των παιδιών. L’accent peut changer : ο δάσκαλος → του δασκάλου.\",",
+      "replace": "\"Quelques modèles : φίλος → φίλου, μαθητής → μαθητή, μητέρα → μητέρας, φίλη → φίλης, βιβλίο → βιβλίου, παιδί → παιδιού. Au pluriel, retiens φίλων et παιδιών. La place de l’accent peut varier : δασκάλου est plus soigné, δάσκαλου est aussi usuel.\","
+    },
+    {
+      "id": "el-b1-genitive",
+      "field": "rule[2]",
+      "find": "\"Piège : le français a un seul « de » ; en grec, on choisit l’article d’après le genre du possesseur, pas de l’objet : το βιβλίο του δασκάλου, la maison de la prof : το σπίτι της δασκάλας. Pour un destinataire, on préfère σε + accusatif : Δίνω το βιβλίο στον Νίκο.\",",
+      "replace": "\"L’article du génitif dépend du possesseur, même si le nom possédé a un autre genre : το βιβλίο του δασκάλου, το σπίτι της δασκάλας. Pour un destinataire exprimé par un nom, on peut aussi employer σε + accusatif : Δίνω το βιβλίο στον Νίκο.\","
+    },
+    {
+      "id": "el-b1-genitive",
+      "field": "exercises[2].answers",
+      "find": "          answers: [\"δασκάλου\"],",
+      "replace": "          answers: [\"δασκάλου\", \"δάσκαλου\"],"
+    },
+    {
+      "id": "el-b1-genitive",
+      "field": "exercises[2].explanation",
+      "find": "explanation: \"Le génitif de δάσκαλος est δασκάλου, avec déplacement de l’accent.\",",
+      "replace": "explanation: \"Les deux génitifs sont possibles : δασκάλου en style soigné, et δάσκαλου en style neutre ou familier.\","
+    },
+    {
+      "id": "el-b1-genitive",
+      "field": "exercises[4].instruction",
+      "find": "instruction: \"Mets le possesseur au pluriel (les enfants).\",",
+      "replace": "instruction: \"Remplace seulement « του παιδιού » par son génitif pluriel (« des enfants »).\","
+    },
+    {
+      "id": "el-b1-middle-verbs",
+      "field": "rule[0]",
+      "find": "\"Beaucoup de verbes courants se conjuguent à la voix moyenne, en -ομαι ou -άμαι, même s’ils ont un sens actif en français : έρχομαι (venir), κάθομαι (s’asseoir), σκέφτομαι (penser), κοιμάμαι (dormir), φοβάμαι (avoir peur), θυμάμαι (se souvenir). Ils n’ont pas de forme en -ω.\",",
+      "replace": "\"Certains verbes courants ont des terminaisons dites non actives, même quand leur sens est actif : έρχομαι (venir), κάθομαι (être assis, rester), σκέφτομαι (penser), κοιμάμαι (dormir), φοβάμαι (avoir peur) et θυμάμαι (se souvenir). Ces verbes s’apprennent avec leurs formes propres.\","
+    },
+    {
+      "id": "el-b1-middle-verbs",
+      "field": "rule[1]",
+      "find": "\"Terminaisons en -ομαι : -ομαι, -εσαι, -εται, -όμαστε, -εστε, -ονται. En -άμαι : -άμαι, -άσαι, -άται, -όμαστε, -άστε, -ούνται (κοιμάμαι, κοιμάσαι, κοιμάται, κοιμόμαστε, κοιμάστε, κοιμούνται).\",",
+      "replace": "\"Pour έρχομαι, les terminaisons sont -ομαι, -εσαι, -εται, -όμαστε, -εστε, -ονται. Pour κοιμάμαι, retiens κοιμάμαι, κοιμάσαι, κοιμάται, κοιμόμαστε, κοιμάστε, κοιμούνται. Le tableau donne un modèle de chaque groupe. Il existe aussi une série avec κοιμούμαι.\","
+    },
+    {
+      "id": "el-b1-middle-verbs",
+      "field": "rule[2]",
+      "find": "\"La même voix exprime le passif et le réfléchi : Το σπίτι χτίζεται (la maison est en construction), Πλένομαι (je me lave). Piège : « avoir peur » se dit avec un verbe, φοβάμαι, suivi de l’accusatif : Φοβάμαι τα σκυλιά.\",",
+      "replace": "\"Ces terminaisons peuvent aussi exprimer le passif ou une action sur soi : Το σπίτι χτίζεται (« La maison est en construction »), Πλένομαι (« Je me lave »). Pour dire « avoir peur des chiens », utilise φοβάμαι avec l’accusatif : Φοβάμαι τα σκυλιά.\","
+    },
+    {
+      "id": "el-b1-middle-verbs",
+      "field": "examples[0].translation",
+      "find": "{ text: \"Έρχομαι από τη δουλειά.\", translation: \"Je rentre du travail.\", note: \"έρχομαι n’a pas de forme active.\" },",
+      "replace": "{ text: \"Έρχομαι από τη δουλειά.\", translation: \"Je viens du travail.\", note: \"Έρχομαι signifie « venir » et a une forme non active.\" },"
+    },
+    {
+      "id": "el-b1-middle-verbs",
+      "field": "examples[1].translation",
+      "find": "{ text: \"Τα παιδιά κοιμούνται νωρίς.\", translation: \"Les enfants dorment tôt.\", note: \"3e personne du pluriel : -ούνται.\" },",
+      "replace": "{ text: \"Τα παιδιά κοιμούνται νωρίς.\", translation: \"Les enfants se couchent tôt.\", note: \"À la 3e personne du pluriel, κοιμάμαι donne κοιμούνται.\" },"
+    },
+    {
+      "id": "el-b1-middle-verbs",
+      "field": "exercises[2].hint",
+      "find": "hint: \"κάθομαι\",",
+      "replace": "hint: \"κάθομαι, au présent\","
+    },
+    {
+      "id": "el-b1-middle-verbs",
+      "field": "exercises[3].hint",
+      "find": "hint: \"σκέφτομαι\",",
+      "replace": "hint: \"σκέφτομαι, au présent\","
+    },
+    {
+      "id": "el-b1-middle-verbs",
+      "field": "exercises[4].instruction",
+      "find": "instruction: \"Mets la phrase à la 3e personne du pluriel (ils).\",",
+      "replace": "instruction: \"Passe à la 3e personne du pluriel. Tu peux commencer par « Αυτοί » ou « Αυτές ». Garde « νωρίς » à la fin.\","
+    },
+    {
+      "id": "el-b1-relative",
+      "field": "rule[1]",
+      "find": "\"Pour « à qui » ou « dont », le grec garde που et ajoute un pronom faible dans la relative : Ο φίλος που του έδωσα το βιβλίο (l’ami à qui j’ai donné le livre), Η γυναίκα που το σπίτι της είναι εκεί (la femme dont la maison est là-bas). Ce pronom n’existe pas en français.\",",
+      "replace": "\"Pour traduire « à qui » ou « dont », une construction courante garde που et ajoute un pronom faible : ο φίλος που του έδωσα το βιβλίο, η γυναίκα που το σπίτι της είναι εκεί. Le français standard n’ajoute pas « lui » après « à qui » dans cette construction.\","
+    },
+    {
+      "id": "el-b1-relative",
+      "field": "rule[2]",
+      "find": "\"Ο οποίος (η οποία, το οποίο) est plus formel, s’accorde en genre et en nombre et prend le cas de sa fonction. On l’emploie surtout après une préposition : Η γυναίκα με την οποία μιλάω. Pour « ce que / ce qui », on dit αυτό που : Αυτό που θέλω.\",",
+      "replace": "\"Ο οποίος, η οποία, το οποίο appartiennent à un registre plus soigné. La forme s’accorde avec l’antécédent en genre et en nombre, et prend le cas requis par la relative : Η γυναίκα με την οποία μιλάω. Pour « ce que / ce qui », on peut employer αυτό που : Αυτό που θέλω.\","
+    },
+    {
+      "id": "el-b1-relative",
+      "field": "examples[1].note",
+      "find": "{ text: \"Το βιβλίο που διαβάζω είναι πολύ καλό.\", translation: \"Le livre que je lis est très bon.\", note: \"Pas de pronom qui répète le livre.\" },",
+      "replace": "{ text: \"Το βιβλίο που διαβάζω είναι πολύ καλό.\", translation: \"Le livre que je lis est très bon.\", note: \"Ici, που introduit la relative sans pronom de reprise.\" },"
+    },
+    {
+      "id": "el-b1-relative",
+      "field": "exercises[1].options",
+      "find": "options: [\"που\", \"που του\", \"του που\", \"που τον\"],",
+      "replace": "options: [\"που τους\", \"που του\", \"του που\", \"που τον\"],"
+    },
+    {
+      "id": "el-b1-relative",
+      "field": "exercises[1].explanation",
+      "find": "explanation: \"« À qui » se dit που + pronom indirect : που του έδωσα.\",",
+      "replace": "explanation: \"Dans cette construction, « à qui » est rendu par που et le pronom faible του : που του έδωσα.\","
+    },
+    {
+      "id": "el-b1-relative",
+      "field": "exercises[4].instruction",
+      "find": "instruction: \"Relie les deux phrases avec « που ».\",",
+      "replace": "instruction: \"Commence par « Ξέρω τον Νίκο ». Ajoute la relative avec « που » et garde « μένει στην Αθήνα ».\","
+    },
+    {
+      "id": "el-b1-relative",
+      "field": "exercises[4].answers",
+      "find": "          answers: [\"Ξέρω τον Νίκο που μένει στην Αθήνα.\"],",
+      "replace": "          answers: [\"Ξέρω τον Νίκο, που μένει στην Αθήνα.\", \"Ξέρω τον Νίκο που μένει στην Αθήνα.\"],"
+    },
+    {
+      "id": "el-b1-perfect",
+      "field": "rule[0]",
+      "find": "\"Le parfait (παρακείμενος) se forme avec έχω conjugué suivi d’une forme invariable en -ει tirée de l’aoriste : έχω γράψει, έχεις φάει, έχει πάει. Cette forme ne change jamais : Έχουμε δει, Έχουν κάνει. Formes courantes : φάω → φάει, βλέπω → δει, πηγαίνω → πάει, λέω → πει, έρχομαι → έρθει.\",",
+      "replace": "\"Le parfait (παρακείμενος) se forme avec έχω conjugué et une forme invariable fondée sur le radical perfectif : έχω γράψει, έχεις φάει, έχει πάει. Cette forme reste la même avec un autre sujet : έχουμε δει, έχουν κάνει. Retiens φάει (τρώω), δει (βλέπω), πει (λέω) et έρθει (έρχομαι).\","
+    },
+    {
+      "id": "el-b1-perfect",
+      "field": "rule[2]",
+      "find": "\"Piège : le passé composé français correspond souvent à l’aoriste en grec. Avec un repère précis (χθες, πέρσι), on emploie l’aoriste, jamais le parfait : Χθες είδα τη Μαρία, et non « έχω δει χθες ».\",",
+      "replace": "\"Le passé composé français se traduit souvent par un aoriste : Χθες είδα τη Μαρία. Quand tu situes un événement achevé à un moment passé comme hier, l’aoriste est le choix usuel. Le parfait est naturel pour une expérience sans date précise ou un résultat qui compte encore.\","
+    },
+    {
+      "id": "el-b1-perfect",
+      "field": "examples[2].text",
+      "find": "{ text: \"Έχεις δει αυτό το φιλμ;\", translation: \"As-tu déjà vu ce film ?\", note: \"Question sur une expérience.\" },",
+      "replace": "{ text: \"Έχεις δει αυτή την ταινία;\", translation: \"As-tu déjà vu ce film ?\", note: \"Question sur une expérience.\" },"
+    },
+    {
+      "id": "el-b1-perfect",
+      "field": "exercises[0].prompt",
+      "find": "prompt: \"Δεν ___ φάει ακόμα.\",",
+      "replace": "prompt: \"Εγώ δεν ___ φάει ακόμα. (Au parfait.)\","
+    },
+    {
+      "id": "el-b1-perfect",
+      "field": "exercises[0].options",
+      "find": "options: [\"είμαι\", \"έχω\", \"θα\"],",
+      "replace": "options: [\"είμαι\", \"έχω\", \"έχει\"],"
+    },
+    {
+      "id": "el-b1-perfect",
+      "field": "exercises[2].prompt",
+      "find": "prompt: \"Χθες ___ στο σινεμά.\",",
+      "replace": "prompt: \"Χθες ___ στο σινεμά. (Fait passé, à l’aoriste.)\","
+    },
+    {
+      "id": "el-b1-perfect",
+      "field": "exercises[2].explanation",
+      "find": "explanation: \"Avec χθες (repère précis dans le passé), on emploie l’aoriste : πήγα.\",",
+      "replace": "explanation: \"Pour raconter ce fait achevé, emploie l’aoriste de πάω : πήγα.\","
+    },
+    {
+      "id": "el-b1-perfect",
+      "field": "exercises[4].instruction",
+      "find": "instruction: \"Mets la phrase au parfait avec έχω.\",",
+      "replace": "instruction: \"Mets seulement « πήγε » au parfait et garde l’ordre des mots.\","
+    },
+    {
+      "id": "el-a2-aorist",
+      "field": "exercises[1].prompt",
+      "find": "prompt: \"Πέρσι εμείς ___ στην Ελλάδα.\",",
+      "replace": "prompt: \"Πέρσι εμείς ___ στην Ελλάδα. (À l’aoriste.)\","
+    }
+  ]
+}

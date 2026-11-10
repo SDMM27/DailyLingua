@@ -2,7 +2,7 @@ import type { GrammarCourse } from "@/lib/schemas/grammar";
 
 export const jaCourse = {
   language: "ja",
-  version: "2026-10-25",
+  version: "2026-11-10",
   points: [
     {
       id: "ja-a1-desu",
@@ -10,9 +10,9 @@ export const jaCourse = {
       title: "Dire qui on est : AはBです",
       summary: "Identifier avec は et です, nier avec じゃありません, interroger avec か et dire « aussi » avec も.",
       rule: [
-        "Le verbe vient toujours en fin de phrase. « A est B » se dit AはBです : は (qui se lit wa dans ce rôle) marque le thème, ce dont on parle, et です est le « être » poli. Il n’y a ni article ni pluriel : わたしは学生 (がくせい) です peut vouloir dire « je suis étudiant » comme « je suis une étudiante ».",
-        "Négation : AはBじゃありません (à l’écrit soigné, ではありません). Question : on ajoute か à la fin, sans changer l’ordre des mots : あなたは学生ですか。 Réponse : はい、学生です。 ou いいえ、学生じゃありません。",
-        "も remplace は pour dire « aussi » : わたしも学生です。 Piège : le sujet est souvent omis quand le contexte est clair, et on évite あなた (« tu ») en conversation : on répète plutôt le nom, avec さん, que l’on n’ajoute jamais à son propre nom (田中 (たなか) さん).",
+        "Dans la phrase simple, le prédicat se place généralement à la fin. Pour identifier, emploie AはBです. は marque le thème et se prononce comme わ dans cet emploi. です rend la phrase polie. Dans わたしは学生（がくせい）です, 学生（がくせい） ne marque ni le genre ni le nombre. Le japonais n’a pas d’articles.",
+        "Pour nier, emploie じゃありません ou じゃないです. ではありません est une autre forme, plus formelle. Pour poser une question, ajoute か : 学生（がくせい）ですか。 Réponse : はい、学生（がくせい）です。 ou いいえ、学生（がくせい）じゃありません。",
+        "も prend la place de は pour dire « aussi » : わたしも学生（がくせい）です。 Quand le contexte suffit, omets le sujet. Pour t’adresser à quelqu’un, le nom suivi de さん ou l’absence de pronom est souvent plus naturel que あなた. Tu n’ajoutes pas さん à ton propre nom.",
       ],
       table: {
         caption: "Les quatre formes de base",
@@ -25,9 +25,9 @@ export const jaCourse = {
         ],
       },
       examples: [
-        { text: "わたしはフランス人です。", translation: "Je suis français(e).", note: "人 (じん) après un nom de pays donne l’habitant : フランス人 (ふらんすじん)." },
-        { text: "田中さんは先生じゃありません。", translation: "Monsieur Tanaka n’est pas professeur.", note: "田中 たなか, 先生 せんせい. Négation polie : じゃありません." },
-        { text: "あなたも学生ですか。", translation: "Es-tu étudiant(e) toi aussi ?", note: "学生 がくせい. も remplace は ; か en fin de phrase fait la question." },
+        { text: "わたしはフランス人です。", translation: "Je suis français(e).", note: "フランス人 フランスじん. 人 se lit じん après un nom de pays." },
+        { text: "たなかさんは先生じゃありません。", translation: "M. ou Mme Tanaka n’est pas professeur.", note: "先生 せんせい. じゃありません marque la négation polie." },
+        { text: "たなかさんも学生ですか。", translation: "Tanaka, êtes-vous aussi étudiant ou étudiante ?", note: "学生 がくせい. も remplace は. か marque la question." },
       ],
       exercises: [
         {
@@ -46,20 +46,21 @@ export const jaCourse = {
         },
         {
           type: "fill",
-          prompt: "佐藤さんは会社員です。わたし___会社員です。（Moi aussi.）",
+          prompt: "さとうさんは学生です。わたし___学生です。（Moi aussi.）",
           answers: ["も"],
-          explanation: "も remplace は pour dire « aussi » : わたしも会社員です。",
+          explanation: "も remplace は pour dire « aussi » : わたしも学生です。",
         },
         {
           type: "transform",
-          instruction: "Transforme la phrase en question.",
-          source: "山田さんは先生です。",
+          instruction: "Ajoute か pour poser une question polie en gardant le thème et le prédicat.",
+          source: "やまださんは先生です。",
           answers: ["山田さんは先生ですか。", "やまださんはせんせいですか。", "山田さんはせんせいですか。", "やまださんは先生ですか。"],
           explanation: "Il suffit d’ajouter か à la fin ; l’ordre des mots ne change pas.",
         },
       ],
       categories: ["function_word", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ja-a1-no-kosoado",
@@ -67,9 +68,9 @@ export const jaCourse = {
       title: "Montrer et relier : これ・この・ここ et の",
       summary: "Désigner ce qui est près ou loin avec こ・そ・あ・ど, et dire « de » avec の.",
       rule: [
-        "Le japonais a trois distances et un mot interrogatif : こ (près de moi), そ (près de toi), あ (loin de nous deux), ど (lequel, où ?). Chaque série a trois formes : これ / それ / あれ / どれ (pronom seul), この / その / あの / どの (devant un nom), ここ / そこ / あそこ / どこ (lieu).",
+        "Pour montrer, emploie こ près de toi, そ près de ton interlocuteur et あ loin de vous deux. ど sert à interroger. Choisis ensuite la forme selon le rôle : これ / それ / あれ / どれ pour une chose, この / その / あの / どの avant un nom, ここ / そこ / あそこ / どこ pour un lieu.",
         "Piège : これ ne se place jamais devant un nom. Il faut この : このほんはわたしのです (ce livre est à moi), pas ✗ これほん. そ sert aussi pour ce dont l’interlocuteur vient de parler.",
-        "の relie deux noms : A の B, « le B de A », dans l’ordre inverse du français : マリアのかばん (le sac de Marie). Il marque la possession (わたしの本) et l’appartenance (日本語 (にほんご) の先生 (せんせい) = le professeur de japonais). Après の, le second nom peut disparaître : それはわたしのです (c’est le mien).",
+        "AのB place le nom qui précise en premier : マリアのかばん (« le sac de Marie »), わたしの本（ほん） (« mon livre »), にほんごの先生（せんせい） (« professeur de japonais »). Quand B est connu, tu peux l’omettre : それはわたしのです (« C’est le mien »).",
       ],
       table: {
         caption: "Les séries こ・そ・あ・ど",
@@ -82,13 +83,13 @@ export const jaCourse = {
       },
       examples: [
         { text: "これはわたしの本です。", translation: "Ceci est mon livre.", note: "本 ほん. これ est seul ; の relie わたし et 本." },
-        { text: "あの人は日本語の先生です。", translation: "Cette personne-là est professeur de japonais.", note: "人 ひと, 日本語 にほんご, 先生 せんせい. あの + nom ; 日本語の先生 : « de japonais » vient devant." },
+        { text: "あの人はにほんごの先生です。", translation: "Cette personne-là est professeur de japonais.", note: "人 ひと, 先生 せんせい. あの précède le nom. の relie la langue et la profession." },
         { text: "トイレはどこですか。", translation: "Où sont les toilettes ?", note: "どこ remplace le lieu demandé ; la phrase garde la forme AはBですか." },
       ],
       exercises: [
         {
           type: "choose",
-          prompt: "___本は田中さんのです。（Ce livre que j’ai en main.）",
+          prompt: "___本はたなかさんのです。（Ce livre que j’ai en main.）",
           options: ["これ", "この", "ここ", "どれ"],
           answer: 1,
           explanation: "Devant un nom, on emploie この (この本). これ s’emploie seul.",
@@ -116,6 +117,7 @@ export const jaCourse = {
       ],
       categories: ["function_word", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ja-a1-masu",
@@ -125,7 +127,7 @@ export const jaCourse = {
       rule: [
         "La forme polie du présent finit en ます (affirmatif) ou ません (négatif). Elle dit le présent habituel et le futur : まいにちコーヒーをのみます (je bois du café tous les jours), あしたたべます (je mangerai demain). Il n’y a pas de personne ni de nombre : une seule forme pour je, tu, il, nous.",
         "On apprend les verbes sous leur forme en ます : たべます (manger), のみます (boire), みます (voir, regarder), いきます (aller), します (faire). Négatif : たべません. Question : たべますか。 Réponse : はい、たべます。 ou いいえ、たべません。",
-        "L’objet direct prend を (qui se lit o) : パンをたべます (je mange du pain). Piège : le verbe vient toujours en dernier, après tous les compléments, alors qu’en français il suit le sujet. L’ordre normal est : thème, complément, verbe.",
+        "L’objet direct prend を, prononcé comme お : パンをたべます (« Je mange du pain »). Dans l’ordre courant, le thème et les compléments précèdent le prédicat. Quand le contexte est clair, le thème peut rester implicite.",
       ],
       table: {
         caption: "Verbes courants",
@@ -162,13 +164,13 @@ export const jaCourse = {
         {
           type: "fill",
           prompt: "コーヒーを___。（Je bois du café.）",
-          hint: "boire",
+          hint: "boire, forme polie en ます",
           answers: ["のみます", "飲みます"],
           explanation: "Boire se dit のみます (飲みます) à la forme polie du présent.",
         },
         {
           type: "transform",
-          instruction: "Mets la phrase au négatif.",
+          instruction: "Mets uniquement le verbe au négatif poli en ません.",
           source: "パンをたべます。",
           answers: ["パンをたべません。", "パンを食べません。"],
           explanation: "On remplace ます par ません ; le reste de la phrase ne change pas.",
@@ -176,6 +178,7 @@ export const jaCourse = {
       ],
       categories: ["verb", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ja-a1-particles",
@@ -183,9 +186,9 @@ export const jaCourse = {
       title: "Lieu, moment, moyen, compagnie : に・で・へ・と・から・まで",
       summary: "Choisir la particule qui marque l’heure, le lieu de l’action, la direction, le moyen et la compagnie.",
       rule: [
-        "Les particules suivent le mot qu’elles marquent et font le travail de nos prépositions. に : moment précis (7じに おきます, je me lève à 7 h) et destination (がっこうにいきます). へ (qui se lit e) : direction, souvent interchangeable avec に après いきます / きます.",
-        "で : lieu où se déroule une action (うちでたべます, je mange à la maison) et moyen (バスでいきます, j’y vais en bus). と : « avec » (ともだちといきます) et « et » entre deux noms (パンとミルク). から et まで : départ et limite (9じからごじまで, de 9 h à 17 h).",
-        "Piège : le français dit « à » partout, le japonais choisit selon le sens. Une action qui se passe quelque part prend で (うちで), un déplacement vers un lieu prend に ou へ, une heure précise prend に. Aucune particule n’est facultative dans ces rôles.",
+        "Les particules suivent le mot qu’elles marquent. に indique notamment une heure précise (しちじにおきます, « Je me lève à 7 h ») ou une destination (がっこうにいきます). へ indique la direction et se prononce comme え dans cet emploi. Avec いきます ou きます, les deux particules peuvent indiquer la destination.",
+        "で indique notamment le lieu d’une action (うちでたべます) et le moyen (バスでいきます). と signifie « avec » (ともだちといきます) ou « et » entre deux noms (パンとミルク). から marque le départ et まで la limite : くじからごごごじまで (« de 9 h à 17 h »).",
+        "Pour une action qui se déroule quelque part, emploie en général で. Pour une destination, に ou へ conviennent avec いきます. に marque aussi une heure précise, mais un repère relatif tel que あした (« demain ») s’emploie normalement seul. À l’oral, certaines particules peuvent être omises.",
       ],
       table: {
         caption: "Les particules de la phrase simple",
@@ -196,7 +199,7 @@ export const jaCourse = {
           ["で", "lieu d’action, moyen", "バスでいきます"],
           ["と", "avec, et", "ともだちとたべます"],
           ["を", "objet direct", "パンをたべます"],
-          ["から / まで", "depuis / jusqu’à", "9じからごじまで"],
+          ["から / まで", "de / jusqu’à", "くじからごごごじまで"],
         ],
       },
       examples: [
@@ -223,7 +226,7 @@ export const jaCourse = {
           type: "fill",
           prompt: "うち___ごはんをたべます。（Je mange à la maison.）",
           answers: ["で"],
-          explanation: "Le lieu où se déroule une action prend で : うちで. に serait réservé à l’existence ou à la destination.",
+          explanation: "Pour le lieu où l’on mange, emploie で : うちで。 に s’utilise dans d’autres constructions, par exemple pour une destination ou un lieu d’existence.",
         },
         {
           type: "choose",
@@ -235,6 +238,7 @@ export const jaCourse = {
       ],
       categories: ["function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ja-a1-adjectives",
@@ -243,8 +247,8 @@ export const jaCourse = {
       summary: "Utiliser les deux familles d’adjectifs devant un nom et en fin de phrase, au présent affirmatif et négatif.",
       rule: [
         "Il y a deux familles. Les adjectifs en い finissent par い et se conjuguent eux-mêmes (たかい : cher, haut ; おいしい : bon ; あたらしい : neuf). Les adjectifs en な se comportent comme des noms (しずか : calme ; きれい : joli, propre ; ゆうめい : célèbre).",
-        "Devant un nom, l’adjectif en い garde son い (たかい本), celui en な prend な (しずかなまち). En fin de phrase on ajoute です : このほんはたかいです, まちはしずかです (sans な).",
-        "Négatif : い devient くないです (たかくないです) ; な devient じゃありません (しずかじゃありません). Piège : on ne dit jamais ✗ たかいじゃありません. Exception : いい (bien) devient よくないです. Attention : きれい et ゆうめい finissent en い mais sont des adjectifs en な.",
+        "Devant un nom, l’adjectif en い garde sa forme (たかい本（ほん）), et l’adjectif en な prend な (しずかなまち). En fin de phrase affirmative polie, ajoute です : このほんはたかいです, まちはしずかです. な ne précède pas です.",
+        "Pour nier un adjectif en い, remplace い par くないです ou くありません : たかくないです, たかくありません. Pour un adjectif en な, ajoute じゃないです ou じゃありません : しずかじゃありません. いい donne よくないです. きれい et ゆうめい appartiennent au groupe en な.",
       ],
       table: {
         caption: "Présent des adjectifs",
@@ -257,16 +261,16 @@ export const jaCourse = {
       },
       examples: [
         { text: "このパンはおいしいです。", translation: "Ce pain est bon.", note: "おいしい est un adjectif en い : おいしいです." },
-        { text: "ここはきれいな町です。", translation: "C’est une jolie ville, ici.", note: "町 まち. きれい est en な : きれいな + nom." },
-        { text: "あの店は高くないです。", translation: "Ce magasin n’est pas cher.", note: "店 みせ, 高 たか. 高い → 高くないです : い devient くない." },
+        { text: "ここはきれいなまちです。", translation: "C’est une jolie ville, ici.", note: "きれい appartient au groupe en な. Devant まち, écris きれいな." },
+        { text: "あのみせはたかくないです。", translation: "Ce magasin n’est pas cher.", note: "たかい → たかくないです. La négation change la fin de l’adjectif." },
       ],
       exercises: [
         {
           type: "choose",
           prompt: "このかばんは___。（Ce sac n’est pas cher.）",
-          options: ["やすいくないです", "やすくないです", "やすじゃありません"],
+          options: ["たかいくないです", "たかくないです", "たかいじゃありません"],
           answer: 1,
-          explanation: "やすい est un adjectif en い : le négatif poli est やすくないです. じゃありません est réservé aux adjectifs en な.",
+          explanation: "たかい signifie ici « cher ». Il perd い et prend くないです pour dire « n’est pas cher ».",
         },
         {
           type: "choose",
@@ -279,18 +283,19 @@ export const jaCourse = {
           type: "fill",
           prompt: "あれはあたらし___くるまです。（une voiture neuve）",
           answers: ["い"],
-          explanation: "Un adjectif en い garde son い devant le nom : あたらしい車.",
+          explanation: "Un adjectif en い garde sa forme devant le nom : あたらしいくるま。",
         },
         {
           type: "transform",
           instruction: "Mets la phrase au négatif.",
           source: "このパンはおいしいです。",
-          answers: ["このパンはおいしくないです。", "このパンはおいしくありません。"],
+          answers: ["このパンはおいしくないです。", "このパンはおいしくありません。", "このパンは美味しくないです。", "このパンは美味しくありません。"],
           explanation: "おいしい devient おいしくない + です (ou おいしくありません, tout aussi poli).",
         },
       ],
       categories: ["agreement", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ja-a1-aru-iru",
@@ -298,7 +303,7 @@ export const jaCourse = {
       title: "Dire qu’il y a : あります et います",
       summary: "Exprimer l’existence et situer quelque chose avec Lieu に N が あります / います.",
       rule: [
-        "Le français a un seul « il y a » ; le japonais a deux verbes. います s’emploie pour les êtres animés (personnes, animaux), あります pour tout le reste (objets, plantes, événements). Négatif : いません / ありません.",
+        "Pour situer une personne ou un animal, emploie います. Pour une chose, une plante ou un événement, emploie généralement あります. Ainsi, le même « il y a » français correspond à deux constructions. Les négatifs sont いません et ありません.",
         "Structure : Lieu に N が あります / います. Le lieu prend に, ce qui existe prend が : つくえのうえにほんがあります (il y a un livre sur le bureau). Le lieu précis se construit avec un nom de position relié par の : つくえの うえ, いすの した.",
         "Pour dire où se trouve quelque chose de connu, on le met en thème avec は : ほんはつくえのうえにあります (le livre est sur le bureau). Piège : ne traduis pas « il y a » par ✗ あります pour une personne : あそこにせんせいがいます.",
       ],
@@ -342,14 +347,15 @@ export const jaCourse = {
         },
         {
           type: "transform",
-          instruction: "Mets la phrase au négatif.",
+          instruction: "Nie la présence du chat avec いません. Garde le lieu en tête et utilise が ou は pour le chat.",
           source: "うちにねこがいます。",
-          answers: ["うちにねこがいません。", "うちにねこはいません。"],
+          answers: ["うちにねこがいません。", "うちにねこはいません。", "うちに猫がいません。", "うちに猫はいません。", "家にねこがいません。", "家にねこはいません。", "家に猫がいません。", "家に猫はいません。"],
           explanation: "います devient いません ; が peut rester ou se changer en は pour nier.",
         },
       ],
       categories: ["verb", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ja-a2-masu-past",
@@ -357,9 +363,9 @@ export const jaCourse = {
       title: "Raconter au passé : ました, ませんでした, でした",
       summary: "Former le passé poli des verbes, de です et des adjectifs.",
       rule: [
-        "Verbes : ます devient ました (passé) et ません devient ませんでした (passé négatif) : きのうえいがをみました (hier, j’ai vu un film), なにもたべませんでした (je n’ai rien mangé). Il n’y a qu’un passé poli, qui rend à la fois le passé composé et l’imparfait ponctuel.",
+        "Pour un verbe au passé poli, remplace ます par ました, ou ません par ませんでした : きのうえいがをみました (« Hier, j’ai vu un film »), なにもたべませんでした (« Je n’ai rien mangé »). Selon le contexte, le français emploie le passé composé ou l’imparfait. Une action qui était en cours se dit souvent avec ていました.",
         "です devient でした (きのうはあめでした : hier, il pleuvait), et じゃありません devient じゃありませんでした. Les adjectifs en な suivent です : しずかでした, しずかじゃありませんでした.",
-        "Adjectifs en い : い devient かったです (たかかったです) et くないです devient くなかったです. Piège : le passé est dans l’adjectif lui-même, pas dans です ; on ne dit pas ✗ たかいでした.",
+        "Pour les adjectifs en い, remplace い par かったです au passé affirmatif, et くないです par くなかったです au négatif. On dit aussi くありませんでした. Exemple : たかかったです. Le passé est marqué dans l’adjectif, puis です rend la phrase polie.",
       ],
       table: {
         caption: "Présent et passé poli",
@@ -376,7 +382,7 @@ export const jaCourse = {
         ],
       },
       examples: [
-        { text: "きのう友だちと映画を見ました。", translation: "Hier, j’ai vu un film avec un ami.", note: "友 とも, 映画 えいが, 見 み. 見ます → 見ました." },
+        { text: "きのう友だちと映画を見ました。", translation: "Hier, j’ai vu un film avec un ami.", note: "友だち ともだち, 映画 えいが, 見ます みます. 見ました est au passé poli." },
         { text: "先週の旅行は楽しかったです。", translation: "Le voyage de la semaine dernière était agréable.", note: "先週 せんしゅう, 旅行 りょこう, 楽 たの. 楽しい → 楽しかったです." },
         { text: "きのうはあまり寒くなかったです。", translation: "Hier, il ne faisait pas très froid.", note: "寒 さむ. 寒い → 寒くなかったです ; あまり + négatif = pas très." },
       ],
@@ -403,14 +409,15 @@ export const jaCourse = {
         },
         {
           type: "transform",
-          instruction: "Mets la phrase au passé.",
+          instruction: "Mets uniquement le verbe au passé poli en ました.",
           source: "まいあさコーヒーをのみます。",
-          answers: ["まいあさコーヒーをのみました。", "毎朝コーヒーを飲みました。", "毎朝コーヒーをのみました。"],
+          answers: ["まいあさコーヒーをのみました。", "まいあさコーヒーを飲みました。", "毎朝コーヒーをのみました。", "毎朝コーヒーを飲みました。"],
           explanation: "のみます devient のみました ; le reste de la phrase ne change pas.",
         },
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ja-a2-counters",
@@ -418,9 +425,9 @@ export const jaCourse = {
       title: "Compter et dire un prix : nombres et compteurs",
       summary: "Utiliser les nombres, les prix en yens et les compteurs pour objets, personnes, livres…",
       rule: [
-        "Nombres : いち 1, に 2, さん 3, し / よん 4, ご 5, ろく 6, しち / なな 7, はち 8, きゅう 9, じゅう 10. Puis 20 = にじゅう, 100 = ひゃく, 1000 = せん, 10 000 = まん (le japonais compte par blocs de 10 000). Prix : さんびゃくえん (300 yens), せんごひゃくえん (1 500 yens).",
-        "On ne compte pas un nom nu : on ajoute un compteur choisi d’après la forme de ce qu’on compte. つ pour les objets en général (ひとつ, ふたつ, みっつ… jusqu’à とお pour 10), にん pour les personnes (ひとり, ふたり, さんにん), まい pour le plat (feuilles, tickets), ほん pour le long (stylos, bouteilles), さつ pour les livres, だい pour les machines.",
-        "Place : Nを + quantité + verbe : りんごをみっつかいました (j’ai acheté trois pommes). Le nom reste invariable. Piège : le son du compteur change avec le chiffre (いっぽん, にほん, さんぼん) et 1 ou 2 personnes sont irrégulières (ひとり, ふたり) : apprends-les comme des mots.",
+        "De 1 à 10 : いち, に, さん, よん / し, ご, ろく, なな / しち, はち, きゅう, じゅう. Puis にじゅう (20), ひゃく (100), せん (1 000), いちまん (10 000). まん est l’unité de 10 000. Pour les prix : さんびゃくえん (300 yens), せんごひゃくえん (1 500 yens).",
+        "Quand tu comptes des personnes ou des objets, choisis un compteur adapté. つ sert à compter beaucoup de choses (ひとつ, ふたつ, jusqu’à とお). にん sert aux personnes, まい aux choses plates, ほん aux objets longs, さつ aux livres et だい aux machines ou aux véhicules.",
+        "Tu peux mettre la quantité après le groupe objet : りんごをみっつかいました (« J’ai acheté trois pommes »). On peut aussi dire みっつのりんご. Le nom reste invariable. Retiens les lectures de ほん (いっぽん, にほん, さんぼん) et les formes ひとり et ふたり pour les personnes.",
       ],
       table: {
         caption: "Compteurs courants",
@@ -464,12 +471,13 @@ export const jaCourse = {
         {
           type: "fill",
           prompt: "このパンは___えんです。（300 yens）",
-          answers: ["さんびゃく", "三百"],
-          explanation: "300 se dit さんびゃく (三百) : le h de ひゃく devient b après さん.",
+          answers: ["さんびゃく", "三百", "300", "３００", "三〇〇"],
+          explanation: "300 se dit さんびゃく (三百). Dans ce nombre, ひゃく se prononce びゃく.",
         },
       ],
       categories: ["word_choice", "agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ja-a2-te-form",
@@ -477,9 +485,9 @@ export const jaCourse = {
       title: "La forme en て : demander et enchaîner",
       summary: "Former la forme en て des trois groupes de verbes, demander poliment et lier des actions.",
       rule: [
-        "Il y a trois groupes. Groupe 1 : verbes en -u comme かく, のむ, まつ, かう ; la fin change selon la dernière syllabe (voir le tableau). Groupe 2 : verbes en -eru ou -iru comme たべる, みる ; on retire る et on ajoute て (たべて, みて). Irréguliers : する → して, くる → きて. Exception du groupe 1 : いく → いって.",
+        "Groupe 1 : la fin change selon le dernier kana, comme かく → かいて ou のむ → のんで (voir le tableau). Groupe 2 : retire る et ajoute て, comme たべる → たべて et みる → みて. Irréguliers : する → して, くる → きて. Pour いく, retiens いって.",
         "Emploi n° 1 : V て + ください = « fais… s’il te plaît » : ちょっとまってください. Emploi n° 2 : enchaîner des actions : あさおきて、シャワーをあびて、がっこうへいきます. Seul le dernier verbe porte le temps et la politesse.",
-        "Piège : on apprend la forme en て avec chaque verbe, car elle sert de base à beaucoup de structures (ている, てもいい, てから…). Ne confonds pas le groupe 2 (たべる → たべて) et un verbe du groupe 1 en -ru (かえる → かえって) : il faut retenir à quel groupe appartient chaque verbe.",
+        "La forme en て sert aussi de base à ている, てもいい et てから. Certains verbes en る suivent le groupe 1. Compare たべる → たべて et かえる (« rentrer ») → かえって. Pour un verbe en る, apprends aussi son groupe.",
       ],
       table: {
         caption: "Formation de la forme en て",
@@ -532,6 +540,7 @@ export const jaCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ja-a2-te-iru",
@@ -539,7 +548,7 @@ export const jaCourse = {
       title: "En cours, permis, interdit : ている, てもいい, てはいけない",
       summary: "Dire ce qu’on est en train de faire, demander la permission et interdire avec la forme en て.",
       rule: [
-        "V て + います exprime une action en cours (いまごはんをたべています : je suis en train de manger) et aussi un état résultant ou durable (とうきょうにすんでいます : j’habite à Tokyo ; けっこんしています : je suis marié). Piège : « habiter » se dit toujours すんでいます ; ✗ すみます voudrait dire « j’habiterai ».",
+        "V て + います peut exprimer une action en cours : いまごはんをたべています (« Je suis en train de manger »). Selon le verbe, il décrit aussi un état : とうきょうにすんでいます (« J’habite à Tokyo »). すみます convient, par exemple, pour annoncer où l’on habitera ensuite.",
         "Permission : V て + もいいです (たべてもいいです : on peut manger). Pour la demander : V てもいいですか。 (Puis-je… ?). Interdiction : V て + はいけません (ここでたべてはいけません : il est interdit de manger ici).",
         "Le négatif de ている est ていません : まだたべていません (je n’ai pas encore mangé). D’autres verbes se disent avec ている pour un état : しっています (je sais, je connais), もっています (je possède). Le contraire de しっています est しりません, sans ている.",
       ],
@@ -561,7 +570,7 @@ export const jaCourse = {
       exercises: [
         {
           type: "choose",
-          prompt: "いまテレビを___。（Je regarde la télé en ce moment.）",
+          prompt: "いまテレビを___。（Je suis en train de regarder la télé.）",
           options: ["みます", "みてもいいです", "みています"],
           answer: 2,
           explanation: "Une action en cours se dit avec V て + います : みています.",
@@ -582,7 +591,7 @@ export const jaCourse = {
         },
         {
           type: "transform",
-          instruction: "Demande la permission (V てもいいですか).",
+          instruction: "Demande la permission avec てもいいですか en gardant ここに.",
           source: "ここにすわります。",
           answers: ["ここにすわってもいいですか。", "ここに座ってもいいですか。"],
           explanation: "すわる → すわって, puis もいいですか.",
@@ -590,6 +599,7 @@ export const jaCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ja-a2-tai-hoshii",
@@ -598,8 +608,8 @@ export const jaCourse = {
       summary: "Dire ce qu’on veut faire ou avoir, et inviter quelqu’un avec ～ませんか / ～ましょう.",
       rule: [
         "Vouloir faire : base de ます + たい (たべたいです : je veux manger). たい se conjugue comme un adjectif en い : たべたくないです (je ne veux pas manger), たべたかったです (je voulais manger). L’objet peut prendre を ou が : すしをたべたいです / すしがたべたいです.",
-        "Vouloir une chose : N が ほしいです (あたらしいくるまがほしいです). ほしい est un adjectif en い et son objet prend が, jamais を. Piège : たい et ほしい décrivent le désir de la personne qui parle, ou celui de l’interlocuteur dans une question (なにがたべたいですか) ; ils ne servent pas à dire « il veut » au présent.",
-        "Inviter : V ませんか (« ne voudrais-tu pas… ? ») et accepter : V ましょう (« faisons-le »). いっしょにたべませんか。— ええ、たべましょう。 Tous deux sont formés sur la base de ます, comme たい.",
+        "Pour dire que tu veux une chose, emploie N が ほしいです. Pour demander ce que l’autre veut faire, dis なにがたべたいですか。 En parlant directement d’un tiers, évite de présenter son désir comme le tien. Tu peux rapporter ses paroles : いきたいといっています (« Il dit qu’il veut y aller »).",
+        "Propose une activité avec la base de ます suivie de ませんか : いっしょにたべませんか。 Tu peux aussi proposer ou accepter avec ましょう : ええ、たべましょう。 Ces deux formes partent de la même base que たい.",
       ],
       table: {
         caption: "Base de ます + たい",
@@ -613,7 +623,7 @@ export const jaCourse = {
         ],
       },
       examples: [
-        { text: "日本へ行きたいです。", translation: "Je veux aller au Japon.", note: "日本 にほん, 行 い. 行きます → 行きたい。" },
+        { text: "日本へ行きたいです。", translation: "Je veux aller au Japon.", note: "日本 にほん, 行きます いきます. Enlève ます et ajoute たいです." },
         { text: "新しいスマホがほしいです。", translation: "Je veux un nouveau smartphone.", note: "新 あたら. ほしい : l’objet prend が." },
         { text: "いっしょに昼ごはんを食べませんか。", translation: "Et si on déjeunait ensemble ?", note: "昼 ひる, 食 た. V ませんか : invitation polie." },
       ],
@@ -635,7 +645,7 @@ export const jaCourse = {
         {
           type: "fill",
           prompt: "あしたはうみへ___。（Demain, je ne veux pas aller à la mer.）",
-          hint: "いく",
+          hint: "いく, négation polie en たい",
           answers: ["いきたくないです", "行きたくないです", "いきたくありません", "行きたくありません"],
           explanation: "たい se conjugue comme un adjectif en い : いきたい → いきたくないです.",
         },
@@ -643,12 +653,13 @@ export const jaCourse = {
           type: "transform",
           instruction: "Transforme en invitation (ませんか).",
           source: "いっしょにえいがをみます。",
-          answers: ["いっしょにえいがをみませんか。", "いっしょに映画を見ませんか。"],
+          answers: ["いっしょにえいがをみませんか。", "いっしょにえいがを見ませんか。", "いっしょにえいがを観ませんか。", "いっしょに映画をみませんか。", "いっしょに映画を見ませんか。", "いっしょに映画を観ませんか。", "一緒にえいがをみませんか。", "一緒にえいがを見ませんか。", "一緒にえいがを観ませんか。", "一緒に映画をみませんか。", "一緒に映画を見ませんか。", "一緒に映画を観ませんか。"],
           explanation: "Le négatif interrogatif ませんか sert à inviter poliment.",
         },
       ],
       categories: ["verb", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ja-a2-plain-forms",
@@ -656,9 +667,9 @@ export const jaCourse = {
       title: "Parler simplement : la forme du dictionnaire, ない, た",
       summary: "Former le style simple (présent, négatif, passé) utilisé entre amis et en famille.",
       rule: [
-        "Entre amis et en famille, on emploie le style simple. La forme du dictionnaire (たべる, のむ, いく, する, くる) remplace ます au présent : たべます → たべる. C’est aussi la forme que l’on cherche dans un dictionnaire.",
-        "Négatif : groupe 2 : る → ない (たべる → たべない) ; groupe 1 : dernière syllabe en -a + ない (のむ → のまない, いく → いかない, かう → かわない) ; する → しない, くる → こない. Passé : た se forme comme て (て → た, で → だ) : たべた, のんだ, いった, した, きた. Négatif passé : ～なかった (たべなかった).",
-        "Pour です, le style simple dit だ, じゃない, だった, じゃなかった. Les adjectifs en い sont déjà simples : たかい, たかくない, たかかった. Piège : le style simple est brusque avec un inconnu ou un supérieur ; garde ます dans ces cas.",
+        "Entre amis et en famille, on emploie souvent la forme neutre. Pour un verbe au non-passé affirmatif, elle correspond à la forme du dictionnaire : たべます → たべる. Elle sert aussi dans certaines propositions à l’intérieur d’une phrase qui se termine poliment.",
+        "Négatif : dans le groupe 2, る devient ない (たべない). Dans le groupe 1, passe à la ligne en あ avant ない (のまない, いかない), avec う → わ (かわない). Retiens しない, こない et ある → ない. Passé : transforme て en た, et で en だ (たべた, のんだ). Négatif passé : ない → なかった.",
+        "Pour un nom ou un adjectif en な, les formes neutres comprennent だ, じゃない, だった et じゃなかった. Dans la conversation, だ s’omet parfois. Un adjectif en い se suffit à lui-même : たかい, たかくない, たかかった. Avec un inconnu, choisis généralement une fin de phrase polie.",
       ],
       table: {
         caption: "Du poli au simple",
@@ -674,7 +685,7 @@ export const jaCourse = {
       },
       examples: [
         { text: "あしたは学校に行かない。", translation: "Demain, je ne vais pas à l’école.", note: "学校 がっこう, 行 い. 行く → 行かない : く devient か + ない." },
-        { text: "きのうの映画、おもしろかった。", translation: "Le film d’hier était bien.", note: "映画 えいが. Passé simple d’un adjectif en い : おもしろかった." },
+        { text: "きのうの映画、おもしろかった。", translation: "Le film d’hier était bien.", note: "映画 えいが. おもしろかった est le passé neutre d’un adjectif en い." },
         { text: "昼ごはんはもう食べた？", translation: "Tu as déjà déjeuné ?", note: "昼 ひる, 食 た. 食べた : た sans ます ; la question se marque à l’intonation." },
       ],
       exercises: [
@@ -687,7 +698,7 @@ export const jaCourse = {
         },
         {
           type: "choose",
-          prompt: "Passé simple de いく : ___",
+          prompt: "Passé à la forme neutre de いく : ___",
           options: ["いきた", "いいた", "いった"],
           answer: 2,
           explanation: "いく est l’exception de la forme en て (いって), donc le passé est いった.",
@@ -701,14 +712,15 @@ export const jaCourse = {
         },
         {
           type: "transform",
-          instruction: "Mets la phrase au style simple.",
+          instruction: "Remplace uniquement la fin polie par le verbe à la forme du dictionnaire.",
           source: "あしたえいがをみます。",
-          answers: ["あしたえいがをみる。", "明日映画を見る。", "あした映画を見る。", "あしたえいがを見る。"],
+          answers: ["あしたえいがをみる。", "あしたえいがを見る。", "あしたえいがを観る。", "あした映画をみる。", "あした映画を見る。", "あした映画を観る。", "明日えいがをみる。", "明日えいがを見る。", "明日えいがを観る。", "明日映画をみる。", "明日映画を見る。", "明日映画を観る。"],
           explanation: "みます devient みる, la forme du dictionnaire.",
         },
       ],
       categories: ["verb", "register"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ja-b1-potential",
@@ -716,9 +728,9 @@ export const jaCourse = {
       title: "Pouvoir faire : la forme potentielle",
       summary: "Dire ce qu’on sait ou peut faire avec la forme potentielle ou ～ことができる.",
       rule: [
-        "Deux façons de dire « pouvoir ». Neutre et écrite : forme du dictionnaire + ことができます (にほんごをはなすことができます). Forme potentielle : groupe 1 : la voyelle finale passe de -u à -eru (かく → かける, のむ → のめる, はなす → はなせる) ; groupe 2 : る → られる (たべる → たべられる) ; する → できる ; くる → こられる.",
-        "Le verbe potentiel est un verbe du groupe 2 et se conjugue comme tel : かけません (je ne peux pas écrire), かけました (j’ai pu écrire). L’objet prend souvent が au lieu de を : にほんごがはなせます. Le を reste possible, surtout à l’oral.",
-        "Piège : « voir » et « entendre » ont leur propre verbe pour une perception qui s’impose : やまがみえます (la montagne est visible), おとがきこえます (on entend un bruit). Ne forme pas ✗ みられる pour cela : みられる veut dire « pouvoir regarder » (un film, par exemple).",
+        "Pour dire « pouvoir », tu peux employer le verbe du dictionnaire suivi de ことができます, ou conjuguer le verbe au potentiel. Groupe 1 : passe à la ligne en え et ajoute る (かく → かける, のむ → のめる). Groupe 2 : remplace る par られる (たべられる). Retiens する → できる et くる → こられる.",
+        "Les formes potentielles se conjuguent comme celles du groupe 2 : かけます, かけません, かけました. Pour l’élément sur lequel porte l’action, が est courant. Dans にほんごがはなせます et にほんごをはなせます, les deux particules conviennent.",
+        "Pour une perception qui se produit, emploie par exemple やまがみえます (« On voit la montagne ») ou おとがきこえます (« On entend un bruit »). みられます exprime plutôt la possibilité de voir ou de regarder quelque chose, par exemple un film disponible.",
       ],
       table: {
         caption: "Forme potentielle",
@@ -745,7 +757,7 @@ export const jaCourse = {
           prompt: "Potentiel de のむ : ___",
           options: ["のまれる", "のみられる", "のめる"],
           answer: 2,
-          explanation: "Groupe 1 : のむ devient のめる (u → eru).",
+          explanation: "Dans le groupe 1, passe à la ligne en え (む → め) et ajoute る : のめる。",
         },
         {
           type: "choose",
@@ -757,20 +769,21 @@ export const jaCourse = {
         {
           type: "fill",
           prompt: "わたしはピアノが___。（Je sais jouer du piano.）",
-          hint: "ひく",
+          hint: "ひく, au potentiel poli en ます",
           answers: ["ひけます", "弾けます"],
           explanation: "ひく (jouer d’un instrument à cordes ou à clavier) fait ひける au potentiel, donc ひけます à la forme polie.",
         },
         {
           type: "transform",
-          instruction: "Mets le verbe à la forme potentielle (poli).",
+          instruction: "Conjugue le verbe au potentiel poli. Pour son complément, garde を ou emploie が.",
           source: "ひらがなをかきます。",
-          answers: ["ひらがながかけます。", "ひらがなをかけます。", "ひらがなが書けます。", "ひらがなを書けます。"],
+          answers: ["ひらがながかけます。", "ひらがなが書けます。", "ひらがなをかけます。", "ひらがなを書けます。", "平仮名がかけます。", "平仮名が書けます。", "平仮名をかけます。", "平仮名を書けます。"],
           explanation: "かきます → かけます. L’objet peut passer de を à が avec le potentiel.",
         },
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ja-b1-giving-receiving",
@@ -778,9 +791,9 @@ export const jaCourse = {
       title: "Donner et recevoir : あげる, くれる, もらう",
       summary: "Choisir entre あげる, くれる et もらう selon qui donne à qui, et les employer avec la forme en て.",
       rule: [
-        "Là où le français dit « donner », le japonais a trois verbes qui dépendent du point de vue. あげる : je donne à un autre ; くれる : un autre me donne (ou donne à mon cercle) ; もらう : je reçois de quelqu’un. Piège : le choix tient à la direction du don par rapport à toi.",
+        "Choisis le verbe selon le point de vue. Avec あげる, on présente le don du côté de celui qui donne à quelqu’un d’autre. Avec くれる, le don va vers la personne qui parle ou son entourage. Avec もらう, la personne qui reçoit est le sujet.",
         "わたしはともだちにはなをあげました (j’ai donné des fleurs à un ami). ともだちがわたしにはなをくれました (un ami m’a donné des fleurs). わたしはともだちにはなをもらいました (j’ai reçu des fleurs d’un ami). Avec もらう, la personne qui donne prend に (ou から) et celui qui reçoit est le sujet.",
-        "Après une forme en て, ces verbes disent un service rendu : てあげる (je fais pour quelqu’un), てくれる (quelqu’un fait pour moi), てもらう (je profite de l’aide de quelqu’un). たなかさんがてつだってくれました = Tanaka m’a aidé. Pour un supérieur, on emploie les formes de respect (さしあげる, くださる, いただく).",
+        "Avec la forme en て, ces verbes expriment un service : てあげる (faire pour quelqu’un), てくれる (on agit pour moi ou un proche), てもらう (le sujet bénéficie de l’action). たなかさんがてつだってくれました signifie « Tanaka m’a aidé ». Pour respecter le donneur, on peut employer くださる ou いただく selon le point de vue.",
       ],
       table: {
         caption: "Qui donne à qui",
@@ -813,29 +826,22 @@ export const jaCourse = {
         },
         {
           type: "fill",
-          prompt: "先生がおしえて___。（Le professeur m’a enseigné.）",
+          prompt: "先生がおしえて___。（Le professeur m’a expliqué.）",
+          hint: "Auxiliaire くれる, au passé poli",
           answers: ["くれました"],
           explanation: "Un service rendu par quelqu’un à moi se dit てくれる : おしえてくれました.",
         },
         {
           type: "transform",
-          instruction: "Redis la phrase avec もらう (sujet : moi).",
+          instruction: "Redis la phrase au passé poli avec もらう. Place « moi » en thème au début, ou laisse-le implicite.",
           source: "ともだちがわたしにほんをくれました。",
-          answers: [
-            "わたしはともだちにほんをもらいました。",
-            "わたしはともだちからほんをもらいました。",
-            "ともだちにほんをもらいました。",
-            "ともだちからほんをもらいました。",
-            "私は友だちに本をもらいました。",
-            "私は友だちから本をもらいました。",
-            "友だちに本をもらいました。",
-            "友だちから本をもらいました。",
-          ],
+          answers: ["わたしはともだちにほんをもらいました。", "わたしはともだちに本をもらいました。", "わたしはともだちからほんをもらいました。", "わたしはともだちから本をもらいました。", "わたしは友だちにほんをもらいました。", "わたしは友だちに本をもらいました。", "わたしは友だちからほんをもらいました。", "わたしは友だちから本をもらいました。", "わたしは友達にほんをもらいました。", "わたしは友達に本をもらいました。", "わたしは友達からほんをもらいました。", "わたしは友達から本をもらいました。", "私はともだちにほんをもらいました。", "私はともだちに本をもらいました。", "私はともだちからほんをもらいました。", "私はともだちから本をもらいました。", "私は友だちにほんをもらいました。", "私は友だちに本をもらいました。", "私は友だちからほんをもらいました。", "私は友だちから本をもらいました。", "私は友達にほんをもらいました。", "私は友達に本をもらいました。", "私は友達からほんをもらいました。", "私は友達から本をもらいました。", "ともだちにほんをもらいました。", "ともだちに本をもらいました。", "ともだちからほんをもらいました。", "ともだちから本をもらいました。", "友だちにほんをもらいました。", "友だちに本をもらいました。", "友だちからほんをもらいました。", "友だちから本をもらいました。", "友達にほんをもらいました。", "友達に本をもらいました。", "友達からほんをもらいました。", "友達から本をもらいました。"],
           explanation: "Avec もらう, c’est moi le sujet et celui qui donne prend に ou から.",
         },
       ],
       categories: ["verb", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ja-b1-conditionals",
@@ -843,17 +849,17 @@ export const jaCourse = {
       title: "Dire « si » et « quand » : と, ば, たら, なら",
       summary: "Choisir la bonne forme de condition selon qu’il s’agit d’un résultat automatique, d’une hypothèse ou d’une reprise.",
       rule: [
-        "Quatre formes, qui se recoupent en partie. ～と : conséquence naturelle ou automatique, après la forme du dictionnaire (はるになるとあたたかくなります : quand le printemps arrive, il fait plus chaud). ～たら : forme en た + ら, la plus polyvalente, pour « si » ou « quand » (あめがふったら、いきません : s’il pleut, je n’irai pas).",
-        "～ば : condition générale ou souhaitée. Groupe 1 : -u → -eba (のむ → のめば) ; groupe 2 : る → れば (たべれば) ; adjectif en い : い → ければ (やすければ) ; する → すれば ; くる → くれば. ～なら : reprend ce que l’autre vient de dire (にほんへいくなら、きょうとがいいですよ : si tu vas au Japon, Kyoto est bien).",
-        "Piège : avec と, la seconde partie ne peut pas exprimer une demande, un souhait ni une invitation : ✗ ひまだとあそびにきてください. Dans ce cas, utilise たら ou ば. En cas de doute, たら convient presque partout, sauf quand on reprend les paroles de l’interlocuteur (なら).",
+        "Ces quatre formes conditionnelles se recoupent. Avec と, la suite est souvent régulière ou automatique : はるになるとあたたかくなります (« Au printemps, il se réchauffe »). たら se forme avec le passé neutre suivi de ら : あめがふったら、いきません (« S’il pleut, je n’irai pas »).",
+        "Pour former ば, passe à la ligne en え et ajoute ば dans le groupe 1 (のめば). Dans le groupe 2, remplace る par れば (たべれば). Avec un adjectif en い, écris ければ (やすければ). Retiens すれば et くれば. なら pose une hypothèse, souvent à partir de ce que l’autre vient de dire.",
+        "Pour une demande ou une invitation après une condition, たら est souvent le choix le plus simple : ひまだったら、あそびにきてください。 と ne convient pas ici. Avec ば, une demande dépend de la condition : よければ、きてください (« Si ça te convient, viens ») est naturel.",
       ],
       table: {
         caption: "Quatre conditions",
         headers: ["Forme", "Formation", "Exemple"],
         rows: [
           ["と", "dictionnaire + と", "おすと"],
-          ["たら", "forme en た + ら", "いったら"],
-          ["ば", "-eba / ければ", "のめば, やすければ"],
+          ["たら", "passé neutre + ら", "いったら, のんだら"],
+          ["ば", "conditionnel du verbe / ければ", "のめば, やすければ"],
           ["なら", "dictionnaire / nom + なら", "にほんへいくなら"],
         ],
       },
@@ -868,12 +874,12 @@ export const jaCourse = {
           prompt: "ひま___、あそびにきてください。（Si tu es libre, passe me voir.）",
           options: ["だと", "だったら", "だから"],
           answer: 1,
-          explanation: "Une demande après la condition exclut と ; ひまだったら convient. だから signifierait « puisque c’est ainsi ».",
+          explanation: "Pour « si tu es libre », ひまだったら convient avant cette invitation. ひまだから signifierait « puisque tu es libre ».",
         },
         {
           type: "choose",
           prompt: "Forme en ば de たかい : ___",
-          options: ["たかいば", "たかくば", "たかければ"],
+          options: ["たかいば", "たかかったば", "たかければ"],
           answer: 2,
           explanation: "Adjectif en い : い devient ければ. たかい → たかければ.",
         },
@@ -886,21 +892,15 @@ export const jaCourse = {
         },
         {
           type: "transform",
-          instruction: "Reformule avec ～たら.",
+          instruction: "Remplace seulement la condition en ば par la forme en たら. Garde le reste de la phrase.",
           source: "おかねがあればくるまをかいます。",
-          answers: [
-            "おかねがあったらくるまをかいます。",
-            "おかねがあったら、くるまをかいます。",
-            "お金があったら車を買います。",
-            "お金があったら、車を買います。",
-            "おかねがあったら車を買います。",
-            "お金があったらくるまをかいます。",
-          ],
+          answers: ["おかねがあったらくるまをかいます。", "おかねがあったらくるまを買います。", "おかねがあったら車をかいます。", "おかねがあったら車を買います。", "おかねがあったら、くるまをかいます。", "おかねがあったら、くるまを買います。", "おかねがあったら、車をかいます。", "おかねがあったら、車を買います。", "お金があったらくるまをかいます。", "お金があったらくるまを買います。", "お金があったら車をかいます。", "お金があったら車を買います。", "お金があったら、くるまをかいます。", "お金があったら、くるまを買います。", "お金があったら、車をかいます。", "お金があったら、車を買います。"],
           explanation: "あれば devient あったら (あった + ら) ; le reste ne change pas.",
         },
       ],
       categories: ["verb", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ja-b1-kara-node",
@@ -908,8 +908,8 @@ export const jaCourse = {
       title: "Expliquer et s’opposer : から, ので, のに",
       summary: "Donner une raison avec から ou ので, et exprimer la surprise ou le regret avec のに.",
       rule: [
-        "A から B : « A, donc B » ou « B parce que A ». La raison vient d’abord en japonais : つかれたから、はやくねます (je suis fatigué, alors je me couche tôt). から suit une phrase complète, polie ou simple (いそがしいですから). Il sert aussi à répondre à どうして : ねつがあるからです。",
-        "A ので B : même sens, mais plus doux et plus objectif, courant en politesse ou pour s’excuser (あめなのでいきません). Avant ので on met la forme simple ; un nom ou un adjectif en な demande な (びょうきなので), alors que から se contente de だ (びょうきだから). ので se combine mal avec un ordre ou une demande directe, contrairement à から.",
+        "A から B présente une raison avant sa conséquence : つかれたから、はやくねます (« Je suis fatigué, donc je me couche tôt »). から peut suivre une forme neutre ou polie (いそがしいですから). En réponse à どうして, la raison peut aussi finir la réponse : ねつがあるからです。",
+        "ので introduit aussi une raison, souvent de façon moins directe que から. Après un nom ou un adjectif en な à la forme neutre affirmative, emploie なので : びょうきなので. Compare びょうきだから. On trouve aussi ですので dans un registre poli. Une demande peut suivre : あぶないので、さわらないでください。",
         "のに : « alors que, malgré ». Il exprime la surprise ou le reproche : べんきょうしたのに、わるいてんをとりました. Même règle que ので pour nom et な. Pour une simple opposition sans émotion, on emploie が ou けど (たかいですが、おいしいです).",
       ],
       table: {
@@ -917,15 +917,15 @@ export const jaCourse = {
         headers: ["Mot", "Sens", "Avant lui"],
         rows: [
           ["から", "parce que, donc", "forme simple ou polie"],
-          ["ので", "parce que (doux)", "forme simple ; な devant nom"],
-          ["のに", "alors que", "forme simple ; な devant nom"],
+          ["ので", "parce que", "neutre ou poli, p. ex. びょうきなので"],
+          ["のに", "alors que", "neutre, p. ex. びょうきなのに"],
           ["けど / が", "mais", "forme simple ou polie"],
         ],
       },
       examples: [
         { text: "頭が痛いから、今日は休みます。", translation: "J’ai mal à la tête, donc je me repose aujourd’hui.", note: "頭 あたま, 痛 いた, 今日 きょう, 休 やす. から : la raison vient avant la conséquence." },
         { text: "雨なので、家にいます。", translation: "Comme il pleut, je reste à la maison.", note: "雨 あめ, 家 いえ. Nom + なので." },
-        { text: "練習したのに、うまくできませんでした。", translation: "J’ai pratiqué, et pourtant je n’y suis pas arrivé.", note: "練習 れんしゅう. のに : surprise, regret." },
+        { text: "練習したのに、うまくできませんでした。", translation: "Je me suis entraîné, et pourtant je n’y suis pas arrivé.", note: "練習 れんしゅう. のに introduit un résultat contraire à l’attente." },
       ],
       exercises: [
         {
@@ -937,34 +937,29 @@ export const jaCourse = {
         },
         {
           type: "choose",
-          prompt: "病気___、会社を休みました。（Comme je suis malade, je me suis absenté du travail.）",
+          prompt: "病気___、会社を休みました。（Étant malade, je me suis absenté du travail.）",
           options: ["だので", "なので", "ので"],
           answer: 1,
-          explanation: "Après un nom, ので devient なので : 病気なので.",
+          explanation: "Après le nom 病気, ajoute な devant ので à la forme neutre affirmative : 病気なので。",
         },
         {
           type: "fill",
-          prompt: "毎日練習した___、まだじょうずになりません。（Je m’entraîne tous les jours et pourtant je ne m’améliore pas.）",
-          answers: ["のに", "けど", "けれど", "けれども"],
-          explanation: "のに exprime la surprise ou le regret ; けど (けれど) marque une opposition plus neutre.",
+          prompt: "毎日練習している___、なかなかじょうずになりません。（Je m’entraîne tous les jours et pourtant je ne progresse guère.）",
+          hint: "Un connecteur d’opposition du tableau",
+          answers: ["のに", "が", "けど", "けれど", "けれども"],
+          explanation: "のに souligne le résultat inattendu. が, けど, けれど et けれども peuvent exprimer une opposition plus neutre.",
         },
         {
           type: "transform",
-          instruction: "Reformule avec ので.",
+          instruction: "Remplace seulement から par ので. Garde l’adjectif à la forme neutre.",
           source: "さむいから、まどをしめます。",
-          answers: [
-            "さむいので、まどをしめます。",
-            "さむいのでまどをしめます。",
-            "寒いので、窓をしめます。",
-            "寒いので窓をしめます。",
-            "寒いので、窓を閉めます。",
-            "寒いので窓を閉めます。",
-          ],
+          answers: ["さむいので、まどをしめます。", "さむいので、まどを閉めます。", "さむいので、窓をしめます。", "さむいので、窓を閉めます。", "さむいのでまどをしめます。", "さむいのでまどを閉めます。", "さむいので窓をしめます。", "さむいので窓を閉めます。", "寒いので、まどをしめます。", "寒いので、まどを閉めます。", "寒いので、窓をしめます。", "寒いので、窓を閉めます。", "寒いのでまどをしめます。", "寒いのでまどを閉めます。", "寒いので窓をしめます。", "寒いので窓を閉めます。"],
           explanation: "から devient ので ; avec un adjectif en い, rien d’autre ne change.",
         },
       ],
       categories: ["function_word", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ja-b1-quotation",
@@ -972,9 +967,9 @@ export const jaCourse = {
       title: "Donner son avis et rapporter : ～と思う, ～と言う",
       summary: "Citer des paroles ou exprimer une opinion avec と et la forme simple.",
       rule: [
-        "と marque le contenu d’une pensée ou d’une parole ; devant lui, la proposition est à la forme simple (jamais ます). Opinion : あしたはあめがふるとおもいます (je pense qu’il pleuvra demain). Parole rapportée : たなかさんはくるといいました (Tanaka a dit qu’il viendrait).",
-        "Piège n° 1 : il n’y a pas de concordance des temps ; la phrase citée garde le temps de la phrase d’origine. Piège n° 2 : un nom ou un adjectif en な prend だ devant と (がくせいだとおもいます), alors qu’un adjectif en い se met directement devant と (おいしいとおもいます).",
-        "Négation : elle porte sur la phrase citée (あしたはこないとおもいます : je pense qu’il ne viendra pas). Pour demander l’avis de quelqu’un : どうおもいますか。 Une citation exacte se met entre 「 」: せんせいは「あしたしけんがあります」といいました.",
+        "と introduit le contenu de la pensée ou de la parole. Pour rapporter indirectement, utilise normalement la forme neutre : あしたはあめがふるとおもいます (« Je pense qu’il pleuvra demain »), たなかさんはくるといいました (« Tanaka a dit qu’il viendrait »).",
+        "Dans くるといいました, la venue reste au non-passé et いいました situe la parole dans le passé. Un nom ou un adjectif en な à l’affirmatif neutre non passé prend normalement だ dans une proposition complète : がくせいだとおもいます. Un adjectif en い se place directement devant と.",
+        "Tu peux nier ce que tu penses : あしたはこないとおもいます (« Je pense qu’il ne viendra pas »). Pour une citation directe, conserve les mots prononcés, même polis, et place-les entre 「 」 : せんせいは「あしたしけんがあります」といいました。",
       ],
       table: {
         caption: "Avant と",
@@ -1004,7 +999,7 @@ export const jaCourse = {
         {
           type: "choose",
           prompt: "あの人は___思います。（Je pense que c’est un étudiant.）",
-          options: ["学生と", "学生だと", "学生なと"],
+          options: ["学生のと", "学生だと", "学生なと"],
           answer: 1,
           explanation: "Un nom prend だ devant と : 学生だと思います.",
         },
@@ -1013,18 +1008,19 @@ export const jaCourse = {
           prompt: "田中さんはあした___と言いました。（Tanaka a dit qu’il viendrait demain.）",
           hint: "くる",
           answers: ["くる", "来る"],
-          explanation: "La phrase citée est à la forme simple : くる (来る), non くます.",
+          explanation: "Dans cette citation indirecte, emploie la forme neutre non passée くる (来る). Sa forme polie est きます.",
         },
         {
           type: "transform",
-          instruction: "Donne ton opinion avec ～と思います.",
+          instruction: "Remplace la fin en です par la construction avec と思います. Garde le contenu de la phrase.",
           source: "この本はおもしろいです。",
-          answers: ["この本はおもしろいと思います。", "このほんはおもしろいとおもいます。", "この本はおもしろいとおもいます。", "このほんはおもしろいと思います。"],
+          answers: ["このほんはおもしろいとおもいます。", "このほんはおもしろいと思います。", "このほんは面白いとおもいます。", "このほんは面白いと思います。", "この本はおもしろいとおもいます。", "この本はおもしろいと思います。", "この本は面白いとおもいます。", "この本は面白いと思います。"],
           explanation: "Devant と, おもしろいです devient おもしろい (forme simple), puis 思います.",
         },
       ],
       categories: ["function_word", "verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "ja-b1-relative-clauses",
@@ -1032,15 +1028,15 @@ export const jaCourse = {
       title: "Décrire un nom avec une proposition : la relative",
       summary: "Placer devant le nom une proposition entière à la forme simple, sans pronom relatif.",
       rule: [
-        "Le japonais n’a ni « qui » ni « que » ni « dont » : la proposition qui décrit le nom se place avant lui, avec le verbe à la forme simple. きのうかったほん = « le livre que j’ai acheté hier » ; えきのまえにたっているひと = « la personne qui se tient devant la gare ». Ordre : [proposition] + nom.",
-        "Dans la relative, le sujet prend が (ou の), pas は : わたしがかったほん. Le verbe est au présent (たべるひと), au passé (たべたひと) ou au négatif (たべないひと) ; on n’y met pas ます. Un adjectif en い s’emploie tel quel (あたらしいほん) et un adjectif en な prend な (しずかなまち).",
+        "Pour décrire un nom par une proposition, place la proposition à la forme neutre juste avant lui. Le japonais n’a pas besoin d’un pronom relatif : きのうかったほん (« le livre que j’ai acheté hier »), えきのまえにたっているひと (« la personne debout devant la gare »).",
+        "Dans les relatives de cette fiche, marque le sujet avec が (わたしがかったほん). の est aussi possible dans certaines relatives. Le verbe reste à la forme neutre (たべるひと, たべたひと, たべないひと). Devant le nom, l’adjectif en い garde sa forme et celui en な prend な.",
         "Piège : en français, le pronom relatif indique le rôle du nom (sujet, objet, lieu…). En japonais, rien ne le marque ; on le comprend par le sens. Compare : ともだちがくれたほん (le livre que mon ami m’a donné) et ほんをくれたともだち (l’ami qui m’a donné le livre).",
       ],
       table: {
         caption: "De la phrase à la relative",
         headers: ["Phrase", "Relative + nom", "Sens"],
         rows: [
-          ["ひとがほんをよみます", "ほんをよむひと", "la personne qui lit"],
+          ["ひとがほんをよみます", "ほんをよむひと", "la personne qui lit un livre"],
           ["わたしがほんをかいました", "わたしがかったほん", "le livre que j’ai acheté"],
           ["ほんはあたらしいです", "あたらしいほん", "un livre neuf"],
           ["ひとはここにいません", "ここにいないひと", "la personne absente"],
@@ -1061,17 +1057,17 @@ export const jaCourse = {
         },
         {
           type: "choose",
-          prompt: "わたし___すきなりょうりはカレーです。（Le plat que j’aime est le curry.）",
-          options: ["は", "が", "を"],
+          prompt: "これはわたし___すきなりょうりです。（C’est un plat que j’aime.）",
+          options: ["に", "が", "を"],
           answer: 1,
-          explanation: "Dans une relative, le sujet prend が (ou の), pas は : わたしがすきな.",
+          explanation: "Dans cette relative, が marque le sujet わたし : わたしがすきなりょうり。",
         },
         {
           type: "fill",
           prompt: "これはともだちが___ほんです。（C’est le livre que mon ami m’a donné.）",
           hint: "くれる",
           answers: ["くれた"],
-          explanation: "Le verbe est au passé simple : くれた, directement devant le nom.",
+          explanation: "くれた est la forme neutre du passé. Elle précède le nom ほん.",
         },
         {
           type: "transform",
@@ -1092,6 +1088,7 @@ export const jaCourse = {
       ],
       categories: ["word_order", "verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
   ],
 } satisfies GrammarCourse;
