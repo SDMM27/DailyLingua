@@ -2,7 +2,7 @@ import type { GrammarCourse } from "@/lib/schemas/grammar";
 
 export const esCourse = {
   language: "es",
-  version: "2026-10-25",
+  version: "2026-11-09",
   points: [
     {
       id: "es-a1-articles",
@@ -12,7 +12,7 @@ export const esCourse = {
       rule: [
         "L’espagnol a deux genres, comme le français, et l’article s’accorde avec le nom : el (masculin), la (féminin), los et las au pluriel ; un, una, unos, unas pour l’indéfini. Il n’y a jamais d’élision : on dit el amigo et la amiga, pas « l’amigo ».",
         "En général, les noms en -o sont masculins et ceux en -a féminins. Pièges : el día, el mapa, el problema sont masculins, et la mano est féminin. Devant un a- accentué on met el au singulier : el agua fría (mais las aguas).",
-        "Pluriel : on ajoute -s après une voyelle (casa, casas) et -es après une consonne (papel, papeles) ; -z devient -ces (lápiz, lápices). Enfin, el se contracte : a + el = al, de + el = del (voy al banco, la casa del jefe).",
+        "Pluriel : on ajoute -s après une voyelle (casa, casas) et -es après une consonne (papel, papeles) ; -z devient -ces (lápiz, lápices). L’accent écrit peut disparaître ou apparaître au pluriel : canción, canciones ; examen, exámenes. Enfin, el se contracte : a + el = al, de + el = del (voy al banco, la casa del jefe).",
       ],
       table: {
         caption: "Les articles",
@@ -27,12 +27,12 @@ export const esCourse = {
       examples: [
         { text: "El problema es difícil.", translation: "Le problème est difficile.", note: "Problema se termine en -a mais il est masculin." },
         { text: "Tengo unos amigos y una amiga en Madrid.", translation: "J’ai des amis et une amie à Madrid." },
-        { text: "Voy al mercado con las chicas del trabajo.", translation: "Je vais au marché avec les filles du travail.", note: "a + el = al." },
+        { text: "Voy al mercado con las chicas del trabajo.", translation: "Je vais au marché avec les copines du travail.", note: "a + el = al." },
       ],
       exercises: [
         {
           type: "choose",
-          prompt: "___ día es muy bonito hoy.",
+          prompt: "___ día tiene veinticuatro horas.",
           options: ["La", "Los", "El"],
           answer: 2,
           explanation: "Día est masculin malgré son -a final : el día.",
@@ -68,6 +68,7 @@ export const esCourse = {
       ],
       categories: ["function_word", "agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "es-a1-ser-estar",
@@ -76,7 +77,7 @@ export const esCourse = {
       summary: "Choisir entre ser (identité, nature), estar (lieu, état) et hay (existence).",
       rule: [
         "Là où le français n’a qu’« être », l’espagnol a deux verbes. Ser sert à dire qui ou ce qu’on est : identité, origine, profession, caractère, heure (soy francés, es médica, son las tres). Estar sert à dire où l’on est et comment on est à un moment donné : lieu, état, humeur (estoy en casa, está cansado).",
-        "Piège pour un francophone : la soupe est froide se dit la sopa está fría (état du moment) ; ser frío décrirait un caractère. Estar se combine aussi avec le gérondif (estoy comiendo).",
+        "Piège pour un francophone : la soupe est froide se dit la sopa está fría (état du moment) ; ser frío décrirait une caractéristique permanente (el gazpacho es una sopa fría) ou un caractère (Juan es frío). Estar se combine aussi avec le gérondif (estoy comiendo).",
         "Pour dire qu’il y a quelque chose, on utilise hay (invariable, singulier ou pluriel) : hay un banco, hay dos bancos. Pour situer un élément précis, on emploie estar : el banco está cerca. Vosotros sois / estáis est utilisé en Espagne ; en Amérique latine on dit ustedes son / están.",
       ],
       table: {
@@ -136,6 +137,7 @@ export const esCourse = {
       ],
       categories: ["verb", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "es-a1-present-regular",
@@ -143,9 +145,9 @@ export const esCourse = {
       title: "Le présent des verbes en -ar, -er, -ir",
       summary: "Conjuguer au présent les verbes réguliers et se passer du pronom sujet.",
       rule: [
-        "Les verbes espagnols se classent en trois groupes selon leur infinitif : -ar (hablar), -er (comer), -ir (vivir). On remplace la terminaison par celle de la personne ; les terminaisons sont différentes pour chaque personne, donc le pronom sujet est en général omis : hablo español, pas « yo hablo » (sauf pour insister ou lever un doute).",
+        "Les verbes espagnols se classent en trois groupes selon leur infinitif : -ar (hablar), -er (comer), -ir (vivir). On remplace la terminaison par celle de la personne ; les terminaisons sont différentes pour chaque personne, donc le pronom sujet est en général omis : on dit hablo español plutôt que yo hablo español (le pronom sert à insister ou à lever un doute).",
         "Comme en français, l’espagnol distingue tú (tutoiement) et usted (vouvoiement, conjugué comme la 3e personne : usted habla). Au pluriel, vosotros est employé en Espagne ; en Amérique latine, on dit ustedes pour tout le monde (ustedes hablan).",
-        "La négation se place avant le verbe : no hablo inglés. Pour poser une question, on garde l’ordre de l’affirmation, avec ¿ ? : ¿Hablas inglés ? Il n’y a pas d’équivalent de « est-ce que ».",
+        "La négation se place avant le verbe : no hablo inglés. Pour poser une question, on garde l’ordre de l’affirmation, avec ¿ ? : ¿Hablas inglés? Il n’y a pas d’équivalent de « est-ce que ».",
       ],
       table: {
         caption: "Présent régulier",
@@ -160,7 +162,7 @@ export const esCourse = {
         ],
       },
       examples: [
-        { text: "Trabajo en una oficina y vivo cerca.", translation: "Je travaille dans un bureau et j’habite près.", note: "Pas de pronom sujet." },
+        { text: "Trabajo en una oficina y vivo cerca.", translation: "Je travaille dans un bureau et j’habite tout près.", note: "Pas de pronom sujet." },
         { text: "¿Hablas inglés?", translation: "Tu parles anglais ?", note: "Même ordre que l’affirmation." },
         { text: "Mis padres comen a las dos.", translation: "Mes parents mangent à deux heures." },
       ],
@@ -174,7 +176,7 @@ export const esCourse = {
         },
         {
           type: "choose",
-          prompt: "Nosotros ___ el autobús al trabajo.",
+          prompt: "Nosotros ___ el autobús para ir al trabajo.",
           options: ["tomo", "tomamos", "toman"],
           answer: 1,
           explanation: "Nosotros appelle la terminaison -amos pour un verbe en -ar : tomamos.",
@@ -203,6 +205,7 @@ export const esCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "es-a1-present-irregular",
@@ -210,7 +213,7 @@ export const esCourse = {
       title: "Verbes irréguliers courants : tener, ir, hacer, querer, poder",
       summary: "Conjuguer au présent les verbes les plus fréquents, dont ceux qui diphtonguent (e → ie, o → ue).",
       rule: [
-        "Certains verbes très courants sont irréguliers : tener (tengo), ir (voy), hacer (hago), venir (vengo), salir (salgo), poner (pongo). Leur 1re personne du singulier est particulière ; le reste est souvent proche du régulier.",
+        "Certains verbes très courants sont irréguliers : tener (tengo), ir (voy), hacer (hago), venir (vengo), salir (salgo), poner (pongo). Leur 1re personne du singulier est particulière ; hacer, salir et poner sont ensuite réguliers, tener et venir diphtonguent en plus (tienes, vienes), et ir est irrégulier à toutes les personnes (voy, vas, va…).",
         "Beaucoup de verbes diphtonguent dans la syllabe accentuée : e → ie (querer : quiero, quieres, quiere, quieren) et o → ue (poder : puedo, puedes, puede, pueden). Nosotros et vosotros n’ont pas de diphtongue : queremos, podemos, podéis.",
         "Piège : pour l’âge, l’espagnol dit tener, pas « être » : tengo veinte años (j’ai vingt ans). Ir se construit avec a : voy a Madrid, vamos al cine.",
       ],
@@ -271,6 +274,7 @@ export const esCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "es-a1-adjectives-possessives",
@@ -278,8 +282,8 @@ export const esCourse = {
       title: "Adjectifs et possessifs : accord et place",
       summary: "Accorder l’adjectif, le placer après le nom et choisir mi, tu, su, nuestro.",
       rule: [
-        "L’adjectif s’accorde en genre et en nombre et se place en général après le nom : una casa pequeña, dos gatos negros. Ceux en -o ont quatre formes (alto, alta, altos, altas) ; ceux en -e ou en consonne n’en ont que deux (grande, grandes ; fácil, fáciles). Avec un groupe mixte, le masculin l’emporte.",
-        "Quelques adjectifs courants se placent avant le nom et perdent leur -o au masculin singulier : un buen restaurante, un mal día, un gran hombre (mais una buena idea).",
+        "L’adjectif s’accorde en genre et en nombre et se place en général après le nom : una casa pequeña, dos gatos negros. Ceux en -o ont quatre formes (alto, alta, altos, altas) ; ceux en -e ou en consonne n’en ont que deux (grande, grandes ; fácil, fáciles), sauf ceux de nationalité et ceux en -or (español, española ; trabajador, trabajadora). Avec un groupe mixte, le masculin l’emporte.",
+        "Quelques adjectifs courants se placent souvent avant le nom et se raccourcissent : bueno et malo perdent leur -o devant un nom masculin singulier (un buen restaurante, un mal día, mais una buena idea) ; grande devient gran devant tout nom singulier, masculin ou féminin, avec le sens de « remarquable » (un gran hombre, una gran ciudad).",
         "Les possessifs mi, tu, su s’accordent avec la chose possédée, pas avec le possesseur : su casa peut dire sa maison, leur maison ou votre maison (usted). Piège : mis amigos, sus amigos prennent un -s car il y a plusieurs amis. Nuestro et vuestro ont quatre formes : nuestro, nuestra, nuestros, nuestras.",
       ],
       table: {
@@ -298,7 +302,7 @@ export const esCourse = {
         { text: "Tengo una casa pequeña y dos gatos negros.", translation: "J’ai une petite maison et deux chats noirs." },
         { text: "Nuestra profesora es muy simpática.", translation: "Notre professeure est très sympathique." },
         { text: "María vive con sus padres.", translation: "María vit avec ses parents.", note: "Sus s’accorde avec padres, pas avec María." },
-        { text: "Es un buen restaurante.", translation: "C’est un bon restaurant.", note: "Bueno devient buen devant un nom masculin." },
+        { text: "Es un buen restaurante.", translation: "C’est un bon restaurant.", note: "Bueno devient buen devant un nom masculin singulier." },
       ],
       exercises: [
         {
@@ -339,6 +343,7 @@ export const esCourse = {
       ],
       categories: ["agreement", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "es-a1-gustar",
@@ -405,6 +410,7 @@ export const esCourse = {
       ],
       categories: ["verb", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "es-a2-reflexive",
@@ -461,7 +467,7 @@ export const esCourse = {
           prompt: "Voy a ___ ahora mismo.",
           hint: "ducharse",
           answers: ["ducharme"],
-          explanation: "Le pronom s’attache à l’infinitif et suit la personne : ducharme.",
+          explanation: "Le pronom s’attache à l’infinitif et correspond au sujet (yo → me) : ducharme.",
         },
         {
           type: "transform",
@@ -473,6 +479,7 @@ export const esCourse = {
       ],
       categories: ["verb", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "es-a2-indefinido",
@@ -480,8 +487,8 @@ export const esCourse = {
       title: "Raconter le passé : le pretérito indefinido",
       summary: "Former le pretérito indefinido pour parler d’actions terminées (comí, fui, hice, tuve).",
       rule: [
-        "Le pretérito indefinido (ou pretérito simple) exprime une action passée et terminée, souvent avec ayer, anoche, el año pasado, en 2020. Il correspond au passé composé français quand le moment est révolu. Terminaisons : -ar → -é, -aste, -ó, -amos, -asteis, -aron ; -er / -ir → -í, -iste, -ió, -imos, -isteis, -ieron.",
-        "Piège : le -é et le -ó finaux portent un accent écrit (hablé, habló). Et ser et ir ont la même forme (fui, fuiste, fue…) : le contexte dit duquel il s’agit. Beaucoup de verbes courants sont irréguliers : hacer (hice, hizo), tener (tuve), estar (estuve), poder (pude), decir (dije), venir (vine).",
+        "Le pretérito indefinido (ou pretérito perfecto simple) exprime une action passée et terminée, souvent avec ayer, anoche, el año pasado, en 2020. Il correspond au passé composé français quand le moment est révolu. Terminaisons : -ar → -é, -aste, -ó, -amos, -asteis, -aron ; -er / -ir → -í, -iste, -ió, -imos, -isteis, -ieron.",
+        "Piège : chez les verbes réguliers, le -é et le -ó finaux portent un accent écrit (hablé, habló) ; les irréguliers à radical propre n’en ont pas (hice, hizo, tuve, tuvo). Ser et ir ont la même forme (fui, fuiste, fue…) : le contexte dit duquel il s’agit. Autres irréguliers courants : estar (estuve), poder (pude), decir (dije), venir (vine).",
         "En Amérique latine, l’indefinido est aussi employé pour des faits récents (hoy comí temprano), là où l’Espagne préfère le pretérito perfecto.",
       ],
       table: {
@@ -541,6 +548,7 @@ export const esCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "es-a2-imperfecto",
@@ -550,7 +558,7 @@ export const esCourse = {
       rule: [
         "L’imperfecto décrit ce qui durait ou se répétait dans le passé : habitudes (de niño jugaba en la calle), décors, âge, heure, météo (eran las ocho, llovía). Il correspond à l’imparfait français. Terminaisons : -ar → -aba, -abas, -aba, -ábamos, -abais, -aban ; -er / -ir → -ía, -ías, -ía, -íamos, -íais, -ían.",
         "Seuls trois verbes sont irréguliers : ser (era), ir (iba) et ver (veía).",
-        "On les combine avec l’indefinido : l’imperfecto plante le décor, l’indefinido raconte l’événement qui l’interrompt. Mientras cenaba, sonó el teléfono : je dînais (en cours), le téléphone a sonné (événement). Cuando era pequeño, siempre iba a la playa, mais El verano pasado fui a la playa une seule fois.",
+        "On les combine avec l’indefinido : l’imperfecto plante le décor, l’indefinido raconte l’événement qui l’interrompt. Mientras cenaba, sonó el teléfono : je dînais (en cours), le téléphone a sonné (événement). Cuando era pequeño, siempre iba a la playa (habitude), mais el verano pasado fui a la playa una vez (événement unique).",
       ],
       table: {
         caption: "Pretérito imperfecto",
@@ -609,6 +617,7 @@ export const esCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "es-a2-perfecto",
@@ -617,7 +626,7 @@ export const esCourse = {
       summary: "Former le pretérito perfecto avec haber et le participe, et savoir quand l’employer.",
       rule: [
         "Le pretérito perfecto se forme avec haber (he, has, ha, hemos, habéis, han) + participe passé : he hablado, hemos comido. Participes réguliers : -ar → -ado, -er / -ir → -ido. Irréguliers courants : hecho, dicho, visto, puesto, escrito, vuelto, abierto, roto.",
-        "Il exprime une action passée liée au présent : période non terminée (hoy, esta semana, este año) ou expérience (¿has estado alguna vez en México ?). Avec ya et todavía no : ya he comido, todavía no he comido. En Amérique latine, on emploie souvent l’indefinido à la place (¿ya comiste ?).",
+        "Il exprime une action passée liée au présent : période non terminée (hoy, esta semana, este año) ou expérience (¿has estado alguna vez en México?). Avec ya et todavía no : ya he comido, todavía no he comido. En Amérique latine, on emploie souvent l’indefinido à la place (¿ya comiste?).",
         "Piège pour un francophone : le participe ne s’accorde jamais avec le complément (la he visto, pas « la he vista »), et on ne sépare pas haber du participe (nunca he comido paella). Et on ne confond pas haber (auxiliaire) avec tener (posséder).",
       ],
       table: {
@@ -658,14 +667,14 @@ export const esCourse = {
         {
           type: "fill",
           prompt: "Esta mañana yo ___ al médico.",
-          hint: "ir",
+          hint: "ir (pretérito perfecto)",
           answers: ["he ido"],
           explanation: "He + participe de ir : ido.",
         },
         {
           type: "fill",
           prompt: "Nosotros todavía no ___ la carta.",
-          hint: "escribir",
+          hint: "escribir (pretérito perfecto)",
           answers: ["hemos escrito"],
           explanation: "Escribir a un participe irrégulier : escrito.",
         },
@@ -679,6 +688,7 @@ export const esCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "es-a2-object-pronouns",
@@ -686,9 +696,9 @@ export const esCourse = {
       title: "Remplacer le complément : lo, la, los, las, le, les",
       summary: "Utiliser les pronoms compléments directs et indirects et les placer avant le verbe ou après l’infinitif.",
       rule: [
-        "Pour éviter de répéter un nom, on utilise un pronom : direct lo, la, los, las (la chose ou la personne que l’on voit) ; indirect le, les (à qui). Me, te, nos, os servent pour les deux : me ve, me da el libro. Le pronom se place avant le verbe conjugué : Lo tengo, no lo veo, ya lo he visto.",
+        "Pour éviter de répéter un nom, on utilise un pronom : direct lo, la, los, las (la chose ou la personne que l’on voit) ; indirect le, les (à qui). Me, te, nos, os servent pour les deux : me ve, me da el libro. Le pronom se place avant le verbe conjugué : lo tengo, no lo veo, ya lo he visto.",
         "Avec un infinitif ou un gérondif, il s’attache à la fin ou se place devant le verbe conjugué : quiero verla = la quiero ver. À l’impératif affirmatif, il s’attache aussi : cómpralo.",
-        "Piège : l’ordre n’est pas celui du français. On dit le escribo a mi madre (même s’il y a le nom, on répète le pronom). Pour un homme, certains Espagnols disent le veo au lieu de lo veo (leísmo) : lo reste la forme la plus sûre. Le participe passé ne s’accorde jamais : la he visto.",
+        "Piège : avec un complément indirect, l’espagnol répète souvent le pronom même quand le nom est présent, ce que le français ne fait jamais : le escribo a mi madre (j’écris à ma mère). Pour un homme, certains Espagnols disent le veo au lieu de lo veo (leísmo) : lo reste la forme la plus sûre. Le participe passé ne s’accorde jamais : la he visto.",
       ],
       table: {
         caption: "Pronoms compléments",
@@ -747,6 +757,7 @@ export const esCourse = {
       ],
       categories: ["function_word", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "es-a2-periphrases",
@@ -756,7 +767,7 @@ export const esCourse = {
       rule: [
         "L’espagnol exprime beaucoup de nuances avec un verbe auxiliaire suivi d’un infinitif ou d’un gérondif. Ir a + infinitif : projet proche (voy a estudiar). Estar + gérondif : action en cours (estoy comiendo). Acabar de + infinitif : passé très récent (acabo de llegar, comme « venir de »).",
         "Tener que + infinitif : obligation personnelle (tengo que salir). Hay que + infinitif : obligation impersonnelle (hay que trabajar). Le gérondif se forme avec -ando (hablando) ou -iendo (comiendo, viviendo), et devient -yendo pour leer (leyendo) ; dormir fait durmiendo.",
-        "Piège : on ne dit pas « estoy ir » ni « voy a el cine » pour le futur. L’espagnol utilise beaucoup plus estar + gérondif que le français « être en train de » : ¿Qué estás haciendo ? (Que fais-tu ?).",
+        "Piège : on n’oublie pas le a de ir a (voy a estudiar, pas « voy estudiar »), et on garde la contraction al (voy a ir al cine). L’espagnol utilise beaucoup plus estar + gérondif que le français « être en train de » : ¿Qué estás haciendo? (Que fais-tu ?).",
       ],
       table: {
         caption: "Périphrases courantes",
@@ -813,6 +824,7 @@ export const esCourse = {
       ],
       categories: ["verb", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "es-b1-por-para",
@@ -821,8 +833,8 @@ export const esCourse = {
       summary: "Choisir entre por (cause, durée, passage, échange) et para (but, destinataire, échéance).",
       rule: [
         "Le français « pour » correspond à deux mots en espagnol. Para regarde vers l’avant : but (estudio para aprender), destinataire (un regalo para ti), destination (salgo para Madrid), échéance (para el lunes), opinion (para mí).",
-        "Por regarde vers l’arrière ou le moyen : cause (llego tarde por el tráfico), échange (pagué diez euros por el libro), durée ou fréquence (por la mañana, tres veces por semana), lieu de passage (paso por el parque), agent du passif (escrito por Cervantes), moyen (por teléfono).",
-        "Astuce : si on peut dire « afin de » ou « à destination de », c’est para ; si on peut dire « à cause de » ou « en passant par », c’est por. Piège : por qué ? signifie pourquoi ?, et porque répond (parce que).",
+        "Por regarde vers l’arrière ou le moyen : cause (llego tarde por el tráfico), échange (pagué diez euros por el libro), moment de la journée ou fréquence (por la mañana, tres veces por semana), lieu de passage (paso por el parque), agent du passif (escrito por Cervantes), moyen (por teléfono).",
+        "Astuce : si on peut dire « afin de » ou « à destination de », c’est para ; si on peut dire « à cause de » ou « en passant par », c’est por. Piège : ¿por qué? signifie « pourquoi ? », et porque répond (« parce que »).",
       ],
       table: {
         caption: "Por et para",
@@ -868,18 +880,21 @@ export const esCourse = {
         {
           type: "fill",
           prompt: "Este regalo es ___ mi madre.",
+          hint: "por ou para",
           answers: ["para"],
           explanation: "Le destinataire d’un cadeau s’indique avec para.",
         },
         {
           type: "fill",
           prompt: "Voy a pasear ___ el parque.",
+          hint: "por ou para",
           answers: ["por"],
           explanation: "Le lieu par où l’on passe se dit avec por.",
         },
       ],
       categories: ["function_word", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "es-b1-subjunctive",
@@ -887,7 +902,7 @@ export const esCourse = {
       title: "Le subjonctif présent : quiero que, espero que, es importante que",
       summary: "Former le subjonctif présent et l’employer après un souhait, une émotion ou une opinion négative.",
       rule: [
-        "Formation : on part de la 1re personne du présent, on enlève -o et on prend les voyelles « contraires » : -ar → -e (hable, hables, hable, hablemos, habléis, hablen), -er / -ir → -a (coma, comas, coma, comamos, comáis, coman). Les irrégularités de la 1re personne passent au subjonctif : tengo → tenga, hago → haga, salgo → salga. À part : ser (sea), ir (vaya), estar (esté), saber (sepa).",
+        "Formation : on part de la 1re personne du présent, on enlève -o et on prend les voyelles « contraires » : -ar → -e (hable, hables, hablemos…), -er / -ir → -a (coma, comas, comamos…). Les irrégularités de la 1re personne passent au subjonctif : tengo → tenga, hago → haga, salgo → salga. À part : ser (sea), ir (vaya), estar (esté), saber (sepa), haber (haya), dar (dé).",
         "Emploi : quand le sujet de la subordonnée est différent, après un souhait ou une demande (quiero que, espero que, prefiero que), une émotion (me alegra que) ou une expression impersonnelle (es importante que). Même sujet : infinitif (quiero venir, mais quiero que vengas).",
         "Piège : creo que + indicatif, mais no creo que + subjonctif. Il y a diphtongue comme au présent : quiera, pueda, mais queramos, podamos. Les verbes en -car, -gar, -zar changent d’orthographe : busque, llegue, empiece.",
       ],
@@ -942,12 +957,13 @@ export const esCourse = {
           type: "transform",
           instruction: "Réécris la phrase en commençant par Quiero que.",
           source: "Tú comes más verduras.",
-          answers: ["Quiero que comas más verduras."],
+          answers: ["Quiero que comas más verduras.", "Quiero que tú comas más verduras."],
           explanation: "Après quiero que, comer passe au subjonctif : comas.",
         },
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "es-b1-imperative",
@@ -955,8 +971,8 @@ export const esCourse = {
       title: "L’impératif : donner un ordre, un conseil, une consigne",
       summary: "Former l’impératif de tú, usted, ustedes, à l’affirmatif et au négatif, avec ou sans pronom.",
       rule: [
-        "Tú, affirmatif : on emploie la 3e personne du singulier du présent (habla, come, escribe). Huit verbes sont irréguliers : di, haz, ve, ven, pon, sal, sé, ten. Usted et ustedes prennent le subjonctif (hable, hablen). Vosotros (Espagne) : infinitif en -d (hablad, comed) ; en Amérique latine on emploie ustedes.",
-        "Négatif : on utilise toujours le subjonctif, pour toutes les personnes : no hables, no comas, no hagas, no hable usted. Piège : ne pas dire « no habla » avec tú, c’est une phrase affirmative.",
+        "Tú, affirmatif : on emploie la 3e personne du singulier du présent (habla, come, escribe). Huit verbes sont irréguliers : di, haz, ve, ven, pon, sal, sé, ten. Usted et ustedes prennent le subjonctif (hable, hablen). Vosotros (Espagne) : le -r de l’infinitif devient -d (hablad, comed) ; en Amérique latine on emploie ustedes.",
+        "Négatif : on utilise toujours le subjonctif, pour toutes les personnes : no hables, no comas, no hagas, no hable usted. Piège : avec tú, ne dis pas « no habla » : c’est l’indicatif (il ne parle pas).",
         "Pronoms : à l’affirmatif ils s’attachent à la fin du verbe, avec un accent écrit si besoin (dime, cómpralo, dímelo) ; au négatif ils précèdent le verbe (no me digas, no lo compres). Avec un verbe pronominal à l’affirmatif : siéntese, levántate.",
       ],
       table: {
@@ -1002,8 +1018,8 @@ export const esCourse = {
         {
           type: "transform",
           instruction: "Mets la phrase à l’impératif négatif (tú).",
-          source: "Habla tan rápido.",
-          answers: ["No hables tan rápido."],
+          source: "Habla en voz alta.",
+          answers: ["No hables en voz alta."],
           explanation: "L’impératif négatif emploie le subjonctif : no hables.",
         },
         {
@@ -1016,6 +1032,7 @@ export const esCourse = {
       ],
       categories: ["verb", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "es-b1-future-conditional",
@@ -1023,9 +1040,9 @@ export const esCourse = {
       title: "Futur simple et conditionnel : projets, hypothèses, politesse",
       summary: "Former le futur et le conditionnel pour un projet, une probabilité, une demande polie ou un conseil.",
       rule: [
-        "Futur et conditionnel se forment sur l’infinitif entier : futur + -é, -ás, -á, -emos, -éis, -án (hablaré) ; conditionnel + -ía, -ías, -ía, -íamos, -íais, -ían (hablaría). Comme en français, quelques radicaux sont irréguliers, identiques pour les deux temps : tendré, haré, diré, podré, querré, saldré, vendré, pondré, sabré, habrá.",
-        "Le futur exprime un projet ou une prévision (el año que viene viajaremos a Perú), mais à l’oral on préfère souvent ir a. Il sert aussi à exprimer une probabilité dans le présent : ¿Qué hora será ? Serán las diez (il doit être dix heures).",
-        "Le conditionnel exprime la politesse, le conseil et le souhait : ¿podrías ayudarme ?, deberías descansar, me gustaría viajar. Comme en français, il est la forme de la demande polie. Piège : après si, on n’emploie ni le futur ni le conditionnel : si llueve, no saldremos.",
+        "Futur et conditionnel se forment sur l’infinitif entier : futur + -é, -ás, -á, -emos, -éis, -án (hablaré) ; conditionnel + -ía, -ías, -ía, -íamos, -íais, -ían (hablaría). Comme en français, quelques radicaux sont irréguliers, identiques pour les deux temps : tendré, haré, diré, podré, querré, saldré, vendré, pondré, sabré, habré.",
+        "Le futur exprime un projet ou une prévision (el año que viene viajaremos a Perú), mais à l’oral on préfère souvent ir a. Il sert aussi à exprimer une probabilité dans le présent : ¿Qué hora será? Serán las diez (il doit être dix heures).",
+        "Le conditionnel exprime la politesse, le conseil et le souhait : ¿podrías ayudarme?, deberías descansar, me gustaría viajar. Comme en français, il est la forme de la demande polie. Piège : après si, on n’emploie ni le futur ni le conditionnel : si llueve, no saldremos.",
       ],
       table: {
         caption: "Futur et conditionnel",
@@ -1063,13 +1080,13 @@ export const esCourse = {
         {
           type: "fill",
           prompt: "Mañana yo ___ todo el día en casa.",
-          hint: "estar",
+          hint: "estar (futur)",
           answers: ["estaré"],
           explanation: "Futur de estar à la 1re personne : estaré, avec l’accent.",
         },
         {
           type: "fill",
-          prompt: "Ana no contesta : ___ en la reunión.",
+          prompt: "Ana no contesta: ___ en la reunión.",
           hint: "estar (probabilité)",
           answers: ["estará"],
           explanation: "Le futur exprime une hypothèse sur le présent : estará (elle doit être en réunion).",
@@ -1084,6 +1101,7 @@ export const esCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "es-b1-double-pronouns",
@@ -1091,7 +1109,7 @@ export const esCourse = {
       title: "Deux pronoms ensemble : me lo, se lo, dárselo",
       summary: "Combiner pronom indirect et direct dans le bon ordre, et transformer le + lo en se lo.",
       rule: [
-        "Quand deux pronoms compléments se suivent, l’indirect vient toujours avant le direct, l’inverse du français : me lo da (il me le donne), te la presto (je te la prête), nos los envía.",
+        "Quand deux pronoms compléments se suivent, l’indirect vient toujours avant le direct : me lo da (il me le donne), te la presto (je te la prête), nos los envía. Avec me, te, nos, os, c’est le même ordre qu’en français ; à la 3e personne, c’est l’inverse : se lo doy (je le lui donne).",
         "Piège : le / les devant lo, la, los, las deviennent se : le doy el libro devient se lo doy (je le lui donne), jamais « le lo doy ». Ce se n’est pas réfléchi : il remplace à lui, à elle, à vous, à eux. Pour lever le doute, on peut ajouter a Ana, a ustedes.",
         "Comme avec un seul pronom, ils précèdent le verbe conjugué ou s’attachent à l’infinitif, au gérondif et à l’impératif affirmatif, avec un accent écrit : voy a dárselo = se lo voy a dar ; dímelo ; no me lo digas.",
       ],
@@ -1151,6 +1169,7 @@ export const esCourse = {
       ],
       categories: ["function_word", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "es-b1-relatives",
@@ -1204,18 +1223,19 @@ export const esCourse = {
         {
           type: "fill",
           prompt: "La persona con ___ hablé es mi jefa.",
-          answers: ["quien", "la que"],
-          explanation: "Après une préposition et pour une personne : quien ou la que.",
+          answers: ["quien", "la que", "la cual"],
+          explanation: "Après une préposition et pour une personne : quien ou la que (la cual, plus soutenu).",
         },
         {
           type: "fill",
           prompt: "Este es el restaurante ___ comemos los viernes.",
-          answers: ["donde", "en el que"],
-          explanation: "Pour un lieu, on emploie donde ou en el que.",
+          answers: ["donde", "en el que", "en el cual", "en donde"],
+          explanation: "Pour un lieu, on emploie donde ou en el que (aussi en el cual, en donde).",
         },
       ],
       categories: ["function_word", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
   ],
 } satisfies GrammarCourse;

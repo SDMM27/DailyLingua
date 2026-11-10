@@ -2,7 +2,7 @@ import type { GrammarCourse } from "@/lib/schemas/grammar";
 
 export const enCourse = {
   language: "en",
-  version: "2026-10-25",
+  version: "2026-11-09",
   points: [
     {
       id: "en-a1-be",
@@ -11,7 +11,7 @@ export const enCourse = {
       summary: "Conjuguer be au présent, le nier, poser une question, et dire son âge ou ses sensations.",
       rule: [
         "Be correspond à « être » : I am, you are, he / she / it is, we are, you are, they are. Le sujet est toujours exprimé : on ne dit pas « Is a teacher » mais He is a teacher. À l’oral et à l’écrit courant, on contracte : I'm, you're, he's, she's, it's, we're, they're.",
-        "Négation : on ajoute not après be (I'm not, he isn't ou he is not). Question : on inverse le sujet et be (Are you tired ? Is she here ?). Réponses courtes : Yes, I am. / No, she isn't.",
+        "Négation : on ajoute not après be (I'm not, he isn't ou he is not). Question : on inverse le sujet et be (Are you tired? Is she here?). Réponses courtes : Yes, I am. / No, she isn't.",
         "Piège : l’anglais emploie be là où le français emploie « avoir » pour l’âge et pour certaines sensations : I am twenty (j’ai vingt ans), I am hungry (j’ai faim), I am cold (j’ai froid). On ne dit jamais « I have twenty years ». Devant un métier, on ajoute a / an : She is a nurse.",
       ],
       table: {
@@ -49,7 +49,7 @@ export const enCourse = {
           type: "fill",
           prompt: "They ___ at work today.",
           hint: "négatif de be",
-          answers: ["aren't", "are not"],
+          answers: ["aren't", "are not", "'re not"],
           explanation: "On forme la négation avec not après be : they aren't ou they are not.",
         },
         {
@@ -62,6 +62,7 @@ export const enCourse = {
       ],
       categories: ["verb", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "en-a1-have-got",
@@ -70,8 +71,8 @@ export const enCourse = {
       summary: "Parler de sa famille, de ses affaires ou d’une caractéristique avec I've got / I have.",
       rule: [
         "Pour la possession, la famille ou une caractéristique, l’anglais britannique emploie surtout have got (I've got a brother), l’anglais américain plutôt have seul (I have a brother). Les deux sont corrects. À la 3e personne : he has got / he's got, ou he has.",
-        "Avec have got, la négation et la question se font sans do : I haven't got a car, Have you got a car ? Avec have seul, on utilise do : I don't have a car, Do you have a car ?",
-        "Piège : got n’a pas de sens de passé ici, et on ne mélange pas les deux formes : « Do you have got » est faux. Rappelle-toi aussi que l’âge, la faim ou le froid se disent avec be, pas avec have.",
+        "Avec have got, la négation et la question se font sans do : I haven't got a car, Have you got a car? Avec have seul, on utilise do : I don't have a car, Do you have a car?",
+        "Piège : got n’a pas de sens de passé ici, et on ne mélange pas les deux formes : « Do you have got » est faux. Have got ne sert qu’à la possession : pour une action, on dit have seul (I have a shower every morning, jamais « I've got a shower every morning »). Rappelle-toi aussi que l’âge, la faim ou le froid se disent avec be, pas avec have.",
       ],
       table: {
         caption: "Have got (britannique) et have (américain)",
@@ -118,7 +119,7 @@ export const enCourse = {
         },
         {
           type: "transform",
-          instruction: "Mets la phrase à la forme négative.",
+          instruction: "Mets la phrase à la forme négative, en gardant have got.",
           source: "He has got a bike.",
           answers: ["He hasn't got a bike.", "He has not got a bike.", "He's not got a bike."],
           explanation: "Avec have got, la négation se fait avec not après have / has : He hasn't got a bike.",
@@ -126,6 +127,7 @@ export const enCourse = {
       ],
       categories: ["verb", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "en-a1-articles",
@@ -141,8 +143,8 @@ export const enCourse = {
         caption: "Quel article ?",
         headers: ["Cas", "Article", "Exemple"],
         rows: [
-          ["1re mention, son consonne", "a", "a book"],
-          ["1re mention, son voyelle", "an", "an egg"],
+          ["1re mention, son de consonne", "a", "a book"],
+          ["1re mention, son de voyelle", "an", "an egg"],
           ["Déjà mentionné ou unique", "the", "the sun"],
           ["Général, pluriel", "(rien)", "Dogs are loyal."],
           ["Général, indénombrable", "(rien)", "I love music."],
@@ -156,10 +158,10 @@ export const enCourse = {
       exercises: [
         {
           type: "choose",
-          prompt: "He has ___ umbrella.",
+          prompt: "There is ___ umbrella in my bag.",
           options: ["a", "an", "the", "(rien)"],
           answer: 1,
-          explanation: "Umbrella commence par un son voyelle : on emploie an. Le nom est singulier dénombrable, donc il faut un article.",
+          explanation: "Umbrella commence par un son de voyelle : on emploie an. C’est la première mention d’un nom singulier dénombrable, donc a / an.",
         },
         {
           type: "choose",
@@ -183,6 +185,7 @@ export const enCourse = {
       ],
       categories: ["function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "en-a1-present-simple",
@@ -224,14 +227,14 @@ export const enCourse = {
         },
         {
           type: "fill",
-          prompt: "Anna ___ English at university.",
+          prompt: "Anna ___ English every evening.",
           hint: "study",
           answers: ["studies"],
           explanation: "Consonne + y devient -ies à la 3e personne : study, studies.",
         },
         {
           type: "fill",
-          prompt: "They often ___ football on Sunday.",
+          prompt: "They often ___ football on Sundays.",
           hint: "play",
           answers: ["play"],
           explanation: "They demande la forme de base, sans -s.",
@@ -246,6 +249,7 @@ export const enCourse = {
       ],
       categories: ["verb", "agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "en-a1-do-questions",
@@ -253,9 +257,9 @@ export const enCourse = {
       title: "Poser des questions et nier avec do / does",
       summary: "Former questions, négations et réponses courtes au present simple.",
       rule: [
-        "Au present simple, tous les verbes sauf be (et have got) forment la question et la négation avec l’auxiliaire do / does : Do you like tea ? She doesn't like tea. Le -s de la 3e personne passe sur does et le verbe reste à la forme de base : Does he work ?, jamais « Does he works ? ».",
+        "Au present simple, tous les verbes sauf be (et have got) forment la question et la négation avec l’auxiliaire do / does : Do you like tea? She doesn't like tea. Le -s de la 3e personne passe sur does et le verbe reste à la forme de base : Does he work?, jamais « Does he works? ».",
         "Réponses courtes : Yes, I do. / No, she doesn't. Piège : on ne reprend pas le verbe, « Yes, I like » ne se dit pas ; on répond par do / does.",
-        "Avec un mot interrogatif (where, what, when, why, who, how), l’ordre est fixe : mot interrogatif + do / does + sujet + verbe de base. Where do you live ? What does she do ? Le français permet « Tu habites où ? », l’anglais non.",
+        "Avec un mot interrogatif (where, what, when, why, who, how), l’ordre est fixe : mot interrogatif + do / does + sujet + verbe de base. Where do you live? What does she do? Le français permet « Tu habites où ? », l’anglais non. Exception : quand who ou what est le sujet, pas de do : Who lives here?",
       ],
       table: {
         caption: "Do / does",
@@ -311,6 +315,7 @@ export const enCourse = {
       ],
       categories: ["verb", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "en-a1-plurals",
@@ -339,7 +344,7 @@ export const enCourse = {
       examples: [
         { text: "These children are my nephews.", translation: "Ces enfants sont mes neveux.", note: "child devient children ; these pour ce qui est proche." },
         { text: "Those women work in a bank.", translation: "Ces femmes travaillent dans une banque.", note: "woman devient women, prononcé « wimin »." },
-        { text: "That watch is expensive, but these shoes are cheap.", translation: "Cette montre est chère, mais ces chaussures sont bon marché.", note: "Shoes est toujours pluriel." },
+        { text: "That watch is expensive, but these shoes are cheap.", translation: "Cette montre est chère, mais ces chaussures sont bon marché.", note: "That + singulier (loin), these + pluriel (proche)." },
       ],
       exercises: [
         {
@@ -380,6 +385,7 @@ export const enCourse = {
       ],
       categories: ["agreement", "spelling"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "en-a2-present-continuous",
@@ -387,7 +393,7 @@ export const enCourse = {
       title: "Dire ce qui se passe maintenant : present continuous",
       summary: "Choisir entre I work (habitude) et I'm working (en ce moment ou temporaire).",
       rule: [
-        "Le present continuous se forme avec be + verbe en -ing : I'm working, she isn't sleeping, Are they coming ? Orthographe : le e muet tombe (make, making), la consonne se double après une voyelle brève (run, running ; sit, sitting).",
+        "Le present continuous se forme avec be + verbe en -ing : I'm working, she isn't sleeping, Are they coming? Orthographe : le e muet tombe (make, making), la consonne se double après une voyelle brève (run, running ; sit, sitting).",
         "On l’emploie pour ce qui se passe en ce moment, pour une situation temporaire ou pour un projet arrangé (I'm meeting Tom tomorrow). Le present simple, lui, exprime l’habitude ou un fait permanent. He plays tennis (il joue au tennis, en général) / He is playing tennis (il est en train de jouer).",
         "Piège : le français utilise le présent pour tout, l’anglais doit choisir. Et les verbes d’état (know, like, love, want, understand, need) ne se mettent presque jamais en -ing : I know the answer, I want a coffee, jamais « I'm knowing » ni « I'm wanting ».",
       ],
@@ -435,6 +441,7 @@ export const enCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "en-a2-past-simple",
@@ -444,7 +451,7 @@ export const enCourse = {
       rule: [
         "Le past simple raconte un fait terminé à un moment révolu : I visited Rome last year. Réguliers : verbe + -ed (work, worked), seulement -d après e (live, lived), consonne + y devient -ied (study, studied), consonne doublée (stop, stopped). Une seule forme pour toutes les personnes.",
         "Beaucoup de verbes courants sont irréguliers et s’apprennent par cœur : go, went ; see, saw ; have, had ; buy, bought ; come, came ; eat, ate ; take, took ; make, made. Be donne was / were. Marqueurs : yesterday, last week, in 2020, two days ago.",
-        "Question et négation avec did + verbe de base, sauf avec be : Did you go ? I didn't go. Piège : après did, le verbe reste à la base (« Did you went ? » est faux). Avec be : Were you at home ? I wasn't. Le past simple traduit souvent le passé composé français : I saw him = je l’ai vu.",
+        "Question et négation avec did + verbe de base, sauf avec be : Did you go? I didn't go. Piège : après did, le verbe reste à la base (« Did you went? » est faux). Avec be : Were you at home? I wasn't. Le past simple traduit souvent le passé composé français : I saw him = je l’ai vu.",
       ],
       table: {
         caption: "Verbes irréguliers courants",
@@ -501,6 +508,7 @@ export const enCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "en-a2-quantifiers",
@@ -509,8 +517,8 @@ export const enCourse = {
       summary: "Distinguer les noms dénombrables et indénombrables et choisir le bon mot de quantité.",
       rule: [
         "Les noms dénombrables se comptent (one apple, two apples) ; les indénombrables non (water, money, bread, advice, information, furniture) : pas de pluriel, pas de a / an, et un verbe au singulier. Piège : « des conseils, des informations, des meubles » sont pluriels en français, mais advice, information, furniture n’ont jamais de -s. On dit some advice, a piece of advice.",
-        "Some s’emploie dans les phrases affirmatives (I have some friends), any dans les négations et les questions (I don't have any money. Do you have any milk ?). Dans une offre ou une demande, on garde some : Would you like some tea ?",
-        "Many (dénombrable) et much (indénombrable) s’emploient surtout dans les questions et les négations : How many books ? How much time ? Dans une phrase affirmative, on préfère a lot of. A few + dénombrable = quelques ; a little + indénombrable = un peu de.",
+        "Some s’emploie dans les phrases affirmatives (I have some friends), any dans les négations et les questions (I don't have any money. Do you have any milk?). Dans une offre ou une demande, on garde some : Would you like some tea?",
+        "Many (dénombrable) et much (indénombrable) s’emploient surtout dans les questions et les négations : How many books? How much time? Dans une phrase affirmative, on préfère a lot of. A few + dénombrable = quelques ; a little + indénombrable = un peu de.",
       ],
       table: {
         caption: "Mots de quantité",
@@ -537,10 +545,10 @@ export const enCourse = {
         },
         {
           type: "choose",
-          prompt: "Is there ___ milk in the fridge?",
+          prompt: "There isn't ___ milk in the fridge.",
           options: ["some", "an", "any", "many"],
           answer: 2,
-          explanation: "Dans une question, on emploie any avec un indénombrable comme milk.",
+          explanation: "Dans une phrase négative, on emploie any avec un indénombrable comme milk : There isn't any milk.",
         },
         {
           type: "fill",
@@ -558,6 +566,7 @@ export const enCourse = {
       ],
       categories: ["function_word", "agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "en-a2-comparatives",
@@ -565,9 +574,9 @@ export const enCourse = {
       title: "Comparer : -er / -est, more / most, than, as … as",
       summary: "Former le comparatif et le superlatif des adjectifs courts, longs et irréguliers.",
       rule: [
-        "Adjectif court (une syllabe, ou deux en -y) : -er et -est. Tall, taller, the tallest ; big, bigger, the biggest ; happy, happier, the happiest. Adjectif long (deux syllabes ou plus) : more et most. Expensive, more expensive, the most expensive. Le deuxième terme est introduit par than : She is taller than me.",
+        "Adjectif court (une syllabe, ou deux en -y) : -er et -est. Tall, taller, the tallest ; big, bigger, the biggest ; happy, happier, the happiest. Adjectif long (deux syllabes ou plus, sauf ceux en -y) : more et most. Expensive, more expensive, the most expensive. Le deuxième terme est introduit par than : She is taller than me.",
         "Irréguliers : good, better, the best ; bad, worse, the worst. Le superlatif prend the et se complète par in ou of : the best student in the class, the tallest of all. L’égalité se dit as … as : He runs as fast as his brother.",
-        "Piège : on ne combine jamais more et -er (« more taller » est faux), et le français « le plus » ne se traduit pas par un mot séparé avec un adjectif court : the tallest, pas « the more tall ». Et après as … as, on ne met pas than : as tall as, jamais « as tall than ».",
+        "Piège : on ne combine jamais more et -er (« more taller » est faux), et le français « le plus » ne se traduit pas par un mot séparé avec un adjectif court : the tallest, pas « the most tall ». Et après as … as, on ne met pas than : as tall as, jamais « as tall than ».",
       ],
       table: {
         caption: "Comparatif et superlatif",
@@ -618,12 +627,13 @@ export const enCourse = {
           type: "transform",
           instruction: "Réécris l’information en une phrase avec taller than.",
           source: "Tom is 1.80 m. Paul is 1.75 m.",
-          answers: ["Tom is taller than Paul."],
+          answers: ["Tom is taller than Paul.", "Tom's taller than Paul.", "Tom is taller than Paul is."],
           explanation: "Tom est le plus grand : Tom is taller than Paul.",
         },
       ],
       categories: ["function_word", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "en-a2-future",
@@ -632,7 +642,7 @@ export const enCourse = {
       summary: "Choisir entre un projet (going to), une décision spontanée ou une promesse (will) et un rendez-vous (continuous).",
       rule: [
         "Going to + verbe exprime un projet ou une prévision fondée sur ce qu’on voit : I'm going to study medicine. Look at the clouds, it's going to rain. Will + verbe exprime une décision prise sur le moment, une promesse, une offre ou une opinion : The phone is ringing. – I'll answer it. I think it will be sunny.",
-        "Will est identique à toutes les personnes, sans -s ni to : she will come, I'll call you. Négation : won't. Question : Will you come ? Piège : après if et when, le futur s’exprime au présent, comme en français : If it rains, we'll stay at home (jamais « if it will rain »).",
+        "Will est identique à toutes les personnes, sans -s ni to : she will come, I'll call you. Négation : won't. Question : Will you come? Piège : après if et when, le futur s’exprime au présent : If it rains, we'll stay at home (jamais « if it will rain »). Avec if, c’est comme en français ; avec when, non : « quand j’arriverai » se dit When I arrive, jamais « When I will arrive ».",
         "Pour un rendez-vous arrangé, on utilise souvent le present continuous : I'm meeting Anna at six. Le futur proche français (« je vais partir ») correspond à going to, le futur simple (« je partirai ») souvent à will, mais le choix dépend du sens, pas de la distance dans le temps.",
       ],
       table: {
@@ -682,6 +692,7 @@ export const enCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "en-a2-modals",
@@ -689,8 +700,8 @@ export const enCourse = {
       title: "Pouvoir, devoir, conseiller : can, should, must, have to",
       summary: "Exprimer la capacité, le conseil, l’obligation et l’interdiction avec les verbes modaux.",
       rule: [
-        "Les modaux (can, could, should, must, may, might, will, would) sont suivis du verbe à la forme de base, sans to ni -s : She can swim. Pas de do pour la question ou la négation : Can you swim ? I can't swim. Can n’a pas d’autre temps : au passé, on emploie could.",
-        "Can : capacité, permission, demande (Can I open the window ?). Should : conseil (You should see a doctor). Must : obligation que le locuteur ressent, ou déduction (He must be tired). Have to : obligation extérieure (I have to work on Saturday) ; il se conjugue avec do : She has to, I don't have to.",
+        "Les modaux (can, could, should, must, may, might, will, would) sont suivis du verbe à la forme de base, sans to ni -s : She can swim. Pas de do pour la question ou la négation : Can you swim? I can't swim. Can n’a pas d’autre temps : au passé, on emploie could.",
+        "Can : capacité, permission, demande (Can I open the window?). Should : conseil (You should see a doctor). Must : obligation que le locuteur ressent, ou déduction (He must be tired). Have to : obligation extérieure (I have to work on Saturday) ; il se conjugue avec do : She has to, I don't have to.",
         "Piège : mustn't et don't have to ne sont pas équivalents. You mustn't park here = c’est interdit. You don't have to come = ce n’est pas obligatoire. Le français dit « tu ne dois pas » pour les deux ; choisis selon le sens.",
       ],
       table: {
@@ -735,7 +746,7 @@ export const enCourse = {
         },
         {
           type: "fill",
-          prompt: "She ___ speak three languages.",
+          prompt: "She's only ten, but she ___ speak three languages.",
           hint: "pouvoir, capacité",
           answers: ["can"],
           explanation: "Pour une capacité, on emploie can, sans -s à la 3e personne.",
@@ -750,6 +761,7 @@ export const enCourse = {
       ],
       categories: ["verb", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "en-b1-present-perfect",
@@ -759,7 +771,8 @@ export const enCourse = {
       rule: [
         "Present perfect = have / has + participe passé : I have seen it, she has gone. Participes réguliers en -ed ; irréguliers à apprendre (seen, done, eaten, written, been). Il relie le passé au présent : expérience de vie (I've been to Japan), résultat visible (I've lost my keys), situation qui continue (I've lived here for ten years).",
         "Dès qu’on donne un moment précis du passé (yesterday, last year, in 2019, ago), on revient au past simple : I saw him yesterday. Piège : le français utilise le passé composé dans les deux cas. « J’ai vu ce film hier » = I saw this film yesterday ; jamais « I have seen it yesterday ».",
-        "Pour une situation qui dure encore : for + durée, since + point de départ. She has lived in Lyon since 2018 (« elle habite à Lyon depuis 2018 »), jamais « she lives ... since ». Autres marqueurs : ever, never, just, already, yet. En anglais américain, le past simple est fréquent avec already, yet et just.",
+        "Pour une situation qui dure encore : for + durée, since + point de départ. She has lived in Lyon since 2018 (« elle habite à Lyon depuis 2018 »), jamais « she lives ... since ».",
+        "Just (« venir de »), already (« déjà »), ever et never se placent entre have et le participe : I've just eaten. Yet va en fin de phrase, dans les questions et les négations : Have you finished yet? I haven't finished yet (« pas encore »). En anglais américain, le past simple est fréquent avec already, yet et just.",
       ],
       table: {
         caption: "Emplois du present perfect",
@@ -794,10 +807,10 @@ export const enCourse = {
         },
         {
           type: "fill",
-          prompt: "They ___ here for two years.",
+          prompt: "They ___ here for two years now.",
           hint: "live",
-          answers: ["have lived", "'ve lived"],
-          explanation: "For two years, avec une situation qui continue : have lived (ou they've lived).",
+          answers: ["have lived", "'ve lived", "have been living", "'ve been living"],
+          explanation: "For two years now, avec une situation qui continue : have lived (ou they've lived) ; have been living insiste sur la durée.",
         },
         {
           type: "fill",
@@ -809,6 +822,7 @@ export const enCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "en-b1-conditionals",
@@ -859,19 +873,20 @@ export const enCourse = {
           type: "fill",
           prompt: "We ___ to the beach if the weather is nice.",
           hint: "go",
-          answers: ["will go", "'ll go", "are going to go", "'re going to go"],
-          explanation: "If + present simple (is nice) appelle will + base dans l’autre proposition : we will go.",
+          answers: ["will go", "'ll go", "are going to go", "'re going to go", "are going", "'re going"],
+          explanation: "If + present simple (is nice) appelle le futur dans l’autre proposition : we will go (going to, ou le present continuous d’un projet arrangé, conviennent aussi).",
         },
         {
           type: "transform",
           instruction: "Mets la phrase au second conditionnel (hypothèse imaginaire).",
           source: "If I have time, I will help you.",
-          answers: ["If I had time, I would help you.", "If I had time, I'd help you."],
+          answers: ["If I had time, I would help you.", "If I had time, I'd help you.", "If I had time I would help you.", "If I had time I'd help you."],
           explanation: "Have devient had (past simple) après if, et will devient would.",
         },
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "en-b1-passive",
@@ -917,7 +932,7 @@ export const enCourse = {
           type: "fill",
           prompt: "The report ___ by Friday.",
           hint: "finish, futur passif",
-          answers: ["will be finished", "'ll be finished", "will have been finished"],
+          answers: ["will be finished", "'ll be finished", "will have been finished", "is going to be finished", "'s going to be finished"],
           explanation: "Futur passif : will be + participe passé, soit will be finished.",
         },
         {
@@ -931,12 +946,13 @@ export const enCourse = {
           type: "transform",
           instruction: "Mets la phrase au passif.",
           source: "Someone has stolen my bag.",
-          answers: ["My bag has been stolen."],
+          answers: ["My bag has been stolen.", "My bag's been stolen."],
           explanation: "Le present perfect actif has stolen devient has been stolen au passif.",
         },
       ],
       categories: ["verb", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "en-b1-relative-clauses",
@@ -989,7 +1005,7 @@ export const enCourse = {
         {
           type: "fill",
           prompt: "This is the town ___ I grew up.",
-          answers: ["where"],
+          answers: ["where", "in which"],
           explanation: "Pour un lieu, on emploie where.",
         },
         {
@@ -1002,6 +1018,7 @@ export const enCourse = {
       ],
       categories: ["function_word", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "en-b1-reported-speech",
@@ -1009,7 +1026,7 @@ export const enCourse = {
       title: "Rapporter des paroles : discours rapporté",
       summary: "Passer du discours direct au discours indirect : temps, pronoms, questions et ordres.",
       rule: [
-        "Quand le verbe introducteur est au passé (said, told, asked), les temps reculent d’un cran : present simple devient past simple, will devient would, can devient could, past simple et present perfect deviennent past perfect. \"I like tea,\" he said → He said (that) he liked tea.",
+        "Quand le verbe introducteur est au passé (said, told, asked), les temps reculent d’un cran : present simple devient past simple, will devient would, can devient could, past simple et present perfect deviennent past perfect. \"I like tea,\" he said → He said (that) he liked tea. Si le fait rapporté est toujours vrai, le recul est facultatif : He said he lives in Madrid.",
         "Les pronoms et repères changent aussi : I devient he ou she, my devient his ou her, now devient then, today devient that day, tomorrow devient the next day, yesterday devient the day before. Say se construit sans complément de personne (He said that ...) ; tell avec un complément (He told me that ...).",
         "Questions rapportées : ordre de la phrase affirmative, sans do ni point d’interrogation. She asked me where I lived. Question oui / non : if ou whether. Piège : « He asked where did I live » est faux. Ordres : told me to + base. The doctor told me to rest.",
       ],
@@ -1034,7 +1051,7 @@ export const enCourse = {
         {
           type: "choose",
           prompt: "\"I am tired,\" she said. She said she ___ tired.",
-          options: ["is", "was", "were", "has been"],
+          options: ["be", "was", "were", "has been"],
           answer: 1,
           explanation: "Said est au passé : am devient was.",
         },
@@ -1048,26 +1065,28 @@ export const enCourse = {
         {
           type: "fill",
           prompt: "\"I will come,\" she said. She said she ___ come.",
-          answers: ["would"],
+          hint: "recul du temps",
+          answers: ["would", "'d"],
           explanation: "Will devient would dans le discours rapporté.",
         },
         {
           type: "transform",
-          instruction: "Mets la phrase au discours rapporté.",
+          instruction: "Mets la phrase au discours rapporté, en faisant reculer le temps.",
           source: "\"I live in Paris,\" he said.",
           answers: ["He said he lived in Paris.", "He said that he lived in Paris."],
           explanation: "I devient he et le present simple recule au past simple : lived.",
         },
         {
           type: "transform",
-          instruction: "Rapporte la question.",
+          instruction: "Rapporte la question, en faisant reculer le temps.",
           source: "\"Where do you work?\" she asked me.",
           answers: ["She asked me where I worked.", "She asked where I worked."],
-          explanation: "Plus de do ni d’inversion : where I worked. You devient I, car c’est « me » qui parle.",
+          explanation: "Plus de do ni d’inversion : where I worked. You devient I, car la question m’était posée et c’est moi qui la rapporte.",
         },
       ],
       categories: ["verb", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "en-b1-gerund-infinitive",
@@ -1076,7 +1095,7 @@ export const enCourse = {
       summary: "Choisir la bonne construction après un verbe ou une préposition (enjoy doing, decide to do).",
       rule: [
         "Après certains verbes on met la forme en -ing, après d’autres to + infinitif ; on apprend le verbe avec sa construction. + -ing : enjoy, finish, avoid, mind, suggest, keep, practise (I enjoy reading). + to : want, need, decide, hope, plan, learn, would like (I want to leave).",
-        "Après une préposition, toujours -ing : I'm interested in learning, Thanks for helping, Before leaving, call me. Piège : le français met l’infinitif après la préposition (« avant de partir », « merci d’aider »). En anglais, jamais « before to leave ».",
+        "Après une préposition, toujours -ing : I'm interested in learning, Thanks for helping, Before leaving, call me. Piège : le français met l’infinitif après la préposition (« avant de partir », « merci de m’aider »). En anglais, jamais « before to leave ».",
         "Quelques verbes changent de sens : stop doing (arrêter de) / stop to do (s’arrêter pour) ; remember doing (se souvenir d’avoir fait) / remember to do (penser à faire). Like, love, hate et start acceptent les deux presque sans changement : I like swimming / I like to swim.",
       ],
       table: {
@@ -1128,12 +1147,13 @@ export const enCourse = {
           type: "transform",
           instruction: "Réécris la phrase avec before + -ing.",
           source: "Wash your hands, then eat.",
-          answers: ["Wash your hands before eating."],
+          answers: ["Wash your hands before eating.", "Before eating, wash your hands.", "Before eating wash your hands."],
           explanation: "Après la préposition before, le verbe prend -ing : before eating.",
         },
       ],
       categories: ["verb", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
   ],
 } satisfies GrammarCourse;
