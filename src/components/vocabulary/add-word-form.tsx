@@ -1,9 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import type { ActionResult } from "@/app/actions/result";
 import { languageInfo } from "@/lib/domain/languages";
 import type { Language } from "@/lib/schemas/common";
-import { newVocabularyInputSchema, type NewVocabularyInput, type VocabularyList } from "@/lib/schemas/vocabulary";
+import {
+  VOCABULARY_TRANSLATION_LIMITS,
+  newVocabularyInputSchema,
+  type NewVocabularyInput,
+  type TranslateVocabularyInput,
+  type VocabularyList,
+  type VocabularyTranslationResult,
+} from "@/lib/schemas/vocabulary";
 
 type FieldErrors = Partial<Record<keyof NewVocabularyInput, string>>;
 
@@ -13,21 +21,63 @@ const inputClass =
 export function AddWordForm({
   languages,
   lists,
+  canTranslate,
+  isGuest,
   onAdd,
+  onTranslate,
   onCancel,
 }: {
   languages: Language[];
   /** The user's lists; only those of the chosen language are offered. */
   lists: VocabularyList[];
+  /** The automatic translation is on for this server. */
+  canTranslate: boolean;
+  isGuest: boolean;
   /** Resolves to an error message to show in the form, or null when the word was added. */
   onAdd: (input: NewVocabularyInput) => Promise<string | null>;
+  onTranslate: (input: TranslateVocabularyInput) => Promise<ActionResult<VocabularyTranslationResult>>;
   onCancel: () => void;
 }) {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [language, setLanguage] = useState<Language>(languages[0]);
+  const [term, setTerm] = useState("");
+  const [translation, setTranslation] = useState("");
+  /** Filled in by the model and not edited since: to be checked by the user. */
+  const [suggestion, setSuggestion] = useState<"suggested" | "uncertain" | null>(null);
+  const [translating, setTranslating] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
   const languageLists = lists.filter((list) => list.language === language);
+
+  async function translate() {
+    const word = term.trim();
+    if (word === "") return;
+    setTranslating(true);
+    setNotice(null);
+    const result = await onTranslate({ language, terms: [word] });
+    setTranslating(false);
+    if (!result.ok) return setNotice(result.error);
+
+    switch (result.data.status) {
+      case "ready": {
+        const found = result.data.translations[0];
+        if (!found) return setNotice("Pas de suggestion pour ce mot : tape la traduction toi-même.");
+        setTranslation(found.translation);
+        setSuggestion(found.uncertain ? "uncertain" : "suggested");
+        setErrors((current) => ({ ...current, translation: undefined }));
+        return;
+      }
+      case "limit":
+        return setNotice(
+          `Tu as atteint la limite de ${VOCABULARY_TRANSLATION_LIMITS.termsPerDay} traductions automatiques pour aujourd’hui. Tape la traduction toi-même ou reviens demain.`,
+        );
+      case "guest":
+        return setNotice("La traduction automatique est réservée aux comptes complets.");
+      default:
+        return setNotice("La traduction automatique est indisponible pour le moment. Tape la traduction toi-même.");
+    }
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -64,6 +114,10 @@ export function AddWordForm({
     else {
       form.reset();
       setLanguage(languages[0]);
+      setTerm("");
+      setTranslation("");
+      setSuggestion(null);
+      setNotice(null);
     }
   }
 
@@ -87,11 +141,47 @@ export function AddWordForm({
         ))}
       </div>
       <Field label="Mot ou expression" error={errors.term}>
-        <input name="term" autoComplete="off" autoCapitalize="none" className={inputClass} />
+        <input
+          name="term"
+          value={term}
+          onChange={(event) => setTerm(event.target.value)}
+          autoComplete="off"
+          autoCapitalize="none"
+          className={inputClass}
+        />
       </Field>
       <Field label="Traduction" error={errors.translation}>
-        <input name="translation" autoComplete="off" className={inputClass} />
+        <input
+          name="translation"
+          value={translation}
+          onChange={(event) => {
+            setTranslation(event.target.value);
+            setSuggestion(null);
+          }}
+          autoComplete="off"
+          className={inputClass}
+        />
       </Field>
+      {suggestion && (
+        <p className="-mt-1 text-xs font-medium text-ink-soft">
+          à vérifier{suggestion === "uncertain" && " · incertain"}
+        </p>
+      )}
+      {canTranslate && !isGuest && (
+        <button
+          type="button"
+          onClick={translate}
+          disabled={translating || term.trim() === ""}
+          className="w-full rounded-2xl border border-line py-2.5 text-sm font-semibold text-ink-soft hover:bg-surface-sunk disabled:opacity-60"
+        >
+          {translating ? "Traduction en cours…" : "Traduire automatiquement"}
+        </button>
+      )}
+      {notice && (
+        <p role="status" className="rounded-2xl bg-surface-sunk px-4 py-3 text-sm text-ink-soft">
+          {notice}
+        </p>
+      )}
       <Field label="Définition (facultatif)" error={errors.definition}>
         <input name="definition" autoComplete="off" className={inputClass} />
       </Field>
