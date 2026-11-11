@@ -1,4 +1,4 @@
-import { Card, Eyebrow, SectionTitle } from "@/components/ui/primitives";
+import { Eyebrow, SectionTitle } from "@/components/ui/primitives";
 import { REVIEW_MODE_LABELS } from "@/lib/domain/labels";
 import {
   RETENTION_MIN_DELAY_DAYS,
@@ -19,14 +19,14 @@ export function RetentionCard({ stats }: { stats: RetentionStats }) {
   return (
     <section>
       <SectionTitle>Ce que tu retiens</SectionTitle>
-      <Card>
+      <div>
         <Eyebrow>Rappel après au moins {RETENTION_MIN_DELAY_DAYS} jours</Eyebrow>
         {modes.length > 0 ? (
-          <ul className="mt-3 space-y-1.5">
+          <ul className="mt-3 border-b border-line">
             {modes.map((mode) => {
               const { reviews, recalled } = stats.byMode[mode];
               return (
-                <li key={mode} className="text-[15px]">
+                <li key={mode} className="border-t border-line py-2.5 text-[15px]">
                   <span className="font-semibold">{REVIEW_MODE_LABELS[mode]}</span>
                   {mode === "flip" && <span className="text-ink-soft"> (auto-évaluée)</span>} :{" "}
                   {percent(recalled, reviews)} % sur {reviews} révisions
@@ -39,7 +39,7 @@ export function RetentionCard({ stats }: { stats: RetentionStats }) {
             Pas encore assez de révisions espacées pour afficher un taux.
           </p>
         )}
-        <p className="mt-3 text-xs text-muted">
+        <p className="mt-4 text-xs text-muted">
           On compte les révisions faites au moins {RETENTION_MIN_DELAY_DAYS} jours après la précédente, sur les{" "}
           {RETENTION_WINDOW_DAYS} derniers jours ; un mot est retenu s’il n’est pas à revoir. Un mode
           apparaît à partir de {RETENTION_MIN_REVIEWS_PER_MODE} révisions.
@@ -50,7 +50,7 @@ export function RetentionCard({ stats }: { stats: RetentionStats }) {
             moins {RETENTION_MIN_REVIEWS_TOTAL}.
           </p>
         )}
-      </Card>
+      </div>
     </section>
   );
 }

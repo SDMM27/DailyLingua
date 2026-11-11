@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { ActionResult } from "@/app/actions/result";
+import { buttonClass } from "@/components/ui/primitives";
 import { languageInfo } from "@/lib/domain/languages";
 import type { Language } from "@/lib/schemas/common";
 import {
@@ -16,7 +17,7 @@ import {
 type FieldErrors = Partial<Record<keyof NewVocabularyInput, string>>;
 
 const inputClass =
-  "w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 placeholder:text-muted focus:border-ink-soft focus:outline-none";
+  "w-full rounded-xl border border-line bg-surface min-h-11 px-3.5 py-2.5 text-base placeholder:text-muted focus:border-ink-soft focus:outline-none";
 
 export function AddWordForm({
   languages,
@@ -134,7 +135,7 @@ export function AddWordForm({
               onChange={() => setLanguage(lang)}
               className="peer sr-only"
             />
-            <span className="block cursor-pointer rounded-xl border border-line py-2 text-center text-sm font-medium text-ink-soft transition-colors peer-checked:border-ink peer-checked:bg-ink peer-checked:text-paper peer-focus-visible:ring-2 peer-focus-visible:ring-ink">
+            <span className="flex min-h-11 cursor-pointer items-center justify-center rounded-xl border border-line text-center text-sm font-medium text-ink-soft transition-colors peer-checked:border-ink peer-checked:bg-ink peer-checked:text-paper peer-focus-visible:ring-2 peer-focus-visible:ring-ink">
               {languageInfo(lang).nameFr}
             </span>
           </label>
@@ -172,7 +173,7 @@ export function AddWordForm({
           type="button"
           onClick={translate}
           disabled={translating || term.trim() === ""}
-          className="w-full rounded-2xl border border-line py-2.5 text-sm font-semibold text-ink-soft hover:bg-surface-sunk disabled:opacity-60"
+          className={`${buttonClass.secondary} w-full`}
         >
           {translating ? "Traduction en cours…" : "Traduire automatiquement"}
         </button>
@@ -209,13 +210,13 @@ export function AddWordForm({
         </p>
       )}
       <div className="flex gap-2 pt-1">
-        <button type="button" onClick={onCancel} className="flex-1 rounded-2xl border border-line py-3 font-semibold text-ink-soft">
+        <button type="button" onClick={onCancel} className={`${buttonClass.secondary} flex-1`}>
           Annuler
         </button>
         <button
           type="submit"
           disabled={pending}
-          className="flex-1 rounded-2xl bg-ink py-3 font-semibold text-paper disabled:opacity-60"
+          className={`${buttonClass.primary} flex-1`}
         >
           Ajouter
         </button>

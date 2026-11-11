@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { PlusIcon } from "@/components/icons";
 import { languageStyle } from "@/components/ui/language-style";
-import { Card, SectionTitle } from "@/components/ui/primitives";
+import { buttonClass, SectionTitle } from "@/components/ui/primitives";
 import { languageInfo } from "@/lib/domain/languages";
 import type { Language } from "@/lib/schemas/common";
 import {
@@ -14,7 +14,7 @@ import {
 } from "@/lib/schemas/vocabulary";
 
 const inputClass =
-  "w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 placeholder:text-muted focus:border-ink-soft focus:outline-none";
+  "w-full rounded-xl border border-line bg-surface min-h-11 px-3.5 py-2.5 text-base placeholder:text-muted focus:border-ink-soft focus:outline-none";
 
 /** "Mes listes": one card per list with its counts and actions, and the form to create an empty list. */
 export function ListsSection({
@@ -48,7 +48,7 @@ export function ListsSection({
             <button
               type="button"
               onClick={() => setCreating(true)}
-              className="inline-flex items-center gap-1 rounded-full border border-line px-3.5 py-1.5 text-sm font-semibold text-ink-soft hover:bg-surface-sunk"
+              className={`${buttonClass.secondary} !px-4 text-sm`}
             >
               <PlusIcon width={15} height={15} />
               Nouvelle liste
@@ -60,7 +60,7 @@ export function ListsSection({
       </SectionTitle>
 
       {creating && (
-        <Card className="mb-5">
+        <div className="mb-5 border-y border-ink py-5">
           <NewListForm
             languages={languages}
             onCreate={async (input) => {
@@ -70,7 +70,7 @@ export function ListsSection({
             }}
             onCancel={() => setCreating(false)}
           />
-        </Card>
+        </div>
       )}
 
       {lists.length === 0 ? (
@@ -78,7 +78,7 @@ export function ListsSection({
           Aucune liste pour l’instant. Importe les mots d’un livre ou d’un cours, ou crée une liste vide.
         </p>
       ) : (
-        <ul aria-label="Mes listes" className="space-y-3">
+        <ul aria-label="Mes listes" className="border-b border-line">
           {lists.map((list) => (
             <ListCard
               key={list.id}
@@ -115,13 +115,13 @@ function ListCard({
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const words = `${wordCount} mot${wordCount > 1 ? "s" : ""}`;
   return (
-    <li className="rounded-3xl border border-line bg-surface p-4 sm:p-5">
+    <li className="border-t border-line py-4">
       <div className="flex items-start gap-3">
-        <span className={`mt-2.5 size-2 shrink-0 rounded-full ${style.bg}`} aria-hidden="true" />
+        <span className={`mt-3 size-2 shrink-0 rounded-full ${style.bg}`} aria-hidden="true" />
         <div className="min-w-0 flex-1">
-          <p className="font-serif text-lg font-semibold break-words">{list.name}</p>
+          <p className="font-serif text-xl font-bold break-words">{list.name}</p>
           {list.description && <p className="text-sm text-ink-soft">{list.description}</p>}
-          <p className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted">
+          <p className="kicker mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-muted">
             <span>{languageInfo(list.language).nameFr}</span>
             <span>{words}</span>
             {list.active ? <span>{dueCount} à revoir</span> : <span className="font-semibold text-ink-soft">En pause</span>}
@@ -134,10 +134,10 @@ function ListCard({
           <span className="text-ink-soft">
             Supprimer « {list.name} » et ses {wordCount} mots ?
           </span>
-          <button type="button" onClick={() => setConfirmingDelete(false)} className="text-muted">
+          <button type="button" onClick={() => setConfirmingDelete(false)} className="min-h-11 px-2 text-muted">
             Annuler
           </button>
-          <button type="button" onClick={onDelete} className="text-danger">
+          <button type="button" onClick={onDelete} className="min-h-11 px-2 text-danger">
             Confirmer la suppression de la liste
           </button>
         </div>
@@ -148,7 +148,7 @@ function ListCard({
             onClick={onReview}
             disabled={!list.active || dueCount === 0}
             aria-label={`Réviser « ${list.name} »`}
-            className="rounded-full bg-ink px-3 py-1.5 font-semibold text-paper disabled:opacity-40"
+            className={`${buttonClass.primary} !px-4 text-sm`}
           >
             Réviser
           </button>
@@ -156,7 +156,7 @@ function ListCard({
             type="button"
             onClick={onToggle}
             aria-label={`${list.active ? "Mettre en pause" : "Réactiver"} « ${list.name} »`}
-            className="rounded-full border border-line px-3 py-1.5 text-ink-soft hover:bg-surface-sunk"
+            className={`${buttonClass.secondary} !px-4 text-sm`}
           >
             {list.active ? "Mettre en pause" : "Réactiver"}
           </button>
@@ -164,7 +164,7 @@ function ListCard({
             type="button"
             onClick={() => setConfirmingDelete(true)}
             aria-label={`Supprimer la liste « ${list.name} »`}
-            className="px-1 py-1.5 text-muted hover:text-danger"
+            className="min-h-11 px-2 text-muted hover:text-danger"
           >
             Supprimer
           </button>
@@ -209,7 +209,7 @@ function NewListForm({
         {languages.map((lang, i) => (
           <label key={lang} className="flex-1">
             <input type="radio" name="language" value={lang} defaultChecked={i === 0} className="peer sr-only" />
-            <span className="block cursor-pointer rounded-xl border border-line py-2 text-center text-sm font-medium text-ink-soft transition-colors peer-checked:border-ink peer-checked:bg-ink peer-checked:text-paper peer-focus-visible:ring-2 peer-focus-visible:ring-ink">
+            <span className="flex min-h-11 cursor-pointer items-center justify-center rounded-xl border border-line text-center text-sm font-medium text-ink-soft transition-colors peer-checked:border-ink peer-checked:bg-ink peer-checked:text-paper peer-focus-visible:ring-2 peer-focus-visible:ring-ink">
               {languageInfo(lang).nameFr}
             </span>
           </label>
@@ -229,10 +229,10 @@ function NewListForm({
         </p>
       )}
       <div className="flex gap-2 pt-1">
-        <button type="button" onClick={onCancel} className="flex-1 rounded-2xl border border-line py-3 font-semibold text-ink-soft">
+        <button type="button" onClick={onCancel} className={`${buttonClass.secondary} flex-1`}>
           Annuler
         </button>
-        <button type="submit" disabled={pending} className="flex-1 rounded-2xl bg-ink py-3 font-semibold text-paper disabled:opacity-60">
+        <button type="submit" disabled={pending} className={`${buttonClass.primary} flex-1`}>
           Créer la liste
         </button>
       </div>

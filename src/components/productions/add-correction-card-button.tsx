@@ -45,7 +45,7 @@ export function AddCorrectionCardButton({
         type="button"
         onClick={add}
         disabled={pending}
-        className="inline-flex min-h-8 items-center gap-1 rounded-full border border-line px-3 text-xs font-semibold text-ink-soft transition-colors hover:bg-surface-sunk disabled:opacity-60"
+        className="inline-flex min-h-11 items-center gap-1 rounded-full border border-line px-3 text-xs font-semibold text-ink-soft transition-colors hover:bg-surface-sunk disabled:opacity-60"
       >
         <PlusIcon width={13} height={13} />À réviser
       </button>

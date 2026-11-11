@@ -4,7 +4,7 @@ import { connection } from "next/server";
 import { ExternalIcon } from "@/components/icons";
 import { WritingFeedbackCard } from "@/components/mission/writing-feedback-card";
 import { languageStyle } from "@/components/ui/language-style";
-import { Card, PageHeader, ProgressBar } from "@/components/ui/primitives";
+import { PageHeader, ProgressBar } from "@/components/ui/primitives";
 import { getRepository, requirePreferences } from "@/lib/data/repository";
 import { formatLongDate } from "@/lib/domain/dates";
 import { CONTENT_TYPE_LABELS } from "@/lib/domain/labels";
@@ -20,35 +20,33 @@ export default async function HistoryPage() {
     <>
       <PageHeader eyebrow="Historique" title="Missions passées">
         Les contenus restent accessibles à leur source d’origine.{" "}
-        <Link href="/productions" className="font-medium text-ink underline underline-offset-4">
+        <Link href="/productions" className="font-medium text-accent-strong underline underline-offset-4">
           Voir mes productions écrites
         </Link>
       </PageHeader>
       {history.length === 0 ? (
         <p className="py-8 text-center text-sm text-muted">Aucune mission terminée pour l’instant.</p>
       ) : (
-        <ol className="space-y-4">
+        <ol className="border-b border-line">
           {history.map((entry) => (
-            <li key={entry.id}>
-              <Card>
-                <div className="flex items-baseline justify-between gap-3">
-                  <h2 className="font-serif text-lg font-semibold first-letter:uppercase">
-                    {formatLongDate(entry.date)}
-                  </h2>
-                  <span className="text-xs font-medium text-muted">
-                    {entry.completedMinutes} / {entry.budgetMinutes} min
-                  </span>
-                </div>
+            <li key={entry.id} className="border-t border-line py-5 lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-10">
+              <div>
+                <h2 className="kicker text-accent-strong">{formatLongDate(entry.date)}</h2>
+                <p className="mt-1 font-serif text-3xl font-extrabold tabular-nums">
+                  {entry.completedMinutes} / {entry.budgetMinutes} min
+                </p>
                 <ProgressBar
                   value={entry.completedMinutes / entry.budgetMinutes}
                   label={`Mission du ${formatLongDate(entry.date)}`}
                   className="mt-3"
                 />
-                <ul className="mt-4 space-y-3">
+              </div>
+              <div className="mt-5 lg:mt-0">
+                <ul className="grid gap-x-10 gap-y-5 md:grid-cols-2">
                   {entry.sessions.map((s) => (
                     <li key={s.language} className="flex gap-3">
                       <span
-                        className={`mt-1 w-1 shrink-0 self-stretch rounded-full ${languageStyle(s.language).bg}`}
+                        className={`mt-2 size-2 shrink-0 rounded-full ${languageStyle(s.language).bg}`}
                         aria-hidden="true"
                       />
                       <div className="min-w-0 flex-1">
@@ -57,18 +55,18 @@ export default async function HistoryPage() {
                           target="_blank"
                           rel="noopener noreferrer"
                           lang={s.language}
-                          className="group inline font-serif text-[16px] leading-snug font-medium hover:underline"
+                          className="group inline font-serif text-lg leading-snug font-bold hover:underline"
                         >
                           {s.title}
                           <ExternalIcon width={13} height={13} className="ml-1 inline text-muted" />
                         </a>
-                        <p className="mt-0.5 text-xs text-muted">
+                        <p className="kicker mt-1 text-muted">
                           {CONTENT_TYPE_LABELS[s.type]} · {s.sourceName}
                           {s.score && ` · quiz ${s.score.correct}/${s.score.total}`}
                         </p>
                         {s.writing && (
                           <details className="mt-2 text-sm">
-                            <summary className="cursor-pointer text-xs font-medium text-ink-soft">
+                            <summary className="flex min-h-11 cursor-pointer items-center text-xs font-medium text-ink-soft">
                               Mon texte
                             </summary>
                             <p lang={s.language} className="mt-2 font-serif leading-relaxed whitespace-pre-wrap">
@@ -78,7 +76,7 @@ export default async function HistoryPage() {
                         )}
                         {s.feedback && (
                           <details className="mt-2 text-sm">
-                            <summary className="cursor-pointer text-xs font-medium text-ink-soft">
+                            <summary className="flex min-h-11 cursor-pointer items-center text-xs font-medium text-ink-soft">
                               Correction
                             </summary>
                             <div className="mt-2">
@@ -90,7 +88,7 @@ export default async function HistoryPage() {
                     </li>
                   ))}
                 </ul>
-              </Card>
+              </div>
             </li>
           ))}
         </ol>

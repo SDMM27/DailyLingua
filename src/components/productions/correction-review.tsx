@@ -66,23 +66,23 @@ export function CorrectionReview({
       <CorrectionReviewSession queue={queue} today={today} onReviewed={handleReviewed} />
 
       <details className="text-sm">
-        <summary className="cursor-pointer text-xs font-medium text-ink-soft">
+        <summary className="flex min-h-11 cursor-pointer items-center text-xs font-medium text-ink-soft">
           Toutes mes erreurs ({cards.length})
         </summary>
-        <ul className="mt-3 space-y-2">
+        <ul className="mt-1 border-b border-line">
           {[...cards]
             .sort((a, b) => a.review.dueOn.localeCompare(b.review.dueOn))
             .map((card) => (
-              <li key={card.id} className="flex items-start gap-3 rounded-2xl border border-line px-4 py-3">
+              <li key={card.id} className="flex items-start gap-3 border-t border-line py-3">
                 <span
                   className={`mt-2 size-2 shrink-0 rounded-full ${languageStyle(card.language).bg}`}
                   aria-hidden="true"
                 />
                 <div className="min-w-0 flex-1">
-                  <p lang={card.language} className="font-serif leading-snug">
+                  <p lang={card.language} className="font-serif text-lg leading-snug font-bold">
                     {card.corrected}
                   </p>
-                  <p className="mt-1 text-xs text-muted">
+                  <p className="kicker mt-1 text-muted">
                     {card.category && `${CORRECTION_CATEGORY_LABELS[card.category]} · `}
                     Révision {relativeDueLabel(card.review.dueOn, today)}
                   </p>
@@ -91,7 +91,7 @@ export function CorrectionReview({
                   type="button"
                   onClick={() => handleDelete(card)}
                   aria-label={`Retirer « ${card.corrected} » des erreurs à revoir`}
-                  className="shrink-0 text-xs font-medium text-muted hover:text-danger"
+                  className="min-h-11 shrink-0 px-2 text-xs font-medium text-muted hover:text-danger"
                 >
                   Retirer
                 </button>
