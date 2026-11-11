@@ -94,7 +94,7 @@ export function TurnstileWidget({
       <div ref={containerRef} className="min-h-[65px]" />
       {fieldName && <input type="hidden" name={fieldName} value={token ?? ""} />}
       {loadFailed && (
-        <p role="alert" className="rounded-2xl bg-danger-soft px-4 py-3 text-sm text-danger">
+        <p role="alert" className="rounded-lg bg-danger-soft px-4 py-3 text-sm text-danger">
           La vérification anti-robot n’a pas pu se charger. Recharge la page.
         </p>
       )}
