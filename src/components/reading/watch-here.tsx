@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { PlayIcon } from "@/components/icons";
+import { buttonClass } from "@/components/ui/primitives";
 import type { Language } from "@/lib/schemas/common";
 import { YouTubePlayer } from "./youtube-player";
 
@@ -16,7 +17,7 @@ export function WatchHere({ videoId, title, language }: { videoId: string; title
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="inline-flex min-h-9 items-center gap-2 rounded-full border border-ink px-4 text-sm font-semibold transition-colors hover:bg-ink hover:text-paper"
+          className={buttonClass.secondary}
         >
           <PlayIcon width={16} height={16} />
           Regarder ici

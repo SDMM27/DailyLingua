@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { HeadphonesIcon } from "@/components/icons";
+import { buttonClass } from "@/components/ui/primitives";
 
 const SPEEDS = [
   { rate: 0.75, label: "0,75×" },
@@ -28,7 +29,7 @@ export function AudioPlayer({ audioUrl, title }: { audioUrl: string; title: stri
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="inline-flex min-h-9 items-center gap-2 rounded-full border border-ink px-4 text-sm font-semibold transition-colors hover:bg-ink hover:text-paper"
+          className={buttonClass.secondary}
         >
           <HeadphonesIcon width={16} height={16} />
           Écouter ici
@@ -62,7 +63,7 @@ export function AudioPlayer({ audioUrl, title }: { audioUrl: string; title: stri
             type="button"
             aria-pressed={rate === speed.rate}
             onClick={() => changeRate(speed.rate)}
-            className="inline-flex min-h-9 min-w-9 items-center justify-center rounded-full border border-line px-3 text-xs font-semibold transition-colors hover:border-ink aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-paper"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-line px-3 text-xs font-semibold transition-colors hover:border-ink aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-paper"
           >
             {speed.label}
           </button>

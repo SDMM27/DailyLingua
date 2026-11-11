@@ -64,24 +64,24 @@ export function WritingFeedbackCard({
         })}
       </ul>
 
-      <p className="rounded-2xl bg-surface-sunk px-4 py-3 text-[13px] leading-relaxed">
-        <span className="block text-xs font-semibold tracking-wide text-muted uppercase">Point fort</span>
+      <p className="border-y border-line py-3 text-[13px] leading-relaxed">
+        <span className="kicker block text-muted">Point fort</span>
         {feedback.strength}
       </p>
 
       {feedback.corrections.length > 0 && (
         <div>
-          <p className="text-xs font-semibold tracking-wide text-muted uppercase">Corrections</p>
-          <ul className="mt-2 space-y-3">
+          <p className="kicker text-muted">Corrections</p>
+          <ul className="mt-2 divide-y divide-line border-y border-line">
             {feedback.corrections.map((correction, i) => (
-              <li key={i} className="rounded-2xl border border-line px-4 py-3">
+              <li key={i} className="py-3">
                 {correction.category && (
                   <span className="mb-1.5 inline-block rounded-full bg-surface-sunk px-2 py-0.5 text-[11px] font-medium text-ink-soft">
                     {CORRECTION_CATEGORY_LABELS[correction.category]}
                   </span>
                 )}
                 <p lang={language} className="font-serif leading-relaxed">
-                  <span className="rounded bg-danger-soft px-1 text-danger line-through">{correction.original}</span>
+                  <span className="bg-danger-soft px-1 text-danger line-through">{correction.original}</span>
                   <span aria-hidden="true" className="mx-1.5 text-muted">
                     →
                   </span>
@@ -98,7 +98,7 @@ export function WritingFeedbackCard({
 
       {feedback.nativeVersion && (
         <div>
-          <p className="text-xs font-semibold tracking-wide text-muted uppercase">Ce qu’un natif écrirait</p>
+          <p className="kicker text-muted">Ce qu’un natif écrirait</p>
           {hideNativeVersion ? (
             <p className="mt-2 text-[13px] leading-relaxed text-muted">Version masquée.</p>
           ) : (
