@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import { Fragment, useState } from "react";
 import { completePlacementTest } from "@/app/actions/placement";
 import { ArrowRightIcon } from "@/components/icons";
-import { languageStyle } from "@/components/ui/language-style";
-import { Card, Eyebrow, LanguageTag } from "@/components/ui/primitives";
+import { buttonClass, Columns, Eyebrow, LanguageTag } from "@/components/ui/primitives";
 import { ALPHABET_SCRIPT_NAMES } from "@/lib/domain/alphabet";
 import { PLACEMENT_CONFIDENCE_LABELS } from "@/lib/domain/labels";
 import { languageInfo } from "@/lib/domain/languages";
@@ -131,7 +130,7 @@ export function PlacementTest({
   }
 
   const header = (
-    <div className="mb-6 flex items-center justify-between gap-3">
+    <div className="mb-8 flex items-center justify-between gap-3 border-b border-line pb-3">
       <LanguageTag language={language} />
       {phase === "questions" && (
         <Link href="/niveau" className="min-h-11 content-center text-sm font-medium text-muted hover:text-ink">
@@ -145,44 +144,43 @@ export function PlacementTest({
     return (
       <div>
         {header}
-        <Card>
-          <Eyebrow>Comment ça marche</Eyebrow>
-          <p className="mt-2 text-[15px] leading-relaxed text-ink-soft">
-            Un test adaptatif de {info.nameFr.toLowerCase()} : jusqu’à {PLACEMENT_MAX_ITEMS} questions, une dizaine de minutes. Le niveau des
-            questions change selon tes réponses, il n’y a rien à préparer.
-          </p>
-          <p className="mt-3 text-[15px] leading-relaxed text-ink-soft">
-            Si tu ne sais pas, choisis « Je ne sais pas » plutôt que de deviner : cette réponse compte comme
-            fausse, mais elle donne une estimation plus juste qu’un coup de chance.
-          </p>
-        </Card>
-        {alphabet && (
-          <p className="mt-4 text-sm leading-relaxed text-ink-soft">
-            Tu ne lis pas encore {ALPHABET_SCRIPT_NAMES[alphabet.script]} ?{" "}
-            <Link href={`/alphabet?langue=${language}`} className="font-medium text-ink underline underline-offset-2">
-              Commence par l’alphabet.
-            </Link>{" "}
-            Tu le lis déjà ?{" "}
-            <Link href={`/alphabet/${language}/test`} className="font-medium text-ink underline underline-offset-2">
-              Vérifie-le en 10 mots.
-            </Link>
-          </p>
-        )}
-        <div className="mt-6 space-y-3">
-          <button
-            type="button"
-            onClick={start}
-            className="w-full rounded-2xl bg-ink px-5 py-3.5 text-[15px] font-semibold text-paper transition-transform active:scale-[0.98]"
-          >
-            Commencer
-          </button>
-          <Link
-            href="/niveau"
-            className="flex min-h-11 items-center justify-center text-sm font-medium text-muted hover:text-ink"
-          >
-            Passer le test
-          </Link>
-        </div>
+        <Columns
+          main={
+            <section className="max-w-[68ch]">
+              <Eyebrow>Comment ça marche</Eyebrow>
+              <p className="mt-3 font-serif text-xl leading-relaxed text-ink-soft">
+                Un test adaptatif de {info.nameFr.toLowerCase()} : jusqu’à {PLACEMENT_MAX_ITEMS} questions, une dizaine de minutes. Le niveau des
+                questions change selon tes réponses, il n’y a rien à préparer.
+              </p>
+              <p className="mt-4 font-serif text-xl leading-relaxed text-ink-soft">
+                Si tu ne sais pas, choisis « Je ne sais pas » plutôt que de deviner : cette réponse compte comme
+                fausse, mais elle donne une estimation plus juste qu’un coup de chance.
+              </p>
+              {alphabet && (
+                <p className="mt-6 border-t border-line pt-4 text-sm leading-relaxed text-ink-soft">
+                  Tu ne lis pas encore {ALPHABET_SCRIPT_NAMES[alphabet.script]} ?{" "}
+                  <Link href={`/alphabet?langue=${language}`} className="font-medium text-accent-strong underline underline-offset-2">
+                    Commence par l’alphabet.
+                  </Link>{" "}
+                  Tu le lis déjà ?{" "}
+                  <Link href={`/alphabet/${language}/test`} className="font-medium text-accent-strong underline underline-offset-2">
+                    Vérifie-le en 10 mots.
+                  </Link>
+                </p>
+              )}
+            </section>
+          }
+          aside={
+            <div className="space-y-3 border-t border-ink pt-5 lg:border-t-0 lg:pt-0">
+              <button type="button" onClick={start} className={`${buttonClass.primary} w-full`}>
+                Commencer
+              </button>
+              <Link href="/niveau" className={`${buttonClass.quiet} w-full`}>
+                Passer le test
+              </Link>
+            </div>
+          }
+        />
       </div>
     );
   }
@@ -193,85 +191,73 @@ export function PlacementTest({
     return (
       <div>
         {header}
-        <Card>
-          <Eyebrow>Niveau estimé</Eyebrow>
-          <p className={`mt-2 font-serif text-6xl font-semibold ${languageStyle(language).text}`}>{result.estimate}</p>
-          <p className="mt-3 font-semibold">Confiance {confidence.title}</p>
-          <p className="mt-1 text-sm leading-relaxed text-ink-soft">{confidence.hint}</p>
-        </Card>
-        <Card className="mt-4">
-          <label className="block">
-            <span className="mb-1 block text-xs font-medium text-ink-soft">Niveau à retenir</span>
-            <select
-              value={level}
-              onChange={(e) => setChosen(e.target.value as CefrLevel)}
-              className="w-full appearance-none rounded-xl border border-line bg-surface px-3.5 py-2.5 text-base font-semibold focus:border-ink-soft focus:outline-none"
-            >
-              {CEFR_LEVELS.map((l) => (
-                <option key={l} value={l}>
-                  {l}
-                </option>
-              ))}
-            </select>
-          </label>
-          <p className="mt-2 text-xs text-muted">
-            Niveau déclaré actuellement : {startLevel}. Tu peux garder l’estimation ou choisir un autre niveau.
-          </p>
-        </Card>
-        <div className="mt-6 space-y-3">
-          {persist && assessmentAvailable ? (
-            <>
-              <p className="text-sm leading-relaxed text-ink-soft">
-                Pour aller plus loin, le bilan complet mesure chaque compétence (lire, écouter, écrire, parler) : compte 20 à 25
-                minutes. Ton niveau est enregistré dans les deux cas.
+        <Columns
+          main={
+            <section>
+              <Eyebrow>Niveau estimé</Eyebrow>
+              <p className="sd-stamp sd-display mt-4 inline-block border-4 border-accent-strong px-6 py-2 text-7xl leading-none text-accent-strong">
+                {result.estimate}
               </p>
-              <button
-                type="button"
-                onClick={() => save("assessment")}
-                disabled={saving}
-                className="w-full rounded-2xl bg-ink px-5 py-3.5 text-[15px] font-semibold text-paper transition-transform active:scale-[0.98] disabled:opacity-60"
-              >
-                {saving ? "Enregistrement…" : "Faire mon bilan complet"}
-              </button>
-              <button
-                type="button"
-                onClick={() => save()}
-                disabled={saving}
-                className="flex min-h-11 w-full items-center justify-center rounded-2xl border border-line px-5 text-[15px] font-semibold text-ink-soft hover:text-ink disabled:opacity-60"
-              >
-                Plus tard
-              </button>
-            </>
-          ) : persist ? (
-            <button
-              type="button"
-              onClick={() => save()}
-              disabled={saving}
-              className="w-full rounded-2xl bg-ink px-5 py-3.5 text-[15px] font-semibold text-paper transition-transform active:scale-[0.98] disabled:opacity-60"
-            >
-              {saving ? "Enregistrement…" : "Enregistrer ce niveau"}
-            </button>
-          ) : (
-            <p className="rounded-2xl border border-dashed border-line px-4 py-3 text-sm text-muted">
-              Mode démonstration : rien n’est enregistré.
-            </p>
-          )}
-          <div aria-live="polite">
-            {error && (
-              <p role="alert" className="rounded-2xl bg-danger-soft px-4 py-3 text-sm text-danger">
-                {error}
+              <p className="mt-5 font-serif text-2xl font-bold italic">Confiance {confidence.title}</p>
+              <p className="mt-1 max-w-[68ch] font-serif text-lg leading-relaxed text-ink-soft">{confidence.hint}</p>
+            </section>
+          }
+          aside={
+            <div className="space-y-6 border-t border-ink pt-5 lg:border-t-0 lg:pt-0">
+              <label className="block">
+                <span className="kicker mb-1 block text-muted">Niveau à retenir</span>
+                <select
+                  value={level}
+                  onChange={(e) => setChosen(e.target.value as CefrLevel)}
+                  className="min-h-11 w-full appearance-none rounded-xl border border-ink bg-surface px-3.5 py-2.5 text-base font-semibold focus:outline-none"
+                >
+                  {CEFR_LEVELS.map((l) => (
+                    <option key={l} value={l}>
+                      {l}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <p className="-mt-4 text-xs text-muted">
+                Niveau déclaré actuellement : {startLevel}. Tu peux garder l’estimation ou choisir un autre niveau.
               </p>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={restart}
-            disabled={saving}
-            className="flex min-h-11 w-full items-center justify-center text-sm font-medium text-muted hover:text-ink disabled:opacity-60"
-          >
-            Recommencer
-          </button>
-        </div>
+              <div className="space-y-3">
+                {persist && assessmentAvailable ? (
+                  <>
+                    <p className="text-sm leading-relaxed text-ink-soft">
+                      Pour aller plus loin, le bilan complet mesure chaque compétence (lire, écouter, écrire, parler) : compte 20 à 25
+                      minutes. Ton niveau est enregistré dans les deux cas.
+                    </p>
+                    <button type="button" onClick={() => save("assessment")} disabled={saving} className={`${buttonClass.primary} w-full`}>
+                      {saving ? "Enregistrement…" : "Faire mon bilan complet"}
+                    </button>
+                    <button type="button" onClick={() => save()} disabled={saving} className={`${buttonClass.secondary} w-full`}>
+                      Plus tard
+                    </button>
+                  </>
+                ) : persist ? (
+                  <button type="button" onClick={() => save()} disabled={saving} className={`${buttonClass.primary} w-full`}>
+                    {saving ? "Enregistrement…" : "Enregistrer ce niveau"}
+                  </button>
+                ) : (
+                  <p className="border-y border-dashed border-line py-2.5 text-sm text-muted">
+                    Mode démonstration : rien n’est enregistré.
+                  </p>
+                )}
+                <div aria-live="polite">
+                  {error && (
+                    <p role="alert" className="rounded-2xl bg-danger-soft px-4 py-3 text-sm text-danger">
+                      {error}
+                    </p>
+                  )}
+                </div>
+                <button type="button" onClick={restart} disabled={saving} className={`${buttonClass.quiet} w-full`}>
+                  Recommencer
+                </button>
+              </div>
+            </div>
+          }
+        />
       </div>
     );
   }
@@ -291,7 +277,7 @@ export function PlacementTest({
   return (
     <div>
       {header}
-      <div className="mb-3">
+      <div className="mb-6">
         <Eyebrow>
           Question {answers.length + 1} sur {PLACEMENT_MAX_ITEMS} max
         </Eyebrow>
@@ -304,46 +290,48 @@ export function PlacementTest({
           className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-sunk"
         >
           <div
-            className="h-full rounded-full bg-ink transition-[width]"
+            className="h-full rounded-full bg-accent transition-[width]"
             style={{ width: `${(answers.length / PLACEMENT_MAX_ITEMS) * 100}%` }}
           />
         </div>
       </div>
-      <Card>
-        {current.context && (
-          <p
-            lang={info.code}
-            dir={info.dir}
-            className="mb-4 rounded-2xl bg-surface-sunk px-4 py-3 text-[15px] leading-relaxed"
-          >
-            {current.context}
+      <div className="grid gap-8 border-t border-ink pt-6 lg:grid-cols-2 lg:gap-0">
+        <section className="lg:pr-10">
+          {current.context && (
+            <p
+              lang={info.code}
+              dir={info.dir}
+              className="mb-4 max-w-[68ch] border-y border-line py-3 text-[15px] leading-relaxed text-ink-soft"
+            >
+              {current.context}
+            </p>
+          )}
+          <p lang={info.code} dir={info.dir} className="max-w-[68ch] font-serif text-2xl leading-snug font-medium sm:text-3xl">
+            <Prompt text={current.prompt} />
           </p>
-        )}
-        <p lang={info.code} dir={info.dir} className="font-serif text-xl leading-snug font-medium">
-          <Prompt text={current.prompt} />
-        </p>
-      </Card>
-      <div key={current.id} className="mt-4 space-y-2.5">
-        {current.options.map((option, index) => (
+        </section>
+        <div key={current.id} className="space-y-2.5 lg:border-l lg:border-line lg:pl-10">
+          {current.options.map((option, index) => (
+            <button
+              key={index}
+              type="button"
+              lang={info.code}
+              dir={info.dir}
+              onClick={() => answer(index)}
+              className="min-h-11 w-full rounded-xl border border-line bg-surface px-4 py-3 text-start text-base leading-snug transition-colors hover:border-ink"
+            >
+              {option}
+            </button>
+          ))}
           <button
-            key={index}
             type="button"
-            lang={info.code}
-            dir={info.dir}
-            onClick={() => answer(index)}
-            className="min-h-11 w-full rounded-2xl border border-line bg-surface px-4 py-3 text-start text-[15px] leading-snug transition-colors hover:border-ink-soft"
+            onClick={() => answer(null)}
+            className="flex min-h-11 w-full items-center justify-center gap-1 rounded-xl px-4 py-3 text-sm font-medium text-muted hover:text-ink"
           >
-            {option}
+            Je ne sais pas
+            <ArrowRightIcon width={14} height={14} />
           </button>
-        ))}
-        <button
-          type="button"
-          onClick={() => answer(null)}
-          className="flex min-h-11 w-full items-center justify-center gap-1 rounded-2xl px-4 py-3 text-sm font-medium text-muted hover:text-ink"
-        >
-          Je ne sais pas
-          <ArrowRightIcon width={14} height={14} />
-        </button>
+        </div>
       </div>
     </div>
   );
