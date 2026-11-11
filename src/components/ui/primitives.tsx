@@ -76,9 +76,9 @@ export function Columns({
   className?: string;
 }) {
   return (
-    <div className={`grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,20rem)] lg:gap-0 ${className}`}>
-      <div className="min-w-0 lg:pr-10">{main}</div>
-      <aside className="min-w-0 lg:border-l lg:border-line lg:pl-10">{aside}</aside>
+    <div className={`grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,20rem)] lg:gap-0 xl:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] 2xl:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] ${className}`}>
+      <div className="min-w-0 lg:pr-10 2xl:pr-14">{main}</div>
+      <aside className="min-w-0 lg:border-l lg:border-line lg:pl-10 2xl:pl-14">{aside}</aside>
     </div>
   );
 }
