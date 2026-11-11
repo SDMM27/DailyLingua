@@ -60,14 +60,14 @@ export function AssessmentInviteCard({ language, kind, today }: { language: Lang
   }
 
   return (
-    <div className="flex items-center gap-3 rounded-3xl border border-line bg-surface px-5 py-4">
-      <Link href={`/niveau/${language}/bilan`} className="min-w-0 flex-1">
+    <div className="flex items-start gap-3 py-2">
+      <Link href={`/niveau/${language}/bilan`} className="min-w-0 flex-1 py-2">
         <Eyebrow>Niveau</Eyebrow>
-        <span className="mt-1 flex items-center gap-1 font-semibold">
+        <span className="mt-1 flex items-center gap-1 font-serif text-lg leading-snug font-semibold">
           {kind === "first" ? "Faire mon bilan complet" : "Refais ton bilan"}
           <ArrowRightIcon width={14} height={14} />
         </span>
-        <span className="text-xs text-muted">
+        <span className="mt-1 block text-xs leading-relaxed text-muted">
           {kind === "first"
             ? `Un test par compétence en ${name}, 20 à 25 minutes, quand tu veux.`
             : `Ça fait un moment : vois ce qui a progressé en ${name}.`}

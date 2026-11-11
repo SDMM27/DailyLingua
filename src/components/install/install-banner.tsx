@@ -31,10 +31,10 @@ export function InstallBanner() {
   if (!eligible || dismissed) return null;
 
   return (
-    <div className="flex items-center gap-3 rounded-3xl border border-line bg-surface px-4 py-3">
+    <div className="flex items-center gap-3 border-y border-line py-2">
       <PhoneIcon className="shrink-0 text-ink-soft" />
       <Link href="/installer" className="min-w-0 flex-1">
-        <span className="flex items-center gap-1 font-semibold">
+        <span className="flex items-center gap-1 font-serif text-lg font-semibold">
           Ajouter à l’écran d’accueil
           <ArrowRightIcon width={14} height={14} />
         </span>
