@@ -127,7 +127,7 @@ export function MissionView({
   return (
     <>
       {/* Sticky progress, always visible while scrolling through long content. */}
-      <div className="sticky top-0 z-20 -mx-4 mb-8 border-b border-ink bg-paper/90 px-4 py-3 backdrop-blur-xl sm:-mx-6 sm:px-6 md:top-[57px] lg:mx-0 lg:px-0">
+      <div className="sticky top-0 z-20 -mx-4 mb-8 border-b border-ink bg-paper/90 px-4 py-3 backdrop-blur-xl sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0">
         <div className="flex items-baseline justify-between">
           <span className="kicker text-muted">Progression</span>
           <span className="font-serif text-base font-bold">
