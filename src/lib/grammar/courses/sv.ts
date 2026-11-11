@@ -2,7 +2,7 @@ import type { GrammarCourse } from "@/lib/schemas/grammar";
 
 export const svCourse = {
   language: "sv",
-  version: "2026-10-25",
+  version: "2026-11-10",
   points: [
     {
       id: "sv-a1-en-ett",
@@ -10,8 +10,8 @@ export const svCourse = {
       title: "Deux genres et article défini en suffixe : en, ett, -en, -et",
       summary: "Choisir en ou ett devant un nom et former « la voiture », « la maison » en collant l’article à la fin du nom.",
       rule: [
-        "Le suédois a deux genres : le genre commun (en) et le neutre (ett). Il n’y a ni masculin ni féminin : en man (un homme) et en flicka (une fille) prennent le même article. Environ les trois quarts des noms sont en ; les noms en ett s’apprennent un par un : ett hus, ett barn, ett äpple.",
-        "L’article défini ne se place pas devant le nom : il se colle à la fin. En bil devient bilen, ett hus devient huset. Si le nom finit par une voyelle, on ajoute seulement -n ou -t : en flicka devient flickan, ett äpple devient äpplet.",
+        "Le suédois a deux genres : le genre commun (en) et le neutre (ett). Il n’y a ni masculin ni féminin : en man (un homme) et en flicka (une fille) prennent le même article. Environ les trois quarts des noms sont en ; les noms en ett s’apprennent un par un : ett hus, ett barn, ett äpple. On parle de en-ord et de ett-ord.",
+        "Au singulier, avec un nom seul, l’article défini se colle à la fin : en bil → bilen, ett hus → huset. Après une voyelle finale, on ajoute souvent -n ou -t : en flicka → flickan, ett äpple → äpplet. Certains noms en -el ou -er non accentués suivent aussi ce modèle, parfois avec chute du e : syster → systern, nyckel → nyckeln, fönster → fönstret.",
         "Piège : le français met l’article devant (la voiture), le suédois derrière (bilen). Et le genre ne suit pas le français : « une table » se dit ett bord, « un livre » en bok. Apprends chaque nom avec son en ou son ett.",
       ],
       table: {
@@ -68,6 +68,7 @@ export const svCourse = {
       ],
       categories: ["function_word", "agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "sv-a1-present",
@@ -76,7 +77,7 @@ export const svCourse = {
       summary: "Conjuguer un verbe au présent (-ar, -er, -r) et utiliser vara (är) et ha (har).",
       rule: [
         "Au présent, le verbe suédois ne change pas selon la personne : jag arbetar, du arbetar, hon arbetar, vi arbetar, de arbetar. Une seule forme, et un seul présent : « je travaille » et « je suis en train de travailler » se disent jag arbetar.",
-        "Le verbe se cite à l’infinitif, qui finit presque toujours par -a (arbeta, läsa). Au présent, on ajoute -r à cet -a pour les verbes du premier groupe (arbeta → arbetar, tala → talar), ou on remplace -a par -er pour beaucoup d’autres (läsa → läser, åka → åker, skriva → skriver). Les verbes courts en voyelle prennent -r : bo → bor, gå → går.",
+        "Le verbe se cite à l’infinitif, souvent en -a. Le premier groupe ajoute -r (arbeta → arbetar, tala → talar). Beaucoup d’autres verbes remplacent -a par -er (läsa → läser, åka → åker). Certains radicaux en -r servent directement de présent (göra → gör, köra → kör). Les verbes courts bo et gå font bor et går.",
         "Vara (être) devient är et ha (avoir) devient har pour toutes les personnes. Piège : ne cherche pas de -s ni de -ent comme en français. L’âge se dit avec vara : jag är 25 år.",
       ],
       table: {
@@ -109,7 +110,7 @@ export const svCourse = {
         {
           type: "choose",
           prompt: "Vi ___ studenter.",
-          options: ["har", "vara", "är"],
+          options: ["ha", "vara", "är"],
           answer: 2,
           explanation: "« Être » se dit är au présent, pour toutes les personnes : vi är.",
         },
@@ -123,7 +124,7 @@ export const svCourse = {
         {
           type: "fill",
           prompt: "Han ___ ett glas vatten.",
-          hint: "dricka",
+          hint: "dricka, au présent",
           answers: ["dricker"],
           explanation: "Dricka est un verbe en -er au présent : han dricker.",
         },
@@ -137,6 +138,7 @@ export const svCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "sv-a1-word-order",
@@ -144,16 +146,16 @@ export const svCourse = {
       title: "Ordre des mots : verbe en 2e position et questions",
       summary: "Construire une phrase affirmative, l’inverser après un complément et poser une question.",
       rule: [
-        "Dans une phrase principale, le verbe conjugué est toujours en deuxième position : Jag arbetar idag. Si tu commences par autre chose (un complément de temps ou de lieu), le sujet passe après le verbe : Idag arbetar jag. Piège : en français on garde « Aujourd’hui, je travaille » ; en suédois, Idag jag arbetar est faux.",
-        "Question oui / non : le verbe vient en premier, sans équivalent de « est-ce que » : Talar du svenska? Question avec mot interrogatif (var, när, hur, varför, vem, vad) : mot interrogatif, puis verbe, puis sujet : Var bor du? Vad gör du?",
+        "Dans une affirmation, le verbe conjugué vient en deuxième position : Jag arbetar i dag. Si tu commences par un complément, le sujet vient après le verbe : I dag arbetar jag. En français, « Aujourd’hui, je travaille » garde l’ordre sujet-verbe.",
+        "Dans une question oui / non, le verbe vient en premier : Talar du svenska? Avec un mot interrogatif, le verbe vient après ce mot : Var bor du? Vad gör du? Si le mot interrogatif est lui-même sujet, il est directement suivi du verbe : Vem bor här? (Qui habite ici ?)",
         "Les conjonctions och, men, eller ne changent pas l’ordre : Jag är trött, men jag arbetar. En suédois, on ne met pas d’espace avant le point d’interrogation.",
       ],
       table: {
-        caption: "Le verbe reste en deuxième position",
-        headers: ["Position 1", "Verbe", "Suite"],
+        caption: "Ordre des mots dans les affirmations et les questions",
+        headers: ["Élément avant le verbe", "Verbe conjugué", "Suite"],
         rows: [
           ["Jag", "bor", "i Lund."],
-          ["Idag", "bor", "jag i Lund."],
+          ["I dag", "arbetar", "jag hemma."],
           ["I Lund", "bor", "jag."],
           ["Var", "bor", "du?"],
           ["—", "Bor", "du i Lund?"],
@@ -189,7 +191,7 @@ export const svCourse = {
         {
           type: "fill",
           prompt: "Vad ___ du?",
-          hint: "göra",
+          hint: "göra, au présent",
           answers: ["gör"],
           explanation: "Le présent de göra est gör, placé juste après vad : Vad gör du?",
         },
@@ -203,6 +205,7 @@ export const svCourse = {
       ],
       categories: ["word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "sv-a1-negation",
@@ -210,9 +213,9 @@ export const svCourse = {
       title: "Négation : inte, ingen, inget, inga",
       summary: "Nier un verbe avec inte et dire « pas de » avec ingen / inget / inga.",
       rule: [
-        "Inte (ne … pas) se place juste après le verbe conjugué : Jag talar inte tyska. Il n’y a qu’un mot, pas de « ne » : le verbe est simplement suivi de inte. Avec une inversion, inte suit le sujet : Idag arbetar jag inte.",
+        "Dans une affirmation, inte (« ne … pas ») se place normalement après le verbe conjugué : Jag talar inte tyska. Si le sujet est un pronom et vient après le verbe, inte le suit généralement : I dag arbetar jag inte.",
         "Avec un verbe de modalité ou le parfait, inte reste après le verbe conjugué, et le reste du verbe vient ensuite : Jag kan inte komma. Jag har inte ätit.",
-        "Pour dire « pas de, aucun », on emploie ingen (en-ord), inget (ett-ord) ou inga (pluriel) : Jag har ingen bil, Jag har inget hus, Jag har inga barn. Piège : il n’y a pas de « de » comme en français (je n’ai pas de voiture) ; ingen / inget / inga s’accorde avec le nom.",
+        "Pour dire « pas de », accorde la forme avec le nom : ingen bil, inget hus, inga barn. En français, on ajoute « de » (je n’ai pas de voiture). Si le complément suit un infinitif ou un supin, on emploie normalement inte avec någon, något ou några : Jag kan inte köpa någon bil.",
       ],
       table: {
         caption: "Ingen, inget, inga",
@@ -225,7 +228,7 @@ export const svCourse = {
       },
       examples: [
         { text: "Jag talar inte tyska.", translation: "Je ne parle pas allemand.", note: "Inte vient juste après le verbe conjugué." },
-        { text: "Idag arbetar hon inte.", translation: "Aujourd’hui, elle ne travaille pas.", note: "Avec inversion, inte suit le sujet." },
+        { text: "I dag arbetar hon inte.", translation: "Aujourd’hui, elle ne travaille pas.", note: "Avec inversion, inte suit le sujet." },
         { text: "Vi har ingen katt.", translation: "Nous n’avons pas de chat.", note: "Katt est un en-ord : ingen." },
         { text: "Jag kan inte komma i kväll.", translation: "Je ne peux pas venir ce soir.", note: "Inte précède l’infinitif komma." },
       ],
@@ -254,13 +257,13 @@ export const svCourse = {
         {
           type: "fill",
           prompt: "Jag har ___ pengar.",
-          hint: "aucun, au pluriel",
+          hint: "ingen, à accorder",
           answers: ["inga"],
           explanation: "Pengar (l’argent) est un pluriel : inga pengar.",
         },
         {
           type: "transform",
-          instruction: "Mets la phrase à la forme négative.",
+          instruction: "Mets la phrase à la forme négative avec « inte ».",
           source: "Hon bor i Malmö.",
           answers: ["Hon bor inte i Malmö."],
           explanation: "Inte se place juste après le verbe conjugué bor.",
@@ -268,16 +271,17 @@ export const svCourse = {
       ],
       categories: ["word_order", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "sv-a1-plural",
       level: "A1",
-      title: "Pluriel des noms : -or, -ar, -er, -n ou rien",
+      title: "Former le pluriel des noms : bilar, äpplen, hus",
       summary: "Former le pluriel indéfini et défini d’un nom selon son groupe.",
       rule: [
-        "Le pluriel suédois n’est jamais en -s. Il existe cinq façons de le former : -or (en flicka → flickor), -ar (en bil → bilar), -er (en student → studenter), -n (ett äpple → äpplen) et aucune terminaison (ett hus → hus, ett barn → barn).",
-        "Repères utiles : les noms en -a prennent -or ; beaucoup de noms de genre commun finissant par une consonne prennent -ar ou -er ; les ett-ord en voyelle prennent -n ; les ett-ord en consonne ne changent pas. Quelques noms changent de voyelle : en bok → böcker, en man → män.",
-        "Le pluriel défini se forme en ajoutant un suffixe au pluriel : flickor → flickorna, bilar → bilarna, studenter → studenterna, äpplen → äpplena, hus → husen. Piège : n’ajoute pas de -s, et apprends le pluriel avec le nom.",
+        "Les pluriels les plus courants se forment avec -or (flickor), -ar (bilar), -er (studenter), -r (skor), -n (äpplen) ou sans terminaison (hus, barn). On rencontre aussi -s, surtout dans des emprunts comme fans.",
+        "Repères utiles : beaucoup de noms de genre commun en -a prennent -or. Beaucoup d’autres noms de ce genre prennent -ar ou -er. Les ett-ord en voyelle prennent souvent -n. Beaucoup d’ett-ord en consonne gardent la même forme, comme hus, mais ett land fait länder. Certains noms changent de voyelle : en bok → böcker, en man → män.",
+        "Le pluriel défini ajoute généralement un suffixe au pluriel indéfini : flickor → flickorna, bilar → bilarna, studenter → studenterna, äpplen → äpplena, hus → husen. Apprends avec chaque nom son pluriel et, si besoin, sa forme définie.",
       ],
       table: {
         caption: "Les groupes de pluriel",
@@ -286,6 +290,7 @@ export const svCourse = {
           ["-or", "en flicka", "flickor", "flickorna"],
           ["-ar", "en bil", "bilar", "bilarna"],
           ["-er", "en student", "studenter", "studenterna"],
+          ["-r", "en sko", "skor", "skorna"],
           ["-n", "ett äpple", "äpplen", "äpplena"],
           ["sans terminaison", "ett hus", "hus", "husen"],
         ],
@@ -308,14 +313,14 @@ export const svCourse = {
           prompt: "Vi köper tre ___.",
           options: ["äppler", "äpplar", "äpplen"],
           answer: 2,
-          explanation: "Les ett-ord finissant par une voyelle prennent -n : ett äpple, äpplen.",
+          explanation: "Äpple est un ett-ord qui prend -n au pluriel : ett äpple, tre äpplen.",
         },
         {
           type: "choose",
           prompt: "Det finns många ___ här.",
           options: ["huser", "hus", "husen"],
           answer: 1,
-          explanation: "Les ett-ord finissant par une consonne ne changent pas au pluriel indéfini : hus.",
+          explanation: "Hus fait partie des ett-ord qui gardent la même forme au pluriel indéfini : ett hus, många hus.",
         },
         {
           type: "fill",
@@ -334,6 +339,7 @@ export const svCourse = {
       ],
       categories: ["agreement", "spelling"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "sv-a1-pronouns",
@@ -341,9 +347,9 @@ export const svCourse = {
       title: "Pronoms personnels et possessifs : jag, mig, min, mitt, mina",
       summary: "Choisir entre pronom sujet et complément et accorder min / mitt / mina avec le nom.",
       rule: [
-        "Pronoms sujets : jag, du, han, hon, den / det, vi, ni, de. Après un verbe ou une préposition, on emploie la forme complément : mig, dig, honom, henne, den / det, oss, er, dem. Jag ser honom. Hon bor med oss. En suédois moderne, on dit du à presque tout le monde.",
-        "Les possessifs s’accordent avec la chose possédée, pas avec le possesseur : min bil (en-ord), mitt hus (ett-ord), mina barn (pluriel). Seuls hans (à lui), hennes (à elle) et deras (à eux) ne varient pas.",
-        "Piège : le français distingue « son » pour un possesseur ou un autre ; le suédois dit clairement hans bil (la voiture de lui) ou hennes bil (la voiture d’elle). Den remplace un nom en-ord (bilen → den), det un ett-ord (huset → det).",
+        "Pronoms sujets : jag, du, han, hon, den / det, vi, ni, de. Quand le pronom est complément du verbe ou d’une préposition, emploie la forme complément : mig, dig, honom, henne, den / det, oss, er, dem. Jag ser honom. Hon bor med oss. On dit du à presque tout le monde.",
+        "Min, mitt et mina s’accordent avec le nom de la chose possédée : min bil (en-ord), mitt hus (ett-ord), mina barn (pluriel). Dans le tableau, hans, hennes et deras gardent la même forme quel que soit le nom qui suit.",
+        "En français, « sa voiture » laisse le genre du possesseur indéterminé. Compare Jag ser hans bil (je vois sa voiture à lui) et Jag ser hennes bil (je vois sa voiture à elle). Den reprend un en-ord (bilen → den), et det un ett-ord (huset → det).",
       ],
       table: {
         caption: "Pronoms et possessifs",
@@ -366,10 +372,10 @@ export const svCourse = {
       exercises: [
         {
           type: "choose",
-          prompt: "Jag ser ___.",
+          prompt: "Jag ser ___. (« Je le vois. » à l’écrit standard)",
           options: ["han", "honom", "hans"],
           answer: 1,
-          explanation: "Après un verbe, on utilise la forme complément : honom.",
+          explanation: "Le pronom est le complément de ser. À l’écrit standard, han a pour forme complément honom.",
         },
         {
           type: "choose",
@@ -380,10 +386,10 @@ export const svCourse = {
         },
         {
           type: "choose",
-          prompt: "Det är ___ hus.",
-          options: ["våra", "vår", "vårt"],
+          prompt: "___ hus är stort.",
+          options: ["Våra", "Vår", "Vårt"],
           answer: 2,
-          explanation: "Hus est un ett-ord : vårt hus.",
+          explanation: "Hus est un ett-ord au singulier (l’adjectif stort le montre) : vårt hus.",
         },
         {
           type: "fill",
@@ -402,6 +408,7 @@ export const svCourse = {
       ],
       categories: ["function_word", "agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "sv-a2-adjectives",
@@ -410,8 +417,8 @@ export const svCourse = {
       summary: "Accorder l’adjectif avec le nom et employer la forme définie (den stora bilen).",
       rule: [
         "L’adjectif s’accorde avec le nom : en stor bil (en-ord), ett stort hus (ett-ord : on ajoute -t), stora bilar et stora hus (pluriel : on ajoute -a). Même accord après vara : Bilen är stor, Huset är stort, Husen är stora.",
-        "Avec un article défini (den, det, de) ou un possessif, l’adjectif prend toujours -a : den stora bilen, det stora huset, de stora husen, min stora bil. Après den / det / de, le nom prend aussi son suffixe défini (double définition) ; après un possessif, le nom reste sans suffixe : min stora bil, jamais « min stora bilen ».",
-        "Quelques particularités : ny → nytt, god → gott, röd → rött, svensk → svenskt. Liten (petit) fait litet, puis små au pluriel et lilla au défini singulier : en liten bil, ett litet hus, små hus, den lilla bilen.",
+        "Devant le nom, après den, det, de ou un possessif, la forme de l’adjectif finit généralement en -a : den stora bilen, min stora bil. Des adjectifs comme bra restent invariables. Pour un homme, on rencontre aussi -e : den gamle mannen. Avec den, det, de, le nom prend normalement le suffixe défini. Après un possessif, il garde sa forme sans suffixe défini.",
+        "Quelques neutres à retenir : ny → nytt, god → gott, röd → rött, vit → vitt. Trött garde la même forme au neutre : ett trött barn. Gammal fait gamla au pluriel et au défini en -a. Liten fait litet au neutre, små au pluriel et lilla au défini singulier : ett litet hus, små hus, den lilla bilen.",
       ],
       table: {
         caption: "Accord de l’adjectif",
@@ -469,6 +476,7 @@ export const svCourse = {
       ],
       categories: ["agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "sv-a2-preterite",
@@ -476,9 +484,9 @@ export const svCourse = {
       title: "Prétérit : parler d’un passé terminé",
       summary: "Former le prétérit des verbes faibles et forts et le placer avec un repère de temps passé.",
       rule: [
-        "Le prétérit sert pour un fait passé et terminé, souvent daté : Igår köpte jag en bok. Il ne change pas selon la personne et remplace à la fois l’imparfait, le passé simple et le passé composé du français : jag bodde = j’habitais / j’ai habité.",
-        "Verbes faibles : -ade pour les verbes en -ar (arbeta → arbetade), -de ou -te pour ceux en -er. On ajoute -te après p, k, s, t, x (köpa → köpte, läsa → läste, åka → åkte), -de sinon (ringa → ringde). Verbes courts : bo → bodde.",
-        "Les verbes forts changent de voyelle et s’apprennent par cœur : gå → gick, äta → åt, se → såg, komma → kom, skriva → skrev, dricka → drack. Vara fait var, ha fait hade, göra fait gjorde.",
+        "Le prétérit situe un fait ou une situation dans le passé : I går köpte jag en bok. Un repère comme i går est fréquent. Le prétérit s’emploie aussi sans date précise : Jag bodde i Lund. Selon le contexte, jag bodde correspond à « j’habitais » ou « j’ai habité ». Le verbe garde la même forme pour toutes les personnes.",
+        "Les verbes faibles du premier groupe prennent -ade (arbeta → arbetade). Dans le deuxième groupe, la terminaison est généralement -te après une consonne sourde (köpa → köpte, läsa → läste, åka → åkte) et -de après une consonne sonore (ringa → ringde). Pour les verbes courts du groupe de bo, la terminaison est -dde : bo → bodde.",
+        "Les verbes forts changent souvent de voyelle : äta → åt, se → såg, skriva → skrev, dricka → drack. Apprends aussi les formes gå → gick, komma → kom, vara → var, ha → hade et göra → gjorde.",
       ],
       table: {
         caption: "Prétérit de verbes courants",
@@ -499,14 +507,14 @@ export const svCourse = {
         ],
       },
       examples: [
-        { text: "Igår köpte jag en bok.", translation: "Hier, j’ai acheté un livre.", note: "Avec un moment passé précis, on emploie le prétérit." },
+        { text: "I går köpte jag en bok.", translation: "Hier, j’ai acheté un livre.", note: "Avec un moment passé précis, on emploie le prétérit." },
         { text: "Vi bodde i Göteborg i fem år.", translation: "Nous avons habité à Göteborg pendant cinq ans.", note: "Un seul prétérit pour « habitions » et « avons habité »." },
         { text: "Hon åt middag och gick hem.", translation: "Elle a dîné et est rentrée chez elle.", note: "Åt et gick sont des verbes forts." },
       ],
       exercises: [
         {
           type: "choose",
-          prompt: "Igår ___ jag på kontoret.",
+          prompt: "I går ___ jag på kontoret. (Au prétérit.)",
           options: ["arbetar", "arbetade", "arbetat"],
           answer: 1,
           explanation: "Un fait passé daté demande le prétérit : arbeta devient arbetade.",
@@ -520,14 +528,14 @@ export const svCourse = {
         },
         {
           type: "choose",
-          prompt: "Vi ___ en film i lördags.",
+          prompt: "Vi ___ en film i lördags. (Au prétérit.)",
           options: ["ser", "sett", "såg"],
           answer: 2,
           explanation: "Se fait såg au prétérit. Le présent ser ne convient pas pour un fait passé.",
         },
         {
           type: "fill",
-          prompt: "Vi ___ mjölk igår.",
+          prompt: "Vi ___ mjölk i går.",
           hint: "köpa",
           answers: ["köpte"],
           explanation: "Le radical köp finit par p : on ajoute -te, donc köpte.",
@@ -542,6 +550,7 @@ export const svCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "sv-a2-perfect",
@@ -550,8 +559,8 @@ export const svCourse = {
       summary: "Former le parfait (har ätit) et choisir entre parfait et prétérit.",
       rule: [
         "Le parfait se forme avec har + supin : Jag har arbetat. Har ne change pas selon la personne et il n’y a jamais d’auxiliaire « être » : même avec gå, on dit jag har gått. Piège pour un francophone : « je suis allé » ne devient pas jag är gått.",
-        "Le supin se forme ainsi : -at pour les verbes en -ar (arbeta → arbetat), -t pour beaucoup de verbes en -er (köpa → köpt, läsa → läst), -tt pour les verbes en voyelle (bo → bott, se → sett). Verbes forts : äta → ätit, skriva → skrivit, komma → kommit, gå → gått, vara → varit, ha → haft, göra → gjort.",
-        "Le parfait relie le passé au présent (expérience, résultat) : Har du ätit? Jag har bott här i två år (j’y habite encore). Avec un moment passé daté (igår, 2019) on emploie le prétérit, jamais le parfait : Jag åt igår. Le passé composé français, lui, se traduit souvent par le prétérit.",
+        "Les verbes faibles peuvent prendre -at (arbeta → arbetat), -t (köpa → köpt, läsa → läst) ou -tt (bo → bott). Apprends aussi les supins suivants avec leur infinitif : se → sett, äta → ätit, skriva → skrivit, komma → kommit, gå → gått, vara → varit, ha → haft, göra → gjort.",
+        "Le parfait relie le passé au présent : Har du ätit? Jag har bott här i två år (j’y habite encore). Pour raconter un fait situé dans une période révolue, le prétérit est le choix habituel : Jag åt i går. Le passé composé français peut donc correspondre à l’un ou l’autre temps.",
       ],
       table: {
         caption: "Supin de verbes courants",
@@ -570,9 +579,9 @@ export const svCourse = {
         ],
       },
       examples: [
-        { text: "Har du ätit?", translation: "As-tu mangé ?", note: "Har + supin ätit ; pas de pronom devant har dans la question." },
+        { text: "Har du ätit?", translation: "As-tu mangé ?", note: "Question : har ouvre la phrase, puis vient le sujet du, puis le supin ätit." },
         { text: "Jag har bott i Lund i två år.", translation: "J’habite à Lund depuis deux ans.", note: "Le parfait marque une situation qui continue." },
-        { text: "Igår åt jag fisk.", translation: "Hier, j’ai mangé du poisson.", note: "Moment daté : prétérit, comme pour le passé composé français." },
+        { text: "I går åt jag fisk.", translation: "Hier, j’ai mangé du poisson.", note: "Hier situe le repas dans une période révolue, ce qui explique le prétérit." },
       ],
       exercises: [
         {
@@ -613,6 +622,7 @@ export const svCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "sv-a2-modals",
@@ -622,7 +632,7 @@ export const svCourse = {
       rule: [
         "Les verbes de modalité sont suivis de l’infinitif sans att : Jag kan simma. Du måste komma. Ils ne varient pas selon la personne. Piège : n’ajoute pas « à » ou « de » comme en français : jag vill att äta est faux, on dit jag vill äta.",
         "Kan veut dire « pouvoir » et aussi « savoir » : Jag kan svenska (je parle suédois). Vill exprime la volonté, måste l’obligation, ska l’intention ou l’obligation prévue, får la permission : Får jag sitta här? Bör signifie « devrait ».",
-        "Avec une négation, inte suit le modal : Jag kan inte komma. Pour dire « vouloir quelque chose », on emploie vill ha : Vill du ha kaffe?",
+        "Dans une affirmation comme Jag kan inte komma, inte suit le modal. Pour une interdiction, emploie får inte : Du får inte röka här. Pour dire qu’une action est facultative, emploie behöver inte : Du behöver inte komma (« tu n’es pas obligé de venir »). Pour demander « Veux-tu du café ? », dis Vill du ha kaffe?",
       ],
       table: {
         caption: "Les modaux au présent",
@@ -666,8 +676,8 @@ export const svCourse = {
         },
         {
           type: "fill",
-          prompt: "Hon ___ tala svenska bra.",
-          hint: "kunna",
+          prompt: "Hon ___ tala bra svenska.",
+          hint: "kunna, au présent",
           answers: ["kan"],
           explanation: "Kunna fait kan au présent : hon kan tala svenska.",
         },
@@ -681,6 +691,7 @@ export const svCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "sv-a2-future",
@@ -689,7 +700,7 @@ export const svCourse = {
       summary: "Choisir entre le présent, ska + infinitif et kommer att + infinitif pour parler de l’avenir.",
       rule: [
         "Le suédois n’a pas de futur simple. Trois outils : le présent avec un mot de temps (I morgon åker vi till Malmö) ; ska + infinitif pour une intention, un projet ou une promesse (Jag ska köpa en bil) ; kommer att + infinitif pour une prévision (Det kommer att regna).",
-        "Ska correspond à « aller + infinitif » quand on décide : jag ska resa = je vais voyager. Kommer att convient quand on prévoit sans décision : Det kommer att bli kallt. Écris toujours att après kommer, et mets l’infinitif sans att après ska.",
+        "Ska annonce souvent une intention : Jag ska resa. Il peut aussi annoncer ce qui est prévu : Det ska regna i morgon. Kommer att présente une prévision : Det kommer att bli kallt. Att peut s’omettre après kommer. Dans un texte imprimé, kommer att est plus fréquent. Après ska, l’infinitif s’emploie sans att.",
         "Piège : kommer ne veut pas dire « viendra » ici. La négation se place après le premier verbe : Jag ska inte åka. Det kommer inte att regna.",
       ],
       table: {
@@ -717,10 +728,10 @@ export const svCourse = {
         },
         {
           type: "choose",
-          prompt: "Det kommer ___ regna i kväll.",
+          prompt: "Det kommer ___ regna i kväll. (Avec le marqueur de l’infinitif.)",
           options: ["till", "att", "på"],
           answer: 1,
-          explanation: "Kommer est suivi de att avant l’infinitif : kommer att regna.",
+          explanation: "Le marqueur de l’infinitif est att. Avec kommer, tu peux aussi l’omettre : Det kommer regna i kväll.",
         },
         {
           type: "choose",
@@ -732,9 +743,9 @@ export const svCourse = {
         {
           type: "fill",
           prompt: "Vi ___ resa till Italien i sommar.",
-          hint: "ska ou kommer att",
-          answers: ["ska", "kommer att"],
-          explanation: "Ska indique une intention ; kommer att est aussi correct pour une prévision.",
+          hint: "komma au présent, pour une prévision",
+          answers: ["kommer att", "kommer"],
+          explanation: "Pour cette prévision, Vi kommer att resa et Vi kommer resa sont deux formulations correctes.",
         },
         {
           type: "transform",
@@ -746,6 +757,7 @@ export const svCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "sv-a2-reflexive",
@@ -755,7 +767,7 @@ export const svCourse = {
       rule: [
         "Quand le possesseur est le sujet de la phrase (à la 3e personne), on emploie sin, sitt, sina au lieu de hans, hennes, deras : Anna tar sin väska (sa propre valise). Anna tar hennes väska signifie la valise d’une autre personne. Sin s’accorde avec la chose : sin (en-ord), sitt (ett-ord), sina (pluriel).",
         "Même idée pour le pronom : à la 3e personne, quand l’objet est le même que le sujet, on emploie sig : Hon tvättar sig. De klär sig. Aux autres personnes, on garde mig, dig, oss, er : Jag tvättar mig.",
-        "Piège : le français dit « son » ou « se » dans les deux cas. Il faut donc se demander si le possesseur est le sujet. Sin ne s’emploie jamais dans le sujet lui-même : Hans bil är ny (et non sin bil).",
+        "En français, « sa valise » peut appartenir au sujet ou à une autre personne. Le suédois distingue sin väska et hennes väska dans Anna tar sin väska et Anna tar hennes väska. Dans une phrase simple comme Hans bil är ny, le possessif fait partie du sujet. Emploie alors hans, hennes ou deras selon le possesseur.",
       ],
       table: {
         caption: "Pronom et possessif réfléchis",
@@ -771,7 +783,7 @@ export const svCourse = {
       examples: [
         { text: "Anna älskar sin bror.", translation: "Anna aime son frère (à elle).", note: "Le possesseur est le sujet : sin." },
         { text: "Hon ser hans bil.", translation: "Elle voit sa voiture à lui.", note: "Le possesseur est une autre personne : hans." },
-        { text: "De tvättar sig.", translation: "Ils se lavent.", note: "Sig renvoie au sujet de." },
+        { text: "De tvättar sig.", translation: "Ils se lavent.", note: "Le pronom sig renvoie au sujet de (« ils »)." },
       ],
       exercises: [
         {
@@ -783,14 +795,14 @@ export const svCourse = {
         },
         {
           type: "choose",
-          prompt: "Per har ___ hus.",
+          prompt: "Per äter ___ äpple.",
           options: ["sin", "sina", "sitt"],
           answer: 2,
-          explanation: "Hus est un ett-ord : sitt hus.",
+          explanation: "Äpple est un ett-ord au singulier (au pluriel, on dirait sina äpplen) : sitt äpple.",
         },
         {
           type: "choose",
-          prompt: "Hon tvättar ___.",
+          prompt: "Hon tvättar ___. (Elle se lave.)",
           options: ["henne", "sig", "hon"],
           answer: 1,
           explanation: "L’objet est le même que le sujet : on emploie sig.",
@@ -804,7 +816,7 @@ export const svCourse = {
         },
         {
           type: "transform",
-          instruction: "Dis que Per aime sa propre femme.",
+          instruction: "Remplace seulement le possessif pour que la phrase parle de la femme de Per.",
           source: "Per älskar hans fru.",
           answers: ["Per älskar sin fru."],
           explanation: "Le possesseur est le sujet Per et fru est un en-ord : sin fru.",
@@ -812,6 +824,7 @@ export const svCourse = {
       ],
       categories: ["function_word", "agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "sv-b1-subordinate",
@@ -819,8 +832,8 @@ export const svCourse = {
       title: "Subordonnées : inte avant le verbe",
       summary: "Construire une subordonnée (att, om, eftersom, när) avec inte et les adverbes devant le verbe.",
       rule: [
-        "Dans une proposition subordonnée, l’ordre change : sujet, puis inte (ou un adverbe comme aldrig, alltid, också), puis le verbe conjugué. C’est la règle dite BIFF. Principale : Jag bor inte här. Subordonnée : Hon säger att jag inte bor här.",
-        "Piège : le français garde le verbe tel quel (« je sais qu’il ne vient pas »), le suédois place inte avant le verbe : Jag vet att han inte kommer. Il n’y a pas d’inversion dans la subordonnée : Jag vet att han bor här.",
+        "À l’écrit standard, dans les subordonnées de cette leçon, inte et des adverbes comme aldrig précèdent le verbe conjugué. C’est la règle dite BIFF. Compare Jag bor inte här et Hon säger att jag inte bor här. À l’oral ou dans un écrit familier, certaines subordonnées en att suivent l’ordre d’une principale.",
+        "En français, la négation encadre le verbe dans « il ne vient pas » comme dans « je sais qu’il ne vient pas ». En suédois, compare Han kommer inte et Jag vet att han inte kommer. Dans Jag vet att han bor här, le sujet han précède le verbe bor.",
         "Conjonctions courantes : att (que), om (si, si … ou non), eftersom (parce que), när (quand), medan (pendant que), för att (pour). Si la subordonnée ouvre la phrase, la principale commence par le verbe : När jag kom hem, åt jag middag.",
       ],
       table: {
@@ -841,7 +854,7 @@ export const svCourse = {
       exercises: [
         {
           type: "choose",
-          prompt: "Jag vet att hon ___ här.",
+          prompt: "Jag vet att hon ___ här. (À l’écrit standard.)",
           options: ["inte bor", "bor inte", "inte bo"],
           answer: 0,
           explanation: "Dans une subordonnée, inte se place avant le verbe conjugué : att hon inte bor.",
@@ -862,7 +875,7 @@ export const svCourse = {
         },
         {
           type: "transform",
-          instruction: "Commence par « Jag vet att ».",
+          instruction: "À l’écrit standard, commence par « Jag vet att ».",
           source: "Han kommer inte.",
           answers: ["Jag vet att han inte kommer."],
           explanation: "Dans la subordonnée, inte passe devant le verbe : han inte kommer.",
@@ -877,6 +890,7 @@ export const svCourse = {
       ],
       categories: ["word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "sv-b1-particle-verbs",
@@ -884,9 +898,9 @@ export const svCourse = {
       title: "Verbes à particule : ringa upp, ge upp, stänga av",
       summary: "Apprendre les verbes à particule comme des mots entiers et les employer à tous les temps.",
       rule: [
-        "Beaucoup de verbes suédois se combinent avec une particule (upp, ut, in, av, på…) qui en change le sens : ringa (sonner) → ringa upp (appeler), ge (donner) → ge upp (abandonner), stänga (fermer) → stänga av (éteindre), slå (frapper) → slå på (allumer).",
-        "La particule est accentuée et reste près du verbe : Jag ringer upp dig. Elle suit le verbe aux autres formes : Jag har ringt upp dig. Jag vill ringa upp dig. Dans une subordonnée, elle vient après le verbe : …att jag ringer upp dig.",
-        "Piège : ne traduis jamais mot à mot (ge upp n’est pas « donner en haut »). Apprends chaque verbe avec sa particule comme un seul mot. Le français a souvent un verbe simple : abandonner, éteindre, appeler.",
+        "Beaucoup de verbes suédois se combinent avec une particule (upp, ut, in, av, på…) qui en change le sens : ge (donner) → ge upp (abandonner), stänga (fermer) → stänga av (éteindre), slå (frapper) → slå på (allumer), komma (venir) → komma in (entrer). Ringa upp (appeler quelqu’un) reste proche de ringa seul, qui veut déjà dire « téléphoner » : Jag ringer dig.",
+        "La particule porte l’accent et se place après le verbe, normalement avant le complément d’objet : Jag ringer upp dig. Elle reste liée au verbe au parfait et à l’infinitif : Jag har ringt upp dig. Jag vill ringa upp dig. Un adverbe peut les séparer : Ge inte upp!",
+        "Apprends le verbe et sa particule ensemble. Ils s’écrivent en deux mots. Le sens peut être figuré : ge upp signifie « abandonner ». Le français emploie souvent un verbe simple là où le suédois ajoute une particule.",
       ],
       table: {
         caption: "Quelques verbes à particule",
@@ -916,14 +930,14 @@ export const svCourse = {
         },
         {
           type: "choose",
-          prompt: "Han ger aldrig ___.",
+          prompt: "Han ger aldrig ___. (Il n’abandonne jamais.)",
           options: ["på", "upp", "ut"],
           answer: 1,
           explanation: "Ge upp signifie abandonner : han ger aldrig upp.",
         },
         {
           type: "choose",
-          prompt: "Jag ringer ___ dig i kväll.",
+          prompt: "Jag ringer ___ dig i kväll. (Je te téléphone ce soir.)",
           options: ["in", "av", "upp"],
           answer: 2,
           explanation: "Ringa upp signifie appeler au téléphone.",
@@ -945,6 +959,7 @@ export const svCourse = {
       ],
       categories: ["verb", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "sv-b1-passive",
@@ -954,7 +969,7 @@ export const svCourse = {
       rule: [
         "Le passif s’obtient en ajoutant -s au verbe : Svenska talas här (on parle suédois ici). Le complément d’agent se met avec av : Brevet skrivs av Anna. Le suédois emploie volontiers ce passif, surtout à l’écrit et pour des règles ou des horaires.",
         "Au présent, on ajoute -s à l’infinitif pour les verbes en -ar (öppna → öppnas, tala → talas), et au radical pour beaucoup d’autres (köpa → köps, stänga → stängs, skriva → skrivs, göra → görs). Läsa fait läses. Au prétérit : öppnades, stängdes, skrevs.",
-        "Piège : le français utilise souvent « on » + actif ou « être » + participe. En suédois, le passif en -s remplace les deux : « La porte est fermée à neuf heures » = Dörren stängs klockan nio. Après av, on met l’agent : Boken skrevs av en lärare.",
+        "Pour décrire l’action de fermer la porte, dis Dörren stängs klockan nio (« On ferme la porte à neuf heures »). Pour décrire son état, emploie vara + participe : Dörren är stängd (« La porte est fermée »). Si tu nommes l’agent, introduis-le avec av : Boken skrevs av en lärare.",
       ],
       table: {
         caption: "Actif et passif",
@@ -968,16 +983,16 @@ export const svCourse = {
       },
       examples: [
         { text: "Svenska talas i Finland också.", translation: "Le suédois est aussi parlé en Finlande.", note: "Tala devient talas." },
-        { text: "Butiken öppnas klockan nio.", translation: "Le magasin ouvre à neuf heures.", note: "Öppna devient öppnas." },
+        { text: "Butiken öppnas klockan nio.", translation: "On ouvre le magasin à neuf heures.", note: "Öppna devient öppnas." },
         { text: "Brevet skrevs av en lärare.", translation: "La lettre a été écrite par un professeur.", note: "Prétérit passif : skrevs, puis av + agent." },
       ],
       exercises: [
         {
           type: "choose",
-          prompt: "Dörren ___ klockan nio.",
+          prompt: "Dörren ___ klockan nio. (Au passif.)",
           options: ["stänger", "stängs", "stängt"],
           answer: 1,
-          explanation: "La porte est fermée : on ajoute -s au radical, donc stängs.",
+          explanation: "On ferme la porte (action) : passif en -s ajouté au radical, donc stängs.",
         },
         {
           type: "choose",
@@ -988,21 +1003,21 @@ export const svCourse = {
         },
         {
           type: "choose",
-          prompt: "Brevet skrevs ___ Anna.",
-          options: ["på", "till", "av"],
+          prompt: "Brevet skrevs ___ Anna. (La lettre a été écrite par Anna.)",
+          options: ["på", "från", "av"],
           answer: 2,
           explanation: "L’agent d’un passif s’introduit par av.",
         },
         {
           type: "fill",
           prompt: "Butiken ___ klockan nio.",
-          hint: "öppna, au passif",
+          hint: "öppna, au présent du passif en -s",
           answers: ["öppnas"],
           explanation: "Öppna est un verbe en -ar : on ajoute -s à l’infinitif, donc öppnas.",
         },
         {
           type: "transform",
-          instruction: "Mets la phrase au passif.",
+          instruction: "Mets la phrase au passif en -s. Commence par « Brevet » et garde l’agent.",
           source: "Anna skriver brevet.",
           answers: ["Brevet skrivs av Anna."],
           explanation: "L’objet devient sujet, le verbe prend -s et l’agent passe après av.",
@@ -1010,6 +1025,7 @@ export const svCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "sv-b1-relative",
@@ -1017,9 +1033,9 @@ export const svCourse = {
       title: "Propositions relatives : som, där et préposition finale",
       summary: "Relier deux phrases avec som et construire les relatives avec lieu ou préposition.",
       rule: [
-        "En suédois, la relative est introduite par som, invariable : qui, que, lequel. Som remplace à la fois qui et que du français : Mannen som bor här (l’homme qui habite ici), Boken som jag läser (le livre que je lis).",
-        "Som peut s’omettre quand il est complément d’objet : Boken jag läser är bra. Quand il est sujet, on ne peut pas l’omettre : Mannen som bor här. Pour un lieu, on emploie där : Staden där jag bor.",
-        "Avec une préposition, celle-ci passe à la fin de la relative : Huset som jag bor i (la maison dans laquelle j’habite). Piège : le français place la préposition devant le pronom. Dans la relative, inte précède le verbe : Boken som jag inte har läst.",
+        "Som est un mot invariable qui introduit beaucoup de relatives. Il correspond à « qui » dans Mannen som bor här (l’homme qui habite ici) et à « que » dans Boken som jag läser (le livre que je lis).",
+        "Som peut s’omettre quand le nom repris est complément : Boken jag läser är bra. Quand le nom repris est sujet du verbe de la relative, il faut garder som dans cette construction : Mannen som bor här. Pour indiquer un lieu, tu peux employer där : Staden där jag bor.",
+        "Dans les relatives construites avec som, la préposition reste dans la proposition relative. Elle peut être suivie d’autres mots : Huset som jag har bott i sedan 2020. Ici, tu peux aussi omettre som : Huset jag bor i. Compare le français « la maison dans laquelle j’habite ». Dans la relative, inte précède normalement le verbe : Boken som jag inte har läst.",
       ],
       table: {
         caption: "Les relatives",
@@ -1033,8 +1049,8 @@ export const svCourse = {
         ],
       },
       examples: [
-        { text: "Det är kvinnan som arbetar här.", translation: "C’est la femme qui travaille ici.", note: "Som sujet : jamais omis." },
-        { text: "Boken som jag köpte var billig.", translation: "Le livre que j’ai acheté était bon marché.", note: "Som objet : on peut l’omettre." },
+        { text: "Det är kvinnan som arbetar här.", translation: "C’est la femme qui travaille ici.", note: "Kvinnan est le sujet repris par la relative, donc on garde som." },
+        { text: "Boken som jag köpte var billig.", translation: "Le livre que j’ai acheté était bon marché.", note: "Boken est le complément repris par la relative, donc som peut s’omettre." },
         { text: "Staden där jag bor är liten.", translation: "La ville où j’habite est petite.", note: "Där pour un lieu." },
         { text: "Det är huset jag bor i.", translation: "C’est la maison dans laquelle j’habite.", note: "Som omis, préposition i en fin de proposition." },
       ],
@@ -1065,11 +1081,11 @@ export const svCourse = {
           prompt: "Kvinnan ___ arbetar här är min syster.",
           hint: "qui",
           answers: ["som"],
-          explanation: "Som est sujet de arbetar : on ne peut pas l’omettre.",
+          explanation: "Kvinnan est le sujet repris par la relative. On garde som devant arbetar.",
         },
         {
           type: "transform",
-          instruction: "Relie les deux phrases avec « som ».",
+          instruction: "Transforme « Den är röd » en relative avec « som » après « Jag har en bil ».",
           source: "Jag har en bil. Den är röd.",
           answers: ["Jag har en bil som är röd."],
           explanation: "Som remplace den et relie la relative à bil.",
@@ -1077,6 +1093,7 @@ export const svCourse = {
       ],
       categories: ["function_word", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "sv-b1-comparison",
@@ -1084,9 +1101,9 @@ export const svCourse = {
       title: "Comparatif et superlatif : -are, -ast, mer, mest",
       summary: "Comparer avec än et lika … som et former les comparatifs et superlatifs, réguliers ou non.",
       rule: [
-        "Le comparatif se forme en ajoutant -are à l’adjectif, le superlatif en ajoutant -ast : snabb → snabbare → snabbast. Les adjectifs longs en -isk, -ad, -ande ou les participes prennent mer et mest : mer intressant, mest intressant.",
+        "Les formes régulières prennent -are au comparatif et -ast au superlatif : snabb → snabbare → snabbast. Beaucoup d’adjectifs longs et de participes se comparent avec mer et mest, par exemple mer intressant et mest intressant. Certains adjectifs admettent les deux constructions.",
         "Irréguliers à connaître : bra → bättre → bäst ; dålig → sämre → sämst ; stor → större → störst ; liten → mindre → minst ; gammal → äldre → äldst ; lång → längre → längst ; många → fler → flest ; mycket → mer → mest.",
-        "« Plus … que » se dit än : Anna är äldre än Per. L’égalité se dit lika … som : Anna är lika gammal som Per. Le comparatif est invariable (ett större hus, större hus). Le superlatif épithète prend la forme définie : den största bilen.",
+        "Après un comparatif, än introduit le second terme : Anna är äldre än Per. L’égalité se dit lika … som : Anna är lika gammal som Per. Le comparatif est invariable : ett större hus, större hus. Avec den, det ou de devant le nom, -ast devient -aste (den snabbaste bilen). Compare les irréguliers den största bilen et den bästa filmen.",
       ],
       table: {
         caption: "Degrés de l’adjectif",
@@ -1125,7 +1142,7 @@ export const svCourse = {
         },
         {
           type: "choose",
-          prompt: "Det är den ___ filmen jag har sett.",
+          prompt: "Det är den ___ filmen jag har sett. (La meilleure.)",
           options: ["bättre", "bäst", "bästa"],
           answer: 2,
           explanation: "Après den, le superlatif prend -a : den bästa filmen.",
@@ -1139,14 +1156,15 @@ export const svCourse = {
         },
         {
           type: "transform",
-          instruction: "Dis que la voiture est plus grande que la maison.",
-          source: "Bilen är lika stor som huset.",
-          answers: ["Bilen är större än huset."],
+          instruction: "Remplace seulement « lika stor som » par le comparatif de stor suivi du mot qui introduit le second terme.",
+          source: "Hunden är lika stor som katten.",
+          answers: ["Hunden är större än katten."],
           explanation: "Lika stor som devient större än : comparatif + än.",
         },
       ],
       categories: ["agreement", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "sv-b1-pluperfect-conditional",
@@ -1156,7 +1174,7 @@ export const svCourse = {
       rule: [
         "Le plus-que-parfait se forme avec hade + supin pour un fait antérieur à un autre fait passé : Jag hade ätit när hon kom. Comme har, hade ne change pas selon la personne et il n’y a pas d’auxiliaire « être » : Vi hade gått hem.",
         "Le conditionnel se forme avec skulle + infinitif (sans att) pour une hypothèse, un souhait ou une demande polie : Jag skulle vilja ha ett glas vatten. Skulle du kunna hjälpa mig?",
-        "Hypothèse présente : om + prétérit, puis skulle + infinitif : Om jag hade tid, skulle jag komma. Hypothèse passée : om + hade + supin, puis hade + supin : Om jag hade haft tid, hade jag kommit. Piège : après om, jamais skulle, comme après « si » en français.",
+        "Hypothèse irréelle au présent : Om jag hade tid, skulle jag komma. Hypothèse irréelle au passé : Om jag hade haft tid, hade jag kommit. Tu peux aussi dire skulle jag ha kommit dans la principale. Pour une éventualité future, om peut être suivi de skulle : Om det skulle regna, stannar vi hemma (« si jamais il pleuvait… »).",
       ],
       table: {
         caption: "Temps et hypothèses",
@@ -1165,7 +1183,7 @@ export const svCourse = {
           ["hade + supin", "antériorité", "Jag hade ätit."],
           ["skulle + infinitif", "souhait, politesse", "Jag skulle vilja ha te."],
           ["om + prétérit, skulle", "hypothèse présente", "Om jag hade tid, skulle jag komma."],
-          ["om hade + supin, hade + supin", "hypothèse passée", "Om jag hade haft tid, hade jag kommit."],
+          ["om + hade + supin", "hypothèse passée", "Om jag hade haft tid, hade jag kommit."],
         ],
       },
       examples: [
@@ -1213,6 +1231,7 @@ export const svCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
   ],
 } satisfies GrammarCourse;

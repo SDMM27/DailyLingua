@@ -1,0 +1,1142 @@
+{
+  "language": "zh",
+  "approved": [
+    "zh-a1-shi-adjectives",
+    "zh-a1-questions",
+    "zh-a1-de",
+    "zh-a1-you-meiyou",
+    "zh-a1-measure-words",
+    "zh-a1-time-place",
+    "zh-a2-le",
+    "zh-a2-guo",
+    "zh-a2-progressive",
+    "zh-a2-modals",
+    "zh-a2-comparison",
+    "zh-a2-duration",
+    "zh-b1-resultative-potential",
+    "zh-b1-directional",
+    "zh-b1-ba",
+    "zh-b1-bei",
+    "zh-b1-degree-de",
+    "zh-b1-connectors"
+  ],
+  "drafts": [],
+  "patches": [
+    {
+      "id": "zh-a1-shi-adjectives",
+      "field": "rule[0]",
+      "find": "        \"Le verbe 是 (shì) correspond à « être » devant un nom : 我是老师 (wǒ shì lǎoshī, je suis professeur). Il ne se conjugue jamais : 是 sert pour toutes les personnes et tous les temps. Négation : 不是 (bú shì), où 不 devient bú devant un 4e ton.\",",
+      "replace": "        \"Pour identifier quelqu’un, emploie 是 shì devant un groupe nominal : 我是老师 wǒ shì lǎoshī (« je suis professeur »). 是 shì ne change pas avec la personne ni avec le temps. À la négative, 不是 se prononce bú shì, avec le 2e ton devant le 4e.\","
+    },
+    {
+      "id": "zh-a1-shi-adjectives",
+      "field": "rule[1]",
+      "find": "        \"Devant un adjectif, on n’emploie pas 是 : l’adjectif est lui-même le prédicat, et on le fait précéder de 很 (hěn) : 她很高 (tā hěn gāo, elle est grande). Ici 很 ne veut presque plus dire « très » ; sans lui, la phrase sonne comparative (« plus grande que… ») ou incomplète. Négation : 不 devant l’adjectif, sans 很 : 她不高 (tā bù gāo).\",",
+      "replace": "        \"Un adjectif peut former le prédicat sans verbe « être ». Dans une description neutre, 很 hěn est courant : 她很高 tā hěn gāo (« elle est grande »). Sans 很 hěn, une lecture contrastive est possible selon le contexte. Pour nier simplement la qualité : 她不高 tā bù gāo.\","
+    },
+    {
+      "id": "zh-a1-shi-adjectives",
+      "field": "rule[2]",
+      "find": "        \"Piège : en français « elle est grande » contient le verbe « être », d’où la tentation de dire « 她是高 » : c’est faux. 是 relie deux noms, 很 s’appuie sur un adjectif. Pour insister vraiment, on emploie 非常 (fēicháng, très).\",",
+      "replace": "        \"Pour décrire directement une qualité, le modèle de base emploie 很 hěn plutôt que 是 shì. 很 hěn peut aussi marquer un degré réel si on insiste dessus. 非常 fēicháng permet d’exprimer clairement une forte intensité.\","
+    },
+    {
+      "id": "zh-a1-shi-adjectives",
+      "field": "examples[0]",
+      "find": "        { text: \"他是老师，不是医生。\", translation: \"Il est professeur, pas médecin.\", note: \"Tā shì lǎoshī, bú shì yīshēng. 不 devient bú devant shì (4e ton).\" },",
+      "replace": "        { text: \"他是老师，不是医生。\", translation: \"Il est professeur, pas médecin.\", note: \"Tā shì lǎoshī, bú shì yīshēng. Dans 不是 bú shì, 不 prend le 2e ton devant shì.\" },"
+    },
+    {
+      "id": "zh-a1-shi-adjectives",
+      "field": "examples[1]",
+      "find": "        { text: \"今天很热。\", translation: \"Aujourd’hui, il fait chaud.\", note: \"Jīntiān hěn rè. 很 est de règle devant l’adjectif, sans 是.\" },",
+      "replace": "        { text: \"今天很热。\", translation: \"Aujourd’hui, il fait chaud.\", note: \"Jīntiān hěn rè. 很 hěn est courant dans une description sans contraste.\" },"
+    },
+    {
+      "id": "zh-a1-shi-adjectives",
+      "field": "examples[2]",
+      "find": "        { text: \"我朋友不忙。\", translation: \"Mon ami n’est pas occupé.\", note: \"Wǒ péngyou bù máng. La négation 不 remplace 很.\" },",
+      "replace": "        { text: \"我朋友不忙。\", translation: \"Mon ami n’est pas occupé.\", note: \"Wǒ péngyou bù máng. 不 bù nie ici l’adjectif 忙 máng.\" },"
+    },
+    {
+      "id": "zh-a1-shi-adjectives",
+      "field": "exercises[0].prompt",
+      "find": "          prompt: \"我___学生。\",",
+      "replace": "          prompt: \"我___学生。 (Je suis étudiant.)\","
+    },
+    {
+      "id": "zh-a1-shi-adjectives",
+      "field": "exercises[1].prompt",
+      "find": "          prompt: \"她___忙。\",",
+      "replace": "          prompt: \"她___忙。 (Elle est occupée, sans insister.)\","
+    },
+    {
+      "id": "zh-a1-shi-adjectives",
+      "field": "exercises[1].options",
+      "find": "          options: [\"是\", \"很\", \"有\", \"在\"],",
+      "replace": "          options: [\"了\", \"很\", \"有\", \"把\"],"
+    },
+    {
+      "id": "zh-a1-shi-adjectives",
+      "field": "exercises[1].explanation",
+      "find": "          explanation: \"忙 est un adjectif : on dit 她很忙, sans 是. Ici 很 relie simplement le sujet à l’adjectif.\",",
+      "replace": "          explanation: \"忙 est l’adjectif « occupé ». Dans une description neutre, on dit 她很忙.\","
+    },
+    {
+      "id": "zh-a1-shi-adjectives",
+      "field": "exercises[3].instruction",
+      "find": "          instruction: \"Mets la phrase à la forme négative.\",\n          source: \"天气很冷。\",",
+      "replace": "          instruction: \"Remplace le marqueur devant 冷 par la négation simple. Garde le reste.\",\n          source: \"天气很冷。\","
+    },
+    {
+      "id": "zh-a1-questions",
+      "field": "rule[0]",
+      "find": "        \"Pour une question fermée, on ajoute 吗 (ma) à la fin d’une phrase affirmative, sans changer l’ordre des mots : 你是学生吗？ (nǐ shì xuésheng ma ?). Il n’y a ni inversion ni équivalent de « est-ce que ». On répond en reprenant le verbe : 是 / 不是, 有 / 没有 (il n’y a pas de mot « oui » ou « non »).\",",
+      "replace": "        \"Pour une question fermée, ajoute 吗 ma à la fin : 你是学生吗？ nǐ shì xuésheng ma? L’ordre de la phrase reste le même. On peut répondre par le verbe affirmatif ou négatif : 是 shì / 不是 bú shì, 有 yǒu / 没有 méiyǒu.\","
+    },
+    {
+      "id": "zh-a1-questions",
+      "field": "rule[1]",
+      "find": "        \"Autre façon de poser la même question : A不A, qui juxtapose le verbe et sa négation : 你去不去？ (nǐ qù bu qù ?, tu y vas ou pas ?). On n’y ajoute jamais 吗. Pour « et toi ? », on dit 你呢？ (nǐ ne ?).\",",
+      "replace": "        \"Autre modèle de question fermée : répète le verbe autour de 不 bu, souvent atone ici. 你去不去？ nǐ qù bu qù? (« Tu y vas ou pas ? »). Dans ce modèle, laisse 吗 ma de côté. Pour dire « Et toi ? », emploie 你呢？ nǐ ne?\","
+    },
+    {
+      "id": "zh-a1-questions",
+      "field": "rule[2]",
+      "find": "        \"Les mots interrogatifs (什么 shénme, 谁 shéi, 哪儿 nǎr, 几 jǐ…) restent à la place de la réponse, sans inversion : 你吃什么？ (nǐ chī shénme ?) répond à 我吃面条. Piège : en français le mot interrogatif passe en tête (« que manges-tu ? ») ; en chinois il reste en place, et on n’ajoute pas 吗.\",",
+      "replace": "        \"En règle générale, le mot interrogatif prend la place de la réponse. Dans 你吃什么？ nǐ chī shénme?, 什么 shénme occupe la place de l’objet. Autres mots utiles : 谁 shéi (« qui »), 哪儿 nǎr (« où »), 几 jǐ (« combien »). Laisse 吗 ma de côté dans ces questions ouvertes.\","
+    },
+    {
+      "id": "zh-a1-questions",
+      "field": "examples[0]",
+      "find": "        { text: \"你是中国人吗？\", translation: \"Es-tu chinois ?\", note: \"Nǐ shì Zhōngguó rén ma? 吗 se place en fin de phrase, l’ordre ne change pas.\" },",
+      "replace": "        { text: \"你是中国人吗？\", translation: \"Es-tu chinois ?\", note: \"Nǐ shì Zhōngguó rén ma? 吗 ma se place en fin de phrase, sans changer l’ordre des mots.\" },"
+    },
+    {
+      "id": "zh-a1-questions",
+      "field": "examples[1]",
+      "find": "        { text: \"你喝不喝咖啡？\", translation: \"Tu veux du café (ou pas) ?\", note: \"Nǐ hē bu hē kāfēi? Dans A不A, 不 est atone (bu).\" },",
+      "replace": "        { text: \"你喝不喝咖啡？\", translation: \"Tu prends du café ou pas ?\", note: \"Nǐ hē bu hē kāfēi? Dans cette question, 不 se prononce souvent bu, sans ton lexical.\" },"
+    },
+    {
+      "id": "zh-a1-questions",
+      "field": "examples[2]",
+      "find": "        { text: \"你想吃什么？\", translation: \"Que veux-tu manger ?\", note: \"Nǐ xiǎng chī shénme? 什么 reste à la place de l’objet.\" },",
+      "replace": "        { text: \"你想吃什么？\", translation: \"Que veux-tu manger ?\", note: \"Nǐ xiǎng chī shénme? 什么 shénme occupe la place de l’objet.\" },"
+    },
+    {
+      "id": "zh-a1-questions",
+      "field": "exercises[2].prompt",
+      "find": "          prompt: \"你去___去？\",",
+      "replace": "          prompt: \"你明天去___去？ (Tu y vas demain ou pas ?)\","
+    },
+    {
+      "id": "zh-a1-questions",
+      "field": "exercises[2].hint",
+      "find": "          hint: \"A不A\",\n          answers: [\"不\"],",
+      "replace": "          hint: \"Marque le choix entre y aller ou non.\",\n          answers: [\"不\"],"
+    },
+    {
+      "id": "zh-a1-de",
+      "field": "rule[1]",
+      "find": "        \"On omet souvent 的 avec les proches et les groupes d’appartenance : 我妈妈 (wǒ māma), 我朋友 (wǒ péngyou), 我们学校 (wǒmen xuéxiào). Avec un adjectif d’une syllabe, on l’omet aussi (好书 hǎo shū) ; avec un adjectif de deux syllabes ou précédé de 很, 的 est en général nécessaire : 漂亮的衣服 (piàoliang de yīfu).\",",
+      "replace": "        \"On omet souvent 的 de dans les liens proches : 我妈妈 wǒ māma, 我朋友 wǒ péngyou, 我们学校 wǒmen xuéxiào. Certains adjectifs courts s’emploient directement devant le nom : 好书 hǎo shū. Avec une description plus développée, 的 de est courant : 漂亮的衣服 piàoliang de yīfu.\","
+    },
+    {
+      "id": "zh-a1-de",
+      "field": "rule[2]",
+      "find": "        \"Quand le nom est connu, on peut le supprimer : 这是我的 (zhè shì wǒ de, c’est le mien). Piège : « le livre de mon ami » ne se construit pas dans l’ordre français ; on dit 我朋友的书, possesseur en premier.\",",
+      "replace": "        \"Quand le nom est connu, on peut l’omettre après 的 de : 这是我的 zhè shì wǒ de (« c’est le mien »). Pour « le livre de mon ami », dis 我朋友的书 wǒ péngyou de shū. Le groupe possesseur vient avant le livre.\","
+    },
+    {
+      "id": "zh-a1-de",
+      "field": "examples[0]",
+      "find": "        { text: \"这是我的手机。\", translation: \"C’est mon téléphone.\", note: \"Zhè shì wǒ de shǒujī. Le possesseur est avant 的.\" },",
+      "replace": "        { text: \"这是我的手机。\", translation: \"C’est mon téléphone.\", note: \"Zhè shì wǒ de shǒujī. Le possesseur est avant 的 de.\" },"
+    },
+    {
+      "id": "zh-a1-de",
+      "field": "examples[1]",
+      "find": "        { text: \"他是我们的老师。\", translation: \"C’est notre professeur.\", note: \"Tā shì wǒmen de lǎoshī. Avec un nom de statut, 的 est présent.\" },",
+      "replace": "        { text: \"他是我们的老师。\", translation: \"C’est notre professeur.\", note: \"Tā shì wǒmen de lǎoshī. On entend aussi 我们老师 wǒmen lǎoshī pour dire « notre professeur ».\" },"
+    },
+    {
+      "id": "zh-a1-de",
+      "field": "examples[2]",
+      "find": "        { text: \"我妈妈很忙。\", translation: \"Ma mère est occupée.\", note: \"Wǒ māma hěn máng. 的 est omis devant un terme de famille.\" },",
+      "replace": "        { text: \"我妈妈很忙。\", translation: \"Ma mère est occupée.\", note: \"Wǒ māma hěn máng. Le lien familial permet d’omettre 的 de dans 我妈妈 wǒ māma.\" },"
+    },
+    {
+      "id": "zh-a1-de",
+      "field": "examples[3]",
+      "find": "        { text: \"那是漂亮的衣服。\", translation: \"Ce sont de jolis vêtements.\", note: \"Nà shì piàoliang de yīfu. Adjectif de deux syllabes : 的 est présent.\" },",
+      "replace": "        { text: \"她有一件漂亮的衣服。\", translation: \"Elle a un joli vêtement.\", note: \"Tā yǒu yí jiàn piàoliang de yīfu. 的 de relie la description au nom.\" },"
+    },
+    {
+      "id": "zh-a1-de",
+      "field": "exercises[2].prompt",
+      "find": "          prompt: \"A：这是你的手机吗？ B：是，是我___。\",",
+      "replace": "          prompt: \"A：这是你的手机吗？ B：对，是我___。\","
+    },
+    {
+      "id": "zh-a1-de",
+      "field": "exercises[2].hint",
+      "find": "          answers: [\"的\"],",
+      "replace": "          hint: \"« Oui, c’est le mien », sans répéter « téléphone ».\",\n          answers: [\"的\"],"
+    },
+    {
+      "id": "zh-a1-you-meiyou",
+      "field": "rule[0]",
+      "find": "        \"有 (yǒu) signifie à la fois « avoir » et « il y a » : 我有一个姐姐 (wǒ yǒu yí ge jiějie, j’ai une sœur) ; 桌子上有一本书 (zhuōzi shang yǒu yì běn shū, il y a un livre sur la table). Pour « il y a », le lieu vient en premier, puis 有, puis ce qui existe.\",",
+      "replace": "        \"有 yǒu signifie « avoir » ou « il y a ». 我有一个姐姐 wǒ yǒu yí ge jiějie veut dire « j’ai une sœur aînée ». Pour présenter quelque chose dans un lieu, place le lieu en tête : 桌子上有一本书 zhuōzi shàng yǒu yì běn shū (« il y a un livre sur la table »).\","
+    },
+    {
+      "id": "zh-a1-you-meiyou",
+      "field": "rule[1]",
+      "find": "        \"La négation de 有 est toujours 没有 (méiyǒu), souvent réduit à 没 : 我没有时间 (wǒ méiyǒu shíjiān, je n’ai pas le temps). On ne dit jamais « 不有 ». Questions : 你有…吗？ ou 你有没有…？ (nǐ yǒu méiyǒu… ?).\",",
+      "replace": "        \"Pour nier la possession ou l’existence, emploie 没有 méiyǒu ou la forme courte 没 méi : 我没有时间 wǒ méiyǒu shíjiān (« je n’ai pas le temps »). Deux questions possibles : 你有笔吗？ nǐ yǒu bǐ ma? et 你有没有笔？ nǐ yǒu méiyǒu bǐ?\","
+    },
+    {
+      "id": "zh-a1-you-meiyou",
+      "field": "rule[2]",
+      "find": "        \"Règle à retenir : 不 nie les habitudes, le présent, le futur et 是 ; 没 nie 有 et les actions déjà accomplies. Piège : « il n’y a pas de café ici » se dit 这儿没有咖啡 et non « 这儿不有咖啡 ».\",",
+      "replace": "        \"不 bù sert notamment à nier une habitude ou une intention. Avec 有 yǒu et pour dire qu’une action n’a pas eu lieu, emploie 没 méi ou 没有 méiyǒu. Par exemple, 这儿没有咖啡 zhèr méiyǒu kāfēi veut dire « il n’y a pas de café ici ».\","
+    },
+    {
+      "id": "zh-a1-you-meiyou",
+      "field": "examples[0]",
+      "find": "        { text: \"我有一个妹妹。\", translation: \"J’ai une petite sœur.\", note: \"Wǒ yǒu yí ge mèimei. 一 devient yí devant ge (4e ton).\" },",
+      "replace": "        { text: \"我有一个妹妹。\", translation: \"J’ai une petite sœur.\", note: \"Wǒ yǒu yí ge mèimei. 一 se prononce yí devant 个, issu de gè (4e ton), même si le classificateur est souvent atone ici.\" },"
+    },
+    {
+      "id": "zh-a1-you-meiyou",
+      "field": "examples[1]",
+      "find": "        { text: \"我没有手机。\", translation: \"Je n’ai pas de téléphone.\", note: \"Wǒ méiyǒu shǒujī. La négation de 有 est 没有.\" },",
+      "replace": "        { text: \"我没有手机。\", translation: \"Je n’ai pas de téléphone.\", note: \"Wǒ méiyǒu shǒujī. Pour nier 有 yǒu, on emploie 没有 méiyǒu.\" },"
+    },
+    {
+      "id": "zh-a1-you-meiyou",
+      "field": "examples[3]",
+      "find": "        { text: \"你有没有时间？\", translation: \"As-tu du temps ?\", note: \"Nǐ yǒu méiyǒu shíjiān? Forme A不A de 有 : 有没有.\" },",
+      "replace": "        { text: \"你有没有时间？\", translation: \"As-tu du temps ?\", note: \"Nǐ yǒu méiyǒu shíjiān? 有没有 yǒu méiyǒu est la forme interrogative avec répétition de 有 yǒu.\" },"
+    },
+    {
+      "id": "zh-a1-you-meiyou",
+      "field": "exercises[2].hint",
+      "find": "          hint: \"A不A\",\n          answers: [\"没\"],",
+      "replace": "          hint: \"Question fermée : « Tu as le temps ou pas ? »\",\n          answers: [\"没\"],"
+    },
+    {
+      "id": "zh-a1-you-meiyou",
+      "field": "exercises[3].instruction",
+      "find": "          instruction: \"Mets la phrase à la forme négative.\",\n          source: \"我有哥哥。\",",
+      "replace": "          instruction: \"Nie la possession avec 没有 ou 没. Garde l’ordre des autres mots.\",\n          source: \"我有哥哥。\","
+    },
+    {
+      "id": "zh-a1-measure-words",
+      "field": "rule[0]",
+      "find": "        \"Entre un nombre (ou 这 / 那 / 几) et un nom, le chinois exige un classificateur : 三个人 (sān ge rén, trois personnes), 这本书 (zhè běn shū, ce livre). Le nom ne prend jamais de pluriel : 书 peut être « livre » ou « livres ».\",",
+      "replace": "        \"Pour compter un nom, place généralement un classificateur entre le nombre et le nom : 三个人 sān ge rén (« trois personnes »). Avec un démonstratif, ce modèle donne par exemple 这本书 zhè běn shū (« ce livre »). La forme 书 shū peut désigner un ou plusieurs livres.\","
+    },
+    {
+      "id": "zh-a1-measure-words",
+      "field": "rule[1]",
+      "find": "        \"个 (ge) est le classificateur passe-partout. Les autres dépendent du nom : 本 (běn) pour les livres, 杯 (bēi) pour une boisson servie dans un verre, 张 (zhāng) pour les objets plats (papier, table, billet), 件 (jiàn) pour les vêtements, 只 (zhī) pour les petits animaux, 瓶 (píng) pour les bouteilles.\",",
+      "replace": "        \"个 gè, souvent atone (ge), est un classificateur courant. Emploie 本 běn pour un livre, 杯 bēi pour une tasse ou un verre, 张 zhāng pour un objet plat, 件 jiàn pour un vêtement, 只 zhī pour de nombreux animaux et 瓶 píng pour une bouteille.\","
+    },
+    {
+      "id": "zh-a1-measure-words",
+      "field": "rule[2]",
+      "find": "        \"Pour « deux », on dit 两 (liǎng) devant un classificateur : 两个人, et non « 二个人 ». Piège : le français dit « une tasse de thé » avec « de » ; le chinois enchaîne simplement 一杯茶 (yì bēi chá). Pour demander un nombre, on emploie 几 + classificateur : 几个人？ (jǐ ge rén ?).\",",
+      "replace": "        \"Pour « deux » devant un classificateur, on emploie habituellement 两 liǎng : 两个人 liǎng ge rén. « Une tasse de thé » se dit 一杯茶 yì bēi chá, sans équivalent du « de » français. Pour demander un petit nombre : 几个人？ jǐ ge rén?\","
+    },
+    {
+      "id": "zh-a1-measure-words",
+      "field": "examples[0]",
+      "find": "        { text: \"我要两杯咖啡。\", translation: \"Je voudrais deux cafés.\", note: \"Wǒ yào liǎng bēi kāfēi. 两 devant le classificateur 杯.\" },",
+      "replace": "        { text: \"我要两杯咖啡。\", translation: \"Je voudrais deux cafés.\", note: \"Wǒ yào liǎng bēi kāfēi. Dans 两杯 liǎng bēi, 两 liǎng précède le classificateur 杯 bēi.\" },"
+    },
+    {
+      "id": "zh-a1-measure-words",
+      "field": "examples[1]",
+      "find": "        { text: \"这本书很好看。\", translation: \"Ce livre est très bien.\", note: \"Zhè běn shū hěn hǎokàn. 这 + classificateur + nom.\" },",
+      "replace": "        { text: \"这本书很好看。\", translation: \"Ce livre est très bien.\", note: \"Zhè běn shū hěn hǎokàn. 这 zhè est suivi du classificateur 本 běn, puis du nom.\" },"
+    },
+    {
+      "id": "zh-a1-measure-words",
+      "field": "examples[2]",
+      "find": "        { text: \"你有几个孩子？\", translation: \"Combien d’enfants as-tu ?\", note: \"Nǐ yǒu jǐ ge háizi? 几 + ge pour demander un petit nombre.\" },",
+      "replace": "        { text: \"你有几个孩子？\", translation: \"Combien d’enfants as-tu ?\", note: \"Nǐ yǒu jǐ ge háizi? 几 jǐ précède ici le classificateur 个 ge.\" },"
+    },
+    {
+      "id": "zh-a1-measure-words",
+      "field": "examples[3]",
+      "find": "        { text: \"那只猫很可爱。\", translation: \"Ce chat est mignon.\", note: \"Nà zhī māo hěn kě’ài. 只 pour un petit animal.\" },",
+      "replace": "        { text: \"那只猫很可爱。\", translation: \"Ce chat est mignon.\", note: \"Nà zhī māo hěn kě’ài. 只 zhī est le classificateur du chat.\" },"
+    },
+    {
+      "id": "zh-a1-measure-words",
+      "field": "exercises[0].prompt",
+      "find": "          prompt: \"我有两___书。\",",
+      "replace": "          prompt: \"我有两___书。 (Classificateur usuel des livres.)\","
+    },
+    {
+      "id": "zh-a1-measure-words",
+      "field": "exercises[1].prompt",
+      "find": "          prompt: \"我要一___咖啡。\",",
+      "replace": "          prompt: \"我要一___咖啡。 (Une tasse de café.)\","
+    },
+    {
+      "id": "zh-a1-measure-words",
+      "field": "exercises[3].hint",
+      "find": "          hint: \"2\",",
+      "replace": "          hint: \"Forme usuelle de « deux » devant un classificateur.\","
+    },
+    {
+      "id": "zh-a1-time-place",
+      "field": "rule[0]",
+      "find": "        \"L’ordre des mots chinois est fixe : sujet – moment – lieu – verbe – objet. Le moment (明天 míngtiān, 每天 měi tiān, 星期六 xīngqīliù…) se place avant le verbe, juste après le sujet ou en début de phrase, jamais à la fin : 我明天去北京 (wǒ míngtiān qù Běijīng, je vais à Pékin demain).\",",
+      "replace": "        \"Dans l’ordre usuel, le sujet est suivi du moment, du lieu, puis de l’action. Le repère de temps peut aussi venir en tête. Exemple : 我明天去北京 wǒ míngtiān qù Běijīng (« je vais à Pékin demain »).\","
+    },
+    {
+      "id": "zh-a1-time-place",
+      "field": "rule[1]",
+      "find": "        \"Le lieu où se déroule l’action s’exprime par 在 (zài) + lieu, lui aussi avant le verbe : 我在北京工作 (wǒ zài Běijīng gōngzuò, je travaille à Pékin). Avec un verbe de déplacement comme 去 ou 来, on n’utilise pas de préposition : 我去学校 (wǒ qù xuéxiào, je vais à l’école).\",",
+      "replace": "        \"Pour dire où une action se déroule, on place souvent 在 zài et le lieu avant le verbe : 我在北京工作 wǒ zài Běijīng gōngzuò. Avec 去 qù ou 来 lái, la destination peut suivre directement le verbe : 我去学校 wǒ qù xuéxiào.\","
+    },
+    {
+      "id": "zh-a1-time-place",
+      "field": "rule[2]",
+      "find": "        \"Piège : le français place volontiers lieu et moment après le verbe (« je travaille à Pékin demain »). En chinois, tout ce qui situe l’action vient avant le verbe : « 我工作在北京 » est faux.\",",
+      "replace": "        \"Le français place facilement le lieu après l’action. En chinois, commence par le modèle 我在北京工作 wǒ zài Běijīng gōngzuò. Certains verbes prennent aussi un lieu après le verbe : 我住在北京 wǒ zhù zài Běijīng (« j’habite à Pékin »).\","
+    },
+    {
+      "id": "zh-a1-time-place",
+      "field": "examples[0]",
+      "find": "        { text: \"我明天去北京。\", translation: \"Je vais à Pékin demain.\", note: \"Wǒ míngtiān qù Běijīng. Le moment est avant le verbe ; 去 n’a pas de préposition.\" },",
+      "replace": "        { text: \"我明天去北京。\", translation: \"Je vais à Pékin demain.\", note: \"Wǒ míngtiān qù Běijīng. 明天 míngtiān vient avant le verbe. La destination suit 去 qù.\" },"
+    },
+    {
+      "id": "zh-a1-time-place",
+      "field": "examples[1]",
+      "find": "        { text: \"他每天在家工作。\", translation: \"Il travaille chez lui tous les jours.\", note: \"Tā měi tiān zài jiā gōngzuò. Moment, puis 在 + lieu, puis le verbe.\" },",
+      "replace": "        { text: \"他每天在家工作。\", translation: \"Il travaille chez lui tous les jours.\", note: \"Tā měi tiān zài jiā gōngzuò. Le groupe 在家 zài jiā précède le verbe 工作 gōngzuò.\" },"
+    },
+    {
+      "id": "zh-a1-time-place",
+      "field": "exercises[0].prompt",
+      "find": "          prompt: \"她___工作。\",",
+      "replace": "          prompt: \"她___工作。 (Elle travaille à Pékin. Utilise la préposition de lieu.)\","
+    },
+    {
+      "id": "zh-a1-time-place",
+      "field": "exercises[1].options",
+      "find": "          options: [\"明天\", \"在明天\", \"明天在\"],",
+      "replace": "          options: [\"明天\", \"明天的\", \"明天在\"],"
+    },
+    {
+      "id": "zh-a1-time-place",
+      "field": "exercises[2].hint",
+      "find": "          answers: [\"在\"],",
+      "replace": "          hint: \"Préposition du lieu où il étudie.\",\n          answers: [\"在\"],"
+    },
+    {
+      "id": "zh-a2-le",
+      "field": "rule[0]",
+      "find": "        \"Le 了 (le) placé après le verbe indique que l’action est accomplie : 我买了三本书 (wǒ mǎi le sān běn shū, j’ai acheté trois livres). Ce n’est pas un temps du passé : on l’emploie aussi pour une action future finie (明天吃了饭就走, après avoir mangé demain, je pars).\",",
+      "replace": "        \"Après le verbe, 了 le présente l’action comme réalisée à un point de référence : 我买了三本书 wǒ mǎile sān běn shū (« j’ai acheté trois livres »). Ce point peut être futur : 明天吃了饭就走 míngtiān chīle fàn jiù zǒu (« demain, on partira après avoir mangé »).\","
+    },
+    {
+      "id": "zh-a2-le",
+      "field": "rule[1]",
+      "find": "        \"Placé en fin de phrase, 了 marque un changement de situation : 下雨了 (xià yǔ le, il s’est mis à pleuvoir), 天黑了 (tiān hēi le, il fait nuit maintenant). Avec un objet nu, 了 juste après le verbe laisse la phrase « en suspens » : on ajoute une quantité (三本书) ou une suite.\",",
+      "replace": "        \"En fin de phrase, 了 le peut marquer un changement : 下雨了 xià yǔ le (« il s’est mis à pleuvoir »). Après un verbe suivi d’un objet, une quantité aide souvent à situer l’action : 买了三本书 mǎile sān běn shū. Un objet sans quantité reste possible si le contexte est clair.\","
+    },
+    {
+      "id": "zh-a2-le",
+      "field": "rule[2]",
+      "find": "        \"Négation : 没(有) + verbe, et 了 disparaît : 我没吃饭 (wǒ méi chī fàn). Piège : on n’emploie pas 了 pour une habitude passée (他以前每天跑步) ni pour une description d’état au passé (昨天很忙). Le chinois n’a pas besoin de marquer le passé quand le contexte est clair.\",",
+      "replace": "        \"Pour dire qu’une action n’a pas eu lieu, place 没 méi ou 没有 méiyǒu devant le verbe et retire le 了 le d’aspect : 我没吃饭 wǒ méi chī fàn. Une habitude passée n’exige pas cette particule : 他以前每天跑步 tā yǐqián měi tiān pǎobù (« avant, il courait tous les jours »).\","
+    },
+    {
+      "id": "zh-a2-le",
+      "field": "table.rows[0]",
+      "find": "          [\"Verbe + 了\", \"我吃了两个苹果。\", \"Wǒ chī le liǎng ge píngguǒ.\", \"J’ai mangé deux pommes.\"],",
+      "replace": "          [\"Verbe + 了\", \"我吃了两个苹果。\", \"Wǒ chīle liǎng ge píngguǒ.\", \"J’ai mangé deux pommes.\"],"
+    },
+    {
+      "id": "zh-a2-le",
+      "field": "examples[0]",
+      "find": "        { text: \"昨天我看了一个电影。\", translation: \"Hier, j’ai vu un film.\", note: \"Zuótiān wǒ kàn le yí ge diànyǐng. 了 suit le verbe, et l’objet porte une quantité.\" },",
+      "replace": "        { text: \"昨天我看了一部电影。\", translation: \"Hier, j’ai vu un film.\", note: \"Zuótiān wǒ kànle yí bù diànyǐng. 了 le suit le verbe et 一部 yí bù indique la quantité.\" },"
+    },
+    {
+      "id": "zh-a2-le",
+      "field": "examples[1]",
+      "find": "        { text: \"下雨了。\", translation: \"Il pleut maintenant.\", note: \"Xià yǔ le. 了 final : la situation vient de changer.\" },",
+      "replace": "        { text: \"下雨了。\", translation: \"Il s’est mis à pleuvoir.\", note: \"Xià yǔ le. Le 了 le final présente la pluie comme un changement.\" },"
+    },
+    {
+      "id": "zh-a2-le",
+      "field": "examples[2]",
+      "find": "        { text: \"我昨天没去学校。\", translation: \"Hier, je ne suis pas allé à l’école.\", note: \"Wǒ zuótiān méi qù xuéxiào. Avec 没, pas de 了.\" },",
+      "replace": "        { text: \"我昨天没去学校。\", translation: \"Hier, je ne suis pas allé à l’école.\", note: \"Wǒ zuótiān méi qù xuéxiào. 没 méi indique que l’action n’a pas eu lieu. On retire le 了 le d’aspect.\" },"
+    },
+    {
+      "id": "zh-a2-le",
+      "field": "exercises[1].prompt",
+      "find": "          prompt: \"我昨天___去学校。\",",
+      "replace": "          prompt: \"我昨天___去学校。 (Hier, je ne suis pas allé à l’école.)\","
+    },
+    {
+      "id": "zh-a2-le",
+      "field": "exercises[1].explanation",
+      "find": "          explanation: \"Pour nier une action accomplie, on emploie 没 (没有) : 我昨天没去学校. 不 nie plutôt une habitude ou un futur.\",",
+      "replace": "          explanation: \"Pour dire qu’une action n’a pas eu lieu, emploie 没 ou 没有. 我昨天没去学校 signifie « Hier, je ne suis pas allé à l’école ».\","
+    },
+    {
+      "id": "zh-a2-le",
+      "field": "exercises[2].hint",
+      "find": "          hint: \"changement\",",
+      "replace": "          hint: \"Une seule particule pour un changement constaté.\","
+    },
+    {
+      "id": "zh-a2-le",
+      "field": "exercises[3].instruction",
+      "find": "          instruction: \"Mets la phrase à la forme négative.\",\n          source: \"我吃了早饭。\",",
+      "replace": "          instruction: \"Dis que tu n’as pas pris le petit-déjeuner. Emploie la négation simple et garde les autres mots dans l’ordre.\",\n          source: \"我吃了早饭。\","
+    },
+    {
+      "id": "zh-a2-le",
+      "field": "exercises[3].explanation",
+      "find": "          explanation: \"On nie avec 没(有) devant le verbe, et on supprime 了.\",",
+      "replace": "          explanation: \"Ajoute 没 ou 没有 avant le verbe et retire le 了 d’aspect après le verbe.\","
+    },
+    {
+      "id": "zh-a2-guo",
+      "field": "rule[0]",
+      "find": "        \"Le suffixe 过 (guo), placé après le verbe, indique une expérience : 我去过中国 (wǒ qù guo Zhōngguó, je suis déjà allé en Chine). C’est l’équivalent du passé composé d’expérience « j’ai déjà… ». Le point de vue est la vie du locuteur, pas un événement daté.\",",
+      "replace": "        \"Après le verbe, 过 guo présente un fait comme une expérience : 我去过中国 wǒ qùguo Zhōngguó (« je suis déjà allé en Chine »). Un repère temporel est possible : 我去年去过中国 wǒ qùnián qùguo Zhōngguó (« je suis allé en Chine l’an dernier »).\","
+    },
+    {
+      "id": "zh-a2-guo",
+      "field": "rule[1]",
+      "find": "        \"Négation : 没(有) + verbe + 过 : 他没去过法国 (tā méi qù guo Fǎguó, il n’est jamais allé en France). Question : 你吃过北京烤鸭吗？ (nǐ chī guo Běijīng kǎoyā ma ?) ou 你吃过…没有？\",",
+      "replace": "        \"Nie l’expérience avec 没 méi ou 没有 méiyǒu et garde 过 guo : 他没去过法国 tā méi qùguo Fǎguó. Pour poser une question : 你吃过北京烤鸭吗？ nǐ chīguo Běijīng kǎoyā ma? ou 你吃过没有？ nǐ chīguo méiyǒu?\","
+    },
+    {
+      "id": "zh-a2-guo",
+      "field": "rule[2]",
+      "find": "        \"Piège : 我去了北京 (wǒ qù le Běijīng) raconte un événement précis (j’y suis allé, souvent une fois, à un moment donné), alors que 我去过北京 dit « j’y suis déjà allé ». On n’emploie jamais 不 avant 过 : « 我不去过 » est faux.\",",
+      "replace": "        \"我去了北京 wǒ qùle Běijīng présente le déplacement comme un événement. 我去过北京 wǒ qùguo Běijīng insiste sur le fait d’y être déjà allé. Pour nier l’expérience, le modèle de cette fiche emploie 没 méi ou 没有 méiyǒu.\","
+    },
+    {
+      "id": "zh-a2-guo",
+      "field": "table.rows[0]",
+      "find": "          [\"Affirmation\", \"我学过法语。\", \"Wǒ xué guo Fǎyǔ.\", \"J’ai déjà appris le français.\"],",
+      "replace": "          [\"Affirmation\", \"我学过法语。\", \"Wǒ xuéguo Fǎyǔ.\", \"J’ai déjà étudié le français.\"],"
+    },
+    {
+      "id": "zh-a2-guo",
+      "field": "table.rows[1]",
+      "find": "          [\"Négation\", \"我没吃过。\", \"Wǒ méi chī guo.\", \"Je n’en ai jamais mangé.\"],",
+      "replace": "          [\"Négation\", \"我没吃过。\", \"Wǒ méi chīguo.\", \"Je n’en ai jamais mangé.\"],"
+    },
+    {
+      "id": "zh-a2-guo",
+      "field": "table.rows[2]",
+      "find": "          [\"Question 吗\", \"你去过吗？\", \"Nǐ qù guo ma?\", \"Y es-tu déjà allé ?\"],",
+      "replace": "          [\"Question 吗\", \"你去过吗？\", \"Nǐ qùguo ma?\", \"Y es-tu déjà allé ?\"],"
+    },
+    {
+      "id": "zh-a2-guo",
+      "field": "table.rows[3]",
+      "find": "          [\"Question 没有\", \"你看过没有？\", \"Nǐ kàn guo méiyǒu?\", \"L’as-tu déjà vu ?\"],",
+      "replace": "          [\"Question 没有\", \"你看过没有？\", \"Nǐ kànguo méiyǒu?\", \"L’as-tu déjà vu ?\"],"
+    },
+    {
+      "id": "zh-a2-guo",
+      "field": "examples[0]",
+      "find": "        { text: \"我吃过北京烤鸭。\", translation: \"J’ai déjà mangé du canard laqué de Pékin.\", note: \"Wǒ chī guo Běijīng kǎoyā. 过 se place directement après le verbe.\" },",
+      "replace": "        { text: \"我吃过北京烤鸭。\", translation: \"J’ai déjà mangé du canard laqué de Pékin.\", note: \"Wǒ chīguo Běijīng kǎoyā. 过 guo marque l’expérience de l’action.\" },"
+    },
+    {
+      "id": "zh-a2-guo",
+      "field": "examples[1]",
+      "find": "        { text: \"他没去过法国。\", translation: \"Il n’est jamais allé en France.\", note: \"Tā méi qù guo Fǎguó. Négation : 没 + verbe + 过.\" },",
+      "replace": "        { text: \"他没去过法国。\", translation: \"Il n’est jamais allé en France.\", note: \"Tā méi qùguo Fǎguó. 没 méi nie l’expérience et 过 guo reste après le verbe.\" },"
+    },
+    {
+      "id": "zh-a2-guo",
+      "field": "examples[2]",
+      "find": "        { text: \"你看过这个电影吗？\", translation: \"As-tu déjà vu ce film ?\", note: \"Nǐ kàn guo zhège diànyǐng ma? Question d’expérience avec 吗.\" },",
+      "replace": "        { text: \"你看过这部电影吗？\", translation: \"As-tu déjà vu ce film ?\", note: \"Nǐ kànguo zhè bù diànyǐng ma? 吗 ma forme la question fermée.\" },"
+    },
+    {
+      "id": "zh-a2-guo",
+      "field": "exercises[0].explanation",
+      "find": "          explanation: \"Pour dire « jamais allé », on emploie 没 + verbe + 过 : 他没去过法国. 没 ne se combine pas avec 了.\",",
+      "replace": "          explanation: \"Pour « il n’est jamais allé », garde 过 après 去 et nie avec 没. Le 了 d’aspect n’est pas possible dans ce modèle.\","
+    },
+    {
+      "id": "zh-a2-guo",
+      "field": "exercises[2].prompt",
+      "find": "          prompt: \"我以前看___这个电影。\",",
+      "replace": "          prompt: \"我以前看___这部电影。\","
+    },
+    {
+      "id": "zh-a2-guo",
+      "field": "exercises[2].hint",
+      "find": "          hint: \"expérience\",",
+      "replace": "          hint: \"Une particule qui marque l’expérience.\","
+    },
+    {
+      "id": "zh-a2-guo",
+      "field": "exercises[2].explanation",
+      "find": "          explanation: \"Avec 以前 (auparavant), on indique l’expérience avec 过 : 看过.\",",
+      "replace": "          explanation: \"Pour dire que tu as déjà fait cette expérience, place 过 après 看.\","
+    },
+    {
+      "id": "zh-a2-guo",
+      "field": "exercises[3].instruction",
+      "find": "          instruction: \"Dis que tu n’y es jamais allé.\",",
+      "replace": "          instruction: \"Nie cette expérience avec 没 ou 没有. Garde 过 et les autres mots dans l’ordre.\","
+    },
+    {
+      "id": "zh-a2-progressive",
+      "field": "rule[0]",
+      "find": "        \"Pour dire « être en train de », on place 在 (zài) ou 正在 (zhèngzài) devant le verbe : 我在看书 (wǒ zài kàn shū, je suis en train de lire). On peut ajouter 呢 (ne) en fin de phrase : 妈妈在做饭呢 (māma zài zuò fàn ne). Le verbe lui-même ne change pas.\",",
+      "replace": "        \"Pour une action en cours, place 在 zài ou 正在 zhèngzài devant le verbe : 我在看书 wǒ zài kàn shū. Tu peux ajouter 呢 ne en fin de phrase : 妈妈在做饭呢 māma zài zuò fàn ne. Dans le contexte, 呢 ne peut aussi suffire sans 在 zài.\","
+    },
+    {
+      "id": "zh-a2-progressive",
+      "field": "rule[1]",
+      "find": "        \"Négation : 没(有)在 + verbe, ou plus simplement 没 + verbe : 我没在看书 (wǒ méi zài kàn shū). Question : 你在做什么？ (nǐ zài zuò shénme ?, que fais-tu ?). Cette construction ne s’emploie que pour le présent en cours, jamais pour un futur.\",",
+      "replace": "        \"Pour nier l’action en cours : 我没在看书 wǒ méi zài kàn shū. Pour interroger : 你在做什么？ nǐ zài zuò shénme? Le point de référence peut être passé : 昨天我到家的时候，他正在吃饭 zuótiān wǒ dào jiā de shíhou, tā zhèngzài chī fàn.\","
+    },
+    {
+      "id": "zh-a2-progressive",
+      "field": "rule[2]",
+      "find": "        \"Piège : 在 a aussi le sens de préposition de lieu (在家看书, lire à la maison). 我在家 veut dire « je suis à la maison » ; 我在看书 veut dire « je suis en train de lire ». Sans 在, 我看书 exprime plutôt une habitude : « je lis ».\",",
+      "replace": "        \"Compare 我在家 wǒ zài jiā (« je suis à la maison ») et 我在看书 wǒ zài kàn shū (« je suis en train de lire »). Dans 在家看书 zài jiā kàn shū, 在 zài indique le lieu. Sans marqueur d’aspect, le contexte indique comment interpréter l’action.\","
+    },
+    {
+      "id": "zh-a2-progressive",
+      "field": "table.rows[2]",
+      "find": "          [\"… 呢\", \"妈妈在做饭呢。\", \"Māma zài zuòfàn ne.\", \"Maman est en train de cuisiner.\"],",
+      "replace": "          [\"… 呢\", \"妈妈在做饭呢。\", \"Māma zài zuò fàn ne.\", \"Maman est en train de cuisiner.\"],"
+    },
+    {
+      "id": "zh-a2-progressive",
+      "field": "examples[0]",
+      "find": "        { text: \"他在打电话。\", translation: \"Il est en train de téléphoner.\", note: \"Tā zài dǎ diànhuà. 在 devant le verbe : action en cours.\" },",
+      "replace": "        { text: \"他在打电话。\", translation: \"Il est en train de téléphoner.\", note: \"Tā zài dǎ diànhuà. 在 zài devant l’action indique qu’elle est en cours.\" },"
+    },
+    {
+      "id": "zh-a2-progressive",
+      "field": "examples[1]",
+      "find": "        { text: \"我们正在开会。\", translation: \"Nous sommes en réunion en ce moment.\", note: \"Wǒmen zhèngzài kāihuì. 正在 insiste sur l’instant présent.\" },",
+      "replace": "        { text: \"我们正在开会。\", translation: \"Nous sommes en réunion en ce moment.\", note: \"Wǒmen zhèngzài kāihuì. 正在 zhèngzài présente la réunion comme en cours au moment dont on parle.\" },"
+    },
+    {
+      "id": "zh-a2-progressive",
+      "field": "exercises[2].hint",
+      "find": "          hint: \"en train de\",",
+      "replace": "          hint: \"Un seul marqueur simple formé avec 在 ou 正.\","
+    },
+    {
+      "id": "zh-a2-progressive",
+      "field": "exercises[3].instruction",
+      "find": "          instruction: \"Dis qu’il est en train de lire (utilise 在).\",",
+      "replace": "          instruction: \"Indique qu’il lit en ce moment, avec 在 ou 正在. Tu peux ajouter 呢. Garde le reste.\","
+    },
+    {
+      "id": "zh-a2-modals",
+      "field": "rule[0]",
+      "find": "        \"Les modaux se placent devant le verbe. 会 (huì) : savoir faire quelque chose qu’on a appris (我会说汉语, wǒ huì shuō Hànyǔ) ou, au futur, « il va (probablement) ». 能 (néng) : pouvoir, grâce aux circonstances ou à la capacité (我今天不能来, wǒ jīntiān bù néng lái). 可以 (kěyǐ) : avoir la permission (这儿可以坐吗？, zhèr kěyǐ zuò ma ?).\",",
+      "replace": "        \"Les modaux précèdent le verbe. 会 huì indique notamment un savoir-faire appris : 我会说汉语 wǒ huì shuō Hànyǔ. 能 néng exprime une capacité ou une possibilité. 可以 kěyǐ sert souvent à demander la permission : 这儿可以坐吗？ zhèr kěyǐ zuò ma?\","
+    },
+    {
+      "id": "zh-a2-modals",
+      "field": "rule[1]",
+      "find": "        \"想 (xiǎng) : avoir envie, « j’aimerais » (我想喝茶, wǒ xiǎng hē chá). 要 (yào) : vouloir de façon plus ferme, devoir ou aller faire (我要去北京, wǒ yào qù Běijīng) ; 我要一杯水 veut aussi dire « je voudrais un verre d’eau ». Négation : 不会, 不能, 不想, 不可以. Attention : 不要 (bú yào) signifie « ne… pas » à l’impératif.\",",
+      "replace": "        \"想 xiǎng peut exprimer une envie : 我想喝茶 wǒ xiǎng hē chá. 要 yào peut exprimer un désir plus ferme : 我要一杯水 wǒ yào yì bēi shuǐ. Il peut aussi annoncer une action ou une obligation selon le contexte. 不要 bú yào sert notamment à interdire dans un ordre.\","
+    },
+    {
+      "id": "zh-a2-modals",
+      "field": "rule[2]",
+      "find": "        \"Piège : le français n’a que « pouvoir » et « savoir » là où le chinois distingue trois verbes. « Je peux nager » se dit 我会游泳 si tu sais nager, 我能游泳 si rien ne t’en empêche aujourd’hui, 我可以游泳 si on te l’autorise.\",",
+      "replace": "        \"Pour nager, 我会游泳 wǒ huì yóuyǒng souligne le savoir-faire, 我能游泳 wǒ néng yóuyǒng la possibilité ou la capacité, et 我可以游泳 wǒ kěyǐ yóuyǒng la permission dans un contexte où elle est demandée. Pour nier un modal, on emploie souvent 不 bù devant lui.\","
+    },
+    {
+      "id": "zh-a2-modals",
+      "field": "examples[0]",
+      "find": "        { text: \"我会说一点儿汉语。\", translation: \"Je sais parler un peu chinois.\", note: \"Wǒ huì shuō yìdiǎnr Hànyǔ. 会 : compétence apprise.\" },",
+      "replace": "        { text: \"我会说一点儿汉语。\", translation: \"Je sais parler un peu chinois.\", note: \"Wǒ huì shuō yìdiǎnr Hànyǔ. 会 huì signale une compétence acquise.\" },"
+    },
+    {
+      "id": "zh-a2-modals",
+      "field": "examples[1]",
+      "find": "        { text: \"这里可以拍照吗？\", translation: \"A-t-on le droit de prendre des photos ici ?\", note: \"Zhèlǐ kěyǐ pāizhào ma? 可以 : permission.\" },",
+      "replace": "        { text: \"这里可以拍照吗？\", translation: \"A-t-on le droit de prendre des photos ici ?\", note: \"Zhèlǐ kěyǐ pāizhào ma? 可以 kěyǐ sert ici à demander la permission.\" },"
+    },
+    {
+      "id": "zh-a2-modals",
+      "field": "examples[2]",
+      "find": "        { text: \"我明天不能来，我要工作。\", translation: \"Demain je ne peux pas venir, je dois travailler.\", note: \"Wǒ míngtiān bù néng lái, wǒ yào gōngzuò. 不能 : impossibilité ; 要 : obligation.\" },",
+      "replace": "        { text: \"我明天不能来，我要工作。\", translation: \"Demain je ne peux pas venir, je dois travailler.\", note: \"Wǒ míngtiān bù néng lái, wǒ yào gōngzuò. 不能 bù néng marque l’impossibilité et 要 yào l’obligation.\" },"
+    },
+    {
+      "id": "zh-a2-modals",
+      "field": "examples[3]",
+      "find": "        { text: \"我想喝咖啡。\", translation: \"J’ai envie de boire un café.\", note: \"Wǒ xiǎng hē kāfēi. 想 : désir.\" },",
+      "replace": "        { text: \"我想喝咖啡。\", translation: \"J’ai envie de boire un café.\", note: \"Wǒ xiǎng hē kāfēi. 想 xiǎng marque l’envie.\" },"
+    },
+    {
+      "id": "zh-a2-modals",
+      "field": "exercises[2].hint",
+      "find": "          hint: \"avoir envie de\",",
+      "replace": "          hint: \"Un modal d’un caractère de la fiche pour « vouloir ».\","
+    },
+    {
+      "id": "zh-a2-modals",
+      "field": "exercises[3].instruction",
+      "find": "          instruction: \"Mets la phrase à la forme négative.\",\n          source: \"我会说日语。\",",
+      "replace": "          instruction: \"Nie la capacité avec la négation simple avant 会. Garde le reste.\",\n          source: \"我会说日语。\","
+    },
+    {
+      "id": "zh-a2-comparison",
+      "field": "summary",
+      "find": "      summary: \"Dire qu’une chose est plus ou moins que une autre avec 比, 没有 ou 一样.\",",
+      "replace": "      summary: \"Comparer deux personnes ou deux choses avec 比, 没有 ou 一样.\","
+    },
+    {
+      "id": "zh-a2-comparison",
+      "field": "rule[0]",
+      "find": "        \"Pour « plus… que », on emploie 比 (bǐ) entre les deux termes, suivi de l’adjectif seul : 我比他高 (wǒ bǐ tā gāo, je suis plus grand que lui). Il n’y a pas d’équivalent de « plus » : l’adjectif est nu. On ne met jamais 很 : « 我比他很高 » est faux. Pour la différence, on ajoute après l’adjectif : 一点儿 (yìdiǎnr, un peu), 很多 / 得多 (beaucoup), ou une quantité : 大三岁 (dà sān suì, plus âgé de trois ans).\",",
+      "replace": "        \"Dans 我比他高 wǒ bǐ tā gāo, 比 bǐ introduit la personne comparée (« je suis plus grand que lui »). Le modèle simple se passe de 很 hěn. L’écart vient après l’adjectif : 一点儿 yìdiǎnr (« un peu »), 很多 hěn duō ou 得多 de duō (« beaucoup »), 大三岁 dà sān suì (« plus âgé de trois ans »).\","
+    },
+    {
+      "id": "zh-a2-comparison",
+      "field": "rule[1]",
+      "find": "        \"Pour « moins… que » ou « pas aussi… que », on emploie 没有 (méiyǒu) : 他没有我高 (tā méiyǒu wǒ gāo, il est moins grand que moi), avec éventuellement 那么 (nàme) devant l’adjectif. L’égalité se dit 跟…一样 (gēn… yíyàng) : 我跟他一样高.\",",
+      "replace": "        \"他没有我高 tā méiyǒu wǒ gāo veut dire « il n’est pas aussi grand que moi ». On peut ajouter 那么 nàme avant l’adjectif. Pour l’égalité : 我跟他一样高 wǒ gēn tā yíyàng gāo (« je suis aussi grand que lui »).\","
+    },
+    {
+      "id": "zh-a2-comparison",
+      "field": "rule[2]",
+      "find": "        \"Piège : le français a des mots pour « plus » et « moins » ; le chinois s’appuie sur 比 / 没有 et laisse l’adjectif tel quel. 更 (gèng, encore plus) exprime un degré supérieur sans comparer deux termes explicites.\",",
+      "replace": "        \"比 bǐ suffit dans le comparatif simple. 更 gèng (« encore plus ») peut aussi se combiner avec lui : 我比他更高 wǒ bǐ tā gèng gāo. Sans second terme exprimé, 更 gèng peut aussi comparer avec une référence déjà connue.\","
+    },
+    {
+      "id": "zh-a2-comparison",
+      "field": "examples[0]",
+      "find": "        { text: \"今天比昨天冷。\", translation: \"Aujourd’hui, il fait plus froid qu’hier.\", note: \"Jīntiān bǐ zuótiān lěng. L’adjectif est nu, sans 很.\" },",
+      "replace": "        { text: \"今天比昨天冷。\", translation: \"Aujourd’hui, il fait plus froid qu’hier.\", note: \"Jīntiān bǐ zuótiān lěng. Dans ce comparatif simple avec 比 bǐ, l’adjectif se suffit à lui-même.\" },"
+    },
+    {
+      "id": "zh-a2-comparison",
+      "field": "examples[2]",
+      "find": "        { text: \"这家店没有那家店贵。\", translation: \"Ce magasin est moins cher que celui-là.\", note: \"Zhè jiā diàn méiyǒu nà jiā diàn guì. 家 est le classificateur des magasins.\" },",
+      "replace": "        { text: \"这家店没有那家店贵。\", translation: \"Ce magasin est moins cher que celui-là.\", note: \"Zhè jiā diàn méiyǒu nà jiā diàn guì. 家 jiā est le classificateur des commerces.\" },"
+    },
+    {
+      "id": "zh-a2-comparison",
+      "field": "examples[3]",
+      "find": "        { text: \"我的手机跟你的一样。\", translation: \"Mon téléphone est le même que le tien.\", note: \"Wǒ de shǒujī gēn nǐ de yíyàng. 一样 sans adjectif : « identique ».\" },",
+      "replace": "        { text: \"我的手机跟你的一样。\", translation: \"Mon téléphone est le même que le tien.\", note: \"Wǒ de shǒujī gēn nǐ de yíyàng. 一样 yíyàng sans adjectif signifie ici « identique ».\" },"
+    },
+    {
+      "id": "zh-a2-comparison",
+      "field": "exercises[2].hint",
+      "find": "          answers: [\"比\"],",
+      "replace": "          hint: \"« Plus chaud qu’hier », avec le comparatif de la fiche.\",\n          answers: [\"比\"],"
+    },
+    {
+      "id": "zh-a2-comparison",
+      "field": "exercises[3].instruction",
+      "find": "          instruction: \"Dis la même chose avec 没有 (je suis moins grand que lui).\",",
+      "replace": "          instruction: \"Utilise 没有 en commençant par 我. Tu peux mettre 那么 avant 高, sans autre mot de degré.\","
+    },
+    {
+      "id": "zh-a2-comparison",
+      "field": "exercises[3].explanation",
+      "find": "          explanation: \"On inverse les deux termes et on utilise 没有 : 我没有他高 (这么/那么 est optionnel).\",",
+      "replace": "          explanation: \"Inverse les deux termes et place 没有 entre eux. 那么 peut précéder 高.\","
+    },
+    {
+      "id": "zh-a2-duration",
+      "field": "rule[0]",
+      "find": "        \"Un moment précis se place avant le verbe (我八点工作, je travaille à 8 h), mais une durée se place après : 我工作八个小时 (wǒ gōngzuò bā ge xiǎoshí, je travaille huit heures). Même règle pour la fréquence avec 次 (cì) : 我去过三次 (wǒ qù guo sān cì, j’y suis allé trois fois).\",",
+      "replace": "        \"Un repère horaire précède souvent le verbe : 我八点开始工作 wǒ bā diǎn kāishǐ gōngzuò (« je commence à travailler à huit heures »). Une durée peut le suivre : 我工作八个小时 wǒ gōngzuò bā ge xiǎoshí. 次 cì compte les occurrences : 我去过三次 wǒ qùguo sān cì.\","
+    },
+    {
+      "id": "zh-a2-duration",
+      "field": "rule[1]",
+      "find": "        \"Avec un objet, on peut insérer la durée avant l’objet (我看了两个小时电视, wǒ kàn le liǎng ge xiǎoshí diànshì) ou répéter le verbe : 我看电视看了两个小时. Avec un nom de lieu, on met 次 avant ou après : 去过两次北京 / 去过北京两次.\",",
+      "replace": "        \"La durée peut venir avant l’objet : 我看了两个小时电视 wǒ kànle liǎng ge xiǎoshí diànshì. On peut aussi répéter le verbe : 我看电视看了两个小时 wǒ kàn diànshì kànle liǎng ge xiǎoshí. Avec un lieu, deux ordres sont courants : 去过两次北京 qùguo liǎng cì Běijīng / 去过北京两次 qùguo Běijīng liǎng cì.\","
+    },
+    {
+      "id": "zh-a2-duration",
+      "field": "rule[2]",
+      "find": "        \"Piège : « depuis deux ans » du français devient souvent 了 + durée + 了 : 他学汉语学了两年了 (tā xué Hànyǔ xué le liǎng nián le), l’action dure encore. Le chinois ne dit pas « depuis » : il place simplement la durée après le verbe.\",",
+      "replace": "        \"Une activité qui se poursuit peut employer deux 了 le : 他学汉语学了两年了 tā xué Hànyǔ xuéle liǎng nián le (« il étudie le chinois depuis deux ans »). Le premier marque la durée déjà écoulée. Avec le second, cette durée est présentée comme atteinte à présent.\","
+    },
+    {
+      "id": "zh-a2-duration",
+      "field": "table.rows[0]",
+      "find": "          [\"Moment précis\", \"avant le verbe\", \"我八点工作。\", \"Wǒ bā diǎn gōngzuò.\"],",
+      "replace": "          [\"Moment précis\", \"avant le verbe\", \"我八点开始工作。\", \"Wǒ bā diǎn kāishǐ gōngzuò.\"],"
+    },
+    {
+      "id": "zh-a2-duration",
+      "field": "table.rows[3]",
+      "find": "          [\"Verbe répété\", \"durée en fin\", \"我学汉语学了两年。\", \"Wǒ xué Hànyǔ xué le liǎng nián.\"],",
+      "replace": "          [\"Verbe répété\", \"durée en fin\", \"我学汉语学了两年。\", \"Wǒ xué Hànyǔ xuéle liǎng nián.\"],"
+    },
+    {
+      "id": "zh-a2-duration",
+      "field": "examples[1]",
+      "find": "        { text: \"他学汉语学了两年了。\", translation: \"Il étudie le chinois depuis deux ans.\", note: \"Tā xué Hànyǔ xué le liǎng nián le. Verbe répété, 了 final : l’action continue.\" },",
+      "replace": "        { text: \"他学汉语学了两年了。\", translation: \"Il étudie le chinois depuis deux ans.\", note: \"Tā xué Hànyǔ xuéle liǎng nián le. Le 了 le final montre que la durée est atteinte au moment dont on parle.\" },"
+    },
+    {
+      "id": "zh-a2-duration",
+      "field": "examples[2]",
+      "find": "        { text: \"我去过两次中国。\", translation: \"Je suis allé deux fois en Chine.\", note: \"Wǒ qù guo liǎng cì Zhōngguó. 次 compte les fois.\" },",
+      "replace": "        { text: \"我去过两次中国。\", translation: \"Je suis allé deux fois en Chine.\", note: \"Wǒ qùguo liǎng cì Zhōngguó. 次 cì compte les occurrences.\" },"
+    },
+    {
+      "id": "zh-a2-duration",
+      "field": "examples[3]",
+      "find": "        { text: \"我等了你十分钟。\", translation: \"Je t’ai attendu dix minutes.\", note: \"Wǒ děng le nǐ shí fēnzhōng. Avec un pronom, la durée vient après le pronom.\" },",
+      "replace": "        { text: \"我等了你十分钟。\", translation: \"Je t’ai attendu dix minutes.\", note: \"Wǒ děngle nǐ shí fēnzhōng. Ici, la durée suit le pronom objet.\" },"
+    },
+    {
+      "id": "zh-a2-duration",
+      "field": "exercises[2].hint",
+      "find": "          answers: [\"了\"],\n          explanation: \"Le 了 après le verbe marque la durée accomplie, et le 了 final indique qu’elle continue : 学了两年了.\",",
+      "replace": "          hint: \"Une seule particule d’aspect pour la durée écoulée.\",\n          answers: [\"了\"],\n          explanation: \"Le 了 après le verbe marque la durée accomplie, et le 了 final indique qu’elle continue : 学了两年了.\","
+    },
+    {
+      "id": "zh-a2-duration",
+      "field": "exercises[3].instruction",
+      "find": "          instruction: \"Dis que tu as regardé la télévision pendant deux heures.\",",
+      "replace": "          instruction: \"Après 我看了, écris la durée « deux heures » avec 两 et 小时, puis 电视. 的 est facultatif.\","
+    },
+    {
+      "id": "zh-a2-duration",
+      "field": "exercises[3].answers",
+      "find": "          answers: [\"我看了两个小时电视。\", \"我看了两个小时的电视。\", \"我看电视看了两个小时。\", \"我看了两小时电视。\", \"我看了两小时的电视。\", \"我看电视看了两小时。\"],",
+      "replace": "          answers: [\"我看了两个小时电视。\", \"我看了两个小时的电视。\", \"我看了两小时电视。\", \"我看了两小时的电视。\"],"
+    },
+    {
+      "id": "zh-a2-duration",
+      "field": "exercises[3].explanation",
+      "find": "          explanation: \"La durée se place après le verbe : devant l’objet (看了两个小时电视) ou après un verbe répété (看电视看了两个小时).\",",
+      "replace": "          explanation: \"La durée se place ici entre 我看了 et 电视. Les formes 两小时 et 两个小时 conviennent, avec ou sans 的 avant 电视.\","
+    },
+    {
+      "id": "zh-b1-resultative-potential",
+      "field": "rule[0]",
+      "find": "        \"Beaucoup de verbes chinois disent l’action sans son résultat. Pour l’ajouter, on soude un second élément directement après : 看完 (kàn wán, finir de lire), 听懂 (tīng dǒng, comprendre en écoutant), 找到 (zhǎo dào, trouver), 写错 (xiě cuò, se tromper en écrivant), 吃饱 (chī bǎo, manger à sa faim). Le groupe fonctionne comme un seul verbe : 我写完作业了. Négation avec 没 : 我没听懂 (wǒ méi tīng dǒng).\",",
+      "replace": "        \"Pour exprimer le résultat, ajoute un complément directement après le verbe : 看完 kànwán (« finir de lire »), 听懂 tīngdǒng (« comprendre en écoutant »), 找到 zhǎodào (« trouver »), 写错 xiěcuò (« se tromper en écrivant »). Pour dire que tu n’as pas compris : 我没听懂 wǒ méi tīngdǒng.\","
+    },
+    {
+      "id": "zh-b1-resultative-potential",
+      "field": "rule[1]",
+      "find": "        \"Le potentiel exprime qu’on peut (ou non) atteindre le résultat : on insère 得 (de) pour le possible, 不 (bu) pour l’impossible : 听得懂 (tīng de dǒng, je peux comprendre) / 听不懂 (tīng bu dǒng, je n’arrive pas à comprendre). Le négatif est de loin le plus fréquent : 我听不懂, 看不见, 吃不完.\",",
+      "replace": "        \"Pour dire si l’on peut atteindre le résultat, insère 得 de ou 不 bu : 听得懂 tīng de dǒng (« pouvoir comprendre à l’écoute »), 听不懂 tīng bu dǒng (« ne pas réussir à comprendre à l’écoute »). Autre exemple négatif : 看不见 kàn bu jiàn (« ne pas arriver à voir »).\","
+    },
+    {
+      "id": "zh-b1-resultative-potential",
+      "field": "rule[2]",
+      "find": "        \"Piège : le français a un seul verbe (« comprendre », « voir »), le chinois sépare l’action (听 écouter, 看 regarder) du résultat (懂 comprendre, 见 apercevoir). « Je n’ai pas compris » se dit 我没听懂 ; « je n’arrive pas à comprendre », 我听不懂.\",",
+      "replace": "        \"Compare 我没听懂 wǒ méi tīngdǒng (« je n’ai pas compris ») et 我听不懂 wǒ tīng bu dǒng (« je n’arrive pas à comprendre »). Avec 没 méi, on parle d’un résultat non atteint. Avec 不 bu entre les deux éléments, on parle de la possibilité d’atteindre ce résultat.\","
+    },
+    {
+      "id": "zh-b1-resultative-potential",
+      "field": "table.rows[0]",
+      "find": "          [\"看完\", \"kàn wán\", \"finir de lire\", \"看得完 / 看不完\"],",
+      "replace": "          [\"看完\", \"kànwán\", \"finir de lire\", \"看得完 / 看不完\"],"
+    },
+    {
+      "id": "zh-b1-resultative-potential",
+      "field": "table.rows[1]",
+      "find": "          [\"听懂\", \"tīng dǒng\", \"comprendre en écoutant\", \"听得懂 / 听不懂\"],",
+      "replace": "          [\"听懂\", \"tīngdǒng\", \"comprendre en écoutant\", \"听得懂 / 听不懂\"],"
+    },
+    {
+      "id": "zh-b1-resultative-potential",
+      "field": "table.rows[4]",
+      "find": "          [\"吃完\", \"chī wán\", \"finir de manger\", \"吃得完 / 吃不完\"],",
+      "replace": "          [\"吃完\", \"chīwán\", \"finir de manger\", \"吃得完 / 吃不完\"],"
+    },
+    {
+      "id": "zh-b1-resultative-potential",
+      "field": "examples[0]",
+      "find": "        { text: \"我没听懂你的问题。\", translation: \"Je n’ai pas compris ta question.\", note: \"Wǒ méi tīng dǒng nǐ de wèntí. 没 + verbe + résultat.\" },",
+      "replace": "        { text: \"我没听懂你的问题。\", translation: \"Je n’ai pas compris ta question.\", note: \"Wǒ méi tīngdǒng nǐ de wèntí. 没 méi indique que le résultat 听懂 tīngdǒng n’a pas été atteint.\" },"
+    },
+    {
+      "id": "zh-b1-resultative-potential",
+      "field": "examples[1]",
+      "find": "        { text: \"你说得太快，我听不懂。\", translation: \"Tu parles trop vite, je n’arrive pas à comprendre.\", note: \"Nǐ shuō de tài kuài, wǒ tīng bu dǒng. Potentiel négatif : 不 entre le verbe et le résultat.\" },",
+      "replace": "        { text: \"你说得太快，我听不懂。\", translation: \"Tu parles trop vite, je n’arrive pas à comprendre.\", note: \"Nǐ shuō de tài kuài, wǒ tīng bu dǒng. Pour le potentiel négatif, place 不 bu entre 听 tīng et 懂 dǒng.\" },"
+    },
+    {
+      "id": "zh-b1-resultative-potential",
+      "field": "examples[3]",
+      "find": "        { text: \"你的作业写完了吗？\", translation: \"As-tu fini tes devoirs ?\", note: \"Nǐ de zuòyè xiě wán le ma? Résultat 完 avec 了.\" },",
+      "replace": "        { text: \"你的作业写完了吗？\", translation: \"As-tu fini tes devoirs ?\", note: \"Nǐ de zuòyè xiěwán le ma? 完 wán indique que l’écriture est terminée.\" },"
+    },
+    {
+      "id": "zh-b1-resultative-potential",
+      "field": "exercises[1].prompt",
+      "find": "          prompt: \"你的作业写___了吗？\",",
+      "replace": "          prompt: \"你的作业写___了吗？ (As-tu fini tes devoirs ?)\","
+    },
+    {
+      "id": "zh-b1-resultative-potential",
+      "field": "exercises[3].instruction",
+      "find": "          instruction: \"Mets la phrase à la forme négative (je n’ai pas compris).\",",
+      "replace": "          instruction: \"Nie ce résultat en gardant 听懂. Utilise la négation simple, sans ajouter d’autre mot.\","
+    },
+    {
+      "id": "zh-b1-directional",
+      "field": "rule[0]",
+      "find": "        \"Un verbe de mouvement est complété par un verbe directionnel : 上 (monter), 下 (descendre), 进 (entrer), 出 (sortir), 回 (retourner), 过 (traverser), puis 来 (vers le locuteur) ou 去 (loin du locuteur) : 走进来 (zǒu jìnlai), 跑出去 (pǎo chūqu). Le choix de 来 ou 去 dépend de l’endroit où se trouve le locuteur.\",",
+      "replace": "        \"Les formes 上来 shànglái, 下去 xiàqù, 进来 jìnlái ou 出去 chūqù indiquent la direction. On peut ajouter un verbe de mouvement : 走进来 zǒu jìnlái (« entrer en marchant »). 来 lái oriente le mouvement vers le point de référence de la scène. 去 qù indique un éloignement.\","
+    },
+    {
+      "id": "zh-b1-directional",
+      "field": "rule[1]",
+      "find": "        \"Quand le verbe est suivi d’un lieu, le lieu se place entre le directionnel et 来 / 去 : 他走进教室来了 (tā zǒu jìn jiàoshì lai le), 他回家去了 (tā huí jiā qu le). Si c’est un objet, on peut dire 带来了一些水果 (dài lai le yìxiē shuǐguǒ, il a apporté des fruits).\",",
+      "replace": "        \"Dans le modèle avec un lieu exprimé, il peut venir avant 来 lái ou 去 qù : 他走进教室来了 tā zǒujìn jiàoshì lái le (« il est entré dans la salle »). Avec un objet à apporter, on peut dire 带来了一些水果 dàiláile yìxiē shuǐguǒ.\","
+    },
+    {
+      "id": "zh-b1-directional",
+      "field": "rule[2]",
+      "find": "        \"Certains directionnels ont un sens figuré : 起来 pour commencer (笑起来, se mettre à rire), 下去 pour continuer (说下去, continuer à parler). Piège : le français place la direction dans le verbe (entrer, sortir) ; en chinois on la sépare du mouvement, et il faut choisir 来 ou 去 selon qui regarde.\",",
+      "replace": "        \"Certains directionnels ont un sens figuré : 笑起来 xiào qǐlái (« se mettre à rire »), 说下去 shuō xiàqù (« continuer à parler »). Pour un déplacement concret, demande-toi où se situe le point de référence avant de choisir 来 lái ou 去 qù.\","
+    },
+    {
+      "id": "zh-b1-directional",
+      "field": "table.rows[0]",
+      "find": "          [\"monter\", \"上来 (shànglai)\", \"上去 (shàngqu)\"],",
+      "replace": "          [\"monter\", \"上来 (shànglái)\", \"上去 (shàngqù)\"],"
+    },
+    {
+      "id": "zh-b1-directional",
+      "field": "table.rows[1]",
+      "find": "          [\"descendre\", \"下来 (xiàlai)\", \"下去 (xiàqu)\"],",
+      "replace": "          [\"descendre\", \"下来 (xiàlái)\", \"下去 (xiàqù)\"],"
+    },
+    {
+      "id": "zh-b1-directional",
+      "field": "table.rows[2]",
+      "find": "          [\"entrer\", \"进来 (jìnlai)\", \"进去 (jìnqu)\"],",
+      "replace": "          [\"entrer\", \"进来 (jìnlái)\", \"进去 (jìnqù)\"],"
+    },
+    {
+      "id": "zh-b1-directional",
+      "field": "table.rows[3]",
+      "find": "          [\"sortir\", \"出来 (chūlai)\", \"出去 (chūqu)\"],",
+      "replace": "          [\"sortir\", \"出来 (chūlái)\", \"出去 (chūqù)\"],"
+    },
+    {
+      "id": "zh-b1-directional",
+      "field": "table.rows[4]",
+      "find": "          [\"retourner\", \"回来 (huílai)\", \"回去 (huíqu)\"],",
+      "replace": "          [\"retourner\", \"回来 (huílái)\", \"回去 (huíqù)\"],"
+    },
+    {
+      "id": "zh-b1-directional",
+      "field": "table.rows[5]",
+      "find": "          [\"traverser\", \"过来 (guòlai)\", \"过去 (guòqu)\"],",
+      "replace": "          [\"passer de l’autre côté\", \"过来 (guòlái)\", \"过去 (guòqù)\"],"
+    },
+    {
+      "id": "zh-b1-directional",
+      "field": "examples[0]",
+      "find": "        { text: \"请进来！\", translation: \"Entrez, je vous prie !\", note: \"Qǐng jìnlai! Le locuteur est à l’intérieur : 进来.\" },",
+      "replace": "        { text: \"请进来！\", translation: \"Entrez, je vous prie !\", note: \"Qǐng jìnlái! 进来 jìnlái invite à entrer vers l’endroit où se tient la personne qui parle.\" },"
+    },
+    {
+      "id": "zh-b1-directional",
+      "field": "examples[1]",
+      "find": "        { text: \"他走出教室去了。\", translation: \"Il est sorti de la classe.\", note: \"Tā zǒu chū jiàoshì qu le. Le lieu 教室 est entre 出 et 去.\" },",
+      "replace": "        { text: \"他走出教室去了。\", translation: \"Il est sorti de la classe.\", note: \"Tā zǒuchū jiàoshì qù le. 教室 jiàoshì (« salle de classe ») se place entre 出 chū et 去 qù.\" },"
+    },
+    {
+      "id": "zh-b1-directional",
+      "field": "examples[2]",
+      "find": "        { text: \"我带来了一些水果。\", translation: \"J’ai apporté des fruits.\", note: \"Wǒ dài lai le yìxiē shuǐguǒ. 来 car l’objet arrive vers le locuteur.\" },",
+      "replace": "        { text: \"我带来了一些水果。\", translation: \"J’ai apporté des fruits.\", note: \"Wǒ dàiláile yìxiē shuǐguǒ. 来 lái présente les fruits comme apportés vers le lieu de référence de l’échange.\" },"
+    },
+    {
+      "id": "zh-b1-directional",
+      "field": "examples[3]",
+      "find": "        { text: \"你什么时候回来？\", translation: \"Quand reviens-tu ?\", note: \"Nǐ shénme shíhou huílai? 回来 : retour vers le lieu où l’on parle.\" },",
+      "replace": "        { text: \"你什么时候回来？\", translation: \"Quand reviens-tu ?\", note: \"Nǐ shénme shíhou huílái? 回来 huílái décrit un retour vers le lieu de référence.\" },"
+    },
+    {
+      "id": "zh-b1-directional",
+      "field": "exercises[3].hint",
+      "find": "          hint: \"loin de moi\",",
+      "replace": "          hint: \"Un caractère indiquant un mouvement qui s’éloigne.\","
+    },
+    {
+      "id": "zh-b1-ba",
+      "field": "rule[0]",
+      "find": "        \"La construction 把 (bǎ) déplace l’objet avant le verbe pour dire ce qu’on lui fait : sujet + 把 + objet + verbe + complément. 请把门关上 (qǐng bǎ mén guān shang, ferme la porte). 我把手机放在桌子上了 (wǒ bǎ shǒujī fàng zài zhuōzi shang le, j’ai posé mon téléphone sur la table).\",",
+      "replace": "        \"Avec 把 bǎ, place l’objet avant le verbe pour dire ce qui lui arrive : 请把门关上 qǐng bǎ mén guānshang (« ferme la porte, s’il te plaît »). La construction suit l’ordre sujet + 把 bǎ + objet + groupe verbal.\","
+    },
+    {
+      "id": "zh-b1-ba",
+      "field": "rule[1]",
+      "find": "        \"Trois conditions : l’objet est précis et connu (这本书, 门, pas 一本书) ; le verbe agit sur lui ; le verbe est suivi d’un résultat (完, 上, 好), d’un lieu (在桌子上), d’une direction ou de 了. Un verbe nu est impossible : « 我把作业写 » est faux. Pas de 把 avec les verbes d’état ou de perception (有, 喜欢, 看见).\",",
+      "replace": "        \"Choisis généralement un objet identifiable dans la situation, par exemple 这本书 zhè běn shū. Un groupe comme 一杯水 yì bēi shuǐ peut aussi convenir. Le verbe porte souvent un résultat, un lieu ou une direction : 我把书放在桌子上 wǒ bǎ shū fàng zài zhuōzi shàng.\","
+    },
+    {
+      "id": "zh-b1-ba",
+      "field": "rule[2]",
+      "find": "        \"Négation et modaux se placent avant 把 : 我没把作业带来 (wǒ méi bǎ zuòyè dài lai), 你应该把门关上. Piège : le français place l’objet après le verbe (« fermer la porte ») ; avec 把, l’idée est de montrer l’effet de l’action sur l’objet. On le retrouve très souvent avec les compléments de résultat et de direction.\",",
+      "replace": "        \"Place la négation ou le modal avant 把 bǎ : 我没把作业带来 wǒ méi bǎ zuòyè dàilái (« je n’ai pas apporté mes devoirs »). Le verbe exprime ici un effet sur l’objet. Un verbe comme 喜欢 xǐhuan (« aimer ») ne suit pas ce modèle de traitement.\","
+    },
+    {
+      "id": "zh-b1-ba",
+      "field": "table.rows[0]",
+      "find": "          [\"Résultat\", \"我把作业写完了。\", \"Wǒ bǎ zuòyè xiě wán le.\", \"J’ai fini mes devoirs.\"],",
+      "replace": "          [\"Résultat\", \"我把作业写完了。\", \"Wǒ bǎ zuòyè xiěwán le.\", \"J’ai fini mes devoirs.\"],"
+    },
+    {
+      "id": "zh-b1-ba",
+      "field": "table.rows[1]",
+      "find": "          [\"Résultat 上\", \"请把门关上。\", \"Qǐng bǎ mén guān shang.\", \"Ferme la porte, s’il te plaît.\"],",
+      "replace": "          [\"Résultat 上\", \"请把门关上。\", \"Qǐng bǎ mén guānshang.\", \"Ferme la porte, s’il te plaît.\"],"
+    },
+    {
+      "id": "zh-b1-ba",
+      "field": "table.rows[2]",
+      "find": "          [\"Lieu 在\", \"他把书放在桌子上。\", \"Tā bǎ shū fàng zài zhuōzi shang.\", \"Il pose le livre sur la table.\"],",
+      "replace": "          [\"Lieu 在\", \"他把书放在桌子上。\", \"Tā bǎ shū fàng zài zhuōzi shàng.\", \"Il pose le livre sur la table.\"],"
+    },
+    {
+      "id": "zh-b1-ba",
+      "field": "table.rows[3]",
+      "find": "          [\"Négation\", \"他没把钥匙带来。\", \"Tā méi bǎ yàoshi dài lai.\", \"Il n’a pas apporté la clé.\"],",
+      "replace": "          [\"Négation\", \"他没把钥匙带来。\", \"Tā méi bǎ yàoshi dàilái.\", \"Il n’a pas apporté la clé.\"],"
+    },
+    {
+      "id": "zh-b1-ba",
+      "field": "examples[0]",
+      "find": "        { text: \"请把门关上。\", translation: \"Ferme la porte, s’il te plaît.\", note: \"Qǐng bǎ mén guān shang. 关上 est le résultat obligatoire.\" },",
+      "replace": "        { text: \"请把门关上。\", translation: \"Ferme la porte, s’il te plaît.\", note: \"Qǐng bǎ mén guānshang. 上 shang marque ici le résultat « fermé ».\" },"
+    },
+    {
+      "id": "zh-b1-ba",
+      "field": "examples[1]",
+      "find": "        { text: \"我把手机放在桌子上了。\", translation: \"J’ai posé mon téléphone sur la table.\", note: \"Wǒ bǎ shǒujī fàng zài zhuōzi shang le. Lieu après le verbe.\" },",
+      "replace": "        { text: \"我把手机放在桌子上了。\", translation: \"J’ai posé mon téléphone sur la table.\", note: \"Wǒ bǎ shǒujī fàng zài zhuōzi shàng le. Le lieu vient ici après le verbe 放 fàng.\" },"
+    },
+    {
+      "id": "zh-b1-ba",
+      "field": "examples[2]",
+      "find": "        { text: \"你把作业做完了吗？\", translation: \"As-tu fini tes devoirs ?\", note: \"Nǐ bǎ zuòyè zuò wán le ma? 完 : résultat.\" },",
+      "replace": "        { text: \"你把作业做完了吗？\", translation: \"As-tu fini tes devoirs ?\", note: \"Nǐ bǎ zuòyè zuòwán le ma? 完 wán indique que l’action est terminée.\" },"
+    },
+    {
+      "id": "zh-b1-ba",
+      "field": "examples[3]",
+      "find": "        { text: \"他没把钥匙带来。\", translation: \"Il n’a pas apporté la clé.\", note: \"Tā méi bǎ yàoshi dài lai. 没 se place avant 把.\" },",
+      "replace": "        { text: \"他没把钥匙带来。\", translation: \"Il n’a pas apporté la clé.\", note: \"Tā méi bǎ yàoshi dàilái. 没 méi précède 把 bǎ.\" },"
+    },
+    {
+      "id": "zh-b1-ba",
+      "field": "exercises[2].hint",
+      "find": "          answers: [\"把\"],",
+      "replace": "          hint: \"Marque de l’objet enseignée dans cette fiche.\",\n          answers: [\"把\"],"
+    },
+    {
+      "id": "zh-b1-bei",
+      "field": "rule[0]",
+      "find": "        \"Le passif avec 被 (bèi) suit le schéma : sujet (ce qui subit) + 被 + agent (facultatif) + verbe + complément : 蛋糕被弟弟吃完了 (dàngāo bèi dìdi chī wán le, le gâteau a été mangé par mon frère). Sans agent : 窗户被打破了 (chuānghu bèi dǎpò le, la fenêtre a été cassée). À l’oral, 让 (ràng) et 叫 (jiào) remplacent 被, mais l’agent est alors obligatoire.\",",
+      "replace": "        \"Dans le passif, le sujet subit l’action. Après 被 bèi, tu peux nommer l’agent : 蛋糕被弟弟吃完了 dàngāo bèi dìdi chīwán le. Tu peux aussi l’omettre : 窗户被打破了 chuānghu bèi dǎpò le. À l’oral, 让 ràng et 叫 jiào sont possibles avec un agent exprimé.\","
+    },
+    {
+      "id": "zh-b1-bei",
+      "field": "rule[1]",
+      "find": "        \"Comme pour 把, le verbe doit être suivi d’un complément ou de 了 : « 蛋糕被吃 » est faux. Négation avant 被 : 我的伞没被拿走 (wǒ de sǎn méi bèi názǒu). On l’emploie souvent pour un événement fâcheux ou inattendu, bien que l’usage se soit élargi.\",",
+      "replace": "        \"Le groupe verbal comporte souvent un résultat ou 了 le. Place la négation avant 被 bèi : 我的伞没被拿走 wǒ de sǎn méi bèi názǒu. Le passif marqué peut aussi décrire un événement positif : 他被老师表扬了 tā bèi lǎoshī biǎoyáng le (« le professeur l’a félicité »).\","
+    },
+    {
+      "id": "zh-b1-bei",
+      "field": "rule[2]",
+      "find": "        \"Piège : le français utilise beaucoup le passif (« le repas est préparé »). Le chinois préfère le plus souvent une phrase sans marque, où le sujet est interprété comme celui qui subit : 饭已经做好了 (fàn yǐjīng zuò hǎo le, le repas est prêt). N’ajoute pas 被 par réflexe pour traduire « être + participe ».\",",
+      "replace": "        \"Le résultat peut aussi se dire sans marque de passif : 饭已经做好了 fàn yǐjīng zuòhǎo le (« le repas est déjà prêt »). Quand le français emploie « être + participe », demande-toi si tu veux décrire le résultat ou raconter l’action subie.\","
+    },
+    {
+      "id": "zh-b1-bei",
+      "field": "table.rows[0]",
+      "find": "          [\"被 + agent\", \"蛋糕被弟弟吃完了。\", \"Dàngāo bèi dìdi chī wán le.\", \"Le gâteau a été mangé par mon frère.\"],",
+      "replace": "          [\"被 + agent\", \"蛋糕被弟弟吃完了。\", \"Dàngāo bèi dìdi chīwán le.\", \"Le petit frère a fini tout le gâteau.\"],"
+    },
+    {
+      "id": "zh-b1-bei",
+      "field": "table.rows[3]",
+      "find": "          [\"Sans marque\", \"饭做好了。\", \"Fàn zuò hǎo le.\", \"Le repas est prêt.\"],",
+      "replace": "          [\"Sans marque\", \"饭做好了。\", \"Fàn zuòhǎo le.\", \"Le repas est prêt.\"],"
+    },
+    {
+      "id": "zh-b1-bei",
+      "field": "examples[0]",
+      "find": "        { text: \"蛋糕被弟弟吃完了。\", translation: \"Le gâteau a été mangé par mon petit frère.\", note: \"Dàngāo bèi dìdi chī wán le. 被 + agent + verbe + résultat.\" },",
+      "replace": "        { text: \"蛋糕被弟弟吃完了。\", translation: \"Mon petit frère a mangé tout le gâteau.\", note: \"Dàngāo bèi dìdi chīwán le. Après 被 bèi, 弟弟 dìdi est l’agent.\" },"
+    },
+    {
+      "id": "zh-b1-bei",
+      "field": "examples[1]",
+      "find": "        { text: \"我的自行车被借走了。\", translation: \"Mon vélo a été emprunté.\", note: \"Wǒ de zìxíngchē bèi jiè zǒu le. Agent omis.\" },",
+      "replace": "        { text: \"我的自行车被借走了。\", translation: \"Mon vélo a été emprunté.\", note: \"Wǒ de zìxíngchē bèi jièzǒu le. L’agent est omis après 被 bèi.\" },"
+    },
+    {
+      "id": "zh-b1-bei",
+      "field": "examples[2]",
+      "find": "        { text: \"饭已经做好了。\", translation: \"Le repas est déjà prêt.\", note: \"Fàn yǐjīng zuò hǎo le. Pas de 被 pour un fait neutre.\" },",
+      "replace": "        { text: \"饭已经做好了。\", translation: \"Le repas est déjà prêt.\", note: \"Fàn yǐjīng zuòhǎo le. Le résultat suffit ici. La phrase n’a pas besoin de 被 bèi.\" },"
+    },
+    {
+      "id": "zh-b1-bei",
+      "field": "examples[3]",
+      "find": "        { text: \"我的伞没被拿走。\", translation: \"Mon parapluie n’a pas été pris.\", note: \"Wǒ de sǎn méi bèi názǒu. 没 avant 被.\" },",
+      "replace": "        { text: \"我的伞没被拿走。\", translation: \"Mon parapluie n’a pas été pris.\", note: \"Wǒ de sǎn méi bèi názǒu. 没 méi précède 被 bèi.\" },"
+    },
+    {
+      "id": "zh-b1-bei",
+      "field": "exercises[1].explanation",
+      "find": "          explanation: \"Pour un fait neutre, le chinois n’utilise pas 被 : 晚饭已经做好了 (le dîner est prêt).\",",
+      "replace": "          explanation: \"好 indique ici que la préparation a abouti. 晚饭已经做好了 veut dire que le dîner est prêt.\","
+    },
+    {
+      "id": "zh-b1-bei",
+      "field": "exercises[2].hint",
+      "find": "          answers: [\"被\"],",
+      "replace": "          hint: \"Marque de la fiche qui peut s’employer sans agent.\",\n          answers: [\"被\"],"
+    },
+    {
+      "id": "zh-b1-bei",
+      "field": "exercises[2].explanation",
+      "find": "          explanation: \"L’agent n’est pas mentionné : seul 被 est possible (让 et 叫 exigent un agent).\",",
+      "replace": "          explanation: \"Parmi les marques de cette fiche, 被 peut s’employer sans agent. 让 et 叫 demandent un agent exprimé.\","
+    },
+    {
+      "id": "zh-b1-bei",
+      "field": "exercises[3].instruction",
+      "find": "          instruction: \"Mets la phrase au passif avec 被 (le gâteau a été mangé par mon frère).\",",
+      "replace": "          instruction: \"Mets la phrase au passif avec l’une des trois marques de la fiche. Garde le petit frère comme agent.\","
+    },
+    {
+      "id": "zh-b1-degree-de",
+      "field": "rule[0]",
+      "find": "        \"Pour qualifier la manière dont une action est faite, le chinois place l’appréciation après le verbe, introduite par 得 (de) : 他说得很好 (tā shuō de hěn hǎo, il parle bien), 她跑得很快 (tā pǎo de hěn kuài, elle court vite). On n’emploie pas d’adverbe direct comme en français.\",",
+      "replace": "        \"Pour apprécier la manière ou le degré d’une action, tu peux placer 得 de après le verbe : 他说得很好 tā shuō de hěn hǎo (« il parle bien »), 她跑得很快 tā pǎo de hěn kuài (« elle court vite »).\","
+    },
+    {
+      "id": "zh-b1-degree-de",
+      "field": "rule[1]",
+      "find": "        \"Si le verbe a un objet, on répète le verbe ou on place l’objet avant : 他说汉语说得很好 ou 他汉语说得很好 (tā Hànyǔ shuō de hěn hǎo). Négation : 说得不好 (shuō de bù hǎo). Question : 他说得怎么样？ (tā shuō de zěnmeyàng ?). L’adjectif est souvent précédé de 很, 太, 真…\",",
+      "replace": "        \"Avec un objet, tu peux répéter le verbe : 他说汉语说得很好 tā shuō Hànyǔ shuō de hěn hǎo. Tu peux aussi placer l’objet avant le verbe : 他汉语说得很好 tā Hànyǔ shuō de hěn hǎo. Compare 说得不好 shuō de bù hǎo et 他说得怎么样？ tā shuō de zěnmeyàng?\","
+    },
+    {
+      "id": "zh-b1-degree-de",
+      "field": "rule[2]",
+      "find": "        \"Piège : trois mots se prononcent de, mais s’écrivent différemment : 的 (devant un nom : 我的书), 得 (après un verbe : 说得好), 地 (devant un verbe pour un adverbe : 高兴地说). Ne confonds pas 的 et 得, et ne place pas l’adjectif avant le verbe : « 他很好说汉语 » est faux.\",",
+      "replace": "        \"Compare trois emplois de la syllabe de : 我的书 wǒ de shū (的 de relie la description au nom), 说得好 shuō de hǎo (得 de introduit le complément du verbe) et 高兴地说 gāoxìng de shuō (地 de introduit ici un modificateur devant le verbe).\","
+    },
+    {
+      "id": "zh-b1-degree-de",
+      "field": "examples[0]",
+      "find": "        { text: \"她唱得很好。\", translation: \"Elle chante très bien.\", note: \"Tā chàng de hěn hǎo. 得 relie le verbe à l’appréciation.\" },",
+      "replace": "        { text: \"她唱得很好。\", translation: \"Elle chante bien.\", note: \"Tā chàng de hěn hǎo. 得 de relie l’action à l’appréciation.\" },"
+    },
+    {
+      "id": "zh-b1-degree-de",
+      "field": "examples[3]",
+      "find": "        { text: \"你写字写得真漂亮！\", translation: \"Tu écris vraiment joliment !\", note: \"Nǐ xiě zì xiě de zhēn piàoliang! Verbe répété devant l’objet 字.\" },",
+      "replace": "        { text: \"你写字写得真漂亮！\", translation: \"Tu écris vraiment joliment !\", note: \"Nǐ xiě zì xiě de zhēn piàoliang! Le verbe 写 xiě est répété après l’objet 字 zì.\" },"
+    },
+    {
+      "id": "zh-b1-degree-de",
+      "field": "exercises[2].explanation",
+      "find": "          explanation: \"On répète le verbe devant l’objet, puis 得 introduit le degré : 唱得不好.\",",
+      "replace": "          explanation: \"On répète 唱 après l’objet 歌, puis 得 introduit le complément de degré.\","
+    },
+    {
+      "id": "zh-b1-degree-de",
+      "field": "exercises[3].instruction",
+      "find": "          instruction: \"Mets la phrase à la forme négative.\",\n          source: \"她跳得很好。\",",
+      "replace": "          instruction: \"Garde la structure avec 得 et remplace 很好 par la négation simple de 好.\",\n          source: \"她跳得很好。\","
+    },
+    {
+      "id": "zh-b1-connectors",
+      "field": "rule[0]",
+      "find": "        \"Le chinois emploie volontiers les connecteurs par paires. 因为…所以… (yīnwèi… suǒyǐ…) : parce que… donc. On peut avoir les deux, ce que le français ne fait pas : 因为下雨，所以我不去 (yīnwèi xià yǔ, suǒyǐ wǒ bú qù). On peut aussi n’en garder qu’un seul, ou faire suivre la conséquence de sa cause : 我不去，因为下雨。\",",
+      "replace": "        \"Pour une cause suivie de sa conséquence, on peut associer 因为 yīnwèi et 所以 suǒyǐ : 因为下雨，所以我不去 yīnwèi xià yǔ, suǒyǐ wǒ bú qù. La cause peut aussi venir après : 我不去，因为下雨 wǒ bú qù, yīnwèi xià yǔ.\","
+    },
+    {
+      "id": "zh-b1-connectors",
+      "field": "rule[1]",
+      "find": "        \"虽然…但是… (suīrán… dànshì…) : bien que… mais. Là où le français interdit « bien que… mais », le chinois exige 但是 (ou 可是) dans la seconde partie : 虽然他很忙，但是每天都运动 (suīrán tā hěn máng, dànshì měi tiān dōu yùndòng). 如果…就… (rúguǒ… jiù…) : si… alors ; 就 se place devant le verbe de la conséquence : 如果你有时间，我们就一起去.\",",
+      "replace": "        \"Pour la concession, on peut employer 虽然 suīrán avec 但是 dànshì ou 可是 kěshì. La seconde marque est facultative : 虽然很贵，我还是买了 suīrán hěn guì, wǒ háishi mǎi le (« c’était cher, mais je l’ai acheté quand même »).\","
+    },
+    {
+      "id": "zh-b1-connectors",
+      "field": "rule[2]",
+      "find": "        \"Piège : après 虽然, la phrase paraît incomplète sans 但是 (ou 可是) dans la seconde partie, alors que le français dit seulement « bien que… ». De même, 就 de 如果…就 se place après le sujet et devant le verbe, pas en tête de proposition.\",",
+      "replace": "        \"Pour une condition, emploie 如果 rúguǒ et, dans la conséquence, éventuellement 就 jiù : 如果你有时间，我们就一起去 rúguǒ nǐ yǒu shíjiān, wǒmen jiù yìqǐ qù. Lorsque la conséquence a un sujet exprimé, 就 jiù vient après ce sujet.\","
+    },
+    {
+      "id": "zh-b1-connectors",
+      "field": "examples[0]",
+      "find": "        { text: \"因为今天很冷，所以我不想出去。\", translation: \"Comme il fait très froid aujourd’hui, je n’ai pas envie de sortir.\", note: \"Yīnwèi jīntiān hěn lěng, suǒyǐ wǒ bù xiǎng chūqù. Cause puis conséquence.\" },",
+      "replace": "        { text: \"因为今天很冷，所以我不想出去。\", translation: \"Comme il fait très froid aujourd’hui, je n’ai pas envie de sortir.\", note: \"Yīnwèi jīntiān hěn lěng, suǒyǐ wǒ bù xiǎng chūqù. 因为 yīnwèi introduit la cause et 所以 suǒyǐ la conséquence.\" },"
+    },
+    {
+      "id": "zh-b1-connectors",
+      "field": "examples[1]",
+      "find": "        { text: \"虽然他很忙，但是每天都运动。\", translation: \"Bien qu’il soit très occupé, il fait du sport tous les jours.\", note: \"Suīrán tā hěn máng, dànshì měi tiān dōu yùndòng. 但是 est requis.\" },",
+      "replace": "        { text: \"虽然他很忙，但是每天都运动。\", translation: \"Bien qu’il soit très occupé, il fait du sport tous les jours.\", note: \"Suīrán tā hěn máng, dànshì měi tiān dōu yùndòng. 但是 dànshì rend le contraste explicite. La construction peut aussi s’en passer.\" },"
+    },
+    {
+      "id": "zh-b1-connectors",
+      "field": "examples[2]",
+      "find": "        { text: \"如果你有时间，我们就一起去。\", translation: \"Si tu as le temps, nous irons ensemble.\", note: \"Rúguǒ nǐ yǒu shíjiān, wǒmen jiù yìqǐ qù. 就 devant le verbe de la conséquence.\" },",
+      "replace": "        { text: \"如果你有时间，我们就一起去。\", translation: \"Si tu as le temps, nous irons ensemble.\", note: \"Rúguǒ nǐ yǒu shíjiān, wǒmen jiù yìqǐ qù. 就 jiù vient ici après le sujet 我们 wǒmen.\" },"
+    },
+    {
+      "id": "zh-b1-connectors",
+      "field": "exercises[0].explanation",
+      "find": "          explanation: \"Après 虽然 (bien que), la seconde partie commence par 但是 (mais) : 虽然…但是…\",",
+      "replace": "          explanation: \"但是 rend explicite le contraste avec la proposition en 虽然. Il convient parmi les trois options.\","
+    },
+    {
+      "id": "zh-b1-connectors",
+      "field": "exercises[2].explanation",
+      "find": "          explanation: \"Dans 如果…就…, 就 se place dans la seconde proposition, juste devant le verbe : 我们就去公园.\",",
+      "replace": "          explanation: \"就 marque ici la conséquence et vient après le sujet 我们.\","
+    },
+    {
+      "id": "zh-b1-connectors",
+      "field": "exercises[3].hint",
+      "find": "          answers: [\"所以\"],",
+      "replace": "          hint: \"Complète la paire cause–conséquence enseignée ici.\",\n          answers: [\"所以\"],"
+    },
+    {
+      "id": "zh-b1-connectors",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Ajoute 如果 et 就 (si… alors…).\",",
+      "replace": "          instruction: \"Ajoute seulement 如果 et 就. Garde l’ordre, les autres mots et la virgule chinoise.\","
+    }
+  ]
+}

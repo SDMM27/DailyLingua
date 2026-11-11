@@ -2,7 +2,7 @@ import type { GrammarCourse } from "@/lib/schemas/grammar";
 
 export const nlCourse = {
   language: "nl",
-  version: "2026-10-25",
+  version: "2026-11-09",
   points: [
     {
       id: "nl-a1-articles",
@@ -10,8 +10,8 @@ export const nlCourse = {
       title: "Articles : de, het et een",
       summary: "Choisir entre de et het pour l’article défini, et employer een pour l’indéfini.",
       rule: [
-        "Le néerlandais a deux articles définis : de pour les noms « de-woorden » (masculins et féminins confondus) et het pour les « het-woorden » (neutres). Au pluriel, c’est toujours de. L’article indéfini est een pour tous les noms, et il n’a pas de pluriel.",
-        "Le genre ne suit pas le français : het huis (la maison) est neutre, de tafel (la table) et de man (l’homme) prennent de. Apprends donc chaque nom avec son article. Quelques repères : les diminutifs en -je sont toujours des het-woorden (het meisje, het huisje).",
+        "Le néerlandais a deux articles définis : de pour les noms « de-woorden » (masculins et féminins confondus) et het pour les « het-woorden » (neutres). Au pluriel, c’est toujours de. L’article indéfini est een pour tous les noms, et il n’a pas de pluriel : là où le français dit « des livres », le néerlandais met le nom seul (boeken).",
+        "Le genre ne suit pas le français : het huis (la maison) est neutre, de tafel (la table) et de man (l’homme) prennent de. Apprends donc chaque nom avec son article. Un repère sûr : les diminutifs en -je sont toujours des het-woorden (het meisje, het huisje).",
         "Piège pour un francophone : il n’y a pas d’article féminin distinct. Ne cherche pas « le / la » : demande-toi seulement si le nom est un de-woord ou un het-woord.",
       ],
       table: {
@@ -52,13 +52,14 @@ export const nlCourse = {
         {
           type: "transform",
           instruction: "Remplace l’article défini par l’article indéfini.",
-          source: "De man is aardig.",
-          answers: ["Een man is aardig."],
+          source: "Ik zie de man.",
+          answers: ["Ik zie een man."],
           explanation: "Un seul article indéfini existe : de man devient een man.",
         },
       ],
       categories: ["function_word", "agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "nl-a1-present",
@@ -67,7 +68,7 @@ export const nlCourse = {
       summary: "Conjuguer un verbe régulier au présent et employer zijn (être) et hebben (avoir).",
       rule: [
         "Au présent, tu retires -en de l’infinitif pour obtenir le radical, puis tu ajoutes -t pour jij, u, hij, zij et het. Exemple : werken → ik werk, jij werkt, hij werkt, wij werken, jullie werken, zij werken. Pas de terminaison à la 1re personne du singulier. Le présent sert aussi pour « je suis en train de ».",
-        "L’orthographe du radical s’adapte : maken → ik maak (la voyelle double reste ouverte), blijven → ik blijf. Zijn et hebben sont irréguliers, à connaître par cœur.",
+        "L’orthographe du radical s’adapte : maken → ik maak (la voyelle longue s’écrit double quand la syllabe se ferme), blijven → ik blijf (v devient f), lezen → ik lees (z devient s). Si le radical finit déjà par -t, on n’ajoute rien : zitten → ik zit, hij zit. Zijn et hebben sont irréguliers, à connaître par cœur.",
         "Pièges : n’oublie pas le -t à jij werkt (en français, la 2e personne prend -s). Pour l’âge, le néerlandais utilise zijn, pas hebben : ik ben 25 jaar (et non « ik heb 25 jaar »).",
       ],
       table: {
@@ -76,7 +77,7 @@ export const nlCourse = {
         rows: [
           ["ik", "werk", "ben", "heb"],
           ["jij / je", "werkt", "bent", "hebt"],
-          ["u", "werkt", "bent", "hebt"],
+          ["u", "werkt", "bent", "hebt / heeft"],
           ["hij / zij / het", "werkt", "is", "heeft"],
           ["wij / we", "werken", "zijn", "hebben"],
           ["jullie", "werken", "zijn", "hebben"],
@@ -101,7 +102,7 @@ export const nlCourse = {
           prompt: "Jullie ___ vandaag vrij.",
           options: ["hebben", "hebt", "heeft"],
           answer: 0,
-          explanation: "Avec jullie (vous, pluriel), la forme est celle de l’infinitif : jullie hebben. Hebt va avec jij et u.",
+          explanation: "Avec jullie (vous, pluriel), la forme est celle de l’infinitif : jullie hebben. Hebt va avec jij et u (u heeft se dit aussi).",
         },
         {
           type: "fill",
@@ -112,7 +113,7 @@ export const nlCourse = {
         },
         {
           type: "fill",
-          prompt: "Ik ___ in een kantoor.",
+          prompt: "Ik ___ op een kantoor.",
           hint: "werken",
           answers: ["werk"],
           explanation: "À ik, on garde le radical seul : ik werk.",
@@ -127,6 +128,7 @@ export const nlCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "nl-a1-word-order",
@@ -137,7 +139,7 @@ export const nlCourse = {
         "Dans une phrase principale, le verbe conjugué est toujours en deuxième position (la deuxième « case », pas forcément le deuxième mot) : Ik werk vandaag in Utrecht.",
         "Si tu mets un autre élément en premier (temps ou lieu), le sujet passe après le verbe : Vandaag werk ik in Utrecht. Le français garde le sujet devant (« Aujourd’hui, je travaille ») : c’est le piège classique.",
         "Question avec mot interrogatif (waar, wanneer, wat, wie, hoe) : mot interrogatif, puis verbe. Question oui / non : le verbe vient en tête, sans équivalent de « est-ce que ». Avec jij, le -t disparaît après le verbe : Werk jij ? et Werk je ? (jamais « werkt je »).",
-        "Les conjonctions en, maar, of, want ne changent pas l’ordre.",
+        "Les conjonctions en (et), maar (mais), of (ou) et want (car) ne changent pas l’ordre.",
       ],
       table: {
         caption: "Le verbe reste en deuxième position",
@@ -147,7 +149,7 @@ export const nlCourse = {
           ["Vandaag", "werk", "ik in Utrecht."],
           ["In Utrecht", "werk", "ik vandaag."],
           ["Waar", "werk", "je vandaag?"],
-          ["Werk", "je", "vandaag in Utrecht?"],
+          ["—", "Werk", "je vandaag in Utrecht?"],
         ],
       },
       examples: [
@@ -194,6 +196,7 @@ export const nlCourse = {
       ],
       categories: ["word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "nl-a1-negation",
@@ -260,6 +263,7 @@ export const nlCourse = {
       ],
       categories: ["function_word", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "nl-a1-plural",
@@ -267,8 +271,8 @@ export const nlCourse = {
       title: "Pluriel des noms : -en et -s",
       summary: "Former le pluriel d’un nom avec -en, -s ou 's, et adapter l’orthographe.",
       rule: [
-        "La plupart des noms prennent -en au pluriel : boek → boeken. Les noms terminés par -el, -er, -em, -en ou un diminutif en -je prennent -s : tafel → tafels, kamer → kamers, meisje → meisjes.",
-        "Les noms terminés par une voyelle longue a, o, u, i ou y prennent 's avec apostrophe : auto → auto's, taxi → taxi's. Quelques mots font -eren : kind → kinderen, ei → eieren.",
+        "La plupart des noms prennent -en au pluriel : boek → boeken. Les noms terminés par -el, -er, -em, -en, par un -e muet ou par un diminutif en -je prennent -s : tafel → tafels, kamer → kamers, tante → tantes, meisje → meisjes.",
+        "Les noms terminés par la voyelle a, o, u, i ou y prennent 's avec apostrophe : auto → auto's, taxi → taxi's. Quelques mots font -eren : kind → kinderen, ei → eieren.",
         "L’orthographe suit la prononciation : huis → huizen (s → z), brief → brieven (f → v), maan → manen (une seule voyelle devant une seule consonne), man → mannen (consonne doublée après une voyelle courte). Piège : le français met -s presque partout, le néerlandais surtout -en.",
       ],
       table: {
@@ -330,6 +334,7 @@ export const nlCourse = {
       ],
       categories: ["agreement", "spelling"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "nl-a1-pronouns-possessives",
@@ -337,7 +342,7 @@ export const nlCourse = {
       title: "Pronoms personnels et possessifs : je, u, mijn, zijn, haar",
       summary: "Choisir le bon pronom (je / jij, u, jullie) et le possessif qui s’accorde avec le possesseur.",
       rule: [
-        "Pour « tu » on dit jij (accentué) ou je (non accentué). Pour « vous » de politesse, on dit u (verbe en -t, comme jij). Pour « vous » pluriel, on dit jullie. Ze, we et je sont les formes courtes de zij, wij et jij. En Flandre, on entend aussi gij / ge à l’oral : en néerlandais standard, utilise jij / je et u.",
+        "Pour « tu » on dit jij (accentué) ou je (non accentué). Pour « vous » de politesse, on dit u (verbe en -t, comme jij, mais le -t reste aussi dans la question : Werkt u ?). Pour « vous » pluriel, on dit jullie. Ze, we et je sont les formes courtes de zij, wij et jij. En Flandre, on entend aussi gij / ge à l’oral : en néerlandais standard, utilise jij / je et u.",
         "Le possessif s’accorde avec le possesseur, pas avec l’objet possédé (contrairement au français) : zijn zus (sa sœur à lui), haar broer (son frère à elle). Mijn, jouw / je, zijn, haar, uw, jullie, hun ne varient pas avec le nom.",
         "Seul ons change : ons devant un het-woord (ons huis), onze devant un de-woord ou un pluriel (onze auto, onze kinderen).",
       ],
@@ -371,7 +376,7 @@ export const nlCourse = {
         },
         {
           type: "choose",
-          prompt: "Wij hebben ___ huis verkocht.",
+          prompt: "Wij verkopen ___ huis.",
           options: ["onze", "ons", "wij"],
           answer: 1,
           explanation: "Huis est un het-woord : ons huis.",
@@ -400,6 +405,7 @@ export const nlCourse = {
       ],
       categories: ["function_word", "agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "nl-a2-separable",
@@ -408,7 +414,7 @@ export const nlCourse = {
       summary: "Détacher la particule en fin de phrase et la garder collée à l’infinitif.",
       rule: [
         "Certains verbes ont une particule (op-, mee-, aan-, terug-, in-, uit-…). Dans une phrase principale, le verbe se conjugue en 2e position et la particule part tout à la fin : Ik sta om zeven uur op.",
-        "À l’infinitif, avec un modal, ou dans une subordonnée, le verbe reste d’un bloc : Ik moet vroeg opstaan. Omdat ik vroeg opsta... Dans une question : Sta je vroeg op ?",
+        "À l’infinitif, avec un modal, ou dans une subordonnée, le verbe reste d’un bloc : Ik moet vroeg opstaan ; … omdat ik vroeg opsta. Dans une question : Sta je vroeg op ?",
         "Piège : les verbes en be-, ver-, ont-, her-, ge- ne se séparent jamais (bezoeken → ik bezoek, vergeten → ik vergeet). Le français n’a pas ce mécanisme : place bien la particule après tous les compléments.",
       ],
       table: {
@@ -417,7 +423,7 @@ export const nlCourse = {
         rows: [
           ["opstaan", "Ik sta op.", "Ik moet opstaan."],
           ["meenemen", "Ik neem het mee.", "Ik wil het meenemen."],
-          ["aankomen", "Hij komt aan.", "Hij kan aankomen."],
+          ["aankomen", "Hij komt om negen uur aan.", "Hij moet om negen uur aankomen."],
           ["terugkomen", "Zij komt terug.", "Zij moet terugkomen."],
           ["opbellen", "Ik bel hem op.", "Ik ga hem opbellen."],
         ],
@@ -466,16 +472,17 @@ export const nlCourse = {
       ],
       categories: ["verb", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "nl-a2-modals",
       level: "A2",
-      title: "Verbes de modalité : kunnen, willen, moeten, mogen",
+      title: "Verbes de modalité : kunnen, willen, moeten, mogen, zullen",
       summary: "Dire ce qu’on peut, veut, doit ou a le droit de faire, avec l’infinitif en fin de phrase.",
       rule: [
-        "Kunnen (pouvoir, être capable de), willen (vouloir), moeten (devoir) et mogen (avoir la permission) se conjuguent au singulier sans -t pour ik et hij : ik kan, ik wil, ik moet, ik mag. L’infinitif de l’autre verbe va à la fin de la phrase, sans te ni préposition : Ik kan zwemmen.",
-        "Piège : « pouvoir » se traduit par kunnen pour une capacité ou une possibilité, mais par mogen pour une permission ou une interdiction (Hier mag je niet roken). Avec jij, kunnen et willen ont deux formes : jij kunt / kan, jij wilt / wil. Après le verbe, seule la forme courte s’emploie : Kun je ... ? Wil je ... ?",
-        "Pour une proposition polie, on utilise souvent kunnen : Kun je mij helpen ?",
+        "Kunnen (pouvoir, être capable de), willen (vouloir), moeten (devoir) et mogen (avoir la permission) sont irréguliers : ik et hij ont la même forme, sans -t ajouté (ik kan, hij kan ; ik mag, hij mag ; le t de moet appartient au radical). L’infinitif de l’autre verbe va à la fin de la phrase, sans te ni préposition : Ik kan zwemmen.",
+        "Piège : « pouvoir » se traduit par kunnen pour une capacité ou une possibilité, mais par mogen pour une permission ou une interdiction (Hier mag je niet roken). Avec jij, kunnen et willen ont deux formes : jij kunt / kan, jij wilt / wil. Quand je ou jij suit le verbe, kunt et wilt perdent leur -t : Kun je… ? Wil je… ? (Kan je… ? est aussi correct et très courant).",
+        "Pour une demande polie, on utilise souvent kunnen : Kun je mij helpen ? Zullen (ik / hij zal, jij zult / zal, wij zullen) sert à proposer : Zullen we gaan ? (on y va ?), et à promettre : Ik zal je helpen.",
       ],
       table: {
         caption: "Présent des verbes de modalité",
@@ -532,6 +539,7 @@ export const nlCourse = {
       ],
       categories: ["verb", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "nl-a2-perfectum",
@@ -540,8 +548,9 @@ export const nlCourse = {
       summary: "Raconter ce qui s’est passé avec hebben ou zijn et un participe en ge-.",
       rule: [
         "Le perfectum se forme avec hebben ou zijn au présent, et le participe passé à la fin de la phrase : Ik heb gewerkt. À l’oral, c’est le temps du récit au passé.",
-        "Verbes réguliers : ge- + radical + -t ou -d. On met -t si le radical finit par t, k, f, s, ch ou p (’t kofschip) : gewerkt, gemaakt ; sinon -d : gespeeld, gewoond. Verbes forts : ge- + radical modifié + -en (gegeten, gezien). Les verbes en be-, ver-, ont- n’ont pas de ge- : bezocht, vergeten. Avec une particule, ge- s’insère : opgestaan.",
-        "Zijn s’emploie avec les verbes de déplacement ou de changement d’état : gaan, komen, blijven, worden, ainsi que zijn lui-même. Piège : « j’ai été » se dit ik ben geweest (zijn), pas « ik heb geweest ».",
+        "Verbes réguliers : ge- + radical + -t ou -d. On met -t si le radical finit par t, k, f, s, ch ou p (’t kofschip) : gewerkt, gemaakt ; sinon -d : gespeeld, gewoond. Regarde l’infinitif : reizen → gereisd, leven → geleefd (-d, car z et v ne sont pas dans ’t kofschip).",
+        "Verbes forts : ge- + radical modifié + -en (gegeten, gezien). Les verbes en be-, ver-, ont- n’ont pas de ge- : bezocht, vergeten. Avec une particule, ge- s’insère : opgestaan.",
+        "Zijn s’emploie avec les verbes de changement de lieu ou d’état : gaan, komen, vertrekken, worden, ainsi qu’avec blijven et zijn lui-même. Les verbes de mouvement comme lopen, fietsen ou zwemmen prennent hebben, sauf quand une destination est donnée : ik heb gefietst, mais ik ben naar huis gefietst. Piège : « j’ai été » se dit ik ben geweest (zijn), pas « ik heb geweest ».",
       ],
       table: {
         caption: "Participes passés fréquents",
@@ -603,6 +612,7 @@ export const nlCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "nl-a2-imperfectum",
@@ -610,12 +620,12 @@ export const nlCourse = {
       title: "Prétérit : was, had, kon et les verbes en -de / -te",
       summary: "Employer l’imperfectum pour décrire le passé, avec les formes de zijn, hebben et des verbes courants.",
       rule: [
-        "Les verbes réguliers prennent -de ou -te (même règle ’t kofschip que pour le participe) au singulier et -den ou -ten au pluriel : werken → ik werkte, wij werkten ; spelen → ik speelde, wij speelden. Les verbes forts changent de voyelle : gaan → ging, komen → kwam, zien → zag.",
+        "Les verbes réguliers prennent -de ou -te (même règle ’t kofschip que pour le participe, avec la même exception : leven → leefde, reizen → reisde) au singulier et -den ou -ten au pluriel : werken → ik werkte, wij werkten ; spelen → ik speelde, wij speelden. Les verbes forts changent de voyelle : gaan → ging, komen → kwam, zien → zag.",
         "À toutes les personnes du singulier, la forme est la même (ik / jij / hij werkte). Zijn fait was / waren, hebben fait had / hadden. Modaux : kon, wilde, moest, mocht.",
         "Le néerlandais n’a pas de distinction entre imparfait et passé simple : l’imperfectum traduit les deux (ik was moe = j’étais fatigué). Dans la conversation, on l’emploie surtout pour zijn, hebben et les modaux ; pour les événements, on préfère le perfectum. Le récit écrit utilise l’imperfectum partout.",
       ],
       table: {
-        caption: "Imperfectum fréquents",
+        caption: "Formes fréquentes de l’imperfectum",
         headers: ["Infinitif", "ik / jij / hij", "wij / jullie / zij"],
         rows: [
           ["zijn", "was", "waren"],
@@ -674,6 +684,7 @@ export const nlCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "nl-a2-adjective-e",
@@ -681,7 +692,7 @@ export const nlCourse = {
       title: "Adjectif épithète : groot ou grote ?",
       summary: "Savoir quand l’adjectif devant le nom prend un -e et quand il reste invariable.",
       rule: [
-        "Devant un nom, l’adjectif prend presque toujours -e : de grote tafel, het grote huis, grote huizen. Il ne prend pas -e dans un seul cas : avec een (ou sans article) devant un het-woord singulier : een groot huis.",
+        "Devant un nom, l’adjectif prend presque toujours -e : de grote tafel, het grote huis, grote huizen. Il ne prend pas -e devant un het-woord singulier précédé de een, geen, elk, ieder, zo'n ou veel, ou sans article : een groot huis, geen groot huis, koud water.",
         "Après le verbe (attribut), l’adjectif ne varie jamais : De tafel is groot, het huis is groot.",
         "L’orthographe change avec le -e : groot → grote (une seule voyelle), wit → witte (consonne doublée). Piège : en français l’adjectif s’accorde en genre, ici l’accord ne dépend que de de / het et de l’article.",
       ],
@@ -739,6 +750,7 @@ export const nlCourse = {
       ],
       categories: ["agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "nl-a2-subordinate",
@@ -746,7 +758,7 @@ export const nlCourse = {
       title: "Subordonnées : dat, omdat, als, of",
       summary: "Construire une subordonnée avec le verbe conjugué rejeté à la fin.",
       rule: [
-        "Après dat (que), omdat (parce que), als (si, quand) ou of (si, pour une question indirecte), le verbe conjugué va à la fin de la subordonnée : Ik blijf thuis omdat ik ziek ben.",
+        "Après dat (que), omdat (parce que), als (si, quand) ou of (si, pour une question indirecte), le verbe conjugué va à la fin de la subordonnée : Ik blijf thuis omdat ik ziek ben. Pour « quand » au passé (un fait unique), on dit toen : Toen ik ziek was, bleef ik thuis.",
         "Quand la subordonnée ouvre la phrase, le verbe de la principale vient juste après (inversion) : Omdat ik ziek ben, blijf ik thuis. Avec un verbe à particule, la particule se recolle : omdat ik vroeg opsta.",
         "Piège : want (car) est une conjonction de coordination, qui ne change pas l’ordre : Ik blijf thuis, want ik ben ziek. Omdat et want ne sont pas interchangeables. Autre piège : n’emploie pas als pour « si » dans une question indirecte, c’est of.",
       ],
@@ -800,12 +812,13 @@ export const nlCourse = {
           type: "transform",
           instruction: "Relie les deux phrases avec omdat.",
           source: "Ik blijf thuis. Ik ben ziek.",
-          answers: ["Ik blijf thuis omdat ik ziek ben.", "Ik blijf thuis, omdat ik ziek ben.", "Omdat ik ziek ben, blijf ik thuis."],
+          answers: ["Ik blijf thuis omdat ik ziek ben.", "Ik blijf thuis, omdat ik ziek ben.", "Omdat ik ziek ben, blijf ik thuis.", "Omdat ik ziek ben blijf ik thuis."],
           explanation: "Après omdat, le verbe va à la fin ; si la subordonnée est en tête, la principale commence par son verbe.",
         },
       ],
       categories: ["word_order", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "nl-b1-er",
@@ -813,8 +826,8 @@ export const nlCourse = {
       title: "Le mot er : lieu, quantité, il y a",
       summary: "Employer er pour « y », « en » et « il y a », et dans erover, ervan.",
       rule: [
-        "Er a quatre emplois courants. Le lieu (= y, non accentué) : Ik woon er al jaren. L’existence (= il y a), avec un sujet indéfini : Er is een probleem. La quantité (= en) : Ik heb er twee. Avec une préposition : erover, ervan, ermee (= en parle, de cela, avec cela).",
-        "Piège : quand tu reprends un nom compté sans le répéter, le français dit « j’en ai deux », le néerlandais exige er : Ik heb er twee (jamais « ik heb twee » seul). Er se place après le verbe conjugué, avant le reste de la phrase.",
+        "Er a quatre emplois courants. Le lieu (= y, non accentué) : Ik woon er al jaren. L’existence (= il y a), avec un sujet indéfini : Er is een probleem. La quantité (= en) : Ik heb er twee. Avec une préposition, pour une chose : erover, ervan, ermee (= à ce sujet, de cela, avec cela).",
+        "Piège : quand tu reprends un nom compté sans le répéter, le français dit « j’en ai deux », le néerlandais exige er : Ik heb er twee (jamais « ik heb twee » seul). Er se place juste après le verbe conjugué, ou après le sujet qui le suit (Gisteren heb ik er twee gekocht). Avec une préposition, er et la préposition se séparent souvent : Ik heb er niets over gehoord.",
         "Pour un lieu accentué, on dit plutôt daar ou hier : Ik woon daar, niet hier.",
       ],
       table: {
@@ -859,7 +872,7 @@ export const nlCourse = {
           type: "fill",
           prompt: "Wat vind je ___?",
           hint: "er + van",
-          answers: ["ervan"],
+          answers: ["ervan", "daarvan"],
           explanation: "Er se soude à la préposition : ervan.",
         },
         {
@@ -872,6 +885,7 @@ export const nlCourse = {
       ],
       categories: ["function_word", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "nl-b1-om-te",
@@ -924,7 +938,7 @@ export const nlCourse = {
         {
           type: "fill",
           prompt: "Ik heb geen tijd ___ te koken.",
-          hint: "om",
+          hint: "mot qui accompagne te",
           answers: ["om"],
           explanation: "Après tijd, on emploie om ... te : geen tijd om te koken.",
         },
@@ -932,12 +946,13 @@ export const nlCourse = {
           type: "transform",
           instruction: "Combine les phrases avec om … te (verbe kopen).",
           source: "Ik ga naar de bakker. Ik koop brood.",
-          answers: ["Ik ga naar de bakker om brood te kopen."],
+          answers: ["Ik ga naar de bakker om brood te kopen.", "Om brood te kopen ga ik naar de bakker."],
           explanation: "Le but se forme avec om, le complément et te + infinitif à la fin.",
         },
       ],
       categories: ["function_word", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "nl-b1-relative",
@@ -964,7 +979,7 @@ export const nlCourse = {
       examples: [
         { text: "De man die naast mij woont, werkt bij de gemeente.", translation: "L’homme qui habite à côté de moi travaille à la mairie.", note: "De man est un de-woord : die." },
         { text: "Het boek dat ik lees, is interessant.", translation: "Le livre que je lis est intéressant.", note: "Het boek est un het-woord : dat." },
-        { text: "Dat is de pen waarmee ik schrijf.", translation: "C’est le stylo avec lequel j’écris.", note: "Waarmee = met + de pen." },
+        { text: "Dat is de pen waarmee ik schrijf.", translation: "C’est le stylo avec lequel j’écris.", note: "Waarmee = met + de pen (met devient mee après waar)." },
         { text: "Alles wat hij zegt, is waar.", translation: "Tout ce qu’il dit est vrai." },
       ],
       exercises: [
@@ -991,7 +1006,7 @@ export const nlCourse = {
         },
         {
           type: "fill",
-          prompt: "De kinderen ___ buiten spelen, zijn mijn buren.",
+          prompt: "De kinderen ___ buiten spelen, zijn van de buren.",
           hint: "pronom relatif",
           answers: ["die"],
           explanation: "Au pluriel, le pronom relatif est die.",
@@ -1006,6 +1021,7 @@ export const nlCourse = {
       ],
       categories: ["function_word", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "nl-b1-comparison",
@@ -1049,7 +1065,7 @@ export const nlCourse = {
           prompt: "Deze auto is ___ dan die auto.",
           options: ["duurder", "duur", "duurst"],
           answer: 0,
-          explanation: "Après dan, on attend un comparatif : duurder (avec -d après -r).",
+          explanation: "Devant dan, on attend un comparatif : duurder (avec -d après -r).",
         },
         {
           type: "choose",
@@ -1075,6 +1091,7 @@ export const nlCourse = {
       ],
       categories: ["agreement", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "nl-b1-passive",
@@ -1083,7 +1100,7 @@ export const nlCourse = {
       summary: "Décrire une action subie avec worden, et savoir quand utiliser zijn à la place.",
       rule: [
         "Le passif d’action se forme avec worden au présent (wordt / worden) ou à l’imperfectum (werd / werden), suivi du participe passé en fin de phrase : De brief wordt geschreven. De brief werd gisteren geschreven. L’agent est introduit par door : De brief wordt door Jan geschreven.",
-        "Au perfectum, on emploie zijn (sans worden) avec le participe : De brief is geschreven (la lettre a été écrite). Piège : au présent, de brief is geschreven décrit un résultat, pas une action en cours ; pour l’action, on dit wordt.",
+        "Au perfectum, on emploie zijn (sans worden ni geworden) avec le participe : De brief is geschreven (la lettre a été écrite). Piège : de brief is geschreven exprime une action terminée ou un résultat, jamais une action en cours ; pour l’action en cours, on dit wordt.",
         "Le néerlandais aime le passif impersonnel avec er (souvent sous-entendu) : In Nederland wordt veel gefietst (on fait beaucoup de vélo). Le français dirait plutôt « on ».",
       ],
       table: {
@@ -1141,6 +1158,7 @@ export const nlCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
     {
       id: "nl-b1-conditional",
@@ -1150,7 +1168,7 @@ export const nlCourse = {
       rule: [
         "Le conditionnel se forme avec zou (zouden au pluriel) + infinitif en fin de phrase : Ik zou graag een koffie willen. C’est le moyen de rendre une demande polie : Zou u het raam willen openen ?",
         "Pour une hypothèse irréelle, on utilise als + imperfectum dans la subordonnée, et zou + infinitif dans la principale : Als ik rijk was, zou ik een huis kopen. La structure est la même qu’en français (« si + imparfait, conditionnel »).",
-        "Piège : n’emploie jamais zou dans la subordonnée en als. Dis als ik rijk was, jamais « als ik zou zijn ». Pour un conseil, on utilise zou + moeten : Je zou naar de dokter moeten gaan.",
+        "À noter : contrairement au français, où le conditionnel est exclu après « si », le néerlandais admet zou dans la subordonnée : als ik rijk zou zijn est correct, mais als ik rijk was reste la forme la plus courante. Pour un conseil, on utilise zou + moeten : Je zou naar de dokter moeten gaan.",
       ],
       table: {
         caption: "Les emplois de zou",
@@ -1172,9 +1190,9 @@ export const nlCourse = {
         {
           type: "choose",
           prompt: "Als ik rijk ___, zou ik een groot huis kopen.",
-          options: ["zou zijn", "ben", "was"],
+          options: ["is", "ben", "was"],
           answer: 2,
-          explanation: "Dans la subordonnée en als, on emploie l’imperfectum : als ik rijk was.",
+          explanation: "Dans la subordonnée en als, on emploie l’imperfectum : als ik rijk was. Is ne va pas avec ik, et ben (présent) ne convient pas à une hypothèse irréelle.",
         },
         {
           type: "choose",
@@ -1194,8 +1212,8 @@ export const nlCourse = {
           type: "fill",
           prompt: "Als ik tijd ___, zou ik meer lezen.",
           hint: "hebben",
-          answers: ["had"],
-          explanation: "L’imperfectum de hebben est had.",
+          answers: ["had", "zou hebben"],
+          explanation: "L’imperfectum de hebben est had ; als ik tijd zou hebben est aussi correct.",
         },
         {
           type: "transform",
@@ -1207,6 +1225,7 @@ export const nlCourse = {
       ],
       categories: ["verb", "register"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-09", model: "claude-opus-5-5", rubric: "x0-2026-11-05" },
     },
   ],
 } satisfies GrammarCourse;

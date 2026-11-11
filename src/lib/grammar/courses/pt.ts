@@ -2,7 +2,7 @@ import type { GrammarCourse } from "@/lib/schemas/grammar";
 
 export const ptCourse = {
   language: "pt",
-  version: "2026-10-25",
+  version: "2026-11-10",
   points: [
     {
       id: "pt-a1-articles",
@@ -11,8 +11,8 @@ export const ptCourse = {
       summary: "Choisir l’article défini ou indéfini, former le pluriel et souder les prépositions à l’article (no, na, do, ao).",
       rule: [
         "Le portugais a deux genres, comme le français, et l’article s’accorde avec le nom : o (masculin), a (féminin), os et as au pluriel ; um, uma, uns, umas pour l’indéfini. Pas d’élision : o amigo, a amiga. L’article s’emploie aussi devant beaucoup de noms de pays : a França, o Brasil.",
-        "En général, les noms en -o sont masculins et ceux en -a féminins. Pièges : o dia, o mapa, o problema sont masculins ; a mão est féminin. Pluriel : -s après une voyelle (casa, casas), -es après -r ou -z (mulher, mulheres), -l devient -is (jornal, jornais), -m devient -ns (homem, homens).",
-        "Les prépositions se soudent à l’article : em + o = no, de + a = da, a + o = ao, a + a = à, por + o = pelo. C’est obligatoire : moro no Brasil, jamais « em o Brasil ». C’est un des pièges majeurs pour un francophone, qui n’a que au / du / des.",
+        "Souvent, les noms en -o sont masculins et les noms en -a féminins. Retiens o dia, o problema, a foto et a viagem (« le voyage »). Au pluriel, on ajoute souvent -s après une voyelle (casas) et -es après -r ou -z (mulheres, vozes). Jornal donne jornais, homem donne homens. Les mots en -il non accentué comme útil font leur pluriel en -eis : úteis.",
+        "Avec l’article défini, em, de, a et por se soudent à l’article : em + o = no, de + a = da, a + o = ao, a + a = à, por + o = pelo. On écrit moro no Brasil. Le français a lui aussi des contractions, comme « au », « aux », « du » et « des ».",
       ],
       table: {
         caption: "Articles et contractions",
@@ -28,7 +28,7 @@ export const ptCourse = {
       examples: [
         { text: "O problema é difícil.", translation: "Le problème est difficile.", note: "Problema se termine en -a mais il est masculin." },
         { text: "Moro no Brasil e trabalho na cidade.", translation: "J’habite au Brésil et je travaille en ville.", note: "em + o = no, em + a = na." },
-        { text: "Eu vou ao mercado com as colegas do trabalho.", translation: "Je vais au marché avec les collègues du travail.", note: "a + o = ao ; de + o = do." },
+        { text: "Eu vou ao mercado com as colegas do trabalho.", translation: "Je vais au marché avec mes collègues de travail.", note: "a + o = ao ; de + o = do." },
       ],
       exercises: [
         {
@@ -43,7 +43,7 @@ export const ptCourse = {
           prompt: "Há dois ___ na mesa.",
           hint: "jornal",
           answers: ["jornais"],
-          explanation: "Les noms en -l changent le -l en -is au pluriel : jornal, jornais.",
+          explanation: "Jornal a pour pluriel jornais. Le -l final est remplacé par -is dans ce mot.",
         },
         {
           type: "choose",
@@ -64,11 +64,12 @@ export const ptCourse = {
           instruction: "Mets la phrase au pluriel.",
           source: "O jornal é útil.",
           answers: ["Os jornais são úteis."],
-          explanation: "O jornal devient os jornais, le verbe passe à son pluriel (são) et l’adjectif en -l devient -is : úteis.",
+          explanation: "O jornal devient os jornais et é devient são. Dans útil, le groupe -il est non accentué et devient -eis au pluriel : úteis.",
         },
       ],
       categories: ["function_word", "agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pt-a1-ser-estar",
@@ -76,9 +77,9 @@ export const ptCourse = {
       title: "Ser, estar, ficar et tem / há : dire « être » et « il y a »",
       summary: "Choisir entre ser (identité, nature), estar (état), ficar (situation d’un lieu) et tem / há (existence).",
       rule: [
-        "Là où le français n’a que « être », le portugais a deux verbes. Ser dit qui ou ce qu’on est : identité, origine, profession, caractère, heure (sou francês, é médica, são três horas). Estar dit comment on est à un moment donné ou où se trouve une personne : estou em casa, está cansado.",
-        "Pour situer un lieu fixe (bâtiment, ville), on emploie plutôt ficar : o banco fica perto da estação. Piège : la soupe est froide se dit a sopa está fria (état du moment) ; ser fria décrirait sa nature.",
-        "Pour « il y a », on dit tem au Brésil à l’oral (na rua tem uma farmácia) et há au Portugal et à l’écrit (há uma farmácia na rua). Le verbe est invariable : tem / há dois bancos. Au Portugal, on emploie aussi tu és / estás ; au Brésil, você est le plus courant (você é / está).",
+        "Ser et estar se traduisent souvent par « être ». Ser sert notamment à donner l’identité, l’origine, la profession ou l’heure : sou francês, é médica, são três horas. Estar décrit souvent un état du moment ou indique où se trouve une personne : estou em casa, está cansado.",
+        "Pour situer un lieu fixe, ficar est fréquent : O banco fica perto da estação. Au Brésil, on entend aussi O banco é perto da estação. Pour dire que la soupe est froide en ce moment, dis A sopa está fria. A sopa é fria peut décrire un type de soupe qui se sert froid.",
+        "Pour dire « il y a », há convient dans les deux pays, notamment à l’écrit. Au Brésil, tem est très courant à l’oral : Na rua tem uma farmácia. Le verbe reste au singulier : Há dois bancos. Tem dois bancos. Au Portugal, tu donne tu és / estás. Avec você, courant au Brésil, on dit você é / está.",
       ],
       table: {
         caption: "Ser et estar au présent",
@@ -107,7 +108,7 @@ export const ptCourse = {
         },
         {
           type: "choose",
-          prompt: "O café ___ frio, pode esquentar?",
+          prompt: "O café esfriou e agora ___ frio. (Il est froid en ce moment.)",
           options: ["é", "tem", "está"],
           answer: 2,
           explanation: "On décrit un état du moment : estar.",
@@ -115,7 +116,7 @@ export const ptCourse = {
         {
           type: "fill",
           prompt: "Nós ___ da França.",
-          hint: "ser",
+          hint: "ser, au présent",
           answers: ["somos"],
           explanation: "L’origine se dit avec ser : nós somos da França.",
         },
@@ -129,13 +130,14 @@ export const ptCourse = {
         {
           type: "fill",
           prompt: "Na minha rua ___ uma farmácia.",
-          hint: "ter / haver",
+          hint: "ter ou haver, au présent",
           answers: ["tem", "há"],
           explanation: "L’existence se dit tem (Brésil, oral) ou há (Portugal, écrit), invariable.",
         },
       ],
       categories: ["verb", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pt-a1-present-regular",
@@ -143,33 +145,33 @@ export const ptCourse = {
       title: "Le présent des verbes en -ar, -er, -ir",
       summary: "Conjuguer au présent les verbes réguliers et choisir entre você et tu.",
       rule: [
-        "Les verbes portugais se classent en trois groupes selon leur infinitif : -ar (falar), -er (comer), -ir (viver). On remplace la terminaison par celle de la personne : falo, falas, fala, falamos, falam. Au Portugal, le pronom sujet est souvent omis (falo português) ; au Brésil, on le garde plus volontiers (eu falo).",
+        "Les trois groupes se distinguent par leur infinitif : falar (-ar), comer (-er), partir (-ir). Pour le présent régulier, remplace la terminaison par celle de la personne : falo, falas, fala, falamos, falam. On omet souvent le pronom sujet au Portugal (falo português). Au Brésil, on le garde plus volontiers (eu falo).",
         "Pour s’adresser à quelqu’un, le Brésil emploie você avec la forme de la 3e personne (você fala) ; le Portugal dit tu falas entre proches. Le vouvoiement poli se fait avec le prénom ou o senhor / a senhora + 3e personne. À l’oral brésilien, a gente fala remplace souvent nós falamos.",
-        "La négation se place avant le verbe : não falo inglês. Pour poser une question, on garde l’ordre de l’affirmation avec une intonation montante : você fala inglês ? Il n’y a pas d’équivalent de « est-ce que ».",
+        "Place não avant le verbe : Não falo inglês. Pour une question à laquelle on répond par oui ou non, tu peux garder l’ordre de l’affirmation et utiliser l’intonation interrogative : Você fala inglês?",
       ],
       table: {
         caption: "Présent régulier",
-        headers: ["Personne", "falar", "comer", "viver"],
+        headers: ["Personne", "falar", "comer", "partir"],
         rows: [
-          ["eu", "falo", "como", "vivo"],
-          ["tu", "falas", "comes", "vives"],
-          ["você / ele / ela", "fala", "come", "vive"],
-          ["nós", "falamos", "comemos", "vivemos"],
-          ["vocês / eles / elas", "falam", "comem", "vivem"],
+          ["eu", "falo", "como", "parto"],
+          ["tu", "falas", "comes", "partes"],
+          ["você / ele / ela", "fala", "come", "parte"],
+          ["nós", "falamos", "comemos", "partimos"],
+          ["vocês / eles / elas", "falam", "comem", "partem"],
         ],
       },
       examples: [
-        { text: "Trabalho num escritório e moro perto.", translation: "Je travaille dans un bureau et j’habite près.", note: "Pas de pronom sujet." },
+        { text: "Trabalho num escritório e moro perto.", translation: "Je travaille dans un bureau et j’habite tout près.", note: "Le sujet eu est omis. Num contracte em + um. On peut aussi écrire em um." },
         { text: "Você fala inglês?", translation: "Tu parles anglais ?", note: "Même ordre que l’affirmation." },
         { text: "Meus pais almoçam às duas horas.", translation: "Mes parents déjeunent à deux heures." },
       ],
       exercises: [
         {
           type: "fill",
-          prompt: "Meus amigos ___ em Lisboa.",
-          hint: "viver",
-          answers: ["vivem"],
-          explanation: "3e personne du pluriel d’un verbe en -ir : vivem.",
+          prompt: "Meus amigos ___ de Lisboa amanhã.",
+          hint: "partir, au présent",
+          answers: ["partem"],
+          explanation: "Partir est un verbe en -ir. Au présent, à la 3e personne du pluriel, il donne partem.",
         },
         {
           type: "choose",
@@ -188,7 +190,7 @@ export const ptCourse = {
         {
           type: "fill",
           prompt: "Vocês ___ café de manhã.",
-          hint: "beber",
+          hint: "beber, au présent",
           answers: ["bebem"],
           explanation: "Vocês se conjugue comme la 3e personne du pluriel : bebem.",
         },
@@ -196,12 +198,13 @@ export const ptCourse = {
           type: "transform",
           instruction: "Mets la phrase à la forme négative.",
           source: "Comemos em casa.",
-          answers: ["Não comemos em casa."],
-          explanation: "On place não juste avant le verbe, sans autre changement.",
+          answers: ["Não comemos em casa.", "Nós não comemos em casa."],
+          explanation: "Place não avant le verbe. Tu peux expliciter le sujet nós ou l’omettre.",
         },
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pt-a1-present-irregular",
@@ -209,9 +212,9 @@ export const ptCourse = {
       title: "Verbes irréguliers courants : ter, ir, fazer, poder, querer",
       summary: "Conjuguer au présent les verbes les plus fréquents, dont l’âge avec ter et le but avec ir.",
       rule: [
-        "Certains verbes très courants sont irréguliers, surtout à la 1re personne du singulier : tenho (ter), vou (ir), faço (fazer), posso (poder), quero (querer). Le reste est souvent proche du régulier : fazemos, podemos, queremos.",
+        "Au présent, retiens tenho (ter), vou (ir), faço (fazer) et posso (poder). Observe aussi faz, à la 3e personne. Pour querer, le début de la conjugaison est quero, queres, quer. Quero suit le modèle régulier, et quer perd le -e attendu. Au pluriel : queremos, querem.",
         "À la 3e personne, ter fait tem (singulier) et têm avec un accent circonflexe (pluriel) : ele tem, eles têm. Ir se construit avec a ou para : vou ao cinema, vou para casa. Querer et poder se suivent d’un infinitif : quero sair, posso entrar.",
-        "Piège : pour l’âge, le portugais dit ter, comme le français « avoir » : tenho vinte anos. Ne dis pas « sou vinte anos » : ser et estar ne servent pas pour l’âge.",
+        "Pour dire ton âge, emploie ter, comme « avoir » en français : Tenho vinte anos. Pour demander l’âge de quelqu’un, dis Quantos anos você tem?",
       ],
       table: {
         caption: "Quatre verbes à connaître",
@@ -228,7 +231,7 @@ export const ptCourse = {
         { text: "Quero um café e ela quer um chá.", translation: "Je veux un café et elle veut un thé.", note: "Querer : quero, quer." },
         { text: "Hoje vou à academia, mas amanhã não posso ir.", translation: "Aujourd’hui je vais à la salle de sport, mais demain je ne peux pas y aller.", note: "Au Portugal : ao ginásio." },
         { text: "Minha irmã tem vinte anos.", translation: "Ma sœur a vingt ans.", note: "L’âge se dit avec ter." },
-        { text: "Fazemos compras aos sábados.", translation: "Nous faisons les courses le samedi.", note: "Fazemos est régulier : seul faço est irrégulier." },
+        { text: "Fazemos compras aos sábados.", translation: "Nous faisons les courses le samedi.", note: "Fazemos suit le modèle régulier. Faço et faz sont à retenir." },
       ],
       exercises: [
         {
@@ -248,27 +251,28 @@ export const ptCourse = {
         {
           type: "fill",
           prompt: "Nós ___ ao cinema às sextas.",
-          hint: "ir",
+          hint: "ir, au présent",
           answers: ["vamos"],
           explanation: "Ir est très irrégulier : vamos à la 1re personne du pluriel.",
         },
         {
           type: "fill",
           prompt: "Eles ___ uma casa grande.",
-          hint: "ter",
+          hint: "ter, au présent",
           answers: ["têm"],
           explanation: "À la 3e personne du pluriel, ter prend un accent circonflexe : têm (au singulier : tem).",
         },
         {
           type: "fill",
           prompt: "Hoje eu ___ o jantar.",
-          hint: "fazer",
+          hint: "fazer, au présent",
           answers: ["faço"],
           explanation: "Fazer fait faço à la 1re personne du singulier, avec une cédille.",
         },
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pt-a1-adjectives-possessives",
@@ -276,9 +280,9 @@ export const ptCourse = {
       title: "Décrire : accord de l’adjectif et possessifs",
       summary: "Accorder l’adjectif en genre et en nombre, le placer, et utiliser meu, minha, seu, nosso.",
       rule: [
-        "L’adjectif s’accorde avec le nom, comme en français : casa nova, carros novos. Les adjectifs en -o font -a au féminin (novo, nova) ; ceux en -e ou en -l ne changent pas au féminin (grande, fácil). Pluriel : -s, et -l devient -is (fácil, fáceis). L’adjectif se place en général après le nom : um carro novo.",
+        "L’adjectif s’accorde avec le nom : casa nova, carros novos. Beaucoup d’adjectifs en -o font -a au féminin (novo, nova). Grande et fácil ne changent pas. Compare francês → francesa et trabalhador → trabalhadora. Au pluriel, on ajoute souvent -s. Retiens legal → legais et fácil → fáceis. L’adjectif vient souvent après le nom.",
         "Les possessifs s’accordent avec la chose possédée, pas avec le possesseur : meu / minha, teu / tua, seu / sua, nosso / nossa, avec -s au pluriel. Au Portugal, on met presque toujours l’article : o meu carro, a minha casa. Au Brésil, il est facultatif : meu carro.",
-        "Piège : seu / sua est ambigu (le sien, le tien, le vôtre). Pour éviter le doute, le Brésil dit a casa dele, a casa dela (sa maison à lui, à elle), ou a casa de vocês.",
+        "Seu et sua devant un nom peuvent correspondre à « ton / ta », « son / sa » ou « votre » selon le contexte. Pour préciser le possesseur, emploie a casa dele (« sa maison à lui »), a casa dela (« sa maison à elle ») ou a casa de vocês (« votre maison »).",
       ],
       table: {
         caption: "Les possessifs",
@@ -334,22 +338,23 @@ export const ptCourse = {
       ],
       categories: ["agreement", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pt-a1-gostar",
       level: "A1",
       title: "Dire ce qu’on aime : gostar de, adorar, preferir",
-      summary: "Exprimer ses goûts avec gostar de (toujours suivi de de), adorar et preferir.",
+      summary: "Exprimer ses goûts avec gostar de, adorar et preferir.",
       rule: [
-        "En français, on « aime » quelque chose directement. En portugais, gostar est toujours suivi de de : gosto de café, gosto de cantar. Oublier le de est l’erreur la plus fréquente d’un francophone : « gosto café » est faux.",
+        "Pour dire qu’on aime une chose ou une activité, place de entre gostar et son complément : Gosto de café. Gosto de cantar. En français, « aimer » se construit directement. En réponse à une question, on peut aussi dire simplement Gosto (« J’aime bien »).",
         "Le de se soude à l’article quand il y en a un : gosto do meu trabalho (de + o), ela gosta da praia (de + a), eles gostam dos amigos. Avec une personne, on dit gosto dele, dela, de você.",
         "Adorar, amar, odiar et preferir se construisent sans préposition : adoro música, prefiro chá. Pour renforcer, on ajoute muito après gostar : gosto muito de viajar. À la forme négative : não gosto de café.",
       ],
       examples: [
-        { text: "Gosto de café, mas não gosto de chá.", translation: "J’aime le café, mais je n’aime pas le thé.", note: "De obligatoire après gostar." },
+        { text: "Gosto de café, mas não gosto de chá.", translation: "J’aime le café, mais je n’aime pas le thé.", note: "Gostar prend de devant le nom de ce qu’on aime." },
         { text: "Gosto muito do meu trabalho.", translation: "J’aime beaucoup mon travail.", note: "de + o = do." },
         { text: "Ela adora música brasileira.", translation: "Elle adore la musique brésilienne.", note: "Adorar : pas de préposition." },
-        { text: "Eles preferem viajar de trem.", translation: "Ils préfèrent voyager en train.", note: "Preferir + infinitif." },
+        { text: "Eles preferem viajar de trem.", translation: "Ils préfèrent voyager en train.", note: "Preferir + infinitif. Au Portugal, en train se dit de comboio." },
       ],
       exercises: [
         {
@@ -357,7 +362,7 @@ export const ptCourse = {
           prompt: "Eu gosto ___ café.",
           options: ["a", "em", "de"],
           answer: 2,
-          explanation: "Gostar est toujours suivi de de.",
+          explanation: "Pour introduire le complément café, on emploie de : Gosto de café.",
         },
         {
           type: "fill",
@@ -377,29 +382,30 @@ export const ptCourse = {
           type: "transform",
           instruction: "Mets la phrase à la forme négative.",
           source: "Ele gosta de futebol.",
-          answers: ["Ele não gosta de futebol."],
+          answers: ["Ele não gosta de futebol.", "Não gosta de futebol."],
           explanation: "On place não avant le verbe ; le de reste en place.",
         },
         {
           type: "fill",
           prompt: "Eu ___ música brasileira.",
-          hint: "adorar",
+          hint: "adorar, au présent",
           answers: ["adoro"],
           explanation: "Adorar est régulier et sans préposition : adoro música brasileira.",
         },
       ],
       categories: ["function_word", "verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pt-a2-preterito-perfeito",
       level: "A2",
       title: "Raconter le passé : le pretérito perfeito",
-      summary: "Former le passé simple de l’oral (falei, comi, fui, fiz) pour une action terminée.",
+      summary: "Raconter un fait passé et terminé avec le pretérito perfeito : falei, comi, fui, fiz.",
       rule: [
         "Le pretérito perfeito dit une action terminée à un moment du passé : ontem comi uma pizza. Il correspond au passé composé français, mais il se forme sans auxiliaire : falei, comi, parti. Piège : tenho falado ne veut pas dire « j’ai parlé », mais « je parle (souvent) depuis un moment ».",
-        "Terminaisons régulières : -ar → -ei, -aste, -ou, -amos, -aram ; -er → -i, -este, -eu, -emos, -eram ; -ir → -i, -iste, -iu, -imos, -iram. Au Portugal, nós falámos prend un accent ; au Brésil, falamos s’écrit comme le présent.",
-        "Quelques irréguliers à connaître : ser et ir font tous deux fui, foste, foi, fomos, foram ; ter → tive ; fazer → fiz ; estar → estive ; poder → pude ; dizer → disse ; ver → vi. Ontem fui ao cinema peut donc venir de ir comme de ser.",
+        "Terminaisons régulières : -ar → -ei, -aste, -ou, -amos, -aram. -er → -i, -este, -eu, -emos, -eram. -ir → -i, -iste, -iu, -imos, -iram. Au Brésil, falamos s’écrit comme au présent. Au Portugal, on peut écrire falámos au passé pour marquer la distinction.",
+        "Ser et ir ont les mêmes formes : fui, foste, foi, fomos, foram. Le contexte distingue les deux verbes : Fui ao cinema (ir) et Fui professor (ser). Retiens aussi tive (ter), fiz (fazer), estive (estar), pude (poder), disse (dizer) et vi (ver).",
       ],
       table: {
         caption: "Perfeito régulier",
@@ -414,14 +420,14 @@ export const ptCourse = {
       },
       examples: [
         { text: "Ontem comi uma pizza com amigos.", translation: "Hier, j’ai mangé une pizza avec des amis." },
-        { text: "No sábado fomos à praia.", translation: "Samedi, nous sommes allés à la plage.", note: "Fomos vient de ir (ou de ser, même forme)." },
+        { text: "No sábado fomos à praia.", translation: "Samedi, nous sommes allés à la plage.", note: "Fomos vient ici de ir. Ser a la même forme." },
         { text: "Ela fez o jantar e eu lavei a louça.", translation: "Elle a fait le dîner et j’ai fait la vaisselle.", note: "Fez est irrégulier." },
       ],
       exercises: [
         {
           type: "fill",
           prompt: "Ontem eu ___ muito.",
-          hint: "trabalhar",
+          hint: "trabalhar, au pretérito perfeito",
           answers: ["trabalhei"],
           explanation: "1re personne du singulier d’un verbe en -ar : trabalhei.",
         },
@@ -435,7 +441,7 @@ export const ptCourse = {
         {
           type: "fill",
           prompt: "No sábado nós ___ à praia.",
-          hint: "ir",
+          hint: "ir, au pretérito perfeito",
           answers: ["fomos"],
           explanation: "Ir fait fomos au perfeito à la 1re personne du pluriel.",
         },
@@ -456,6 +462,7 @@ export const ptCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pt-a2-imperfeito",
@@ -464,8 +471,8 @@ export const ptCourse = {
       summary: "Parler des habitudes et du décor du passé avec l’imperfeito, et l’opposer au perfeito.",
       rule: [
         "L’imperfeito décrit ce qui durait ou se répétait dans le passé : habitudes, décor, état, âge (quando eu era criança, morava perto do mar). Il s’emploie comme l’imparfait français. Le perfeito, lui, dit un fait précis et terminé : ontem comprei um carro.",
-        "Les deux se combinent souvent : l’imperfeito pose le décor, le perfeito l’événement (ele dormia quando o telefone tocou). Pour les mots-signaux, sempre, todos os dias, naquela época appellent l’imperfeito ; de repente, ontem, uma vez appellent le perfeito.",
-        "Formation : -ar → -ava, -avas, -ava, -ávamos, -avam ; -er et -ir → -ia, -ias, -ia, -íamos, -iam. Seuls quatre verbes sont irréguliers : ser (era), ter (tinha), vir (vinha) et pôr (punha). Attention à l’accent à la 1re personne du pluriel : falávamos, comíamos.",
+        "Les deux temps se combinent souvent : l’imperfeito pose le décor, le perfeito présente l’événement (Ele dormia quando o telefone tocou). Todos os dias et naquela época peuvent signaler une habitude, et de repente peut introduire un événement. Le temps dépend de la façon dont le récit présente le fait.",
+        "Formation : -ar → -ava, -avas, -ava, -ávamos, -avam. -er et -ir → -ia, -ias, -ia, -íamos, -iam. Retiens aussi era (ser), tinha (ter), vinha (vir) et punha (pôr). Attention à l’accent à la 1re personne du pluriel : falávamos, comíamos et íamos.",
       ],
       table: {
         caption: "Pretérito imperfeito",
@@ -486,29 +493,29 @@ export const ptCourse = {
       exercises: [
         {
           type: "choose",
-          prompt: "Quando eu era criança, ___ futebol todos os domingos.",
+          prompt: "Quando eu era criança, ___ futebol todos os domingos. (À l’imparfait.)",
           options: ["jogo", "joguei", "jogava"],
           answer: 2,
-          explanation: "Une habitude répétée dans le passé demande l’imperfeito : jogava.",
+          explanation: "Pour décrire cette habitude à l’imparfait, emploie jogava.",
         },
         {
           type: "choose",
-          prompt: "De repente, o telefone ___.",
+          prompt: "De repente, o telefone ___. (Au pretérito perfeito.)",
           options: ["tocava", "tocou", "toca"],
           answer: 1,
-          explanation: "De repente annonce un événement ponctuel : perfeito, tocou.",
+          explanation: "Dans ce récit au pretérito perfeito, tocou présente la sonnerie comme un événement ponctuel.",
         },
         {
           type: "fill",
           prompt: "Naquela época nós ___ em Recife.",
-          hint: "morar",
+          hint: "morar, à l’imparfait",
           answers: ["morávamos"],
           explanation: "-ar à la 1re personne du pluriel : morávamos, avec l’accent sur le á.",
         },
         {
           type: "fill",
           prompt: "Meu avô ___ muito alto.",
-          hint: "ser",
+          hint: "ser, à l’imparfait",
           answers: ["era"],
           explanation: "Une description dans le passé : era (imperfeito de ser).",
         },
@@ -516,12 +523,13 @@ export const ptCourse = {
           type: "transform",
           instruction: "Mets la phrase à l’imperfeito.",
           source: "Ele tem um cachorro.",
-          answers: ["Ele tinha um cachorro."],
+          answers: ["Ele tinha um cachorro.", "Tinha um cachorro."],
           explanation: "Ter fait tinha à l’imperfeito, à la 3e personne du singulier.",
         },
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pt-a2-reflexive",
@@ -530,8 +538,8 @@ export const ptCourse = {
       summary: "Employer me, te, se, nos avec les verbes pronominaux et savoir où placer le pronom.",
       rule: [
         "Comme en français, beaucoup de verbes se conjuguent avec un pronom réfléchi : me, te, se, nos, se (levantar-se, chamar-se, deitar-se, sentir-se, lembrar-se de). À l’infinitif, ils s’écrivent avec un trait d’union : levantar-se.",
-        "Place du pronom, c’est la grande différence entre pays. Au Brésil, il se met avant le verbe : eu me levanto, ela se chama Ana. Au Portugal, il suit le verbe avec un trait d’union : levanto-me, chama-se Ana.",
-        "Quand un mot attire le pronom (não, já, nunca, que, tout adverbe), le pronom passe avant le verbe aussi au Portugal : não me levanto, já se foi. Piège : lembrar-se de se construit avec de (não me lembro do nome), alors que le français dit « se souvenir de ».",
+        "Dans une affirmation simple, le pronom vient souvent avant le verbe au Brésil : Eu me levanto, ela se chama Ana. Au Portugal, il suit généralement le verbe avec un trait d’union : Levanto-me, chama-se Ana.",
+        "Au Portugal, não, nunca, já et le que d’une subordonnée placent le pronom avant le verbe : Não me levanto, já me deitei. Lembrar-se de se construit comme « se souvenir de » : Não me lembro do nome. Attention au français « se rappeler le nom ». Au Brésil, on entend aussi Não lembro do nome.",
       ],
       table: {
         caption: "Levantar-se au présent",
@@ -559,7 +567,7 @@ export const ptCourse = {
         },
         {
           type: "choose",
-          prompt: "Ela ___ chama Marta.",
+          prompt: "Ela ___ chama Marta. (Elle s’appelle Marta.)",
           options: ["me", "se", "nos"],
           answer: 1,
           explanation: "Pour ela (3e personne), le pronom réfléchi est se : ela se chama Marta.",
@@ -573,7 +581,7 @@ export const ptCourse = {
         {
           type: "fill",
           prompt: "Não ___ lembro do nome dele.",
-          hint: "eu",
+          hint: "pronom réfléchi de eu",
           answers: ["me"],
           explanation: "Après não, le pronom se place avant le verbe : não me lembro.",
         },
@@ -587,6 +595,7 @@ export const ptCourse = {
       ],
       categories: ["verb", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pt-a2-object-pronouns",
@@ -594,9 +603,9 @@ export const ptCourse = {
       title: "Les pronoms compléments : o, a, os, as, lhe, me, te",
       summary: "Remplacer un complément par un pronom et le placer correctement (Brésil / Portugal).",
       rule: [
-        "Pour le complément direct, on emploie me, te, o, a, nos, os, as ; pour l’indirect (à quelqu’un), me, te, lhe, nos, lhes. Piège : lhe(s) (« lui, leur ») est surtout écrit. À l’oral brésilien, on dit plutôt ele / ela après le verbe (eu vi ele) ou on répète un nom ; la norme écrite garde o, a.",
-        "Place. Au Brésil, le pronom précède le verbe (ele me ligou, eu o vi). Au Portugal, il suit le verbe avec un trait d’union à l’affirmative (ele ligou-me, vi-o) et précède le verbe après não, que, já, tout adverbe (não o vi, ele não me ligou).",
-        "Après une forme verbale en -r, -s ou -z, o devient lo : vou comprá-lo (comprar + o), fi-lo. Après -m, on met no : dão-no. Pour une négation, la règle est la même partout : não a conheço, não lhe dei.",
+        "Complément direct : me, te, o, a, nos, os, as. Complément indirect (« à quelqu’un ») : me, te, lhe, nos, lhes. À l’oral familier au Brésil, on entend Eu vi ele (direct) et Eu dei o livro para ele (indirect). À l’écrit standard, on peut employer Eu o vi et Eu lhe dei o livro.",
+        "Au Brésil, le pronom précède souvent le verbe : Ele me ligou, eu o vi. Au Portugal, il suit généralement le verbe dans une affirmation simple : Ele ligou-me, vi-o. Après não, nunca, já ou le que d’une subordonnée, il se place avant le verbe dans les deux variétés : Não o vi, já te disse.",
+        "Après une forme en -r, -s ou -z, la consonne tombe et o / a devient -lo / -la : comprá-lo (comprar + o), fi-lo (fiz + o). Après une terminaison nasale comme -m ou -ão, on emploie -no / -na : compram-no, dão-no. Après não, le pronom précède le verbe : Não a conheço, não lhe dei nada.",
       ],
       table: {
         caption: "Pronoms compléments",
@@ -619,17 +628,17 @@ export const ptCourse = {
       exercises: [
         {
           type: "choose",
-          prompt: "Conhece a Maria? Não, não ___ conheço.",
+          prompt: "Conhece a Maria? Não, não ___ conheço. (À l’écrit standard.)",
           options: ["lhe", "o", "a"],
           answer: 2,
           explanation: "Maria est un complément direct féminin : a. Le pronom précède le verbe après não.",
         },
         {
           type: "choose",
-          prompt: "A Ana pediu ajuda e eu não ___ dei.",
+          prompt: "Encontrei a Ana, mas não ___ dei o recado.",
           options: ["lhe", "o", "a"],
           answer: 0,
-          explanation: "On donne l’aide à Ana : complément indirect, lhe.",
+          explanation: "O recado est le complément direct. Ana est la personne à qui l’on transmet le message, donc on la reprend par lhe.",
         },
         {
           type: "fill",
@@ -640,14 +649,14 @@ export const ptCourse = {
         },
         {
           type: "transform",
-          instruction: "Remplace le complément par un pronom.",
+          instruction: "Remplace le complément direct par un pronom atone de l’écrit standard.",
           source: "Não vejo o João.",
           answers: ["Não o vejo."],
           explanation: "João (masculin) devient o, placé avant le verbe après não.",
         },
         {
           type: "transform",
-          instruction: "Remplace le complément par un pronom.",
+          instruction: "Remplace le complément direct par un pronom atone de l’écrit standard.",
           source: "Não compro as flores.",
           answers: ["Não as compro."],
           explanation: "As flores (féminin pluriel) devient as, placé avant le verbe après não.",
@@ -655,6 +664,7 @@ export const ptCourse = {
       ],
       categories: ["function_word", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pt-a2-periphrases",
@@ -664,7 +674,7 @@ export const ptCourse = {
       rule: [
         "Ir + infinitif exprime un projet ou le futur proche, et c’est la forme la plus courante à l’oral : amanhã vou visitar meus avós. Acabar de + infinitif dit un passé tout récent : acabei de chegar.",
         "Pour une action en cours, le Brésil emploie estar + gérondif : estou trabalhando, estamos comendo. Le Portugal préfère estar a + infinitif : estou a trabalhar. Le gérondif se forme en remplaçant -r par -ndo : falando, comendo, partindo.",
-        "Pour l’obligation, on dit ter que + infinitif au Brésil et ter de au Portugal : tenho que sair / tenho de sair. Piège : en français, « venir de » (je viens d’arriver) se rend par acabar de, jamais par vir de.",
+        "Pour exprimer l’obligation, ter que est fréquent au Brésil et ter de est courant au Portugal. Les deux formes existent : Tenho que sair, tenho de sair. Pour traduire « je viens d’arriver », utilise acabar de : Acabei de chegar. Vir de introduit notamment une provenance : Venho do trabalho.",
       ],
       table: {
         caption: "Quatre périphrases",
@@ -680,21 +690,21 @@ export const ptCourse = {
       examples: [
         { text: "Amanhã vou visitar meus avós.", translation: "Demain, je vais rendre visite à mes grands-parents." },
         { text: "Estou cozinhando agora.", translation: "Je suis en train de cuisiner.", note: "Portugal : estou a cozinhar." },
-        { text: "Tenho que acordar cedo.", translation: "Je dois me lever tôt.", note: "Portugal : tenho de acordar cedo." },
+        { text: "Tenho que acordar cedo.", translation: "Je dois me réveiller tôt.", note: "Autre formulation, courante au Portugal : tenho de acordar cedo." },
         { text: "Acabei de chegar do trabalho.", translation: "Je viens d’arriver du travail." },
       ],
       exercises: [
         {
           type: "choose",
           prompt: "Agora eu ___ estudando.",
-          options: ["vou", "estou", "tenho"],
+          options: ["está", "estou", "estamos"],
           answer: 1,
           explanation: "Une action en cours se dit estar + gérondif : estou estudando.",
         },
         {
           type: "fill",
           prompt: "Amanhã nós ___ viajar.",
-          hint: "ir",
+          hint: "ir, au présent",
           answers: ["vamos"],
           explanation: "Le futur proche se forme avec ir + infinitif : vamos viajar.",
         },
@@ -703,14 +713,14 @@ export const ptCourse = {
           prompt: "Amanhã eu ___ acordar cedo.",
           options: ["acabei de", "tenho que", "estou"],
           answer: 1,
-          explanation: "Une obligation future : tenho que (ou tenho de au Portugal) + infinitif.",
+          explanation: "Tenho que et tenho de, suivis de l’infinitif, expriment une obligation. Tenho de est courant au Portugal.",
         },
         {
           type: "fill",
           prompt: "Ela está ___ o jantar.",
           hint: "fazer",
-          answers: ["fazendo"],
-          explanation: "Le gérondif de fazer est fazendo (estar a fazer au Portugal).",
+          answers: ["fazendo", "a fazer"],
+          explanation: "Pour une action en cours, on dit Ela está fazendo o jantar ou, couramment au Portugal, Ela está a fazer o jantar.",
         },
         {
           type: "transform",
@@ -722,6 +732,7 @@ export const ptCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pt-a2-prepositions",
@@ -730,8 +741,8 @@ export const ptCourse = {
       summary: "Choisir la bonne préposition de lieu et de temps (moro em, sou de, às oito, perto de).",
       rule: [
         "Em dit où l’on est (moro em Lisboa, estou no escritório) ; de dit l’origine (sou de Paris, venho do trabalho) ; para dit la destination (vou para casa, viajo para o Brasil). Le français « à / en / dans » correspond donc à plusieurs prépositions portugaises selon le sens.",
-        "Pour l’heure, on emploie a + article : o filme começa às oito (a + as). Les expressions de distance utilisent perto de, longe de, ao lado de : o banco fica perto da estação. Em casa dit « à la maison » ; para casa dit « vers la maison ».",
-        "Piège : avec chegar, le Brésil dit chegar em (chego em casa) et le Portugal chegar a (chego a casa). Avec les pays, em se contracte avec l’article : no Brasil, em Portugal, na França.",
+        "Pour l’heure, emploie a + article : O filme começa às oito (a + as). Pour situer un lieu, utilise perto de, longe de ou ao lado de. Em casa indique où l’on est. Para casa indique la destination : Vou para casa (« je rentre à la maison »).",
+        "À l’écrit soigné, on emploie chegar a : Cheguei a Lisboa, cheguei a casa. Au Brésil, chegar em est fréquent à l’oral : Cheguei em casa. Avec les pays qui prennent un article, em se contracte : no Brasil, na França. Portugal s’emploie ici sans article : em Portugal.",
       ],
       table: {
         caption: "Prépositions courantes",
@@ -741,7 +752,7 @@ export const ptCourse = {
           ["de", "origine", "sou de Paris"],
           ["para", "destination", "vou para casa"],
           ["a", "heure, distance", "às oito horas"],
-          ["perto de / longe de", "proximité", "perto da estação"],
+          ["perto de / longe de", "distance", "perto da estação"],
         ],
       },
       examples: [
@@ -780,14 +791,15 @@ export const ptCourse = {
         },
         {
           type: "choose",
-          prompt: "O banco fica ___ da estação, a dois minutos a pé.",
+          prompt: "O banco fica ___ da estação. (La banque est près de la gare.)",
           options: ["longe", "perto", "dentro"],
           answer: 1,
-          explanation: "À deux minutes à pied : perto da estação.",
+          explanation: "Pour dire « près de », utilise perto de. Avec a estação, de + a donne da : perto da estação.",
         },
       ],
       categories: ["function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pt-b1-subjunctive",
@@ -795,9 +807,9 @@ export const ptCourse = {
       title: "Le subjonctif présent : quero que, espero que, talvez",
       summary: "Former le subjonctif présent et l’employer après un souhait, un doute, un jugement ou talvez.",
       rule: [
-        "Le subjonctif s’emploie, comme en français, après un souhait, un doute ou un jugement avec un sujet différent : quero que você venha, espero que ela esteja bem, é importante que todos cheguem cedo. Avec le même sujet, on garde l’infinitif : quero sair. Il suit aussi talvez (talvez eu vá).",
-        "Formation : on part de la 1re personne du présent (falo, como) et on prend la voyelle opposée : -ar → -e (fale, fales, fale, falemos, falem) ; -er et -ir → -a (coma, comas, coma, comamos, comam). L’orthographe suit la prononciation : chegar → cheguemos, fazer → faça.",
-        "Irréguliers courants : ser → seja, estar → esteja, ter → tenha, ir → vá, poder → possa, querer → queira, saber → saiba, dar → dê. Après acho que ou tenho certeza que, on garde l’indicatif.",
+        "Le subjonctif suit souvent un souhait, un doute ou un jugement : Quero que você venha. Espero que ela esteja bem. É importante que todos cheguem cedo. Avec querer et le même sujet, on dit Quero sair. Quand talvez ouvre la proposition, le subjonctif est courant : Talvez eu vá.",
+        "Pour la plupart des verbes, pars de la 1re personne de l’indicatif présent. Les verbes en -ar prennent -e (falo → fale, fales, fale, falemos, falem). Les verbes en -er et -ir prennent -a (como → coma). Certains radicaux sont repris (faço → faça, tenho → tenha). L’orthographe peut s’adapter : chegar → chegue.",
+        "Apprends aussi seja (ser), esteja (estar), vá (ir), possa (poder), queira (querer), saiba (saber) et dê (dar). Pour affirmer une opinion ou une certitude, l’indicatif convient : Acho que ele vem. Tenho certeza de que ele vem (au Portugal : Tenho a certeza de que ele vem).",
       ],
       table: {
         caption: "Subjonctif présent",
@@ -834,14 +846,14 @@ export const ptCourse = {
         {
           type: "fill",
           prompt: "É importante que nós ___ cedo.",
-          hint: "chegar",
+          hint: "chegar, au subjonctif présent",
           answers: ["cheguemos"],
           explanation: "Chegar fait cheguemos au subjonctif : on ajoute un u pour garder le son [g].",
         },
         {
           type: "fill",
           prompt: "Duvido que ele ___ a verdade.",
-          hint: "saber",
+          hint: "saber, au subjonctif présent",
           answers: ["saiba"],
           explanation: "Saber est irrégulier au subjonctif : saiba.",
         },
@@ -849,12 +861,13 @@ export const ptCourse = {
           type: "transform",
           instruction: "Commence la phrase par « Quero que ».",
           source: "Ela chega cedo.",
-          answers: ["Quero que ela chegue cedo."],
+          answers: ["Quero que ela chegue cedo.", "Quero que chegue cedo."],
           explanation: "Après quero que, chegar passe au subjonctif : chegue.",
         },
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pt-b1-imperative",
@@ -862,9 +875,9 @@ export const ptCourse = {
       title: "Donner des ordres et des conseils : l’impératif",
       summary: "Former l’impératif pour você, tu et vocês, à l’affirmative et à la négative.",
       rule: [
-        "Avec você (et senhor / senhora), l’impératif est identique au subjonctif présent : fale, coma, abra, faça. Avec vocês : falem, comam, abram, façam. C’est la forme standard au Brésil, y compris à l’oral.",
-        "Avec tu (courant au Portugal et dans certaines régions du Brésil), l’impératif affirmatif est la 3e personne du présent : fala, come, abre, faz. À la négative, tu utilise le subjonctif : não fales, não comas. Nós se dit vamos + infinitif (vamos comer) ou le subjonctif (comamos).",
-        "Piège : la négative est toujours au subjonctif, même avec você : não fale. Les pronoms suivent l’affirmative dans la norme (diga-me) et précèdent à la négative (não me diga) ; à l’oral brésilien, me diga est courant.",
+        "Avec você, o senhor ou a senhora, l’impératif standard reprend le subjonctif présent : fale, coma, abra, faça. Avec vocês : falem, comam, abram, façam. Selon les régions et les situations, on entend aussi au Brésil des formes comme Fala! ou Vem cá! en s’adressant à você.",
+        "Avec tu, l’impératif affirmatif se forme généralement sur le présent de tu sans le -s final : falas → fala, comes → come, abres → abre. Retiens aussi faz (fazer) et sê (ser). Pour proposer une action collective, emploie par exemple Vamos comer ou Comamos.",
+        "À l’écrit standard, l’impératif négatif reprend le subjonctif présent, y compris avec tu : Não fales. Avec você : Não fale. Dans l’impératif affirmatif, Diga-me est la forme attendue au Portugal et dans l’écrit soigné. Au Brésil, Me diga est courant. Dans la négative, le pronom précède le verbe : Não me diga.",
       ],
       table: {
         caption: "Impératif",
@@ -879,9 +892,9 @@ export const ptCourse = {
         ],
       },
       examples: [
-        { text: "Abra a porta, por favor.", translation: "Ouvrez la porte, s’il vous plaît.", note: "Forme avec você ou o senhor." },
+        { text: "Abra a porta, por favor.", translation: "Ouvrez la porte, s’il vous plaît.", note: "Avec o senhor ou a senhora. Avec você, la même forme peut se traduire par « Ouvre la porte »." },
         { text: "Não fale tão rápido!", translation: "Ne parle pas si vite !", note: "Négatif : subjonctif." },
-        { text: "Faz o exercício, por favor.", translation: "Fais l’exercice, s’il te plaît.", note: "Tu : 3e personne du présent." },
+        { text: "Faz o exercício, por favor.", translation: "Fais l’exercice, s’il te plaît.", note: "Faz est une forme de l’impératif affirmatif avec tu." },
         { text: "Venham jantar com a gente.", translation: "Venez dîner avec nous.", note: "Vocês : subjonctif de vir." },
       ],
       exercises: [
@@ -894,24 +907,24 @@ export const ptCourse = {
         },
         {
           type: "choose",
-          prompt: "Não ___ tão rápido, senhora!",
+          prompt: "Não ___ tão rápido, senhora! (Impératif standard.)",
           options: ["fala", "falar", "fale"],
           answer: 2,
           explanation: "La négative se fait au subjonctif : não fale.",
         },
         {
           type: "fill",
-          prompt: "Vocês, ___ a lição, por favor.",
+          prompt: "___ a lição, por favor. (À l’impératif affirmatif avec vocês.)",
           hint: "fazer",
           answers: ["façam"],
           explanation: "Vocês : subjonctif, avec la cédille : façam.",
         },
         {
           type: "fill",
-          prompt: "Tu, ___ mais devagar!",
+          prompt: "___ mais devagar! (À l’impératif affirmatif avec tu.)",
           hint: "falar",
           answers: ["fala"],
-          explanation: "Avec tu, l’affirmatif est la 3e personne du présent : fala.",
+          explanation: "Pars de falas au présent et enlève le -s final : fala.",
         },
         {
           type: "transform",
@@ -923,6 +936,7 @@ export const ptCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pt-b1-future-conditional",
@@ -931,7 +945,7 @@ export const ptCourse = {
       summary: "Former le futur et le conditionnel pour un projet, une demande polie ou un conseil.",
       rule: [
         "Le futur simple se forme sur l’infinitif entier, comme en français : falar + ei → falarei, falarás, falará, falaremos, falarão. À l’oral, on le remplace souvent par ir + infinitif ; il reste courant à l’écrit, pour un projet formel ou une probabilité : ele estará em casa.",
-        "Le conditionnel se forme de la même façon avec les terminaisons de l’imparfait de haver : falar + ia → falaria, falarias, falaria, falaríamos, falariam. Il sert à demander poliment (você poderia me ajudar ?), à souhaiter (gostaria de um café) et à conseiller (no seu lugar, eu falaria com ela).",
+        "Au conditionnel, ajoute -ia, -ias, -ia, -íamos ou -iam à l’infinitif des verbes réguliers : falaria, falarias, falaria, falaríamos, falariam. Il sert à conseiller ou à demander poliment : Você poderia me ajudar? Au Portugal, l’imparfait sert aussi à atténuer une demande : Podia ajudar-me? Gostava de um café.",
         "Trois verbes ont un radical contracté, au futur comme au conditionnel : fazer → farei, faria ; dizer → direi, diria ; trazer → trarei, traria. Piège : l’accent aigu du futur (falarás, falará) disparaît au conditionnel (falarias, falaria).",
       ],
       table: {
@@ -954,7 +968,7 @@ export const ptCourse = {
         {
           type: "fill",
           prompt: "Amanhã nós ___ para Lisboa.",
-          hint: "viajar",
+          hint: "viajar, au futur simple",
           answers: ["viajaremos"],
           explanation: "Futur : infinitif + -emos : viajaremos.",
         },
@@ -967,7 +981,7 @@ export const ptCourse = {
         },
         {
           type: "choose",
-          prompt: "No seu lugar, eu ___ com ela.",
+          prompt: "No seu lugar, eu ___ com ela. (Exprime le conseil au conditionnel.)",
           options: ["falaria", "falei", "falarei"],
           answer: 0,
           explanation: "Un conseil se donne au conditionnel : eu falaria.",
@@ -975,7 +989,7 @@ export const ptCourse = {
         {
           type: "fill",
           prompt: "Ele ___ o trabalho amanhã.",
-          hint: "fazer",
+          hint: "fazer, au futur simple",
           answers: ["fará"],
           explanation: "Fazer a un radical contracté au futur : fará (et non fazerá).",
         },
@@ -989,16 +1003,17 @@ export const ptCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pt-b1-personal-infinitive",
       level: "B1",
       title: "L’infinitif personnel : para eles entenderem, antes de sairmos",
-      summary: "Conjuguer l’infinitif quand son sujet diffère du verbe principal (é importante vocês chegarem).",
+      summary: "Conjuguer l’infinitif pour rendre son sujet explicite ou le mettre en relief.",
       rule: [
-        "Le portugais peut conjuguer l’infinitif, ce que le français ne fait pas. On l’utilise quand l’infinitif a son propre sujet, différent de celui du verbe principal : é importante vocês chegarem cedo (« il est important que vous arriviez tôt »), fiz isso para eles entenderem.",
+        "Le portugais peut marquer la personne sur l’infinitif. On le voit notamment quand l’infinitif a son propre sujet : É importante vocês chegarem cedo (« il est important que vous arriviez tôt »). Après une préposition, le sujet peut aussi être le même que celui de la principale : Ao chegarmos, jantamos juntos.",
         "Terminaisons ajoutées à l’infinitif : eu et ele : rien ; tu : -es ; nós : -mos ; eles : -em. Ainsi falar, falares, falar, falarmos, falarem. Il suit des prépositions (para, antes de, sem, ao) : antes de sairmos, sem eu saber.",
-        "Si le sujet est le même que celui du verbe principal, on garde l’infinitif simple : quero sair, não posso ir. Piège pour un francophone : on emploie ici le subjonctif en français, mais l’infinitif personnel est la norme en portugais. À l’oral, on entend parfois l’infinitif nu, mais la forme standard est la forme conjuguée.",
+        "Après quero ou posso, l’infinitif reste sans terminaison personnelle quand les deux verbes ont le même sujet : Quero sair, não posso ir. « Pour qu’ils comprennent » peut se rendre par para eles entenderem, avec l’infinitif personnel, ou par para que eles entendam, avec le subjonctif.",
       ],
       table: {
         caption: "Infinitif personnel",
@@ -1019,7 +1034,7 @@ export const ptCourse = {
       exercises: [
         {
           type: "choose",
-          prompt: "É difícil nós ___ tudo hoje.",
+          prompt: "É difícil nós ___ tudo hoje. (À l’écrit standard.)",
           options: ["fazer", "fazermos", "fazemos"],
           answer: 1,
           explanation: "Le sujet nós de l’infinitif demande l’infinitif personnel : fazermos.",
@@ -1027,13 +1042,13 @@ export const ptCourse = {
         {
           type: "fill",
           prompt: "Ele saiu sem nós ___.",
-          hint: "perceber",
+          hint: "perceber, à l’infinitif personnel",
           answers: ["percebermos"],
           explanation: "Nós + infinitif personnel : percebermos (-mos).",
         },
         {
           type: "choose",
-          prompt: "Quero ___ cedo hoje.",
+          prompt: "Quero ___ cedo hoje. (Je veux partir tôt aujourd’hui.)",
           options: ["saírem", "sair", "saíres"],
           answer: 1,
           explanation: "Le sujet est le même que celui de quero : infinitif simple, sair.",
@@ -1042,12 +1057,13 @@ export const ptCourse = {
           type: "transform",
           instruction: "Remplace « para que » + subjonctif par para + infinitif personnel.",
           source: "Falo devagar para que eles entendam.",
-          answers: ["Falo devagar para eles entenderem."],
-          explanation: "Para eles entenderem : sujet eles + infinitif à la terminaison -em.",
+          answers: ["Falo devagar para eles entenderem.", "Falo devagar para entenderem."],
+          explanation: "Après para, l’infinitif de entender prend -em pour eles. Le sujet peut rester implicite si le contexte permet de l’identifier.",
         },
       ],
       categories: ["verb", "agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pt-b1-por-para",
@@ -1056,8 +1072,8 @@ export const ptCourse = {
       summary: "Choisir entre para (but, destinataire, échéance) et por (cause, trajet, durée, échange).",
       rule: [
         "Le français « pour » correspond à deux prépositions portugaises. Para dit le but, la destination, le destinataire ou l’échéance : estudo para trabalhar no Brasil, este presente é para você, preciso do relatório para sexta.",
-        "Por dit la cause, le moyen, le trajet, la durée ou l’échange : obrigado pela ajuda, passamos por Lisboa, trabalhei por dois anos, paguei dez euros por isso. Por causa de dit « à cause de » : fiquei em casa por causa da chuva. La passive utilise aussi por : escrito por um amigo.",
-        "Por se soude à l’article : por + o = pelo, por + a = pela (pelos, pelas). Piège : « obrigado pelo presente » mais « um presente para ele ». Pour la question, on dit por que (cause) ou para que (but) : por que você chegou tarde ?",
+        "Por exprime notamment la cause, le moyen, le trajet, la durée ou l’échange : Obrigado pela ajuda, passamos por Lisboa, trabalhei por dois anos, paguei dez euros por isso. Por causa de signifie « à cause de ». La voix passive utilise aussi por : escrito por um amigo.",
+        "Por + o donne pelo, por + a donne pela (pelos, pelas). Compare Obrigado pelo presente et Um presente para ele. Pour demander la raison, on écrit Por que você chegou tarde? au Brésil et Porque chegaste tarde? au Portugal. Pour demander le but, on peut employer Para que...?",
       ],
       table: {
         caption: "Por et para",
@@ -1094,14 +1110,15 @@ export const ptCourse = {
         },
         {
           type: "fill",
-          prompt: "Estudo português ___ trabalhar no Brasil.",
+          prompt: "Estudo português ___ trabalhar no Brasil. (Exprime le but à l’écrit standard.)",
+          hint: "Choisis entre por et para.",
           answers: ["para"],
           explanation: "Le but, suivi d’un infinitif, se dit avec para.",
         },
         {
           type: "fill",
-          prompt: "Passo ___ banco todos os dias.",
-          hint: "por + o",
+          prompt: "O trem passa ___ túnel. (Le train traverse le tunnel.)",
+          hint: "por ou para + o",
           answers: ["pelo"],
           explanation: "Le trajet se dit avec por ; por + o se contracte en pelo.",
         },
@@ -1115,6 +1132,7 @@ export const ptCourse = {
       ],
       categories: ["function_word", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pt-b1-relatives",
@@ -1122,9 +1140,9 @@ export const ptCourse = {
       title: "Relier deux phrases : que, quem, onde, o que, cujo",
       summary: "Employer les pronoms relatifs, sans oublier la préposition devant que et quem.",
       rule: [
-        "Le plus simple : que remplace qui, que, et souvent où et dont. A casa que comprei é grande (que), o homem que mora aqui é meu tio (qui). Il s’emploie pour des personnes comme pour des choses.",
-        "Après une préposition, on emploie quem pour une personne (a amiga com quem viajei), et que ou o qual pour une chose (o livro de que falo, o livro do qual falo). Onde sert au lieu : o restaurante onde jantamos. Piège : il faut garder la préposition devant le relatif, même si l’oral brésilien l’oublie.",
-        "O que traduit « ce qui, ce que » : não entendi o que ele disse. Cujo (cuja, cujos, cujas) traduit « dont » avec idée de possession et s’accorde avec le nom qui suit : o homem cujo filho é médico. En conversation, on préfère souvent une autre tournure : o homem que tem um filho médico.",
+        "Que introduit des relatives sur une personne ou une chose et traduit souvent « qui » ou « que » : A casa que comprei é grande, o homem que mora aqui é meu tio. Avec un complément de lieu ou un complément introduit par de, on peut employer em que ou de que.",
+        "Après une préposition, quem est courant pour une personne : A amiga com quem viajei. On rencontre aussi que ou o qual avec leur préposition : O livro de que falo, o livro do qual falo. Onde reprend un lieu : O restaurante onde jantamos. À l’écrit standard, garde la préposition quand la construction l’exige.",
+        "O que traduit « ce qui, ce que » : Não entendi o que ele disse. Cujo, cuja, cujos et cujas expriment une relation de possession. La forme s’accorde avec le nom qui suit et ce nom s’écrit sans article : O homem cujo filho é médico (« l’homme dont le fils est médecin »).",
       ],
       table: {
         caption: "Relatifs",
@@ -1140,7 +1158,7 @@ export const ptCourse = {
       },
       examples: [
         { text: "A casa que comprei é grande.", translation: "La maison que j’ai achetée est grande." },
-        { text: "A amiga com quem viajei mora em Lisboa.", translation: "L’amie avec qui j’ai voyagé habite à Lisbonne.", note: "Préposition + quem : toujours pour une personne." },
+        { text: "A amiga com quem viajei mora em Lisboa.", translation: "L’amie avec qui j’ai voyagé habite à Lisbonne.", note: "Avec un antécédent humain, com quem est une construction courante." },
         { text: "O restaurante onde jantamos fica perto.", translation: "Le restaurant où nous avons dîné est près d’ici.", note: "Onde : lieu." },
         { text: "Não entendi o que ele disse.", translation: "Je n’ai pas compris ce qu’il a dit.", note: "O que : « ce que »." },
       ],
@@ -1155,9 +1173,9 @@ export const ptCourse = {
         {
           type: "choose",
           prompt: "A amiga com ___ viajei é brasileira.",
-          options: ["onde", "quem", "que"],
+          options: ["onde", "quem", "qual"],
           answer: 1,
-          explanation: "Après une préposition (com), on emploie quem pour une personne.",
+          explanation: "Pour reprendre a amiga après com, quem convient. Avec qual, il faudrait ajouter l’article : com a qual.",
         },
         {
           type: "fill",
@@ -1170,12 +1188,12 @@ export const ptCourse = {
           type: "fill",
           prompt: "Não entendi ___ ele disse.",
           hint: "ce que",
-          answers: ["o que"],
-          explanation: "« Ce que » se dit o que.",
+          answers: ["o que", "aquilo que"],
+          explanation: "O que ele disse et aquilo que ele disse peuvent traduire « ce qu’il a dit ».",
         },
         {
           type: "transform",
-          instruction: "Réunis les deux phrases avec un pronom relatif.",
+          instruction: "Insère après « A casa » une relative en « que » qui indique ton achat.",
           source: "A casa é grande. Comprei a casa.",
           answers: ["A casa que comprei é grande.", "A casa que eu comprei é grande."],
           explanation: "Que remplace le complément la casa : a casa que comprei é grande.",
@@ -1183,6 +1201,7 @@ export const ptCourse = {
       ],
       categories: ["function_word", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
   ],
 } satisfies GrammarCourse;

@@ -72,7 +72,7 @@ export function VocabularyView({
   languages: Language[];
   today: DateKey;
   persist: boolean;
-  /** Automatic translation of imported words is on for this server. */
+  /** Automatic translation of added or imported words is on for this server. */
   canTranslate: boolean;
   isGuest: boolean;
 }) {
@@ -325,7 +325,15 @@ export function VocabularyView({
 
         {panel === "add" && (
           <Card className="mb-5">
-            <AddWordForm languages={languages} lists={lists} onAdd={handleAdd} onCancel={() => setPanel(null)} />
+            <AddWordForm
+              languages={languages}
+              lists={lists}
+              canTranslate={canTranslate}
+              isGuest={isGuest}
+              onAdd={handleAdd}
+              onTranslate={translateWords}
+              onCancel={() => setPanel(null)}
+            />
           </Card>
         )}
         {panel === "import" && (

@@ -2,7 +2,7 @@ import type { GrammarCourse } from "@/lib/schemas/grammar";
 
 export const plCourse = {
   language: "pl",
-  version: "2026-10-25",
+  version: "2026-11-10",
   points: [
     {
       id: "pl-a1-gender",
@@ -10,8 +10,8 @@ export const plCourse = {
       title: "Reconnaître le genre d’un nom : on, ona, ono",
       summary: "Deviner le genre d’un nom d’après sa terminaison et choisir on, ona ou ono.",
       rule: [
-        "Tout nom polonais a un genre, et la terminaison le révèle presque toujours : consonne → masculin (stół, kot, brat) ; -a → féminin (książka, kobieta, siostra) ; -o, -e ou -ę → neutre (okno, morze, imię).",
-        "Les exceptions sont peu nombreuses. Quelques noms masculins finissent en -a (mężczyzna, kolega) et s’accordent comme des masculins. Des féminins finissent par une consonne (noc, rzecz, miłość) : le dictionnaire te le dit.",
+        "La terminaison donne souvent un indice sur le genre d’un nom au singulier : consonne → masculin (stół, kot, brat), -a → féminin (książka, kobieta, siostra), -o, -e ou -ę → neutre (okno, morze, imię).",
+        "Certains noms masculins finissent en -a (mężczyzna, kolega). Certains féminins finissent par une consonne (noc, rzecz, miłość). Apprends le genre avec le nom, et vérifie-le dans le dictionnaire en cas de doute.",
         "Le genre te donne le pronom : on (masculin), ona (féminin), ono (neutre). Ne calque pas le français : « le livre » est książka (féminin), « la table » est stół (masculin), « la fenêtre » est okno (neutre). Il n’y a pas d’article en polonais.",
       ],
       table: {
@@ -27,8 +27,8 @@ export const plCourse = {
       },
       examples: [
         { text: "To jest mój brat. On pracuje w banku.", translation: "C’est mon frère. Il travaille dans une banque.", note: "Brat finit par une consonne : masculin, donc on." },
-        { text: "Oto nasza książka. Ona jest bardzo stara.", translation: "Voici notre livre. Il est très vieux.", note: "Książka finit en -a : féminin, donc ona (et non « il » comme en français)." },
-        { text: "Popatrz, okno jest otwarte. Ono jest duże.", translation: "Regarde, la fenêtre est ouverte. Elle est grande.", note: "Okno est neutre : ono, alors que « fenêtre » est féminin en français." },
+        { text: "Ten zeszyt jest nowy, a ta książka? Ona jest bardzo stara.", translation: "Ce cahier est neuf. Et ce livre ? Il est très vieux.", note: "Książka est féminin en polonais, donc ona." },
+        { text: "Popatrz na to dziecko. Ono już śpi.", translation: "Regarde cet enfant. Il dort déjà.", note: "Dziecko est neutre en polonais, donc ono." },
       ],
       exercises: [
         {
@@ -40,7 +40,7 @@ export const plCourse = {
         },
         {
           type: "choose",
-          prompt: "Gdzie jest okno? ___ jest duże.",
+          prompt: "Jakie jest to okno? — ___ jest duże.",
           options: ["Ona", "On", "Ono"],
           answer: 2,
           explanation: "Okno finit en -o : c’est un neutre, donc ono. Le français « la fenêtre » est féminin, mais le polonais suit sa propre terminaison.",
@@ -55,12 +55,13 @@ export const plCourse = {
         {
           type: "fill",
           prompt: "Gdzie jest twoja książka? — ___ jest na stole.",
+          hint: "Pronom sujet",
           answers: ["Ona"],
           explanation: "Książka est un féminin en -a : on la reprend par ona (le possessif twoja l’indique aussi).",
         },
         {
           type: "transform",
-          instruction: "Remplace le nom sujet par le pronom qui convient.",
+          instruction: "Remplace seulement le nom sujet par le pronom qui convient.",
           source: "Kot śpi w domu.",
           answers: ["On śpi w domu."],
           explanation: "Kot est masculin : il est repris par on.",
@@ -68,6 +69,7 @@ export const plCourse = {
       ],
       categories: ["agreement", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pl-a1-byc",
@@ -75,8 +77,8 @@ export const plCourse = {
       title: "Dire qui l’on est et où l’on est : być au présent",
       summary: "Conjuguer być (jestem, jesteś, jest…) et dire « c’est » avec to jest.",
       rule: [
-        "Być (« être ») a un présent irrégulier à apprendre par cœur : jestem, jesteś, jest, jesteśmy, jesteście, są. Le polonais omet le plus souvent le pronom sujet, car la terminaison suffit : Jestem z Francji (et non Ja jestem… sauf pour insister).",
-        "Pour montrer ou présenter quelque chose, on dit to jest (au pluriel to są), toujours invariable : To jest mój kolega. Il n’y a pas d’article : « un frère », « le frère » se disent tous deux brat.",
+        "Być (« être ») a un présent irrégulier : jestem, jesteś, jest, jesteśmy, jesteście, są. La terminaison suffit souvent à identifier la personne : Jestem z Francji. Tu peux exprimer le pronom pour souligner la personne ou marquer un contraste : Ja jestem z Francji, a ty?",
+        "Pour présenter quelqu’un ou quelque chose, utilise to jest au singulier et to są au pluriel : To jest mój kolega, To są moi koledzy. To ne change pas. Le polonais n’a pas d’article : brat peut signifier « un frère » ou « le frère ».",
         "La négation se place devant le verbe : nie jestem, nie jesteś… Piège : l’adjectif s’accorde avec le sujet, comme en français : un homme dit jestem zmęczony, une femme jestem zmęczona.",
       ],
       table: {
@@ -94,7 +96,7 @@ export const plCourse = {
       examples: [
         { text: "Jestem z Francji.", translation: "Je suis de France.", note: "Pas de pronom ja : jestem suffit." },
         { text: "Moja siostra jest bardzo miła.", translation: "Ma sœur est très gentille.", note: "Jest sert aussi bien pour un caractère que pour un lieu." },
-        { text: "To są moi koledzy.", translation: "Ce sont mes collègues.", note: "To są devant un pluriel." },
+        { text: "To są moi koledzy.", translation: "Ce sont mes copains.", note: "To są devant un pluriel." },
       ],
       exercises: [
         {
@@ -114,20 +116,20 @@ export const plCourse = {
         {
           type: "fill",
           prompt: "My ___ w pracy.",
-          hint: "być",
+          hint: "być, au présent",
           answers: ["jesteśmy"],
           explanation: "Avec my (nous) : jesteśmy.",
         },
         {
           type: "fill",
           prompt: "Wy ___ bardzo mili.",
-          hint: "być",
+          hint: "być, au présent",
           answers: ["jesteście"],
           explanation: "Avec wy (vous) : jesteście.",
         },
         {
           type: "transform",
-          instruction: "Mets la phrase à la forme négative.",
+          instruction: "Ajoute la négation sans déplacer les mots ni ajouter de pronom.",
           source: "Jestem zmęczony.",
           answers: ["Nie jestem zmęczony."],
           explanation: "La négation nie se place juste devant le verbe : nie jestem.",
@@ -135,6 +137,7 @@ export const plCourse = {
       ],
       categories: ["verb", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pl-a1-present-am",
@@ -142,7 +145,7 @@ export const plCourse = {
       title: "Conjuguer au présent : czytać, mieć, znać",
       summary: "Former le présent des verbes en -am, -asz, -a, -amy, -acie, -ają.",
       rule: [
-        "Beaucoup de verbes polonais ont un infinitif en -ać et une conjugaison en -am : czytać → czytam, czytasz, czyta, czytamy, czytacie, czytają. Retire -ać et ajoute les terminaisons -m, -sz, rien, -my, -cie, -ją.",
+        "Beaucoup de verbes en -ać suivent le modèle de czytać. Retire seulement le -ć de l’infinitif et ajoute -m, -sz, rien, -my, -cie ou -ją : czytam, czytasz, czyta, czytamy, czytacie, czytają.",
         "Attention à la 3e personne du singulier : elle n’a pas de terminaison (on czyta). Mieć est irrégulier : mam, masz, ma, mamy, macie, mają. Il n’y a qu’un seul présent : czytam signifie « je lis » et « je suis en train de lire ».",
         "Piège : ne garde pas l’infinitif (ja czytać est faux) et n’oublie pas que le pronom est facultatif : Czytam gazetę suffit. Le polonais distingue aussi ty (familier) et wy (pluriel) ; pour la politesse, on dit pan ou pani + 3e personne.",
       ],
@@ -152,14 +155,14 @@ export const plCourse = {
         rows: [
           ["ja", "czytam", "mam"],
           ["ty", "czytasz", "masz"],
-          ["on / ona", "czyta", "ma"],
+          ["on / ona / ono","czyta","ma"],
           ["my", "czytamy", "mamy"],
           ["wy", "czytacie", "macie"],
           ["oni / one", "czytają", "mają"],
         ],
       },
       examples: [
-        { text: "Czytam każdy wieczór.", translation: "Je lis chaque soir.", note: "Un seul présent : « je lis » et « je suis en train de lire »." },
+        { text: "Teraz czytam książkę. Zwykle czytam wieczorem.", translation: "Je suis en train de lire un livre. D’habitude, je lis le soir.", note: "Le même présent, czytam, exprime l’action en cours ou l’habitude selon le contexte." },
         { text: "Mamy duży dom i mały ogród.", translation: "Nous avons une grande maison et un petit jardin.", note: "Mieć : mamy. Pas d’article devant dom ni ogród." },
         { text: "Znamy ten adres.", translation: "Nous connaissons cette adresse.", note: "Znać (« connaître ») se conjugue comme czytać : znamy." },
       ],
@@ -181,20 +184,20 @@ export const plCourse = {
         {
           type: "fill",
           prompt: "My ___ ten adres.",
-          hint: "znać",
+          hint: "znać, au présent",
           answers: ["znamy"],
           explanation: "Avec my, on ajoute -my : znamy.",
         },
         {
           type: "fill",
           prompt: "Anna ___ dużo wolnego czasu.",
-          hint: "mieć",
+          hint: "mieć, au présent",
           answers: ["ma"],
           explanation: "À la 3e personne du singulier, mieć donne ma, sans terminaison personnelle.",
         },
         {
           type: "transform",
-          instruction: "Mets la phrase à la forme « my ».",
+          instruction: "Mets le verbe à la 1re personne du pluriel. Laisse « gazetę » à la fin. Le pronom « my » est facultatif.",
           source: "Czytam gazetę.",
           answers: ["Czytamy gazetę.", "My czytamy gazetę."],
           explanation: "Avec my, la terminaison est -my : czytamy. Le pronom my est facultatif.",
@@ -202,6 +205,7 @@ export const plCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pl-a1-present-e",
@@ -209,8 +213,8 @@ export const plCourse = {
       title: "Conjuguer au présent : pisać, robić, mówić",
       summary: "Former le présent en -ę / -esz (pisać) et en -ę / -isz (robić, mówić).",
       rule: [
-        "Deux autres grandes familles. Groupe -ę, -esz, -e, -emy, -ecie, -ą (pisać → piszę, piszesz, pisze, piszemy, piszecie, piszą). Groupe -ę, -isz / -ysz, -i / -y, -imy, -icie, -ią (robić → robię, robisz, robi, robimy, robicie, robią).",
-        "La 1re personne du singulier finit toujours en -ę (voyelle nasale)et la 3e du pluriel en -ą ou -ią. Le radical peut changer : pisać → piszę (s devient sz), mówić → mówię mais mówisz.",
+        "Deux modèles : pisać donne piszę, piszesz, pisze, piszemy, piszecie, piszą. Robić donne robię, robisz, robi, robimy, robicie, robią. Le modèle en -ysz existe aussi : uczyć donne uczę, uczysz, uczy, uczymy, uczycie, uczą.",
+        "Dans ces modèles, la 1re personne du singulier finit en -ę. La 3e du pluriel finit en -ą ou -ią. Le radical peut alterner : pisać → piszę (s devient sz), mówić → mówię mais mówisz.",
         "Piège : ne mélange pas les familles (ne dis pas piszam ni robam). Seul le dictionnaire t’indique le groupe, retiens donc le verbe avec sa 1re et sa 2e personne : piszę, piszesz.",
       ],
       table: {
@@ -219,7 +223,7 @@ export const plCourse = {
         rows: [
           ["ja", "piszę", "robię"],
           ["ty", "piszesz", "robisz"],
-          ["on / ona", "pisze", "robi"],
+          ["on / ona / ono","pisze","robi"],
           ["my", "piszemy", "robimy"],
           ["wy", "piszecie", "robicie"],
           ["oni / one", "piszą", "robią"],
@@ -227,7 +231,7 @@ export const plCourse = {
       },
       examples: [
         { text: "Piszę list do przyjaciela.", translation: "J’écris une lettre à un ami.", note: "Pisać : 1re personne en -ę, avec s → sz." },
-        { text: "Co robisz wieczorem?", translation: "Que fais-tu ce soir ?", note: "Robić : robisz, à la 2e personne en -isz." },
+        { text: "Co robisz dziś wieczorem?", translation: "Que fais-tu ce soir ?", note: "Robić : robisz, à la 2e personne en -isz." },
         { text: "Oni mówią po polsku i po francusku.", translation: "Ils parlent polonais et français.", note: "Mówić : 3e personne du pluriel en -ią." },
       ],
       exercises: [
@@ -248,20 +252,20 @@ export const plCourse = {
         {
           type: "fill",
           prompt: "Oni ___ obiad.",
-          hint: "robić",
+          hint: "robić, au présent",
           answers: ["robią"],
           explanation: "À la 3e personne du pluriel, robić donne robią.",
         },
         {
           type: "fill",
           prompt: "Ty często ___ listy.",
-          hint: "pisać",
+          hint: "pisać, au présent",
           answers: ["piszesz"],
           explanation: "Radical pisz- + -esz : piszesz.",
         },
         {
           type: "transform",
-          instruction: "Mets la phrase à la 3e personne du singulier (« il »).",
+          instruction: "Mets le verbe à la 3e personne du singulier (« il »). Laisse « zakupy » à la fin. Le pronom « on » est facultatif.",
           source: "Robię zakupy.",
           answers: ["On robi zakupy.", "Robi zakupy."],
           explanation: "À la 3e personne du singulier, robić donne robi.",
@@ -269,6 +273,7 @@ export const plCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pl-a1-accusative",
@@ -276,9 +281,9 @@ export const plCourse = {
       title: "Dire ce que l’on a, voit, aime : l’accusatif",
       summary: "Mettre le complément d’objet direct à l’accusatif (widzę kota, mam książkę).",
       rule: [
-        "Le complément direct prend l’accusatif. Seuls certains noms changent. Féminin en -a → -ę (książka → książkę, kobieta → kobietę). Masculin animé (personnes, animaux) → -a, comme le génitif (kot → kota, brat → brata).",
-        "Masculin inanimé et neutre ne changent pas : widzę stół, mam okno (l’accusatif est identique au nominatif). Les adjectifs s’accordent : duża → dużą, nowy → nowego (masculin animé).",
-        "Piège : le français n’a pas de cas, mais il faut pourtant marquer l’objet. Après lubić, mieć, widzieć, czytać, kupować, ne laisse jamais la forme du dictionnaire pour un féminin : dis mam książkę, pas mam książka.",
+        "À l’affirmatif, des verbes comme mieć, widzieć et kupować prennent un complément à l’accusatif. Au singulier, les féminins en -a prennent en général -ę (książka → książkę). Les masculins animés ont le même accusatif que génitif (kot → kota, pies → psa).",
+        "Au singulier, les masculins inanimés et les neutres gardent la forme du nominatif : widzę stół, mam okno. L’adjectif s’accorde : duża książka → dużą książkę, nowy kot → nowego kota. Certains noms de choses se déclinent comme des animés : jem pomidora (« je mange une tomate »).",
+        "En français, « le livre » garde la même forme en sujet et en objet. En polonais, compare Książka leży na stole (« Le livre est sur la table ») et Mam książkę (« J’ai un livre »). Certains féminins ne changent pas à l’accusatif, par exemple noc.",
       ],
       table: {
         caption: "Nominatif et accusatif au singulier",
@@ -301,7 +306,7 @@ export const plCourse = {
           prompt: "Widzę ___.",
           options: ["kot", "kota", "kotu", "kotem"],
           answer: 1,
-          explanation: "Kot est un masculin animé : l’accusatif prend la forme -a, kota.",
+          explanation: "Kot est un masculin animé. Son accusatif singulier est kota, comme au génitif.",
         },
         {
           type: "choose",
@@ -320,20 +325,21 @@ export const plCourse = {
         {
           type: "fill",
           prompt: "Kupuję ___.",
-          hint: "kawa",
+          hint: "kawa, au singulier",
           answers: ["kawę"],
           explanation: "Féminin en -a → -ę : kawę.",
         },
         {
           type: "fill",
           prompt: "Czytam ___.",
-          hint: "gazeta",
+          hint: "gazeta, au singulier",
           answers: ["gazetę"],
           explanation: "Féminin en -a → -ę : gazetę.",
         },
       ],
       categories: ["agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pl-a1-locative",
@@ -341,8 +347,8 @@ export const plCourse = {
       title: "Dire où l’on est : w / na + locatif",
       summary: "Dire où l’on habite ou se trouve avec w ou na suivis du locatif (w domu, w Polsce).",
       rule: [
-        "Pour dire où on est, w (« dans ») et na (« sur, à ») sont suivis du locatif. Masculin et neutre le plus souvent -u (w domu, na stole) ou -ie (w sklepie, w mieście, w Krakowie). Féminin en -a → -e (w szkole, w Polsce, w Warszawie).",
-        "La consonne finale peut s’adoucir devant -e : Polska → w Polsce, książka → w książce, szkoła → w szkole, poczta → na poczcie. Retiens les mots courants par cœur. Attention : les pays disent w Polsce, we Francji (we devant certains groupes de consonnes).",
+        "Pour indiquer où l’on est, w (« dans, à ») et na (« sur, à ») sont suivis du locatif. Au singulier, les masculins et les neutres prennent souvent -e (parfois écrit -ie) ou -u : na stole, w sklepie, w domu. Parmi les féminins : w szkole, w Warszawie, na ulicy.",
+        "La consonne finale peut alterner : Polska → w Polsce, książka → w książce, szkoła → w szkole, poczta → na poczcie. Apprends les formes courantes avec leur préposition. Devant certains groupes de consonnes, on dit we au lieu de w : we Francji.",
         "Piège : w ou na n’est pas toujours le même qu’en français. Dis na poczcie, na dworcu, na uniwersytecie, na wsi, mais w szkole, w pracy, w biurze, w kinie.",
       ],
       table: {
@@ -351,10 +357,10 @@ export const plCourse = {
         rows: [
           ["dom", "w domu", "-u"],
           ["sklep", "w sklepie", "-ie"],
-          ["miasto", "w mieście", "t → ci"],
-          ["Polska", "w Polsce", "sk → sc"],
+          ["miasto","w mieście","a → e, st → ść (écrit ści devant e)"],
+          ["Polska","w Polsce","k → c"],
           ["szkoła", "w szkole", "-a → -e"],
-          ["poczta", "na poczcie", "na, et t → c"],
+          ["poczta","na poczcie","na, et t → ć (écrit ci devant e)"],
           ["dworzec", "na dworcu", "na, et e disparaît"],
         ],
       },
@@ -369,11 +375,11 @@ export const plCourse = {
           prompt: "Moi rodzice mieszkają w ___.",
           options: ["Polska", "Polskę", "Polską", "Polsce"],
           answer: 3,
-          explanation: "Après w, on met le locatif : Polska devient Polsce (sk → sc).",
+          explanation: "Ici, w indique le lieu de résidence et demande le locatif : Polska devient Polsce (k → c).",
         },
         {
           type: "choose",
-          prompt: "Kasia jest ___.",
+          prompt: "Kasia jest ___. (Kasia est au bureau de poste.)",
           options: ["w poczcie", "na poczta", "na poczcie", "do poczty"],
           answer: 2,
           explanation: "On dit na poczcie : na + locatif (poczta → poczcie).",
@@ -402,6 +408,7 @@ export const plCourse = {
       ],
       categories: ["agreement", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pl-a2-plural",
@@ -409,8 +416,8 @@ export const plCourse = {
       title: "Mettre au pluriel : koty, książki, studenci",
       summary: "Former le pluriel au nominatif et distinguer le masculin-personnel du non-personnel.",
       rule: [
-        "Le pluriel varie selon le genre. Féminin -a → -y ou -i (kobieta → kobiety, książka → książki ; -i après k, g et consonne douce). Neutre -o → -a (okno → okna). Masculin non-personnel (choses, animaux) → -y ou -i (stół → stoły, kot → koty).",
-        "Le polonais distingue le masculin-personnel (hommes, ou groupes avec au moins un homme) : student → studenci, Polak → Polacy, kolega → koledzy. Cette forme change aussi le verbe et l’adjectif : dobrzy studenci, mais dobre koty.",
+        "Au nominatif pluriel, beaucoup de féminins en -a prennent -y ou -i (kobiety, książki), d’autres -e (ulica → ulice). Les neutres en -o prennent souvent -a (okno → okna). Les masculins non personnels prennent souvent -y, -i ou -e (koty, stoły, pokoje).",
+        "Les noms masculins de personnes ont des formes propres : student → studenci, Polak → Polacy, kolega → koledzy. L’accord distingue dobrzy studenci de dobre koty, et au passé studenci byli de koty były. Un sujet qui coordonne une femme et un homme prend aussi l’accord masculin-personnel.",
         "Piège : au pluriel non-personnel, féminin, neutre et masculin non-personnel partagent les mêmes accords : te nowe książki, te nowe okna, te nowe stoły. Quelques pluriels irréguliers : dziecko → dzieci, człowiek → ludzie.",
       ],
       table: {
@@ -445,7 +452,7 @@ export const plCourse = {
           prompt: "To są moi ___.",
           options: ["koty", "studenci", "książki", "kobiety"],
           answer: 1,
-          explanation: "Le possessif moi est la forme masculin-personnel : il ne s’emploie qu’avec des hommes, donc studenci.",
+          explanation: "Moi est le possessif au masculin-personnel pluriel. Parmi les quatre noms, seul studenci appelle cette forme.",
         },
         {
           type: "fill",
@@ -465,12 +472,13 @@ export const plCourse = {
           type: "transform",
           instruction: "Mets la phrase au pluriel.",
           source: "To jest mój kolega.",
-          answers: ["To są moi koledzy."],
-          explanation: "To jest devient to są, mój devient moi et kolega devient koledzy.",
+          answers: ["To są moi koledzy.","To moi koledzy."],
+          explanation: "Mój devient moi et kolega devient koledzy. On peut dire to są ou simplement to devant le groupe nominal.",
         },
       ],
       categories: ["agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pl-a2-genitive",
@@ -478,9 +486,9 @@ export const plCourse = {
       title: "Nier et quantifier : le génitif (nie mam, dużo czasu)",
       summary: "Employer le génitif après la négation, nie ma, les mots de quantité et pour la possession.",
       rule: [
-        "Le génitif s’emploie après nie ma (« il n’y a pas ») et dans la négation d’un objet direct : Mam czas → Nie mam czasu. Il sert aussi pour la possession (dom brata) et après les mots de quantité (dużo, mało, trochę, szklanka, butelka).",
-        "Singulier : féminin -a → -y ou -i (woda → wody, praca → pracy). Masculin inanimé souvent -u (czas → czasu, dom → domu, cukier → cukru), parfois -a (chleb → chleba) ; masculin animé -a (kot → kota). Neutre -o → -a (mleko → mleka).",
-        "Piège : en français, la négation ne change pas le nom (« je n’ai pas de temps »). En polonais, l’objet direct passe au génitif : nie widzę kota, nie mam książki. Ne garde pas l’accusatif après nie.",
+        "Après nie ma (« il n’y a pas »), on emploie le génitif. Il remplace aussi l’accusatif de l’objet quand on nie le verbe : Mam czas → Nie mam czasu. Autres emplois : la possession (dom brata) et la quantité (dużo, mało, trochę, szklanka, butelka).",
+        "Au singulier, les féminins en -a prennent souvent -y ou -i (woda → wody, praca → pracy). Les masculins inanimés prennent -u ou -a (czas → czasu, chleb → chleba). Les animés prennent souvent -a (kot → kota), avec d’autres modèles (mężczyzna → mężczyzny). Les neutres en -o prennent souvent -a (mleko → mleka).",
+        "En français, « un livre » devient « pas de livre » sans modifier le nom. En polonais, compare mam książkę et nie mam książki. Si le verbe demande déjà le datif, il le garde : pomagam mamie → nie pomagam mamie.",
       ],
       table: {
         caption: "Nominatif et génitif au singulier",
@@ -497,7 +505,7 @@ export const plCourse = {
       examples: [
         { text: "Nie mam dziś czasu.", translation: "Je n’ai pas le temps aujourd’hui.", note: "Czas → czasu après la négation." },
         { text: "W lodówce nie ma mleka.", translation: "Il n’y a pas de lait dans le frigo.", note: "Nie ma + génitif : mleko → mleka." },
-        { text: "To jest dom mojego brata.", translation: "C’est la maison de mon frère.", note: "Possession : brat → brata, et l’adjectif suit." },
+        { text: "To jest dom mojego brata.", translation: "C’est la maison de mon frère.", note: "Possession : brat → brata, et le possessif mojego s’accorde au génitif." },
       ],
       exercises: [
         {
@@ -530,7 +538,7 @@ export const plCourse = {
         },
         {
           type: "transform",
-          instruction: "Mets la phrase à la forme négative.",
+          instruction: "Mets la phrase à la forme négative en commençant par « Nie mam ».",
           source: "Mam samochód.",
           answers: ["Nie mam samochodu."],
           explanation: "Après la négation, l’objet passe au génitif : samochód → samochodu (ó devient o).",
@@ -538,6 +546,7 @@ export const plCourse = {
       ],
       categories: ["agreement", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pl-a2-past",
@@ -545,13 +554,13 @@ export const plCourse = {
       title: "Parler au passé : -ł, -ła, -li et le genre",
       summary: "Former le passé avec -ł, -ła, -ło, -li, -ły et les terminaisons personnelles.",
       rule: [
-        "Le passé se construit sur l’infinitif sans -ć, avec -ł (masculin), -ła (féminin), -ło (neutre), -li (masculin-personnel pluriel) ou -ły (autres pluriels), puis une terminaison de personne : -m (ja), -ś (ty), -śmy (my), -ście (wy). À la 3e personne, il n’y en a pas.",
-        "Le genre de celui qui parle compte : un homme dit czytałem, une femme czytałam. Au pluriel, un groupe avec au moins un homme prend -li (czytaliśmy), un groupe de femmes seulement -ły (czytałyśmy).",
-        "Piège : le français a le passé composé avec avoir/être, le polonais n’a pas d’auxiliaire. Les verbes en -ć restent réguliers, mais la voyelle du radical peut changer : być → był, byli. Le pronom reste facultatif : Byłam w kinie.",
+        "Pars des formes de la 3e personne : czytał, czytała, czytało, czytali, czytały. Pour ja et ty, ajoute -em ou -eś au masculin et -m ou -ś au féminin : czytałem, czytałam. Pour my et wy, ajoute -śmy ou -ście à la forme du pluriel : czytaliśmy, czytałyście.",
+        "Le genre compte : un homme dit czytałem, une femme czytałam. Un groupe masculin ou mixte dit czytaliśmy, un groupe de femmes dit czytałyśmy. À la 3e personne, les sujets non masculins-personnels prennent aussi le modèle en -ły : Koty spały.",
+        "Le passé courant se forme sans auxiliaire, là où le français emploie souvent avoir ou être. Certains verbes changent de radical : iść donne szedł et szła. Le pronom sujet peut s’omettre : Byłam w kinie.",
       ],
       table: {
         caption: "Passé de czytać",
-        headers: ["Personne", "Masculin", "Féminin"],
+        headers: ["Personne","Masculin / masc.-personnel","Féminin / autres pluriels"],
         rows: [
           ["ja", "czytałem", "czytałam"],
           ["ty", "czytałeś", "czytałaś"],
@@ -562,7 +571,7 @@ export const plCourse = {
         ],
       },
       examples: [
-        { text: "Wczoraj byłam w kinie.", translation: "Hier, je suis allée au cinéma.", note: "Une femme dit byłam ; un homme dirait byłem." },
+        { text: "Wczoraj byłam w kinie.", translation: "Hier, j’étais au cinéma.", note: "Une femme dit byłam, un homme dirait byłem." },
         { text: "Mój brat dużo czytał.", translation: "Mon frère lisait beaucoup.", note: "3e personne du masculin : -ł, sans terminaison personnelle." },
         { text: "Wczoraj oglądaliśmy film.", translation: "Hier, nous avons regardé un film.", note: "Groupe mixte ou masculin : -liśmy." },
       ],
@@ -572,7 +581,7 @@ export const plCourse = {
           prompt: "Anna wczoraj ___ w domu.",
           options: ["było", "był", "byli", "była"],
           answer: 3,
-          explanation: "Anna est féminin : -ła, donc była.",
+          explanation: "Le sujet Anna est féminin. On emploie była, avec -ła.",
         },
         {
           type: "choose",
@@ -584,20 +593,20 @@ export const plCourse = {
         {
           type: "fill",
           prompt: "Kasia wczoraj ___ do mamy.",
-          hint: "dzwonić",
+          hint: "dzwonić, au passé",
           answers: ["dzwoniła"],
-          explanation: "Kasia est féminin : dzwonić → dzwoniła.",
+          explanation: "Kasia est un sujet féminin. Au passé, dzwonić donne dzwoniła.",
         },
         {
           type: "fill",
           prompt: "Oni wczoraj ___ w kinie.",
-          hint: "być",
+          hint: "być, au passé",
           answers: ["byli"],
           explanation: "Oni (hommes ou groupe mixte) → byli.",
         },
         {
           type: "transform",
-          instruction: "Mets la phrase au passé (c’est un homme qui parle).",
+          instruction: "Mets le verbe au passé (un homme parle). Laisse « książkę » à la fin. Le pronom « ja » est facultatif.",
           source: "Czytam książkę.",
           answers: ["Czytałem książkę.", "Ja czytałem książkę."],
           explanation: "Un homme dit czytałem : -ł + -em. Le pronom ja est facultatif.",
@@ -605,6 +614,7 @@ export const plCourse = {
       ],
       categories: ["verb", "agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pl-a2-instrumental",
@@ -612,9 +622,9 @@ export const plCourse = {
       title: "Dire son métier et « avec » : l’instrumental",
       summary: "Employer l’instrumental après być (jestem studentem) et après z (z siostrą).",
       rule: [
-        "Pour dire son métier, sa nationalité ou sa fonction avec być, on met l’attribut à l’instrumental : Jestem studentem, Mój ojciec jest lekarzem. Le même cas suit z (« avec ») : z bratem, z kawą.",
+        "Après być, un nom qui indique le métier, la nationalité ou la fonction se met à l’instrumental : Jestem studentem, Mój ojciec jest lekarzem. La préposition z demande aussi l’instrumental au sens de « avec » : z bratem, z kawą.",
         "Terminaisons au singulier : masculin et neutre -em ou -iem (student → studentem, mleko → mlekiem, dziecko → dzieckiem). Féminin -a → -ą (siostra → siostrą, kawa → kawą). Les adjectifs s’accordent : dobrym lekarzem, dobrą siostrą.",
-        "Piège : en français, « il est médecin » se dit avec un nom nu. En polonais, on met l’instrumental : on jest lekarzem, et non on jest lekarz. Seul to jest garde le nominatif (To jest lekarz).",
+        "Compare On jest lekarzem (« Il est médecin ») avec To jest lekarz (« C’est un médecin »). Dans la seconde construction, le nom est au nominatif. Un adjectif employé seul s’accorde au nominatif : On jest zmęczony (« Il est fatigué »).",
       ],
       table: {
         caption: "Nominatif et instrumental au singulier",
@@ -647,7 +657,7 @@ export const plCourse = {
           prompt: "Idę do kina z ___.",
           options: ["siostra", "siostry", "siostrą", "siostrę"],
           answer: 2,
-          explanation: "Après z, l’instrumental féminin prend -ą : siostrą.",
+          explanation: "Z signifie ici « avec » et demande l’instrumental : siostra → siostrą.",
         },
         {
           type: "fill",
@@ -661,11 +671,12 @@ export const plCourse = {
           prompt: "Piję kawę z ___.",
           hint: "mleko",
           answers: ["mlekiem"],
-          explanation: "Mleko → mlekiem après z.",
+          explanation: "Z signifie ici « avec ». Mleko devient mlekiem à l’instrumental.",
         },
       ],
       categories: ["agreement", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pl-a2-dative",
@@ -673,9 +684,9 @@ export const plCourse = {
       title: "À qui ? Le datif : mi się podoba, daję bratu",
       summary: "Employer le datif pour le destinataire, podobać się et les sensations (jest mi zimno).",
       rule: [
-        "Le datif répond à « à qui ? » : Daję prezent bratu, Pomagam mamie. Noms : masculin -owi ou -u (bratu, studentowi), féminin -e ou -ie (mamie, siostrze), neutre -u. Verbes fréquents avec le datif : dać, pokazać, pomagać, podobać się.",
-        "Les pronoms ont deux formes : courte et inaccentuée (mi, ci, mu, jej, nam, wam, im) après le verbe, longue et accentuée (mnie, tobie, jemu…) pour insister. Jest mi zimno, Podoba mi się ten dom, Pomagam jej.",
-        "Piège : en français, « ça me plaît » a « me » comme complément. En polonais, le sujet est la chose qui plaît (ten dom podoba mi się) et la personne est au datif. De même, jest mi zimno (« j’ai froid ») n’a pas de sujet personnel.",
+        "Le datif répond à « à qui ? » : Daję prezent bratu, Pomagam mamie. Au singulier, on trouve -owi ou -u au masculin (studentowi, bratu), souvent -e écrit -e ou -ie au féminin (siostrze, mamie), et généralement -u au neutre (dziecku).",
+        "Ja, ty et on/ono ont des formes brèves (mi, ci, mu) et longues (mnie, tobie, jemu). La forme brève s’emploie sans accent, même avant le verbe : Czy ci pomóc? La longue sert notamment à insister : Mnie się ten dom podoba. Les autres formes du tableau restent identiques dans ces emplois.",
+        "Pour « j’aime cette maison », tu peux dire Podoba mi się ten dom, comme « cette maison me plaît ». Ten dom est le sujet et mi désigne la personne au datif. Dans Jest mi zimno (« J’ai froid »), il n’y a pas de sujet personnel.",
       ],
       table: {
         caption: "Pronoms personnels au datif",
@@ -726,7 +737,7 @@ export const plCourse = {
         },
         {
           type: "transform",
-          instruction: "Remplace le nom par un pronom.",
+          instruction: "Remplace seulement « mamie » par le pronom correspondant, à la même place.",
           source: "Daję mamie kwiaty.",
           answers: ["Daję jej kwiaty."],
           explanation: "Mama (ona) devient jej au datif.",
@@ -734,6 +745,7 @@ export const plCourse = {
       ],
       categories: ["agreement", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pl-a2-motion",
@@ -741,9 +753,9 @@ export const plCourse = {
       title: "Aller à pied ou en véhicule : iść / chodzić, jechać / jeździć",
       summary: "Choisir entre le verbe d’un trajet précis (idę) et d’une habitude (chodzę).",
       rule: [
-        "Le polonais a deux verbes pour « aller ». À pied : iść (trajet précis, maintenant) et chodzić (habitude, allers-retours). En véhicule : jechać (trajet précis) et jeździć (habitude). Idę do szkoły = « je suis en train d’y aller » ; Chodzę do szkoły = « j’y vais d’habitude ».",
-        "Lieu d’arrivée : do + génitif (do szkoły, do pracy, do kina). Moyen de transport : instrumental, sans préposition (jadę autobusem, samochodem). Pour la direction vers une personne, on emploie do + génitif aussi : do mamy.",
-        "Piège : le français n’a qu’« aller ». Ne dis pas chodzę pour un trajet unique. Les conjugaisons se mémorisent à part (voir le tableau), surtout jadę / jedziesz et jeżdżę / jeździsz.",
+        "À pied, iść décrit un déplacement dans une direction, par exemple Idę do szkoły. Chodzić convient notamment à une habitude ou à des déplacements dans plusieurs directions : Chodzę do szkoły, Chodzę po parku. En véhicule, le même contraste oppose jechać et jeździć.",
+        "Pour la destination, do se construit avec le génitif : do szkoły, do kina, do mamy. On dit aussi na + accusatif dans certains cas : Idę na koncert. Le moyen de transport se met à l’instrumental sans préposition : Jadę autobusem.",
+        "Le français emploie souvent le même verbe, « aller ». Compare Idę do szkoły (« Je suis en route pour l’école ») et Chodzę do szkoły (« Je vais à l’école régulièrement »). Le tableau donne les formes à retenir, dont jadę / jedziesz et jeżdżę / jeździsz.",
       ],
       table: {
         caption: "Présent de quatre verbes de mouvement",
@@ -765,35 +777,35 @@ export const plCourse = {
       exercises: [
         {
           type: "choose",
-          prompt: "Teraz ___ pieszo do pracy.",
+          prompt: "W tej chwili ___ pieszo do pracy. Jestem już w połowie drogi.",
           options: ["chodzę", "jeżdżę", "jadę", "idę"],
           answer: 3,
           explanation: "Trajet précis, à pied : iść → idę.",
         },
         {
           type: "choose",
-          prompt: "Codziennie ___ do szkoły autobusem.",
-          options: ["jadę", "jeżdżę", "idę", "chodzę"],
+          prompt: "Codziennie ___ do szkoły autobusem. (Je parle de moi.)",
+          options: ["jeździsz","jeżdżę","idę","chodzę"],
           answer: 1,
           explanation: "Habitude, en véhicule (autobusem) : jeździć → jeżdżę.",
         },
         {
           type: "fill",
-          prompt: "Dzisiaj my ___ pieszo do kina.",
-          hint: "iść",
+          prompt: "Czy ___ dziś razem pieszo do kina?",
+          hint: "iść, my, au présent",
           answers: ["idziemy"],
           explanation: "Iść avec my : idziemy.",
         },
         {
           type: "fill",
           prompt: "Moja siostra często ___ do Polski.",
-          hint: "jeździć",
+          hint: "jeździć, au présent",
           answers: ["jeździ"],
           explanation: "Habitude en véhicule, 3e personne : jeździ.",
         },
         {
           type: "transform",
-          instruction: "Mets la phrase à l’habitude (au lieu d’un trajet précis).",
+          instruction: "Remplace seulement le verbe par celui d’un trajet habituel.",
           source: "Idę do szkoły.",
           answers: ["Chodzę do szkoły."],
           explanation: "Pour une habitude, iść devient chodzić : chodzę.",
@@ -801,6 +813,7 @@ export const plCourse = {
       ],
       categories: ["verb", "word_choice"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pl-b1-aspect",
@@ -808,20 +821,20 @@ export const plCourse = {
       title: "Processus ou résultat : l’aspect (czytać / przeczytać)",
       summary: "Choisir entre l’imperfectif (action en cours, habitude) et le perfectif (action achevée).",
       rule: [
-        "La plupart des verbes polonais existent en deux versions : imperfectif (czytać) et perfectif (przeczytać). L’imperfectif décrit un processus, une habitude, une action répétée. Le perfectif décrit une action unique et achevée, avec un résultat.",
+        "Beaucoup de verbes polonais vont par paires : czytać (imperfectif) et przeczytać (perfectif). L’imperfectif présente l’action comme un processus, une habitude ou un fait, sans souligner son achèvement. Le perfectif la présente dans son ensemble, souvent avec un résultat.",
         "Au passé, czytałem książkę signifie « je lisais le livre » (peut-être sans l’avoir fini), przeczytałem książkę signifie « je l’ai lu en entier ». Le perfectif est souvent formé par un préfixe (pisać → napisać, robić → zrobić), parfois par un autre radical (brać → wziąć).",
-        "Piège : le français marque cette nuance avec l’imparfait et le passé composé, pas par deux verbes. Retiens les deux verbes ensemble. Le présent du perfectif n’existe pas comme présent : il a un sens futur (voir le point suivant).",
+        "Le français peut employer le même passé composé dans deux sens : « J’ai lu toute la soirée » (czytałem) et « J’ai lu le livre en entier » (przeczytałem). Apprends les verbes par paires. Les formes personnelles du perfectif qui ressemblent au présent ont un sens futur : przeczytam (« je lirai en entier »).",
       ],
       table: {
         caption: "Quelques couples de verbes",
         headers: ["Imperfectif", "Perfectif", "Sens"],
         rows: [
           ["czytać", "przeczytać", "lire / lire en entier"],
-          ["pisać", "napisać", "écrire / avoir écrit"],
-          ["robić", "zrobić", "faire / avoir fait"],
-          ["kupować", "kupić", "acheter / avoir acheté"],
-          ["jeść", "zjeść", "manger / avoir mangé"],
-          ["dawać", "dać", "donner / avoir donné"],
+          ["pisać","napisać","écrire / terminer d’écrire"],
+          ["robić","zrobić","faire / mener à bien"],
+          ["kupować","kupić","acheter (activité / acte complet)"],
+          ["jeść","zjeść","manger / finir de manger"],
+          ["dawać","dać","donner (activité / acte complet)"],
         ],
       },
       examples: [
@@ -832,14 +845,14 @@ export const plCourse = {
       exercises: [
         {
           type: "choose",
-          prompt: "W końcu ___ ten list!",
+          prompt: "Wreszcie ___ ten list! (J’ai enfin fini d’écrire cette lettre.)",
           options: ["pisałem", "piszę", "napisałem", "pisał"],
           answer: 2,
-          explanation: "W końcu insiste sur le résultat : perfectif napisałem.",
+          explanation: "Le sens demandé inclut l’achèvement et le locuteur parle de lui-même. On emploie napisałem.",
         },
         {
           type: "choose",
-          prompt: "Codziennie rano ___ gazetę.",
+          prompt: "Codziennie rano ___ gazetę. (Habitude au présent.)",
           options: ["przeczytam", "przeczytałem", "przeczytał", "czytam"],
           answer: 3,
           explanation: "Codziennie exprime une habitude : imperfectif, czytam.",
@@ -847,20 +860,20 @@ export const plCourse = {
         {
           type: "fill",
           prompt: "Wczoraj w końcu ___ zakupy.",
-          hint: "zrobić",
+          hint: "zrobić, 1re personne du singulier",
           answers: ["zrobiłem", "zrobiłam"],
           explanation: "Résultat atteint : perfectif zrobić → zrobiłem (homme) ou zrobiłam (femme).",
         },
         {
           type: "fill",
           prompt: "Zawsze ___ rano kawę.",
-          hint: "pić",
+          hint: "pić, 1re personne du singulier au présent",
           answers: ["piję"],
           explanation: "Habitude : imperfectif piję (pić → piję).",
         },
         {
           type: "transform",
-          instruction: "Mets le verbe au perfectif (action terminée).",
+          instruction: "Remplace seulement « robiłem » par la forme perfective correspondante, en gardant le temps et la personne.",
           source: "Robiłem zakupy.",
           answers: ["Zrobiłem zakupy."],
           explanation: "Robić (imperfectif) devient zrobić (perfectif) : zrobiłem.",
@@ -868,16 +881,17 @@ export const plCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pl-b1-future",
       level: "B1",
       title: "Parler du futur : będę czytać ou przeczytam",
-      summary: "Former le futur imperfectif avec będę et le futur perfectif avec le présent du perfectif.",
+      summary: "Former le futur composé avec będę et le futur simple des verbes perfectifs.",
       rule: [
-        "Deux manières de faire le futur. Imperfectif (action qui dure, habitude) : będę + infinitif ou będę + forme en -ł (będę czytać / będę czytał). Perfectif (action unique, achevée) : la conjugaison du présent du verbe perfectif (przeczytam, przeczytasz…).",
-        "Będę se conjugue ainsi : będę, będziesz, będzie, będziemy, będziecie, będą. Après będę, l’infinitif est le plus courant. La forme en -ł s’accorde avec le sujet (będę czytał / czytała).",
-        "Piège : przeczytam n’est pas un présent mais un futur, et le perfectif ne se combine jamais avec będę (będę przeczytać est faux). On peut aussi parler d’un futur proche avec le présent imperfectif : Jutro jadę do Krakowa.",
+        "À l’imperfectif, forme le futur avec będę + infinitif (będę czytać) ou będę + la forme en -ł (będę czytał). Au perfectif, le futur se forme en un seul mot : przeczytam, przeczytasz, przeczyta. Le choix dépend du point de vue sur l’action (voir la fiche sur l’aspect).",
+        "Być au futur : będę, będziesz, będzie, będziemy, będziecie, będą. Tu peux dire będę czytać ou employer la forme du passé de 3e personne qui correspond au genre et au nombre du sujet : będę czytał / czytała, będziemy czytali / czytały.",
+        "Przeczytam signifie « je lirai en entier ». Ne combine pas le futur de być avec l’infinitif d’un perfectif comme przeczytać. Pour un déplacement prévu, un présent imperfectif peut aussi avoir un sens futur : Jutro jadę do Krakowa.",
       ],
       table: {
         caption: "Futur de czytać / przeczytać",
@@ -894,7 +908,7 @@ export const plCourse = {
       examples: [
         { text: "Jutro będę pracować w domu.", translation: "Demain, je travaillerai à la maison.", note: "Action qui dure : będę + infinitif." },
         { text: "Zrobię to jutro.", translation: "Je le ferai demain.", note: "Perfectif : zrobić → zrobię, sens de futur." },
-        { text: "Za godzinę napiszę do ciebie.", translation: "Dans une heure, je t’écrirai.", note: "Action unique et achevée : perfectif napiszę." },
+        { text: "Za godzinę napiszę do ciebie.", translation: "Dans une heure, je t’écrirai.", note: "Napiszę présente l’action d’écrire comme un acte complet à venir." },
       ],
       exercises: [
         {
@@ -902,7 +916,7 @@ export const plCourse = {
           prompt: "Jutro ___ ten film.",
           options: ["będę obejrzeć", "będę obejrzę", "obejrzałem", "obejrzę"],
           answer: 3,
-          explanation: "Le perfectif n’a pas de futur avec będę : son présent a le sens du futur, obejrzę.",
+          explanation: "Obejrzeć est perfectif. Son futur à la 1re personne se forme en un seul mot : obejrzę.",
         },
         {
           type: "choose",
@@ -913,21 +927,21 @@ export const plCourse = {
         },
         {
           type: "fill",
-          prompt: "Jutro my ___ zakupy.",
-          hint: "zrobić",
+          prompt: "Jutro ___ zakupy.",
+          hint: "zrobić, my, au futur",
           answers: ["zrobimy"],
           explanation: "Perfectif au futur, avec my : zrobimy.",
         },
         {
           type: "fill",
           prompt: "Czy wy ___ w domu w niedzielę?",
-          hint: "być",
+          hint: "być, au futur",
           answers: ["będziecie"],
           explanation: "Futur de być avec wy : będziecie.",
         },
         {
           type: "transform",
-          instruction: "Mets la phrase au futur avec « będę ».",
+          instruction: "Mets au futur composé. Commence par « będę », puis mets la forme de « czytać », et enfin « książkę ».",
           source: "Czytam książkę.",
           answers: ["Będę czytać książkę.", "Będę czytał książkę.", "Będę czytała książkę."],
           explanation: "Futur imperfectif : będę + infinitif (czytać) ou forme en -ł (czytał / czytała).",
@@ -935,16 +949,17 @@ export const plCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pl-b1-imperative",
       level: "B1",
       title: "Donner un ordre ou un conseil : l’impératif",
-      summary: "Former l’impératif (czytaj, pisz, bądź) et employer nie + imperfectif pour interdire.",
+      summary: "Former l’impératif (czytaj, pisz, bądź) et choisir l’aspect dans les ordres et les interdictions.",
       rule: [
-        "L’impératif de ty se forme à partir de la 3e personne du pluriel ou du radical. Exemples : czytaj (czytać), pisz (pisać), jedz (jeść), pij (pić), rób (robić), mów (mówić). Irréguliers à connaître : bądź, idź, jedź.",
-        "Pour wy on ajoute -cie (czytajcie, piszcie), pour « nous » on ajoute -my (czytajmy, piszmy). Le perfectif sert pour un ordre unique (Zrób to, Zadzwoń do mnie), l’imperfectif pour une interdiction (Nie rób tego ! Nie jedz tak szybko !).",
-        "Piège : le français emploie l’infinitif ou le présent pour la politesse (« veuillez… »). En polonais, on ajoute proszę : Proszę usiąść. N’emploie pas le perfectif avec nie pour interdire (Nie zrób tego est incorrect).",
+        "Apprends d’abord la forme de ty. Avec un verbe comme czytać, pars de czytają et enlève le ą final : czytaj. D’autres formes à retenir : pisać → pisz, jeść → jedz, pić → pij, robić → rób, mówić → mów, być → bądź, iść → idź, jechać → jedź.",
+        "Pour wy, ajoute -cie, et pour my, ajoute -my : czytajcie, czytajmy. Le perfectif est fréquent quand on demande un résultat précis : Zrób to. Pour une interdiction, on emploie souvent l’imperfectif : Nie rób tego! Un avertissement peut être au perfectif : Nie zapomnij kluczy!",
+        "Pour adoucir une demande, ajoute proszę : Czytaj ten tekst, proszę. La formule proszę + infinitif est également courante : Proszę usiąść (« Veuillez vous asseoir »).",
       ],
       table: {
         caption: "Impératif de six verbes",
@@ -959,14 +974,14 @@ export const plCourse = {
         ],
       },
       examples: [
-        { text: "Marek, czytaj ten tekst, proszę.", translation: "Marek, lis ce texte, s’il te plaît.", note: "Czytać → czytaj." },
-        { text: "Dzieci, bądźcie cicho!", translation: "Les enfants, soyez silencieux !", note: "Être → bądźcie (wy)." },
+        { text: "Marku, czytaj ten tekst, proszę.", translation: "Marek, lis ce texte, s’il te plaît.", note: "Le prénom est au vocatif (Marku), et czytaj est l’impératif de ty." },
+        { text: "Dzieci, bądźcie cicho!", translation: "Les enfants, silence !", note: "Być donne bądźcie à l’impératif de wy." },
         { text: "Nie jedz tak szybko!", translation: "Ne mange pas si vite !", note: "Interdiction : nie + imperfectif." },
       ],
       exercises: [
         {
           type: "choose",
-          prompt: "Marku, ___ ten tekst, proszę.",
+          prompt: "Marku, ___ ten tekst, proszę. (Impératif de ty.)",
           options: ["czytam", "czytajcie", "czytać", "czytaj"],
           answer: 3,
           explanation: "Pour ty (Marku), l’impératif est czytaj.",
@@ -981,20 +996,20 @@ export const plCourse = {
         {
           type: "fill",
           prompt: "Nie ___ tak szybko!",
-          hint: "jeść",
+          hint: "jeść, impératif de ty",
           answers: ["jedz"],
-          explanation: "Impératif de ty : jeść → jedz. Après nie, on emploie l’imperfectif.",
+          explanation: "Jeść donne jedz à l’impératif de ty. Cette interdiction porte sur une manière de manger et s’emploie à l’imperfectif.",
         },
         {
           type: "fill",
           prompt: "___ mi, proszę.",
-          hint: "pomóc",
+          hint: "pomóc, impératif de ty",
           answers: ["Pomóż"],
           explanation: "Impératif de ty : pomóc → pomóż. Le perfectif convient à une demande unique.",
         },
         {
           type: "transform",
-          instruction: "Transforme le constat en ordre adressé à ty.",
+          instruction: "Remplace seulement le verbe par l’impératif adressé à « ty ».",
           source: "Piszesz list.",
           answers: ["Pisz list."],
           explanation: "Impératif de ty : piszesz → pisz.",
@@ -1002,30 +1017,31 @@ export const plCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pl-b1-numbers",
       level: "B1",
       title: "Compter et accorder : dwa koty, pięć kotów",
-      summary: "Choisir le cas du nom selon le nombre : 1, 2 à 4, 5 et plus.",
+      summary: "Accorder le nom avec un nombre dans un sujet ou un complément à l’accusatif.",
       rule: [
-        "Le nombre décide du cas du nom. Après 1, le nom reste au singulier (jeden stół). Après 2, 3, 4 (et 22-24, 32-34…), il est au nominatif pluriel (dwa koty, trzy książki, cztery okna).",
-        "À partir de 5 (et 12-21, 25-31…), le nom passe au génitif pluriel (pięć stołów, pięć książek, pięć okien). Génitif pluriel : masculin -ów (stołów), féminin et neutre souvent sans terminaison, avec un e intercalé (książka → książek, okno → okien).",
-        "Piège : le français garde simplement le pluriel. Ne dis pas pięć koty. Pour le masculin-personnel, on emploie dwóch, trzech, czterech + génitif (dwóch studentów). Formes irrégulières à connaître : pięć lat, dziesięć złotych.",
+        "Dans un sujet ou un objet à l’accusatif, hors masculin-personnel, 1 seul garde le nom au singulier : jeden stół. Avec 2, 3, 4 ou un nombre qui se termine ainsi (sauf si ses deux derniers chiffres sont 12, 13 ou 14), le nom est au pluriel, au cas du groupe : Dwie książki leżą na stole, Mam dwie książki.",
+        "Dans les mêmes fonctions, les autres nombres (5–21, 25–31, etc.) demandent le génitif pluriel : pięć stołów, pięć książek, pięć okien. Apprends ces formes avec les noms. Aux autres cas, ce repère change : z pięcioma kotami (« avec cinq chats ») est à l’instrumental.",
+        "Au masculin-personnel, compare Dwóch studentów przyszło (génitif pluriel) et Dwaj studenci przyszli (nominatif pluriel). Avec 3 et 4, compare de même trzech / trzej et czterech / czterej. Autres formes à retenir : pięć lat, dziesięć złotych.",
       ],
       table: {
-        caption: "Nombre et cas du nom",
+        caption: "Nombre et cas hors masculin-personnel",
         headers: ["Nombre", "Cas du nom", "Exemple"],
         rows: [
-          ["1", "nominatif singulier", "jeden stół"],
-          ["2, 3, 4", "nominatif pluriel", "dwa koty, trzy książki, cztery okna"],
+          ["1 seul","singulier, cas du groupe","jeden stół"],
+          ["2, 3, 4","pluriel, cas du groupe","dwa koty, trzy książki, cztery okna"],
           ["5 à 21", "génitif pluriel", "pięć stołów, pięć książek, pięć okien"],
-          ["22, 23, 24", "nominatif pluriel", "dwadzieścia dwa stoły"],
+          ["22, 23, 24…","pluriel, cas du groupe","dwadzieścia dwa stoły"],
           ["25 à 31", "génitif pluriel", "dwadzieścia pięć stołów"],
         ],
       },
       examples: [
-        { text: "Mam dwa koty i trzy książki.", translation: "J’ai deux chats et trois livres.", note: "2-4 : nominatif pluriel." },
+        { text: "Mam dwa koty i trzy książki.", translation: "J’ai deux chats et trois livres.", note: "Avec mam, les deux groupes sont à l’accusatif pluriel, de même forme que le nominatif ici." },
         { text: "W domu jest pięć okien.", translation: "Il y a cinq fenêtres dans la maison.", note: "5+ : génitif pluriel (okno → okien)." },
         { text: "To kosztuje dziesięć złotych.", translation: "Ça coûte dix zlotys.", note: "Génitif pluriel de złoty : złotych." },
       ],
@@ -1035,7 +1051,7 @@ export const plCourse = {
           prompt: "Mam dwa ___.",
           options: ["kota", "koty", "kotów", "kot"],
           answer: 1,
-          explanation: "Après 2, 3 ou 4, le nom est au nominatif pluriel : dwa koty.",
+          explanation: "Mam demande ici l’accusatif : dwa koty est à l’accusatif pluriel, de même forme que le nominatif.",
         },
         {
           type: "choose",
@@ -1049,7 +1065,7 @@ export const plCourse = {
           prompt: "Mam trzy ___.",
           options: ["książka", "książek", "książkę", "książki"],
           answer: 3,
-          explanation: "Après trzy, le nominatif pluriel : książki.",
+          explanation: "Avec mam, trzy książki est à l’accusatif pluriel. Sa forme coïncide ici avec le nominatif.",
         },
         {
           type: "fill",
@@ -1063,11 +1079,12 @@ export const plCourse = {
           instruction: "Remplace « jeden » par « cztery » en adaptant le nom.",
           source: "Mam jeden samochód.",
           answers: ["Mam cztery samochody."],
-          explanation: "Après cztery, le nominatif pluriel : samochód → samochody.",
+          explanation: "Avec mam, on emploie l’accusatif pluriel : cztery samochody. Il a ici la même forme que le nominatif.",
         },
       ],
       categories: ["agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pl-b1-conditional",
@@ -1075,13 +1092,13 @@ export const plCourse = {
       title: "Demander poliment et imaginer : chciałbym, gdybym miał",
       summary: "Former le conditionnel (-łbym, -łabym) pour la politesse, le souhait et l’hypothèse.",
       rule: [
-        "Le conditionnel se forme avec la forme en -ł du passé, suivie de by et de la terminaison personnelle : czytałbym (homme), czytałabym (femme), czytałbyś, czytałby, czytalibyśmy, czytalibyście, czytaliby. Un seul conditionnel pour le présent et le passé.",
-        "Emplois : politesse (Chciałbym kawę, Czy mógłbyś mi pomóc ?), souhait (Chciałbym pojechać do Polski), hypothèse avec gdyby (Gdybym miał czas, poszedłbym do kina). Gdybym est déjà gdyby + terminaison, et le verbe suivant est au passé ou au conditionnel.",
-        "Piège : en français, l’imparfait suit « si » (« si j’avais le temps »). En polonais, on garde gdybym + forme en -ł, puis le conditionnel dans la principale. Ne dis pas jeżeli miałbym. Le genre du locuteur compte : chciałbym (homme) / chciałabym (femme).",
+        "Ajoute by et la terminaison personnelle à la forme en -ł : czytałbym (homme), czytałabym (femme), czytałbyś, czytałby, czytalibyśmy, czytalibyście, czytaliby. La particule peut aussi précéder le verbe : Ja bym czytał. Le contexte indique souvent si l’hypothèse concerne le présent ou le passé.",
+        "Le conditionnel sert à demander poliment (Chciałbym kawę, Czy mógłbyś mi pomóc?), à exprimer un souhait (Chciałbym pojechać do Polski) ou une hypothèse (Gdybym miał czas, poszedłbym do kina). Dans gdybym, le marqueur by et la terminaison -m sont déjà présents.",
+        "Pour « Si j’avais le temps, j’irais au cinéma », retiens gdybym miał czas, poszedłbym do kina. Après gdybym, écris miał. Dans la principale, ajoute -bym à poszedł. L’accord dépend du locuteur : un homme dit chciałbym, une femme chciałabym.",
       ],
       table: {
         caption: "Conditionnel de czytać",
-        headers: ["Personne", "Masculin", "Féminin"],
+        headers: ["Personne","Masculin / masc.-personnel","Féminin / autres pluriels"],
         rows: [
           ["ja", "czytałbym", "czytałabym"],
           ["ty", "czytałbyś", "czytałabyś"],
@@ -1099,14 +1116,14 @@ export const plCourse = {
       exercises: [
         {
           type: "choose",
-          prompt: "Marta mówi: ___ pojechać do Polski.",
+          prompt: "Marta mówi o sobie: ___ pojechać do Polski.",
           options: ["Chciałbym", "Chciałabym", "Chciałaby", "Chcieliby"],
           answer: 1,
           explanation: "Marta est une femme : chciałabym (-ła + by + -m).",
         },
         {
           type: "choose",
-          prompt: "Gdybym miał czas, ___ do kina.",
+          prompt: "Gdybym miał czas, ___ do kina. (Si j’avais le temps, j’irais au cinéma.)",
           options: ["poszedłem", "pójdę", "poszedłbym", "poszedłby"],
           answer: 2,
           explanation: "Dans la principale d’une hypothèse, on emploie le conditionnel : poszedłbym.",
@@ -1114,20 +1131,20 @@ export const plCourse = {
         {
           type: "fill",
           prompt: "Czy ___ mi pomóc?",
-          hint: "móc, ty",
-          answers: ["mógłbyś", "mogłabyś"],
-          explanation: "Politesse avec ty : mógłbyś (homme) ou mogłabyś (femme).",
+          hint: "móc, ty, au conditionnel",
+          answers: ["mógłbyś","mogłabyś","byś mógł","byś mogła"],
+          explanation: "Pour ty, on dit mógłbyś ou mogłabyś. On peut aussi placer byś avant le verbe : Czy byś mógł mi pomóc?",
         },
         {
           type: "fill",
           prompt: "My ___ pojechać nad morze.",
-          hint: "chcieć",
-          answers: ["chcielibyśmy", "chciałybyśmy"],
+          hint: "chcieć, au conditionnel",
+          answers: ["chcielibyśmy","chciałybyśmy","byśmy chcieli","byśmy chciały"],
           explanation: "Souhait avec my : chcielibyśmy (groupe avec un homme) ou chciałybyśmy (femmes).",
         },
         {
           type: "transform",
-          instruction: "Mets la phrase au conditionnel de politesse.",
+          instruction: "Remplace seulement « Chcę » par une forme du conditionnel en un mot.",
           source: "Chcę kawę.",
           answers: ["Chciałbym kawę.", "Chciałabym kawę."],
           explanation: "Chcę devient chciałbym (homme) ou chciałabym (femme).",
@@ -1135,6 +1152,7 @@ export const plCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "pl-b1-relative",
@@ -1142,8 +1160,8 @@ export const plCourse = {
       title: "Relier deux phrases : le pronom relatif który",
       summary: "Employer który, która, które selon le genre du nom repris et le cas de sa fonction.",
       rule: [
-        "Który remplace « qui, que, dont, où » et suit deux règles. Son genre et son nombre sont ceux du nom repris (antécédent). Son cas est celui de sa fonction dans la proposition relative : sujet → nominatif, objet → accusatif, après une préposition → le cas de cette préposition.",
-        "Exemples : Mam brata, który mieszka w Lyonie (sujet, nominatif masculin). To jest książka, którą czytam (objet, accusatif féminin). Miasto, w którym mieszkam, jest małe (w + locatif neutre). Une virgule précède toujours który.",
+        "Który introduit des relatives qui correspondent souvent à « qui », « que », « dont » ou « où ». Son genre et son nombre suivent le nom repris. Son cas dépend de sa fonction dans la relative : le sujet est au nominatif, le complément suit le cas demandé par le verbe ou par la préposition.",
+        "Mam brata, który mieszka w Lyonie (sujet au nominatif). To jest książka, którą czytam (objet à l’accusatif). Miasto, w którym mieszkam, jest małe (locatif après w). La virgule sépare la relative du reste : avec w którym, elle se met avant w.",
         "Piège : ne laisse pas le cas de l’antécédent dicter la forme. Dans « la femme que je vois », kobieta est féminin, mais le relatif est à l’accusatif : kobieta, którą widzę (pas która).",
       ],
       table: {
@@ -1151,9 +1169,11 @@ export const plCourse = {
         headers: ["Cas", "Masculin", "Féminin", "Neutre", "Pluriel"],
         rows: [
           ["Nominatif", "który", "która", "które", "którzy / które"],
-          ["Accusatif", "którego / który", "którą", "które", "których / które"],
+          ["Accusatif","którego (animé) / który (inanimé)","którą","które","których (masc.-pers.) / które"],
           ["Génitif", "którego", "której", "którego", "których"],
-          ["Locatif", "którym", "której", "którym", "których"],
+          ["Locatif","którym","której","którym","których"],
+          ["Datif","któremu","której","któremu","którym"],
+          ["Instrumental","którym","którą","którym","którymi"],
         ],
       },
       examples: [
@@ -1192,7 +1212,7 @@ export const plCourse = {
         },
         {
           type: "transform",
-          instruction: "Relie les deux phrases avec « który ».",
+          instruction: "Garde « Mam brata ». Remplace « Mój brat » par « który » et rattache la seconde phrase comme relative.",
           source: "Mam brata. Mój brat mieszka w Lyonie.",
           answers: ["Mam brata, który mieszka w Lyonie."],
           explanation: "Brat est masculin et sujet de mieszka : który, précédé d’une virgule.",
@@ -1200,6 +1220,7 @@ export const plCourse = {
       ],
       categories: ["agreement", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
   ],
 } satisfies GrammarCourse;

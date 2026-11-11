@@ -1,0 +1,1142 @@
+{
+  "language": "ar",
+  "approved": [
+    "ar-a1-gender",
+    "ar-a1-article",
+    "ar-a1-nominal",
+    "ar-a1-possessive",
+    "ar-a1-adjective",
+    "ar-a1-demonstrative",
+    "ar-a2-idafa",
+    "ar-a2-prepositions",
+    "ar-a2-past",
+    "ar-a2-present",
+    "ar-a2-negation",
+    "ar-a2-plural",
+    "ar-b1-kana",
+    "ar-b1-future-subjunctive",
+    "ar-b1-jussive-imperative",
+    "ar-b1-relative",
+    "ar-b1-numbers",
+    "ar-b1-verb-forms"
+  ],
+  "drafts": [],
+  "patches": [
+    {
+      "id": "ar-a1-gender",
+      "field": "rule[0]",
+      "find": "\"L’arabe n’a que deux genres, le masculin et le féminin (pas de neutre). La plupart des féminins se reconnaissent à la terminaison ـَة (tāʾ marbūṭa), qui se prononce -a en fin de mot : طَالِب (étudiant) → طَالِبَة (étudiante).\",",
+      "replace": "\"L’arabe distingue le masculin et le féminin. La terminaison ـَة marque souvent le féminin : طَالِبٌ (« étudiant ») → طَالِبَةٌ (« étudiante »). À la pause, on entend généralement la voyelle qui précède ة. En lecture liée avec la voyelle de cas, ة se prononce comme ت.\","
+    },
+    {
+      "id": "ar-a1-gender",
+      "field": "rule[1]",
+      "find": "\"Pour former le féminin d’un nom de personne ou d’un adjectif, on ajoute donc ـَة : صَدِيق → صَدِيقَة (ami, amie), كَبِير → كَبِيرَة (grand, grande), جَدِيد → جَدِيدَة (nouveau, nouvelle).\",",
+      "replace": "\"Pour beaucoup de noms de personnes et d’adjectifs, le féminin ajoute ـَة : صَدِيقٌ → صَدِيقَةٌ, كَبِيرٌ → كَبِيرَةٌ, جَدِيدٌ → جَدِيدَةٌ.\","
+    },
+    {
+      "id": "ar-a1-gender",
+      "field": "rule[2]",
+      "find": "\"Quelques féminins n’ont pas de ـَة et s’apprennent par cœur : أُمّ (mère), شَمْس (soleil), يَد (main).\",",
+      "replace": "\"Certains noms féminins n’ont pas cette terminaison : أُمٌّ (« mère »), شَمْسٌ (« soleil »), يَدٌ (« main »).\","
+    },
+    {
+      "id": "ar-a1-gender",
+      "field": "rule[3]",
+      "find": "\"Piège : le genre ne suit pas toujours le français. شَمْس (soleil) est féminin et قَمَر (lune) est masculin, c’est l’inverse. Et le ـَة final n’est pas un -e muet : on l’entend.\",",
+      "replace": "\"Le genre peut différer du français. شَمْسٌ (« soleil ») est féminin et قَمَرٌ (« lune ») est masculin.\","
+    },
+    {
+      "id": "ar-a1-gender",
+      "field": "table.rows[0]",
+      "find": "[\"طَالِب\", \"طَالِبَة\", \"étudiant, étudiante\"],",
+      "replace": "[\"طَالِبٌ\", \"طَالِبَةٌ\", \"étudiant, étudiante\"],"
+    },
+    {
+      "id": "ar-a1-gender",
+      "field": "table.rows[1]",
+      "find": "[\"صَدِيق\", \"صَدِيقَة\", \"ami, amie\"],",
+      "replace": "[\"صَدِيقٌ\", \"صَدِيقَةٌ\", \"ami, amie\"],"
+    },
+    {
+      "id": "ar-a1-gender",
+      "field": "table.rows[2]",
+      "find": "[\"مُعَلِّم\", \"مُعَلِّمَة\", \"enseignant, enseignante\"],",
+      "replace": "[\"مُعَلِّمٌ\", \"مُعَلِّمَةٌ\", \"enseignant, enseignante\"],"
+    },
+    {
+      "id": "ar-a1-gender",
+      "field": "table.rows[3]",
+      "find": "[\"طَبِيب\", \"طَبِيبَة\", \"médecin (homme, femme)\"],",
+      "replace": "[\"طَبِيبٌ\", \"طَبِيبَةٌ\", \"médecin (homme, femme)\"],"
+    },
+    {
+      "id": "ar-a1-gender",
+      "field": "table.rows[4]",
+      "find": "[\"جَدِيد\", \"جَدِيدَة\", \"nouveau, nouvelle\"],",
+      "replace": "[\"جَدِيدٌ\", \"جَدِيدَةٌ\", \"nouveau, nouvelle\"],"
+    },
+    {
+      "id": "ar-a1-gender",
+      "field": "examples[0]",
+      "find": "{ text: \"هُوَ مُعَلِّم.\", translation: \"Il est enseignant.\", note: \"Pas de verbe « être » : on dit simplement « il enseignant ».\" },",
+      "replace": "{ text: \"هُوَ مُعَلِّمٌ.\", translation: \"Il est enseignant.\", note: \"La phrase nominale associe un sujet à sa profession.\" },"
+    },
+    {
+      "id": "ar-a1-gender",
+      "field": "examples[1]",
+      "find": "{ text: \"هِيَ مُعَلِّمَة.\", translation: \"Elle est enseignante.\", note: \"Le féminin ajoute ـَة au masculin.\" },",
+      "replace": "{ text: \"هِيَ مُعَلِّمَةٌ.\", translation: \"Elle est enseignante.\", note: \"La terminaison ـَة marque le féminin.\" },"
+    },
+    {
+      "id": "ar-a1-gender",
+      "field": "examples[2]",
+      "find": "{ text: \"هِيَ طَبِيبَة، وَهُوَ طَالِب.\", translation: \"Elle est médecin, et lui est étudiant.\", note: \"وَ (« et ») se colle au mot suivant.\" },",
+      "replace": "{ text: \"هِيَ طَبِيبَةٌ، وَهُوَ طَالِبٌ.\", translation: \"Elle est médecin, et lui est étudiant.\", note: \"وَ (« et ») se colle au mot suivant.\" },"
+    },
+    {
+      "id": "ar-a1-article",
+      "field": "rule[0]",
+      "find": "\"L’arabe n’a pas d’article indéfini : كِتَاب veut dire « un livre ». Pour « le, la, les », on colle ال devant le nom : الْكِتَاب (le livre). L’article ne change ni avec le genre ni avec le nombre.\",",
+      "replace": "\"L’arabe n’a pas d’article indéfini : كِتَابٌ veut dire « un livre ». L’article ال se soude au nom pour le définir : الْكِتَابُ (« le livre »). Il s’écrit de la même façon au féminin et au pluriel.\","
+    },
+    {
+      "id": "ar-a1-article",
+      "field": "rule[1]",
+      "find": "\"Devant une lettre lunaire (أ ب ج ح خ ع غ ف ق ك م ه و ي), le ل se prononce : الْقَمَر (al-qamar), الْبَيْت (al-bayt).\",",
+      "replace": "\"Devant une lettre lunaire (أ ب ج ح خ ع غ ف ق ك م ه و ي), le ل se prononce. Observe le soukoun sur le ل dans الْقَمَرُ et الْبَيْتُ.\","
+    },
+    {
+      "id": "ar-a1-article",
+      "field": "rule[2]",
+      "find": "\"Devant une lettre solaire (ت ث د ذ ر ز س ش ص ض ط ظ ل ن), le ل s’assimile : on double la lettre suivante, marquée par une chadda ّ. الشَّمْس se lit ash-shams, pas al-shams. L’écriture ne change pas.\",",
+      "replace": "\"Devant une lettre solaire (ت ث د ذ ر ز س ش ص ض ط ظ ل ن), le ل de l’article s’écrit toujours. À l’oral, on double la consonne suivante. La chadda ّ le montre sur ش dans الشَّمْسُ.\","
+    },
+    {
+      "id": "ar-a1-article",
+      "field": "rule[3]",
+      "find": "\"Piège : ne traduis pas « un » par un mot, et n’ajoute jamais ال pour un nom indéfini. Le nom défini s’écrit d’un bloc avec ال, sans espace.\",",
+      "replace": "\"L’article se soude directement au nom : الْكِتَابُ s’écrit d’un bloc. Pour dire « un livre », écris كِتَابٌ. Un nombre peut s’ajouter pour insister sur la quantité.\","
+    },
+    {
+      "id": "ar-a1-article",
+      "field": "table.headers",
+      "find": "headers: [\"Type\", \"Mot\", \"Se lit\", \"Sens\"],",
+      "replace": "headers: [\"Type\", \"Mot\", \"Repère de lecture\", \"Sens\"],"
+    },
+    {
+      "id": "ar-a1-article",
+      "field": "table.rows[0]",
+      "find": "[\"Lunaire\", \"الْقَمَر\", \"al-qamar\", \"la lune\"],",
+      "replace": "[\"Lunaire\", \"الْقَمَرُ\", \"ل prononcé\", \"la lune\"],"
+    },
+    {
+      "id": "ar-a1-article",
+      "field": "table.rows[1]",
+      "find": "[\"Lunaire\", \"الْبَيْت\", \"al-bayt\", \"la maison\"],",
+      "replace": "[\"Lunaire\", \"الْبَيْتُ\", \"ل prononcé\", \"la maison\"],"
+    },
+    {
+      "id": "ar-a1-article",
+      "field": "table.rows[2]",
+      "find": "[\"Solaire\", \"الشَّمْس\", \"ash-shams\", \"le soleil\"],",
+      "replace": "[\"Solaire\", \"الشَّمْسُ\", \"ش doublé\", \"le soleil\"],"
+    },
+    {
+      "id": "ar-a1-article",
+      "field": "table.rows[3]",
+      "find": "[\"Solaire\", \"الدَّرْس\", \"ad-dars\", \"la leçon\"],",
+      "replace": "[\"Solaire\", \"الدَّرْسُ\", \"د doublé\", \"la leçon\"],"
+    },
+    {
+      "id": "ar-a1-article",
+      "field": "table.rows[4]",
+      "find": "[\"Solaire\", \"الرَّجُل\", \"ar-rajul\", \"l’homme\"],",
+      "replace": "[\"Solaire\", \"الرَّجُلُ\", \"ر doublé\", \"l’homme\"],"
+    },
+    {
+      "id": "ar-a1-article",
+      "field": "examples[0]",
+      "find": "{ text: \"الشَّمْس جَمِيلَة.\", translation: \"Le soleil est beau.\", note: \"ش est solaire : on prononce ash-shams.\" },",
+      "replace": "{ text: \"الشَّمْسُ جَمِيلَةٌ.\", translation: \"Le soleil est beau.\", note: \"ش est solaire. La chadda indique la consonne doublée.\" },"
+    },
+    {
+      "id": "ar-a1-article",
+      "field": "examples[1]",
+      "find": "{ text: \"الْقَمَر كَبِير.\", translation: \"La lune est grande.\", note: \"ق est lunaire : le ل de l’article se prononce.\" },",
+      "replace": "{ text: \"الْقَمَرُ كَبِيرٌ.\", translation: \"La lune est grande.\", note: \"ق est lunaire. Le ل de l’article se prononce.\" },"
+    },
+    {
+      "id": "ar-a1-article",
+      "field": "examples[2]",
+      "find": "{ text: \"الدَّرْس سَهْل.\", translation: \"La leçon est facile.\", note: \"د est solaire : ad-dars.\" },",
+      "replace": "{ text: \"الدَّرْسُ سَهْلٌ.\", translation: \"La leçon est facile.\", note: \"د est solaire. On le double dans الدَّرْسُ.\" },"
+    },
+    {
+      "id": "ar-a1-article",
+      "field": "exercises[0].options",
+      "find": "options: [\"se prononce normalement\", \"s’assimile : on dit ash-shams\", \"disparaît à l’écrit\"],",
+      "replace": "options: [\"se prononce normalement\", \"s’assimile à la consonne suivante\", \"disparaît à l’écrit\"],"
+    },
+    {
+      "id": "ar-a1-article",
+      "field": "exercises[0].explanation",
+      "find": "explanation: \"Devant une lettre solaire, le ل est écrit mais on double la lettre suivante : ash-shams.\",",
+      "replace": "explanation: \"Le ل reste écrit. À l’oral, on double ش, la consonne qui suit.\","
+    },
+    {
+      "id": "ar-a1-article",
+      "field": "exercises[1].explanation",
+      "find": "explanation: \"م est lunaire (al-madrasa). ت, س et ن sont solaires.\",",
+      "replace": "explanation: \"م est lunaire, comme dans الْمَدْرَسَةُ. ت, س et ن sont solaires.\","
+    },
+    {
+      "id": "ar-a1-article",
+      "field": "exercises[4].explanation",
+      "find": "explanation: \"ال ne change pas avec le genre : صديقة → الصديقة (on dit as-sadīqa, car ص est solaire).\",",
+      "replace": "explanation: \"L’article est identique au féminin. ص est solaire, comme le montre la chadda dans الصَّدِيقَةُ.\","
+    },
+    {
+      "id": "ar-a1-nominal",
+      "field": "rule[0]",
+      "find": "\"Au présent, l’arabe n’a pas de verbe « être » : on juxtapose le sujet et ce qu’on en dit. أَنَا طَالِب se traduit « je suis étudiant ». Ne cherche jamais à traduire « suis, es, est ».\",",
+      "replace": "\"Pour dire ce qu’est une personne ou comment elle est maintenant, juxtapose le sujet et ce que tu en dis : أَنَا طَالِبٌ (« je suis étudiant »). Dans cette phrase, aucun mot ne correspond à « suis ».\","
+    },
+    {
+      "id": "ar-a1-nominal",
+      "field": "rule[1]",
+      "find": "\"Les pronoms distinguent le masculin et le féminin, même à la 2e personne : أَنْتَ (tu, à un homme) et أَنْتِ (tu, à une femme). Il n’y a pas de vouvoiement : on dit أَنْتَ ou أَنْتِ à une personne qu’on respecte.\",",
+      "replace": "\"À la deuxième personne du singulier, أَنْتَ s’adresse à un homme et أَنْتِ à une femme. Le pluriel ne sert pas habituellement de vouvoiement. Les formules de politesse dépendent de la situation.\","
+    },
+    {
+      "id": "ar-a1-nominal",
+      "field": "rule[2]",
+      "find": "\"Pour une question à réponse oui / non, on place هَلْ au début : هَلْ أَنْتَ طَالِب؟ (Es-tu étudiant ?). Le point d’interrogation arabe est ؟.\",",
+      "replace": "\"Pour une question à réponse oui ou non, tu peux placer هَلْ devant la phrase : هَلْ أَنْتَ طَالِبٌ؟ (« Es-tu étudiant ? »). Le point d’interrogation arabe est ؟.\","
+    },
+    {
+      "id": "ar-a1-nominal",
+      "field": "table.rows[9]",
+      "find": "[\"هُنَّ\", \"elles\"],",
+      "replace": "[\"هُنَّ\", \"elles\"],\n          [\"أَنْتُمَا\", \"vous deux\"],\n          [\"هُمَا\", \"eux ou elles deux\"],"
+    },
+    {
+      "id": "ar-a1-nominal",
+      "field": "examples[0]",
+      "find": "{ text: \"أَنَا مُهَنْدِس.\", translation: \"Je suis ingénieur.\", note: \"Aucun mot pour « suis ».\" },",
+      "replace": "{ text: \"أَنَا مُهَنْدِسٌ.\", translation: \"Je suis ingénieur.\", note: \"Il n’y a pas de copule dans cette phrase.\" },"
+    },
+    {
+      "id": "ar-a1-nominal",
+      "field": "examples[1]",
+      "find": "{ text: \"هَلْ أَنْتَ طَالِب؟\", translation: \"Es-tu étudiant ?\", note: \"هَلْ ouvre la question, l’ordre des mots ne change pas.\" },",
+      "replace": "{ text: \"هَلْ أَنْتَ طَالِبٌ؟\", translation: \"Es-tu étudiant ?\", note: \"هَلْ ouvre la question sans changer l’ordre des autres mots.\" },"
+    },
+    {
+      "id": "ar-a1-nominal",
+      "field": "examples[2]",
+      "find": "{ text: \"نَحْنُ أَصْدِقَاء.\", translation: \"Nous sommes amis.\", note: \"أَصْدِقَاء est le pluriel de صَدِيق.\" },",
+      "replace": "{ text: \"نَحْنُ أَصْدِقَاءُ.\", translation: \"Nous sommes amis.\", note: \"أَصْدِقَاءُ est le pluriel de صَدِيقٌ.\" },"
+    },
+    {
+      "id": "ar-a1-nominal",
+      "field": "exercises[2].hint",
+      "find": "answers: [\"هل\"],",
+      "replace": "hint: \"Mot interrogatif écrit séparément.\",\n          answers: [\"هل\"],"
+    },
+    {
+      "id": "ar-a1-nominal",
+      "field": "exercises[3].answers",
+      "find": "          answers: [\"هل أنت مهندس؟\", \"هل أنت مهندس?\"],",
+      "replace": "          answers: [\"هل أنت مهندس؟\"],"
+    },
+    {
+      "id": "ar-a1-possessive",
+      "field": "rule[0]",
+      "find": "\"L’arabe n’a pas de mots séparés pour « mon, ton, son » : on colle un suffixe à la fin du nom. كِتَاب (livre) → كِتَابِي (mon livre), كِتَابُكَ (ton livre).\",",
+      "replace": "\"Pour former « mon, ton, son », soude un suffixe au nom : كِتَابٌ (« un livre ») → كِتَابِي (« mon livre »), كِتَابُكَ (« ton livre », à un homme).\","
+    },
+    {
+      "id": "ar-a1-possessive",
+      "field": "rule[2]",
+      "find": "\"Un nom à ـَة change son ة en ت devant le suffixe : سَيَّارَة → سَيَّارَتِي (ma voiture).\",",
+      "replace": "\"La ة s’écrit ت devant un suffixe : سَيَّارَةٌ (« une voiture ») → سَيَّارَتِي (« ma voiture »).\","
+    },
+    {
+      "id": "ar-a1-possessive",
+      "field": "rule[3]",
+      "find": "\"Piège : un nom avec suffixe est déjà défini, on n’y ajoute pas ال. On dit كِتَابِي, jamais الكتابي. Devant le suffixe, le nom prend sa voyelle finale (-u au sujet).\",",
+      "replace": "\"Un nom avec suffixe possessif est défini et ne prend pas ال : écris كِتَابِي. Le tableau montre la damma du nominatif avant la plupart des suffixes. Pour « mon livre », on écrit كِتَابِي. La voyelle de cas dépend de la fonction du nom.\","
+    },
+    {
+      "id": "ar-a1-possessive",
+      "field": "table.rows[6]",
+      "find": "[\"vous\", \"ـكُمْ\", \"كِتَابُكُمْ\", \"votre livre\"],",
+      "replace": "[\"vous (m.)\", \"ـكُمْ\", \"كِتَابُكُمْ\", \"votre livre\"],"
+    },
+    {
+      "id": "ar-a1-possessive",
+      "field": "table.rows[7]",
+      "find": "[\"ils\", \"ـهُمْ\", \"كِتَابُهُمْ\", \"leur livre\"],",
+      "replace": "[\"ils\", \"ـهُمْ\", \"كِتَابُهُمْ\", \"leur livre\"],\n          [\"vous (f.)\", \"ـكُنَّ\", \"كِتَابُكُنَّ\", \"votre livre\"],\n          [\"elles\", \"ـهُنَّ\", \"كِتَابُهُنَّ\", \"leur livre\"],\n          [\"vous deux\", \"ـكُمَا\", \"كِتَابُكُمَا\", \"votre livre\"],\n          [\"eux ou elles deux\", \"ـهُمَا\", \"كِتَابُهُمَا\", \"leur livre\"],"
+    },
+    {
+      "id": "ar-a1-possessive",
+      "field": "examples[0]",
+      "find": "{ text: \"أَبِي مُهَنْدِس.\", translation: \"Mon père est ingénieur.\", note: \"أَب + ـِي : le suffixe ـِي s’attache sans espace.\" },",
+      "replace": "{ text: \"أَبِي مُهَنْدِسٌ.\", translation: \"Mon père est ingénieur.\", note: \"أَبٌ devient أَبِي avec le suffixe de première personne.\" },"
+    },
+    {
+      "id": "ar-a1-possessive",
+      "field": "examples[1]",
+      "find": "{ text: \"سَيَّارَتُهَا جَدِيدَة.\", translation: \"Sa voiture (à elle) est neuve.\", note: \"Le ة de سَيَّارَة devient ت.\" },",
+      "replace": "{ text: \"سَيَّارَتُهَا جَدِيدَةٌ.\", translation: \"Sa voiture (à elle) est neuve.\", note: \"Le ة de سَيَّارَةٌ s’écrit ت devant le suffixe.\" },"
+    },
+    {
+      "id": "ar-a1-possessive",
+      "field": "examples[2]",
+      "find": "{ text: \"بَيْتُنَا كَبِير.\", translation: \"Notre maison est grande.\", note: \"بَيْت est masculin : l’adjectif aussi (كَبِير).\" },",
+      "replace": "{ text: \"بَيْتُنَا كَبِيرٌ.\", translation: \"Notre maison est grande.\", note: \"بَيْتٌ est masculin, comme l’adjectif كَبِيرٌ.\" },"
+    },
+    {
+      "id": "ar-a1-adjective",
+      "field": "rule[0]",
+      "find": "\"L’adjectif se place toujours après le nom et s’accorde en genre : رَجُل كَبِير (un grand homme), سَيَّارَة كَبِيرَة (une grande voiture). Contrairement au français, il n’y a pas d’adjectifs placés avant.\",",
+      "replace": "\"Dans un groupe nominal, l’adjectif qualificatif suit le nom. Au singulier, observe l’accord en genre : رَجُلٌ طَوِيلٌ (« un homme de grande taille »), سَيَّارَةٌ كَبِيرَةٌ (« une grande voiture »).\","
+    },
+    {
+      "id": "ar-a1-adjective",
+      "field": "rule[1]",
+      "find": "\"Il s’accorde aussi en défini : si le nom prend ال, l’adjectif aussi. Le groupe الْبَيْت الْكَبِير signifie « la grande maison ».\",",
+      "replace": "\"Le qualificatif s’accorde aussi en détermination : الْبَيْتُ الْكَبِيرُ (« la grande maison »). Il porte l’article après un nom défini par un possessif, même si le nom n’en porte pas : بَيْتُنَا الْكَبِيرُ (« notre grande maison »).\","
+    },
+    {
+      "id": "ar-a1-adjective",
+      "field": "rule[2]",
+      "find": "\"Piège : si l’adjectif n’a pas ال alors que le nom est défini, on obtient une phrase complète : الْبَيْت كَبِير, « la maison est grande ». Tout se joue sur l’ال de l’adjectif.\",",
+      "replace": "\"Compare الْبَيْتُ الْكَبِيرُ (« la grande maison ») et الْبَيْتُ كَبِيرٌ (« la maison est grande »). Dans la seconde phrase, l’adjectif indéfini est attribut et donne une information sur la maison.\","
+    },
+    {
+      "id": "ar-a1-adjective",
+      "field": "table.rows[0]",
+      "find": "[\"بَيْت كَبِير\", \"une grande maison\"],",
+      "replace": "[\"بَيْتٌ كَبِيرٌ\", \"une grande maison\"],"
+    },
+    {
+      "id": "ar-a1-adjective",
+      "field": "table.rows[1]",
+      "find": "[\"الْبَيْت الْكَبِير\", \"la grande maison\"],",
+      "replace": "[\"الْبَيْتُ الْكَبِيرُ\", \"la grande maison\"],"
+    },
+    {
+      "id": "ar-a1-adjective",
+      "field": "table.rows[2]",
+      "find": "[\"الْبَيْت كَبِير\", \"la maison est grande\"],",
+      "replace": "[\"الْبَيْتُ كَبِيرٌ\", \"la maison est grande\"],"
+    },
+    {
+      "id": "ar-a1-adjective",
+      "field": "table.rows[3]",
+      "find": "[\"سَيَّارَة جَدِيدَة\", \"une voiture neuve\"],",
+      "replace": "[\"سَيَّارَةٌ جَدِيدَةٌ\", \"une voiture neuve\"],"
+    },
+    {
+      "id": "ar-a1-adjective",
+      "field": "table.rows[4]",
+      "find": "[\"السَّيَّارَة الْجَدِيدَة\", \"la voiture neuve\"],",
+      "replace": "[\"السَّيَّارَةُ الْجَدِيدَةُ\", \"la voiture neuve\"],"
+    },
+    {
+      "id": "ar-a1-adjective",
+      "field": "table.rows[5]",
+      "find": "[\"السَّيَّارَة جَدِيدَة\", \"la voiture est neuve\"],",
+      "replace": "[\"السَّيَّارَةُ جَدِيدَةٌ\", \"la voiture est neuve\"],"
+    },
+    {
+      "id": "ar-a1-adjective",
+      "field": "examples[0]",
+      "find": "{ text: \"هِيَ طَالِبَة جَدِيدَة.\", translation: \"C’est une nouvelle étudiante.\", note: \"طَالِبَة et جَدِيدَة sont toutes deux féminines et indéfinies.\" },",
+      "replace": "{ text: \"هِيَ طَالِبَةٌ جَدِيدَةٌ.\", translation: \"C’est une nouvelle étudiante.\", note: \"طَالِبَةٌ et جَدِيدَةٌ sont féminins et indéfinis.\" },"
+    },
+    {
+      "id": "ar-a1-adjective",
+      "field": "examples[1]",
+      "find": "{ text: \"الْمَدِينَة الْكَبِيرَة جَمِيلَة.\", translation: \"La grande ville est belle.\", note: \"Le groupe défini (الْكَبِيرَة), puis l’attribut sans ال (جَمِيلَة).\" },",
+      "replace": "{ text: \"الْمَدِينَةُ الْكَبِيرَةُ جَمِيلَةٌ.\", translation: \"La grande ville est belle.\", note: \"الْكَبِيرَةُ est le qualificatif défini et جَمِيلَةٌ l’attribut indéfini.\" },"
+    },
+    {
+      "id": "ar-a1-adjective",
+      "field": "examples[2]",
+      "find": "{ text: \"الْبَيْت كَبِير، وَالْغُرْفَة صَغِيرَة.\", translation: \"La maison est grande et la chambre est petite.\", note: \"Adjectifs sans ال : ce sont deux phrases.\" },",
+      "replace": "{ text: \"الْبَيْتُ كَبِيرٌ، وَالْغُرْفَةُ صَغِيرَةٌ.\", translation: \"La maison est grande et la chambre est petite.\", note: \"Les deux adjectifs indéfinis sont ici des attributs.\" },"
+    },
+    {
+      "id": "ar-a1-adjective",
+      "field": "exercises[0].explanation",
+      "find": "explanation: \"Pour une phrase complète, l’adjectif n’a pas ال, mais s’accorde au féminin : جديدة.\",",
+      "replace": "explanation: \"Dans cette phrase, l’adjectif est attribut et reste indéfini. Il est féminin comme le sujet : السَّيَّارَةُ جَدِيدَةٌ.\","
+    },
+    {
+      "id": "ar-a1-adjective",
+      "field": "exercises[4].answers",
+      "find": "          answers: [\"السيارة جديدة\"],",
+      "replace": "          answers: [\"السيارة جديدة.\"],"
+    },
+    {
+      "id": "ar-a1-demonstrative",
+      "field": "rule[1]",
+      "find": "\"Devant un nom indéfini, le démonstratif fait une phrase : هَذَا كِتَاب signifie « c’est un livre ». Devant un nom défini, il donne « ce… » : هَذَا الْكِتَاب, « ce livre ».\",",
+      "replace": "\"Dans هَذَا كِتَابٌ (« c’est un livre »), le nom indéfini est l’attribut. Avec un nom défini, هَذَا الْكِتَابُ peut former le groupe « ce livre ». Dans هَذَا الْكِتَابُ جَدِيدٌ, c’est le groupe sujet de « ce livre est neuf ».\","
+    },
+    {
+      "id": "ar-a1-demonstrative",
+      "field": "rule[2]",
+      "find": "\"Le démonstratif suit le genre du nom : هَذِهِ الْمَدِينَة (cette ville). Au pluriel de personnes, on dit هَؤُلَاءِ (ceux-ci) et أُولَئِكَ (ceux-là).\",",
+      "replace": "\"Le démonstratif correspond au genre du nom singulier : هَذِهِ الْمَدِينَةُ (« cette ville »). Pour plusieurs personnes, emploie هَؤُلَاءِ ou أُولَئِكَ. Pour les choses au pluriel, le féminin singulier est le modèle courant : هَذِهِ الْكُتُبُ (« ces livres »).\","
+    },
+    {
+      "id": "ar-a1-demonstrative",
+      "field": "rule[3]",
+      "find": "\"Piège : ne dis pas هَذَا الْمَدِينَة, le genre doit correspondre. Et pas de « est » : هَذِهِ الْمَدِينَة كَبِيرَة, « cette ville est grande ».\",",
+      "replace": "\"Pour « cette ville est grande », dis هَذِهِ الْمَدِينَةُ كَبِيرَةٌ. Le démonstratif et l’adjectif suivent tous deux le genre féminin de مَدِينَةٌ.\","
+    },
+    {
+      "id": "ar-a1-demonstrative",
+      "field": "table.rows[2]",
+      "find": "[\"Pluriel\", \"هَؤُلَاءِ\", \"أُولَئِكَ\"],",
+      "replace": "[\"Pluriel de personnes\", \"هَؤُلَاءِ\", \"أُولَئِكَ\"],"
+    },
+    {
+      "id": "ar-a1-demonstrative",
+      "field": "examples[0]",
+      "find": "{ text: \"هَذَا كِتَاب.\", translation: \"C’est un livre.\", note: \"Nom indéfini : phrase complète.\" },",
+      "replace": "{ text: \"هَذَا كِتَابٌ.\", translation: \"C’est un livre.\", note: \"Le nom indéfini est l’attribut.\" },"
+    },
+    {
+      "id": "ar-a1-demonstrative",
+      "field": "examples[1]",
+      "find": "{ text: \"هَذِهِ الْمَدِينَة كَبِيرَة.\", translation: \"Cette ville est grande.\", note: \"مَدِينَة est féminin : هَذِهِ.\" },",
+      "replace": "{ text: \"هَذِهِ الْمَدِينَةُ كَبِيرَةٌ.\", translation: \"Cette ville est grande.\", note: \"مَدِينَةٌ est féminin et prend هَذِهِ.\" },"
+    },
+    {
+      "id": "ar-a1-demonstrative",
+      "field": "examples[2]",
+      "find": "{ text: \"ذَلِكَ الْبَيْت جَدِيد.\", translation: \"Cette maison-là est neuve.\", note: \"بَيْت est masculin, même si « maison » est féminin en français.\" },",
+      "replace": "{ text: \"ذَلِكَ الْبَيْتُ جَدِيدٌ.\", translation: \"Cette maison-là est neuve.\", note: \"بَيْتٌ est masculin, même si « maison » est féminin en français.\" },"
+    },
+    {
+      "id": "ar-a2-idafa",
+      "field": "rule[0]",
+      "find": "\"L’arabe n’a pas de mot pour « de » entre deux noms : on les juxtapose. C’est l’annexion (الإِضَافَة). Le premier nom est le possédé, le second est le possesseur : كِتَابُ الطَّالِبِ (le livre de l’étudiant).\",",
+      "replace": "\"Dans l’annexion, ou الْإِضَافَةُ, le nom complété précède son complément, sans mot équivalent à « de » entre eux : كِتَابُ الطَّالِبِ (« le livre de l’étudiant »).\","
+    },
+    {
+      "id": "ar-a2-idafa",
+      "field": "rule[1]",
+      "find": "\"Le premier nom ne prend jamais ال ni de tanwin. Le second est au génitif, avec une voyelle finale -i (ـِ) : الطَّالِبِ. C’est le second nom qui rend tout le groupe défini ou indéfini.\",",
+      "replace": "\"Dans ce modèle, le premier nom est sans article et sans tanwin. Sa voyelle dépend de son rôle dans la phrase. Le second nom est au génitif, marqué ici par la kasra : الطَّالِبِ. Si le complément est défini, le groupe entier l’est.\","
+    },
+    {
+      "id": "ar-a2-idafa",
+      "field": "rule[2]",
+      "find": "\"Ainsi بَيْتُ الْمُدِيرِ signifie « la maison du directeur », alors que بَيْتُ مُدِيرٍ signifie « une maison de directeur ». Un ـة du premier nom se prononce -at : سَيَّارَةُ الْمُدِيرِ.\",",
+      "replace": "\"بَيْتُ الْمُدِيرِ signifie « la maison du directeur ». بَيْتُ مُدِيرٍ désigne une maison appartenant à un directeur non identifié. La ة du premier nom se prononce comme ت en lecture liée : سَيَّارَةُ الْمُدِيرِ (« la voiture du directeur »).\","
+    },
+    {
+      "id": "ar-a2-idafa",
+      "field": "rule[3]",
+      "find": "\"Piège : l’ordre est l’inverse du français et rien ne s’intercale. Ne dis pas الكتاب الطالب : ال sur le premier nom est faux.\",",
+      "replace": "\"Comme en français, le nom précède son complément. Dans le groupe arabe, aucun mot ne s’intercale. N’ajoute pas ال à كِتَابُ dans كِتَابُ الطَّالِبِ.\","
+    },
+    {
+      "id": "ar-a2-idafa",
+      "field": "examples[0]",
+      "find": "{ text: \"هَذَا كِتَابُ الطَّالِبِ.\", translation: \"C’est le livre de l’étudiant.\", note: \"كِتَابُ n’a pas d’ال ; الطَّالِبِ est au génitif (-i).\" },",
+      "replace": "{ text: \"هَذَا كِتَابُ الطَّالِبِ.\", translation: \"C’est le livre de l’étudiant.\", note: \"كِتَابُ est sans article. الطَّالِبِ est au génitif.\" },"
+    },
+    {
+      "id": "ar-a2-idafa",
+      "field": "examples[1]",
+      "find": "{ text: \"سَيَّارَةُ الْمُدِيرِ جَدِيدَة.\", translation: \"La voiture du directeur est neuve.\", note: \"Le groupe est défini grâce à ال sur الْمُدِير.\" },",
+      "replace": "{ text: \"سَيَّارَةُ الْمُدِيرِ جَدِيدَةٌ.\", translation: \"La voiture du directeur est neuve.\", note: \"Le groupe est défini car الْمُدِيرِ est défini.\" },"
+    },
+    {
+      "id": "ar-a2-idafa",
+      "field": "examples[2]",
+      "find": "{ text: \"اسْمُ الْمَدِينَةِ جَمِيل.\", translation: \"Le nom de la ville est joli.\", note: \"La voyelle -u sur le premier nom, -i sur le second.\" },",
+      "replace": "{ text: \"اسْمُ الْمَدِينَةِ جَمِيلٌ.\", translation: \"Le nom de la ville est joli.\", note: \"اسْمُ est au nominatif comme premier mot du groupe sujet. الْمَدِينَةِ est au génitif.\" },"
+    },
+    {
+      "id": "ar-a2-idafa",
+      "field": "exercises[3].hint",
+      "find": "answers: [\"اسم\"],",
+      "replace": "hint: \"Mot de cette fiche pour « nom ».\",\n          answers: [\"اسم\"],"
+    },
+    {
+      "id": "ar-a2-prepositions",
+      "field": "rule[0]",
+      "find": "\"Les prépositions courantes sont : فِي (dans, à), مِنْ (de, depuis), إِلَى (vers, à), عَلَى (sur), مَعَ (avec), عِنْدَ (chez). بِـ (avec, par) et لِـ (pour, à) se collent au mot suivant.\",",
+      "replace": "\"Repère فِي (« dans, à »), مِنْ (« de, depuis »), إِلَى (« vers, à ») et عَلَى (« sur »). مَعَ indique l’accompagnement et عِنْدَ le lieu où se trouve quelqu’un ou quelque chose. بِـ (« avec, par ») et لِـ (« pour, à ») se soudent au mot suivant.\","
+    },
+    {
+      "id": "ar-a2-prepositions",
+      "field": "rule[1]",
+      "find": "\"Le nom qui suit une préposition est au génitif, avec la voyelle -i : فِي الْبَيْتِ. Dans la langue parlée soignée, on peut l’omettre en fin de phrase. لِـ + ال donne لِلـ : لِلْمُدِيرِ (au directeur).\",",
+      "replace": "\"Après une préposition, le nom est au génitif. Observe la kasra dans فِي الْبَيْتِ. Le duel et certains pluriels ont d’autres marques. À la pause, la voyelle finale peut ne pas s’entendre. لِـ se soude à ال sous la forme لِلـ : لِلْمُدِيرِ (« au directeur »).\","
+    },
+    {
+      "id": "ar-a2-prepositions",
+      "field": "rule[3]",
+      "find": "\"Piège : « avoir » n’existe pas. On dit عِنْدِي كِتَاب, littéralement « chez moi (il y a) un livre ». Le possesseur est le suffixe de عِنْد.\",",
+      "replace": "\"Pour dire « j’ai un livre », emploie عِنْدِي كِتَابٌ, comme si tu disais « chez moi, il y a un livre ». Le possesseur est marqué par le suffixe de عِنْدَ.\","
+    },
+    {
+      "id": "ar-a2-prepositions",
+      "field": "table.rows[5]",
+      "find": "[\"عِنْدَ\", \"chez, avoir\", \"عِنْدِي كِتَاب\"],",
+      "replace": "[\"عِنْدَ\", \"chez, avoir\", \"عِنْدِي كِتَابٌ\"],"
+    },
+    {
+      "id": "ar-a2-prepositions",
+      "field": "examples[0]",
+      "find": "{ text: \"الْكِتَاب عَلَى الطَّاوِلَة.\", translation: \"Le livre est sur la table.\", note: \"Pas de « est » : le sujet est suivi de la préposition.\" },",
+      "replace": "{ text: \"الْكِتَابُ عَلَى الطَّاوِلَةِ.\", translation: \"Le livre est sur la table.\", note: \"La préposition introduit الطَّاوِلَةِ au génitif.\" },"
+    },
+    {
+      "id": "ar-a2-prepositions",
+      "field": "examples[1]",
+      "find": "{ text: \"أَنَا مِنْ فَرَنْسَا.\", translation: \"Je suis de France.\", note: \"مِنْ indique l’origine.\" },",
+      "replace": "{ text: \"أَنَا مِنْ فَرَنْسَا.\", translation: \"Je viens de France.\", note: \"مِنْ indique l’origine.\" },"
+    },
+    {
+      "id": "ar-a2-prepositions",
+      "field": "examples[2]",
+      "find": "{ text: \"عِنْدِي سَيَّارَة جَدِيدَة.\", translation: \"J’ai une voiture neuve.\", note: \"Littéralement : chez moi une voiture neuve.\" },",
+      "replace": "{ text: \"عِنْدِي سَيَّارَةٌ جَدِيدَةٌ.\", translation: \"J’ai une voiture neuve.\", note: \"Le groupe سَيَّارَةٌ جَدِيدَةٌ est au nominatif.\" },"
+    },
+    {
+      "id": "ar-a2-prepositions",
+      "field": "exercises[0].prompt",
+      "find": "prompt: \"الكتاب ___ الطاولة.\",",
+      "replace": "prompt: \"« Le livre est sur la table » : الكتاب ___ الطاولة.\","
+    },
+    {
+      "id": "ar-a2-prepositions",
+      "field": "exercises[2].prompt",
+      "find": "prompt: \"أنا أذهب ___ المدرسة.\",",
+      "replace": "prompt: \"« Je vais à l’école » : أنا أذهب ___ المدرسة.\","
+    },
+    {
+      "id": "ar-a2-prepositions",
+      "field": "exercises[3].hint",
+      "find": "answers: [\"مع\"],",
+      "replace": "hint: \"Mot d’accompagnement étudié dans cette fiche.\",\n          answers: [\"مع\"],"
+    },
+    {
+      "id": "ar-a2-past",
+      "field": "rule[0]",
+      "find": "\"Le passé (الماضي) se forme avec la base du verbe et des suffixes qui marquent la personne. La forme de référence est la 3e personne masculin singulier : كَتَبَ (il a écrit). Le pronom sujet est facultatif : كَتَبْتُ suffit pour « j’ai écrit ».\",",
+      "replace": "\"Le passé, الْمَاضِي, se forme avec une base et des suffixes de personne. La forme de référence est la troisième personne du masculin singulier : كَتَبَ (« il a écrit »). Le pronom sujet est facultatif : كَتَبْتُ peut suffire pour « j’ai écrit ».\","
+    },
+    {
+      "id": "ar-a2-past",
+      "field": "rule[1]",
+      "find": "\"Un seul passé traduit à la fois le passé composé et le passé simple : كَتَبَ = il a écrit / il écrivit. Pour « il écrivait », on emploiera كَانَ plus le présent (voir B1).\",",
+      "replace": "\"كَتَبَ peut se traduire par « il a écrit » ou « il écrivit ». Pour présenter une activité passée en cours ou habituelle, une tournure fréquente est كَانَ يَكْتُبُ (« il écrivait »).\","
+    },
+    {
+      "id": "ar-a2-past",
+      "field": "rule[3]",
+      "find": "\"Piège : si le sujet est un nom placé après le verbe, le verbe reste au singulier : ذَهَبَ الطُّلَّاب (les étudiants sont partis). Il s’accorde seulement en genre.\",",
+      "replace": "\"Quand un sujet humain pluriel suit le verbe, le modèle courant laisse le verbe au singulier : ذَهَبَ الطُّلَّابُ (« les étudiants sont partis »). Quand le sujet vient d’abord, le verbe prend le pluriel dans cet exemple : الطُّلَّابُ ذَهَبُوا.\","
+    },
+    {
+      "id": "ar-a2-past",
+      "field": "table.rows[8]",
+      "find": "[\"هُنَّ\", \"كَتَبْنَ\", \"elles ont écrit\"],",
+      "replace": "[\"هُنَّ\", \"كَتَبْنَ\", \"elles ont écrit\"],\n          [\"أَنْتُنَّ\", \"كَتَبْتُنَّ\", \"vous avez écrit (f.)\"],\n          [\"أَنْتُمَا\", \"كَتَبْتُمَا\", \"vous deux avez écrit\"],\n          [\"هُمَا\", \"كَتَبَا / كَتَبَتَا\", \"ils ou elles ont écrit (duel)\"],"
+    },
+    {
+      "id": "ar-a2-past",
+      "field": "examples[0]",
+      "find": "{ text: \"دَرَسْتُ الْعَرَبِيَّة أَمْسِ.\", translation: \"J’ai étudié l’arabe hier.\", note: \"Le suffixe ـتُ marque « je ».\" },",
+      "replace": "{ text: \"دَرَسْتُ الْعَرَبِيَّةَ أَمْسِ.\", translation: \"J’ai étudié l’arabe hier.\", note: \"Le suffixe ـتُ marque « je ».\" },"
+    },
+    {
+      "id": "ar-a2-past",
+      "field": "examples[1]",
+      "find": "{ text: \"هِيَ ذَهَبَتْ إِلَى السُّوق.\", translation: \"Elle est allée au marché.\", note: \"ـَتْ marque la 3e personne féminin.\" },",
+      "replace": "{ text: \"هِيَ ذَهَبَتْ إِلَى السُّوقِ.\", translation: \"Elle est allée au marché.\", note: \"ـَتْ marque le féminin singulier à la troisième personne.\" },"
+    },
+    {
+      "id": "ar-a2-past",
+      "field": "examples[2]",
+      "find": "{ text: \"الطُّلَّاب دَرَسُوا الدَّرْس.\", translation: \"Les étudiants ont étudié la leçon.\", note: \"Le sujet est avant le verbe : le verbe est au pluriel, دَرَسُوا.\" },",
+      "replace": "{ text: \"الطُّلَّابُ دَرَسُوا الدَّرْسَ.\", translation: \"Les étudiants ont étudié la leçon.\", note: \"Le sujet précède le verbe, qui est au pluriel.\" },"
+    },
+    {
+      "id": "ar-a2-past",
+      "field": "exercises[4].instruction",
+      "find": "instruction: \"Mets la phrase à la 3e personne du féminin (elle).\",",
+      "replace": "instruction: \"Passe à la troisième personne du féminin singulier. Garde la destination. Tu peux écrire ou omettre le pronom « elle ».\","
+    },
+    {
+      "id": "ar-a2-present",
+      "field": "rule[0]",
+      "find": "\"Le présent (المضارع) se forme avec un préfixe qui marque la personne : أ- (je), ن- (nous), ي- (il, ils), ت- (tu, elle, vous). يَكْتُبُ signifie « il écrit » et aussi « il est en train d’écrire ».\",",
+      "replace": "\"Le présent, الْمُضَارِعُ, prend un préfixe de personne. Dans le modèle étudié, on trouve أَـ pour « je », نَـ pour « nous », يَـ pour « il » et تَـ notamment pour « tu » et « elle ». يَكْتُبُ signifie « il écrit » ou « il est en train d’écrire ».\","
+    },
+    {
+      "id": "ar-a2-present",
+      "field": "rule[1]",
+      "find": "\"Certaines personnes ajoutent un suffixe : ـِينَ (tu, féminin), ـُونَ (vous et ils, masculin), ـْنَ (elles, vous féminin). Le pronom sujet est facultatif.\",",
+      "replace": "\"Certaines personnes ajoutent un suffixe : ـِينَ pour « tu » féminin, ـُونَ pour « vous » et « ils » au masculin pluriel, ـْنَ pour « vous » et « elles » au féminin pluriel dans ce modèle. Le pronom peut rester implicite.\","
+    },
+    {
+      "id": "ar-a2-present",
+      "field": "table.rows[0]",
+      "find": "[\"أَنَا\", \"أَكْتُب\", \"j’écris\"],",
+      "replace": "[\"أَنَا\", \"أَكْتُبُ\", \"j’écris\"],"
+    },
+    {
+      "id": "ar-a2-present",
+      "field": "table.rows[1]",
+      "find": "[\"أَنْتَ\", \"تَكْتُب\", \"tu écris (m.)\"],",
+      "replace": "[\"أَنْتَ\", \"تَكْتُبُ\", \"tu écris (m.)\"],"
+    },
+    {
+      "id": "ar-a2-present",
+      "field": "table.rows[3]",
+      "find": "[\"هُوَ\", \"يَكْتُب\", \"il écrit\"],",
+      "replace": "[\"هُوَ\", \"يَكْتُبُ\", \"il écrit\"],"
+    },
+    {
+      "id": "ar-a2-present",
+      "field": "table.rows[4]",
+      "find": "[\"هِيَ\", \"تَكْتُب\", \"elle écrit\"],",
+      "replace": "[\"هِيَ\", \"تَكْتُبُ\", \"elle écrit\"],"
+    },
+    {
+      "id": "ar-a2-present",
+      "field": "table.rows[5]",
+      "find": "[\"نَحْنُ\", \"نَكْتُب\", \"nous écrivons\"],",
+      "replace": "[\"نَحْنُ\", \"نَكْتُبُ\", \"nous écrivons\"],"
+    },
+    {
+      "id": "ar-a2-present",
+      "field": "table.rows[8]",
+      "find": "[\"هُنَّ\", \"يَكْتُبْنَ\", \"elles écrivent\"],",
+      "replace": "[\"هُنَّ\", \"يَكْتُبْنَ\", \"elles écrivent\"],\n          [\"أَنْتُنَّ\", \"تَكْتُبْنَ\", \"vous écrivez (f.)\"],\n          [\"أَنْتُمَا\", \"تَكْتُبَانِ\", \"vous deux écrivez\"],\n          [\"هُمَا\", \"يَكْتُبَانِ / تَكْتُبَانِ\", \"ils ou elles écrivent (duel)\"],"
+    },
+    {
+      "id": "ar-a2-present",
+      "field": "examples[0]",
+      "find": "{ text: \"أَنَا أَكْتُب رِسَالَة.\", translation: \"J’écris une lettre.\", note: \"Préfixe أ- pour « je ».\" },",
+      "replace": "{ text: \"أَنَا أَكْتُبُ رِسَالَةً.\", translation: \"J’écris une lettre.\", note: \"أَـ marque « je » dans ce verbe. رِسَالَةً est le complément d’objet direct.\" },"
+    },
+    {
+      "id": "ar-a2-present",
+      "field": "examples[1]",
+      "find": "{ text: \"هِيَ تَشْرَب الْقَهْوَة.\", translation: \"Elle boit du café.\", note: \"Préfixe ت- pour « elle ».\" },",
+      "replace": "{ text: \"هِيَ تَشْرَبُ الْقَهْوَةَ.\", translation: \"Elle boit du café.\", note: \"Le préfixe تَـ marque ici le féminin singulier.\" },"
+    },
+    {
+      "id": "ar-a2-present",
+      "field": "examples[2]",
+      "find": "{ text: \"هُمْ يَذْهَبُونَ إِلَى الْعَمَل.\", translation: \"Ils vont au travail.\", note: \"Préfixe ي- et suffixe ـُونَ pour « ils ».\" },",
+      "replace": "{ text: \"هُمْ يَذْهَبُونَ إِلَى الْعَمَلِ.\", translation: \"Ils vont au travail.\", note: \"يَـ et ـُونَ marquent ici la troisième personne du masculin pluriel.\" },"
+    },
+    {
+      "id": "ar-a2-present",
+      "field": "exercises[3].hint",
+      "find": "prompt: \"هو ___ العربية.\",\n          hint: \"درس\",",
+      "replace": "prompt: \"هو ___ العربية.\",\n          hint: \"دَرَسَ, au présent\","
+    },
+    {
+      "id": "ar-a2-negation",
+      "field": "rule[0]",
+      "find": "\"Pour nier un verbe au présent, on place لَا devant lui, sans rien changer : أَنَا أَشْرَب الْقَهْوَة → أَنَا لَا أَشْرَب الْقَهْوَة.\",",
+      "replace": "\"Pour nier une action au présent dans le modèle étudié, place لَا devant le verbe à l’indicatif : أَنَا أَشْرَبُ الْقَهْوَةَ → أَنَا لَا أَشْرَبُ الْقَهْوَةَ.\","
+    },
+    {
+      "id": "ar-a2-negation",
+      "field": "rule[1]",
+      "find": "\"Pour nier une phrase sans verbe (هُوَ طَالِب), on emploie لَيْسَ, qui se conjugue comme un passé : لَسْتُ, لَسْتَ, لَيْسَ… L’attribut est alors à l’accusatif, avec -an : لَسْتُ طَالِبًا.\",",
+      "replace": "\"لَيْسَ nie une phrase nominale au présent et prend des suffixes semblables à ceux du passé : لَسْتُ, لَسْتَ, لَيْسَ. Un attribut nominal passe à l’accusatif : لَسْتُ طَالِبًا. Avec un lieu, on peut dire لَسْتُ فِي الْبَيْتِ.\","
+    },
+    {
+      "id": "ar-a2-negation",
+      "field": "rule[2]",
+      "find": "\"Piège : ne mets pas لَا devant un nom ou un adjectif attribut, هُوَ لَا طَالِب est faux. Pour nier le passé et le futur, on utilisera لَمْ et لَنْ (voir B1).\",",
+      "replace": "\"Pour dire « il n’est pas étudiant », emploie هُوَ لَيْسَ طَالِبًا. Pour nier l’action dans ce modèle, compare هُوَ لَا يَدْرُسُ (« il n’étudie pas »). Tu verras l’emploi de لَمْ et de لَنْ au niveau suivant.\","
+    },
+    {
+      "id": "ar-a2-negation",
+      "field": "table.rows[7]",
+      "find": "[\"هُمْ\", \"لَيْسُوا\", \"ils ne sont pas\"],",
+      "replace": "[\"هُمْ\", \"لَيْسُوا\", \"ils ne sont pas\"],\n          [\"أَنْتُنَّ\", \"لَسْتُنَّ\", \"vous n’êtes pas (f.)\"],\n          [\"هُنَّ\", \"لَسْنَ\", \"elles ne sont pas\"],\n          [\"أَنْتُمَا\", \"لَسْتُمَا\", \"vous deux n’êtes pas\"],\n          [\"هُمَا\", \"لَيْسَا / لَيْسَتَا\", \"ils ou elles ne sont pas (duel)\"],"
+    },
+    {
+      "id": "ar-a2-negation",
+      "field": "examples[0]",
+      "find": "{ text: \"أَنَا لَا أَشْرَب الْقَهْوَة.\", translation: \"Je ne bois pas de café.\", note: \"لَا précède le verbe.\" },",
+      "replace": "{ text: \"أَنَا لَا أَشْرَبُ الْقَهْوَةَ.\", translation: \"Je ne bois pas de café.\", note: \"لَا précède le verbe.\" },"
+    },
+    {
+      "id": "ar-a2-negation",
+      "field": "examples[1]",
+      "find": "{ text: \"لَسْتُ طَالِبًا، أَنَا مُعَلِّم.\", translation: \"Je ne suis pas étudiant, je suis enseignant.\", note: \"L’attribut de لَسْتُ est à l’accusatif : طَالِبًا.\" },",
+      "replace": "{ text: \"لَسْتُ طَالِبًا، أَنَا مُعَلِّمٌ.\", translation: \"Je ne suis pas étudiant, je suis enseignant.\", note: \"L’attribut طَالِبًا est à l’accusatif.\" },"
+    },
+    {
+      "id": "ar-a2-negation",
+      "field": "examples[2]",
+      "find": "{ text: \"هِيَ لَيْسَتْ مُدَرِّسَةً.\", translation: \"Elle n’est pas enseignante.\", note: \"لَيْسَتْ prend ـَتْ comme un passé féminin.\" },",
+      "replace": "{ text: \"هِيَ لَيْسَتْ مُدَرِّسَةً.\", translation: \"Elle n’est pas enseignante.\", note: \"لَيْسَتْ prend ـَتْ comme un passé féminin.\" },"
+    },
+    {
+      "id": "ar-a2-negation",
+      "field": "exercises[2].hint",
+      "find": "answers: [\"لسنا\"],",
+      "replace": "hint: \"Conjugue لَيْسَ.\",\n          answers: [\"لسنا\"],"
+    },
+    {
+      "id": "ar-a2-negation",
+      "field": "exercises[3].hint",
+      "find": "answers: [\"ليست\"],",
+      "replace": "hint: \"Conjugue لَيْسَ.\",\n          answers: [\"ليست\"],"
+    },
+    {
+      "id": "ar-a2-negation",
+      "field": "exercises[4].instruction",
+      "find": "instruction: \"Mets la phrase à la forme négative.\",",
+      "replace": "instruction: \"Nie la phrase au présent avec لَا. Tu peux omettre le pronom sujet.\","
+    },
+    {
+      "id": "ar-a2-plural",
+      "field": "rule[0]",
+      "find": "\"L’arabe a trois nombres : singulier, duel (deux) et pluriel. Le duel s’obtient avec ـَانِ : كِتَابَانِ (deux livres), طَالِبَتَانِ (deux étudiantes). On ne met pas le mot « deux » en plus.\",",
+      "replace": "\"L’arabe distingue le singulier, le duel et le pluriel. Le duel se termine par ـَانِ au nominatif : كِتَابَانِ, طَالِبَتَانِ. À l’accusatif et au génitif, il prend ـَيْنِ : مَعَ طَالِبَتَيْنِ (« avec deux étudiantes »). Le duel suffit à indiquer qu’il y en a deux.\","
+    },
+    {
+      "id": "ar-a2-plural",
+      "field": "rule[1]",
+      "find": "\"Le pluriel sain ajoute ـُونَ au masculin des personnes (مُهَنْدِسُونَ) et ـَات au féminin (طَالِبَات, le ة tombe). Après une préposition, ـُونَ devient ـِينَ : مَعَ مُهَنْدِسِينَ.\",",
+      "replace": "\"Le pluriel masculin dit sain prend ـُونَ au nominatif (مُهَنْدِسُونَ) et ـِينَ à l’accusatif et au génitif (مَعَ مُهَنْدِسِينَ). Le pluriel féminin dit sain ajoute ـَاتٌ au nominatif : طَالِبَةٌ → طَالِبَاتٌ. La ة du singulier disparaît.\","
+    },
+    {
+      "id": "ar-a2-plural",
+      "field": "rule[2]",
+      "find": "\"Le pluriel brisé change la forme du mot : كِتَاب → كُتُب, بَيْت → بُيُوت, مَدِينَة → مُدُن. Il faut l’apprendre avec le singulier. La plupart des noms ont un pluriel brisé.\",",
+      "replace": "\"Le pluriel brisé modifie la forme du mot : كِتَابٌ → كُتُبٌ, بَيْتٌ → بُيُوتٌ, مَدِينَةٌ → مُدُنٌ. Apprends le pluriel avec le singulier.\","
+    },
+    {
+      "id": "ar-a2-plural",
+      "field": "rule[3]",
+      "find": "\"Piège : le pluriel brisé de choses s’accorde comme un féminin singulier : الْكُتُب جَدِيدَة (les livres sont neufs), et non جَدِيدُونَ.\",",
+      "replace": "\"Les noms pluriels qui ne désignent pas des personnes prennent généralement l’accord féminin singulier. Compare الْكُتُبُ جَدِيدَةٌ (« les livres sont neufs ») et السَّيَّارَاتُ جَدِيدَةٌ (« les voitures sont neuves »).\","
+    },
+    {
+      "id": "ar-a2-plural",
+      "field": "table.rows[0]",
+      "find": "[\"مُهَنْدِس\", \"مُهَنْدِسَانِ\", \"مُهَنْدِسُونَ\", \"ingénieur\"],",
+      "replace": "[\"مُهَنْدِسٌ\", \"مُهَنْدِسَانِ\", \"مُهَنْدِسُونَ\", \"ingénieur\"],"
+    },
+    {
+      "id": "ar-a2-plural",
+      "field": "table.rows[1]",
+      "find": "[\"طَالِبَة\", \"طَالِبَتَانِ\", \"طَالِبَات\", \"étudiante\"],",
+      "replace": "[\"طَالِبَةٌ\", \"طَالِبَتَانِ\", \"طَالِبَاتٌ\", \"étudiante\"],"
+    },
+    {
+      "id": "ar-a2-plural",
+      "field": "table.rows[2]",
+      "find": "[\"كِتَاب\", \"كِتَابَانِ\", \"كُتُب\", \"livre\"],",
+      "replace": "[\"كِتَابٌ\", \"كِتَابَانِ\", \"كُتُبٌ\", \"livre\"],"
+    },
+    {
+      "id": "ar-a2-plural",
+      "field": "table.rows[3]",
+      "find": "[\"بَيْت\", \"بَيْتَانِ\", \"بُيُوت\", \"maison\"],",
+      "replace": "[\"بَيْتٌ\", \"بَيْتَانِ\", \"بُيُوتٌ\", \"maison\"],"
+    },
+    {
+      "id": "ar-a2-plural",
+      "field": "table.rows[4]",
+      "find": "[\"مَدِينَة\", \"مَدِينَتَانِ\", \"مُدُن\", \"ville\"],",
+      "replace": "[\"مَدِينَةٌ\", \"مَدِينَتَانِ\", \"مُدُنٌ\", \"ville\"],"
+    },
+    {
+      "id": "ar-a2-plural",
+      "field": "table.rows[5]",
+      "find": "[\"صَدِيق\", \"صَدِيقَانِ\", \"أَصْدِقَاء\", \"ami\"],",
+      "replace": "[\"صَدِيقٌ\", \"صَدِيقَانِ\", \"أَصْدِقَاءُ\", \"ami\"],"
+    },
+    {
+      "id": "ar-a2-plural",
+      "field": "table.rows[6]",
+      "find": "[\"طَالِب\", \"طَالِبَانِ\", \"طُلَّاب\", \"étudiant\"],",
+      "replace": "[\"طَالِبٌ\", \"طَالِبَانِ\", \"طُلَّابٌ\", \"étudiant\"],"
+    },
+    {
+      "id": "ar-a2-plural",
+      "field": "examples[0]",
+      "find": "{ text: \"عِنْدِي كِتَابَانِ.\", translation: \"J’ai deux livres.\", note: \"Le duel suffit : pas de mot pour « deux ».\" },",
+      "replace": "{ text: \"عِنْدِي كِتَابَانِ.\", translation: \"J’ai deux livres.\", note: \"Le duel suffit ici, et le nom est au nominatif.\" },"
+    },
+    {
+      "id": "ar-a2-plural",
+      "field": "examples[1]",
+      "find": "{ text: \"الْبُيُوت فِي الْمَدِينَة كَبِيرَة.\", translation: \"Les maisons de la ville sont grandes.\", note: \"بُيُوت est un pluriel de choses : l’adjectif est au féminin singulier.\" },",
+      "replace": "{ text: \"الْبُيُوتُ فِي الْمَدِينَةِ كَبِيرَةٌ.\", translation: \"Les maisons de la ville sont grandes.\", note: \"بُيُوتٌ désigne des choses. L’adjectif est au féminin singulier.\" },"
+    },
+    {
+      "id": "ar-a2-plural",
+      "field": "exercises[0].prompt",
+      "find": "prompt: \"« Deux livres » : ___\",",
+      "replace": "prompt: \"« Deux livres » (au nominatif) : ___\","
+    },
+    {
+      "id": "ar-a2-plural",
+      "field": "exercises[1].prompt",
+      "find": "prompt: \"« Les ingénieurs » : ال___\",",
+      "replace": "prompt: \"« Les ingénieurs » (masculin pluriel, au nominatif) : ال___\","
+    },
+    {
+      "id": "ar-a2-plural",
+      "field": "exercises[3].prompt",
+      "find": "prompt: \"« Des maisons » : ___ كبيرة\",",
+      "replace": "prompt: \"« De grandes maisons » : ___ كبيرة\","
+    },
+    {
+      "id": "ar-b1-kana",
+      "field": "rule[0]",
+      "find": "\"Pour mettre une phrase sans verbe au passé, on ajoute كَانَ : الْبَيْت كَبِير → كَانَ الْبَيْتُ كَبِيرًا (la maison était grande). Le sujet reste au nominatif et l’attribut passe à l’accusatif (-an). Au présent, il n’y a aucun verbe.\",",
+      "replace": "\"Pour mettre une phrase nominale au passé, emploie كَانَ : الْبَيْتُ كَبِيرٌ → كَانَ الْبَيْتُ كَبِيرًا (« la maison était grande »). Le sujet reste au nominatif. L’attribut adjectival passe à l’accusatif.\","
+    },
+    {
+      "id": "ar-b1-kana",
+      "field": "rule[1]",
+      "find": "\"كَانَ se conjugue comme un passé : كُنْتُ, كُنْتَ, كَانَ, كَانَتْ, كُنَّا, كَانُوا… Il s’accorde en genre : كَانَتِ الْمَدِينَةُ جَمِيلَةً.\",",
+      "replace": "\"كَانَ se conjugue comme un verbe au passé : كُنْتُ, كَانَ, كَانَتْ, كُنَّا, كَانُوا. Il s’accorde ici avec le sujet : كَانَتِ الْمَدِينَةُ جَمِيلَةً. La kasra finale de كَانَتِ assure la liaison.\","
+    },
+    {
+      "id": "ar-b1-kana",
+      "field": "table.rows[8]",
+      "find": "[\"هُنَّ\", \"كُنَّ\", \"elles étaient\"],",
+      "replace": "[\"هُنَّ\", \"كُنَّ\", \"elles étaient\"],\n          [\"أَنْتُنَّ\", \"كُنْتُنَّ\", \"vous étiez (f.)\"],\n          [\"أَنْتُمَا\", \"كُنْتُمَا\", \"vous étiez (duel)\"],\n          [\"هُمَا\", \"كَانَا / كَانَتَا\", \"ils ou elles étaient (duel)\"],"
+    },
+    {
+      "id": "ar-b1-kana",
+      "field": "exercises[0].explanation",
+      "find": "explanation: \"مدينة est féminin : l’attribut de كانت est جميلة (accusatif -an).\",",
+      "replace": "explanation: \"مدينة est féminin. Avec كانت, l’attribut féminin جميلةً est à l’accusatif.\","
+    },
+    {
+      "id": "ar-b1-kana",
+      "field": "exercises[2].hint",
+      "find": "answers: [\"كنا\"],",
+      "replace": "hint: \"Conjugue كَانَ pour « nous ».\",\n          answers: [\"كنا\"],"
+    },
+    {
+      "id": "ar-b1-kana",
+      "field": "exercises[3].hint",
+      "find": "prompt: \"« Il étudiait chaque jour » : كان ___ كل يوم.\",\n          hint: \"درس\",",
+      "replace": "prompt: \"« Il étudiait chaque jour » : كان ___ كل يوم.\",\n          hint: \"دَرَسَ, au présent\","
+    },
+    {
+      "id": "ar-b1-kana",
+      "field": "exercises[4].instruction",
+      "find": "instruction: \"Mets la phrase au passé avec كان.\",",
+      "replace": "instruction: \"Commence la phrase par كَانَ et mets l’attribut au cas qui convient.\","
+    },
+    {
+      "id": "ar-b1-future-subjunctive",
+      "field": "rule[0]",
+      "find": "\"Le futur se forme avec سَـ (collé) ou سَوْفَ devant le présent : سَأَكْتُبُ ou سَوْفَ أَكْتُبُ (j’écrirai). سَوْفَ évoque un futur plus lointain ou plus ferme.\",",
+      "replace": "\"Pour annoncer l’avenir, soude سَـ au verbe à l’indicatif ou place سَوْفَ devant : سَأَكْتُبُ ou سَوْفَ أَكْتُبُ (« j’écrirai »). Ces deux marqueurs n’imposent pas une distance temporelle précise.\","
+    },
+    {
+      "id": "ar-b1-future-subjunctive",
+      "field": "rule[1]",
+      "find": "\"Après أَنْ (que, de), لِكَيْ (pour que) et لَنْ, le présent passe au subjonctif (مَنْصُوب), avec une fatha finale : أُرِيدُ أَنْ أَكْتُبَ (je veux écrire). En arabe on met un verbe conjugué après أَنْ : « je veux que j’écrive ».\",",
+      "replace": "\"Après أَنْ, لِكَيْ ou لَنْ, le verbe passe au subjonctif (مَنْصُوب). Sur le modèle de أَكْتُبُ, il prend une fatha finale : أُرِيدُ أَنْ أَكْتُبَ (« je veux écrire »). Après أَنْ, on emploie une forme conjuguée, même quand le français a un infinitif.\","
+    },
+    {
+      "id": "ar-b1-future-subjunctive",
+      "field": "table.rows[1]",
+      "find": "[\"Futur proche\", \"سَيَكْتُبُ\", \"il écrira\"],",
+      "replace": "[\"Futur avec سَـ\", \"سَيَكْتُبُ\", \"il écrira\"],"
+    },
+    {
+      "id": "ar-b1-future-subjunctive",
+      "field": "table.rows[2]",
+      "find": "[\"Futur lointain\", \"سَوْفَ يَكْتُبُ\", \"il écrira (plus tard)\"],",
+      "replace": "[\"Futur avec سَوْفَ\", \"سَوْفَ يَكْتُبُ\", \"il écrira\"],"
+    },
+    {
+      "id": "ar-b1-future-subjunctive",
+      "field": "examples[1]",
+      "find": "{ text: \"أُرِيدُ أَنْ أَدْرُسَ الْعَرَبِيَّة.\", translation: \"Je veux étudier l’arabe.\", note: \"Après أَنْ, le verbe est conjugué : أَدْرُسَ.\" },",
+      "replace": "{ text: \"أُرِيدُ أَنْ أَدْرُسَ الْعَرَبِيَّةَ.\", translation: \"Je veux étudier l’arabe.\", note: \"Après أَنْ, أَدْرُسَ porte une fatha finale.\" },"
+    },
+    {
+      "id": "ar-b1-future-subjunctive",
+      "field": "exercises[3].prompt",
+      "find": "prompt: \"« Elle ne voyagera pas » : هي ___ تسافر.\",",
+      "replace": "prompt: \"« Elle ne voyagera pas demain » : هي لن ___ غدا.\","
+    },
+    {
+      "id": "ar-b1-future-subjunctive",
+      "field": "exercises[3]",
+      "find": "          answers: [\"لن\"],",
+      "replace": "          hint: \"سَافَرَ, au subjonctif\",\n          answers: [\"تسافر\"],"
+    },
+    {
+      "id": "ar-b1-future-subjunctive",
+      "field": "exercises[3].explanation",
+      "find": "explanation: \"لن + subjonctif exprime le futur négatif.\",",
+      "replace": "explanation: \"Après لن, écris تُسَافِرَ, à la troisième personne du féminin singulier et au subjonctif.\","
+    },
+    {
+      "id": "ar-b1-future-subjunctive",
+      "field": "exercises[4].instruction",
+      "find": "instruction: \"Mets la phrase au futur avec سـ.\",",
+      "replace": "instruction: \"Mets la phrase au futur en gardant le même ordre. Choisis سَـ ou سَوْفَ. Tu peux omettre « je ».\","
+    },
+    {
+      "id": "ar-b1-future-subjunctive",
+      "field": "exercises[4].explanation",
+      "find": "explanation: \"سـ se colle au présent : سأكتب. سوف est aussi correct, avec un futur plus lointain.\",",
+      "replace": "explanation: \"سَـ se soude au présent : سَأَكْتُبُ. سَوْفَ reste séparé : سَوْفَ أَكْتُبُ. Les deux annoncent l’avenir.\","
+    },
+    {
+      "id": "ar-b1-jussive-imperative",
+      "field": "rule[0]",
+      "find": "\"Pour nier le passé, on emploie لَمْ + le présent à l’apocopé (مَجْزُوم), qui prend un soukoun final : يَكْتُبُ → لَمْ يَكْتُبْ (il n’a pas écrit). Le verbe a la forme du présent mais le sens du passé.\",",
+      "replace": "\"Pour nier un fait passé avec لَمْ, emploie le verbe à l’apocopé (مَجْزُوم). Dans le modèle يَكْتُبُ, la damma est remplacée par un soukoun : لَمْ يَكْتُبْ (« il n’a pas écrit »).\","
+    },
+    {
+      "id": "ar-b1-jussive-imperative",
+      "field": "rule[2]",
+      "find": "\"L’impératif se tire du présent à la 2e personne : on retire le ت et on met un soukoun. تَكْتُبُ → اُكْتُبْ (écris !), تَذْهَبُ → اِذْهَبْ. Le ا initial reçoit une damma ou une kasra selon la voyelle du verbe. Féminin : اُكْتُبِي ; pluriel : اُكْتُبُوا.\",",
+      "replace": "\"À la forme simple, pars de la deuxième personne à l’apocopé. Retire تَـ. Si la base commence alors par une consonne sans voyelle, ajoute un alif initial : اُكْتُبْ (« écris »), اِذْهَبْ (« va »). Dans ces modèles, compare aussi اُكْتُبِي et اُكْتُبُوا.\","
+    },
+    {
+      "id": "ar-b1-jussive-imperative",
+      "field": "rule[3]",
+      "find": "\"Pour interdire, on emploie لَا + apocopé : لَا تَذْهَبْ (n’y va pas). Piège : ne nie pas le passé avec لَا ou لَنْ, qui visent le présent et le futur.\",",
+      "replace": "\"Pour interdire, emploie لَا suivi de l’apocopé : لَا تَذْهَبْ (« n’y va pas »). Pour nier un fait passé, cette fiche enseigne لَمْ. Une autre tournure courante est مَا suivi du passé : مَا ذَهَبَ (« il n’est pas parti »).\","
+    },
+    {
+      "id": "ar-b1-jussive-imperative",
+      "field": "exercises[2].prompt",
+      "find": "prompt: \"« N’y va pas ! » : لا ___ إلى هناك.\",",
+      "replace": "prompt: \"« Ne va pas au marché ! » (à un homme) : لا ___ إلى السوق.\","
+    },
+    {
+      "id": "ar-b1-jussive-imperative",
+      "field": "exercises[3].explanation",
+      "find": "explanation: \"On retire le ت de تكتب : اكتب.\",",
+      "replace": "explanation: \"Pars de تَكْتُبْ, retire تَـ et ajoute l’alif avec damma pour pouvoir prononcer la première consonne : اُكْتُبْ.\","
+    },
+    {
+      "id": "ar-b1-relative",
+      "field": "rule[0]",
+      "find": "\"Le pronom relatif s’accorde en genre et en nombre avec le nom qu’il suit : الَّذِي (masculin singulier), الَّتِي (féminin singulier), الَّذِينَ (masculin pluriel de personnes), اللَّاتِي (féminin pluriel de personnes). Pour les choses au pluriel, on emploie الَّتِي.\",",
+      "replace": "\"Le relatif s’accorde en genre et en nombre avec l’antécédent. Emploie الَّذِي au masculin singulier, الَّتِي au féminin singulier, الَّذِينَ et اللَّاتِي au pluriel de personnes. Pour un pluriel non humain, الَّتِي est le modèle courant. Le duel distingue aussi les cas : اللَّذَانِ ou اللَّذَيْنِ, اللَّتَانِ ou اللَّتَيْنِ.\","
+    },
+    {
+      "id": "ar-b1-relative",
+      "field": "rule[1]",
+      "find": "\"Il ne s’emploie qu’après un nom défini : الرَّجُل الَّذِي يَعْمَلُ هُنَا (l’homme qui travaille ici). Après un nom indéfini, il n’y a pas de pronom : رَجُل يَعْمَلُ هُنَا (un homme qui travaille ici).\",",
+      "replace": "\"Pour décrire un nom défini, place le relatif après lui : الرَّجُلُ الَّذِي يَعْمَلُ هُنَا (« l’homme qui travaille ici »). Un nom indéfini peut être suivi directement d’une proposition descriptive : رَجُلٌ يَعْمَلُ هُنَا (« un homme qui travaille ici »).\","
+    },
+    {
+      "id": "ar-b1-relative",
+      "field": "rule[2]",
+      "find": "\"Le relatif ne change pas selon sa fonction (qui, que, où, dont). Quand il n’est pas le sujet, on reprend le nom par un pronom suffixe : الْكِتَاب الَّذِي قَرَأْتُهُ (le livre, littéralement « que je l’ai lu »).\",",
+      "replace": "\"Avec un complément d’objet direct, une reprise est fréquente : الْكِتَابُ الَّذِي قَرَأْتُهُ (« le livre que j’ai lu »). Ce pronom objet peut être omis dans une phrase comme الْكِتَابُ الَّذِي قَرَأْتُ. Au duel, la forme du relatif dépend de son rôle auprès de l’antécédent.\","
+    },
+    {
+      "id": "ar-b1-relative",
+      "field": "rule[3]",
+      "find": "\"Piège : le français n’a pas cette reprise. N’oublie pas ـهُ, ـهَا… : الْمَدِينَة الَّتِي أَسْكُنُ فِيهَا (la ville où j’habite, littéralement « dans elle »).\",",
+      "replace": "\"Après une préposition, garde la reprise dans ce modèle : الْمَدِينَةُ الَّتِي أَسْكُنُ فِيهَا (« la ville où j’habite »). Le suffixe ـهَا reprend الْمَدِينَةُ après فِي.\","
+    },
+    {
+      "id": "ar-b1-relative",
+      "field": "table.rows[4]",
+      "find": "[\"choses au pluriel\", \"الَّتِي\", \"الْكُتُبُ الَّتِي قَرَأْتُهَا\"],",
+      "replace": "[\"pluriel non humain\", \"الَّتِي\", \"الْكُتُبُ الَّتِي قَرَأْتُهَا\"],\n          [\"masculin duel\", \"اللَّذَانِ / اللَّذَيْنِ\", \"الطَّالِبَانِ اللَّذَانِ دَرَسَا\"],\n          [\"féminin duel\", \"اللَّتَانِ / اللَّتَيْنِ\", \"الطَّالِبَتَانِ اللَّتَانِ دَرَسَتَا\"],"
+    },
+    {
+      "id": "ar-b1-relative",
+      "field": "examples[1]",
+      "find": "{ text: \"الْكِتَابُ الَّذِي قَرَأْتُهُ جَمِيل.\", translation: \"Le livre que j’ai lu est beau.\", note: \"ـهُ reprend الْكِتَاب.\" },",
+      "replace": "{ text: \"الْكِتَابُ الَّذِي قَرَأْتُهُ جَمِيلٌ.\", translation: \"Le livre que j’ai lu est beau.\", note: \"ـهُ reprend الْكِتَابُ. Dans cet exemple, la reprise est possible sans être obligatoire.\" },"
+    },
+    {
+      "id": "ar-b1-relative",
+      "field": "exercises[2].prompt",
+      "find": "prompt: \"« Un homme qui travaille ici » : رجل ___ يعمل هنا.\",",
+      "replace": "prompt: \"« Un homme qui travaille ici » : رجل ___ هنا.\","
+    },
+    {
+      "id": "ar-b1-relative",
+      "field": "exercises[2].options",
+      "find": "options: [\"الذي\", \"التي\", \"aucun mot\"],",
+      "replace": "options: [\"يعمل\", \"الذي يعمل\", \"التي تعمل\"],"
+    },
+    {
+      "id": "ar-b1-relative",
+      "field": "exercises[2].answer",
+      "find": "answer: 2,\n          explanation: \"Après un nom indéfini, il n’y a pas de relatif : رجل يعمل هنا.\",",
+      "replace": "answer: 0,\n          explanation: \"Après un nom indéfini, il n’y a pas de relatif : رجل يعمل هنا.\","
+    },
+    {
+      "id": "ar-b1-relative",
+      "field": "exercises[3].hint",
+      "find": "answers: [\"الذين\"],",
+      "replace": "hint: \"Relatif masculin pluriel.\",\n          answers: [\"الذين\"],"
+    },
+    {
+      "id": "ar-b1-relative",
+      "field": "exercises[4].instruction",
+      "find": "instruction: \"Relie les deux phrases avec الذي : « Voici le livre. Je l’ai lu hier. »\",",
+      "replace": "instruction: \"Ajoute le relatif après الْكِتَابُ. Garde le début de la première phrase. Tu peux conserver ou omettre la reprise objet.\","
+    },
+    {
+      "id": "ar-b1-relative",
+      "field": "exercises[4].source",
+      "find": "source: \"هذا الكتاب. قرأته أمس.\",",
+      "replace": "source: \"هذا هو الكتاب. قرأته أمس.\","
+    },
+    {
+      "id": "ar-b1-relative",
+      "field": "exercises[4].answers",
+      "find": "          answers: [\"هذا الكتاب الذي قرأته أمس.\", \"هذا هو الكتاب الذي قرأته أمس.\"],",
+      "replace": "          answers: [\"هذا هو الكتاب الذي قرأته أمس.\", \"هذا هو الكتاب الذي قرأت أمس.\"],"
+    },
+    {
+      "id": "ar-b1-relative",
+      "field": "exercises[4].explanation",
+      "find": "explanation: \"On insère الذي et on garde le pronom de reprise ـه dans قرأته.\",",
+      "replace": "explanation: \"الَّذِي suit le nom masculin défini. Dans cette relative, les formes قَرَأْتُهُ et قَرَأْتُ conviennent.\","
+    },
+    {
+      "id": "ar-b1-numbers",
+      "field": "rule[1]",
+      "find": "\"Le genre pris en compte est celui du singulier du nom : كِتَاب est masculin, même si son pluriel كُتُب ressemble à un féminin.\",",
+      "replace": "\"Pour choisir la forme du nombre, regarde le genre du singulier. كِتَابٌ est masculin et son pluriel كُتُبٌ ne change pas ce choix.\","
+    },
+    {
+      "id": "ar-b1-numbers",
+      "field": "rule[2]",
+      "find": "\"1 et 2 s’accordent normalement et suivent le nom : كِتَاب وَاحِد (un livre), كِتَابَانِ اثْنَانِ (deux livres).\",",
+      "replace": "\"Le nombre 1 s’accorde avec le nom, comme dans كِتَابٌ وَاحِدٌ. Pour deux, le duel suffit souvent : كِتَابَانِ. On peut préciser la quantité en ajoutant le nombre accordé : كِتَابَانِ اثْنَانِ.\","
+    },
+    {
+      "id": "ar-b1-numbers",
+      "field": "rule[3]",
+      "find": "\"Piège : le français n’a pas cette inversion. Astuce : un nom masculin demande un nombre en ـة, qui ressemble à un féminin.\",",
+      "replace": "\"Le tableau présente les nombres au nominatif devant le nom compté. En phrase, la finale du nombre peut changer selon sa fonction. Dans اشْتَرَيْتُ سَبْعَةَ أَقْلَامٍ (« j’ai acheté sept stylos »), سَبْعَةَ est à l’accusatif.\","
+    },
+    {
+      "id": "ar-b1-numbers",
+      "field": "exercises[3]",
+      "find": "          answers: [\"أربع\", \"اربع\"],",
+      "replace": "          hint: \"Écris le nombre en toutes lettres.\",\n          answers: [\"أربع\"],"
+    },
+    {
+      "id": "ar-b1-verb-forms",
+      "field": "rule[0]",
+      "find": "\"Un verbe arabe est construit sur une racine de trois consonnes dans un moule (وَزْن). La forme I est la base : كَتَبَ (écrire). Les formes dérivées ajoutent une lettre ou une voyelle et modifient le sens.\",",
+      "replace": "\"De nombreux verbes arabes reposent sur une racine de trois consonnes et un modèle (وَزْن). La forme I de كَتَبَ signifie « écrire ». Les formes dérivées changent le modèle par un ajout, une consonne doublée ou d’autres modifications, souvent avec un changement de sens.\","
+    },
+    {
+      "id": "ar-b1-verb-forms",
+      "field": "rule[2]",
+      "find": "\"Forme V (تَفَعَّلَ) : souvent le réfléchi de la forme II, عَلَّمَ (enseigner) → تَعَلَّمَ (apprendre). Au présent, les formes II, III et IV prennent يُـ, la forme V prend يَـ.\",",
+      "replace": "\"Forme V (تَفَعَّلَ) : elle est souvent liée à la forme II, comme عَلَّمَ (« enseigner ») et تَعَلَّمَ (« apprendre »). À la troisième personne du masculin singulier, le présent commence par يُـ aux formes II, III et IV, et par يَـ à la forme V.\","
+    },
+    {
+      "id": "ar-b1-verb-forms",
+      "field": "table.rows[0]",
+      "find": "[\"I\", \"كَتَبَ\", \"يَكْتُب\", \"écrire\"],",
+      "replace": "[\"I\", \"كَتَبَ\", \"يَكْتُبُ\", \"écrire\"],"
+    },
+    {
+      "id": "ar-b1-verb-forms",
+      "field": "table.rows[1]",
+      "find": "[\"II\", \"دَرَّسَ\", \"يُدَرِّس\", \"enseigner\"],",
+      "replace": "[\"II\", \"دَرَّسَ\", \"يُدَرِّسُ\", \"enseigner\"],"
+    },
+    {
+      "id": "ar-b1-verb-forms",
+      "field": "table.rows[2]",
+      "find": "[\"III\", \"كَاتَبَ\", \"يُكَاتِب\", \"correspondre avec\"],",
+      "replace": "[\"III\", \"كَاتَبَ\", \"يُكَاتِبُ\", \"correspondre avec\"],"
+    },
+    {
+      "id": "ar-b1-verb-forms",
+      "field": "table.rows[3]",
+      "find": "[\"IV\", \"أَخْرَجَ\", \"يُخْرِج\", \"faire sortir\"],",
+      "replace": "[\"IV\", \"أَخْرَجَ\", \"يُخْرِجُ\", \"faire sortir\"],"
+    },
+    {
+      "id": "ar-b1-verb-forms",
+      "field": "table.rows[4]",
+      "find": "[\"V\", \"تَعَلَّمَ\", \"يَتَعَلَّم\", \"apprendre\"],",
+      "replace": "[\"V\", \"تَعَلَّمَ\", \"يَتَعَلَّمُ\", \"apprendre\"],"
+    },
+    {
+      "id": "ar-b1-verb-forms",
+      "field": "examples[0]",
+      "find": "{ text: \"هُوَ يُدَرِّس الْعَرَبِيَّة فِي الْمَدْرَسَة.\", translation: \"Il enseigne l’arabe à l’école.\", note: \"Forme II : la 2e consonne est doublée, préfixe يُـ.\" },",
+      "replace": "{ text: \"هُوَ يُدَرِّسُ الْعَرَبِيَّةَ فِي الْمَدْرَسَةِ.\", translation: \"Il enseigne l’arabe à l’école.\", note: \"Forme II : la deuxième consonne de la racine est doublée.\" },"
+    },
+    {
+      "id": "ar-b1-verb-forms",
+      "field": "examples[1]",
+      "find": "{ text: \"أَنَا أَتَعَلَّم الْعَرَبِيَّة.\", translation: \"J’apprends l’arabe.\", note: \"Forme V : préfixe أَتَـ et chadda sur ل.\" },",
+      "replace": "{ text: \"أَنَا أَتَعَلَّمُ الْعَرَبِيَّةَ.\", translation: \"J’apprends l’arabe.\", note: \"Forme V : préfixe أَتَـ et chadda sur ل.\" },"
+    },
+    {
+      "id": "ar-b1-verb-forms",
+      "field": "examples[2]",
+      "find": "{ text: \"أَخْرَجَ الطَّالِب الْكِتَاب مِنَ الْحَقِيبَة.\", translation: \"L’étudiant a sorti le livre du sac.\", note: \"Forme IV : أَخْرَجَ signifie « faire sortir ».\" },",
+      "replace": "{ text: \"أَخْرَجَ الطَّالِبُ الْكِتَابَ مِنَ الْحَقِيبَةِ.\", translation: \"L’étudiant a sorti le livre du sac.\", note: \"أَخْرَجَ est la forme IV de خَرَجَ.\" },"
+    },
+    {
+      "id": "ar-b1-verb-forms",
+      "field": "exercises[2].hint",
+      "find": "hint: \"تعلم\",",
+      "replace": "hint: \"تَعَلَّمَ, au présent\","
+    },
+    {
+      "id": "ar-b1-verb-forms",
+      "field": "exercises[3].hint",
+      "find": "hint: \"كاتب\",",
+      "replace": "hint: \"كَاتَبَ, au présent\","
+    },
+    {
+      "id": "ar-a2-prepositions",
+      "field": "rule[2]",
+      "find": "\"Avec un pronom, la préposition prend un suffixe : مَعِي (avec moi), مِنْهُ (de lui), فِيهِ (dedans). إِلَى et عَلَى deviennent إِلَيْـ et عَلَيْـ : عَلَيْهِ (sur lui).\",",
+      "replace": "\"Un pronom se soude à la préposition sous forme de suffixe : مِنْهُ (« de lui »), فِيهِ (« dedans »). Devant ce suffixe, إِلَى et عَلَى deviennent إِلَيْـ et عَلَيْـ, comme dans عَلَيْهِ (« sur lui »). Les mots مَعَ (accompagnement) et عِنْدَ (lieu) prennent eux aussi un suffixe pronominal : مَعِي (« avec moi »), عِنْدِي (« chez moi »).\","
+    },
+    {
+      "id": "ar-a2-prepositions",
+      "field": "table.caption",
+      "find": "caption: \"Prépositions courantes\",",
+      "replace": "caption: \"Prépositions, accompagnement et lieu\","
+    },
+    {
+      "id": "ar-a2-prepositions",
+      "field": "table.headers",
+      "find": "headers: [\"Préposition\", \"Sens\", \"Exemple\"],",
+      "replace": "headers: [\"Mot\", \"Sens\", \"Exemple\"],"
+    }
+  ]
+}

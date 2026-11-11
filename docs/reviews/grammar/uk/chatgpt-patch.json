@@ -1,0 +1,1646 @@
+{
+  "language": "uk",
+  "approved": [
+    "uk-a1-gender",
+    "uk-a1-present-first",
+    "uk-a1-present-second",
+    "uk-a1-plural",
+    "uk-a1-locative",
+    "uk-a1-vocative",
+    "uk-a2-accusative",
+    "uk-a2-genitive",
+    "uk-a2-past",
+    "uk-a2-dative",
+    "uk-a2-instrumental",
+    "uk-a2-motion",
+    "uk-b1-aspect",
+    "uk-b1-future",
+    "uk-b1-imperative",
+    "uk-b1-numbers",
+    "uk-b1-relative",
+    "uk-b1-conditional"
+  ],
+  "drafts": [],
+  "patches": [
+    {
+      "id": "uk-a1-gender",
+      "field": "title",
+      "find": "      title: \"Reconnaître le genre d’un nom \u0001 він, вона, воно\",",
+      "replace": "      title: \"Reconnaître le genre d’un nom : він, вона, воно\","
+    },
+    {
+      "id": "uk-a1-gender",
+      "field": "rule[0]",
+      "find": "        \"Tout nom ukrainien a un genre, et la terminaison le révèle presque toujours \u0001 consonne ou -й → masculin (брат, музе́й) \u0001 -а ou -я → féminin (кни́га, неді́ля) \u0001 -о ou -е → neutre (вікно́, мо́ре). Le genre ne suit pas le français \u0001 « le livre » se dit кни́га (féminin), « la fenêtre » вікно́ (neutre).\",",
+      "replace": "        \"La plupart des noms ont un genre. Au singulier, la terminaison donne un indice. Une consonne ou -й indique souvent le masculin (брат, музе́й), -а ou -я le féminin (кни́га, неді́ля), -о ou -е le neutre (вікно́, мо́ре). Des neutres se terminent aussi en -я, comme завда́ння. Le genre ne suit pas celui du français.\","
+    },
+    {
+      "id": "uk-a1-gender",
+      "field": "rule[1]",
+      "find": "        \"Le -ь et les consonnes finales sont un piège \u0001 день, вчи́тель sont masculins, mais ніч, о́сінь sont féminins, et seul le dictionnaire te le dit. Quelques noms d’hommes finissent en -а, -я ou -о (та́то, дя́дя, Мико́ла) \u0001 ils restent masculins.\",",
+      "replace": "        \"Les noms en -ь ou en consonne peuvent être masculins (день, вчи́тель) ou féminins (ніч, о́сінь). Apprends leur genre avec le nom. Des noms masculins comme та́то et Мико́ла finissent par une voyelle.\","
+    },
+    {
+      "id": "uk-a1-gender",
+      "field": "rule[2]",
+      "find": "        \"Le pronom reprend le genre \u0001 він (masculin), вона́ (féminin), воно́ (neutre). Le possessif s’accorde aussi \u0001 мій брат, моя́ кни́жка, моє́ вікно́, мої́ ді́ти. Seuls його́ (à lui) et її́ (à elle) ne changent jamais \u0001 наш, ваш et ї́хній s’accordent comme мій.\",",
+      "replace": "        \"Le pronom reprend le genre du nom (він, вона́ ou воно́). Le possessif мій s’accorde avec le nom : мій брат, моя́ кни́жка, моє́ вікно́, мої́ ді́ти. Наш et ваш s’accordent aussi. Його́, її́ et їх sont invariables. Pour « leur », on emploie aussi ї́хній, qui s’accorde.\","
+    },
+    {
+      "id": "uk-a1-gender",
+      "field": "examples[0]",
+      "find": "        { text: \"Це мій брат. Він працю́є в о́фісі.\", translation: \"C’est mon frère. Il travaille dans un bureau.\", note: \"Брат finit par une consonne : masculin, donc він et мій.\" },",
+      "replace": "        { text: \"Це мій брат. Він працю́є в о́фісі.\", translation: \"C’est mon frère. Il travaille dans un bureau.\", note: \"Брат finit par une consonne : masculin, donc він et мій.\" },"
+    },
+    {
+      "id": "uk-a1-gender",
+      "field": "examples[1]",
+      "find": "        { text: \"Ось на́ша маши́на. Вона́ дуже стара́.\", translation: \"Voici notre voiture. Elle est très vieille.\", note: \"Маши́на finit en -а : féminin, donc вона́ et на́ша.\" },",
+      "replace": "        { text: \"Ось на́ша маши́на. Вона́ ду́же стара́.\", translation: \"Voici notre voiture. Elle est très vieille.\", note: \"Маши́на finit en -а : féminin, donc вона́ et на́ша.\" },"
+    },
+    {
+      "id": "uk-a1-gender",
+      "field": "examples[2]",
+      "find": "        { text: \"Диви́сь, вікно́ відчи́нене. Воно́ вели́ке.\", translation: \"Regarde, la fenêtre est ouverte. Elle est grande.\", note: \"Вікно́ est neutre : воно́, alors qu’en français « fenêtre » est féminin.\" },",
+      "replace": "        { text: \"Диви́сь, вікно́ відчи́нене. Воно́ вели́ке.\", translation: \"Regarde, la fenêtre est ouverte. Elle est grande.\", note: \"Вікно́ est neutre : воно́, alors qu’en français « fenêtre » est féminin.\" },"
+    },
+    {
+      "id": "uk-a1-gender",
+      "field": "exercises[0].explanation",
+      "find": "          explanation: \"Сестра finit en -а \u0001 c’est un féminin, on le reprend par вона.\",",
+      "replace": "          explanation: \"Сестра finit en -а : c’est un féminin, on le reprend par вона.\","
+    },
+    {
+      "id": "uk-a1-gender",
+      "field": "exercises[1].explanation",
+      "find": "          explanation: \"Вікно finit en -о \u0001 c’est un neutre, donc воно. Le français « fenêtre » est féminin, mais l’ukrainien suit sa propre terminaison.\",",
+      "replace": "          explanation: \"Вікно finit en -о : c’est un neutre, donc воно. Le français « fenêtre » est féminin, mais l’ukrainien suit sa propre terminaison.\","
+    },
+    {
+      "id": "uk-a1-gender",
+      "field": "exercises[2].explanation",
+      "find": "          explanation: \"Діти est un pluriel \u0001 le possessif prend la forme du pluriel, мої.\",",
+      "replace": "          explanation: \"Діти est un pluriel : le possessif prend la forme du pluriel, мої.\","
+    },
+    {
+      "id": "uk-a1-gender",
+      "field": "exercises[3].prompt",
+      "find": "          prompt: \"Де твоя книжка? — ___ на столі.\",",
+      "replace": "          prompt: \"Де твоя книжка? — ___ на столі.\",\n          hint: \"Pronom personnel de la 3e personne\","
+    },
+    {
+      "id": "uk-a1-gender",
+      "field": "exercises[3].explanation",
+      "find": "          explanation: \"Книжка est un féminin en -а (le possessif твоя le confirme) \u0001 вона.\",",
+      "replace": "          explanation: \"Книжка est un féminin en -а (le possessif твоя le confirme) : вона.\","
+    },
+    {
+      "id": "uk-a1-gender",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Remplace le nom sujet par le pronom qui convient.\",",
+      "replace": "          instruction: \"Remplace seulement le nom sujet par le pronom qui convient.\","
+    },
+    {
+      "id": "uk-a1-gender",
+      "field": "exercises[4].source",
+      "find": "          source: \"Брат живе у Києві.\",",
+      "replace": "          source: \"Брат живе в Києві.\","
+    },
+    {
+      "id": "uk-a1-gender",
+      "field": "exercises[4].explanation",
+      "find": "          explanation: \"Брат est masculin \u0001 il est repris par він.\",",
+      "replace": "          explanation: \"Брат est masculin : il est repris par він.\","
+    },
+    {
+      "id": "uk-a1-present-first",
+      "field": "title",
+      "find": "      title: \"Conjuguer au présent \u0001 читати, жити\",",
+      "replace": "      title: \"Conjuguer au présent : читати, жити\","
+    },
+    {
+      "id": "uk-a1-present-first",
+      "field": "rule[0]",
+      "find": "        \"Au présent, on retire -ти de l’infinitif et on ajoute les terminaisons de la personne. 1re conjugaison \u0001 -ю/-у, -єш/-еш, -є/-е, -ємо/-емо, -єте/-ете, -ють/-уть. Exemple \u0001 чита́ти → я чита́ю, ти чита́єш, вони́ чита́ють. Un seul présent \u0001 « je lis » et « je suis en train de lire » se disent tous deux я чита́ю.\",",
+      "replace": "        \"Apprends le radical du présent avec chaque verbe. Dans чита́ти → чита́ю, il suffit de retirer -ти. D’autres radicaux changent (жи́ти → живу́, працюва́ти → працю́ю). À la 1re conjugaison, la forme « ils/elles » se termine en -уть ou -ють. Я чита́ю signifie « je lis » ou « je suis en train de lire ».\","
+    },
+    {
+      "id": "uk-a1-present-first",
+      "field": "rule[1]",
+      "find": "        \"Après une voyelle on écrit -ю, -єш, -є, -ємо, -єте, -ють (чита́ти, працюва́ти → працю́ю) \u0001 après une consonne -у, -еш, -е, -емо, -ете, -уть (жити → живу́, живу́ть). La 3e personne du singulier finit en -є ou -е, jamais en -ть \u0001 -ть est la marque de la 2e conjugaison.\",",
+      "replace": "        \"Après une voyelle, les terminaisons sont -ю, -єш, -є, -ємо, -єте, -ють (я чита́ю, вони́ чита́ють). Après une consonne, on a -у, -еш, -е, -емо, -ете, -уть (я живу́, вони́ живу́ть). Compare la 3e personne du singulier чита́є et живе́ avec говори́ть, de la 2e conjugaison.\","
+    },
+    {
+      "id": "uk-a1-present-first",
+      "field": "rule[2]",
+      "find": "        \"Pièges \u0001 ne garde pas l’infinitif (я чита́ти est faux) et n’ajoute pas de verbe « être ». L’ukrainien distingue ти (une personne familière) et ви (politesse ou pluriel) \u0001 ви чита́єте.\",",
+      "replace": "        \"Pour dire « je lis », conjugue le verbe (я чита́ю) sans ajouter d’équivalent du verbe « être ». L’ukrainien distingue ти, pour une personne qu’on tutoie, et ви, pour plusieurs personnes ou pour une personne qu’on vouvoie. Compare ти чита́єш et ви чита́єте.\","
+    },
+    {
+      "id": "uk-a1-present-first",
+      "field": "table.caption",
+      "find": "        caption: \"Présent de чита́ти et de жити\",",
+      "replace": "        caption: \"Présent de чита́ти et de жи́ти\","
+    },
+    {
+      "id": "uk-a1-present-first",
+      "field": "table.headers",
+      "find": "        headers: [\"Personne\", \"чита́ти\", \"жити\"],",
+      "replace": "        headers: [\"Personne\", \"чита́ти\", \"жи́ти\"],"
+    },
+    {
+      "id": "uk-a1-present-first",
+      "field": "examples[0]",
+      "find": "        { text: \"Я чита́ю щодня́.\", translation: \"Je lis tous les jours.\", note: \"Un seul présent : « je lis » et « je suis en train de lire ».\" },",
+      "replace": "        { text: \"Я чита́ю щодня́.\", translation: \"Je lis tous les jours.\", note: \"Un seul présent : « je lis » et « je suis en train de lire ».\" },"
+    },
+    {
+      "id": "uk-a1-present-first",
+      "field": "examples[1]",
+      "find": "        { text: \"Ми живемо́ тут, а вони́ живу́ть там.\", translation: \"Nous habitons ici et eux habitent là-bas.\", note: \"Après une consonne : -у / -уть, et -е- (живемо́) à la place de -є-.\" },",
+      "replace": "        { text: \"Ми живемо́ тут, а вони́ живу́ть там.\", translation: \"Nous habitons ici et eux habitent là-bas.\", note: \"Après une consonne : -у / -уть, et -е- (живемо́) à la place de -є-.\" },"
+    },
+    {
+      "id": "uk-a1-present-first",
+      "field": "examples[2]",
+      "find": "        { text: \"Ви працю́єте за́втра?\", translation: \"Vous travaillez demain ?\", note: \"Le présent peut aussi parler d’un avenir proche.\" },",
+      "replace": "        { text: \"Ви працю́єте за́втра?\", translation: \"Vous travaillez demain ?\", note: \"Le présent peut aussi parler d’un avenir proche.\" },"
+    },
+    {
+      "id": "uk-a1-present-first",
+      "field": "exercises[0].explanation",
+      "find": "          explanation: \"Avec ти, la terminaison de la 1re conjugaison est -єш \u0001 читаєш.\",",
+      "replace": "          explanation: \"Avec ти, la terminaison de la 1re conjugaison est -єш : читаєш.\","
+    },
+    {
+      "id": "uk-a1-present-first",
+      "field": "exercises[1].explanation",
+      "find": "          explanation: \"Sujet pluriel (вони) \u0001 -ють après une voyelle, donc працюють.\",",
+      "replace": "          explanation: \"Sujet pluriel (вони) : -ють après une voyelle, donc працюють.\","
+    },
+    {
+      "id": "uk-a1-present-first",
+      "field": "exercises[2].hint",
+      "find": "          hint: \"жити\",",
+      "replace": "          hint: \"жити, au présent\","
+    },
+    {
+      "id": "uk-a1-present-first",
+      "field": "exercises[2].explanation",
+      "find": "          explanation: \"Radical жив- (après consonne) + -емо \u0001 живемо.\",",
+      "replace": "          explanation: \"Radical жив- (après consonne) + -емо : живемо.\","
+    },
+    {
+      "id": "uk-a1-present-first",
+      "field": "exercises[3].hint",
+      "find": "          hint: \"знати\",",
+      "replace": "          hint: \"знати, au présent\","
+    },
+    {
+      "id": "uk-a1-present-first",
+      "field": "exercises[3].explanation",
+      "find": "          explanation: \"Radical зна- + -єш \u0001 знаєш.\",",
+      "replace": "          explanation: \"Radical зна- + -єш : знаєш.\","
+    },
+    {
+      "id": "uk-a1-present-first",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Mets la phrase à la forme « ми ».\",\n          source: \"Я працюю в банку.\",",
+      "replace": "          instruction: \"Remplace « Я » par « Ми » et change seulement la forme du verbe au présent.\",\n          source: \"Я працюю в банку.\","
+    },
+    {
+      "id": "uk-a1-present-first",
+      "field": "exercises[4].explanation",
+      "find": "          explanation: \"Avec ми, la terminaison est -ємо après une voyelle \u0001 працюємо.\",",
+      "replace": "          explanation: \"Avec ми, la terminaison est -ємо après une voyelle : працюємо.\","
+    },
+    {
+      "id": "uk-a1-present-second",
+      "field": "title",
+      "find": "      title: \"Conjuguer au présent \u0001 говорити, любити et l’alternance\",",
+      "replace": "      title: \"Conjuguer au présent : говорити, любити et l’alternance\","
+    },
+    {
+      "id": "uk-a1-present-second",
+      "field": "summary",
+      "find": "      summary: \"Former le présent de la 2e conjugaison (-иш, -ить, -имо, -ите, -ять/-ать) et repérer les alternances de la 1re personne.\",",
+      "replace": "      summary: \"Former le présent de la 2e conjugaison et repérer les changements de consonne avec я et вони.\","
+    },
+    {
+      "id": "uk-a1-present-second",
+      "field": "rule[0]",
+      "find": "        \"2e conjugaison \u0001 la plupart des verbes en -ити et en -іти (говори́ти, сиді́ти), plus quelques verbes en -ати après ж, ч, ш (кричати́, лежа́ти). Terminaisons \u0001 -ю/-у, -иш, -ить, -имо, -ите, -ять/-ать. Exemple \u0001 говори́ти → я говорю́, ти говори́ш, він говори́ть, вони́ говоря́ть. La 3e personne en -ть est la marque de cette conjugaison.\",",
+      "replace": "        \"À la 2e conjugaison, la 3e personne du pluriel finit en -ять ou -ать (вони́ говоря́ть, вони́ крича́ть). Au singulier, compare я говорю́, ти говори́ш, він говори́ть. Au pluriel, ми говори́мо, ви говори́те. Après une voyelle, on écrit notamment -їш, -їть, -їмо, -їте (стої́ш, стої́ть).\","
+    },
+    {
+      "id": "uk-a1-present-second",
+      "field": "rule[1]",
+      "find": "        \"Alternance \u0001 à la 1re personne du singulier seulement, б, п, в, м, ф prennent un л (люби́ти → люблю́, mais ти лю́биш) \u0001 д devient дж (сиді́ти → сиджу́) \u0001 т → ч (плати́ти → плачу́) \u0001 з → ж (вози́ти → вожу́) \u0001 с → ш (носи́ти → ношу́). Attention \u0001 д donne дж, pas ж. Les autres personnes gardent la consonne d’origine.\",",
+      "replace": "        \"Dans certains verbes, la consonne du radical change avec я : д → дж (сиді́ти → сиджу́), т → ч (плати́ти → плачу́), з → ж (вози́ти → вожу́), с → ш (носи́ти → ношу́). Avec certaines consonnes labiales, un л s’ajoute à la 1re personne du singulier et à la 3e du pluriel (я люблю́, вони́ лю́блять, mais ти лю́биш).\","
+    },
+    {
+      "id": "uk-a1-present-second",
+      "field": "rule[2]",
+      "find": "        \"Piège \u0001 « j’aime » est я люблю́, jamais я любю. Le -ся des verbes réfléchis se garde partout \u0001 диви́тися → я дивлю́ся, ти диви́шся, він диви́ться.\",",
+      "replace": "        \"« J’aime » se dit я люблю́. Apprends la forme des verbes en -ся avec leur terminaison (диви́тися → я дивлю́ся, ти диви́шся, він диви́ться).\","
+    },
+    {
+      "id": "uk-a1-present-second",
+      "field": "examples[0]",
+      "find": "        { text: \"Я люблю́ ка́ву, а моя́ сестра́ лю́бить чай.\", translation: \"J’aime le café et ma sœur aime le thé.\", note: \"Я люблю́ (avec л), mais вона́ лю́бить : l’alternance ne touche que « je ».\" },",
+      "replace": "        { text: \"Я люблю́ ка́ву, а моя́ сестра́ лю́бить чай.\", translation: \"J’aime le café et ma sœur aime le thé.\", note: \"Compare я люблю́, вона́ лю́бить et вони́ лю́блять. Л apparaît avec я et вони́.\" },"
+    },
+    {
+      "id": "uk-a1-present-second",
+      "field": "examples[1]",
+      "find": "        { text: \"Вони́ говоря́ть украї́нською.\", translation: \"Ils parlent ukrainien.\", note: \"Après une consonne, la 3e personne du pluriel finit en -ять.\" },",
+      "replace": "        { text: \"Вони́ говоря́ть украї́нською.\", translation: \"Ils parlent ukrainien.\", note: \"Говори́ти prend -ять au pluriel. Compare крича́ти → крича́ть.\" },"
+    },
+    {
+      "id": "uk-a1-present-second",
+      "field": "examples[2]",
+      "find": "        { text: \"Що ти ро́биш за́втра?\", translation: \"Que fais-tu demain ?\", note: \"Роби́ти : я роблю́, ти ро́биш. Le présent peut parler d’un avenir proche.\" },",
+      "replace": "        { text: \"Що ти ро́биш за́втра?\", translation: \"Que fais-tu demain ?\", note: \"Роби́ти : я роблю́, ти ро́биш. Le présent peut parler d’un avenir proche.\" },"
+    },
+    {
+      "id": "uk-a1-present-second",
+      "field": "exercises[0].explanation",
+      "find": "          explanation: \"Sujet вона \u0001 la 3e personne du singulier de la 2e conjugaison finit en -ить.\",",
+      "replace": "          explanation: \"Sujet вона : la 3e personne du singulier de la 2e conjugaison finit en -ить.\","
+    },
+    {
+      "id": "uk-a1-present-second",
+      "field": "exercises[1].explanation",
+      "find": "          explanation: \"À la 1re personne, б prend un л \u0001 люблю (jamais любю).\",",
+      "replace": "          explanation: \"À la 1re personne, б prend un л : люблю (jamais любю).\","
+    },
+    {
+      "id": "uk-a1-present-second",
+      "field": "exercises[2].hint",
+      "find": "          hint: \"сидіти\",",
+      "replace": "          hint: \"сидіти, au présent\","
+    },
+    {
+      "id": "uk-a1-present-second",
+      "field": "exercises[2].explanation",
+      "find": "          explanation: \"Radical сид- + -ять (3e personne du pluriel). Le д ne change qu’à la 1re personne \u0001 я сиджу.\",",
+      "replace": "          explanation: \"Radical сид- + -ять (3e personne du pluriel). Le д ne change qu’à la 1re personne : я сиджу.\","
+    },
+    {
+      "id": "uk-a1-present-second",
+      "field": "exercises[3].hint",
+      "find": "          hint: \"платити\",",
+      "replace": "          hint: \"платити, au présent\","
+    },
+    {
+      "id": "uk-a1-present-second",
+      "field": "exercises[3].explanation",
+      "find": "          explanation: \"À la 1re personne, т devient ч \u0001 плачу.\",",
+      "replace": "          explanation: \"À la 1re personne, т devient ч : плачу.\","
+    },
+    {
+      "id": "uk-a1-present-second",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Mets la phrase à la forme « ми ».\",\n          source: \"Я роблю каву.\",",
+      "replace": "          instruction: \"Remplace « Я » par « Ми » et change seulement la forme de « роблю » au présent.\",\n          source: \"Я роблю каву.\","
+    },
+    {
+      "id": "uk-a1-present-second",
+      "field": "exercises[4].explanation",
+      "find": "          explanation: \"Avec ми, la terminaison est -имо et le л de роблю disparaît \u0001 робимо.\",",
+      "replace": "          explanation: \"Avec ми, la terminaison est -имо et le л de роблю disparaît : робимо.\","
+    },
+    {
+      "id": "uk-a1-plural",
+      "field": "summary",
+      "find": "      summary: \"Former le pluriel des noms au nominatif \u0001 -и, -і, -ї, -а, -я.\",",
+      "replace": "      summary: \"Former le pluriel des noms au nominatif : -и, -і, -ї, -а, -я.\","
+    },
+    {
+      "id": "uk-a1-plural",
+      "field": "rule[0]",
+      "find": "        \"Au nominatif pluriel, un nom prend -и après une consonne dure (студе́нт → студе́нти, сестра́ → сестри́) et -і après une consonne molle, après ж, ч, ш, щ et dans -ця (вчи́тель → вчи́телі, неді́ля → неді́лі, ключ → ключі́, ву́лиця → ву́лиці). Les noms en -й font -ї \u0001 музе́й → музе́ї.\",",
+      "replace": "        \"Au nominatif pluriel, beaucoup de masculins et de féminins prennent -и après une consonne dure (студе́нт → студе́нти, сестра́ → се́стри). Les noms à radical mou ou à chuintante prennent souvent -і (вчи́тель → вчителі́, неді́ля → неді́лі, ключ → ключі́, ву́лиця → ву́лиці). Les noms comme музе́й prennent -ї (музе́ї).\","
+    },
+    {
+      "id": "uk-a1-plural",
+      "field": "rule[1]",
+      "find": "        \"Les neutres changent -о en -а (вікно́ → вікна́) et -е en -я (мо́ре → моря́). Les noms en -ка, -га, -ха prennent -и, jamais -і (кни́жка → кни́жки, но́га → но́ги).\",",
+      "replace": "        \"Les neutres changent souvent -о en -а (вікно́ → ві́кна) et -е en -я (мо́ре → моря́). Les féminins comme кни́жка et но́га prennent -и (книжки́, но́ги). L’accent peut se déplacer au pluriel.\","
+    },
+    {
+      "id": "uk-a1-plural",
+      "field": "rule[2]",
+      "find": "        \"Quelques pluriels sont irréguliers et s’apprennent par cœur \u0001 дру́г → дру́зі, лю́дина → лю́ди, дити́на → ді́ти. Adjectifs et possessifs se mettent aussi au pluriel \u0001 нови́й → нові́, мій → мої́. Le pluriel ukrainien ne se fait jamais avec un -s.\",",
+      "replace": "        \"Quelques pluriels sont irréguliers (друг → дру́зі, лю́дина → лю́ди, дити́на → ді́ти). Les adjectifs et possessifs s’accordent au pluriel (нови́й → нові́, мій → мої́).\","
+    },
+    {
+      "id": "uk-a1-plural",
+      "field": "table.rows[1]",
+      "find": "          [\"Masculin mou\", \"вчи́тель\", \"вчи́телі\", \"-ь → -і\"],",
+      "replace": "          [\"Masculin mou\",\"вчи́тель\",\"вчителі́\",\"-ь → -і\"],"
+    },
+    {
+      "id": "uk-a1-plural",
+      "field": "table.rows[3]",
+      "find": "          [\"Féminin en -а\", \"сестра́\", \"сестри́\", \"-а → -и\"],",
+      "replace": "          [\"Féminin en -а\",\"сестра́\",\"се́стри\",\"-а → -и\"],"
+    },
+    {
+      "id": "uk-a1-plural",
+      "field": "table.rows[4]",
+      "find": "          [\"Féminin en -ка\", \"кни́жка\", \"кни́жки\", \"-ка → -ки\"],",
+      "replace": "          [\"Féminin en -ка\",\"кни́жка\",\"книжки́\",\"-ка → -ки\"],"
+    },
+    {
+      "id": "uk-a1-plural",
+      "field": "table.rows[6]",
+      "find": "          [\"Neutre en -о\", \"вікно́\", \"вікна́\", \"-о → -а\"],",
+      "replace": "          [\"Neutre en -о\",\"вікно́\",\"ві́кна\",\"-о → -а\"],"
+    },
+    {
+      "id": "uk-a1-plural",
+      "field": "examples[0]",
+      "find": "        { text: \"Це на́ші нові́ студе́нти.\", translation: \"Ce sont nos nouveaux étudiants.\", note: \"Le nom et l’adjectif sont au pluriel : студе́нти, нові́.\" },",
+      "replace": "        { text: \"Це на́ші нові́ студе́нти.\", translation: \"Ce sont nos nouveaux étudiants.\", note: \"Le nom et l’adjectif sont au pluriel : студе́нти, нові́.\" },"
+    },
+    {
+      "id": "uk-a1-plural",
+      "field": "examples[1]",
+      "find": "        { text: \"Ось кни́жки й зо́шити, а ось ключі́.\", translation: \"Voici des livres et des cahiers, et voilà les clés.\", note: \"Ключ finit par ч : pluriel en -і.\" },",
+      "replace": "        { text: \"Ось книжки́ й зо́шити, а ось ключі́.\", translation: \"Voici des livres et des cahiers, et voilà les clés.\", note: \"Ключ finit par ч : pluriel en -і.\" },"
+    },
+    {
+      "id": "uk-a1-plural",
+      "field": "exercises[0].explanation",
+      "find": "          explanation: \"Друг a un pluriel irrégulier \u0001 друзі (г devient з).\",",
+      "replace": "          explanation: \"Друг a un pluriel irrégulier : друзі (г devient з).\","
+    },
+    {
+      "id": "uk-a1-plural",
+      "field": "exercises[1].explanation",
+      "find": "          explanation: \"Les neutres en -о font leur pluriel en -а \u0001 вікна.\",",
+      "replace": "          explanation: \"Вікно fait son nominatif pluriel en -а, ce qui donne вікна.\","
+    },
+    {
+      "id": "uk-a1-plural",
+      "field": "exercises[2].explanation",
+      "find": "          explanation: \"Féminin en -а après consonne dure \u0001 -а → -и, donc сестри.\",",
+      "replace": "          explanation: \"Féminin en -а après consonne dure : -а → -и, donc сестри.\","
+    },
+    {
+      "id": "uk-a1-plural",
+      "field": "exercises[3].explanation",
+      "find": "          explanation: \"Les noms en -й changent -й en -ї au pluriel \u0001 музеї.\",",
+      "replace": "          explanation: \"Les noms en -й changent -й en -ї au pluriel : музеї.\","
+    },
+    {
+      "id": "uk-a1-locative",
+      "field": "title",
+      "find": "      title: \"Dire où l’on est \u0001 у / в / на + locatif\",",
+      "replace": "      title: \"Dire où l’on est : у / в / на + locatif\","
+    },
+    {
+      "id": "uk-a1-locative",
+      "field": "rule[0]",
+      "find": "        \"Pour dire où l’on est, on emploie у (ou в) ou на suivi du locatif. Au lieu d’un seul « à / dans », l’ukrainien utilise у / в pour un lieu fermé (в о́фісі, у шко́лі, у мі́сті) et на pour une surface, un lieu ouvert ou une activité (на робо́ті, на ву́лиці, на столі́, на заво́ді).\",",
+      "replace": "        \"Pour dire où l’on se trouve, emploie у / в ou на avec le locatif. On dit souvent у / в pour un lieu où l’on est à l’intérieur (в о́фісі, у шко́лі, у мі́сті). На se rencontre notamment avec une surface ou une activité (на столі́, на робо́ті). Apprends certaines expressions entières, comme на заво́ді et на ву́лиці.\","
+    },
+    {
+      "id": "uk-a1-locative",
+      "field": "rule[1]",
+      "find": "        \"Terminaisons du locatif \u0001 -і pour la plupart des noms (шко́ла → у шко́лі, вікно́ → на вікні́, стіл → на столі́) \u0001 -у pour certains masculins (банк → у ба́нку, парк → у па́рку) \u0001 -ові / -еві pour des noms de villes (Льві́в → у Льво́ві, Ки́їв → у Ки́єві). Le dictionnaire tranche.\",",
+      "replace": "        \"La terminaison est souvent -і (шко́ла → у шко́лі, стіл → на столі́). Certains masculins prennent -у (банк → у ба́нку, парк → у па́рку). Quelques villes ont -ові, -еві ou -єві (Льві́в → у Льво́ві, Ки́їв → у Ки́єві). Vérifie les variantes dans le dictionnaire.\","
+    },
+    {
+      "id": "uk-a1-locative",
+      "field": "rule[2]",
+      "find": "        \"Les noms en -ка, -га, -ха et -ця changent leur consonne \u0001 кни́жка → у кни́жці, кни́га → у кни́зі, ву́лиця → на ву́лиці. У et в alternent pour le son \u0001 у après une consonne (він у шко́лі), в après une voyelle devant une consonne (я в о́фісі). Les exercices acceptent les deux quand les deux sont corrects.\",",
+      "replace": "        \"Devant -і, les consonnes к, г, х deviennent ц, з, с (кни́жка → у кни́жці, кни́га → у кни́зі). Dans ву́лиця → на ву́лиці, ц reste inchangé. У et в alternent pour faciliter la prononciation (він у шко́лі, я в о́фісі). On emploie notamment у devant льв-, comme dans вони́ живу́ть у Льво́ві.\","
+    },
+    {
+      "id": "uk-a1-locative",
+      "field": "examples[0]",
+      "find": "        { text: \"Я працю́ю в о́фісі, а мій брат працю́є на заво́ді.\", translation: \"Je travaille dans un bureau et mon frère travaille dans une usine.\", note: \"В о́фісі (lieu fermé) mais на заво́ді (en français : « dans une usine »).\" },",
+      "replace": "        { text: \"Я працю́ю в о́фісі, а мій брат працю́є на заво́ді.\", translation: \"Je travaille dans un bureau et mon frère travaille dans une usine.\", note: \"Apprends les expressions в о́фісі et на заво́ді. En français, elles se traduisent toutes deux avec « dans ».\" },"
+    },
+    {
+      "id": "uk-a1-locative",
+      "field": "examples[1]",
+      "find": "        { text: \"Вони́ живу́ть у Льво́ві.\", translation: \"Ils habitent à Lviv.\", note: \"Ville : у + locatif en -ові.\" },",
+      "replace": "        { text: \"Вони́ живу́ть у Льво́ві.\", translation: \"Ils habitent à Lviv.\", note: \"Ville : у + locatif en -ові.\" },"
+    },
+    {
+      "id": "uk-a1-locative",
+      "field": "examples[2]",
+      "find": "        { text: \"Мої́ ключі́ на столі́.\", translation: \"Mes clés sont sur la table.\", note: \"Стіл → на столі́ : la voyelle ouverte du radical se ferme.\" },",
+      "replace": "        { text: \"Мої́ ключі́ на столі́.\", translation: \"Mes clés sont sur la table.\", note: \"Dans стіл → на столі́, la voyelle і du radical alterne avec о.\" },"
+    },
+    {
+      "id": "uk-a1-locative",
+      "field": "exercises[0].options",
+      "find": "          options: [\"у\", \"на\", \"до\", \"з\"],",
+      "replace": "          options: [\"біля\",\"на\",\"до\",\"з\"],"
+    },
+    {
+      "id": "uk-a1-locative",
+      "field": "exercises[1].explanation",
+      "find": "          explanation: \"Après в, la ville est au locatif \u0001 Київ → в Києві.\",",
+      "replace": "          explanation: \"Après в, la ville est au locatif : Київ → в Києві.\","
+    },
+    {
+      "id": "uk-a1-locative",
+      "field": "exercises[2].explanation",
+      "find": "          explanation: \"Стіл → столі \u0001 locatif en -і après на.\",",
+      "replace": "          explanation: \"Стіл → столі : locatif en -і après на.\","
+    },
+    {
+      "id": "uk-a1-locative",
+      "field": "exercises[3].answers",
+      "find": "          answers: [\"банку\"],",
+      "replace": "          answers: [\"банку\",\"банкові\"],"
+    },
+    {
+      "id": "uk-a1-locative",
+      "field": "exercises[3].explanation",
+      "find": "          explanation: \"Банк fait partie des masculins qui ont le locatif en -у \u0001 у банку.\",",
+      "replace": "          explanation: \"Le locatif courant est банку. La variante банкові est aussi attestée.\","
+    },
+    {
+      "id": "uk-a1-locative",
+      "field": "exercises[4].explanation",
+      "find": "          explanation: \"Féminin en -а \u0001 locatif en -і, donc школі.\",",
+      "replace": "          explanation: \"Féminin en -а : locatif en -і, donc школі.\","
+    },
+    {
+      "id": "uk-a1-vocative",
+      "field": "title",
+      "find": "      title: \"Appeler quelqu’un \u0001 le vocatif\",",
+      "replace": "      title: \"Appeler quelqu’un : le vocatif\","
+    },
+    {
+      "id": "uk-a1-vocative",
+      "field": "summary",
+      "find": "      summary: \"S’adresser à une personne avec le vocatif \u0001 Ма́мо, Оле́но, Іва́не, дру́же.\",",
+      "replace": "      summary: \"S’adresser à une personne avec le vocatif : Ма́мо, Оле́но, Іва́не, дру́же.\","
+    },
+    {
+      "id": "uk-a1-vocative",
+      "field": "rule[0]",
+      "find": "        \"Quand on s’adresse directement à quelqu’un, l’ukrainien utilise un cas à part, le vocatif, que le français n’a pas \u0001 Ма́мо, де ти \u0001 (et non Ма́ма, де ти \u0001). Appeler quelqu’un au nominatif sonne étranger ou très familier.\",",
+      "replace": "        \"Quand tu t’adresses directement à quelqu’un, mets son nom ou son titre au vocatif. Compare Ма́ма вдо́ма (« Maman est à la maison ») et Ма́мо, де ти? (« Maman, où es-tu ? »). Sépare le terme d’adresse par une virgule.\","
+    },
+    {
+      "id": "uk-a1-vocative",
+      "field": "rule[1]",
+      "find": "        \"Féminin \u0001 -а → -о (Оле́на → Оле́но), -я → -ю (Та́ня → Та́ню), -ія → -іє (Марі́я → Марі́є). Masculin \u0001 consonne dure → -е (Іва́н → Іва́не), -ь et -й → -ю (вчи́тель → вчи́телю, Андрі́й → Андрі́ю), -о → -е (Миха́йло → Миха́йле).\",",
+      "replace": "        \"Pour les féminins en -а, on trouve -о (Оле́на → Оле́но). Certains prénoms en -я prennent -ю (Та́ня → Та́ню), et Марі́я donne Марі́є. Au masculin, retiens Іва́не, Андрі́ю, вчи́телю et Миха́йле. Certains masculins prennent -у, par exemple та́то → та́ту.\","
+    },
+    {
+      "id": "uk-a1-vocative",
+      "field": "rule[2]",
+      "find": "        \"Certaines consonnes changent \u0001 г → ж (дру́г → дру́же), -ець → -че (хло́пець → хло́пче). Avec un titre et un prénom, les deux se mettent au vocatif \u0001 па́не Іва́не, па́ні Оле́но (па́ні ne change jamais).\",",
+      "replace": "        \"Dans certains mots, la consonne change (друг → дру́же, хло́пець → хло́пче). Avec un titre et un prénom, applique le vocatif aux deux (па́не Іва́не, па́ні Оле́но). Па́ні est invariable.\","
+    },
+    {
+      "id": "uk-a1-vocative",
+      "field": "table.rows[4]",
+      "find": "          [\"Іва́н\", \"Іва́не\", \"consonne → -е\"],",
+      "replace": "          [\"Іва́н\",\"Іва́не\",\"Exemple en -е\"],"
+    },
+    {
+      "id": "uk-a1-vocative",
+      "field": "table.rows[7]",
+      "find": "          [\"дру́г\", \"дру́же\", \"г → ж + -е\"],",
+      "replace": "          [\"друг\",\"дру́же\",\"г → ж + -е\"],"
+    },
+    {
+      "id": "uk-a1-vocative",
+      "field": "table.rows[9]",
+      "find": "          [\"Миха́йло\", \"Миха́йле\", \"-о → -е\"],",
+      "replace": "          [\"Миха́йло\",\"Миха́йле\",\"Exemple en -е\"],"
+    },
+    {
+      "id": "uk-a1-vocative",
+      "field": "examples[0]",
+      "find": "        { text: \"Ма́мо, де мої́ ключі́?\", translation: \"Maman, où sont mes clés ?\", note: \"Ма́ма → ма́мо.\" },",
+      "replace": "        { text: \"Ма́мо, де мої́ ключі́?\", translation: \"Maman, où sont mes clés ?\", note: \"Ма́ма → ма́мо.\" },"
+    },
+    {
+      "id": "uk-a1-vocative",
+      "field": "examples[1]",
+      "find": "        { text: \"До́брий день, па́не Іва́не!\", translation: \"Bonjour, monsieur Ivan !\", note: \"Le titre et le prénom sont tous deux au vocatif.\" },",
+      "replace": "        { text: \"До́брий день, па́не Іва́не!\", translation: \"Bonjour, monsieur Ivan !\", note: \"Le titre et le prénom sont tous deux au vocatif.\" },"
+    },
+    {
+      "id": "uk-a1-vocative",
+      "field": "examples[2]",
+      "find": "        { text: \"Дру́же, дя́кую за допомо́гу!\", translation: \"Mon ami, merci pour ton aide !\", note: \"Дру́г → дру́же : г devient ж.\" },",
+      "replace": "        { text: \"Дру́же, дя́кую за допомо́гу!\", translation: \"Mon ami, merci pour ton aide !\", note: \"Друг → дру́же. Г devient ж.\" },"
+    },
+    {
+      "id": "uk-a1-vocative",
+      "field": "exercises[0].explanation",
+      "find": "          explanation: \"Le titre пане et le prénom sont au vocatif \u0001 Іван → Іване.\",",
+      "replace": "          explanation: \"Le titre пане et le prénom sont au vocatif : Іван → Іване.\","
+    },
+    {
+      "id": "uk-a1-vocative",
+      "field": "exercises[1].explanation",
+      "find": "          explanation: \"Féminin en -а \u0001 vocatif en -о. Пані ne change pas, mais le prénom oui.\",",
+      "replace": "          explanation: \"Féminin en -а : vocatif en -о. Пані ne change pas, mais le prénom oui.\","
+    },
+    {
+      "id": "uk-a1-vocative",
+      "field": "exercises[2].explanation",
+      "find": "          explanation: \"Les noms en -ія prennent -іє au vocatif \u0001 Марія → Маріє.\",",
+      "replace": "          explanation: \"Les noms en -ія prennent -іє au vocatif : Марія → Маріє.\","
+    },
+    {
+      "id": "uk-a1-vocative",
+      "field": "exercises[3].explanation",
+      "find": "          explanation: \"Друг au vocatif \u0001 г devient ж et on ajoute -е, donc друже.\",",
+      "replace": "          explanation: \"Друг au vocatif : г devient ж et on ajoute -е, donc друже.\","
+    },
+    {
+      "id": "uk-a1-vocative",
+      "field": "exercises[4].explanation",
+      "find": "          explanation: \"Мама → мамо \u0001 -а devient -о au vocatif.\",",
+      "replace": "          explanation: \"Мама → мамо : -а devient -о au vocatif.\","
+    },
+    {
+      "id": "uk-a2-accusative",
+      "field": "title",
+      "find": "      title: \"Le complément d’objet \u0001 l’accusatif\",",
+      "replace": "      title: \"Le complément d’objet : l’accusatif\","
+    },
+    {
+      "id": "uk-a2-accusative",
+      "field": "rule[0]",
+      "find": "        \"L’accusatif est le cas du complément d’objet direct (« je vois quoi / qui \u0001 »). Pour beaucoup de noms il est identique au nominatif \u0001 masculin inanimé (Я ба́чу стіл), neutre (Я ба́чу вікно́), féminin en -ь (Я ба́чу ніч). Mais au féminin -а → -у et -я → -ю \u0001 Я чита́ю кни́жку, Я п’ю́ во́ду.\",",
+      "replace": "        \"L’accusatif marque le complément d’objet direct. Il coïncide souvent avec le nominatif (Я ба́чу стіл, Я ба́чу вікно́, Я ба́чу ніч). Les féminins en -а et -я prennent en général -у et -ю (Я чита́ю кни́жку, Я п’ю во́ду).\","
+    },
+    {
+      "id": "uk-a2-accusative",
+      "field": "rule[1]",
+      "find": "        \"Piège \u0001 pour un être vivant (masculin animé), l’accusatif prend la forme du génitif \u0001 Я ба́чу бра́та (et non Я ба́чу брат). Le pluriel animé fait de même (студе́нтів) et les adjectifs et possessifs suivent \u0001 Я ба́чу мого́ бра́та.\",",
+      "replace": "        \"Pour les masculins animés du type брат, l’accusatif singulier coïncide avec le génitif (Я ба́чу бра́та). Au pluriel animé, la forme du génitif est courante (студе́нтів). Les déterminants s’accordent avec le nom (Я ба́чу мого́ бра́та).\","
+    },
+    {
+      "id": "uk-a2-accusative",
+      "field": "rule[2]",
+      "find": "        \"Après в / у et на, l’accusatif répond à « où vas-tu \u0001 » \u0001 Я іду́ на робо́ту, Я іду́ в шко́лу. Le locatif répond à « où es-tu \u0001 » \u0001 Я на робо́ті, Я в шко́лі. Le français « à » ne fait pas cette différence.\",",
+      "replace": "        \"Pour indiquer la destination, в / у et на prennent l’accusatif (Я іду́ на робо́ту, Я іду́ в шко́лу). Pour indiquer le lieu où l’on est, ces prépositions prennent le locatif (Я на робо́ті, Я в шко́лі). Le français peut employer « à » dans les deux cas.\","
+    },
+    {
+      "id": "uk-a2-accusative",
+      "field": "table.rows[5]",
+      "find": "          [\"Féminin en -ь\", \"ніч\", \"ніч\", \"= nominatif\"],",
+      "replace": "          [\"Féminin à consonne finale\",\"ніч\",\"ніч\",\"= nominatif\"],"
+    },
+    {
+      "id": "uk-a2-accusative",
+      "field": "table.rows[8]",
+      "find": "          [\"Pluriel inanimé\", \"кни́жки\", \"кни́жки\", \"= nominatif\"],",
+      "replace": "          [\"Pluriel inanimé\",\"книжки́\",\"книжки́\",\"= nominatif\"],"
+    },
+    {
+      "id": "uk-a2-accusative",
+      "field": "examples[0]",
+      "find": "        { text: \"Я ба́чу твого́ бра́та.\", translation: \"Je vois ton frère.\", note: \"Брат est animé : forme du génitif, et твій devient твого́.\" },",
+      "replace": "        { text: \"Я ба́чу твого́ бра́та.\", translation: \"Je vois ton frère.\", note: \"Брат est animé : forme du génitif, et твій devient твого́.\" },"
+    },
+    {
+      "id": "uk-a2-accusative",
+      "field": "examples[1]",
+      "find": "        { text: \"Вона́ чита́є ціка́ву кни́жку.\", translation: \"Elle lit un livre intéressant.\", note: \"Кни́жка → кни́жку, et l’adjectif s’accorde : ціка́ва → ціка́ву.\" },",
+      "replace": "        { text: \"Вона́ чита́є ціка́ву кни́жку.\", translation: \"Elle lit un livre intéressant.\", note: \"Кни́жка → кни́жку, et l’adjectif s’accorde : ціка́ва → ціка́ву.\" },"
+    },
+    {
+      "id": "uk-a2-accusative",
+      "field": "examples[2]",
+      "find": "        { text: \"Ми іде́мо на робо́ту.\", translation: \"Nous allons au travail.\", note: \"На + accusatif = direction. Où on est : на робо́ті.\" },",
+      "replace": "        { text: \"Ми іде́мо на робо́ту.\", translation: \"Nous allons au travail.\", note: \"На + accusatif = direction. Où on est : на робо́ті.\" },"
+    },
+    {
+      "id": "uk-a2-accusative",
+      "field": "exercises[0].explanation",
+      "find": "          explanation: \"Féminin en -а à l’accusatif \u0001 -а → -у, donc книжку (comme новий → нову).\",",
+      "replace": "          explanation: \"Книжка est féminin en -а. À l’accusatif, il devient книжку. Нова, le féminin de новий, devient нову.\","
+    },
+    {
+      "id": "uk-a2-accusative",
+      "field": "exercises[1].explanation",
+      "find": "          explanation: \"Студент est animé \u0001 l’accusatif prend la forme du génitif, студента (le pronom цього l’annonce).\",",
+      "replace": "          explanation: \"Студент désigne une personne. Son accusatif prend la forme du génitif студента. Le démonstratif цього a lui aussi cette forme.\","
+    },
+    {
+      "id": "uk-a2-accusative",
+      "field": "exercises[3].prompt",
+      "find": "          prompt: \"Вона п'є ___.\",",
+      "replace": "          prompt: \"Вона п’є ___.\","
+    },
+    {
+      "id": "uk-a2-accusative",
+      "field": "exercises[3].explanation",
+      "find": "          explanation: \"Féminin en -а à l’accusatif \u0001 -а → -у, donc каву.\",",
+      "replace": "          explanation: \"Féminin en -а à l’accusatif : -а → -у, donc каву.\","
+    },
+    {
+      "id": "uk-a2-accusative",
+      "field": "exercises[4].explanation",
+      "find": "          explanation: \"Брат est animé \u0001 l’accusatif prend la forme du génitif, брата (мого le confirme).\",",
+      "replace": "          explanation: \"Брат est animé : l’accusatif prend la forme du génitif, брата (мого le confirme).\","
+    },
+    {
+      "id": "uk-a2-genitive",
+      "field": "title",
+      "find": "      title: \"Avoir et ne pas avoir \u0001 у мене є / немає + génitif\",",
+      "replace": "      title: \"Avoir et ne pas avoir : у мене є / немає + génitif\","
+    },
+    {
+      "id": "uk-a2-genitive",
+      "field": "rule[0]",
+      "find": "        \"L’ukrainien n’a pas de verbe « avoir » \u0001 on dit у ме́не є + chose au nominatif (littéralement « chez moi est… ») \u0001 У ме́не є брат. Après у, les pronoms sont au génitif \u0001 у ме́не, у тебе́, у ньо́го, у не́ї, у нас, у вас, у них (les formes de la 3e personne prennent un н- après une préposition).\",",
+      "replace": "        \"Pour exprimer la possession, on dit souvent у ме́не є avec le nom possédé au nominatif (У ме́не є брат). L’ukrainien a aussi le verbe ма́ти, « avoir ». Après у, le pronom est au génitif (у ме́не, у те́бе, у ньо́го, у не́ї, у нас, у вас, у них). À la 3e personne, note le н- après у.\","
+    },
+    {
+      "id": "uk-a2-genitive",
+      "field": "rule[1]",
+      "find": "        \"La négation est немає (ou нема́) + génitif \u0001 У ме́не нема́є бра́та, У не́ї нема́є кни́жки. Le génitif s’emploie aussi après les quantités (бага́то, ма́ло, скі́льки) et pour une quantité de matière \u0001 скля́нка води́, ча́шка ча́ю.\",",
+      "replace": "        \"Pour dire qu’une chose manque, emploie нема́є (ou нема́) avec le génitif (У ме́не нема́є бра́та, У не́ї нема́є кни́жки). Le génitif s’emploie aussi après бага́то, ма́ло ou скі́льки et pour indiquer une quantité de matière (скля́нка води́, ча́шка ча́ю).\","
+    },
+    {
+      "id": "uk-a2-genitive",
+      "field": "rule[2]",
+      "find": "        \"Terminaisons du singulier \u0001 masculin -а / -я (бра́та, вчи́теля) ou -у / -ю pour une matière ou une notion (чай → ча́ю, час → ча́су) \u0001 féminin -а → -и, -я → -і (кни́жки, неді́лі) \u0001 neutre -о → -а (вікна́). Pluriel \u0001 -ів pour la plupart des masculins (студе́нтів), aucune terminaison pour les féminins et neutres (кни́жок, ві́кон).\",",
+      "replace": "        \"Au singulier, le masculin a notamment -а / -я (бра́та, вчи́теля) ou -у / -ю (ча́су, ча́ю). Beaucoup de féminins en -а ou -я prennent -и ou -і (кни́жки, неді́лі). Un neutre comme вікно́ donne вікна́. Au pluriel, compare -ів dans студе́нтів et l’absence de terminaison dans книжо́к ou ві́кон.\","
+    },
+    {
+      "id": "uk-a2-genitive",
+      "field": "table.rows[9]",
+      "find": "          [\"кни́жки\", \"кни́жок\", \"pluriel féminin : sans terminaison\"],",
+      "replace": "          [\"книжки́\",\"книжо́к\",\"pluriel féminin : sans terminaison\"],"
+    },
+    {
+      "id": "uk-a2-genitive",
+      "field": "examples[0]",
+      "find": "        { text: \"У ме́не є брат і сестра́.\", translation: \"J’ai un frère et une sœur.\", note: \"Є + nominatif : брат, сестра́.\" },",
+      "replace": "        { text: \"У ме́не є брат і сестра́.\", translation: \"J’ai un frère et une sœur.\", note: \"Є + nominatif : брат, сестра́.\" },"
+    },
+    {
+      "id": "uk-a2-genitive",
+      "field": "examples[1]",
+      "find": "        { text: \"У ньо́го нема́є ча́су.\", translation: \"Il n’a pas le temps.\", note: \"Нема́є + génitif : час → ча́су. Note le н- après la préposition : у ньо́го.\" },",
+      "replace": "        { text: \"У ньо́го нема́є ча́су.\", translation: \"Il n’a pas le temps.\", note: \"Нема́є + génitif : час → ча́су. Note le н- après la préposition : у ньо́го.\" },"
+    },
+    {
+      "id": "uk-a2-genitive",
+      "field": "examples[2]",
+      "find": "        { text: \"У нас вдо́ма бага́то кни́жок.\", translation: \"Nous avons beaucoup de livres à la maison.\", note: \"Бага́то + génitif pluriel : кни́жки → кни́жок.\" },",
+      "replace": "        { text: \"У нас удо́ма бага́то книжо́к.\", translation: \"Nous avons beaucoup de livres à la maison.\", note: \"Бага́то + génitif pluriel : книжки́ → книжо́к.\" },"
+    },
+    {
+      "id": "uk-a2-genitive",
+      "field": "exercises[0].explanation",
+      "find": "          explanation: \"Après немає, on met le génitif \u0001 брат → брата.\",",
+      "replace": "          explanation: \"Après немає, on met le génitif : брат → брата.\","
+    },
+    {
+      "id": "uk-a2-genitive",
+      "field": "exercises[1].explanation",
+      "find": "          explanation: \"Après la préposition у, le pronom est au génitif et prend н- \u0001 у нього.\",",
+      "replace": "          explanation: \"Après la préposition у, le pronom est au génitif et prend н- : у нього.\","
+    },
+    {
+      "id": "uk-a2-genitive",
+      "field": "exercises[2].explanation",
+      "find": "          explanation: \"Багато est suivi du génitif pluriel \u0001 студентів.\",",
+      "replace": "          explanation: \"Багато est suivi du génitif pluriel : студентів.\","
+    },
+    {
+      "id": "uk-a2-genitive",
+      "field": "exercises[3].explanation",
+      "find": "          explanation: \"Le génitif des féminins en -а est en -и \u0001 сестри.\",",
+      "replace": "          explanation: \"Le génitif singulier de сестра est сестри. Il suit ici немає.\","
+    },
+    {
+      "id": "uk-a2-genitive",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Mets la phrase à la forme négative.\",",
+      "replace": "          instruction: \"Remplace « є » par « немає » ou « нема », puis mets le nom au génitif sans changer l’ordre des mots.\","
+    },
+    {
+      "id": "uk-a2-genitive",
+      "field": "exercises[4].explanation",
+      "find": "          explanation: \"Є est remplacé par немає (ou нема), et le nom passe au génitif \u0001 брата.\",",
+      "replace": "          explanation: \"Є est remplacé par немає (ou нема), et le nom passe au génitif : брата.\","
+    },
+    {
+      "id": "uk-a2-past",
+      "field": "title",
+      "find": "      title: \"Le passé \u0001 -в, -ла, -ло, -ли\",",
+      "replace": "      title: \"Le passé : -в, -ла, -ло, -ли\","
+    },
+    {
+      "id": "uk-a2-past",
+      "field": "rule[0]",
+      "find": "        \"Le passé ukrainien n’a qu’une forme, construite sur l’infinitif \u0001 on remplace -ти par -в (masculin), -ла (féminin), -ло (neutre) ou -ли (pluriel). Le verbe s’accorde avec le sujet en genre et en nombre, pas en personne \u0001 я чита́в (un homme), я чита́ла (une femme), ми чита́ли.\",",
+      "replace": "        \"Au passé, le verbe s’accorde en genre et en nombre avec le sujet. Si le radical de l’infinitif se termine en voyelle, remplace -ти par -в au masculin, -ла au féminin, -ло au neutre, -ли au pluriel (чита́ти → чита́в, чита́ла, чита́ло, чита́ли). Я чита́в et я чита́ла diffèrent selon la personne qui parle.\","
+    },
+    {
+      "id": "uk-a2-past",
+      "field": "rule[1]",
+      "find": "        \"Un seul passé couvre le passé composé et l’imparfait français \u0001 я чита́в peut vouloir dire « j’ai lu » ou « je lisais ». C’est l’aspect (voir plus loin) qui précise. Pas d’auxiliaire \u0001 бу́ти donne був, була́, було́, були́.\",",
+      "replace": "        \"Le passé ukrainien peut correspondre au passé composé ou à l’imparfait. Я чита́в peut signifier « je lisais » ou « j’ai lu » sans préciser si j’ai fini. L’aspect apporte cette précision. Le verbe se suffit à lui-même, sans auxiliaire. Бу́ти donne був, була́, було́, були́.\","
+    },
+    {
+      "id": "uk-a2-past",
+      "field": "rule[2]",
+      "find": "        \"Pour les verbes en consonne + -ти, la forme du masculin est irrégulière \u0001 йти → йшов, йшла, йшло, йшли \u0001 нести́ → ніс, несла́. Le « vous » de politesse prend le pluriel \u0001 Ви були́ вдо́ма \u0001\",",
+      "replace": "        \"Avec un radical en consonne, apprends les formes de chaque verbe, par exemple нести́ → ніс, несла́. Йти donne йшов, йшла, йшло, йшли. Avec le « vous » de politesse, on emploie le pluriel (Ви були́ вдо́ма?).\","
+    },
+    {
+      "id": "uk-a2-past",
+      "field": "examples[0]",
+      "find": "        { text: \"Вчо́ра я чита́в, а моя́ сестра́ відпочива́ла.\", translation: \"Hier je lisais et ma sœur se reposait.\", note: \"Le verbe suit le genre du sujet : чита́в (я = homme), відпочива́ла (сестра́).\" },",
+      "replace": "        { text: \"Вчо́ра я чита́в, а моя́ сестра́ відпочива́ла.\", translation: \"Hier je lisais et ma sœur se reposait.\", note: \"Le verbe suit le genre du sujet : чита́в (я = homme), відпочива́ла (сестра́).\" },"
+    },
+    {
+      "id": "uk-a2-past",
+      "field": "examples[1]",
+      "find": "        { text: \"Ми були́ в теа́трі.\", translation: \"Nous étions au théâtre.\", note: \"Бу́ти : був, була́, було́, були́.\" },",
+      "replace": "        { text: \"Ми були́ в теа́трі.\", translation: \"Nous étions au théâtre.\", note: \"Бу́ти : був, була́, було́, були́.\" },"
+    },
+    {
+      "id": "uk-a2-past",
+      "field": "examples[2]",
+      "find": "        { text: \"Це було́ давно́.\", translation: \"C’était il y a longtemps.\", note: \"Це est neutre : було́.\" },",
+      "replace": "        { text: \"Це було́ давно́.\", translation: \"C’était il y a longtemps.\", note: \"Це est neutre : було́.\" },"
+    },
+    {
+      "id": "uk-a2-past",
+      "field": "exercises[0].explanation",
+      "find": "          explanation: \"Сестра est féminin singulier \u0001 була.\",",
+      "replace": "          explanation: \"Сестра est féminin singulier : була.\","
+    },
+    {
+      "id": "uk-a2-past",
+      "field": "exercises[1].explanation",
+      "find": "          explanation: \"Ми est pluriel \u0001 йти donne йшли.\",",
+      "replace": "          explanation: \"Ми est pluriel : йти donne йшли.\","
+    },
+    {
+      "id": "uk-a2-past",
+      "field": "exercises[2].explanation",
+      "find": "          explanation: \"Брат est masculin \u0001 працювати → працював.\",",
+      "replace": "          explanation: \"Брат est masculin : працювати → працював.\","
+    },
+    {
+      "id": "uk-a2-past",
+      "field": "exercises[3].hint",
+      "find": "          hint: \"бути\",",
+      "replace": "          hint: \"бути, au passé\","
+    },
+    {
+      "id": "uk-a2-past",
+      "field": "exercises[3].explanation",
+      "find": "          explanation: \"Sujet féminin singulier \u0001 була.\",",
+      "replace": "          explanation: \"Sujet féminin singulier : була.\","
+    },
+    {
+      "id": "uk-a2-past",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Mets la phrase au passé.\",\n          source: \"Вона читає книжку.\",",
+      "replace": "          instruction: \"Mets seulement « читає » au passé en gardant le verbe « читати ».\",\n          source: \"Вона читає книжку.\","
+    },
+    {
+      "id": "uk-a2-past",
+      "field": "exercises[4].answers",
+      "find": "          answers: [\"Вона читала книжку.\", \"Вона прочитала книжку.\"],",
+      "replace": "          answers: [\"Вона читала книжку.\"],"
+    },
+    {
+      "id": "uk-a2-past",
+      "field": "exercises[4].explanation",
+      "find": "          explanation: \"On remplace -ти par -ла, car вона est féminin \u0001 читала (ou прочитала au perfectif).\",",
+      "replace": "          explanation: \"Le sujet вона est féminin singulier. Читати donne donc читала au passé.\","
+    },
+    {
+      "id": "uk-a2-dative",
+      "field": "title",
+      "find": "      title: \"Le datif \u0001 мені подобається, мені двадцять років\",",
+      "replace": "      title: \"Le datif : мені подобається, мені двадцять років\","
+    },
+    {
+      "id": "uk-a2-dative",
+      "field": "rule[0]",
+      "find": "        \"Le datif répond à « à qui \u0001 » et sert aussi à dire ce qu’on ressent. Pronoms \u0001 я → мені́, ти → тобі́, він → йому́, вона́ → їй, ми → нам, ви → вам, вони́ → їм. En ukrainien on dit Мені́ подо́бається ка́ва (littéralement « à moi plaît le café »).\",",
+      "replace": "        \"Le datif répond à « à qui ? » et indique aussi la personne qui ressent quelque chose. Compare я → мені́, ти → тобі́, він / воно́ → йому́, вона́ → їй, ми → нам, ви → вам, вони́ → їм. Мені́ подо́бається ка́ва signifie littéralement « le café me plaît ».\","
+    },
+    {
+      "id": "uk-a2-dative",
+      "field": "rule[1]",
+      "find": "        \"Le verbe подо́батися s’accorde avec la chose qui plaît, pas avec la personne \u0001 Мені́ подо́бається ка́ва, Мені́ подо́баються ці кни́жки. L’âge se dit aussi au datif \u0001 Мені́ два́дцять п’ять ро́ків (« à moi vingt-cinq ans »). Les mêmes pronoms suivent дзвони́ти, допомага́ти, дя́кувати, каза́ти.\",",
+      "replace": "        \"Подо́батися s’accorde avec ce qui plaît (Мені́ подо́бається ка́ва, Мені́ подо́баються ці книжки́). Pour l’âge, on emploie le datif (Мені́ два́дцять п’ять ро́ків). On trouve aussi le datif avec дзвони́ти, допомага́ти, дя́кувати et каза́ти.\","
+    },
+    {
+      "id": "uk-a2-dative",
+      "field": "rule[2]",
+      "find": "        \"Les noms au datif \u0001 masculin -ові ou -у (бра́тові, бра́ту), féminin -і (сестрі́, ма́мі), neutre -у (вікну́), pluriel -ам / -ям (студе́нтам). Piège \u0001 ne traduis pas « j’ai vingt ans » par Я ма́ю два́дцять ро́ків \u0001 on dit Мені́ два́дцять ро́ків.\",",
+      "replace": "        \"Parmi les modèles courants, retiens бра́тові ou бра́ту au masculin, сестрі́ et ма́мі au féminin, вікну́ au neutre et студе́нтам au pluriel. Pour « j’ai vingt ans », emploie Мені́ два́дцять ро́ків. Le nom рік s’accorde avec le nombre.\","
+    },
+    {
+      "id": "uk-a2-dative",
+      "field": "table.rows[2]",
+      "find": "          [\"він\", \"йому́\", \"Я допомага́ю йому́.\"],",
+      "replace": "          [\"він / воно́\",\"йому́\",\"Я допомага́ю йому́.\"],"
+    },
+    {
+      "id": "uk-a2-dative",
+      "field": "examples[1]",
+      "find": "        { text: \"Мені́ два́дцять п’ять ро́ків.\", translation: \"J’ai vingt-cinq ans.\", note: \"Âge : datif + nombre + ро́ків.\" },",
+      "replace": "        { text: \"Мені́ два́дцять п’ять ро́ків.\", translation: \"J’ai vingt-cinq ans.\", note: \"Âge : datif, puis le nombre et la forme de рік qui lui correspond.\" },"
+    },
+    {
+      "id": "uk-a2-dative",
+      "field": "examples[2]",
+      "find": "        { text: \"Я дзвоню́ ма́мі щове́чора.\", translation: \"Je téléphone à ma mère chaque soir.\", note: \"Дзвони́ти + datif : ма́ма → ма́мі.\" },",
+      "replace": "        { text: \"Я дзвоню́ ма́мі щове́чора.\", translation: \"Je téléphone à ma mère chaque soir.\", note: \"Дзвони́ти + datif : ма́ма → ма́мі.\" },"
+    },
+    {
+      "id": "uk-a2-dative",
+      "field": "exercises[0].explanation",
+      "find": "          explanation: \"Celui à qui quelque chose plaît est au datif \u0001 мені.\",",
+      "replace": "          explanation: \"Celui à qui quelque chose plaît est au datif : мені.\","
+    },
+    {
+      "id": "uk-a2-dative",
+      "field": "exercises[1].explanation",
+      "find": "          explanation: \"Допомагати se construit avec le datif \u0001 брату.\",",
+      "replace": "          explanation: \"Допомагати se construit avec le datif : брату.\","
+    },
+    {
+      "id": "uk-a2-dative",
+      "field": "exercises[2].explanation",
+      "find": "          explanation: \"Le verbe s’accorde avec ce qui plaît \u0001 квіти est pluriel, donc подобаються.\",",
+      "replace": "          explanation: \"Le verbe s’accorde avec ce qui plaît : квіти est pluriel, donc подобаються.\","
+    },
+    {
+      "id": "uk-a2-dative",
+      "field": "exercises[3].explanation",
+      "find": "          explanation: \"L’âge se dit au datif \u0001 мені.\",",
+      "replace": "          explanation: \"L’âge se dit au datif : мені.\","
+    },
+    {
+      "id": "uk-a2-dative",
+      "field": "exercises[4].explanation",
+      "find": "          explanation: \"Après дзвонити, la personne est au datif \u0001 вона → їй.\",",
+      "replace": "          explanation: \"Après дзвонити, la personne est au datif : вона → їй.\","
+    },
+    {
+      "id": "uk-a2-instrumental",
+      "field": "title",
+      "find": "      title: \"L’instrumental \u0001 з + instrumental, être / travailler comme\",",
+      "replace": "      title: \"L’instrumental : з + instrumental, être / travailler comme\","
+    },
+    {
+      "id": "uk-a2-instrumental",
+      "field": "rule[0]",
+      "find": "        \"L’instrumental répond à « avec qui / avec quoi \u0001 » après з (зі, із devant certains groupes de consonnes) \u0001 Я іду́ з дру́гом. Il indique aussi l’instrument \u0001 писа́ти ру́чкою. Pronoms \u0001 мно́ю, тобо́ю, ним, не́ю, на́ми, ва́ми, ни́ми \u0001 « avec moi » se dit зі мно́ю.\",",
+      "replace": "        \"Après з, із ou зі, l’instrumental indique l’accompagnement (Я іду́ з дру́гом). Sans préposition, il peut indiquer l’outil (писа́ти ру́чкою). Les pronoms sont мно́ю, тобо́ю, ним, не́ю, на́ми, ва́ми et ни́ми. « Avec moi » se dit notamment зі мно́ю.\","
+    },
+    {
+      "id": "uk-a2-instrumental",
+      "field": "rule[1]",
+      "find": "        \"Terminaisons \u0001 masculin et neutre -ом / -ем (бра́том, вчи́телем, вікно́м), féminin -ою / -ею (сестро́ю, неді́лею), pluriel -ами / -ями (кни́жками, студе́нтами).\",",
+      "replace": "        \"Parmi les terminaisons, retiens -ом ou -ем au masculin et au neutre (бра́том, вчи́телем, вікно́м), -ою ou -ею pour les féminins étudiés (сестро́ю, неді́лею), et souvent -ами ou -ями au pluriel (книжка́ми, студе́нтами).\","
+    },
+    {
+      "id": "uk-a2-instrumental",
+      "field": "rule[2]",
+      "find": "        \"Piège \u0001 on met l’instrumental pour la profession ou le rôle après бути au passé, au futur ou à l’infinitif, et après працюва́ти, стати \u0001 Він був лі́карем, Вона́ працю́є вчи́телькою. Au présent de « être », c’est le nominatif \u0001 Він лі́кар.\",",
+      "replace": "        \"Pour dire le métier après працюва́ти ou la fonction après ста́ти, emploie l’instrumental (Вона́ працю́є вчи́телькою). Avec бу́ти exprimé au passé ou au futur, l’instrumental est courant (Він був лі́карем). Au présent, on dit souvent Він лі́кар, sans exprimer бу́ти.\","
+    },
+    {
+      "id": "uk-a2-instrumental",
+      "field": "examples[0]",
+      "find": "        { text: \"Я іду́ в кафе́ з дру́гом.\", translation: \"Je vais au café avec un ami.\", note: \"З + instrumental : дру́г → дру́гом.\" },",
+      "replace": "        { text: \"Я іду́ в кафе́ з дру́гом.\", translation: \"Je vais au café avec un ami.\", note: \"З + instrumental : дру́г → дру́гом.\" },"
+    },
+    {
+      "id": "uk-a2-instrumental",
+      "field": "examples[1]",
+      "find": "        { text: \"Мій брат працю́є лі́карем.\", translation: \"Mon frère travaille comme médecin.\", note: \"Profession après працюва́ти : лі́кар → лі́карем.\" },",
+      "replace": "        { text: \"Мій брат працю́є лі́карем.\", translation: \"Mon frère travaille comme médecin.\", note: \"Profession après працюва́ти : лі́кар → лі́карем.\" },"
+    },
+    {
+      "id": "uk-a2-instrumental",
+      "field": "examples[3]",
+      "find": "        { text: \"Вона́ була́ студе́нткою.\", translation: \"Elle était étudiante.\", note: \"Après бу́ти au passé : студе́нтка → студе́нткою.\" },",
+      "replace": "        { text: \"Вона́ була́ студе́нткою.\", translation: \"Elle était étudiante.\", note: \"Après бу́ти au passé : студе́нтка → студе́нткою.\" },"
+    },
+    {
+      "id": "uk-a2-instrumental",
+      "field": "exercises[0].prompt",
+      "find": "          prompt: \"Я п'ю каву з ___.\",",
+      "replace": "          prompt: \"Я п’ю каву з ___.\","
+    },
+    {
+      "id": "uk-a2-instrumental",
+      "field": "exercises[0].explanation",
+      "find": "          explanation: \"Après з (« avec »), on met l’instrumental \u0001 молоко → молоком.\",",
+      "replace": "          explanation: \"Après з (« avec »), on met l’instrumental : молоко → молоком.\","
+    },
+    {
+      "id": "uk-a2-instrumental",
+      "field": "exercises[2].prompt",
+      "find": "          prompt: \"Він був ___.\",",
+      "replace": "          prompt: \"Він працює ___.\","
+    },
+    {
+      "id": "uk-a2-instrumental",
+      "field": "exercises[2].explanation",
+      "find": "          explanation: \"Après був, la profession est à l’instrumental \u0001 вчитель → вчителем.\",",
+      "replace": "          explanation: \"Après працює, le métier se met à l’instrumental. Вчитель et учитель donnent вчителем et учителем.\","
+    },
+    {
+      "id": "uk-a2-instrumental",
+      "field": "exercises[3].explanation",
+      "find": "          explanation: \"Après з, masculin dur \u0001 брат → братом.\",",
+      "replace": "          explanation: \"Après з, masculin dur : брат → братом.\","
+    },
+    {
+      "id": "uk-a2-instrumental",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Mets la phrase au passé.\",\n          source: \"Він лікар.\",",
+      "replace": "          instruction: \"Ajoute « був » entre le sujet et le métier, et mets le nom de métier à l’instrumental.\",\n          source: \"Він лікар.\","
+    },
+    {
+      "id": "uk-a2-instrumental",
+      "field": "exercises[4].explanation",
+      "find": "          explanation: \"Au passé, « être » est exprimé (був) et la profession passe à l’instrumental \u0001 лікарем.\",",
+      "replace": "          explanation: \"Був est le passé masculin de бути. Pour la construction demandée, le nom лікар prend la forme лікарем.\","
+    },
+    {
+      "id": "uk-a2-motion",
+      "field": "title",
+      "find": "      title: \"Verbes de mouvement \u0001 йти / ходити, їхати / їздити\",",
+      "replace": "      title: \"Verbes de mouvement : йти / ходити, їхати / їздити\","
+    },
+    {
+      "id": "uk-a2-motion",
+      "field": "rule[0]",
+      "find": "        \"Là où le français n’a que « aller », l’ukrainien choisit selon le moyen (à pied ou en véhicule) et selon la nature du trajet. Йти / хо́дити \u0001 à pied. Ї́хати / ї́здити \u0001 en véhicule (voiture, bus, train, vélo).\",",
+      "replace": "        \"En français, « aller » suffit souvent. Pour un déplacement à pied, compare йти / іти́ et хо́дити. Pour un déplacement en véhicule (voiture, bus, train, vélo), compare ї́хати et ї́здити.\","
+    },
+    {
+      "id": "uk-a2-motion",
+      "field": "rule[1]",
+      "find": "        \"Йти et ї́хати décrivent un trajet unique, dans une direction, en cours maintenant \u0001 За́раз я іду́ на робо́ту. Хо́дити et ї́здити décrivent l’habitude, le trajet répété, l’aller-retour \u0001 Я щодня́ хожу́ на робо́ту. Вчо́ра ми хо́дили в кіно́ (nous y sommes allés et revenus).\",",
+      "replace": "        \"Йти / іти́ et ї́хати envisagent le trajet dans une direction, par exemple quand il est en cours (За́раз я іду́ на робо́ту). Хо́дити et ї́здити servent notamment pour les habitudes et les allers-retours (Я щодня́ ходжу́ на робо́ту. Вчо́ра ми хо́дили в кіно́).\","
+    },
+    {
+      "id": "uk-a2-motion",
+      "field": "rule[2]",
+      "find": "        \"Direction \u0001 куди́ \u0001 → в / на + accusatif (іду́ в шко́лу) ou до + génitif (іду́ до шко́ли, до ліка́ря, до ба́бусі, pour aller chez quelqu’un) \u0001 d’où \u0001 → з / із + génitif.\",",
+      "replace": "        \"Pour répondre à куди́? (« où vas-tu ? »), emploie notamment в / у ou на avec l’accusatif (іду́ в шко́лу), ou до avec le génitif (іду́ до шко́ли, до лі́каря, до ба́бусі). Pour indiquer d’où l’on vient, on emploie souvent з ou із avec le génitif.\","
+    },
+    {
+      "id": "uk-a2-motion",
+      "field": "examples[0]",
+      "find": "        { text: \"За́раз я іду́ на робо́ту.\", translation: \"En ce moment, je vais au travail (à pied).\", note: \"Йти : un trajet précis, maintenant.\" },",
+      "replace": "        { text: \"За́раз я іду́ на робо́ту.\", translation: \"En ce moment, je vais au travail (à pied).\", note: \"Йти : un trajet précis, maintenant.\" },"
+    },
+    {
+      "id": "uk-a2-motion",
+      "field": "examples[1]",
+      "find": "        { text: \"Я ча́сто хожу́ в кіно́.\", translation: \"Je vais souvent au cinéma.\", note: \"Хо́дити : habitude, aller-retour.\" },",
+      "replace": "        { text: \"Я ча́сто ходжу́ в кіно́.\", translation: \"Je vais souvent au cinéma.\", note: \"Хо́дити : habitude, aller-retour.\" },"
+    },
+    {
+      "id": "uk-a2-motion",
+      "field": "examples[2]",
+      "find": "        { text: \"За́раз ми ї́демо до ба́бусі.\", translation: \"En ce moment, nous allons chez ma grand-mère (en véhicule).\", note: \"Ї́хати : en véhicule, trajet en cours. До + génitif : ба́буся → до ба́бусі.\" },",
+      "replace": "        { text: \"За́раз ми ї́демо до ба́бусі.\", translation: \"En ce moment, nous allons chez ma grand-mère (en véhicule).\", note: \"Ї́хати : en véhicule, trajet en cours. До + génitif : ба́буся → до ба́бусі.\" },"
+    },
+    {
+      "id": "uk-a2-motion",
+      "field": "examples[3]",
+      "find": "        { text: \"Вони́ ча́сто ї́здять до мо́ря.\", translation: \"Ils vont souvent à la mer.\", note: \"Ї́здити : trajet répété en véhicule.\" },",
+      "replace": "        { text: \"Вони́ ча́сто ї́здять до мо́ря.\", translation: \"Ils vont souvent à la mer.\", note: \"Ї́здити : trajet répété en véhicule.\" },"
+    },
+    {
+      "id": "uk-a2-motion",
+      "field": "exercises[0].prompt",
+      "find": "          prompt: \"Зараз я ___ пішки на роботу.\",",
+      "replace": "          prompt: \"Зараз я ___ пішки на роботу. (Je suis en train d’y aller.)\","
+    },
+    {
+      "id": "uk-a2-motion",
+      "field": "exercises[0].explanation",
+      "find": "          explanation: \"Пішки veut dire « à pied » et зараз un trajet en cours \u0001 іду.\",",
+      "replace": "          explanation: \"Пішки veut dire « à pied » et зараз un trajet en cours : іду.\","
+    },
+    {
+      "id": "uk-a2-motion",
+      "field": "exercises[1].options",
+      "find": "          options: [\"їдемо\", \"йдемо\", \"ходимо\", \"їздимо\"],",
+      "replace": "          options: [\"їздять\",\"йдемо\",\"ходимо\",\"їздимо\"],"
+    },
+    {
+      "id": "uk-a2-motion",
+      "field": "exercises[1].explanation",
+      "find": "          explanation: \"Щодня exprime l’habitude et автобусом un véhicule \u0001 їздимо.\",",
+      "replace": "          explanation: \"Щодня exprime l’habitude et автобусом un véhicule : їздимо.\","
+    },
+    {
+      "id": "uk-a2-motion",
+      "field": "exercises[2].prompt",
+      "find": "          prompt: \"Зараз вони ___ до моря на машині.\",",
+      "replace": "          prompt: \"Вони вже в дорозі й ___ до моря на машині.\","
+    },
+    {
+      "id": "uk-a2-motion",
+      "field": "exercises[2].explanation",
+      "find": "          explanation: \"Зараз \u0001 trajet en cours \u0001 на машині \u0001 en véhicule. D’où їдуть.\",",
+      "replace": "          explanation: \"Вже в дорозі précise qu’ils sont en route. Avec на машині, le verbe de trajet en véhicule est їдуть.\","
+    },
+    {
+      "id": "uk-a2-motion",
+      "field": "exercises[3].hint",
+      "find": "          hint: \"ходити\",",
+      "replace": "          hint: \"ходити, au présent\","
+    },
+    {
+      "id": "uk-a2-motion",
+      "field": "exercises[4].hint",
+      "find": "          hint: \"їхати\",",
+      "replace": "          hint: \"їхати, au présent\","
+    },
+    {
+      "id": "uk-a2-motion",
+      "field": "exercises[4].explanation",
+      "find": "          explanation: \"Їхати \u0001 ви їдете. Зараз demande le verbe de trajet en cours.\",",
+      "replace": "          explanation: \"Pour un trajet en véhicule, їхати donne ви їдете au présent.\","
+    },
+    {
+      "id": "uk-b1-aspect",
+      "field": "rule[0]",
+      "find": "        \"La plupart des verbes ukrainiens existent en deux aspects. L’imperfectif (чита́ти) montre l’action en cours, sa durée, sa répétition ou un fait général \u0001 le perfectif (прочита́ти) montre l’action menée à son terme, avec un résultat, en une seule fois. Le français le rend par l’imparfait et le passé composé, mais pas toujours.\",",
+      "replace": "        \"L’imperfectif présente une action en cours, répétée, ou comme un fait sans en souligner le terme. Le perfectif présente l’action comme un tout, souvent avec un résultat. Compare читати (« lire ») et прочитати (« lire jusqu’au bout »). Le choix ne se déduit pas du seul temps français.\","
+    },
+    {
+      "id": "uk-b1-aspect",
+      "field": "rule[1]",
+      "find": "        \"Au passé \u0001 Я читав книжку = je lisais ce livre (ou je l’ai lu, sans dire si je l’ai fini) \u0001 Я прочитав книжку = je l’ai lue jusqu’au bout. Avec une durée (дві години), une répétition (щодня, завжди) on prend l’imperfectif \u0001 avec « enfin », « déjà », « tout », on prend le perfectif.\",",
+      "replace": "        \"Au passé, Я читав книжку peut signifier « je lisais un livre » ou « j’ai lu un livre » sans indiquer que je l’ai fini. Я прочитав книжку le présente comme lu jusqu’au bout. Une durée d’activité favorise l’imperfectif (читав дві години). За дві години peut au contraire mesurer le temps qu’a pris une action achevée.\","
+    },
+    {
+      "id": "uk-b1-aspect",
+      "field": "rule[2]",
+      "find": "        \"Le perfectif se forme avec un préfixe (читати → прочитати, писати → написати, робити → зробити) ou avec un autre suffixe (купувати → купити) \u0001 certaines paires sont différentes (говорити → сказати, брати → взяти). Apprends les deux verbes ensemble. Le « présent » d’un perfectif désigne le futur (point suivant).\",",
+      "replace": "        \"Apprends les paires avec leur sens. On rencontre un préfixe (писати → написати), une autre forme du radical ou du suffixe (купувати → купити), ou deux verbes différents (брати → взяти). La forme du perfectif qui ressemble à un présent a généralement valeur de futur.\","
+    },
+    {
+      "id": "uk-b1-aspect",
+      "field": "table.rows[7]",
+      "find": "          [\"вчи́ти\", \"вивчи́ти\", \"apprendre\"],",
+      "replace": "          [\"вивча́ти\",\"ви́вчити\",\"étudier / apprendre\"],"
+    },
+    {
+      "id": "uk-b1-aspect",
+      "field": "examples[0]",
+      "find": "        { text: \"Вчо́ра я чита́в цю кни́жку весь ве́чір.\", translation: \"Hier, j’ai lu ce livre toute la soirée.\", note: \"Imperfectif : durée (весь ве́чір), pas de résultat annoncé.\" },",
+      "replace": "        { text: \"Вчо́ра я чита́в цю кни́жку весь ве́чір.\", translation: \"Hier, j’ai lu ce livre toute la soirée.\", note: \"Imperfectif : durée (весь ве́чір), pas de résultat annoncé.\" },"
+    },
+    {
+      "id": "uk-b1-aspect",
+      "field": "examples[1]",
+      "find": "        { text: \"Вчо́ра я прочита́в цю кни́жку.\", translation: \"Hier, j’ai fini ce livre.\", note: \"Perfectif : action achevée, avec résultat.\" },",
+      "replace": "        { text: \"Вчо́ра я прочита́в цю кни́жку.\", translation: \"Hier, j’ai fini ce livre.\", note: \"Perfectif : action achevée, avec résultat.\" },"
+    },
+    {
+      "id": "uk-b1-aspect",
+      "field": "examples[2]",
+      "find": "        { text: \"Він за́вжди купува́в хліб, а сього́дні купи́в сир.\", translation: \"Il achetait toujours du pain, mais aujourd’hui il a acheté du fromage.\", note: \"Habitude : купува́в. Fait unique : купи́в.\" },",
+      "replace": "        { text: \"Він за́вжди купува́в хліб, а сього́дні купи́в сир.\", translation: \"Il achetait toujours du pain, mais aujourd’hui il a acheté du fromage.\", note: \"Habitude : купува́в. Fait unique : купи́в.\" },"
+    },
+    {
+      "id": "uk-b1-aspect",
+      "field": "exercises[0].prompt",
+      "find": "          prompt: \"Учора я ___ листа дві години.\",",
+      "replace": "          prompt: \"Учора я ___ листа дві години, але так і не закінчив.\","
+    },
+    {
+      "id": "uk-b1-aspect",
+      "field": "exercises[0].explanation",
+      "find": "          explanation: \"Une durée (дві години) demande l’imperfectif au passé \u0001 писав.\",",
+      "replace": "          explanation: \"Але так і не закінчив signifie « mais je n’ai pas fini ». L’imperfectif писав présente le temps passé à écrire.\","
+    },
+    {
+      "id": "uk-b1-aspect",
+      "field": "exercises[1].prompt",
+      "find": "          prompt: \"Нарешті я ___ цей текст!\",",
+      "replace": "          prompt: \"Нарешті я ___ цей текст! (J’ai enfin fini de le traduire.)\","
+    },
+    {
+      "id": "uk-b1-aspect",
+      "field": "exercises[1].explanation",
+      "find": "          explanation: \"Нарешті annonce un résultat atteint \u0001 perfectif, переклав.\",",
+      "replace": "          explanation: \"Le sens demandé est « j’ai fini de traduire », d’où le perfectif переклав. Нарешті seul ne détermine pas l’aspect.\","
+    },
+    {
+      "id": "uk-b1-aspect",
+      "field": "exercises[2].explanation",
+      "find": "          explanation: \"Щодня exprime une répétition \u0001 imperfectif au passé, читав.\",",
+      "replace": "          explanation: \"Le contexte décrit une ancienne habitude de lecture. L’imperfectif au passé читав convient.\","
+    },
+    {
+      "id": "uk-b1-aspect",
+      "field": "exercises[3].hint",
+      "find": "          hint: \"зробити\",",
+      "replace": "          hint: \"зробити, au passé\","
+    },
+    {
+      "id": "uk-b1-aspect",
+      "field": "exercises[3].explanation",
+      "find": "          explanation: \"Вже annonce un résultat \u0001 perfectif au passé. Зробив (homme) ou зробила (femme).\",",
+      "replace": "          explanation: \"Зробити est perfectif. Au passé, choisis зробив si le locuteur est un homme ou зробила si c’est une femme.\","
+    },
+    {
+      "id": "uk-b1-aspect",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Mets le verbe au perfectif.\",",
+      "replace": "          instruction: \"Remplace seulement « писав » par le passé du perfectif « написати ».\","
+    },
+    {
+      "id": "uk-b1-aspect",
+      "field": "exercises[4].explanation",
+      "find": "          explanation: \"Писати → написати \u0001 le préfixe на- forme le perfectif.\",",
+      "replace": "          explanation: \"Писати → написати : le préfixe на- forme le perfectif.\","
+    },
+    {
+      "id": "uk-b1-future",
+      "field": "title",
+      "find": "      title: \"Le futur \u0001 буду читати, читатиму, прочитаю\",",
+      "replace": "      title: \"Le futur : буду читати, читатиму, прочитаю\","
+    },
+    {
+      "id": "uk-b1-future",
+      "field": "rule[0]",
+      "find": "        \"Trois façons de parler de l’avenir. Imperfectif \u0001 бу́ду + infinitif (бу́ду чита́ти) ou la forme synthétique (чита́тиму), qui a le même sens. Perfectif \u0001 la forme qui ressemble à un présent donne le futur (прочита́ю = je lirai jusqu’au bout).\",",
+      "replace": "        \"L’imperfectif a deux futurs usuels. Le futur composé emploie бу́ду avec l’infinitif (бу́ду чита́ти), et le futur synthétique combine les deux éléments en un mot (чита́тиму). Le perfectif a un futur simple (прочита́ю, « je lirai jusqu’au bout »).\","
+    },
+    {
+      "id": "uk-b1-future",
+      "field": "rule[1]",
+      "find": "        \"La forme synthétique ajoute -му, -меш, -ме, -мемо, -мете, -муть à l’infinitif \u0001 чита́ти → чита́тиму, чита́тимеш, чита́тиме. Les deux formes sont correctes \u0001 choisis la composée (бу́ду чита́ти) pour commencer.\",",
+      "replace": "        \"Le futur synthétique ajoute -му, -меш, -ме, -мемо, -мете ou -муть à l’infinitif (чита́ти → чита́тиму, чита́тимеш, чита́тиме). Les deux futurs imperfectifs ont le même sens de base.\","
+    },
+    {
+      "id": "uk-b1-future",
+      "field": "rule[2]",
+      "find": "        \"Pièges \u0001 on ne dit jamais бу́ду + verbe perfectif (бу́ду написа́ти est faux) \u0001 et pour un verbe perfectif la forme en -у / -ю n’a pas de sens présent \u0001 Я напишу́ = je l’écrirai. Бу́ти lui-même se conjugue au futur sans infinitif \u0001 За́втра я бу́ду вдо́ма.\",",
+      "replace": "        \"Utilise бу́ду avec un infinitif imperfectif pour le futur composé (бу́ду писа́ти). Pour le perfectif написа́ти, emploie напишу́. Бу́ти peut aussi être le verbe de la phrase, sans autre infinitif (За́втра я бу́ду вдо́ма).\","
+    },
+    {
+      "id": "uk-b1-future",
+      "field": "examples[1]",
+      "find": "        { text: \"Вона́ чита́тиме цю кни́жку весь ве́чір.\", translation: \"Elle lira ce livre toute la soirée.\", note: \"Forme synthétique : чита́ти + -ме.\" },",
+      "replace": "        { text: \"Вона́ чита́тиме цю кни́жку весь ве́чір.\", translation: \"Elle lira ce livre toute la soirée.\", note: \"Forme synthétique : чита́ти + -ме.\" },"
+    },
+    {
+      "id": "uk-b1-future",
+      "field": "examples[2]",
+      "find": "        { text: \"Я напишу́ тобі́ за́втра.\", translation: \"Je t’écrirai demain.\", note: \"Perfectif : написа́ти → напишу́, sens de futur.\" },",
+      "replace": "        { text: \"Я напишу́ тобі́ за́втра.\", translation: \"Je t’écrirai demain.\", note: \"Perfectif : написа́ти → напишу́, sens de futur.\" },"
+    },
+    {
+      "id": "uk-b1-future",
+      "field": "exercises[0].explanation",
+      "find": "          explanation: \"Sujet ми \u0001 будемо + infinitif.\",",
+      "replace": "          explanation: \"Sujet ми : будемо + infinitif.\","
+    },
+    {
+      "id": "uk-b1-future",
+      "field": "exercises[1].explanation",
+      "find": "          explanation: \"Le futur d’un verbe perfectif est sa forme en -у \u0001 напишу. Буду написати et написатиму n’existent pas.\",",
+      "replace": "          explanation: \"Напишу est la première personne du singulier du futur de написати, un verbe perfectif. Les futurs composé et synthétique s’emploient avec des verbes imperfectifs.\","
+    },
+    {
+      "id": "uk-b1-future",
+      "field": "exercises[2].explanation",
+      "find": "          explanation: \"Цілий тиждень exprime une durée \u0001 imperfectif, читатиме. Прочитатиме n’existe pas.\",",
+      "replace": "          explanation: \"Цілий тиждень présente la durée de lecture. L’imperfectif читатиме convient. Pour dire « elle finira de lire en une semaine », on dirait прочитає за тиждень.\","
+    },
+    {
+      "id": "uk-b1-future",
+      "field": "exercises[3].explanation",
+      "find": "          explanation: \"Подзвонити est perfectif \u0001 sa forme 1re personne подзвоню a un sens de futur.\",",
+      "replace": "          explanation: \"Подзвонити est perfectif : sa forme 1re personne подзвоню a un sens de futur.\","
+    },
+    {
+      "id": "uk-b1-future",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Mets la phrase au futur.\",",
+      "replace": "          instruction: \"Mets « читаю » au futur sans changer d’aspect. Garde « Я » au début et « книжку » à la fin. Au futur composé, place l’auxiliaire avant l’infinitif.\","
+    },
+    {
+      "id": "uk-b1-future",
+      "field": "exercises[4].answers",
+      "find": "          answers: [\"Я буду читати книжку.\", \"Я читатиму книжку.\", \"Буду читати книжку.\", \"Читатиму книжку.\"],",
+      "replace": "          answers: [\"Я буду читати книжку.\",\"Я читатиму книжку.\"],"
+    },
+    {
+      "id": "uk-b1-future",
+      "field": "exercises[4].explanation",
+      "find": "          explanation: \"Futur imperfectif \u0001 буду + infinitif, ou la forme synthétique читатиму.\",",
+      "replace": "          explanation: \"Futur imperfectif : буду + infinitif, ou la forme synthétique читатиму.\","
+    },
+    {
+      "id": "uk-b1-imperative",
+      "field": "title",
+      "find": "      title: \"L’impératif \u0001 читай, читайте, ходімо\",",
+      "replace": "      title: \"L’impératif : читай, читайте, ходімо\","
+    },
+    {
+      "id": "uk-b1-imperative",
+      "field": "rule[0]",
+      "find": "        \"L’impératif se construit sur la forme « вони » du présent. Radical en voyelle → -й (читають → читай, працюють → працюй). Sinon -и (пишуть → пиши, говорять → говори), parfois -ь après une consonne molle. Pour « vous » ou la politesse, on ajoute -те \u0001 читайте \u0001 -и devient -іть \u0001 говоріть, пишіть.\",",
+      "replace": "        \"Pour « tu », l’impératif peut se terminer en -й (читай), en -и (пиши, говори), ou en consonne parfois notée avec -ь (сядь). Compare les formes de « vous » читайте, пишіть, говоріть et сядьте. Apprends ensemble les deux formes.\","
+    },
+    {
+      "id": "uk-b1-imperative",
+      "field": "rule[1]",
+      "find": "        \"À connaître \u0001 бути → будь, будьте \u0001 їсти → їж, їжте \u0001 пити → пий, пийте \u0001 дати → дай, дайте \u0001 йти → іди, ідіть. Le réfléchi garde -ся \u0001 дивитися → дивись (ти), дивіться (ви). La 1re personne du pluriel (« faisons ») prend -мо \u0001 читаймо, ходімо.\",",
+      "replace": "        \"Retiens aussi будь / будьте (бути), їж / їжте (їсти), пий / пийте (пити), дай / дайте (дати) et іди / ідіть (іти). Pour « regarde », on peut dire дивись ou дивися, et pour « regardez », дивіться. Pour « faisons », emploie par exemple читаймо ou ходімо.\","
+    },
+    {
+      "id": "uk-b1-imperative",
+      "field": "rule[2]",
+      "find": "        \"Aspect \u0001 à l’affirmatif les deux existent. Le perfectif demande une action unique avec résultat (Відкрийте вікно) \u0001 l’imperfectif une action répétée ou une invitation polie (Сідайте, будь ласка). Le négatif prend toujours l’imperfectif \u0001 Не читай \u0001 (et non Не прочитай \u0001). Ajoute будь ласка pour adoucir.\",",
+      "replace": "        \"Le perfectif convient souvent pour obtenir un résultat (Відкрийте вікно), l’imperfectif pour une activité ou une invitation (Сідайте, будь ласка). Une interdiction ordinaire prend souvent l’imperfectif (Не читай!). Le perfectif est possible, par exemple dans un avertissement (Не впади!) ou un rappel (Не забудь!).\","
+    },
+    {
+      "id": "uk-b1-imperative",
+      "field": "table.rows[3]",
+      "find": "          [\"роби́ти\", \"ро́би\", \"ро́біть\", \"-и ; ви : -іть\"],",
+      "replace": "          [\"роби́ти\",\"роби́\",\"робі́ть\",\"-и / -іть\"],"
+    },
+    {
+      "id": "uk-b1-imperative",
+      "field": "table.rows[4]",
+      "find": "          [\"диви́тися\", \"диви́сь\", \"диві́ться\", \"réfléchi\"],",
+      "replace": "          [\"диви́тися\",\"диви́сь / диви́ся\",\"диві́ться\",\"réfléchi\"],"
+    },
+    {
+      "id": "uk-b1-imperative",
+      "field": "examples[0]",
+      "find": "        { text: \"Чита́й уго́лос, будь ла́ска.\", translation: \"Lis à voix haute, s’il te plaît.\", note: \"Чита́ти → чита́й (radical en voyelle).\" },",
+      "replace": "        { text: \"Чита́й уго́лос, будь ла́ска.\", translation: \"Lis à voix haute, s’il te plaît.\", note: \"Le singulier чита́й s’adresse à une personne qu’on tutoie.\" },"
+    },
+    {
+      "id": "uk-b1-imperative",
+      "field": "examples[1]",
+      "find": "        { text: \"Скажі́ть, будь ла́ска, де вокза́л?\", translation: \"Dites-moi, s’il vous plaît, où est la gare ?\", note: \"Сказа́ти → скажи́ ; ви : скажі́ть (-и devient -іть).\" },",
+      "replace": "        { text: \"Скажі́ть, будь ла́ска, де вокза́л?\", translation: \"Dites-moi, s’il vous plaît, où est la gare ?\", note: \"Сказа́ти donne скажи́ avec ти et скажі́ть avec ви.\" },"
+    },
+    {
+      "id": "uk-b1-imperative",
+      "field": "examples[2]",
+      "find": "        { text: \"Не хвилю́йся, все до́бре.\", translation: \"Ne t’inquiète pas, tout va bien.\", note: \"Négatif : imperfectif. Réfléchi : -ся reste.\" },",
+      "replace": "        { text: \"Не хвилю́йся, все до́бре.\", translation: \"Ne t’inquiète pas, tout va bien.\", note: \"Хвилюва́тися est imperfectif. Le -ся reste dans хвилю́йся.\" },"
+    },
+    {
+      "id": "uk-b1-imperative",
+      "field": "examples[3]",
+      "find": "        { text: \"Відкри́йте вікно́, будь ла́ска.\", translation: \"Ouvrez la fenêtre, s’il vous plaît.\", note: \"Perfectif : une action unique avec résultat.\" },",
+      "replace": "        { text: \"Відкри́йте вікно́, будь ла́ска.\", translation: \"Ouvrez la fenêtre, s’il vous plaît.\", note: \"Perfectif : une action unique avec résultat.\" },"
+    },
+    {
+      "id": "uk-b1-imperative",
+      "field": "exercises[0].prompt",
+      "find": "          prompt: \"Іване, ___ уважно!\",",
+      "replace": "          prompt: \"Іване, ___ уважно! (Avec « ти ».)\","
+    },
+    {
+      "id": "uk-b1-imperative",
+      "field": "exercises[0].explanation",
+      "find": "          explanation: \"On s’adresse à une personne avec ти \u0001 слухай (radical en voyelle + -й).\",",
+      "replace": "          explanation: \"La consigne demande le tutoiement. L’impératif de слухати est alors слухай.\","
+    },
+    {
+      "id": "uk-b1-imperative",
+      "field": "exercises[1].prompt",
+      "find": "          prompt: \"Пані Олено, ___ , будь ласка, сюди!\",",
+      "replace": "          prompt: \"Пані Олено, ___, будь ласка, сюди! (Avec « ви ».)\","
+    },
+    {
+      "id": "uk-b1-imperative",
+      "field": "exercises[1].explanation",
+      "find": "          explanation: \"Пані est un « vous » de politesse \u0001 ідіть (іди + -іть).\",",
+      "replace": "          explanation: \"Пані Олено indique à qui l’on s’adresse. La forme de politesse demandée est ідіть.\","
+    },
+    {
+      "id": "uk-b1-imperative",
+      "field": "exercises[2].options",
+      "find": "          options: [\"говори\", \"скажи\", \"скажу\", \"поговори\"],",
+      "replace": "          options: [\"говори\",\"говорю\",\"скажу\",\"говорять\"],"
+    },
+    {
+      "id": "uk-b1-imperative",
+      "field": "exercises[2].explanation",
+      "find": "          explanation: \"À la forme négative on emploie l’imperfectif \u0001 не говори.\",",
+      "replace": "          explanation: \"Pour demander de parler moins vite, on dit Не говори так швидко. L’imperfectif porte sur la façon de parler.\","
+    },
+    {
+      "id": "uk-b1-imperative",
+      "field": "exercises[3].prompt",
+      "find": "          prompt: \"Андрію, ___ своє ім'я!\",",
+      "replace": "          prompt: \"Андрію, ___ своє ім’я!\","
+    },
+    {
+      "id": "uk-b1-imperative",
+      "field": "exercises[3].hint",
+      "find": "          hint: \"написати\",",
+      "replace": "          hint: \"написати, impératif de ти\","
+    },
+    {
+      "id": "uk-b1-imperative",
+      "field": "exercises[3].explanation",
+      "find": "          explanation: \"Написати est perfectif (résultat unique) \u0001 ти → напиши.\",",
+      "replace": "          explanation: \"Написати est perfectif (résultat unique) : ти → напиши.\","
+    },
+    {
+      "id": "uk-b1-imperative",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Mets la phrase à la forme polie (« ви »).\",",
+      "replace": "          instruction: \"Mets seulement « Читай » à la forme polie (« ви »).\","
+    },
+    {
+      "id": "uk-b1-imperative",
+      "field": "exercises[4].explanation",
+      "find": "          explanation: \"À la forme « ви », on ajoute -те \u0001 читай → читайте.\",",
+      "replace": "          explanation: \"À la forme « ви », on ajoute -те : читай → читайте.\","
+    },
+    {
+      "id": "uk-b1-numbers",
+      "field": "title",
+      "find": "      title: \"Nombres et cas \u0001 два бра́ти, п’ять бра́тів\",",
+      "replace": "      title: \"Nombres et cas : два бра́ти, п’ять бра́тів\","
+    },
+    {
+      "id": "uk-b1-numbers",
+      "field": "rule[0]",
+      "find": "        \"En ukrainien le nom change de cas selon le nombre qui le précède. 1 \u0001 nominatif singulier (оди́н брат, одна́ кни́жка, одне́ вікно́). 2, 3, 4 \u0001 nominatif pluriel (два бра́ти, дві кни́жки, три вікна́). 5 et plus \u0001 génitif pluriel (п’ять бра́тів, п’ять кни́жок, п’ять ві́кон).\",",
+      "replace": "        \"Dans un groupe sujet, avec оди́н, одна́ ou одне́, le nom est au nominatif singulier. Après два, дві, три ou чоти́ри, il est généralement au nominatif pluriel (два бра́ти, дві кни́жки, три вікна́). Avec п’ять ou un autre nombre de 5 à 20, il est au génitif pluriel (п’ять бра́тів, п’ять ві́кон).\","
+    },
+    {
+      "id": "uk-b1-numbers",
+      "field": "rule[1]",
+      "find": "        \"C’est le dernier chiffre qui décide, sauf de 11 à 14, qui prennent toujours le génitif pluriel \u0001 два́дцять оди́н рік, два́дцять два ро́ки, два́дцять п’ять ро́ків, оди́надцять ро́ків. Un et deux ont des formes féminines \u0001 одна́, дві.\",",
+      "replace": "        \"Pour un nombre composé, regarde le dernier élément, pas seulement le dernier chiffre. Compare два́дцять оди́н рік, два́дцять два ро́ки et два́дцять п’ять ро́ків. Les nombres de 11 à 19 prennent le génitif pluriel, y compris en fin de nombre composé (сто одина́дцять ро́ків).\","
+    },
+    {
+      "id": "uk-b1-numbers",
+      "field": "rule[2]",
+      "find": "        \"Les adjectifs suivent le nom \u0001 два нові́ столи́, дві нові́ кни́жки. Pour l’âge \u0001 Мені́ два́дцять оди́н рік, Йому́ два́дцять два ро́ки, Їй три́дцять п’ять ро́ків (рік, ро́ки, ро́ків).\",",
+      "replace": "        \"Après 2, 3 ou 4, l’accent du nom peut différer de celui du pluriel isolé (се́стри, mais три сестри́). Un adjectif peut se mettre au pluriel comme le nom (дві нові́ кни́жки). Pour l’âge, compare оди́н рік, два ро́ки et п’ять ро́ків.\","
+    },
+    {
+      "id": "uk-b1-numbers",
+      "field": "table.rows[2]",
+      "find": "          [\"5 à 20\", \"au génitif pluriel (11 à 14 aussi)\", \"п’ять бра́тів, п’ять кни́жок, п’ять ві́кон\"],",
+      "replace": "          [\"5 à 20\",\"au génitif pluriel\",\"п’ять бра́тів, п’ять книжо́к, п’ять ві́кон\"],"
+    },
+    {
+      "id": "uk-b1-numbers",
+      "field": "table.rows[5]",
+      "find": "          [\"25 à 30…\", \"au génitif pluriel\", \"два́дцять п’ять ро́ків\"],",
+      "replace": "          [\"25 à 30…\",\"au génitif pluriel\",\"два́дцять п’ять ро́ків\"],"
+    },
+    {
+      "id": "uk-b1-numbers",
+      "field": "examples[0]",
+      "find": "        { text: \"У ме́не є два бра́ти й три сестри́.\", translation: \"J’ai deux frères et trois sœurs.\", note: \"2-4 : nominatif pluriel (бра́ти, сестри́).\" },",
+      "replace": "        { text: \"У ме́не є два бра́ти й три сестри́.\", translation: \"J’ai deux frères et trois sœurs.\", note: \"2-4 : nominatif pluriel (бра́ти, сестри́).\" },"
+    },
+    {
+      "id": "uk-b1-numbers",
+      "field": "examples[1]",
+      "find": "        { text: \"У на́шій гру́пі п’ятна́дцять студе́нтів.\", translation: \"Dans notre groupe, il y a quinze étudiants.\", note: \"5 et plus : génitif pluriel (студе́нтів).\" },",
+      "replace": "        { text: \"У на́шій гру́пі п’ятна́дцять студе́нтів.\", translation: \"Dans notre groupe, il y a quinze étudiants.\", note: \"П’ятна́дцять est suivi du génitif pluriel студе́нтів.\" },"
+    },
+    {
+      "id": "uk-b1-numbers",
+      "field": "examples[2]",
+      "find": "        { text: \"Мені́ два́дцять оди́н рік.\", translation: \"J’ai vingt et un ans.\", note: \"Se termine par 1 : nominatif singulier (рік).\" },",
+      "replace": "        { text: \"Мені́ два́дцять оди́н рік.\", translation: \"J’ai vingt et un ans.\", note: \"Se termine par 1 : nominatif singulier (рік).\" },"
+    },
+    {
+      "id": "uk-b1-numbers",
+      "field": "examples[3]",
+      "find": "        { text: \"На столі́ лежа́ть дві кни́жки й п’ять зо́шитів.\", translation: \"Sur la table il y a deux livres et cinq cahiers.\", note: \"Дві (féminin) + nominatif pluriel ; п’ять + génitif pluriel.\" },",
+      "replace": "        { text: \"На столі́ лежа́ть дві кни́жки й п’ять зо́шитів.\", translation: \"Sur la table il y a deux livres et cinq cahiers.\", note: \"Дві prend ici le nominatif pluriel et п’ять le génitif pluriel.\" },"
+    },
+    {
+      "id": "uk-b1-numbers",
+      "field": "exercises[0].explanation",
+      "find": "          explanation: \"Après 2, 3 ou 4, le nom est au nominatif pluriel \u0001 три сестри.\",",
+      "replace": "          explanation: \"Après 2, 3 ou 4, le nom est au nominatif pluriel : три сестри.\","
+    },
+    {
+      "id": "uk-b1-numbers",
+      "field": "exercises[1].prompt",
+      "find": "          prompt: \"У нас п'ять ___.\",",
+      "replace": "          prompt: \"У нас п’ять ___.\","
+    },
+    {
+      "id": "uk-b1-numbers",
+      "field": "exercises[1].explanation",
+      "find": "          explanation: \"À partir de 5, le nom est au génitif pluriel \u0001 п’ять студентів.\",",
+      "replace": "          explanation: \"Après п’ять, on emploie le génitif pluriel студентів.\","
+    },
+    {
+      "id": "uk-b1-numbers",
+      "field": "exercises[2].explanation",
+      "find": "          explanation: \"Le nombre finit par 2 \u0001 nominatif pluriel, двадцять два роки.\",",
+      "replace": "          explanation: \"Le nombre finit par 2 : nominatif pluriel, двадцять два роки.\","
+    },
+    {
+      "id": "uk-b1-numbers",
+      "field": "exercises[3].explanation",
+      "find": "          explanation: \"Après дві, nominatif pluriel \u0001 книжки.\",",
+      "replace": "          explanation: \"Après дві, nominatif pluriel : книжки.\","
+    },
+    {
+      "id": "uk-b1-numbers",
+      "field": "exercises[4].answers",
+      "find": "          answers: [\"У мене п'ять братів.\", \"У мене п’ять братів.\"],",
+      "replace": "          answers: [\"У мене п’ять братів.\"],"
+    },
+    {
+      "id": "uk-b1-numbers",
+      "field": "exercises[4].explanation",
+      "find": "          explanation: \"Après п’ять, le nom est au génitif pluriel \u0001 братів.\",",
+      "replace": "          explanation: \"Après п’ять, le nom est au génitif pluriel : братів.\","
+    },
+    {
+      "id": "uk-b1-relative",
+      "field": "rule[0]",
+      "find": "        \"Який (яка, яке, які) relie une proposition à un nom, comme « qui », « que », « dont » ou « où » en français. Il s’accorde en genre et en nombre avec le nom qu’il reprend, mais son cas dépend de son rôle dans la proposition relative. La relative est toujours entourée de virgules.\",",
+      "replace": "        \"Який introduit une relative. Son genre et son nombre viennent du nom repris, mais son cas dépend de sa fonction dans la relative. Une virgule sépare la relative de la phrase principale. Mets aussi une virgule après la relative si la principale reprend ensuite.\","
+    },
+    {
+      "id": "uk-b1-relative",
+      "field": "rule[1]",
+      "find": "        \"Sujet (« qui ») → nominatif \u0001 чоловік, який живе поруч. Objet (« que ») → accusatif \u0001 книжка, яку я читаю (яку car книжка est féminin). Avec une préposition, le cas suit la préposition \u0001 дівчина, з якою я працюю (instrumental), місто, в якому я живу (locatif), друг, до якого я іду (génitif).\",",
+      "replace": "        \"Comme sujet, le relatif est au nominatif (чоловік, який живе поруч). Comme objet direct, il est à l’accusatif (книжка, яку я читаю). Après une préposition, le cas dépend de cette préposition et de son sens (дівчина, з якою я працюю, місто, в якому я живу, друг, до якого я іду).\","
+    },
+    {
+      "id": "uk-b1-relative",
+      "field": "rule[2]",
+      "find": "        \"Pièges \u0001 « dont » se rend par le génitif de який, placé devant le nom possédé \u0001 дівчина, сестра якої живе в Києві. Et la virgule n’est jamais facultative devant який, contrairement au français.\",",
+      "replace": "        \"Pour « dont » au sens de « de qui » ou « dont le/la… », on peut employer le génitif de який après le nom du membre de la famille ou de la chose possédée. Dans дівчина, сестра якої живе в Києві, якої vient après сестра.\","
+    },
+    {
+      "id": "uk-b1-relative",
+      "field": "examples[0]",
+      "find": "        { text: \"Це чолові́к, який живе́ в на́шому буди́нку.\", translation: \"C’est l’homme qui habite dans notre immeuble.\", note: \"Який est sujet : nominatif masculin, comme чолові́к.\" },",
+      "replace": "        { text: \"Це чолові́к, яки́й живе́ в на́шому буди́нку.\", translation: \"C’est l’homme qui habite dans notre immeuble.\", note: \"Яки́й est au nominatif masculin, car il est sujet de живе́.\" },"
+    },
+    {
+      "id": "uk-b1-relative",
+      "field": "examples[1]",
+      "find": "        { text: \"Кни́жка, яку я чита́ю, дуже ціка́ва.\", translation: \"Le livre que je lis est très intéressant.\", note: \"Яку : accusatif féminin, car кни́жка est féminin et objet de чита́ю.\" },",
+      "replace": "        { text: \"Кни́жка, яку́ я чита́ю, ду́же ціка́ва.\", translation: \"Le livre que je lis est très intéressant.\", note: \"Яку́ est à l’accusatif féminin. Il reprend кни́жка et sert d’objet à чита́ю.\" },"
+    },
+    {
+      "id": "uk-b1-relative",
+      "field": "examples[2]",
+      "find": "        { text: \"Дівчи́на, з якою я працю́ю, з Льво́ва.\", translation: \"La fille avec qui je travaille vient de Lviv.\", note: \"З + instrumental féminin : якою.\" },",
+      "replace": "        { text: \"Ді́вчина, з яко́ю я працю́ю, з Льво́ва.\", translation: \"La fille avec qui je travaille vient de Lviv.\", note: \"З (« avec ») commande ici l’instrumental яко́ю.\" },"
+    },
+    {
+      "id": "uk-b1-relative",
+      "field": "examples[3]",
+      "find": "        { text: \"Мі́сто, в якому я живу́, дуже вели́ке.\", translation: \"La ville où j’habite est très grande.\", note: \"В + locatif neutre : якому. Il rend « où ».\" },",
+      "replace": "        { text: \"Мі́сто, в яко́му я живу́, ду́же вели́ке.\", translation: \"La ville où j’habite est très grande.\", note: \"В яко́му signifie « dans lequel » avec un nom neutre. Le français emploie ici « où ».\" },"
+    },
+    {
+      "id": "uk-b1-relative",
+      "field": "exercises[0].explanation",
+      "find": "          explanation: \"Жінка est féminin et sujet de la relative \u0001 яка (nominatif féminin).\",",
+      "replace": "          explanation: \"Жінка est féminin et sujet de la relative : яка (nominatif féminin).\","
+    },
+    {
+      "id": "uk-b1-relative",
+      "field": "exercises[1].explanation",
+      "find": "          explanation: \"Книжка est féminin et objet de читаю \u0001 accusatif féminin, яку.\",",
+      "replace": "          explanation: \"Книжка est féminin et objet de читаю : accusatif féminin, яку.\","
+    },
+    {
+      "id": "uk-b1-relative",
+      "field": "exercises[2].explanation",
+      "find": "          explanation: \"Друзі est un pluriel, et з demande l’instrumental \u0001 якими.\",",
+      "replace": "          explanation: \"Друзі est un pluriel, et з demande l’instrumental : якими.\","
+    },
+    {
+      "id": "uk-b1-relative",
+      "field": "exercises[3].answers",
+      "find": "          answers: [\"якому\"],",
+      "replace": "          answers: [\"якому\",\"якім\"],"
+    },
+    {
+      "id": "uk-b1-relative",
+      "field": "exercises[3].explanation",
+      "find": "          explanation: \"Місто est neutre et у demande le locatif \u0001 якому.\",",
+      "replace": "          explanation: \"Місто est neutre. Les deux formes locatives possibles ici sont якому et якім.\","
+    },
+    {
+      "id": "uk-b1-relative",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Réunis les deux phrases avec « який ».\",",
+      "replace": "          instruction: \"Garde « Це чоловік » au début et transforme la seconde phrase en relative avec « який » à la place de « Він ». Garde l’ordre des autres mots.\","
+    },
+    {
+      "id": "uk-b1-conditional",
+      "field": "title",
+      "find": "      title: \"Le conditionnel \u0001 хотів би, якби\",",
+      "replace": "      title: \"Le conditionnel : хотів би, якби\","
+    },
+    {
+      "id": "uk-b1-conditional",
+      "field": "rule[0]",
+      "find": "        \"Le conditionnel se forme avec le passé + la particule би (б) \u0001 я хоті́в би, вона́ хоті́ла б, ми хоті́ли б. Le verbe s’accorde en genre et en nombre comme au passé \u0001 il n’y a pas de formes spéciales. On écrit le plus souvent би après une consonne et б après une voyelle.\",",
+      "replace": "        \"Forme le conditionnel avec une forme du passé et la particule би ou б (я хоті́в би, вона́ хоті́ла б, ми хоті́ли б). Le verbe garde l’accord du passé. La particule peut aussi suivre le sujet (я б прийшо́в). On écrit souvent би après une consonne et б après une voyelle.\","
+    },
+    {
+      "id": "uk-b1-conditional",
+      "field": "rule[1]",
+      "find": "        \"Pour la politesse, l’ukrainien emploie ce conditionnel comme le français \u0001 Я хотів би замовити каву (« j’aimerais commander un café »), Чи не могли б ви допомогти? (« pourriez-vous aider \u0001 »).\",",
+      "replace": "        \"Le conditionnel permet de faire une demande polie. Я хотів би замовити каву signifie « j’aimerais commander un café ». Чи не могли б ви допомогти? signifie « pourriez-vous aider ? ».\","
+    },
+    {
+      "id": "uk-b1-conditional",
+      "field": "rule[2]",
+      "find": "        \"Condition réelle → якщо + indicatif \u0001 Якщо буде час, я прийду. Condition irréelle (« si j’avais… ») → якби + passé, et passé + б dans la principale \u0001 Якби я мав час, я б прийшов. Якби contient déjà би \u0001 on ne le répète pas dans la subordonnée.\",",
+      "replace": "        \"Pour une condition envisagée comme possible, emploie якщо avec l’indicatif (Якщо буде час, я прийду). Pour une hypothèse irréelle, emploie якби avec le passé. Dans la principale, ajoute би ou б à la forme du passé (Якби я мав час, я б прийшов). Якби contient déjà la particule.\","
+    },
+    {
+      "id": "uk-b1-conditional",
+      "field": "examples[0]",
+      "find": "        { text: \"Я хоті́в би замо́вити ка́ву.\", translation: \"J’aimerais commander un café.\", note: \"Demande polie : passé + би.\" },",
+      "replace": "        { text: \"Я хоті́в би замо́вити ка́ву.\", translation: \"J’aimerais commander un café.\", note: \"Demande polie : passé + би.\" },"
+    },
+    {
+      "id": "uk-b1-conditional",
+      "field": "examples[3]",
+      "find": "        { text: \"Чи не могли́ б ви допомогти́ мені́?\", translation: \"Pourriez-vous m’aider ?\", note: \"Чи не + conditionnel : demande très polie.\" },",
+      "replace": "        { text: \"Чи не могли́ б ви допомогти́ мені́?\", translation: \"Pourriez-vous m’aider ?\", note: \"Чи не + conditionnel : demande très polie.\" },"
+    },
+    {
+      "id": "uk-b1-conditional",
+      "field": "exercises[1].explanation",
+      "find": "          explanation: \"Après якби, le verbe est au passé \u0001 були гроші.\",",
+      "replace": "          explanation: \"Après якби, le verbe est au passé : були гроші.\","
+    },
+    {
+      "id": "uk-b1-conditional",
+      "field": "exercises[2].explanation",
+      "find": "          explanation: \"Якщо annonce une condition réelle \u0001 le verbe est au futur, прийду.\",",
+      "replace": "          explanation: \"Завтра situe cette condition et sa conséquence dans l’avenir. Ici, прийду est le futur de прийти.\","
+    },
+    {
+      "id": "uk-b1-conditional",
+      "field": "exercises[3].hint",
+      "find": "          hint: \"хотіти\",",
+      "replace": "          hint: \"хотіти, au conditionnel\","
+    },
+    {
+      "id": "uk-b1-conditional",
+      "field": "exercises[3].explanation",
+      "find": "          explanation: \"Demande polie \u0001 passé + би. Хотів би (homme) ou хотіла б (femme).\",",
+      "replace": "          explanation: \"Demande polie : passé + би. Хотів би (homme) ou хотіла б (femme).\","
+    },
+    {
+      "id": "uk-b1-conditional",
+      "field": "exercises[4].instruction",
+      "find": "          instruction: \"Mets la phrase à l’irréel, au masculin, avec « мав ».\",",
+      "replace": "          instruction: \"Mets la phrase à l’irréel au masculin. Emploie « Якби я мав час », puis commence la principale par « я » et mets « прийти » au conditionnel.\","
+    },
+    {
+      "id": "uk-b1-conditional",
+      "field": "exercises[4].explanation",
+      "find": "          explanation: \"Якщо + futur devient якби + passé, et la principale prend le passé + б \u0001 я б прийшов.\",",
+      "replace": "          explanation: \"Якщо + futur devient якби + passé, et la principale prend le passé + б : я б прийшов.\","
+    },
+    {
+      "id": "uk-a1-locative",
+      "field": "exercises[4].hint",
+      "find": "          prompt: \"Мої діти в ___.\",\n          hint: \"школа\",",
+      "replace": "          prompt: \"Мої діти в ___.\",\n          hint: \"школа, au singulier\","
+    }
+  ]
+}

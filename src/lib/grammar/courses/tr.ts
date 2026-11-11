@@ -2,7 +2,7 @@ import type { GrammarCourse } from "@/lib/schemas/grammar";
 
 export const trCourse = {
   language: "tr",
-  version: "2026-10-25",
+  version: "2026-11-10",
   points: [
     {
       id: "tr-a1-harmony-plural",
@@ -10,9 +10,9 @@ export const trCourse = {
       title: "Harmonie vocalique et pluriel : -lar / -ler",
       summary: "Choisir la bonne voyelle d’un suffixe et former le pluriel des noms.",
       rule: [
-        "Le turc n’a ni article ni genre, et il fonctionne par suffixes collés à la fin du mot. La voyelle du suffixe s’adapte à la dernière voyelle du mot : c’est l’harmonie vocalique, la clé de toute la grammaire.",
-        "Pour le pluriel, il n’y a que deux formes : -lar après a, ı, o, u ; -ler après e, i, ö, ü. On dit kitap → kitaplar (dernière voyelle a), ev → evler (e), göz → gözler (ö). Aucune exception à apprendre, contrairement au français.",
-        "Piège : après un nombre ou après çok (beaucoup), le nom reste au singulier : üç kitap (trois livres), et non üç kitaplar. Le pluriel -lar / -ler sert quand aucun mot ne dit déjà la quantité.",
+        "Le turc n’a pas de genre grammatical ni d’article défini. Bir peut introduire un nom indéfini, comme « un » ou « une ». Beaucoup de suffixes changent de voyelle suivant la dernière voyelle du mot : c’est l’harmonie vocalique.",
+        "Le pluriel a deux formes : -lar après a, ı, o, u et -ler après e, i, ö, ü. Observe kitap → kitaplar, ev → evler et göz → gözler. Certains emprunts font exception : saat → saatler (« heures »).",
+        "Après un nombre, le nom compté reste au singulier : üç kitap (« trois livres »). Avec çok au sens de « beaucoup de », le singulier est courant : çok kitap. Compare Evler çok büyük (« Les maisons sont très grandes »), où çok signifie « très » et porte sur l’adjectif.",
       ],
       table: {
         caption: "Pluriel selon la dernière voyelle",
@@ -54,7 +54,7 @@ export const trCourse = {
         },
         {
           type: "transform",
-          instruction: "Mets la phrase au pluriel.",
+          instruction: "Mets seulement le nom au pluriel. Garde les autres mots dans le même ordre.",
           source: "Bu kitap çok güzel.",
           answers: ["Bu kitaplar çok güzel."],
           explanation: "Kitap prend -lar (dernière voyelle a) ; l’adjectif ne change pas.",
@@ -62,6 +62,7 @@ export const trCourse = {
       ],
       categories: ["agreement", "spelling"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "tr-a1-to-be",
@@ -69,9 +70,9 @@ export const trCourse = {
       title: "Dire qui l’on est : les terminaisons de « être »",
       summary: "Dire « je suis étudiant, tu es fatigué » en collant une terminaison au nom ou à l’adjectif.",
       rule: [
-        "Au présent, le turc n’a pas de verbe « être » séparé : on colle une terminaison personnelle au nom ou à l’adjectif. Ben öğrenciyim signifie « je suis étudiant ». Le pronom sujet est facultatif (öğrenciyim suffit) ; on le garde pour insister.",
+        "Pour dire qui tu es ou comment tu es au présent, on ajoute généralement une terminaison au nom ou à l’adjectif : Ben öğrenciyim (« Je suis étudiant »). Le pronom est facultatif : Öğrenciyim suffit. Ben peut préciser ou mettre en relief la personne.",
         "Les terminaisons suivent l’harmonie à quatre voies : i, ı, u ou ü selon la dernière voyelle du mot (a, ı → ı ; e, i → i ; o, u → u ; ö, ü → ü). Après une voyelle, la 1re personne reçoit un y : öğrenciyim, öğrenciyiz ; après une consonne, non : doktorum, doktoruz.",
-        "À la 3e personne du singulier, il n’y a aucune terminaison : O öğrenci. Au pluriel, on ajoute -ler / -lar : öğrenciler.",
+        "À la 3e personne du singulier, la forme simple n’a pas de terminaison : O öğrenci. Au pluriel, on peut ajouter -ler ou -lar : Onlar öğrenciler. Avec onlar explicite, Onlar öğrenci est aussi possible. On rencontre également -dir, par exemple dans une définition.",
         "Piège : un Français cherche un mot pour « suis, es, est ». En turc, il n’y a rien à ajouter entre le sujet et le nom : Sen Fransızsın, avec la terminaison -sın collée à Fransız.",
       ],
       table: {
@@ -110,20 +111,20 @@ export const trCourse = {
         {
           type: "fill",
           prompt: "Siz çok ___. (fatigués)",
-          hint: "yorgun",
+          hint: "yorgun, avec la terminaison du présent",
           answers: ["yorgunsunuz"],
           explanation: "Pour « vous », la terminaison est -sunuz après u : yorgunsunuz.",
         },
         {
           type: "fill",
           prompt: "Sen ___. (heureux)",
-          hint: "mutlu",
+          hint: "mutlu, avec la terminaison du présent",
           answers: ["mutlusun"],
           explanation: "Pour « tu », la terminaison est -sun après u : mutlusun.",
         },
         {
           type: "transform",
-          instruction: "Remplace « Ben » par « Biz » et adapte la terminaison.",
+          instruction: "Passe à la 1re personne du pluriel. Le pronom « Biz » est facultatif.",
           source: "Ben öğretmenim.",
           answers: ["Biz öğretmeniz.", "Öğretmeniz."],
           explanation: "Öğretmen se termine par une consonne et sa dernière voyelle est e : pour « nous », -iz, donc öğretmeniz.",
@@ -131,6 +132,7 @@ export const trCourse = {
       ],
       categories: ["verb", "agreement"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "tr-a1-locative-ablative-dative",
@@ -140,11 +142,11 @@ export const trCourse = {
       rule: [
         "Trois suffixes remplacent la plupart de nos prépositions de lieu : -de / -da (locatif : à, dans, sur ; où ?), -den / -dan (ablatif : de, depuis ; d’où ?) et -e / -a (datif : vers, à ; vers où ?). Ils suivent l’harmonie à deux voies : a, ı, o, u → a ; e, i, ö, ü → e.",
         "Après f, s, t, k, ç, ş, h, p (retiens fıstıkçı şahap), le d devient t : kitapta, işten, ofiste. Après une voyelle, le datif prend un y : araba → arabaya, mais ev → eve, okul → okula.",
-        "Les noms propres reçoivent une apostrophe avant le suffixe : İstanbul'da, Paris'ten, Ankara'ya. Un seul suffixe remplace les prépositions françaises : evde veut dire « à la maison » ou « dans la maison ». Quelques mots changent leur dernière consonne devant une voyelle (kitap → kitaba).",
+        "Avec un nom de personne ou de lieu comme İstanbul, Paris ou Ankara, sépare le suffixe de cas par une apostrophe : İstanbul'da, Paris'ten, Ankara'ya. Evde peut traduire « à la maison » ou « dans la maison ». Certains mots changent de consonne devant une voyelle : kitap → kitaba.",
       ],
       table: {
         caption: "Les trois suffixes de lieu",
-        headers: ["Cas", "Question", "Normal", "Après f s t k ç ş h p"],
+        headers: ["Cas", "Question", "Exemples", "Autres exemples"],
         rows: [
           ["Locatif -de / -da", "Où ?", "evde, okulda", "kitapta, işte"],
           ["Ablatif -den / -dan", "D’où ?", "evden, okuldan", "kitaptan, işten"],
@@ -167,35 +169,36 @@ export const trCourse = {
         },
         {
           type: "choose",
-          prompt: "Anahtar ___. (dans le livre)",
-          options: ["kitapda", "kitapa", "kitapta"],
+          prompt: "Anahtar ___. (dans le panier)",
+          options: ["sepetde", "sepete", "sepette"],
           answer: 2,
-          explanation: "Après p (consonne sourde), le d du locatif devient t : kitapta.",
+          explanation: "Sepet signifie « panier ». Après t, consonne sourde, le d du locatif devient t : sepette.",
         },
         {
           type: "fill",
           prompt: "Kitap ___. (dans le sac)",
-          hint: "çanta",
+          hint: "çanta, au locatif seul",
           answers: ["çantada"],
           explanation: "Çanta se termine par une voyelle : locatif -da (dernière voyelle a), donc çantada.",
         },
         {
           type: "fill",
           prompt: "Bu mektup ___.",
-          hint: "Ali (pour Ali)",
-          answers: ["Ali'ye", "Aliye"],
+          hint: "Ali, au datif seul (« pour Ali »)",
+          answers: ["Ali'ye"],
           explanation: "Après la voyelle i, le datif s’écrit -ye ; le nom propre prend l’apostrophe : Ali'ye.",
         },
         {
           type: "fill",
           prompt: "Biz ___. (nous sommes d’Ankara)",
           hint: "Ankara + ablatif",
-          answers: ["Ankara'danız", "Ankaradanız"],
+          answers: ["Ankara'danız"],
           explanation: "Ablatif -dan (a) + terminaison « nous sommes » -ız : Ankara'danız.",
         },
       ],
       categories: ["agreement", "spelling", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "tr-a1-var-yok-mi",
@@ -203,10 +206,10 @@ export const trCourse = {
       title: "Il y a, il n’y a pas, et poser une question avec mi",
       summary: "Dire ce qui existe avec var / yok et poser une question oui/non avec la particule mi.",
       rule: [
-        "Var veut dire « il y a, il existe » et yok « il n’y a pas ». On met le lieu au locatif, puis le nom sans article ni pluriel, puis var ou yok : Masada kitap var. Odada televizyon yok. Pas besoin de « ne… pas » : yok suffit.",
-        "Pour une question oui/non, on ajoute la particule mi après le mot sur lequel porte la question, sans changer l’ordre des mots : Kitap var mı (y a-t-il un livre ?). Elle s’écrit séparément et suit l’harmonie à quatre voies (mi, mı, mu, mü) d’après la dernière voyelle du mot précédent.",
-        "Avec « être », la terminaison personnelle se place sur mi, pas sur le mot : Yorgun musun (es-tu fatigué ?), Öğretmen misiniz (êtes-vous professeur ?). On répond evet (oui) ou hayır (non).",
-        "Piège : pas d’inversion ni d’« est-ce que » comme en français. La question garde l’ordre de l’affirmation ; seul mi apparaît.",
+        "Var signifie « il y a » et yok « il n’y a pas ». Pour dire ce qu’on trouve dans un lieu, tu peux mettre le lieu au locatif, puis le nom et var ou yok : Masada kitap var. Odada televizyon yok. Le pluriel est aussi possible : Masada kitaplar var.",
+        "Pour une question oui/non, place la particule mi après le mot sur lequel porte la question : Kitap var mı? Elle s’écrit séparément et s’accorde avec la dernière voyelle du mot précédent : mi, mı, mu ou mü.",
+        "Avec un nom ou un adjectif au présent, les terminaisons de « je », « tu », « nous » et « vous » s’attachent à la particule : Yorgun musun? Öğretmen misiniz? On peut répondre Evet (« oui ») ou Hayır (« non »).",
+        "En français, tu peux dire « est-ce que… » ou inverser le sujet et le verbe. Pour les exemples de cette fiche, garde l’ordre de l’affirmation et place mi après l’élément interrogé.",
       ],
       table: {
         caption: "La particule mi",
@@ -242,20 +245,20 @@ export const trCourse = {
         {
           type: "fill",
           prompt: "Odada televizyon ___.",
-          hint: "il n’y a pas",
+          hint: "« Il n’y a pas » au présent, forme simple",
           answers: ["yok"],
           explanation: "Yok dit qu’il n’y a pas de télévision dans la pièce.",
         },
         {
           type: "fill",
           prompt: "Siz öğretmen ___?",
-          hint: "mi + siniz",
+          hint: "Question au présent avec « siz »",
           answers: ["misiniz"],
-          explanation: "Öğretmen se termine par e : mi, puis la terminaison « vous » -siniz, donc misiniz.",
+          explanation: "La dernière voyelle d’öğretmen est e : écris mi suivi de -siniz, donc misiniz.",
         },
         {
           type: "transform",
-          instruction: "Transforme en question oui/non.",
+          instruction: "Ajoute la particule interrogative à la fin, sans modifier les autres mots.",
           source: "Bu bir okul.",
           answers: ["Bu bir okul mu?"],
           explanation: "On ajoute mi après le mot interrogé ; okul a pour dernière voyelle u, donc mu.",
@@ -263,6 +266,7 @@ export const trCourse = {
       ],
       categories: ["function_word", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "tr-a1-present-continuous",
@@ -270,9 +274,9 @@ export const trCourse = {
       title: "Dire ce qu’on fait : le présent continu -iyor",
       summary: "Conjuguer un verbe au présent continu et placer le verbe en fin de phrase.",
       rule: [
-        "Le présent continu se forme sur le radical du verbe (infinitif sans -mek / -mak : gelmek → gel) avec -iyor, dont la voyelle suit l’harmonie à quatre voies : geliyor, alıyor, görüyor. Si le radical finit par une voyelle, on ajoute -yor : oku → okuyor. Un a / e final devient ı / i : bekle → bekliyor.",
-        "Les terminaisons personnelles se collent après -yor : -um, -sun, rien, -uz, -sunuz, -lar. Le pronom est facultatif. Les verbes en -t perdent leur t : gitmek → gidiyorum (et non gitiyorum).",
-        "Ce temps traduit « je fais » et « je suis en train de faire » ; il sert aussi pour un futur proche. Piège : le verbe se place toujours en dernier : Ben kahve içiyorum, mot à mot « je café bois ». Pour une question, mi précède la terminaison : gidiyor musun.",
+        "Retire -mek ou -mak. Après une consonne, ajoute -ıyor, -iyor, -uyor ou -üyor : alıyor, geliyor, buluyor, görüyor. Après ı, i, u ou ü, ajoute -yor : okuyor. Un a ou un e final se resserre selon l’harmonie : başlıyor, bekliyor, oynuyor, söylüyor. Retiens aussi yiyor et diyor.",
+        "Après -yor, les terminaisons sont -um, -sun, aucune terminaison au singulier à la 3e personne, puis -uz, -sunuz, -lar. Avec onlar, le -lar peut être omis. Retiens gitmek → gidiyorum (t devient d), mais atmak → atıyorum (t reste).",
+        "Ce temps traduit souvent « je fais » ou « je suis en train de faire ». Il peut aussi indiquer une habitude ou un projet. Dans une phrase neutre, place le verbe à la fin : Ben kahve içiyorum. Pour poser une question à « tu », écris par exemple Gidiyor musun?",
       ],
       table: {
         caption: "Présent continu",
@@ -305,42 +309,43 @@ export const trCourse = {
           prompt: "Ali her gün işe ___. (gitmek)",
           options: ["gitiyor", "gidiyor", "gidiyorsun"],
           answer: 1,
-          explanation: "Gitmek perd son t devant une voyelle : gidiyor. À la 3e personne, il n’y a pas de terminaison.",
+          explanation: "Dans gitmek, t devient d devant la voyelle de -iyor : gidiyor. À la 3e personne du singulier, il n’y a pas de terminaison personnelle.",
         },
         {
           type: "fill",
           prompt: "Biz Türkçe ___.",
-          hint: "öğrenmek",
+          hint: "öğrenmek, au présent en -iyor",
           answers: ["öğreniyoruz"],
           explanation: "Radical öğren + iyor + la terminaison « nous » -uz : öğreniyoruz.",
         },
         {
           type: "fill",
           prompt: "Sen ne ___?",
-          hint: "yapmak",
+          hint: "yapmak, au présent en -iyor",
           answers: ["yapıyorsun"],
           explanation: "Radical yap : dernière voyelle a → ı, puis -yor + -sun : yapıyorsun.",
         },
         {
           type: "transform",
-          instruction: "Remplace « Ben » par « Onlar » et conjugue le verbe.",
+          instruction: "Remplace « Ben » par « Onlar ». Garde le lieu à la même place et adapte le verbe.",
           source: "Ben Ankara'ya gidiyorum.",
-          answers: ["Onlar Ankara'ya gidiyorlar.", "Onlar Ankaraya gidiyorlar."],
-          explanation: "Pour « onlar », la terminaison est -lar après -yor : gidiyorlar.",
+          answers: ["Onlar Ankara'ya gidiyorlar.", "Onlar Ankara'ya gidiyor."],
+          explanation: "Avec onlar, on peut dire gidiyorlar ou gidiyor. Écris Ankara'ya avec l’apostrophe du nom de lieu.",
         },
       ],
       categories: ["verb", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "tr-a1-accusative",
       level: "A1",
-      title: "L’objet défini : l’accusatif -i",
+      title: "Marquer l’objet direct avec l’accusatif -i",
       summary: "Marquer l’objet précis (le livre, Ali, cette voiture) avec le suffixe -i.",
       rule: [
-        "Le complément d’objet direct précis prend le suffixe -(y)i, à quatre voies : -ı, -i, -u, -ü. Après une voyelle, on ajoute y : kitabı, evi, okulu, gözü, arabayı, kediyi. Les noms propres prennent l’apostrophe : Ali'yi.",
-        "Le suffixe s’emploie seulement quand l’objet est précis : avec bu / şu / o (ce), un possessif ou un nom propre. Un objet non précis reste nu : Kahve içiyorum (« je bois du café »), mais Bu kahveyi içiyorum (« je bois ce café »).",
-        "Piège : le turc n’a pas d’article, mais le suffixe joue un peu le rôle de « le / la ». Bir kitap (un livre) reste sans suffixe, tandis que kitabı (le livre en question) en prend un. Autre point : p, ç, k finaux changent devant une voyelle : kitap → kitabı, çocuk → çocuğu.",
+        "L’accusatif de l’objet direct a quatre voyelles possibles : -ı, -i, -u, -ü. Sur un nom simple qui finit par une voyelle, ajoute y : araba → arabayı, kedi → kediyi. Sur un nom propre, écris l’apostrophe : Ali'yi. Après un possessif de 3e personne, le lien se fait avec n : arabası → arabasını.",
+        "L’accusatif marque notamment les objets identifiés : un nom précédé de bu, şu ou o, un nom propre ou un nom avec un possessif. Compare Kahve içiyorum (« Je bois du café ») et Bu kahveyi içiyorum (« Je bois ce café »). L’objet nu sans suffixe se place juste avant le verbe.",
+        "Bir kitap okuyorum évoque un livre sans préciser lequel. Bir kitabı okuyorum peut viser un livre particulier, même avec bir. Devant la voyelle du suffixe, certaines consonnes changent : kitap → kitabı, çocuk → çocuğu, ağaç → ağacı. D’autres restent telles quelles : top → topu.",
       ],
       table: {
         caption: "Accusatif",
@@ -383,13 +388,13 @@ export const trCourse = {
         {
           type: "fill",
           prompt: "Biz bu ___ seviyoruz.",
-          hint: "şarkı",
+          hint: "şarkı, au singulier",
           answers: ["şarkıyı"],
           explanation: "Şarkı se termine par une voyelle (ı) : on ajoute -yı, donc şarkıyı.",
         },
         {
           type: "transform",
-          instruction: "Remplace « kahve » par « bu kahve » (ce café).",
+          instruction: "Remplace « kahve » par « bu kahve » à la même place et adapte le cas. « Ben » est facultatif.",
           source: "Ben kahve içiyorum.",
           answers: ["Ben bu kahveyi içiyorum.", "Bu kahveyi içiyorum."],
           explanation: "Avec bu, l’objet est précis : kahve + yi, donc kahveyi.",
@@ -397,6 +402,7 @@ export const trCourse = {
       ],
       categories: ["agreement", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "tr-a2-possessive-genitive",
@@ -404,9 +410,9 @@ export const trCourse = {
       title: "Dire à qui est quoi : suffixes possessifs et génitif",
       summary: "Dire « ma voiture », « la maison d’Ali » et « j’ai une voiture ».",
       rule: [
-        "Pour dire « mon, ton, son… », on colle un suffixe possessif au nom : ev → evim, evin, evi, evimiz, eviniz, evleri. Après une voyelle, la voyelle du suffixe tombe (arabam, araban, arabamız) et la 3e personne prend -sı (arabası).",
-        "Le possesseur se met devant au génitif : benim, senin, onun, bizim, sizin, onların. Pour un pronom, il est facultatif : (benim) arabam. Pour un nom, il est obligatoire : Ali'nin arabası (la voiture d’Ali). Le génitif est -in / -ın / -un / -ün, et -nin etc. après une voyelle : evin, kızın, Ali'nin.",
-        "Piège : le turc marque les deux mots : le possesseur au génitif et le possédé avec le suffixe possessif (evin kapısı, « de la maison la porte-sa »). Il n’y a pas de verbe « avoir » : on dit Benim arabam var (« ma voiture existe ») et Benim arabam yok (« je n’ai pas de voiture »).",
+        "Pour dire « mon, ton, son… », on ajoute un suffixe au nom : evim, evin, evi, evimiz, eviniz, evleri. Après une voyelle finale, on dit arabam, araban, arabamız, arabanız. À la 3e personne du singulier, ajoute s et la voyelle harmonisée : arabası, kedisi.",
+        "Le possesseur se place devant le nom. On peut omettre un pronom quand le suffixe suffit : (benim) arabam. Pour nommer le possesseur, emploie le génitif : Ali'nin arabası. Le génitif est -ın, -in, -un ou -ün, avec n après une voyelle (evin, kızın, Ali'nin). Pronominalement : benim, senin, onun, bizim, sizin, onların.",
+        "Dans evin kapısı (« la porte de la maison »), evin est au génitif et kapısı porte le suffixe possessif. Pour rendre « j’ai » et « je n’ai pas », utilise souvent le possessif avec var ou yok : Arabam var (« J’ai une voiture »), Arabam yok (« Je n’ai pas de voiture »).",
       ],
       table: {
         caption: "Suffixes possessifs",
@@ -459,12 +465,13 @@ export const trCourse = {
           type: "transform",
           instruction: "Remplace « Benim » par « Ali'nin » et adapte le nom.",
           source: "Benim arabam yeni.",
-          answers: ["Ali'nin arabası yeni.", "Alinin arabası yeni."],
+          answers: ["Ali'nin arabası yeni."],
           explanation: "Avec un possesseur à la 3e personne, le nom prend -sı : arabası.",
         },
       ],
       categories: ["agreement", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "tr-a2-past",
@@ -474,7 +481,7 @@ export const trCourse = {
       rule: [
         "Le passé se forme avec -di à quatre voies (-dı, -di, -du, -dü) collé au radical : gel → geldi, al → aldı, oku → okudu, gör → gördü. Après f, s, t, k, ç, ş, h, p, le d devient t : yap → yaptı, çalış → çalıştı, git → gitti.",
         "Les terminaisons ne sont pas celles de « être » : -m, -n, rien, -k, -nız (à quatre voies), -ler / -lar. Geldim, geldin, geldi, geldik, geldiniz, geldiler.",
-        "Une seule forme couvre le passé composé et le passé simple français. Pour dire « j’étais » (état), on ajoute -ydi au nom : Dün evdeydim. Piège : pas d’auxiliaire, donc pas de choix entre avoir et être comme en français.",
+        "Le passé en -di peut traduire le passé composé ou le passé simple. Pour dire « j’étais » après un nom, un adjectif ou un lieu, utilise -di et ses variantes, avec y après une voyelle : Dün evdeydim. Compare Yorgundum (« J’étais fatigué »). Il n’y a pas d’auxiliaire à choisir comme en français.",
       ],
       table: {
         caption: "Passé en -di",
@@ -512,20 +519,20 @@ export const trCourse = {
         {
           type: "fill",
           prompt: "Biz sinemada film ___.",
-          hint: "izlemek",
+          hint: "izlemek, au passé en -di",
           answers: ["izledik"],
           explanation: "Radical izle + di + k : izledik.",
         },
         {
           type: "fill",
           prompt: "O dün çok ___.",
-          hint: "çalışmak",
+          hint: "çalışmak, au passé en -di",
           answers: ["çalıştı"],
           explanation: "Après ş (sourd), le d devient t ; la voyelle suit a → ı : çalıştı.",
         },
         {
           type: "transform",
-          instruction: "Mets la phrase au passé.",
+          instruction: "Mets le verbe au passé en -di. Garde le sujet, le complément et leur ordre.",
           source: "Ali kahve içiyor.",
           answers: ["Ali kahve içti."],
           explanation: "Après ç (sourd), -ti : içti. À la 3e personne, il n’y a pas de terminaison.",
@@ -533,6 +540,7 @@ export const trCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "tr-a2-future",
@@ -542,7 +550,7 @@ export const trCourse = {
       rule: [
         "Le futur se forme avec -ecek / -acak (harmonie à deux voies) collé au radical : gel → gelecek, al → alacak. Après une voyelle, on ajoute y : oku → okuyacak.",
         "Devant une terminaison qui commence par une voyelle, le k final devient ğ : geleceğim, alacağız. Les autres personnes gardent le k : geleceksin, gelecek, geleceksiniz, gelecekler.",
-        "Les terminaisons sont celles de « être » : -im, -sin, rien, -iz, -siniz, -ler. Les verbes en -t perdent leur t : gitmek → gideceğim. Piège : le ğ s’écrit toujours, même s’il s’entend à peine. On peut aussi utiliser le présent continu pour un projet proche : Yarın geliyorum.",
+        "Les terminaisons ressemblent à celles de « être » : -im, -sin, rien à la 3e personne du singulier, puis -iz, -siniz et -ler, avec leurs variantes. Dans gitmek, t devient d : gideceğim. Écris le ğ de la 1re personne même s’il est peu perceptible. Pour un projet proche, Yarın geliyorum est aussi courant.",
       ],
       table: {
         caption: "Futur en -ecek / -acak",
@@ -580,20 +588,20 @@ export const trCourse = {
         {
           type: "fill",
           prompt: "Sen yarın ne ___?",
-          hint: "yapmak",
+          hint: "yapmak, au futur en -ecek / -acak",
           answers: ["yapacaksın"],
           explanation: "Yap + acak + sın : le k reste devant la consonne s : yapacaksın.",
         },
         {
           type: "fill",
           prompt: "Ben bu akşam kitap ___.",
-          hint: "okumak",
+          hint: "okumak, au futur en -ecek / -acak",
           answers: ["okuyacağım"],
           explanation: "Oku se termine par une voyelle : on ajoute y, puis -acak ; le k devient ğ devant -ım : okuyacağım.",
         },
         {
           type: "transform",
-          instruction: "Mets la phrase au futur.",
+          instruction: "Mets le verbe au futur en -ecek / -acak. Garde les autres mots dans le même ordre.",
           source: "Ali işe gidiyor.",
           answers: ["Ali işe gidecek."],
           explanation: "Git devient gid- devant une voyelle ; à la 3e personne, pas de terminaison : gidecek.",
@@ -601,6 +609,7 @@ export const trCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "tr-a2-negation",
@@ -610,7 +619,7 @@ export const trCourse = {
       rule: [
         "La négation du verbe s’insère juste après le radical : -me / -ma (deux voies), avant le temps et la personne. Geldim → gelmedim ; geleceğim → gelmeyeceğim (y entre deux voyelles).",
         "Devant -iyor, la voyelle -e / -a disparaît et la voyelle suit l’harmonie : gelmiyor, almıyorum, gitmiyorum. Pour un nom ou un adjectif, on emploie değil + la terminaison : öğrenci değilim, yorgun değil. Pour « il y a », yok remplace var.",
-        "Piège : pas de petit mot comme « pas » après le verbe ; tout se passe à l’intérieur du verbe. Écris -miyor et non -meyor.",
+        "Pour nier les formes verbales étudiées ici, place le suffixe à l’intérieur du verbe. Compare geliyorum et gelmiyorum. Pour nier un nom ou un adjectif, écris değil séparément : yorgun değilim.",
       ],
       table: {
         caption: "Affirmatif et négatif",
@@ -626,7 +635,7 @@ export const trCourse = {
       examples: [
         { text: "Ben bugün işe gitmiyorum.", translation: "Je ne vais pas au travail aujourd’hui.", note: "git + mi + yor : la négation vient avant -yor." },
         { text: "Ali dün okula gelmedi.", translation: "Ali n’est pas venu à l’école hier.", note: "gel + me + di." },
-        { text: "Biz yarın çalışmayacağız.", translation: "Nous ne travaillerons pas demain.", note: "me + y + acağız : y entre deux voyelles." },
+        { text: "Biz yarın çalışmayacağız.", translation: "Nous ne travaillerons pas demain.", note: "çalış + ma + y + acağız : y relie deux voyelles." },
         { text: "Ben öğrenci değilim.", translation: "Je ne suis pas étudiant.", note: "değil porte la terminaison de « être »." },
       ],
       exercises: [
@@ -654,20 +663,21 @@ export const trCourse = {
         {
           type: "fill",
           prompt: "Ben yorgun ___.",
-          hint: "pas, avec la terminaison",
+          hint: "Négation de « être fatigué » au présent",
           answers: ["değilim"],
           explanation: "Değil prend la terminaison de « être » : değilim.",
         },
         {
           type: "transform",
-          instruction: "Mets la phrase à la forme négative.",
+          instruction: "Mets seulement le verbe à la forme négative. Garde le sujet et le lieu.",
           source: "Ayşe Ankara'ya gidiyor.",
-          answers: ["Ayşe Ankara'ya gitmiyor.", "Ayşe Ankaraya gitmiyor."],
+          answers: ["Ayşe Ankara'ya gitmiyor."],
           explanation: "Le radical est git (le t ne change pas devant une consonne) : git + mi + yor.",
         },
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "tr-a2-aorist",
@@ -675,9 +685,9 @@ export const trCourse = {
       title: "Habitudes et propositions polies : l’aoriste",
       summary: "Dire ce qu’on fait d’habitude et proposer poliment avec -r / -ir / -er.",
       rule: [
-        "L’aoriste exprime les habitudes, les vérités générales et les offres polies (Çay içer misiniz, « voulez-vous du thé ? »). Après une voyelle, on ajoute -r (okur, anlar) ; après une consonne, -ir / -ır / -ur / -ür pour les verbes de plus d’une syllabe (çalışır, öğrenir) et pour quelques verbes courts : gelir, alır, görür, bilir, kalır, olur, verir.",
-        "Les autres verbes d’une syllabe prennent -er / -ar : yapar, içer, gider, bakar, yazar, kalkar. Terminaisons : -im, -sin, rien, -iz, -siniz, -ler / -lar : yaparım, yaparsın, yapar, yaparız, yaparsınız, yaparlar.",
-        "Le négatif est particulier : -mez / -maz, avec gelmem, gelmezsin, gelmez, gelmeyiz, gelmezsiniz, gelmezler. Piège : ne confonds pas avec le présent continu : Kahve içerim dit ce que tu fais d’habitude, Kahve içiyorum ce que tu fais maintenant.",
+        "L’aoriste exprime notamment les habitudes, les vérités générales et les offres polies : Çay içer misiniz? Après un radical qui finit par une voyelle, ajoute -r : okur, anlar. Après une consonne, un radical de plusieurs syllabes prend généralement -ır, -ir, -ur ou -ür : çalışır, öğrenir.",
+        "Les radicaux d’une syllabe prennent en général -ar ou -er : yapar, içer, gider. Treize formes courantes font exception : alır, bilir, bulur, durur, gelir, görür, kalır, olur, ölür, sanır, varır, verir, vurur.",
+        "Au négatif, on trouve -maz ou -mez, avec des formes particulières pour « je » et « nous » : gelmem, gelmezsin, gelmez, gelmeyiz, gelmezsiniz, gelmezler. Kahve içerim évoque une habitude. Kahve içiyorum peut décrire l’action actuelle ou, avec Her sabah, une habitude.",
       ],
       table: {
         caption: "Aoriste affirmatif",
@@ -715,20 +725,20 @@ export const trCourse = {
         {
           type: "fill",
           prompt: "O her gün erken ___.",
-          hint: "kalkmak",
+          hint: "kalkmak, à l’aoriste",
           answers: ["kalkar"],
           explanation: "Kalk est un verbe d’une syllabe qui prend -ar : kalkar.",
         },
         {
           type: "fill",
           prompt: "Ben sabahları çok ___.",
-          hint: "çalışmak",
+          hint: "çalışmak, à l’aoriste",
           answers: ["çalışırım"],
-          explanation: "Çalışmak a deux syllabes : -ır, puis -ım : çalışırım.",
+          explanation: "Le radical çalış a deux syllabes. Il prend -ır, puis la terminaison -ım : çalışırım.",
         },
         {
           type: "transform",
-          instruction: "Mets la phrase à la forme négative.",
+          instruction: "Mets seulement le verbe à l’aoriste négatif. Garde les autres mots à la même place.",
           source: "Ali et yer.",
           answers: ["Ali et yemez."],
           explanation: "Le négatif de l’aoriste est -mez : ye + mez, donc yemez.",
@@ -736,6 +746,7 @@ export const trCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "tr-a2-ability",
@@ -743,9 +754,9 @@ export const trCourse = {
       title: "Pouvoir et savoir : -ebil et son négatif",
       summary: "Dire « je peux », « je sais » avec -ebil, et « je ne peux pas » avec -eme.",
       rule: [
-        "Pour « pouvoir » ou « savoir », on insère -ebil / -abil entre le radical et le temps : gel + ebil + ir + im → gelebilirim (« je peux venir »), yap + abil + iyor + um → yapabiliyorum. Ce suffixe devient un verbe à part entière et se conjugue : gelebildim.",
-        "Le négatif n’est pas -ebilme-, mais -e / -a (avec y après une voyelle) suivi de -me : gelemem (« je ne peux pas venir »), yapamıyorum, okuyamadım. Ne confonds pas avec gelmem, qui veut dire « je ne viens pas ».",
-        "La forme polie est un grand classique pour demander quelque chose : Pencereyi açabilir misiniz (« pouvez-vous ouvrir la fenêtre ? »). Piège : un Français pense « ne pas + pouvoir » ; en turc, un suffixe spécial remplace -ebil au négatif.",
+        "Pour exprimer la capacité ou la possibilité, ajoute -ebil ou -abil au radical, avec y après une voyelle : gelebilirim (« Je peux venir »), okuyabilirim (« Je peux lire »). Puis conjugue normalement : yapabiliyorum (« Je suis capable de le faire »), gelebildim (« J’ai pu venir »).",
+        "Pour exprimer l’impossibilité, ajoute -(y)a ou -(y)e suivi de la négation : gelemem, yapamıyorum, okuyamadım. Compare gelmem (« Je ne viens pas ») et gelemem (« Je ne peux pas venir »). Gelmeyebilirim signifie autre chose : « Il se peut que je ne vienne pas ».",
+        "Pour faire une demande polie, emploie souvent la forme de possibilité à l’aoriste avec la particule interrogative : Pencereyi açabilir misiniz? (« Pouvez-vous ouvrir la fenêtre ? »).",
       ],
       table: {
         caption: "Capacité : affirmatif et négatif",
@@ -783,20 +794,20 @@ export const trCourse = {
         {
           type: "fill",
           prompt: "Pencereyi ___ misiniz?",
-          hint: "açmak (pouvoir)",
+          hint: "açmak, possibilité à l’aoriste",
           answers: ["açabilir"],
           explanation: "Aç + abil + ir, suivi de mi + siniz : açabilir misiniz.",
         },
         {
           type: "fill",
           prompt: "Üzgünüm, bunu ___.",
-          hint: "yapmak (je ne peux pas)",
+          hint: "yapmak, impossibilité à l’aoriste (je)",
           answers: ["yapamam"],
           explanation: "Yap + a + ma + m : yapamam.",
         },
         {
           type: "transform",
-          instruction: "Exprime la possibilité avec -ebil / -abil.",
+          instruction: "Ajoute la possibilité au verbe en gardant l’aoriste et le reste de la phrase. « Ben » est facultatif.",
           source: "Ben yarın gelirim.",
           answers: ["Ben yarın gelebilirim.", "Yarın gelebilirim."],
           explanation: "On insère -ebil avant l’aoriste : gel + ebil + ir + im.",
@@ -804,6 +815,7 @@ export const trCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "tr-b1-necessity",
@@ -812,8 +824,8 @@ export const trCourse = {
       summary: "Dire ce qu’on doit faire avec -meli, lazım, gerek ou zorunda.",
       rule: [
         "Le suffixe -meli / -malı (deux voies) exprime le devoir ou le conseil : gel + meli + yim → gelmeliyim. Terminaisons de « être » : gelmeliyim, gelmelisin, gelmeli, gelmeliyiz, gelmelisiniz, gelmeliler. Négatif : gelmemeli.",
-        "On peut aussi dire « il faut que » avec lazım ou gerek : le verbe prend -me et le suffixe possessif du sujet : gitmem lazım (« il faut que j’aille »), gitmen gerek, gitmesi lazım. Pour une obligation qui vient de l’extérieur, on dit gitmek zorundayım (« je suis obligé d’aller »).",
-        "Piège : en français, « il faut que » appelle le subjonctif ; en turc, le verbe devient un nom d’action (gitme-) avec le suffixe du sujet. Pour le passé, on ajoute -ydi : gelmeliydim (« j’aurais dû venir »).",
+        "Avec lazım ou gerek (« il faut »), emploie un nom verbal en -ma ou -me avec un suffixe possessif qui indique la personne : gitmem lazım (« il faut que j’aille »), gitmen gerek, gitmesi lazım. Gitmek zorundayım signifie « je suis obligé d’aller » et exprime une obligation forte.",
+        "Après « il faut que », le français emploie le subjonctif. Dans gitmem lazım, le turc indique le sujet avec le suffixe du nom verbal. Pour situer un devoir dans le passé, compare gelmeliyim et gelmeliydim (« je devais venir » ou « j’aurais dû venir », selon le contexte).",
       ],
       table: {
         caption: "Devoir : -meli et lazım",
@@ -843,28 +855,28 @@ export const trCourse = {
         },
         {
           type: "choose",
-          prompt: "Yarın erken kalkmam ___.",
+          prompt: "Yarın erken kalkmam ___. (Il faut que je me lève tôt demain.)",
           options: ["için", "ile", "lazım"],
           answer: 2,
           explanation: "Lazım (ou gerek) exprime la nécessité : kalkmam lazım = il faut que je me lève.",
         },
         {
           type: "fill",
-          prompt: "Biz yarın erken ___ gerek.",
-          hint: "kalkmak",
+          prompt: "Bizim yarın erken ___ gerek.",
+          hint: "kalkmak, nom verbal pour « nous »",
           answers: ["kalkmamız"],
           explanation: "Kalk + ma + mız : le suffixe de « nous » donne kalkmamız.",
         },
         {
           type: "fill",
           prompt: "Siz doktora ___.",
-          hint: "gitmek (devoir)",
+          hint: "gitmek, avec -meli / -malı",
           answers: ["gitmelisiniz"],
           explanation: "Git + meli + siniz : gitmelisiniz.",
         },
         {
           type: "transform",
-          instruction: "Mets la phrase à la forme négative.",
+          instruction: "Mets seulement le verbe en -meli à la forme négative. Garde les autres mots au même endroit.",
           source: "Çok kahve içmelisin.",
           answers: ["Çok kahve içmemelisin."],
           explanation: "Le négatif se place après le radical : iç + me + meli + sin.",
@@ -872,6 +884,7 @@ export const trCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "tr-b1-infinitive",
@@ -880,8 +893,8 @@ export const trCourse = {
       summary: "Choisir la bonne forme de l’infinitif après vouloir, aimer, commencer et « pour ».",
       rule: [
         "L’infinitif turc finit par -mek / -mak (gelmek, almak). Il se comporte comme un nom : Türkçe öğrenmek zor (« apprendre le turc est difficile »). Avec istemek (vouloir), il reste tel quel : Gitmek istiyorum.",
-        "Avec d’autres verbes, il prend un cas, comme un nom : sevmek réclame l’accusatif -meyi / -mayı (le k devient y) : Yüzmeyi seviyorum. Başlamak réclame le datif -meye / -maya : Çalışmaya başladım. Pour « pour + infinitif », on dit -mek için : Öğrenmek için okuyorum.",
-        "Piège : le français met l’infinitif directement après le verbe (j’aime nager). En turc, la forme dépend du verbe principal. Retiens trois modèles : -mek (istemek), -meyi (sevmek) et -meye (başlamak).",
+        "Après sevmek, emploie le nom verbal en -me ou -ma à l’accusatif : Yüzmeyi seviyorum. Après başlamak, mets ce nom verbal au datif : Çalışmaya başladım. Le y relie deux voyelles dans -meyi ou -meye. Pour exprimer le but d’une action avec le même sujet, on peut employer -mek ou -mak suivi de için.",
+        "En français, « j’aime nager » contient un infinitif nu. Retiens les trois constructions turques de cette fiche : gitmek istiyorum, yüzmeyi seviyorum et çalışmaya başladım. Elles se distinguent par la forme du complément.",
       ],
       table: {
         caption: "L’infinitif après certains verbes",
@@ -912,7 +925,7 @@ export const trCourse = {
           prompt: "Ben müzik ___ seviyorum. (écouter)",
           options: ["dinlemek", "dinlemeyi", "dinlemeye"],
           answer: 1,
-          explanation: "Sevmek demande l’accusatif : dinlemek devient dinlemeyi.",
+          explanation: "Avec sevmek, mets le nom verbal en -me à l’accusatif : dinle + me + yi donne dinlemeyi.",
         },
         {
           type: "choose",
@@ -924,20 +937,21 @@ export const trCourse = {
         {
           type: "fill",
           prompt: "Ben ___ çok seviyorum.",
-          hint: "yüzmek + accusatif",
+          hint: "yüzmek, nom verbal à l’accusatif",
           answers: ["yüzmeyi"],
-          explanation: "L’infinitif prend l’accusatif devant sevmek : yüzmek → yüzmeyi.",
+          explanation: "Yüz + me + yi donne yüzmeyi. Le complément de seviyorum est à l’accusatif.",
         },
         {
           type: "fill",
           prompt: "Çok para ___ için çalışıyorum.",
-          hint: "kazanmak",
+          hint: "Radical kazan-, à l’infinitif",
           answers: ["kazanmak"],
           explanation: "« Pour + infinitif » se dit -mek için : kazanmak için.",
         },
       ],
       categories: ["verb", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "tr-b1-ken",
@@ -945,9 +959,9 @@ export const trCourse = {
       title: "Pendant que : le suffixe -ken",
       summary: "Dire que deux choses ont lieu en même temps avec -ken (yürürken, çocukken).",
       rule: [
-        "Le suffixe -ken (invariable, sans harmonie) veut dire « pendant que, quand ». Il se colle à l’aoriste, à un nom ou à un adjectif : yürür + ken → yürürken (« en marchant »), çocuk + ken → çocukken (« quand j’étais enfant »). Après une voyelle, on intercale y : öğrenciyken, evdeyken.",
-        "Le sujet est le même dans les deux propositions, et la personne ne se marque que sur le verbe principal : Yürürken müzik dinlerim. Le -ken lui-même ne porte aucune terminaison.",
-        "Piège : le français emploie un gérondif ou « quand, pendant que » avec une proposition conjuguée. Le turc n’a qu’un petit suffixe, sans conjonction. Pour « quand j’étais enfant », on garde la forme nominale : çocukken.",
+        "-Ken est invariable. On peut l’ajouter à un nom, à un adjectif ou à une base verbale, souvent à l’aoriste : yürürken (« en marchant »), çocukken (« quand j’étais enfant »). Après une voyelle, on intercale y : öğrenciyken, evdeyken. Iken peut aussi s’écrire séparément : öğrenci iken.",
+        "-Ken ne marque pas la personne. Les deux propositions peuvent partager le même sujet : Yürürken müzik dinlerim. Elles peuvent aussi avoir des sujets différents : Ben çalışırken Ali uyuyordu (« Ali dormait pendant que je travaillais »).",
+        "En français, « en marchant » et « pendant que je marche » sont deux constructions distinctes. En turc, -ken peut convenir dans les deux cas. Le temps se comprend grâce au contexte et à la principale : Öğrenciyken Paris'te yaşadım se comprend au passé grâce à yaşadım.",
       ],
       table: {
         caption: "-ken avec différents mots",
@@ -990,13 +1004,14 @@ export const trCourse = {
         {
           type: "fill",
           prompt: "Ali kahve ___ gazete okur.",
-          hint: "içmek, aoriste + -ken",
+          hint: "içmek, aoriste suivi de -ken soudé",
           answers: ["içerken"],
           explanation: "İç + er (aoriste) + ken : içerken.",
         },
       ],
       categories: ["verb", "function_word"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "tr-b1-participles",
@@ -1004,9 +1019,9 @@ export const trCourse = {
       title: "Les propositions relatives : -en et -dik",
       summary: "Dire « l’homme qui attend » et « le livre que j’ai acheté » avec des participes.",
       rule: [
-        "Le turc n’a pas de pronom relatif (qui, que). La relative se place avant le nom et son verbe devient un participe. Pour le sujet (« qui »), on emploie -en / -an : gelen adam (« l’homme qui vient »), kitap okuyan çocuk (« l’enfant qui lit un livre »).",
-        "Pour les autres cas (« que »), on emploie -dik (-dık, -dik, -duk, -dük, ou -t- après consonne sourde) avec le suffixe possessif du sujet de la relative : benim aldığım kitap (« le livre que j’ai acheté »), Ali'nin yazdığı mektup. Le k devient ğ devant le suffixe. Pour le futur, on emploie -ecek : alacağım kitap.",
-        "Piège : l’ordre est inverse de celui du français : la relative entière précède le nom. Dün aldığım kitap = « hier acheté-mon livre ». Le sujet est facultatif quand il est évident.",
+        "Dans les relatives de cette fiche, le verbe prend une forme participiale et le groupe relatif précède le nom. Quand ce nom est le sujet du verbe de la relative, emploie souvent -en ou -an : gelen adam (« l’homme qui vient »), kitap okuyan çocuk (« l’enfant qui lit un livre »).",
+        "Quand le nom est, par exemple, l’objet du verbe, emploie souvent -dik et ses variantes, avec le possessif qui indique le sujet : aldığım kitap (« le livre que j’ai acheté »), sevdiğim şarkı (« la chanson que j’aime »). Le k devient ğ devant la voyelle du suffixe. Pour un événement futur : alacağım kitap.",
+        "Dans les relatives en -dik, le sujet exprimé prend le génitif : Ali'nin yazdığı mektup. Il peut être omis quand il est évident : Dün aldığım kitap (« le livre que j’ai acheté hier »). En français, la relative suit le nom. En turc, elle le précède.",
       ],
       table: {
         caption: "Deux types de participes",
@@ -1028,7 +1043,7 @@ export const trCourse = {
       exercises: [
         {
           type: "choose",
-          prompt: "Kapıda ___ adam benim arkadaşım. (qui attend)",
+          prompt: "Kapıda ___ adam benim arkadaşım. (qui attend en ce moment)",
           options: ["beklediğim", "bekleyecek", "bekleyen"],
           answer: 2,
           explanation: "L’homme est le sujet de « attendre » : participe en -en, donc bekleyen.",
@@ -1050,20 +1065,21 @@ export const trCourse = {
         {
           type: "fill",
           prompt: "Burada ___ insanlar çok nazik. (qui travaillent)",
-          hint: "çalışmak",
+          hint: "çalışmak, participe sujet en -en / -an",
           answers: ["çalışan"],
           explanation: "Sujet de la relative : çalış + an.",
         },
         {
           type: "fill",
           prompt: "Senin ___ yemek çok güzel. (que tu as préparé)",
-          hint: "yapmak",
+          hint: "yapmak, participe en -dik avec « tu »",
           answers: ["yaptığın"],
           explanation: "Yap + tığ + ın : le d devient t après p, et le suffixe est celui de « tu ».",
         },
       ],
       categories: ["verb", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "tr-b1-conditional",
@@ -1071,9 +1087,9 @@ export const trCourse = {
       title: "La condition réelle : -se",
       summary: "Dire « si tu viens », « si tu es fatigué », « si tu as le temps » avec -se.",
       rule: [
-        "La condition réelle se forme avec -se / -sa (deux voies) collé à l’aoriste, à un nom, à un adjectif ou à var / yok, suivi de la terminaison personnelle : gelirsem (si je viens), gelirsen, gelirse, gelirsek, gelirseniz, gelirlerse. Pour un adjectif ou un nom, on ajoute directement -sa : yorgunsan, vaktin varsa.",
-        "La proposition conditionnelle précède la principale, sans « si » séparé (eğer est facultatif) : Yağmur yağarsa evde kalırım (« s’il pleut, je reste à la maison »). Le négatif utilise l’aoriste négatif : gelmezsen (si tu ne viens pas).",
-        "Piège : en français, « si » est suivi du présent ; en turc, tout est dans le suffixe qui se colle au verbe, avec les mêmes terminaisons personnelles. N’ajoute pas de mot pour « si » à la place.",
+        "Pour une condition réelle, ajoute -se ou -sa à l’aoriste : gelirsem (« si je viens »), gelirsen, gelirse, gelirsek, gelirseniz, gelirlerse. On peut aussi l’ajouter à un nom, à un adjectif ou à var ou yok : yorgunsan, vaktin varsa. Après une voyelle, ajoute y : öğrenciysen.",
+        "La condition se place souvent avant la principale : Yağmur yağarsa evde kalırım (« S’il pleut, je reste à la maison »). Eğer (« si ») peut s’ajouter au début. Pour nier la condition, utilise par exemple l’aoriste négatif : gelmezsen (« si tu ne viens pas »).",
+        "En français, « si » introduit la condition. En turc, le suffixe suffit souvent, même sans eğer. Écris la condition sans virgule immédiatement après le suffixe : Yorgunsan eve gidebilirsin.",
       ],
       table: {
         caption: "-se avec un verbe et avec un adjectif",
@@ -1110,21 +1126,21 @@ export const trCourse = {
         },
         {
           type: "fill",
-          prompt: "Sen yarın ___, ben de gelirim.",
-          hint: "gelmek, si",
+          prompt: "Sen yarın ___ ben de gelirim.",
+          hint: "gelmek, aoriste suivi du suffixe de condition",
           answers: ["gelirsen"],
           explanation: "Gel + ir (aoriste) + sen : gelirsen.",
         },
         {
           type: "fill",
           prompt: "Zamanın ___ sinemaya gideriz.",
-          hint: "var, si",
+          hint: "var, avec le suffixe de condition soudé",
           answers: ["varsa"],
           explanation: "Var + sa : varsa, « s’il y a (du temps) ».",
         },
         {
           type: "transform",
-          instruction: "Mets les deux verbes à la forme négative.",
+          instruction: "Mets seulement les deux verbes à la forme négative. Garde l’ordre et les pronoms.",
           source: "Sen gelirsen ben de gelirim.",
           answers: ["Sen gelmezsen ben de gelmem."],
           explanation: "Le négatif de l’aoriste est -mez (gelmezsen) et, à la 1re personne, -m (gelmem).",
@@ -1132,6 +1148,7 @@ export const trCourse = {
       ],
       categories: ["verb"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
     {
       id: "tr-b1-converbs",
@@ -1139,9 +1156,9 @@ export const trCourse = {
       title: "Enchaîner des actions : -ip et -erek",
       summary: "Relier deux actions avec -ip (et puis) et dire comment avec -erek (en…ant).",
       rule: [
-        "Le suffixe -ip (-ıp, -up, -üp) relie deux actions qui se suivent, comme « et puis » : eve gelip yemek yedim (« je suis rentré et j’ai mangé »). Seul le dernier verbe porte le temps et la personne ; les autres restent à cette forme invariable.",
+        "-Ip, -ıp, -up ou -üp relie des actions. Il rend souvent « et puis », comme dans Eve gelip yemek yedim (« Je suis rentré et j’ai mangé »). Il peut aussi relier des actions concomitantes, comme gülüp eğlenmek (« rire et s’amuser »). La forme en -ip ne marque ni le temps ni la personne.",
         "Le suffixe -erek / -arak exprime la manière ou le moyen, comme le gérondif français : yürüyerek gitmek (« aller à pied », « en marchant »), Türkçe konuşarak öğrenmek. Après une voyelle, un y est inséré : okuyup, okuyarak.",
-        "Piège : le français répète « et » et la conjugaison (je me suis levé et j’ai pris…). En turc, la chaîne a le même sujet du début à la fin, et le temps n’est dit qu’une fois, à la fin.",
+        "Dans les exemples de cette fiche, le même sujet fait les deux actions et le dernier verbe porte la terminaison de temps et de personne. En français, on peut avoir deux verbes conjugués reliés par « et ».",
       ],
       table: {
         caption: "Deux gérondifs",
@@ -1178,20 +1195,20 @@ export const trCourse = {
         {
           type: "fill",
           prompt: "Marketten ekmek ___ eve döndüm.",
-          hint: "almak (et puis)",
+          hint: "almak, avec le suffixe -ip et ses variantes",
           answers: ["alıp"],
           explanation: "Al + ıp : alıp. Le temps n’est marqué que sur le dernier verbe (döndüm).",
         },
         {
           type: "fill",
           prompt: "Her gün işe ___ gidiyorum.",
-          hint: "koşmak (en courant)",
+          hint: "koşmak, avec -erek / -arak",
           answers: ["koşarak"],
           explanation: "Koş + arak : koşarak, « en courant ».",
         },
         {
           type: "transform",
-          instruction: "Relie les deux phrases avec -ip.",
+          instruction: "Relie les deux phrases en mettant le premier verbe en -ip. Garde le reste dans le même ordre.",
           source: "Kapıyı açtım. İçeri girdim.",
           answers: ["Kapıyı açıp içeri girdim."],
           explanation: "Aç + ıp relie les deux actions ; seul le dernier verbe porte le passé (girdim).",
@@ -1199,6 +1216,7 @@ export const trCourse = {
       ],
       categories: ["verb", "word_order"],
       reviewedOn: null,
+      aiReview: { on: "2026-11-10", model: "Codex (GPT-6)", rubric: "x0-chatgpt-2026-11-10" },
     },
   ],
 } satisfies GrammarCourse;
