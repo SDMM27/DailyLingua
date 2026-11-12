@@ -52,9 +52,9 @@ Notation : `→` clé étrangère ; toutes les FK vers `auth.users` et entre tab
 
 **`app.skill_estimate`** (lecture : propriétaire)
 
-`user_id`, `language → app.language`, `skill text check (in 'reading','listening','writing','speaking')`, `level_value numeric(4,2) not null check (between 0 and 6)`, `uncertainty numeric(4,2) not null check (> 0)`, `source text not null check (in 'legacy','placement','assessment','estimated','declared')`, `updated_at`. PK `(user_id, language, skill)`.
+`user_id`, `language → app.language`, `skill text check (in 'reading','listening','writing','speaking')`, `level_value numeric(4,2) not null check (between 0 and 7)`, `uncertainty numeric(4,2) not null check (> 0)`, `source text not null check (in 'legacy','placement','assessment','estimated','declared')`, `updated_at`. PK `(user_id, language, skill)`.
 
-Échelle continue : `0` = A0, `1` = début de A1, `2` = début de A2 … `6` = fin de C2. Le milieu de A1 vaut `1.5`.
+Échelle continue, une unité par niveau : A0 = [0,1), A1 = [1,2), A2 = [2,3), B1 = [3,4), B2 = [4,5), C1 = [5,6), C2 = [6,7]. Le milieu de A1 vaut `1.5`, celui de C2 `6.5`.
 
 ### 2.2 Mémoire
 
@@ -151,7 +151,7 @@ Lis les migrations de `public` pour les colonnes exactes. Correspondance :
 |---|---|---|
 | `profiles` | `profile` | `native_language = 'fr'`, `ui_language = 'fr'`, `time_zone` repris, `reminder_time = generation_time`, `game_settings = {"streak": show_streak}`, `is_guest` d'après `auth.users.is_anonymous`. La ligne `profile` peut déjà exister (déclencheur) : mise à jour si `legacy_migrated_at is null` |
 | `user_languages` | `enrollment` | `daily_minutes = weight` (borné 5..120), `days`, `target_level`, objectif et focus repris ; `position` selon l'ordre existant |
-| `user_languages.level` | `skill_estimate` `reading` et `listening` | `level_value` = milieu du niveau (A1 → 1.5 … C2 → 6.0 pour C2 : utiliser 5.5), `uncertainty = 0.5`, `source = 'legacy'` |
+| `user_languages.level` | `skill_estimate` `reading` et `listening` | `level_value` = milieu de la bande (A1 → 1.5, A2 → 2.5, B1 → 3.5, B2 → 4.5, C1 → 5.5, C2 → 6.5), `uncertainty = 0.5`, `source = 'legacy'` |
 | `user_languages.production_level` (sinon `level`) | `skill_estimate` `writing` | idem. **Pas de ligne `speaking`** |
 | `vocabulary_lists` | `card_list` | copie |
 | `vocabulary_items` | `card` (`kind = 'word'`) | `front = term`, `back = translation`, `back_language = 'fr'`, `context = example`, `payload` = le reste (définition, incertain…), `source` repris, `list_id` via `legacy_map`, état : §4.1 |
