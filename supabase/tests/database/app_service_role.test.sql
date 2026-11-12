@@ -84,7 +84,7 @@ select lives_ok($$update app.quota_usage set used = 2$$, 'quota_usage: update');
 select lives_ok($$insert into app.legacy_record (user_id, legacy_table, legacy_id, payload)
   values ('c0000000-0000-4000-8000-0000000000a1', 'feedback', 'x', '{}')$$, 'legacy_record: insert');
 select lives_ok($$update app.legacy_record set payload = '{"a": 1}'$$, 'legacy_record: update');
-select lives_ok($$insert into app.legacy_map (legacy_table, legacy_id, app_table, app_id) values ('t', 'i', 'a', 'x')$$,
+select lives_ok($$insert into app.legacy_map (legacy_table, legacy_id, app_table, app_id, user_id) values ('t', 'i', 'a', 'x', 'c0000000-0000-4000-8000-0000000000a1')$$,
   'legacy_map: insert');
 select lives_ok($$update app.legacy_map set app_id = 'y'$$, 'legacy_map: update');
 

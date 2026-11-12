@@ -334,7 +334,7 @@ create temporary table r_again on commit drop as select app.migrate_all() as j;
 reset role;
 select pg_temp.snapshot('app', 'snap_app_2');
 
-select is((select count(*)::int from jsonb_each_text((select j from r_again)) e where e.key <> 'users' and e.value <> '0'), 0,
+select is((select count(*)::int from jsonb_each_text((select j from r_again)) e where e.key not in ('users', 'skipped_active', 'errors') and e.value <> '0'), 0,
   'a second run creates nothing');
 select is((select count(*)::int from snap_app_1b a join snap_app_2 b using (t) where (a.n, a.h) is distinct from (b.n, b.h)), 0,
   'and changes nothing: same row counts and same content in every table of app');

@@ -42,7 +42,8 @@ insert into app.quota_usage (user_id, day, kind, used)
 select id, '2030-01-01', 'ai', 1 from auth.users where id::text like 'c0000000-0000-4000-8000-0000000000a_';
 insert into app.legacy_record (user_id, legacy_table, legacy_id, payload)
 select id, 'feedback', id::text, '{}' from auth.users where id::text like 'c0000000-0000-4000-8000-0000000000a_';
-insert into app.legacy_map (legacy_table, legacy_id, app_table, app_id) values ('t', 'i', 'a', 'x');
+insert into app.legacy_map (legacy_table, legacy_id, app_table, app_id, user_id)
+select 't', 'i', 'a', 'x', id from auth.users where id::text like 'c0000000-0000-4000-8000-0000000000a1';
 insert into app.ai_call (purpose, model, user_id)
 select 'test', 'm', id from auth.users where id::text like 'c0000000-0000-4000-8000-0000000000a_';
 
