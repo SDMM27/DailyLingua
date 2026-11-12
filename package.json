@@ -2,6 +2,10 @@
   "name": "daily-lingua",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -33,7 +37,11 @@
     "assessment:check": "tsx scripts/assessment-check.mts",
     "assessment:audio": "tsx scripts/assessment-audio.mts",
     "e2e": "playwright test",
-    "e2e:install": "playwright install webkit"
+    "e2e:install": "playwright install webkit",
+    "refonte:typecheck": "npm run typecheck --workspaces --if-present",
+    "refonte:lint": "npm run lint --workspaces --if-present",
+    "refonte:test": "npm run test --workspaces --if-present",
+    "refonte:check": "npm run refonte:typecheck && npm run refonte:lint && npm run refonte:test"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",
