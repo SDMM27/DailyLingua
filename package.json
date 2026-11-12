@@ -12,6 +12,7 @@
     "typecheck": "next typegen && tsc --noEmit",
     "check": "npm run typecheck && npm run lint && npm run migrations:check && npm run test",
     "migrations:check": "tsx scripts/migrations-check.mts",
+    "migration:verify": "tsx --env-file-if-exists=.env.local scripts/migration-verify.mts",
     "preview": "next build && next start",
     "db:start": "supabase start",
     "db:stop": "supabase stop",
