@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@dailylingua/schemas": "*",
-    "ts-fsrs": "^5.4.2"
+    "ts-fsrs": "5.4.2"
   },
   "devDependencies": {
     "@types/node": "^20",
