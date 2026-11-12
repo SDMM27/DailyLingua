@@ -3,7 +3,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(36);
+select plan(37);
 
 -- Two users, one row each in every table that holds user data --------------------------------------
 -- (the profile and the streak state are created by the signup trigger)
@@ -115,7 +115,7 @@ select is(
   (select array_agg(t.relname::text order by t.relname) from pg_class t
    where t.relnamespace = 'app'::regnamespace and t.relkind = 'r'
      and not has_table_privilege('authenticated', t.oid, 'select')),
-  array['ai_call', 'legacy_map'], 'authenticated can read every table except ai_call and legacy_map');
+  array['ai_call', 'legacy_map', 'legacy_record'], 'authenticated can read every table except ai_call, legacy_map and legacy_record');
 
 select set_config('request.jwt.claims',
   '{"sub": "c0000000-0000-4000-8000-0000000000a1", "role": "authenticated"}', true);
@@ -130,6 +130,7 @@ select throws_ok($$delete from app.review_log$$, '42501', null, 'a user cannot d
 select throws_ok($$update app.profile set ui_language = 'en'$$, '42501', null, 'a user cannot update their profile directly');
 select throws_ok($$select count(*) from app.ai_call$$, '42501', null, 'ai_call is unreadable by a client');
 select throws_ok($$select count(*) from app.legacy_map$$, '42501', null, 'legacy_map is unreadable by a client');
+select throws_ok($$select count(*) from app.legacy_record$$, '42501', null, 'legacy_record is unreadable by a client');
 select throws_ok($$select app.migrate_all()$$, '42501', null, 'a user cannot run the migration');
 
 -- Each user reads their own rows only (exactly one row per user per table was inserted).
@@ -149,8 +150,8 @@ select is(
   4, 'production, correction, rewrite, assessment_result: own row only');
 select is(
   (select count(*)::int from app.xp_ledger) + (select count(*)::int from app.streak_state)
-  + (select count(*)::int from app.quota_usage) + (select count(*)::int from app.legacy_record),
-  4, 'xp_ledger, streak_state, quota_usage, legacy_record: own row only');
+  + (select count(*)::int from app.quota_usage),
+  3, 'xp_ledger, streak_state, quota_usage: own row only');
 select is((select count(*)::int from app.card where user_id <> 'c0000000-0000-4000-8000-0000000000a1'), 0,
   'no row of another user is visible');
 
