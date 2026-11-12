@@ -81,7 +81,8 @@ select ok(not has_schema_privilege('anon', 'app', 'usage'), 'anon has no usage o
 select is(
   (select count(*)::int from pg_class t
    where t.relnamespace = 'app'::regnamespace and t.relkind = 'r'
-     and has_any_column_privilege('anon', t.oid, 'select, insert, update, references')),
+     and (has_any_column_privilege('anon', t.oid, 'select, insert, update, references')
+       or has_table_privilege('anon', t.oid, 'delete') or has_table_privilege('anon', t.oid, 'truncate'))),
   0, 'anon has no privilege on any table of app');
 
 set local role anon;

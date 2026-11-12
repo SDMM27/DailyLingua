@@ -58,23 +58,23 @@ isOneToOne: false
       referencedRelation: "language"
       referencedColumns: ["code"]
     },{
-      foreignKeyName: "attempt_session_id_fkey"
-      columns: ["session_id"]
+      foreignKeyName: "attempt_session_fkey"
+      columns: ["session_id","user_id","language"]
 isOneToOne: false
       referencedRelation: "session"
-      referencedColumns: ["id"]
+      referencedColumns: ["id","user_id","language"]
     }
                   ]
                 },"card": {
                   Row: {
-                    "back": string | null,"back_language": string | null,"context": string | null,"created_at": string,"difficulty": number | null,"due_at": string,"front": string,"id": string,"kind": string,"language": string,"lapses": number,"last_review_at": string | null,"legacy_box": number | null,"list_id": string | null,"note": string | null,"payload": NonNullable<Json>,"ref": string | null,"reps": number,"source": string,"stability": number | null,"state": string,"updated_at": string,"user_id": string
+                    "back": string | null,"back_language": string | null,"context": string | null,"created_at": string,"deleted_at": string | null,"difficulty": number | null,"due_at": string,"front": string,"id": string,"kind": string,"language": string,"lapses": number,"last_review_at": string | null,"legacy_box": number | null,"list_id": string | null,"note": string | null,"payload": NonNullable<Json>,"ref": string | null,"reps": number,"source": string,"stability": number | null,"state": string,"updated_at": string,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "back"?: string | null,"back_language"?: string | null,"context"?: string | null,"created_at"?: string,"difficulty"?: number | null,"due_at": string,"front": string,"id"?: string,"kind": string,"language": string,"lapses"?: number,"last_review_at"?: string | null,"legacy_box"?: number | null,"list_id"?: string | null,"note"?: string | null,"payload"?: NonNullable<Json>,"ref"?: string | null,"reps"?: number,"source"?: string,"stability"?: number | null,"state": string,"updated_at"?: string,"user_id": string
+                    "back"?: string | null,"back_language"?: string | null,"context"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"difficulty"?: number | null,"due_at": string,"front": string,"id"?: string,"kind": string,"language": string,"lapses"?: number,"last_review_at"?: string | null,"legacy_box"?: number | null,"list_id"?: string | null,"note"?: string | null,"payload"?: NonNullable<Json>,"ref"?: string | null,"reps"?: number,"source"?: string,"stability"?: number | null,"state": string,"updated_at"?: string,"user_id": string
                   }
                   Update: {
-                    "back"?: string | null,"back_language"?: string | null,"context"?: string | null,"created_at"?: string,"difficulty"?: number | null,"due_at"?: string,"front"?: string,"id"?: string,"kind"?: string,"language"?: string,"lapses"?: number,"last_review_at"?: string | null,"legacy_box"?: number | null,"list_id"?: string | null,"note"?: string | null,"payload"?: NonNullable<Json>,"ref"?: string | null,"reps"?: number,"source"?: string,"stability"?: number | null,"state"?: string,"updated_at"?: string,"user_id"?: string
+                    "back"?: string | null,"back_language"?: string | null,"context"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"difficulty"?: number | null,"due_at"?: string,"front"?: string,"id"?: string,"kind"?: string,"language"?: string,"lapses"?: number,"last_review_at"?: string | null,"legacy_box"?: number | null,"list_id"?: string | null,"note"?: string | null,"payload"?: NonNullable<Json>,"ref"?: string | null,"reps"?: number,"source"?: string,"stability"?: number | null,"state"?: string,"updated_at"?: string,"user_id"?: string
                   }
                   Relationships: [
                     {
@@ -84,11 +84,11 @@ isOneToOne: false
       referencedRelation: "language"
       referencedColumns: ["code"]
     },{
-      foreignKeyName: "card_list_id_fkey"
-      columns: ["list_id"]
+      foreignKeyName: "card_list_fkey"
+      columns: ["list_id","user_id","language"]
 isOneToOne: false
       referencedRelation: "card_list"
-      referencedColumns: ["id"]
+      referencedColumns: ["id","user_id","language"]
     }
                   ]
                 },"card_list": {
@@ -124,11 +124,11 @@ isOneToOne: false
                   }
                   Relationships: [
                     {
-      foreignKeyName: "correction_production_id_fkey"
-      columns: ["production_id"]
-isOneToOne: true
+      foreignKeyName: "correction_production_fkey"
+      columns: ["production_id","user_id"]
+isOneToOne: false
       referencedRelation: "production"
-      referencedColumns: ["id"]
+      referencedColumns: ["id","user_id"]
     }
                   ]
                 },"enrollment": {
@@ -167,14 +167,14 @@ isOneToOne: false
                   ]
                 },"legacy_map": {
                   Row: {
-                    "app_id": string,"app_table": string,"legacy_id": string,"legacy_table": string,"migrated_at": string
+                    "app_id": string,"app_table": string,"legacy_id": string,"legacy_table": string,"migrated_at": string,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "app_id": string,"app_table": string,"legacy_id": string,"legacy_table": string,"migrated_at"?: string
+                    "app_id": string,"app_table": string,"legacy_id": string,"legacy_table": string,"migrated_at"?: string,"user_id": string
                   }
                   Update: {
-                    "app_id"?: string,"app_table"?: string,"legacy_id"?: string,"legacy_table"?: string,"migrated_at"?: string
+                    "app_id"?: string,"app_table"?: string,"legacy_id"?: string,"legacy_table"?: string,"migrated_at"?: string,"user_id"?: string
                   }
                   Relationships: [
                     
@@ -211,18 +211,24 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "language"
       referencedColumns: ["code"]
+    },{
+      foreignKeyName: "production_session_fkey"
+      columns: ["session_id","user_id","language"]
+isOneToOne: false
+      referencedRelation: "session"
+      referencedColumns: ["id","user_id","language"]
     }
                   ]
                 },"profile": {
                   Row: {
-                    "created_at": string,"game_settings": NonNullable<Json>,"is_guest": boolean,"legacy_migrated_at": string | null,"native_language": string,"reminder_time": string | null,"time_zone": string,"ui_language": string,"updated_at": string,"user_id": string
+                    "app_active_since": string | null,"created_at": string,"game_settings": NonNullable<Json>,"is_guest": boolean,"legacy_migrated_at": string | null,"native_language": string,"reminder_time": string | null,"time_zone": string,"ui_language": string,"updated_at": string,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"game_settings"?: NonNullable<Json>,"is_guest"?: boolean,"legacy_migrated_at"?: string | null,"native_language"?: string,"reminder_time"?: string | null,"time_zone"?: string,"ui_language"?: string,"updated_at"?: string,"user_id": string
+                    "app_active_since"?: string | null,"created_at"?: string,"game_settings"?: NonNullable<Json>,"is_guest"?: boolean,"legacy_migrated_at"?: string | null,"native_language"?: string,"reminder_time"?: string | null,"time_zone"?: string,"ui_language"?: string,"updated_at"?: string,"user_id": string
                   }
                   Update: {
-                    "created_at"?: string,"game_settings"?: NonNullable<Json>,"is_guest"?: boolean,"legacy_migrated_at"?: string | null,"native_language"?: string,"reminder_time"?: string | null,"time_zone"?: string,"ui_language"?: string,"updated_at"?: string,"user_id"?: string
+                    "app_active_since"?: string | null,"created_at"?: string,"game_settings"?: NonNullable<Json>,"is_guest"?: boolean,"legacy_migrated_at"?: string | null,"native_language"?: string,"reminder_time"?: string | null,"time_zone"?: string,"ui_language"?: string,"updated_at"?: string,"user_id"?: string
                   }
                   Relationships: [
                     
@@ -254,11 +260,11 @@ isOneToOne: false
                   }
                   Relationships: [
                     {
-      foreignKeyName: "review_log_card_id_fkey"
-      columns: ["card_id"]
+      foreignKeyName: "review_log_card_fkey"
+      columns: ["card_id","user_id"]
 isOneToOne: false
       referencedRelation: "card"
-      referencedColumns: ["id"]
+      referencedColumns: ["id","user_id"]
     }
                   ]
                 },"rewrite": {
@@ -274,11 +280,11 @@ isOneToOne: false
                   }
                   Relationships: [
                     {
-      foreignKeyName: "rewrite_correction_id_fkey"
-      columns: ["correction_id"]
+      foreignKeyName: "rewrite_correction_fkey"
+      columns: ["correction_id","user_id"]
 isOneToOne: false
       referencedRelation: "correction"
-      referencedColumns: ["id"]
+      referencedColumns: ["id","user_id"]
     }
                   ]
                 },"session": {
@@ -362,17 +368,17 @@ isOneToOne: false
                   }
                   Relationships: [
                     {
-      foreignKeyName: "xp_ledger_attempt_id_fkey"
-      columns: ["attempt_id"]
+      foreignKeyName: "xp_ledger_attempt_fkey"
+      columns: ["attempt_id","user_id"]
 isOneToOne: false
       referencedRelation: "attempt"
-      referencedColumns: ["id"]
+      referencedColumns: ["id","user_id"]
     },{
-      foreignKeyName: "xp_ledger_review_log_id_fkey"
-      columns: ["review_log_id"]
+      foreignKeyName: "xp_ledger_review_log_fkey"
+      columns: ["review_log_id","user_id"]
 isOneToOne: false
       referencedRelation: "review_log"
-      referencedColumns: ["id"]
+      referencedColumns: ["id","user_id"]
     }
                   ]
                 }
@@ -384,14 +390,32 @@ isOneToOne: false
             "is_valid_weekdays":
 { Args: { "p_days": (number)[] }; Returns: boolean
                            },
+"legacy_assessments":
+{ Args: { "p_user_id": string }; Returns: {
+              "kind": string,"language": string,"legacy_id": string,"legacy_table": string,"levels": Json,"payload": Json,"taken_at": string
+            }[]
+                           },
+"legacy_cards":
+{ Args: { "p_user_id": string }; Returns: {
+              "back": string,"back_language": string,"context": string,"created_at": string,"due_at": string,"front": string,"kind": string,"language": string,"lapses": number,"last_review_at": string,"legacy_box": number,"legacy_id": string,"legacy_list_id": string,"legacy_table": string,"payload": Json,"ref": string,"reps": number,"stability": number,"state": string,"updated_at": string
+            }[]
+                           },
 "legacy_level_value":
 { Args: { "p_level": string }; Returns: number
+                           },
+"legacy_productions":
+{ Args: { "p_user_id": string }; Returns: {
+              "body": string,"created_at": string,"language": string,"legacy_id": string,"mode": string,"task": Json
+            }[]
                            },
 "legacy_study_days":
 { Args: { "p_user_id": string }; Returns: string[]
                            },
 "leitner_interval":
 { Args: { "p_box": number }; Returns: number
+                           },
+"mark_active":
+{ Args: { "p_user_id": string }; Returns: undefined
                            },
 "migrate_all":
 { Args: Record<PropertyKey, never>; Returns: Json
@@ -401,7 +425,8 @@ isOneToOne: false
                            },
 "save_profile":
 { Args: { "p_native_language": string,"p_reminder_time"?: string,"p_time_zone": string,"p_ui_language": string }; Returns: {
-              "created_at": string,
+              "app_active_since": string | null,
+"created_at": string,
 "game_settings": NonNullable<Json>,
 "is_guest": boolean,
 "legacy_migrated_at": string | null,
