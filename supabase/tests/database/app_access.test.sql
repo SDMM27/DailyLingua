@@ -3,7 +3,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(36);
+select plan(37);
 
 -- Two users, one row each in every table that holds user data --------------------------------------
 -- (the profile and the streak state are created by the signup trigger)
@@ -42,7 +42,8 @@ insert into app.quota_usage (user_id, day, kind, used)
 select id, '2030-01-01', 'ai', 1 from auth.users where id::text like 'c0000000-0000-4000-8000-0000000000a_';
 insert into app.legacy_record (user_id, legacy_table, legacy_id, payload)
 select id, 'feedback', id::text, '{}' from auth.users where id::text like 'c0000000-0000-4000-8000-0000000000a_';
-insert into app.legacy_map (legacy_table, legacy_id, app_table, app_id) values ('t', 'i', 'a', 'x');
+insert into app.legacy_map (legacy_table, legacy_id, app_table, app_id, user_id)
+select 't', 'i', 'a', 'x', id from auth.users where id::text like 'c0000000-0000-4000-8000-0000000000a1';
 insert into app.ai_call (purpose, model, user_id)
 select 'test', 'm', id from auth.users where id::text like 'c0000000-0000-4000-8000-0000000000a_';
 
@@ -80,7 +81,8 @@ select ok(not has_schema_privilege('anon', 'app', 'usage'), 'anon has no usage o
 select is(
   (select count(*)::int from pg_class t
    where t.relnamespace = 'app'::regnamespace and t.relkind = 'r'
-     and has_any_column_privilege('anon', t.oid, 'select, insert, update, references')),
+     and (has_any_column_privilege('anon', t.oid, 'select, insert, update, references')
+       or has_table_privilege('anon', t.oid, 'delete') or has_table_privilege('anon', t.oid, 'truncate'))),
   0, 'anon has no privilege on any table of app');
 
 set local role anon;
@@ -115,7 +117,7 @@ select is(
   (select array_agg(t.relname::text order by t.relname) from pg_class t
    where t.relnamespace = 'app'::regnamespace and t.relkind = 'r'
      and not has_table_privilege('authenticated', t.oid, 'select')),
-  array['ai_call', 'legacy_map'], 'authenticated can read every table except ai_call and legacy_map');
+  array['ai_call', 'legacy_map', 'legacy_record'], 'authenticated can read every table except ai_call, legacy_map and legacy_record');
 
 select set_config('request.jwt.claims',
   '{"sub": "c0000000-0000-4000-8000-0000000000a1", "role": "authenticated"}', true);
@@ -130,6 +132,7 @@ select throws_ok($$delete from app.review_log$$, '42501', null, 'a user cannot d
 select throws_ok($$update app.profile set ui_language = 'en'$$, '42501', null, 'a user cannot update their profile directly');
 select throws_ok($$select count(*) from app.ai_call$$, '42501', null, 'ai_call is unreadable by a client');
 select throws_ok($$select count(*) from app.legacy_map$$, '42501', null, 'legacy_map is unreadable by a client');
+select throws_ok($$select count(*) from app.legacy_record$$, '42501', null, 'legacy_record is unreadable by a client');
 select throws_ok($$select app.migrate_all()$$, '42501', null, 'a user cannot run the migration');
 
 -- Each user reads their own rows only (exactly one row per user per table was inserted).
@@ -149,8 +152,8 @@ select is(
   4, 'production, correction, rewrite, assessment_result: own row only');
 select is(
   (select count(*)::int from app.xp_ledger) + (select count(*)::int from app.streak_state)
-  + (select count(*)::int from app.quota_usage) + (select count(*)::int from app.legacy_record),
-  4, 'xp_ledger, streak_state, quota_usage, legacy_record: own row only');
+  + (select count(*)::int from app.quota_usage),
+  3, 'xp_ledger, streak_state, quota_usage: own row only');
 select is((select count(*)::int from app.card where user_id <> 'c0000000-0000-4000-8000-0000000000a1'), 0,
   'no row of another user is visible');
 

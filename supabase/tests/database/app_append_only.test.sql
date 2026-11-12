@@ -4,7 +4,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(19);
+select plan(18);
 
 insert into auth.users (instance_id, id, aud, role, email) values
   ('00000000-0000-0000-0000-000000000000', 'c0000000-0000-4000-8000-0000000000b1', 'authenticated', 'authenticated', 'owner@test.invalid'),
@@ -50,26 +50,25 @@ select throws_ok($$update app.review_log set rating = 1$$, '42501', 'review_log 
 select is((select count(*)::int from app.review_log where user_id::text like 'c0000000-0000-4000-8000-0000000000b_'), 3,
   'no journal row was lost');
 
--- Rows go away with their parent -------------------------------------------------------------------
+-- A parent cannot disappear and take the journal with it ---------------------------------------------
 
-select lives_ok($$delete from app.card where id = 'c0000000-0000-4000-8000-0000000000c2'$$,
-  'a card can be deleted');
-select is((select count(*)::int from app.review_log where card_id = 'c0000000-0000-4000-8000-0000000000c2'), 0,
-  'its reviews went with it');
-select is((select count(*)::int from app.xp_ledger where reason = 'review'), 0,
-  'and the XP that came from them');
-
-select lives_ok($$delete from app.session where id = 'c0000000-0000-4000-8000-0000000000d1'$$,
-  'a session can be deleted');
-select is((select count(*)::int from app.attempt where session_id is null), 1,
-  'the attempts of the session went with it, the others stay');
-select is((select count(*)::int from app.xp_ledger where reason = 'attempt'), 0,
-  'and the XP that came from them');
+set local role service_role;
+select throws_ok($$delete from app.card where id = 'c0000000-0000-4000-8000-0000000000c2'$$, '23503', null,
+  'a card with a review history cannot be deleted');
+select throws_ok($$delete from app.session where id = 'c0000000-0000-4000-8000-0000000000d1'$$, '23503', null,
+  'a session with attempts cannot be deleted');
+select lives_ok($$update app.card set deleted_at = now() where id = 'c0000000-0000-4000-8000-0000000000c2'$$,
+  'a card is removed by marking it deleted');
+reset role;
+select is((select count(*)::int from app.review_log where card_id = 'c0000000-0000-4000-8000-0000000000c2'), 1,
+  'its reviews are still there');
+select is((select count(*)::int from app.xp_ledger where user_id = 'c0000000-0000-4000-8000-0000000000b1'
+           and reason in ('review', 'attempt')), 2, 'and so is the XP that came from them');
 
 -- Rows go away with their owner ----------------------------------------------------------------------
 
-select is((select count(*)::int from app.xp_ledger where user_id = 'c0000000-0000-4000-8000-0000000000b1'), 1,
-  'before the deletion of the account: the plain XP row is there');
+select is((select count(*)::int from app.xp_ledger where user_id = 'c0000000-0000-4000-8000-0000000000b1'), 3,
+  'before the deletion of the account: the XP rows are there');
 select lives_ok($$delete from auth.users where id = 'c0000000-0000-4000-8000-0000000000b1'$$,
   'an account can be deleted');
 select is(
