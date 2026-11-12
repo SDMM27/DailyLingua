@@ -3,7 +3,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(27);
+select plan(34);
 
 -- Signup trigger ------------------------------------------------------------------------------------
 
@@ -31,6 +31,10 @@ select results_eq(
   $$select "current", best, last_day, freezes, mode from app.streak_state where user_id = 'c0000000-0000-4000-8000-0000000000e1'$$,
   $$values (0, 0, null::date, 0::smallint, 'daily')$$,
   'the streak state starts empty');
+
+select is((select count(*)::int from app.profile where app_active_since is not null
+           and user_id::text like 'c0000000-0000-4000-8000-0000000000e_'), 0,
+  'nobody is "active in the new app" at signup');
 
 -- Constraints --------------------------------------------------------------------------------------------
 
@@ -88,6 +92,28 @@ reset role;
 select results_eq(
   $$select native_language, time_zone from app.profile where user_id = 'c0000000-0000-4000-8000-0000000000e2'$$,
   $$values ('fr', 'Europe/Paris')$$, 'the profile of another user is untouched');
+
+-- app_active_since ----------------------------------------------------------------------------------------
+
+select ok((select app_active_since is not null from app.profile where user_id = 'c0000000-0000-4000-8000-0000000000e1'),
+  'save_profile marks the user as active in the new app');
+select is((select app_active_since from app.profile where user_id = 'c0000000-0000-4000-8000-0000000000e2'), null,
+  'and only that user');
+update app.profile set app_active_since = '2031-01-01 00:00+00' where user_id = 'c0000000-0000-4000-8000-0000000000e1';
+select set_config('request.jwt.claims',
+  '{"sub": "c0000000-0000-4000-8000-0000000000e1", "role": "authenticated"}', true);
+set local role authenticated;
+select lives_ok($$select app.save_profile('es', 'fr', 'Europe/Paris')$$, 'save_profile again');
+select throws_ok($$select app.mark_active('c0000000-0000-4000-8000-0000000000e2')$$, '42501', null,
+  'a client cannot call mark_active');
+reset role;
+select is((select app_active_since from app.profile where user_id = 'c0000000-0000-4000-8000-0000000000e1'),
+  '2031-01-01 00:00+00'::timestamptz, 'the first activation date is kept');
+set local role service_role;
+select app.mark_active('c0000000-0000-4000-8000-0000000000e2');
+reset role;
+select ok((select app_active_since is not null from app.profile where user_id = 'c0000000-0000-4000-8000-0000000000e2'),
+  'service_role can mark a user as active');
 
 select * from finish();
 rollback;
