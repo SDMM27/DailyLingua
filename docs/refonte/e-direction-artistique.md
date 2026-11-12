@@ -1,6 +1,6 @@
 # Direction artistique de la refonte : « L'édition du jour »
 
-Maquettes : `docs/refonte/maquettes/maquettes.html` (11 écrans, clair et sombre côte à côte).
+Maquettes : `docs/refonte/maquettes/maquettes.html` (11 écrans, dont l'accueil en trois états, clair et sombre côte à côte). Toutes respectent la règle de densité de la section 5.
 
 ## 1. Diagnostic de l'existant
 
@@ -21,12 +21,12 @@ Le vocabulaire visuel découle de l'imprimerie, et chaque métaphore porte une m
 | --- | --- |
 | Jour d'étude | Une *édition* numérotée (« N° 214 ») |
 | Objectif du jour | Anneau en forme de *repère de calage* ; fermé, il reçoit le tampon « Bon à tirer » |
-| Série | *Tampon dateur* avec le nombre de jours ; le gel s'appelle *relâche* (jour sans parution prévu) |
+| Série | *Tampon dateur* avec le nombre de jours (dans le détail et les célébrations ; sur l'accueil, un petit chiffre) ; le gel s'appelle *relâche* (jour sans parution prévu) |
 | Réparation de série | *Édition de rattrapage*, proposée sans dramatiser |
 | Badge | *Tampon* d'étape réelle (« 500 mots connus », « A2 en lecture ») |
-| Quêtes | *Petites annonces* encadrées de pointillés |
+| Quêtes | *Petites annonces* (en liste, une ligne sobre par quête) |
 | Carte du parcours | *Chemin de fer* (le plan page à page d'un magazine) : une vignette de page par unité |
-| Montée de niveau, fin de cahier | *Édition spéciale* : bandeau défilant, gros titre |
+| Montée de niveau, fin de cahier | *Édition spéciale* : bandeau défilant, gros titre (jamais sur l'accueil) |
 | Ligue (option) | *Tableau des résultats* des pages sportives, divisions nommées par formats de presse |
 
 Les étapes de la séance reprennent la numérotation romaine des rubriques (I Révisions, II Texte, III Focus, IV Écriture, V Fluidité, VI Bilan). Le libellé « XP » reste tel quel : il est compris partout et se traduit mal.
@@ -123,23 +123,78 @@ Illustrations en aplats de deux encres au plus, avec un léger décalage de rep�
 
 **`prefers-reduced-motion`** : tampons et marqueurs apparaissent sans échelle ni rotation, en fondu de 100 ms au plus, et le bandeau défilant devient fixe. Le sens est porté par le texte (« Juste », « Bon à tirer »), jamais par le seul mouvement.
 
-**Réglages.** Les sons, les vibrations et les célébrations animées ont chacun un interrupteur. Les sons respectent le mode silencieux d'iOS. Volume par défaut : bas.
+**Réglages.** Les sons, les vibrations et les célébrations animées ont chacun un interrupteur. **Les sons sont coupés par défaut** (game design, §3.8) : à la fin de la première séance, une seule proposition de les activer. Une fois activés, ils respectent le mode silencieux d'iOS, avec un volume bas par défaut et trois niveaux. La colonne « Son » du tableau ci-dessus ne vaut donc que pour qui les a activés. Vibrations activées par défaut dans l'app native ; dans la PWA sur iPhone, Safari ne les permet pas et le réglage est masqué.
 
-## 5. Composants clés
+## 5. Densité
+
+Retour du propriétaire du produit (novembre 2026) : l'accueil empilait trop d'informations et « submerge le cerveau ». La règle qui suit est un budget vérifiable, pas une intention. Elle vaut pour chaque écran et passe avant toute envie d'ajouter un bloc.
+
+### Définitions
+
+- **Ligne de flottaison** : sur un écran de 390 × 844, la zone utile va du bas de la barre d'état (54 px) au haut de la barre d'onglets, du pied d'action ou du lecteur audio. Avec la barre d'onglets, il reste environ 700 px.
+- **Bloc** : un groupe visuel séparé de ses voisins par au moins 24 px. Une liste de lignes est un seul bloc, quelle que soit sa longueur. Un bloc compte dès qu'il commence au-dessus de la ligne de flottaison.
+
+### Budget par écran
+
+| Règle | Seuil | Comment vérifier |
+| --- | --- | --- |
+| Blocs au-dessus de la ligne de flottaison | 3 au plus (la barre de séance et le pied d'action ne comptent pas) | Lister les enfants directs du conteneur défilant dont le haut est au-dessus de la ligne |
+| Bouton plein | 1 au plus, 0 permis | Compter les boutons en aplat d'accent ou de réussite |
+| Espacement entre blocs | 24 px au moins | Mesurer l'écart entre deux blocs consécutifs |
+| Marge autour du bloc principal | 32 px au moins | Mesurer au-dessus et en dessous |
+| Tailles de titre visibles en même temps | 2 au plus | Relever les tailles des titres serif visibles |
+| Tampon ou élément décoratif | 1 au plus (l'anneau et son tampon comptent pour un) | Compter tampons, illustrations, bandeaux |
+| Bandeau défilant | Jamais sur l'accueil ; réservé à l'édition spéciale | Rechercher le composant dans l'écran |
+
+Ce qui dépasse le budget n'est pas supprimé : il se replie en **ligne sobre** (une ligne par élément : icône, libellé, valeur courte, chevron, 56 px de haut), passe sous la ligne de flottaison, derrière un onglet ou dans une feuille ouverte d'un toucher. Une idée principale par écran ; le détail au second plan.
+
+Des libellés plus longs de 40 % ne doivent pas faire sortir un bloc de la ligne de flottaison : la valeur d'une ligne passe à la ligne, le budget ne bouge pas.
+
+### L'accueil (« Aujourd'hui »)
+
+Au-dessus de la ligne de flottaison, trois blocs et rien d'autre :
+1. **En-tête réduit** : nom du journal et date, sur une ligne. Pas de salutation, pas de masthead à double filet.
+2. **Bloc séance** : anneau d'objectif, langue, titre du texte du jour (et son titre original), durée, un seul bouton plein « Commencer la séance » (ou « Reprendre · étape II sur VI »). Une fois la séance faite : anneau fermé et tamponné, une phrase factuelle, la suite proposée en bouton à contour, sans insistance.
+3. **Ligne d'état** : deux petits chiffres avec icône et libellé, la série et l'XP de la semaine. Pas de carte. Un toucher ouvre le détail (relâches en réserve, record, semaine en sept pastilles).
+
+Sous la ligne de flottaison, en lignes sobres : bilan de la séance (une fois faite), quêtes du jour, révisions dues, parutions, semaine. Les parutions vivent dans l'onglet « Lire » ; l'accueil n'en garde qu'une ligne.
+
+Ce qui a le droit d'apparaître, et à partir de quand (calé sur le dévoilement du game design, §4) :
+
+| Jour | Au-dessus de la ligne | En dessous |
+| --- | --- | --- |
+| J1 | En-tête, bloc séance avec anneau. Pas de ligne d'état. | Rien |
+| J2 | + ligne d'état : série seule | Révisions dues, parutions |
+| J3-J4 | Inchangé | + quêtes du jour |
+| J5-J7 | Ligne d'état : série et XP de la semaine | + semaine (volets couverts) ; relâches dans le détail de la série |
+| J8 et après | Inchangé | + parcours si une unité est en cours |
+
+La ligue n'apparaît jamais sur l'accueil : elle vit derrière l'onglet « Ligue » de l'écran des quêtes, et seulement si elle est activée. Une mécanique désactivée dans les réglages disparaît de l'accueil sans laisser de place vide.
+
+### Les autres écrans
+
+- **Séance** (rappel, lecteur, production, fluidité) : barre de séance, un exercice, un pied d'action. La grille de correction se replie en une ligne.
+- **Fin de séance** : l'anneau tamponné et un titre, puis une ligne par résultat (XP, mots, erreur du jour, série) ; le relevé détaillé s'ouvre en feuille. « Demain » tient en une phrase au-dessus de « Terminer ».
+- **Parcours** : le chemin de fer du cahier en cours. Les niveaux par compétence sont sur Progrès ; une ligne y mène.
+- **Progrès** : les quatre jauges. Mots connus, « Je peux… », projection et série sont des lignes qui ouvrent leur écran.
+- **Quêtes** : une ligne par quête. La ligue est derrière un onglet.
+- **Réglages** : une seule liste, groupée par thème.
+
+## 6. Composants clés
 
 - **Barre de séance** : fermer (44 px), six segments, compteur d'XP de la séance en `xp`, puis une ligne mono « Étape II sur VI · Texte ». Fermer met en pause : rien n'est perdu.
 - **Carte d'exercice** : consigne en métadonnée, phrase cible en serif 22-25 px, indice, source citée (« Tiré de… »). Champ de 16 px au bord `border-strong`, « Vérifier » fixé au-dessus du clavier.
 - **Retour correct ou incorrect** : feuille montante à double filet. Juste : `success-soft`, tampon « Juste », XP, prochaine révision. À revoir : `error-soft`, réponse attendue en entier, explication en une phrase, bouton « J'avais raison ». Le mot « faux » n'apparaît jamais.
 - **Lecteur et bulle de mot** : texte à 19 px, phrase lue sur `surface-2`. La bulle donne le mot, le lemme et le genre, la traduction en langue maternelle, la forme dans la phrase, l'écoute et « Ajouter aux révisions » (avec la phrase). Audio phrase par phrase, vitesse 0,6-1,2×, répétition.
 - **Anneau d'objectif** : arc indigo, quatre repères de calage, valeur au centre. Fermé, tampon « Bon à tirer ». On lit « 12 XP de plus ferment l'anneau », jamais « il te manque ».
-- **Compteur de série** : tampon dateur, jours, relâches en réserve. Une série cassée affiche « Nouvelle série, jour 1 » et propose une fois le rattrapage. Aucun compte à rebours.
-- **Carte de quête** : petite annonce en pointillés, verbe d'action, barre, récompense, tampon une fois faite. Toujours du travail utile, jamais la seule présence.
+- **Compteur de série** : sur l'accueil, un petit chiffre avec l'icône du tampon dateur dans la ligne d'état ; le détail (tampon, jours, relâches en réserve sur 3, record, semaine en sept pastilles) s'ouvre d'un toucher. Une série cassée affiche « Nouvelle série, jour 1 » et propose une fois le rattrapage. Aucun compte à rebours.
+- **Ligne de quête** : verbe d'action, avancement chiffré (« 1/3 »), récompense, coche une fois faite. Toujours du travail utile, jamais la seule présence. La petite annonce en pointillés n'est plus utilisée en liste.
 - **Badge** : tampon circulaire, intitulé factuel, date. Les badges à venir montrent leur critère exact.
 - **Nœud du parcours** : vignette de page cornée de 64 px. Fait : coche. Courant : couleur de langue. À venir : pointillés et cadenas, contournables par un test. Bilan : étoile « Édition spéciale ».
-- **Fin de séance** : une une datée et numérotée, titre factuel, anneau tamponné, relevé d'XP à points de conduite, série, mots appris, erreur du jour, programme de demain. Un seul bouton.
+- **Fin de séance** : une ligne datée et numérotée, anneau tamponné, titre factuel, puis une ligne par résultat (XP gagnés, mots passés en révision, erreur du jour, série). Le relevé d'XP à points de conduite, la liste des mots, l'erreur expliquée et la semaine de série s'ouvrent en feuille. « Demain » en une phrase. Un seul bouton, « Terminer ».
 - **Jauge par compétence** : règle A0-C2 en 7 cases, bande hachurée d'incertitude, niveau en toutes lettres (« B1, début »).
 
-## 6. Mascotte
+## 7. Mascotte
 
 **Piste A, « Pica »** : un caractère mobile en plomb, petit bloc d'encre dont la lettre gravée change selon la langue apprise (Я, ع, あ, ß). Il apporte les nouvelles de la rédaction. On le voit dans l'onboarding, les états vides, la fin de séance et les éditions spéciales, mais jamais dans un exercice ni dans une notification. Ton : sobre, précis, chaleureux (« Texte réécrit sans faute. On l'imprime. »). Animation peu coûteuse : il s'encre, il tamponne.
 
@@ -151,7 +206,7 @@ Dans les deux cas, la mascotte ne fait jamais certaines choses : pleurer, bouder
 
 **Recommandation : Pica**, avec un rôle limité. Il s'adapte à toute langue sans biais culturel, prolonge directement la métaphore de l'imprimerie et reste discret pour les apprenants avancés. Si le propriétaire hésite, l'option C est un bon point de départ : Pica peut s'ajouter plus tard sans refonte.
 
-## 7. Accessibilité AA
+## 8. Accessibilité AA
 
 Contrastes calculés selon la formule de luminance relative du WCAG 2.1. Ils ont été calculés à partir des valeurs hexadécimales, pas estimés.
 
@@ -174,6 +229,8 @@ Contrastes calculés selon la formule de luminance relative du WCAG 2.1. Ils ont
 | `xp` / `xp-soft` | 4,97 | 7,88 |
 | `streak` / `streak-soft` | 5,40 | 5,12 |
 | `streak` / `surface` | 6,41 | 6,51 |
+| `streak` / `bg` (ligne d'état de l'accueil) | 5,82 | 6,97 |
+| `xp` / `bg` (ligne d'état de l'accueil) | 5,26 | 10,51 |
 | `ink` / mot nouveau | 13,86 | 9,36 |
 | `ink` / mot en cours | 13,53 | 10,68 |
 | Texte sur bouton `success` | 6,29 (blanc) | 9,28 (`#0f0e0c`) |
@@ -196,7 +253,7 @@ Les filets `line` (1,47:1) sont décoratifs ; les contrôles utilisent `border-s
 - Le texte cible porte son `lang`. Les nombres et les mots latins dans une interface RTL sont isolés (`<bdi>`). Les chiffres suivent la locale (`Intl.NumberFormat`).
 - Le focus est visible : contour `ink` de 2 px.
 
-## 8. Conséquences pour `@sdmm/design`
+## 9. Conséquences pour `@sdmm/design`
 
 **À ajouter (version mineure) :**
 - tokens de rôle `success`, `error`, `streak`, `xp` (avec leurs `-soft`), `border-strong` ;
@@ -212,12 +269,13 @@ Ces tokens peuvent rester propres au thème `dailylingua`. Les statuts communs `
 
 **Commun avec le natif :** tous les tokens passent par `getTheme()` et `nativewindPreset()`. Sons en fichiers, haptiques nommés par intention (`light`, `medium`, `success`) pour `expo-haptics` comme pour le web, composants en propriétés logiques.
 
-## 9. Points à trancher
+## 10. Points à trancher
 
 1. **Mascotte** : Pica (recommandé), Pli ou aucune.
 2. **Nom de l'XP** : garder « XP » partout (recommandé) ou le localiser par langue d'interface.
-3. **Ligue sans relégation** : seuls les cinq premiers montent, personne ne descend. Je le recommande : c'est la seule forme de ligue compatible avec « pas de pression ». Elle est désactivée par défaut.
-4. **Relâches (gel)** : recommandé, deux en réserve, regagnées par sept jours d'étude, et posées automatiquement les jours non prévus au planning.
-5. **Sons activés par défaut** : recommandé oui, volume bas, en respectant le mode silencieux.
-6. **Objectif du jour en XP ou en minutes** : recommandé en XP, puisque l'XP ne vient que du travail utile, avec équivalence en minutes affichée dans les réglages.
+3. **Ligue** : le game design (§3.4) retient la forme sans promotion ni relégation (réappariement chaque semaine avec des pairs de même volume, distinctions « podium » et « régularité »). Elle est désactivée par défaut et, dans les maquettes, rangée derrière un onglet de l'écran des quêtes. Les noms de divisions par formats de presse deviennent des noms de tranches, sans montée.
+4. **Relâches (gel)** : tranché par le game design (§3.2), qui fait foi. Une relâche offerte chaque lundi, une de plus par semaine où l'objectif de semaine est atteint, **3 en réserve au plus** ; posée automatiquement un jour non validé. Les jours de repos choisis n'en consomment pas.
+5. **Sons** : tranché par le game design (§3.8), **coupés par défaut**, proposés une fois après la première séance.
+6. **Objectif du jour en XP ou en minutes** : le game design (§3.1) fixe des paliers libellés en minutes (10, 20, 30, 45 min = 50, 100, 150, 220 XP). Les maquettes affichent l'XP dans l'anneau et les minutes dans les réglages.
 7. **Texte cible en serif** : recommandé Newsreader + Literata pour le cyrillique et le grec. Alternative : Inter pour tout le lecteur, plus neutre mais moins « journal ».
+8. **Second chiffre de la ligne d'état de l'accueil** : les maquettes y mettent l'XP de la semaine, parce que l'XP du jour est déjà au centre de l'anneau, juste au-dessus. Alternative : l'XP du jour, l'anneau ne gardant alors que son arc.
