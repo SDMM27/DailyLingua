@@ -20,10 +20,13 @@ export function nativeLanguageOptions(locale: string): LanguageOption[] {
       if (isValidNativeLanguage(code)) codes.add(code);
     }
   }
-  return sortByName(
-    [...codes].map((code) => ({ code, name: languageDisplayName(code, locale) })),
-    locale,
-  );
+  // Two codes can share a name (ak and tw are both « Akan »): one row per name, the registry first.
+  const byName = new Map<string, LanguageOption>();
+  for (const code of [...LANGUAGE_CODES, ...[...codes].sort()]) {
+    const name = languageDisplayName(code, locale);
+    if (!byName.has(name)) byName.set(name, { code, name });
+  }
+  return sortByName([...byName.values()], locale);
 }
 
 /** The study languages of the registry, named in `locale`. */

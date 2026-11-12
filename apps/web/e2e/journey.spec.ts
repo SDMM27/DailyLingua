@@ -106,7 +106,7 @@ test.describe("account journey", () => {
 
     // Today, first-day state.
     await expect(page).toHaveURL(/\/$/);
-    await expect(page.getByRole("heading", { level: 1, name: "italien" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /^italien$/i })).toBeVisible();
     await expect(page.getByText("Niveau de départ : A0")).toBeVisible();
     await expect(page.getByRole("button", { name: "Les séances arrivent bientôt" })).toBeDisabled();
     await expect(page.getByRole("progressbar", { name: "Objectif du jour : 0 sur 100 XP" })).toBeVisible();

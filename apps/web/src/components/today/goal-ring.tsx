@@ -34,7 +34,7 @@ export function GoalRing({ current, target }: { current: number; target: number 
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center" aria-hidden="true">
-        <span className="text-sm font-semibold leading-tight">
+        <span className="text-xs font-semibold leading-tight">
           {t("progress", { current: format.number(current), target: format.number(target) })}
         </span>
       </div>

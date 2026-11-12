@@ -60,7 +60,7 @@ export default async function TodayPage() {
         <hr className="border-line" />
         <div>
           {startLevel && <p className="meta">{t("session.startLevel", { level: startLevel })}</p>}
-          <h1 id="today-language" className="sd-display mt-1 text-3xl">
+          <h1 id="today-language" className="sd-display mt-1 text-3xl capitalize">
             {languageDisplayName(enrollment.language, locale)}
           </h1>
           <p className="mt-2 text-muted">{t("session.duration", { count: enrollment.dailyMinutes })}</p>
