@@ -6,7 +6,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(60);
+select plan(61);
 
 -- Snapshot helper: row count and content hash of every table of a schema -------------------------------
 
@@ -350,6 +350,9 @@ values ('c0000000-0000-4000-8000-0000000000f2', 'es', 'nuevo', 'nouveau', 'learn
 insert into public.vocabulary_reviews (user_id, item_id, reviewed_at, reviewed_on, grade, box_before, box_after, due_on_after, mode, days_since_last)
 values ('c0000000-0000-4000-8000-0000000000f2', 'c0000000-0000-4000-8000-0000000007a2', '2031-03-15 09:00+13', '2031-03-15',
   'easy', 3, 4, '2031-03-31', 'produce', 3);
+-- (as the old app does: a review also moves the item itself)
+update public.vocabulary_items set box = 4, due_on = '2031-03-31', last_reviewed_on = '2031-03-15', review_count = 5
+where id = 'c0000000-0000-4000-8000-0000000007a2';
 update public.activity_progress set completed_at = '2031-03-11 10:00+13'
 where activity_id = 'c0000000-0000-4000-8000-0000000005a2';
 
@@ -362,6 +365,7 @@ select results_eq(
   $$select (j ->> 'card_word')::int, (j ->> 'review_log')::int, (j ->> 'study_day')::int, (j ->> 'profile')::int from r_inc$$,
   $$values (1, 1, 2, 0)$$, 'the new word, the new review and the two new study days are copied, nothing else');
 select is_empty($$select * from v2$$, 'verify_migration is still clean');
+select is((select reps from app.card where front = 'comer'), 5, 'a reviewed card follows its source');
 select is((select payload -> 'sessions' -> 0 -> 'activities' -> 0 -> 'progress' ->> 'completed_at'
            from app.legacy_record where legacy_table = 'missions' and legacy_id = 'c0000000-0000-4000-8000-0000000003a2') is not null,
   true, 'an archived mission follows its source: the progress made after the first run is not lost');
