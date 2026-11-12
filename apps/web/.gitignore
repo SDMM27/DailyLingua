@@ -1,0 +1,7 @@
+# next.js
+/.next/
+/out/
+
+# playwright
+/playwright-report/
+/test-results/
