@@ -6,7 +6,8 @@
       "today": "Today",
       "path": "Path",
       "read": "Read",
-      "progress": "Progress"
+      "progress": "Progress",
+      "settings": "Settings"
     },
     "actions": {
       "continue": "Continue",
@@ -48,7 +49,8 @@
       "hasAccount": "Already have an account?",
       "signInLink": "Sign in",
       "checkEmail": "Check your inbox: we just sent a confirmation link to {email}.",
-      "confirmed": "Email confirmed. You can sign in now."
+      "confirmed": "Email confirmed. You can sign in now.",
+      "passwordHint": "At least {min} characters."
     },
     "guest": {
       "trial": "Try without an account",
@@ -74,7 +76,9 @@
     "stepCount": "Step {current} of {total}",
     "native": {
       "title": "Your native language",
-      "hint": "We use it to explain things in the language you understand best."
+      "hint": "We use it to explain things in the language you understand best.",
+      "search": "Search for a language",
+      "noResult": "No language matches."
     },
     "target": {
       "title": "The language you’re learning",
@@ -89,20 +93,25 @@
       "hint": "You can change it whenever you like.",
       "option": "{count, plural, one {# minute a day} other {# minutes a day}}"
     },
-    "finish": "Get started"
+    "finish": "Get started",
+    "saving": "Saving…"
   },
   "today": {
     "title": "Today",
     "goal": {
       "progress": "{current} / {target} XP",
-      "caption": "One session is enough to close the ring."
+      "caption": "One session is enough to close the ring.",
+      "label": "Today’s goal",
+      "ariaLabel": "Today’s goal: {current} of {target} XP"
     },
     "session": {
       "firstLabel": "{language} · first session",
       "duration": "{count, plural, one {# minute, step by step.} other {# minutes, step by step.}}",
       "nothingToChoose": "Nothing to pick to get going.",
       "start": "Start the session",
-      "resume": "Resume · step {current} of {total}"
+      "resume": "Resume · step {current} of {total}",
+      "startLevel": "Starting level: {level}",
+      "soon": "Sessions are coming soon"
     }
   },
   "settings": {
@@ -123,9 +132,26 @@
       "label": "Reminder time",
       "hint": "One reminder a day, never at night.",
       "at": "Reminder at {time}",
-      "off": "No reminder"
+      "off": "No reminder",
+      "clear": "Remove the reminder"
     },
-    "saved": "Settings saved."
+    "saved": "Settings saved.",
+    "groups": {
+      "display": "Display",
+      "learning": "Learning",
+      "account": "Account"
+    },
+    "theme": {
+      "label": "Theme",
+      "hint": "Light, dark, or follow your phone.",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "account": {
+      "signedInAs": "Signed in as {email}",
+      "guest": "You’re using Daily Lingua without an account."
+    }
   },
   "errors": {
     "generic": "Something went wrong. Try again in a moment.",
@@ -139,6 +165,12 @@
     "passwordTooShort": "The password must be at least {min} characters long.",
     "passwordMismatch": "The two passwords don’t match.",
     "linkExpired": "This link is no longer valid. Ask for a new one.",
-    "botCheck": "Complete the bot check first."
+    "botCheck": "Complete the bot check first.",
+    "emailInvalid": "That email address doesn’t look valid.",
+    "emailTaken": "An account already exists with this address. Sign in instead.",
+    "passwordWeak": "That password is too weak. Pick a longer or more varied one.",
+    "tooManyRequests": "Too many attempts. Try again in a few minutes.",
+    "botCheckLoad": "The bot check couldn’t load. Reload the page.",
+    "guestUnavailable": "Trying without an account isn’t available right now."
   }
 }

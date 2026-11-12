@@ -6,7 +6,8 @@
       "today": "Aujourd’hui",
       "path": "Parcours",
       "read": "Lire",
-      "progress": "Progrès"
+      "progress": "Progrès",
+      "settings": "Réglages"
     },
     "actions": {
       "continue": "Continuer",
@@ -48,7 +49,8 @@
       "hasAccount": "Déjà un compte ?",
       "signInLink": "Se connecter",
       "checkEmail": "Regarde ta boîte mail : un lien de confirmation vient d’être envoyé à {email}.",
-      "confirmed": "Adresse confirmée. Tu peux te connecter."
+      "confirmed": "Adresse confirmée. Tu peux te connecter.",
+      "passwordHint": "Au moins {min} caractères."
     },
     "guest": {
       "trial": "Essayer sans compte",
@@ -74,7 +76,9 @@
     "stepCount": "Étape {current} sur {total}",
     "native": {
       "title": "Ta langue maternelle",
-      "hint": "On s’en sert pour t’expliquer les choses dans la langue que tu comprends le mieux."
+      "hint": "On s’en sert pour t’expliquer les choses dans la langue que tu comprends le mieux.",
+      "search": "Chercher une langue",
+      "noResult": "Aucune langue ne correspond."
     },
     "target": {
       "title": "La langue que tu apprends",
@@ -89,20 +93,25 @@
       "hint": "Tu pourras le changer quand tu veux.",
       "option": "{count, plural, one {# minute par jour} other {# minutes par jour}}"
     },
-    "finish": "Commencer"
+    "finish": "Commencer",
+    "saving": "Enregistrement…"
   },
   "today": {
     "title": "Aujourd’hui",
     "goal": {
       "progress": "{current} / {target} XP",
-      "caption": "Une séance suffit pour fermer l’anneau."
+      "caption": "Une séance suffit pour fermer l’anneau.",
+      "label": "Objectif du jour",
+      "ariaLabel": "Objectif du jour : {current} sur {target} XP"
     },
     "session": {
       "firstLabel": "{language} · première séance",
       "duration": "{count, plural, one {# minute, étape par étape.} other {# minutes, étape par étape.}}",
       "nothingToChoose": "Rien à choisir pour commencer.",
       "start": "Commencer la séance",
-      "resume": "Reprendre · étape {current} sur {total}"
+      "resume": "Reprendre · étape {current} sur {total}",
+      "startLevel": "Niveau de départ : {level}",
+      "soon": "Les séances arrivent bientôt"
     }
   },
   "settings": {
@@ -123,9 +132,26 @@
       "label": "Heure du rappel",
       "hint": "Un seul rappel par jour, jamais la nuit.",
       "at": "Rappel à {time}",
-      "off": "Pas de rappel"
+      "off": "Pas de rappel",
+      "clear": "Retirer le rappel"
     },
-    "saved": "Réglages enregistrés."
+    "saved": "Réglages enregistrés.",
+    "groups": {
+      "display": "Affichage",
+      "learning": "Apprentissage",
+      "account": "Compte"
+    },
+    "theme": {
+      "label": "Thème",
+      "hint": "Clair, sombre, ou celui de ton téléphone.",
+      "light": "Clair",
+      "dark": "Sombre",
+      "system": "Système"
+    },
+    "account": {
+      "signedInAs": "Connecté avec {email}",
+      "guest": "Tu utilises Daily Lingua sans compte."
+    }
   },
   "errors": {
     "generic": "Quelque chose n’a pas marché. Réessaie dans un instant.",
@@ -139,6 +165,12 @@
     "passwordTooShort": "Le mot de passe doit contenir au moins {min} caractères.",
     "passwordMismatch": "Les deux mots de passe ne sont pas identiques.",
     "linkExpired": "Ce lien n’est plus valide. Demande-en un nouveau.",
-    "botCheck": "Termine d’abord la vérification anti-robot."
+    "botCheck": "Termine d’abord la vérification anti-robot.",
+    "emailInvalid": "Cette adresse e-mail n’a pas l’air valide.",
+    "emailTaken": "Un compte existe déjà avec cette adresse. Connecte-toi.",
+    "passwordWeak": "Ce mot de passe est trop faible. Choisis-en un plus long ou plus varié.",
+    "tooManyRequests": "Trop de tentatives. Réessaie dans quelques minutes.",
+    "botCheckLoad": "La vérification anti-robot n’a pas pu se charger. Recharge la page.",
+    "guestUnavailable": "L’essai sans compte n’est pas disponible pour le moment."
   }
 }

@@ -5,8 +5,8 @@ import {
   type SkillEstimate,
 } from "@dailylingua/schemas";
 import { appSchema, type AppClient } from "./client";
-import { DataError, toDataError, type RawDatabaseError } from "./errors";
-import { toEnrollment, toEnrollmentsPayload, toSkillEstimate, type EnrollmentRow } from "./mappers";
+import { DataError, toDataError } from "./errors";
+import { toEnrollment, toEnrollmentsPayload, toSkillEstimate } from "./mappers";
 
 /** Active enrollments of the signed-in user, in plan order. */
 export async function listEnrollments(client: AppClient): Promise<Enrollment[]> {
@@ -27,24 +27,13 @@ export async function listSkillEstimates(client: AppClient, language: string): P
 }
 
 /**
- * `app.save_enrollments` (lot A) is not in the generated types until they are regenerated with its
- * migration: the call goes through this minimal signature. Remove it, and the cast, once it is.
- */
-interface SaveEnrollmentsRpc {
-  rpc(
-    fn: "save_enrollments",
-    args: { p_enrollments: unknown },
-  ): PromiseLike<{ data: EnrollmentRow[] | null; error: RawDatabaseError | null }>;
-}
-
-/**
  * Replaces the learning plan: the languages of `input` become active, in that order; the others
  * become inactive (never deleted). Validates the input, then calls `app.save_enrollments`.
  */
 export async function saveEnrollments(client: AppClient, input: SaveEnrollmentsInput): Promise<Enrollment[]> {
   const parsed = saveEnrollmentsInputSchema.safeParse(input);
   if (!parsed.success) throw new DataError("invalid");
-  const { data, error } = await (appSchema(client) as unknown as SaveEnrollmentsRpc).rpc("save_enrollments", {
+  const { data, error } = await appSchema(client).rpc("save_enrollments", {
     p_enrollments: toEnrollmentsPayload(parsed.data),
   });
   if (error) throw toDataError(error);

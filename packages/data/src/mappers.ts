@@ -74,14 +74,14 @@ export function toSkillEstimate(row: SkillEstimateRow): SkillEstimate {
 }
 
 /** Wire form of one enrollment sent to `app.save_enrollments`. */
-export interface EnrollmentPayload {
+export type EnrollmentPayload = {
   language: string;
   daily_minutes: number;
   days: number[];
   target_level: string | null;
   purpose: string | null;
   start_level: string | null;
-}
+};
 
 /** Parsed input (defaults applied) to the JSON array of `app.save_enrollments`; order is the position. */
 export function toEnrollmentsPayload(input: readonly EnrollmentInput[]): EnrollmentPayload[] {
