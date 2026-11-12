@@ -28,6 +28,8 @@ Alternative écartée : un nouveau projet Supabase. Elle obligerait à migrer le
 | Quotas (`*_usage`, `*_quota`) | Non migrés | Compteurs journaliers sans valeur historique |
 | Comptes invités | Migrés comme les autres | Purge des inactifs inchangée |
 
+**Règle de reprise incrémentale (ajoutée après la revue de sécurité du jalon 1).** Tant qu'un utilisateur n'a rien écrit dans la nouvelle app (`profile.app_active_since` nul), chaque passage de la reprise est une **resynchronisation complète** depuis `public` : lignes nouvelles ajoutées, lignes modifiées mises à jour, lignes supprimées répercutées. Ce qu'il fait dans l'ancienne app entre la migration à blanc et la bascule n'est donc pas perdu. Dès sa première écriture dans la nouvelle app, la reprise ne touche plus à ses données. Les cartes ne sont jamais effacées physiquement (`deleted_at`), parce que leurs journaux de révision sont en ajout seul.
+
 Chaque ligne migrée est inscrite dans `app.legacy_map` (table et identifiant d'origine → nouvel identifiant). La migration est donc **rejouable** : relancée, elle ne crée pas de doublon et ne traite que ce qui a changé.
 
 ## 3. De Leitner à FSRS
