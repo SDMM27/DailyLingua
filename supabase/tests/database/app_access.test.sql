@@ -62,8 +62,8 @@ select is(
   (select count(*)::int from pg_proc p join pg_namespace n on n.oid = p.pronamespace
    where n.nspname = 'app'
      and (has_function_privilege('anon', p.oid, 'execute') or has_function_privilege('authenticated', p.oid, 'execute'))
-     and p.proname <> 'save_profile'),
-  0, 'save_profile is the only function of app that clients can execute');
+     and p.proname not in ('save_profile', 'save_enrollments')),
+  0, 'save_profile and save_enrollments are the only functions of app that clients can execute');
 select is(
   (select count(*)::int from pg_proc p join pg_namespace n on n.oid = p.pronamespace
    where n.nspname = 'app' and p.proname in ('migrate_user', 'migrate_all', 'verify_migration')
