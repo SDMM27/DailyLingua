@@ -48,8 +48,8 @@ export const skillEstimateSchema = z.object({
   userId: z.uuid(),
   language: languageCodeSchema,
   skill: skillSchema,
-  /** Continuous scale: 0 = A0, 1 = start of A1, 2 = start of A2 … 6 = end of C2. */
-  levelValue: z.number().min(0).max(6),
+  /** Continuous scale: 0 = A0, 1 = start of A1 … 6 = start of C2, 7 = end of C2. */
+  levelValue: z.number().min(0).max(7),
   uncertainty: z.number().positive(),
   source: skillEstimateSourceSchema,
   updatedAt: isoInstantSchema,

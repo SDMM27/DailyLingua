@@ -26,8 +26,8 @@ describe("wantedLevels", () => {
 });
 
 describe("levelToValue", () => {
-  it("is A1 1.5, A2 2.5 … C2 5.5, always inside 0..6", () => {
-    expect(cefrLevels.map(levelToValue)).toEqual([1.5, 2.5, 3.5, 4.5, 5.25, 5.5]);
+  it("is the middle of the band: A1 1.5 … C2 6.5, inside 0..7", () => {
+    expect(cefrLevels.map(levelToValue)).toEqual([1.5, 2.5, 3.5, 4.5, 5.5, 6.5]);
   });
 });
 
@@ -44,13 +44,14 @@ describe("valueToLevel", () => {
     expect(valueToLevel(3.5)).toBe("B1");
     expect(valueToLevel(4.99)).toBe("B2");
     expect(valueToLevel(5)).toBe("C1");
-    expect(valueToLevel(5.49)).toBe("C1");
-    expect(valueToLevel(5.5)).toBe("C2");
+    expect(valueToLevel(5.99)).toBe("C1");
+    expect(valueToLevel(6)).toBe("C2");
+    expect(valueToLevel(7)).toBe("C2");
   });
 
   it("clamps outside the scale", () => {
     expect(valueToLevel(-3)).toBe("A0");
-    expect(valueToLevel(6)).toBe("C2");
+    expect(valueToLevel(7.01)).toBe("C2");
     expect(valueToLevel(9)).toBe("C2");
     expect(valueToLevel(Number.NaN)).toBe("A0");
   });

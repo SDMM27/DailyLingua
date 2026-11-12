@@ -40,7 +40,8 @@ export function clampTargetRetention(value: number | undefined): number {
 }
 
 // Fuzz is off (reviews must be reproducible) and so are sub-day learning steps: a card is scheduled
-// in whole days from its first answer, which suits a daily session.
+// in whole days from its first answer, which suits a daily session. Within-day steps (`relearning`,
+// new cards seen again after a few minutes) are deliberately disabled in this batch: milestone 2.
 const schedulers = new Map<number, FSRS>();
 function schedulerFor(retention: number): FSRS {
   let scheduler = schedulers.get(retention);

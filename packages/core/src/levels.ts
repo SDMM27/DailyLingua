@@ -17,23 +17,18 @@ export function wantedLevels(level: CefrLevel, difficulty: DifficultyMode): Cefr
 }
 
 /**
- * Continuous scale of `skill_estimate.level_value`, bounded to [0, 6]: [0, 1) is A0 and 6 is the end of C2.
- * The spec fixes A1 → 1.5, A2 → 2.5 … C2 → 5.5 and the 0..6 bound, which leaves no room for six
- * bands of width 1: A1 to B2 keep their unit band (the value is its middle), C1 and C2 share [5, 6]
- * (C1 = [5, 5.5), C2 = [5.5, 6]). Open point reported to the architect.
+ * Continuous scale of `skill_estimate.level_value`, bounded to [0, 7], one band of width 1 per level:
+ * A0 = [0, 1), A1 = [1, 2) … C1 = [5, 6), C2 = [6, 7]. Bands are closed on the left; 7 belongs to C2.
  */
-const BAND_START = { A1: 1, A2: 2, B1: 3, B2: 4, C1: 5, C2: 5.5 } as const satisfies Record<CefrLevel, number>;
-const BAND_VALUE = { A1: 1.5, A2: 2.5, B1: 3.5, B2: 4.5, C1: 5.25, C2: 5.5 } as const satisfies Record<CefrLevel, number>;
+export const LEVEL_SCALE_MAX = 7;
 
-/** Representative value of a level on the continuous scale (A1 → 1.5 … C2 → 5.5). */
+/** Middle of the level's band: A1 1.5, A2 2.5, B1 3.5, B2 4.5, C1 5.5, C2 6.5. */
 export function levelToValue(level: CefrLevel): number {
-  return BAND_VALUE[level];
+  return cefrLevels.indexOf(level) + 1.5;
 }
 
-/** The level whose band contains `value`; below 1 is A0, from 6 up is C2. */
+/** The level whose band contains `value`. Values outside [0, 7] are clamped (below 0 is A0, above 7 is C2). */
 export function valueToLevel(value: number): "A0" | CefrLevel {
   if (!(value >= 1)) return "A0";
-  let found: CefrLevel = "A1";
-  for (const level of cefrLevels) if (value >= BAND_START[level]) found = level;
-  return found;
+  return cefrLevels[Math.min(cefrLevels.length - 1, Math.floor(value) - 1)] as CefrLevel;
 }

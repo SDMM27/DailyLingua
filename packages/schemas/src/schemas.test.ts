@@ -155,14 +155,14 @@ const estimate = {
 };
 
 describe("skillEstimateSchema", () => {
-  it("accepts the whole 0..6 scale", () => {
-    for (const levelValue of [0, 1.5, 6]) {
+  it("accepts the whole 0..7 scale", () => {
+    for (const levelValue of [0, 1.5, 6.5, 7]) {
       expect(skillEstimateSchema.safeParse({ ...estimate, levelValue }).success).toBe(true);
     }
   });
 
   it("refuses out-of-scale values, a null uncertainty and unknown sources", () => {
-    expect(skillEstimateSchema.safeParse({ ...estimate, levelValue: 6.1 }).success).toBe(false);
+    expect(skillEstimateSchema.safeParse({ ...estimate, levelValue: 7.1 }).success).toBe(false);
     expect(skillEstimateSchema.safeParse({ ...estimate, levelValue: -0.1 }).success).toBe(false);
     expect(skillEstimateSchema.safeParse({ ...estimate, uncertainty: 0 }).success).toBe(false);
     expect(skillEstimateSchema.safeParse({ ...estimate, source: "guess" }).success).toBe(false);
