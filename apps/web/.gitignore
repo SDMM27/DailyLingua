@@ -5,3 +5,6 @@
 # playwright
 /playwright-report/
 /test-results/
+
+# dependencies (workspace-local caches, e.g. Vitest)
+/node_modules/
