@@ -1,0 +1,46 @@
+@import "tailwindcss";
+@import "@sdmm/design/css/all-dailylingua.css";
+@import "@sdmm/design/tailwind/v4.css";
+
+/*
+ * Only the tokens of the design system (--sd-*, and the Tailwind names it generates: bg-bg,
+ * text-ink, border-line, bg-accent…). The three families come from next/font (self-hosted); they
+ * replace the names the design system expects, with its own fallbacks behind them.
+ */
+:root {
+  --sd-font-display: var(--font-newsreader), "Newsreader", ui-serif, Georgia, serif;
+  --sd-font-sans: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --sd-font-mono: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, monospace;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    min-block-size: 100dvh;
+    background: var(--sd-bg);
+    color: var(--sd-ink);
+    font-family: var(--sd-font-sans);
+    overscroll-behavior-block: none;
+  }
+
+  /* iOS zooms on focus when a field is under 16px. */
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1em);
+  }
+}
+
+/* Mono metadata line: spaced capitals for scripts with case, the interface font elsewhere. */
+@utility meta {
+  font-family: var(--sd-font-mono);
+  font-size: var(--sd-text-xs);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sd-muted);
+}
