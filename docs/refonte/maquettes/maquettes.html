@@ -1,0 +1,954 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Maquettes DailyLingua</title>
+<meta name="description" content="Direction artistique « L'édition du jour » : onze écrans de la refonte (l'accueil en trois états), en clair et en sombre, sous la règle de densité.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..800;1,6..72,400..600&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+/* ---------- Planche : suit le thème de la page ---------- */
+:root{
+  --p-bg:#efeadf;--p-card:#f7f3ea;--p-ink:#1d1b17;--p-muted:#625c53;--p-line:#d3cbbb;--p-accent:#33478c;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --p-bg:#0a0908;--p-card:#141210;--p-ink:#f3efe6;--p-muted:#a39b8e;--p-line:#34302a;--p-accent:#b3c0ff;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --p-bg:#0a0908;--p-card:#141210;--p-ink:#f3efe6;--p-muted:#a39b8e;--p-line:#34302a;--p-accent:#b3c0ff;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--p-bg);color:var(--p-ink);font:16px/1.55 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:40px 16px 96px}
+.p-meta{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--p-muted);margin:0}
+.p-top{border-bottom:3px double var(--p-ink);padding-bottom:20px}
+.p-top h1{font-family:"Newsreader",Georgia,serif;font-weight:700;letter-spacing:-.02em;font-size:clamp(38px,8vw,64px);line-height:1;margin:10px 0 14px}
+.p-top h1 em{font-weight:500;color:var(--p-accent)}
+.p-lede{max-width:62ch;margin:0;color:var(--p-ink)}
+.p-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:18px}
+.p-tools button{font:600 14px Inter,system-ui,sans-serif;min-height:44px;padding:0 16px;border-radius:12px;border:1px solid var(--p-line);background:var(--p-card);color:var(--p-ink);cursor:pointer}
+.p-tools button[aria-pressed="true"]{border-color:var(--p-ink);box-shadow:inset 0 0 0 1px var(--p-ink)}
+.p-index{display:flex;flex-wrap:wrap;gap:6px 14px;margin:18px 0 0;padding:0;list-style:none}
+.p-index a{color:var(--p-ink);font-size:14px;text-underline-offset:3px;text-decoration-color:var(--p-line)}
+.shot{margin-top:72px;border-top:1px solid var(--p-line);padding-top:22px}
+.shot-head{display:grid;grid-template-columns:auto 1fr;gap:2px 14px;align-items:baseline}
+.shot-head h2{font-family:"Newsreader",Georgia,serif;font-weight:700;font-size:30px;letter-spacing:-.02em;margin:0;line-height:1.15}
+.shot-head .cap{grid-column:1/-1;margin:6px 0 0;color:var(--p-muted);max-width:70ch}
+.pair{display:flex;flex-wrap:wrap;justify-content:center;gap:44px 56px;margin-top:30px}
+.frame{margin:0;display:flex;flex-direction:column;align-items:center;gap:20px;max-width:100%}
+.frame figcaption{order:-1}
+.state{margin:48px 0 0;text-align:center;color:var(--p-ink)}
+.p-foot{margin-top:80px;border-top:3px double var(--p-ink);padding-top:16px;color:var(--p-muted);font-size:14px}
+
+/* ---------- Thèmes des écrans (indépendants de la page) ---------- */
+.t-light{
+  --bg:#f5f1e8;--surface:#fffcf6;--surface2:#ede7da;--ink:#1d1b17;--muted:#6b655c;--line:#d9d2c4;--border:#8b8478;
+  --accent:#33478c;--accent-strong:#33478c;--on-accent:#fff;--accent-soft:#e5e9f4;--accent2:#b0502b;
+  --streak:#9a4322;--streak-soft:#f6e6dc;--xp:#8a5a00;--xp-soft:#f6ead0;
+  --success:#2f6b4f;--success-soft:#e0eee5;--on-success:#fff;--error:#a33a32;--error-soft:#f6e1de;
+  --new:#fbe6a0;--new-line:#8a5a00;--learning:#dfe4f3;
+  --shadow:0 1px 0 rgba(29,27,23,.05),0 14px 30px -16px rgba(29,27,23,.35);
+  color-scheme:light;
+}
+.t-dark{
+  --bg:#0f0e0c;--surface:#181614;--surface2:#1d1a17;--ink:#f3efe6;--muted:#a39b8e;--line:#34302a;--border:#6f685e;
+  --accent:#8fa2ff;--accent-strong:#b3c0ff;--on-accent:#0d1330;--accent-soft:#222a42;--accent2:#e2825c;
+  --streak:#e2825c;--streak-soft:#3b261c;--xp:#e8b85a;--xp-soft:#33280f;
+  --success:#7fc29d;--success-soft:#1b3326;--on-success:#0f0e0c;--error:#ec8f86;--error-soft:#3e1f1c;
+  --new:#4b3c13;--new-line:#e8b85a;--learning:#2a3358;
+  --shadow:0 1px 0 rgba(0,0,0,.4),0 18px 34px -14px rgba(0,0,0,.8);
+  color-scheme:dark;
+}
+.t-light.lang-ru{--lang:#33478c;--lang-soft:#e5e9f4;--on-lang:#fff}
+.t-dark.lang-ru{--lang:#9eb0ea;--lang-soft:#222a42;--on-lang:#0f0e0c}
+.t-light.lang-fr{--lang:#24609a;--lang-soft:#dde9f4;--on-lang:#fff}
+.t-dark.lang-fr{--lang:#8fbfe9;--lang-soft:#182a3b;--on-lang:#0f0e0c}
+
+/* ---------- Cadre iPhone ---------- */
+.phone{
+  --serif:"Newsreader","Literata",Georgia,"Noto Serif",serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  position:relative;width:390px;max-width:100%;height:844px;border-radius:52px;overflow:hidden;isolation:isolate;
+  background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.45;text-align:start;
+  box-shadow:0 0 0 8px #1c1b19,0 0 0 9px #4b4842,0 40px 70px -34px rgba(0,0,0,.55);
+}
+.phone[lang="ar"]{font-family:"Noto Sans Arabic","Geeza Pro","Segoe UI",Tahoma,sans-serif;--serif:"Noto Naskh Arabic","Geeza Pro","Times New Roman",serif}
+/* Cyrillique : Newsreader n'en a pas ; repli serif qui place bien l'accent tonique (U+0301). */
+.phone [lang="ru"]{--serif:"Literata","PT Serif",Cambria,"Times New Roman",serif}
+.phone p,.phone h1,.phone h2,.phone h3,.phone ol,.phone ul{margin:0}
+.phone ol,.phone ul{padding:0;list-style:none}
+.phone button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+.sb{position:absolute;inset:0 0 auto 0;height:54px;display:flex;align-items:center;justify-content:space-between;padding:4px 30px 0 36px;font-weight:600;font-size:16px;z-index:5}
+.sb-r{display:flex;gap:6px;align-items:center}
+.sb .ic{width:18px;height:18px}
+.batt{display:inline-block;width:25px;height:12px;border:1.5px solid currentColor;border-radius:4px;position:relative;opacity:.9}
+.batt::before{content:"";position:absolute;inset:1.5px;width:70%;background:currentColor;border-radius:1.5px}
+.batt::after{content:"";position:absolute;top:3px;inset-inline-end:-4px;width:2px;height:4px;background:currentColor;border-radius:0 1px 1px 0}
+.island{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:122px;height:36px;border-radius:20px;background:#000;z-index:6}
+.hi{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:var(--ink);z-index:6}
+.view{position:absolute;inset:54px 0 0 0;display:flex;flex-direction:column}
+.scroll{flex:1;min-height:0;overflow:hidden;padding:6px 20px 16px;position:relative}
+.foot{padding:12px 20px 42px;border-top:1px solid var(--line);background:var(--surface)}
+
+/* ---------- Typo ---------- */
+.ic{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.ic.fill{fill:currentColor;stroke:none}
+.ic.s16{width:16px;height:16px}.ic.s20{width:20px;height:20px}
+.meta{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.phone[lang="ar"] .meta{font-family:inherit;letter-spacing:0;text-transform:none;font-weight:600;font-size:13px}
+.serif{font-family:var(--serif)}
+.muted{color:var(--muted)}
+.rub{display:flex;align-items:baseline;gap:8px;font-family:var(--serif);font-style:italic;font-size:17px;font-weight:500}
+.rn{font-style:normal;font-weight:700;color:var(--accent-strong);font-size:15px;min-width:1.2em}
+.mast{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;border-bottom:3px double var(--ink);padding-bottom:8px}
+.logo{font-family:var(--serif);font-weight:700;font-size:27px;letter-spacing:-.02em;line-height:1.05}
+.langchip{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 12px;border-radius:22px;border:1px solid var(--line);background:var(--surface);font-weight:600;font-size:14px;white-space:nowrap}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--lang);display:inline-block}
+
+/* ---------- Boutons, cartes ---------- */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;padding:0 18px;border-radius:12px;background:var(--accent);color:var(--on-accent);font-weight:600;font-size:16px;text-decoration:none;text-align:center}
+.phone .btn{background:var(--accent);color:var(--on-accent)}
+.phone .btn.ok{background:var(--success);color:var(--on-success)}
+.phone .btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--border)}
+.btnrow{display:flex;gap:10px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
+.ad{border:1.5px dashed var(--border);background:transparent}
+.bar{height:6px;border-radius:3px;background:var(--surface2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.iconbtn{width:44px;height:44px;display:grid;place-items:center;border-radius:22px;color:var(--ink)}
+.xpt{color:var(--xp);font-family:var(--mono);font-weight:500;font-size:13px;white-space:nowrap}
+.flip{transform:scaleX(1)}
+[dir="rtl"] .flip{transform:scaleX(-1)}
+
+/* ---------- Tampons ---------- */
+.stamp{display:inline-block;font-family:var(--mono);font-weight:500;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--success);border:2px solid currentColor;outline:1px solid currentColor;outline-offset:2px;border-radius:5px;padding:3px 10px;transform:rotate(-7deg);
+  -webkit-mask-image:radial-gradient(circle at 30% 40%,#000 62%,rgba(0,0,0,.72) 63%,#000 75%);mask-image:radial-gradient(circle at 30% 40%,#000 62%,rgba(0,0,0,.72) 63%,#000 75%)}
+.stamp.round{border-radius:50%;width:92px;height:92px;display:grid;place-items:center;text-align:center;padding:6px;font-size:11px;line-height:1.25;letter-spacing:.12em}
+.phone[lang="ar"] .stamp{font-family:inherit;letter-spacing:0;font-weight:700}
+@keyframes stampIn{from{transform:scale(1.8) rotate(-18deg);opacity:0}to{transform:scale(1) rotate(-9deg);opacity:1}}
+.stamp.anim{animation:stampIn .45s cubic-bezier(.34,1.56,.64,1) .5s both}
+@media (prefers-reduced-motion:reduce){.stamp.anim{animation:none}}
+
+/* ---------- Onglets ---------- */
+.tabbar{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);background:var(--surface);padding:6px 6px 34px}
+.tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:50px;font-size:12px;font-weight:500;color:var(--muted);text-align:center;line-height:1.2}
+.tab.on{color:var(--accent-strong);font-weight:600}
+.tab.on .ic{stroke-width:2.1}
+
+/* ---------- Anneau d'objectif (commun) ---------- */
+.ring{width:100%;height:100%;display:block}
+.ring .track{fill:none;stroke:var(--line);stroke-width:7}
+.ring .arc{fill:none;stroke:var(--accent);stroke-width:7;stroke-linecap:round}
+.ring .reg{stroke:var(--ink);stroke-width:1.4;fill:none}
+.small{font-size:14px;color:var(--muted);margin-top:4px;line-height:1.4}
+
+/* ---------- Listes sobres : une ligne par élément, chevron ---------- */
+.rows{border-top:1px solid var(--line)}
+.row{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:8px 0;border-bottom:1px solid var(--line);color:var(--ink);text-decoration:none;text-align:start;font-size:15px;line-height:1.3}
+.row>.ic{width:20px;height:20px;color:var(--muted)}
+.row .r-l{flex:1;min-width:0;font-weight:600}
+.row .r-v{flex:0 1 auto;max-width:58%;color:var(--muted);font-size:14px;text-align:end}
+.row .chev{width:18px;height:18px;color:var(--muted)}
+.rows-h{margin:0 0 8px}
+
+/* ---------- 1. Aujourd'hui ---------- */
+.today{display:flex;flex-direction:column;gap:32px;padding:8px 20px 20px}
+.tbar{display:flex;align-items:baseline;justify-content:space-between;gap:12px;min-height:44px;padding-top:6px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.tlogo{font-family:var(--serif);font-weight:700;font-size:22px;letter-spacing:-.02em;line-height:1.1}
+.tbar .meta{white-space:nowrap}
+.sblock{margin-block:auto;padding:24px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+.goal{display:flex;align-items:center;gap:16px}
+.gring{position:relative;width:88px;height:88px;flex:none}
+.gtxt{position:absolute;inset:0;display:grid;place-content:center;text-align:center;line-height:1.05}
+.gtxt b{font-size:18px;font-weight:600}
+.gtxt span{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:2px}
+.phone[lang="ar"] .gtxt span{font-family:inherit}
+.gring .stamp{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-9deg);white-space:nowrap;font-size:11px;line-height:1.2;letter-spacing:.08em;text-align:center;padding:2px 5px;background:color-mix(in srgb,var(--surface) 88%,transparent)}
+.gring .stamp.anim{animation:stampGoal .45s cubic-bezier(.34,1.56,.64,1) .4s both}
+@keyframes stampGoal{from{transform:translate(-50%,-50%) scale(1.8) rotate(-18deg);opacity:0}to{transform:translate(-50%,-50%) scale(1) rotate(-9deg);opacity:1}}
+@media (prefers-reduced-motion:reduce){.gring .stamp.anim{animation:fadeIn .1s linear both}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.goal p{font-size:15px;line-height:1.35}
+.goal .meta{margin-bottom:2px}
+.sdiv{height:1px;background:var(--line);margin:24px 0}
+.s-lang{display:flex;align-items:center;gap:8px}
+.hl{font-family:var(--serif);font-weight:700;font-size:28px;line-height:1.14;letter-spacing:-.015em;margin-top:8px}
+.hl-t{font-family:var(--serif);font-style:italic;color:var(--lang);font-size:16px;margin-top:6px}
+.sblock .btn{margin-top:24px}
+.sblock .btn.ghost{margin-top:16px}
+.sline{display:flex;align-items:center;gap:12px;min-height:44px;font-size:14px;color:var(--muted);text-decoration:none}
+.sline .sl{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:4px 14px}
+.sline span{display:inline-flex;align-items:center;gap:6px}
+.sline b{font-size:15px;font-weight:600}
+.sline .st{color:var(--streak)} .sline .xq{color:var(--xp)}
+.sline .ic{width:18px;height:18px}
+.sline .chev{color:var(--muted)}
+
+/* Suite au défilement : sous la ligne de flottaison */
+.fold{width:390px;max-width:100%;display:flex;align-items:center;gap:10px;margin:-4px 0 -8px}
+.fold::before,.fold::after{content:"";flex:1;border-top:1.5px dashed var(--p-muted)}
+.below{width:390px;max-width:100%;border-radius:28px;background:var(--bg);color:var(--ink);padding:20px 20px 24px;font-family:Inter,system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.45;box-shadow:0 0 0 1px var(--line);text-align:start}
+.below p,.below h3,.below ul{margin:0}
+.below ul{padding:0;list-style:none}
+.below .flip{transform:scaleX(1)}
+.budget{margin:22px auto 0;max-width:820px;padding:14px 16px;border:1px solid var(--p-line);border-radius:12px;background:var(--p-card);font-size:14px}
+.budget ol{margin:6px 0 0;padding-inline-start:20px}
+.budget li+li{margin-top:2px}
+
+/* ---------- Barre de séance ---------- */
+.sess{display:flex;align-items:center;gap:8px;padding:2px 14px 0 8px}
+.segs{flex:1;display:flex;gap:4px}
+.seg{flex:1;height:7px;border-radius:4px;background:var(--surface2);overflow:hidden;border:1px solid var(--line)}
+.seg i{display:block;height:100%;width:var(--p,0%);background:var(--accent)}
+.seg.done i{background:var(--success);width:100%}
+.xpc{display:flex;align-items:center;gap:4px;color:var(--xp);font-family:var(--mono);font-size:14px;font-weight:500;min-width:52px;justify-content:flex-end}
+.sess-l{padding:4px 20px 6px}
+
+/* ---------- 2. Rappel ---------- */
+.ex{margin-top:10px}
+.target{font-family:var(--serif);font-size:25px;line-height:1.3;margin-top:10px}
+.gap{display:inline-block;min-width:4.2em;border-bottom:2px solid var(--ink);height:1.05em;vertical-align:-2px}
+.hint{margin-top:10px;font-size:15px}
+.hint b{font-weight:600}
+.src{margin-top:12px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+.field{display:block;margin-top:14px}
+.input{display:flex;align-items:center;justify-content:space-between;margin-top:6px;min-height:54px;padding:0 14px;border-radius:12px;background:var(--surface);border:1.5px solid var(--border);font-size:20px}
+.input.ok{border-color:var(--success);box-shadow:0 0 0 3px var(--success-soft)}
+.input.ok .ic{color:var(--success)}
+.sheet{position:absolute;left:0;right:0;bottom:0;padding:16px 20px 42px;border-radius:22px 22px 0 0;border-top:3px double var(--success);background:var(--success-soft);box-shadow:var(--shadow);z-index:3}
+.sheet-top{display:flex;align-items:center;justify-content:space-between}
+.xpgain{font-family:var(--mono);font-weight:500;font-size:18px;color:var(--xp);background:var(--surface);border-radius:20px;padding:4px 12px;display:flex;align-items:center;gap:6px}
+.sheet-t{font-family:var(--serif);font-size:24px;margin-top:12px}
+.sheet p+p{margin-top:6px}
+.sheet .btn{margin-top:14px}
+
+/* ---------- 3. Lecteur ---------- */
+.rtitle{font-family:var(--serif);font-weight:700;font-size:26px;line-height:1.12;letter-spacing:-.015em}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;margin:10px 0 0;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw-new,.sw-learn,.sw-known{display:inline-block;width:22px;height:14px;border-radius:3px}
+.sw-new{background:var(--new);border-bottom:2px dotted var(--new-line)}
+.sw-learn{background:var(--learning);border-bottom:2px solid var(--accent)}
+.sw-known{border-bottom:1px solid var(--muted)}
+.rtext{font-family:var(--serif);font-size:19px;line-height:1.7}
+.rtext p+p{margin-top:10px}
+.w-new{background:var(--new);border-bottom:2px dotted var(--new-line);border-radius:3px;padding:0 1px}
+.w-learn{background:var(--learning);border-bottom:2px solid var(--accent);border-radius:3px;padding:0 1px}
+.w-sel{outline:2px solid var(--accent);outline-offset:1px}
+.cur{background:var(--surface2);box-shadow:-3px 0 0 var(--surface2),3px 0 0 var(--surface2);-webkit-box-decoration-break:clone;box-decoration-break:clone;border-radius:3px}
+.bubble{position:relative;margin:12px 0 4px;padding:14px;border-radius:14px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);font-family:Inter,system-ui,sans-serif;font-size:15px;line-height:1.4}
+.bubble::before{content:"";position:absolute;top:-8px;inset-inline-start:42%;width:14px;height:14px;background:var(--surface);border-top:1px solid var(--border);border-left:1px solid var(--border);transform:rotate(45deg)}
+.b-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.b-word{font-family:var(--serif);font-size:24px;font-weight:700}
+.b-tr{font-size:17px;font-weight:600;margin-top:2px}
+.b-ctx{font-size:14px;color:var(--muted);margin-top:4px}
+.b-act{display:flex;gap:8px;margin-top:10px}
+.b-act .btn{min-height:44px;font-size:15px}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--new);color:var(--ink)}
+.player{padding:8px 20px 40px;border-top:1px solid var(--line);background:var(--surface)}
+.scrub{display:flex;gap:3px;align-items:center;height:16px}
+.scrub i{flex:1;height:4px;border-radius:2px;background:var(--surface2)}
+.scrub i.p{background:var(--accent)}
+.scrub i.c{height:8px;background:var(--accent)}
+.pl-row{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
+.phone .play{width:56px;height:56px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center}
+.speed{min-width:44px;min-height:44px;display:grid;place-items:center;font-family:var(--mono);font-size:14px;font-weight:500}
+
+/* ---------- 4. Production ---------- */
+.ltext{font-family:var(--serif);font-size:18px;line-height:1.65;margin-top:14px;padding-top:10px;border-top:1px solid var(--line)}
+.ltext del{color:var(--error);text-decoration-thickness:2px;text-decoration-color:var(--error)}
+.ltext ins{text-decoration:none;color:var(--success);font-weight:600;border-bottom:2px solid var(--success)}
+.ltext sup,.corr sup{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--error)}
+.corr{margin-top:12px;display:grid;gap:6px}
+.corr li{display:flex;gap:8px;align-items:baseline;font-size:14px;line-height:1.35}
+.tag{flex:none;font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:5px;background:var(--error-soft);color:var(--error)}
+.rewrite{margin-top:14px;border-top:3px double var(--ink);padding-top:10px}
+.ta{margin-top:8px;min-height:84px;padding:12px 14px;border-radius:12px;background:var(--surface);border:1.5px solid var(--accent);font-size:17px;line-height:1.45;box-shadow:0 0 0 3px var(--accent-soft)}
+.caret{display:inline-block;width:2px;height:1.1em;background:var(--accent);vertical-align:-3px;margin-inline-start:1px}
+
+/* ---------- 5. Fin de séance ---------- */
+.fin{display:flex;flex-direction:column;gap:24px;padding:8px 20px 16px}
+.fin-top{display:grid;justify-items:center;gap:24px;text-align:center;padding-top:8px}
+.ed-ring{position:relative;width:148px;height:148px}
+.ed-ring .stamp{position:absolute;left:50%;top:50%;margin:-46px 0 0 -46px;background:color-mix(in srgb,var(--bg) 82%,transparent)}
+.ed-hl{font-family:var(--serif);font-weight:700;font-size:28px;line-height:1.14;letter-spacing:-.015em;max-width:20ch}
+.row .xpt,.row .r-v.xpt{font-size:14px;color:var(--xp)}
+.row .st{color:var(--streak);font-weight:600}
+
+/* ---------- 6. Parcours ---------- */
+.phone .map{position:relative;margin-top:24px}
+.map::before{content:"";position:absolute;top:20px;bottom:20px;inset-inline-start:50%;border-inline-start:2px dotted var(--border)}
+.node{display:grid;grid-template-columns:1fr 84px 1fr;align-items:center;min-height:86px;position:relative}
+.pg{grid-column:2;justify-self:center;width:60px;height:68px;border:1.5px solid var(--ink);border-radius:6px;background:var(--surface);display:grid;place-items:center;position:relative}
+.pg::after{content:"";position:absolute;top:-1.5px;inset-inline-end:-1.5px;width:14px;height:14px;background:linear-gradient(to bottom left,var(--bg) 50%,var(--surface2) 50%);border-bottom:1.5px solid var(--ink);border-inline-start:1.5px solid var(--ink);border-end-start-radius:3px}
+.node.done .pg{color:var(--success)}
+.node.now .pg{width:76px;height:84px;background:var(--lang);color:var(--on-lang);border-color:var(--lang);box-shadow:0 0 0 4px var(--bg),0 0 0 6px var(--lang)}
+.node.lock .pg{border-style:dashed;border-color:var(--border);color:var(--muted);background:transparent}
+.node.lock .pg::after{display:none}
+.node.special .pg{border-radius:50%;width:64px;height:64px;border-style:double;border-width:4px;color:var(--accent-strong)}
+.node.special .pg::after{display:none}
+.nl{font-size:14px;line-height:1.3;padding:0 10px}
+.nl b{display:block;font-size:15px}
+.nl small{color:var(--muted);font-size:13px}
+.node.L .nl{grid-column:1;grid-row:1;text-align:end}
+.node.R .nl{grid-column:3;grid-row:1}
+.node .pg{grid-row:1}
+.pgnum{font-family:var(--serif);font-weight:700;font-size:22px}
+.now-card{grid-column:1/-1;margin-top:10px;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:var(--surface);border:1px solid var(--line);font-size:14px}
+.now-card .btn{width:auto;min-height:44px;flex:none;font-size:15px}
+
+/* ---------- 7. Progrès ---------- */
+.h1{font-family:var(--serif);font-weight:700;font-size:30px;letter-spacing:-.02em;line-height:1.1;margin-top:10px}
+.gauge-row{margin-top:8px}
+.g-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:15px}
+.g-head span{display:flex;align-items:center;gap:6px;font-weight:600}
+.g-head b{font-family:var(--serif);font-size:17px}
+.gauge{position:relative;display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:6px}
+.gauge i{height:12px;background:var(--surface2);border-radius:2px}
+.gauge i.f{background:var(--accent)}
+.gauge i.h{background:linear-gradient(90deg,var(--accent) var(--h),var(--surface2) var(--h))}
+[dir="rtl"] .gauge i.h{background:linear-gradient(-90deg,var(--accent) var(--h),var(--surface2) var(--h))}
+.band{position:absolute;top:-3px;height:18px;border:1.5px solid var(--ink);border-radius:4px;background:repeating-linear-gradient(135deg,transparent 0 3px,color-mix(in srgb,var(--ink) 30%,transparent) 3px 4.5px)}
+.g-scale{display:grid;grid-template-columns:repeat(7,1fr);font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center;margin-top:4px}
+.gauges{display:grid;gap:20px;margin-top:24px}
+.pg-rows{margin-top:32px}
+
+/* ---------- 8. Quêtes (ligue derrière un onglet) ---------- */
+.segtabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;margin-top:24px;border-radius:12px;background:var(--surface2)}
+.segtabs a{display:grid;place-items:center;min-height:44px;border-radius:9px;font-weight:600;font-size:15px;color:var(--muted);text-align:center;padding:0 8px}
+.segtabs a[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--border)}
+.qsec{margin-top:24px}
+.qrow .r-v{font-family:var(--mono);font-size:13px}
+.qrow.done .r-l{color:var(--muted);font-weight:500}
+.qrow.done>.ic{color:var(--success)}
+.note{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.4}
+/* Écrans en pile : un bloc = un groupe séparé de ses voisins par 24 px au moins */
+.phone .scroll.stack{display:flex;flex-direction:column;gap:24px}
+.phone .scroll.stack>*{margin-top:0}
+
+/* ---------- 9. Débutant (RTL) ---------- */
+.illus{margin-top:10px;border-radius:14px;overflow:hidden;background:var(--lang-soft);height:112px}
+.illus svg{width:100%;height:100%;display:block}
+.dlg{display:grid;gap:8px;margin-top:12px}
+.msg{max-width:86%;padding:9px 12px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+.msg.me{justify-self:end;background:var(--lang-soft);border-color:transparent}
+.msg .who{font-size:12px;color:var(--muted);font-weight:600}
+.msg .fr{font-family:"Newsreader",Georgia,serif;font-size:18px;line-height:1.3;display:flex;gap:8px;align-items:flex-start;justify-content:space-between}
+.msg .fr .ic{color:var(--lang);width:20px;height:20px;margin-top:3px}
+.msg .tr{font-size:14px;color:var(--muted);margin-top:2px}
+.key{margin-top:10px;padding:10px 12px;border-radius:12px;border:1.5px dashed var(--border);font-size:15px}
+.key bdi{font-family:"Newsreader",Georgia,serif;font-size:18px;font-weight:600;color:var(--lang)}
+
+/* ---------- 10. Shadowing ---------- */
+.shad{font-family:var(--serif);font-size:26px;line-height:1.3;margin-top:10px}
+.shad u{text-decoration:none;border-bottom:2px solid var(--lang)}
+.waves{margin-top:14px;display:grid;gap:10px}
+.wl{display:grid;grid-template-columns:62px 1fr;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
+.wave{display:flex;align-items:center;gap:2px;height:40px}
+.wave i{flex:1;border-radius:2px;background:var(--accent)}
+.wave.me i{background:var(--accent2)}
+.fb{margin:14px 0 12px;display:grid;gap:6px}
+.fb li{display:flex;gap:8px;font-size:14px;line-height:1.35;align-items:flex-start}
+.fb .ic{width:18px;height:18px;margin-top:1px}
+.fb .y .ic{color:var(--success)} .fb .w .ic{color:var(--accent-strong)}
+.mic-wrap{display:flex;align-items:center;justify-content:space-around;margin-top:4px}
+.phone .mic{width:76px;height:76px;border-radius:50%;background:var(--accent2);color:#fff;display:grid;place-items:center;box-shadow:0 0 0 6px var(--streak-soft),0 0 0 7px var(--accent2)}
+.phone.t-dark .mic{color:#0f0e0c}
+.mic .ic{width:32px;height:32px}
+.side{display:grid;justify-items:center;gap:2px;font-size:12px;color:var(--muted);min-width:64px}
+.side .iconbtn{border:1px solid var(--border)}
+
+/* ---------- 11. Réglages ---------- */
+.set{margin-top:12px}
+.sets{margin-top:24px}
+.sets>.set:first-child{margin-top:0}
+.set h3{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;padding-bottom:4px;border-bottom:1px solid var(--ink)}
+.set li{display:flex;align-items:center;gap:12px;min-height:52px;border-bottom:1px solid var(--line);padding:4px 0}
+.set li>div{flex:1;min-width:0}
+.set li b{display:block;font-weight:600;font-size:15px}
+.set li small{display:block;color:var(--muted);font-size:13px;line-height:1.3}
+.tg{flex:none;width:51px;height:31px;border-radius:16px;background:var(--surface2);border:1.5px solid var(--border);position:relative}
+.tg::after{content:"";position:absolute;top:2px;inset-inline-start:2px;width:24px;height:24px;border-radius:50%;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.3);border:1px solid var(--border)}
+.tg.on{background:var(--accent);border-color:var(--accent)}
+.tg.on::after{inset-inline-start:22px;border-color:transparent}
+.seglist{display:flex;border:1px solid var(--border);border-radius:10px;overflow:hidden;flex:none}
+.seglist span{min-width:40px;min-height:36px;display:grid;place-items:center;font-family:var(--mono);font-size:13px;border-inline-start:1px solid var(--border)}
+.seglist span:first-child{border:0}
+.seglist span.on{background:var(--ink);color:var(--bg);font-weight:500}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-paper" viewBox="0 0 24 24"><path d="M4 5h12v13a2 2 0 0 0 2 2H6a2 2 0 0 1-2-2z"/><path d="M16 9h4v9a2 2 0 0 1-2 2"/><path d="M7 9h6M7 12.5h6M7 16h4"/></symbol>
+  <symbol id="i-path" viewBox="0 0 24 24"><circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h6a3 3 0 0 0 0-6h-4a3 3 0 0 1 0-6h6"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M3 5.5c2.5-1 5.5-1 9 1 3.5-2 6.5-2 9-1V19c-2.5-1-5.5-1-9 1-3.5-2-6.5-2-9-1z"/><path d="M12 6.5V20"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20h16M7 16v-5M12 16V6M17 16V9"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8.5 5.5v13M15.5 5.5v13" stroke-width="3.2"/></symbol>
+  <symbol id="i-prev" viewBox="0 0 24 24"><path d="M18 6l-8 6 8 6zM6 6v12"/></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24"><path d="M6 6l8 6-8 6zM18 6v12"/></symbol>
+  <symbol id="i-speaker" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9.5 6l6 6-6 6"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol>
+  <symbol id="i-stamp" viewBox="0 0 24 24"><path d="M9.5 3h5v5l3 3h-11l3-3z"/><rect x="4" y="11" width="16" height="4.5" rx="1"/><path d="M5 19.5h14"/></symbol>
+  <symbol id="i-snow" viewBox="0 0 24 24"><path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9M9.5 4.5L12 6.5l2.5-2M9.5 19.5l2.5-2 2.5 2"/></symbol>
+  <symbol id="i-xp" viewBox="0 0 24 24"><path d="M12 3c.9 4.6 2.6 6.3 8 9-5.4 2.7-7.1 4.4-8 9-.9-4.6-2.6-6.3-8-9 5.4-2.7 7.1-4.4 8-9z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-repeat" viewBox="0 0 24 24"><path d="M4 12a7 7 0 0 1 12-5l3 3M20 12a7 7 0 0 1-12 5l-3-3M19 5v5h-5M5 19v-5h5"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20l4-1L19 8l-3-3L5 16zM14 7l3 3"/></symbol>
+  <symbol id="i-ear" viewBox="0 0 24 24"><path d="M7 9a5 5 0 0 1 10 0c0 3-3 4-3 7a3 3 0 0 1-5.5 1.5"/><path d="M10 9.5a2 2 0 0 1 4 0"/></symbol>
+  <symbol id="i-sig" viewBox="0 0 24 24"><rect x="2" y="15" width="3.5" height="5" rx="1"/><rect x="7.5" y="12" width="3.5" height="8" rx="1"/><rect x="13" y="8.5" width="3.5" height="11.5" rx="1"/><rect x="18.5" y="5" width="3.5" height="15" rx="1"/></symbol>
+  <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M3 9.5a13 13 0 0 1 18 0M6 13a8.5 8.5 0 0 1 12 0M9 16.5a4 4 0 0 1 6 0" stroke-width="2.2"/><circle cx="12" cy="19.5" r="1.4" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-cup" viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7M10 17h4"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 4l2.4 5 5.4.7-4 3.7 1 5.4L12 16.2 7.2 18.8l1-5.4-4-3.7 5.4-.7z"/></symbol>
+</svg>
+
+<div class="wrap">
+  <header class="p-top">
+    <p class="p-meta">DailyLingua · refonte · direction artistique</p>
+    <h1>L'édition du jour <em>et son atelier</em></h1>
+    <p class="p-lede">Le journal reste le socle&nbsp;: papier, serif, filets, calme de la lecture. La gamification prend le registre de l'atelier d'imprimerie&nbsp;: tampons, repère de calage, «&nbsp;bon à tirer&nbsp;», éditions numérotées, petites annonces, chemin de fer. Chaque écran est présenté en clair et en sombre, à la taille d'un iPhone (390 × 844). Règle de densité&nbsp;: une idée par écran, trois blocs au plus au-dessus de la ligne de flottaison, un seul bouton plein, le détail derrière un toucher (voir <code>e-direction-artistique.md</code>, section 5).</p>
+    <div class="p-tools" role="group" aria-label="Thème de la planche">
+      <button type="button" data-set-theme="auto" aria-pressed="true">Thème&nbsp;: système</button>
+      <button type="button" data-set-theme="light" aria-pressed="false">Clair</button>
+      <button type="button" data-set-theme="dark" aria-pressed="false">Sombre</button>
+    </div>
+    <ul class="p-index">
+      <li><a href="#s1">01 Aujourd'hui (3 états)</a></li><li><a href="#s2">02 Rappel</a></li><li><a href="#s3">03 Lecteur</a></li><li><a href="#s4">04 Production</a></li><li><a href="#s5">05 Fin de séance</a></li><li><a href="#s6">06 Parcours</a></li><li><a href="#s7">07 Progrès</a></li><li><a href="#s8">08 Quêtes (EN)</a></li><li><a href="#s9">09 Débutant (AR, RTL)</a></li><li><a href="#s10">10 Shadowing</a></li><li><a href="#s11">11 Réglages</a></li>
+    </ul>
+  </header>
+
+  <!-- 01 ===================================================== -->
+  <section class="shot" id="s1">
+    <div class="shot-head"><p class="p-meta">01</p><h2>Aujourd'hui</h2><p class="cap">Un seul geste&nbsp;: commencer (ou reprendre) la séance du jour. Au-dessus de la ligne de flottaison, trois blocs et rien d'autre&nbsp;: l'en-tête réduit, le bloc séance avec l'anneau d'objectif, une ligne d'état. Quête, révisions, parutions et semaine attendent en dessous, une ligne chacune.</p></div>
+
+    <p class="p-meta state">État A · avant la séance (jour 23)</p>
+    <div class="pair"><figure class="frame"><figcaption class="p-meta">Clair</figcaption>
+      <div class="phone t-light lang-ru" lang="fr">
+        <div class="view">
+          <div class="scroll today" data-fold>
+            <header class="tbar"><p class="tlogo">Daily Lingua</p><p class="meta">Jeudi 12 nov.</p></header>
+            <article class="sblock" aria-labelledby="a-hl">
+              <div class="goal">
+                <div class="gring" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Objectif du jour&nbsp;: 0 sur 100 XP">
+                  <svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><path class="reg" d="M50 1v12M50 87v12M1 50h12M87 50h12"/><circle class="track" cx="50" cy="50" r="37"/></svg>
+                  <div class="gtxt" aria-hidden="true"><b>0</b><span>/ 100 XP</span></div>
+                </div>
+                <div><p class="meta">Objectif du jour</p><p>La séance du jour suffit à fermer l'anneau.</p></div>
+              </div>
+              <div class="sdiv"></div>
+              <p class="meta s-lang"><i class="dot"></i>Russe · texte du jour</p>
+              <h2 class="hl" id="a-hl">La foire du Nouvel An ouvre à Kazan</h2>
+              <p class="hl-t" lang="ru">Новогодняя ярмарка в Казани</p>
+              <p class="small">20 min, des révisions au bilan.</p>
+              <a class="btn" href="#s2">Commencer la séance <svg class="ic s20 flip"><use href="#i-arrow"/></svg></a>
+            </article>
+            <a class="sline" href="#s7" aria-label="Série&nbsp;: 23 jours de suite. 412 XP cette semaine. Voir le détail">
+              <span class="sl"><span><svg class="ic st"><use href="#i-stamp"/></svg><b class="st">23</b> jours de suite</span><span><svg class="ic xq"><use href="#i-xp"/></svg><b class="xq">412</b> XP cette semaine</span></span>
+              <svg class="ic chev flip"><use href="#i-chev"/></svg>
+            </a>
+          </div>
+          <nav class="tabbar" data-l="fr" data-on="0"></nav>
+        </div>
+      </div>
+      <p class="fold p-meta">Ligne de flottaison</p>
+      <div class="below t-light lang-ru" lang="fr">
+        <h3 class="meta rows-h">Aussi aujourd'hui</h3>
+        <ul class="rows">
+          <li><a class="row" href="#s8"><svg class="ic"><use href="#i-pen"/></svg><span class="r-l">Quêtes du jour</span><span class="r-v">1 sur 3 faite</span><svg class="ic chev flip"><use href="#i-chev"/></svg></a></li>
+          <li><a class="row" href="#s2"><svg class="ic"><use href="#i-repeat"/></svg><span class="r-l">Révisions dues</span><span class="r-v">24 cartes, dans la séance</span><svg class="ic chev flip"><use href="#i-chev"/></svg></a></li>
+          <li><a class="row" href="#s3"><svg class="ic"><use href="#i-paper"/></svg><span class="r-l">Parutions</span><span class="r-v">3 nouveaux textes</span><svg class="ic chev flip"><use href="#i-chev"/></svg></a></li>
+          <li><a class="row" href="#s7"><svg class="ic"><use href="#i-chart"/></svg><span class="r-l">Cette semaine</span><span class="r-v">4 jours, 3 volets sur 4</span><svg class="ic chev flip"><use href="#i-chev"/></svg></a></li>
+        </ul>
+      </div>
+    </figure></div>
+
+    <p class="p-meta state">État B · séance terminée</p>
+    <div class="pair"><figure class="frame"><figcaption class="p-meta">Clair</figcaption>
+      <div class="phone t-light lang-ru" lang="fr" data-time="9:07">
+        <div class="view">
+          <div class="scroll today" data-fold>
+            <header class="tbar"><p class="tlogo">Daily Lingua</p><p class="meta">Jeudi 12 nov.</p></header>
+            <article class="sblock" aria-labelledby="b-hl">
+              <div class="goal">
+                <div class="gring" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-label="Objectif du jour atteint&nbsp;: 104 XP sur 100">
+                  <svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><path class="reg" d="M50 1v12M50 87v12M1 50h12M87 50h12"/><circle class="track" cx="50" cy="50" r="37"/><circle class="arc" cx="50" cy="50" r="37" pathLength="100" stroke-dasharray="100 100" transform="rotate(-90 50 50)"/></svg>
+                  <span class="stamp anim">Bon<br>à tirer</span>
+                </div>
+                <div><p class="meta">Objectif du jour</p><p>Anneau fermé&nbsp;: 104&nbsp;XP.</p></div>
+              </div>
+              <div class="sdiv"></div>
+              <h2 class="hl" id="b-hl">Séance bouclée&nbsp;: un texte lu, un texte réécrit.</h2>
+              <p class="small">Si l'envie te prend, un texte court sur le même thème&nbsp;: <span lang="ru">«&nbsp;Каток на площади&nbsp;»</span>, 5&nbsp;min.</p>
+              <a class="btn ghost" href="#s3">Lire ce texte</a>
+            </article>
+            <a class="sline" href="#s7" aria-label="Série&nbsp;: 24 jours de suite. 516 XP cette semaine. Voir le détail">
+              <span class="sl"><span><svg class="ic st"><use href="#i-stamp"/></svg><b class="st">24</b> jours de suite</span><span><svg class="ic xq"><use href="#i-xp"/></svg><b class="xq">516</b> XP cette semaine</span></span>
+              <svg class="ic chev flip"><use href="#i-chev"/></svg>
+            </a>
+          </div>
+          <nav class="tabbar" data-l="fr" data-on="0"></nav>
+        </div>
+      </div>
+      <p class="fold p-meta">Ligne de flottaison</p>
+      <div class="below t-light lang-ru" lang="fr">
+        <h3 class="meta rows-h">Aussi aujourd'hui</h3>
+        <ul class="rows">
+          <li><a class="row" href="#s5"><svg class="ic"><use href="#i-check"/></svg><span class="r-l">Bilan de la séance</span><span class="r-v">104 XP, 6 mots</span><svg class="ic chev flip"><use href="#i-chev"/></svg></a></li>
+          <li><a class="row" href="#s8"><svg class="ic"><use href="#i-pen"/></svg><span class="r-l">Quêtes du jour</span><span class="r-v">2 sur 3 faites</span><svg class="ic chev flip"><use href="#i-chev"/></svg></a></li>
+          <li><a class="row" href="#s2"><svg class="ic"><use href="#i-repeat"/></svg><span class="r-l">Révisions</span><span class="r-v">À jour, 18 demain</span><svg class="ic chev flip"><use href="#i-chev"/></svg></a></li>
+          <li><a class="row" href="#s3"><svg class="ic"><use href="#i-paper"/></svg><span class="r-l">Parutions</span><span class="r-v">3 nouveaux textes</span><svg class="ic chev flip"><use href="#i-chev"/></svg></a></li>
+          <li><a class="row" href="#s7"><svg class="ic"><use href="#i-chart"/></svg><span class="r-l">Cette semaine</span><span class="r-v">5 jours, 4 volets sur 4</span><svg class="ic chev flip"><use href="#i-chev"/></svg></a></li>
+        </ul>
+      </div>
+    </figure></div>
+
+    <p class="p-meta state">État C · tout premier jour · interface en arabe (RTL), apprenant de français</p>
+    <div class="pair"><figure class="frame"><figcaption class="p-meta">Clair</figcaption>
+      <div class="phone t-light lang-fr" lang="ar" dir="rtl" data-time="٨:٣٠">
+        <div class="view">
+          <div class="scroll today" data-fold>
+            <header class="tbar"><p class="tlogo">Daily Lingua</p><p class="meta">الخميس ١٢ نوفمبر</p></header>
+            <article class="sblock" aria-labelledby="c-hl">
+              <div class="goal">
+                <div class="gring" role="progressbar" aria-valuemin="0" aria-valuemax="50" aria-valuenow="0" aria-label="هدف اليوم: ٠ من ٥٠ XP">
+                  <svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><path class="reg" d="M50 1v12M50 87v12M1 50h12M87 50h12"/><circle class="track" cx="50" cy="50" r="37"/></svg>
+                  <div class="gtxt" aria-hidden="true"><b>٠</b><span>/ ٥٠ <bdi>XP</bdi></span></div>
+                </div>
+                <div><p class="meta">هدف اليوم</p><p>جلسة واحدة تكفي لإغلاق الحلقة.</p></div>
+              </div>
+              <div class="sdiv"></div>
+              <p class="meta s-lang"><i class="dot"></i>الفرنسية · الجلسة الأولى</p>
+              <h2 class="hl" id="c-hl">في المقهى</h2>
+              <p class="hl-t" lang="fr" dir="ltr" style="text-align:end">Au café</p>
+              <p class="small">عشر دقائق، خطوة بخطوة. لا شيء عليك أن تختاره.</p>
+              <a class="btn" href="#s9">ابدأ الجلسة <svg class="ic s20 flip"><use href="#i-arrow"/></svg></a>
+            </article>
+          </div>
+          <nav class="tabbar" data-l="ar" data-on="0"></nav>
+        </div>
+      </div>
+    </figure></div>
+
+    <div class="budget">
+      <p class="p-meta">Budget de l'accueil, mesuré dans la planche (voir la note de vérification en pied de page)</p>
+      <ol>
+        <li><b>En-tête réduit</b>&nbsp;: nom du journal et date, sur une ligne.</li>
+        <li><b>Bloc séance</b>&nbsp;: anneau d'objectif, langue, titre du texte, durée, un seul bouton plein (aucun une fois la séance faite&nbsp;: la suite est proposée en bouton à contour).</li>
+        <li><b>Ligne d'état</b>&nbsp;: série et XP de la semaine en deux petits chiffres, avec icône et libellé. Un toucher ouvre le détail (relâches en réserve, record, semaine en sept pastilles). Absente tant que la série n'est pas dévoilée (jour 2).</li>
+      </ol>
+      <p style="margin-top:6px">Reprendre&nbsp;: si la séance est entamée, le bouton devient «&nbsp;Reprendre · étape II sur VI&nbsp;» et l'anneau montre l'XP déjà gagnée. Le bandeau «&nbsp;Parutions&nbsp;» quitte l'accueil&nbsp;: les nouveaux textes sont une ligne sous la flottaison et vivent dans l'onglet «&nbsp;Lire&nbsp;». Premier jour&nbsp;: rien sous la ligne de flottaison.</p>
+    </div>
+  </section>
+
+  <!-- 02 ===================================================== -->
+  <section class="shot" id="s2">
+    <div class="shot-head"><p class="p-meta">02</p><h2>Séance · rappel en contexte</h2><p class="cap">Carte tirée d'un texte déjà lu, réponse tapée&nbsp;; le retour «&nbsp;Juste&nbsp;» est tamponné, explique la forme et annonce la prochaine révision.</p></div>
+    <div class="pair"><figure class="frame"><figcaption class="p-meta">Clair</figcaption>
+      <div class="phone t-light lang-ru" lang="fr">
+        <div class="view">
+          <div class="sess"><button class="iconbtn" aria-label="Mettre la séance en pause"><svg class="ic"><use href="#i-x"/></svg></button><div class="segs" aria-label="Étape 1 sur 6"><span class="seg" style="--p:30%"><i></i></span><span class="seg"><i></i></span><span class="seg"><i></i></span><span class="seg"><i></i></span><span class="seg"><i></i></span><span class="seg"><i></i></span></div><span class="xpc"><svg class="ic s16"><use href="#i-xp"/></svg>+8</span></div>
+          <p class="meta sess-l">Étape I sur VI · Révisions · 7 / 24</p>
+          <div class="scroll">
+            <div class="card ex">
+              <p class="meta">Complète la phrase</p>
+              <p class="target" lang="ru">Мы с подругой договори́лись о <span class="gap"></span> у фонта́на.</p>
+              <p class="hint">Mot à décliner&nbsp;: <b lang="ru">встре́ча</b> · rendez-vous</p>
+              <p class="src">Tiré de «&nbsp;Новогодняя ярмарка в Казани&nbsp;», lu le 9 novembre.</p>
+            </div>
+            <label class="field"><span class="meta">Ta réponse</span><span class="input ok" lang="ru">встрече<svg class="ic"><use href="#i-check"/></svg></span></label>
+          </div>
+          <div class="sheet" role="status">
+            <div class="sheet-top"><span class="stamp">Juste</span><span class="xpgain"><svg class="ic s16"><use href="#i-xp"/></svg>+2 XP</span></div>
+            <p class="sheet-t" lang="ru">договори́лись о <b>встре́че</b></p>
+            <p>Après <b lang="ru">о</b> («&nbsp;au sujet de&nbsp;»), le nom se met au prépositionnel&nbsp;: <span lang="ru">встреча → встрече</span>.</p>
+            <p class="meta">Prochaine révision&nbsp;: dans 6 jours</p>
+            <button class="btn ok">Continuer</button>
+          </div>
+        </div>
+      </div>
+    </figure></div>
+  </section>
+
+  <!-- 03 ===================================================== -->
+  <section class="shot" id="s3">
+    <div class="shot-head"><p class="p-meta">03</p><h2>Séance · lecteur</h2><p class="cap">Texte gradué&nbsp;: nouveau au marqueur pointillé, en cours souligné, connu sans marque&nbsp;; un toucher ouvre la bulle, l'audio avance phrase par phrase.</p></div>
+    <div class="pair"><figure class="frame"><figcaption class="p-meta">Clair</figcaption>
+      <div class="phone t-light lang-ru" lang="fr">
+        <div class="view">
+          <div class="sess"><button class="iconbtn" aria-label="Mettre la séance en pause"><svg class="ic"><use href="#i-x"/></svg></button><div class="segs"><span class="seg done"><i></i></span><span class="seg" style="--p:45%"><i></i></span><span class="seg"><i></i></span><span class="seg"><i></i></span><span class="seg"><i></i></span><span class="seg"><i></i></span></div><span class="xpc"><svg class="ic s16"><use href="#i-xp"/></svg>+24</span></div>
+          <p class="meta sess-l">Étape II sur VI · Texte gradué · A2+</p>
+          <div class="scroll stack">
+            <header><h2 class="rtitle" lang="ru">Новогодняя ярмарка в Казани</h2>
+            <p class="meta" style="margin-top:4px">212 mots · 3 min · 94 % connus</p>
+            <div class="legend"><span><i class="sw-new"></i>nouveau</span><span><i class="sw-learn"></i>en cours</span><span><i class="sw-known"></i>connu</span></div></header>
+            <div class="rtext" lang="ru">
+              <p>В субботу в Казани <span class="w-learn">откры́лась</span> новогодняя <span class="w-new w-sel">я́рмарка</span>. На центральной <span class="w-learn">пло́щади</span> стоят <span class="w-new">деревя́нные</span> домики, где продают горячий чай и <span class="w-learn">пироги́</span>.</p>
+              <div class="bubble" lang="fr">
+                <div class="b-head"><span class="b-word" lang="ru">я́рмарка</span><span class="pill">Nouveau</span><button class="iconbtn" aria-label="Écouter «&nbsp;ярмарка&nbsp;»" style="margin-inline-start:auto"><svg class="ic"><use href="#i-speaker"/></svg></button></div>
+                <p class="meta">nom féminin · lemme</p>
+                <p class="b-tr">foire, marché</p>
+                <p class="b-ctx">Dans la phrase&nbsp;: nominatif, sujet de <span lang="ru">открылась</span>.</p>
+                <div class="b-act"><button class="btn"><svg class="ic s20"><use href="#i-plus"/></svg>Ajouter aux révisions</button></div>
+              </div>
+              <p><span class="cur">Мы с подругой <span class="w-learn">договори́лись</span> о встрече у фонтана в шесть часов.</span> Вечером играет оркестр, и все танцуют, <span class="w-new">несмотря́</span> на <span class="w-new">моро́з</span>.</p>
+            </div>
+          </div>
+          <div class="player" aria-label="Lecteur audio">
+            <div class="scrub" aria-hidden="true"><i class="p"></i><i class="p"></i><i class="c"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="pl-row">
+              <span class="speed">0,8×</span>
+              <button class="iconbtn" aria-label="Phrase précédente"><svg class="ic flip"><use href="#i-prev"/></svg></button>
+              <button class="play" aria-label="Pause"><svg class="ic"><use href="#i-pause"/></svg></button>
+              <button class="iconbtn" aria-label="Phrase suivante"><svg class="ic flip"><use href="#i-next"/></svg></button>
+              <button class="iconbtn" aria-label="Répéter la phrase"><svg class="ic"><use href="#i-repeat"/></svg></button>
+            </div>
+            <p class="meta" style="text-align:center">Phrase 3 sur 12</p>
+          </div>
+        </div>
+      </div>
+    </figure></div>
+  </section>
+
+  <!-- 04 ===================================================== -->
+  <section class="shot" id="s4">
+    <div class="shot-head"><p class="p-meta">04</p><h2>Séance · production corrigée puis réécriture</h2><p class="cap">Ratures à l'encre du correcteur rangées par catégorie, puis «&nbsp;réécris&nbsp;» sans regarder. La grille à quatre critères (consigne 4, grammaire 3, vocabulaire 4, cohérence 4, sur 5) est repliée en une ligne&nbsp;: un toucher l'ouvre.</p></div>
+    <div class="pair"><figure class="frame"><figcaption class="p-meta">Clair</figcaption>
+      <div class="phone t-light lang-ru" lang="fr">
+        <div class="view">
+          <div class="sess"><button class="iconbtn" aria-label="Mettre la séance en pause"><svg class="ic"><use href="#i-x"/></svg></button><div class="segs"><span class="seg done"><i></i></span><span class="seg done"><i></i></span><span class="seg done"><i></i></span><span class="seg" style="--p:60%"><i></i></span><span class="seg"><i></i></span><span class="seg"><i></i></span></div><span class="xpc"><svg class="ic s16"><use href="#i-xp"/></svg>+45</span></div>
+          <p class="meta sess-l">Étape IV sur VI · Écriture</p>
+          <div class="scroll stack">
+            <div class="blk">
+            <ul class="rows"><li><a class="row"><svg class="ic"><use href="#i-pen"/></svg><span class="r-l">Grille de correction</span><span class="r-v">15 / 20 · détail</span><svg class="ic chev flip"><use href="#i-chev"/></svg></a></li></ul>
+            <p class="ltext" lang="ru" style="border-top:0;margin-top:8px">В субботу я пошёл в центр с <del>моя сестра</del> <ins>мое́й сестро́й</ins><sup>1</sup>. Мы долго <del>выбрали</del> <ins>выбира́ли</ins><sup>2</sup> подарки на ярмарке, а потом пили чай в маленьком <del>кафэ</del> <ins>кафе́</ins><sup>3</sup>. Там было очень <del>ую́тная</del> <ins>ую́тно</ins><sup>4</sup>!</p>
+            <ol class="corr">
+              <li><sup>1</sup><span class="tag">Cas</span><span><span lang="ru">с</span> + instrumental&nbsp;: <span lang="ru">с моей сестрой</span>.</span></li>
+              <li><sup>2</sup><span class="tag">Aspect</span><span><span lang="ru">долго</span> appelle l'imperfectif&nbsp;: action qui dure.</span></li>
+              <li><sup>3</sup><span class="tag">Orthographe</span><span>On écrit <span lang="ru">кафе</span>, avec <span lang="ru">е</span>.</span></li>
+              <li><sup>4</sup><span class="tag">Forme</span><span><span lang="ru">было уютно</span>&nbsp;: adverbe, pas d'accord.</span></li>
+            </ol>
+            </div>
+            <div class="rewrite">
+              <p class="rub"><span class="rn">↺</span>Réécris les phrases 1 et 2, de mémoire</p>
+              <div class="ta" lang="ru">В субботу я пошёл в центр с моей сестрой. Мы долго выбира<span class="caret"></span></div>
+            </div>
+          </div>
+          <div class="foot"><button class="btn">Vérifier ma réécriture · <span style="font-family:var(--mono);font-weight:500">+10 XP</span></button></div>
+        </div>
+      </div>
+    </figure></div>
+  </section>
+
+  <!-- 05 ===================================================== -->
+  <section class="shot" id="s5">
+    <div class="shot-head"><p class="p-meta">05</p><h2>Fin de séance · la une du jour</h2><p class="cap">Une seule idée&nbsp;: la séance est bouclée. L'anneau tamponné «&nbsp;Bon à tirer&nbsp;» et un titre factuel, puis une ligne par résultat. Le relevé d'XP ligne par ligne, les mots appris, l'erreur du jour et la semaine de série s'ouvrent d'un toucher, en feuille.</p></div>
+    <div class="pair"><figure class="frame"><figcaption class="p-meta">Clair</figcaption>
+      <div class="phone t-light lang-ru" lang="fr" data-time="9:06">
+        <div class="view">
+          <div class="scroll fin" data-fold>
+            <div class="fin-top">
+              <p class="meta">Jeudi 12 nov. · Russe · N° 214</p>
+              <div class="ed-ring" role="img" aria-label="Objectif du jour atteint, bon à tirer&nbsp;: 104 XP">
+                <svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><path class="reg" d="M50 1v12M50 87v12M1 50h12M87 50h12"/><circle class="track" cx="50" cy="50" r="37"/><circle class="arc" cx="50" cy="50" r="37" pathLength="100" stroke-dasharray="100 100" transform="rotate(-90 50 50)"/></svg>
+                <span class="stamp round anim" aria-hidden="true">Bon<br>à tirer<br>104 XP</span>
+              </div>
+              <h1 class="ed-hl">Séance bouclée&nbsp;: un texte lu, un texte réécrit.</h1>
+            </div>
+            <ul class="rows">
+              <li><a class="row"><svg class="ic"><use href="#i-xp"/></svg><span class="r-l">XP gagnés</span><span class="r-v xpt">104 XP</span><svg class="ic chev flip"><use href="#i-chev"/></svg></a></li>
+              <li><a class="row"><svg class="ic"><use href="#i-plus"/></svg><span class="r-l">Mots passés en révision</span><span class="r-v">6</span><svg class="ic chev flip"><use href="#i-chev"/></svg></a></li>
+              <li><a class="row"><svg class="ic"><use href="#i-pen"/></svg><span class="r-l">Erreur du jour</span><span class="r-v" lang="ru">с моей сестрой</span><svg class="ic chev flip"><use href="#i-chev"/></svg></a></li>
+              <li><a class="row"><svg class="ic"><use href="#i-stamp"/></svg><span class="r-l">Série</span><span class="r-v st">24 jours</span><svg class="ic chev flip"><use href="#i-chev"/></svg></a></li>
+            </ul>
+          </div>
+          <div class="foot"><p class="small" style="margin:0 0 12px">Demain&nbsp;: 18 révisions et la suite de <span lang="ru">«&nbsp;Ярмарка&nbsp;»</span>.</p><button class="btn">Terminer</button></div>
+        </div>
+      </div>
+    </figure></div>
+  </section>
+
+  <!-- 06 ===================================================== -->
+  <section class="shot" id="s6">
+    <div class="shot-head"><p class="p-meta">06</p><h2>Parcours · chemin de fer</h2><p class="cap">Une seule idée&nbsp;: où j'en suis dans le cahier en cours. Une vignette de page par situation, bilan en édition spéciale. Les niveaux par compétence, qui doublaient l'écran Progrès, n'y figurent plus qu'en une ligne qui y mène.</p></div>
+    <div class="pair"><figure class="frame"><figcaption class="p-meta">Clair</figcaption>
+      <div class="phone t-light lang-ru" lang="fr">
+        <div class="view">
+          <div class="scroll">
+            <header class="mast"><div><p class="meta">Russe · cahier A2 → B1</p><p class="logo">La ville au quotidien</p></div><span class="langchip"><i class="dot"></i>RU</span></header>
+            <ol class="map">
+              <li class="node done L"><span class="nl"><b>Au café</b><small>5 / 5 leçons</small></span><span class="pg"><svg class="ic"><use href="#i-check"/></svg></span></li>
+              <li class="node done R"><span class="nl"><b>Prendre le métro</b><small>5 / 5 leçons</small></span><span class="pg"><svg class="ic"><use href="#i-check"/></svg></span></li>
+              <li class="node now L"><span class="nl"><b>Chercher un logement</b><small>Leçon 3 / 5 · toucher pour continuer</small></span><span class="pg"><span class="pgnum">3</span></span></li>
+              <li class="node lock R"><span class="nl"><b>Chez le médecin</b><small>À venir · ou passe le test</small></span><span class="pg"><svg class="ic"><use href="#i-lock"/></svg></span></li>
+              <li class="node special L"><span class="nl"><b>Bilan du cahier</b><small>Édition spéciale</small></span><span class="pg"><svg class="ic"><use href="#i-star"/></svg></span></li>
+            </ol>
+            <ul class="rows" style="margin-top:24px">
+              <li><a class="row" href="#s7"><svg class="ic"><use href="#i-chart"/></svg><span class="r-l">Niveau par compétence</span><span class="r-v">lecture B1, début</span><svg class="ic chev flip"><use href="#i-chev"/></svg></a></li>
+            </ul>
+          </div>
+          <nav class="tabbar" data-l="fr" data-on="1"></nav>
+        </div>
+      </div>
+    </figure></div>
+  </section>
+
+  <!-- 07 ===================================================== -->
+  <section class="shot" id="s7">
+    <div class="shot-head"><p class="p-meta">07</p><h2>Progrès</h2><p class="cap">Une seule idée&nbsp;: le niveau par compétence, avec sa marge d'incertitude hachurée. Mots connus, «&nbsp;Je peux…&nbsp;», projection prudente et série passent en lignes&nbsp;: chacune ouvre son écran de détail (courbe des mots, liste des descripteurs, intervalle de projection, relâches et semaine).</p></div>
+    <div class="pair"><figure class="frame"><figcaption class="p-meta">Clair</figcaption>
+      <div class="phone t-light lang-ru" lang="fr">
+        <div class="view">
+          <div class="scroll stack">
+            <header><p class="meta" style="margin-top:6px">Russe · mis à jour lundi</p>
+            <h1 class="h1">Où tu en es</h1></header>
+            <div class="gauges">
+              <div class="gauge-row"><div class="g-head"><span><svg class="ic s20"><use href="#i-book"/></svg>Lire</span><b>B1, début</b></div><div class="gauge"><i class="f"></i><i class="f"></i><i class="f"></i><i class="h" style="--h:20%"></i><i></i><i></i><i></i><span class="band" style="inset-inline-start:38%;width:14%"></span></div></div>
+              <div class="gauge-row"><div class="g-head"><span><svg class="ic s20"><use href="#i-ear"/></svg>Écouter</span><b>A2, avancé</b></div><div class="gauge"><i class="f"></i><i class="f"></i><i class="h" style="--h:70%"></i><i></i><i></i><i></i><i></i><span class="band" style="inset-inline-start:32%;width:13%"></span></div></div>
+              <div class="gauge-row"><div class="g-head"><span><svg class="ic s20"><use href="#i-pen"/></svg>Écrire</span><b>A2, avancé</b></div><div class="gauge"><i class="f"></i><i class="f"></i><i class="h" style="--h:60%"></i><i></i><i></i><i></i><i></i><span class="band" style="inset-inline-start:31%;width:12%"></span></div></div>
+              <div class="gauge-row"><div class="g-head"><span><svg class="ic s20"><use href="#i-mic"/></svg>Parler</span><b>A2</b></div><div class="gauge"><i class="f"></i><i class="f"></i><i class="h" style="--h:30%"></i><i></i><i></i><i></i><i></i><span class="band" style="inset-inline-start:27%;width:15%"></span></div><div class="g-scale"><span>A0</span><span>A1</span><span>A2</span><span>B1</span><span>B2</span><span>C1</span><span>C2</span></div></div>
+            </div>
+            <ul class="rows pg-rows">
+              <li><a class="row"><svg class="ic"><use href="#i-book"/></svg><span class="r-l">Mots connus</span><span class="r-v">1 486, +64 cette semaine</span><svg class="ic chev flip"><use href="#i-chev"/></svg></a></li>
+              <li><a class="row"><svg class="ic"><use href="#i-check"/></svg><span class="r-l">Je peux…</span><span class="r-v">12 validés, 1 en cours</span><svg class="ic chev flip"><use href="#i-chev"/></svg></a></li>
+              <li><a class="row"><svg class="ic"><use href="#i-arrow"/></svg><span class="r-l">Projection prudente</span><span class="r-v">lecture B1&nbsp;: mars-juin 2027</span><svg class="ic chev flip"><use href="#i-chev"/></svg></a></li>
+              <li><a class="row"><svg class="ic"><use href="#i-stamp"/></svg><span class="r-l">Série</span><span class="r-v">23 jours, 2 relâches</span><svg class="ic chev flip"><use href="#i-chev"/></svg></a></li>
+            </ul>
+          </div>
+          <nav class="tabbar" data-l="fr" data-on="3"></nav>
+        </div>
+      </div>
+    </figure></div>
+  </section>
+
+  <!-- 08 ===================================================== -->
+  <section class="shot" id="s8">
+    <div class="shot-head"><p class="p-meta">08</p><h2>Quêtes, ligue derrière un onglet · interface en anglais</h2><p class="cap">Une seule idée&nbsp;: les quêtes de travail utile, une ligne chacune. La ligue (facultative, sans relégation, désactivée par défaut) passe derrière l'onglet «&nbsp;League&nbsp;», avec son tableau et sa note&nbsp;; l'onglet n'apparaît que si elle est activée.</p></div>
+    <div class="pair"><figure class="frame"><figcaption class="p-meta">Clair</figcaption>
+      <div class="phone t-light lang-ru" lang="en">
+        <div class="view">
+          <div class="scroll stack">
+            <header class="mast"><div><p class="meta">Thursday, Nov 12</p><p class="logo">Quests</p></div></header>
+            <div class="segtabs" role="tablist" aria-label="Quests and league"><a role="tab" aria-selected="true">Quests</a><a role="tab" aria-selected="false">League</a></div>
+            <div><div class="qsec">
+              <h3 class="meta rows-h">Today</h3>
+              <ul class="rows">
+                <li><a class="row qrow done"><svg class="ic"><use href="#i-check"/></svg><span class="r-l">Rewrite 2 corrected sentences</span><span class="r-v">Done · +10 XP</span></a></li>
+                <li><a class="row qrow"><svg class="ic"><use href="#i-mic"/></svg><span class="r-l">Say 3 sentences out loud</span><span class="r-v">1/3 · <span class="xpt">+10 XP</span></span></a></li>
+                <li><a class="row qrow"><svg class="ic"><use href="#i-repeat"/></svg><span class="r-l">Win back 3 cards you missed yesterday</span><span class="r-v">0/3 · <span class="xpt">+10 XP</span></span></a></li>
+              </ul>
+            </div>
+            <div class="qsec">
+              <h3 class="meta rows-h">This week · new set on Monday</h3>
+              <ul class="rows">
+                <li><a class="row qrow"><svg class="ic"><use href="#i-book"/></svg><span class="r-l">Read 5 texts</span><span class="r-v">3/5 · <span class="xpt">+40 XP</span></span></a></li>
+                <li><a class="row qrow"><svg class="ic"><use href="#i-pen"/></svg><span class="r-l">Send 4 pieces of writing</span><span class="r-v">1/4 · <span class="xpt">+40 XP</span></span></a></li>
+                <li><a class="row qrow"><svg class="ic"><use href="#i-chart"/></svg><span class="r-l">Cover all four strands</span><span class="r-v">3/4 · <span class="xpt">+40 XP</span></span></a></li>
+              </ul>
+            </div>
+            <p class="note">Quests fit inside your usual session. Unfinished ones simply go away.</p></div>
+          </div>
+          <nav class="tabbar" data-l="en" data-on="0"></nav>
+        </div>
+      </div>
+    </figure></div>
+  </section>
+
+  <!-- 09 ===================================================== -->
+  <section class="shot" id="s9">
+    <div class="shot-head"><p class="p-meta">09</p><h2>Parcours débutant · interface en arabe (RTL)</h2><p class="cap">Apprenant arabophone de français A1, situation «&nbsp;À la boulangerie&nbsp;»&nbsp;: mise en page miroir, phrases françaises isolées en LTR, chiffres de la locale.</p></div>
+    <div class="pair"><figure class="frame"><figcaption class="p-meta">Clair</figcaption>
+      <div class="phone t-light lang-fr" lang="ar" dir="rtl" data-time="٩:٤١">
+        <div class="view">
+          <div class="sess"><button class="iconbtn" aria-label="إيقاف مؤقت"><svg class="ic"><use href="#i-x"/></svg></button><div class="segs"><span class="seg done"><i></i></span><span class="seg" style="--p:50%"><i></i></span><span class="seg"><i></i></span><span class="seg"><i></i></span><span class="seg"><i></i></span></div><span class="xpc"><bdi dir="ltr">+6 XP</bdi></span></div>
+          <p class="meta sess-l">الوحدة ٣ · مواقف يومية · المستوى <bdi>A1</bdi></p>
+          <div class="scroll stack">
+            <div class="blk"><h1 class="h1" style="margin-top:0">في المخبز</h1>
+            <p class="muted">اطلب خبزًا واسأل عن السعر.</p>
+            <div class="illus" aria-hidden="true">
+              <svg viewBox="0 0 340 112" preserveAspectRatio="xMidYMid slice">
+                <g fill="none" stroke="var(--accent2)" stroke-width="3" transform="translate(3 2)" opacity=".55"><path d="M70 104V44h200v60M60 44l20-22h180l20 22z"/><rect x="100" y="60" width="60" height="44"/><rect x="190" y="60" width="54" height="30"/></g>
+                <g fill="none" stroke="var(--lang)" stroke-width="3" stroke-linejoin="round"><path d="M70 104V44h200v60M60 44l20-22h180l20 22z"/><rect x="100" y="60" width="60" height="44"/><rect x="190" y="60" width="54" height="30"/><path d="M196 82c10-12 30-12 42 0M30 104h280"/></g>
+                <text x="170" y="38" text-anchor="middle" font-family="Newsreader,Georgia,serif" font-weight="700" font-size="14" fill="var(--ink)" direction="ltr">BOULANGERIE</text>
+              </svg>
+            </div></div>
+            <div class="dlg">
+              <div class="msg"><p class="who">البائعة</p><p class="fr" lang="fr" dir="ltr"><span>Bonjour&nbsp;! Vous désirez&nbsp;?</span><svg class="ic"><use href="#i-speaker"/></svg></p><p class="tr">صباح الخير! ماذا تريد؟</p></div>
+              <div class="msg me"><p class="who">أنت</p><p class="fr" lang="fr" dir="ltr"><span>Je voudrais une baguette, s'il vous plaît.</span><svg class="ic"><use href="#i-speaker"/></svg></p><p class="tr">أريد خبزة باغيت، من فضلك.</p></div>
+              <div class="msg"><p class="who">البائعة</p><p class="fr" lang="fr" dir="ltr"><span>Bien sûr. Et avec ceci&nbsp;?</span><svg class="ic"><use href="#i-speaker"/></svg></p><p class="tr">بالتأكيد. هل تريد شيئًا آخر؟</p></div>
+            </div>
+            <div class="key">عبارة اليوم: <bdi lang="fr">Je voudrais…</bdi> = أريد…</div>
+          </div>
+          <div class="foot"><div class="btnrow"><button class="btn ghost"><svg class="ic s20"><use href="#i-speaker"/></svg>استمع</button><button class="btn"><svg class="ic s20"><use href="#i-mic"/></svg>دورك: اطلب خبزك</button></div></div>
+        </div>
+      </div>
+    </figure></div>
+  </section>
+
+  <!-- 10 ===================================================== -->
+  <section class="shot" id="s10">
+    <div class="shot-head"><p class="p-meta">10</p><h2>Séance · fluidité (shadowing)</h2><p class="cap">Répéter juste après la voix&nbsp;: accents toniques marqués, deux tracés comparés, retour indicatif écrit en clair, jamais une note.</p></div>
+    <div class="pair"><figure class="frame"><figcaption class="p-meta">Clair</figcaption>
+      <div class="phone t-light lang-ru" lang="fr">
+        <div class="view">
+          <div class="sess"><button class="iconbtn" aria-label="Mettre la séance en pause"><svg class="ic"><use href="#i-x"/></svg></button><div class="segs"><span class="seg done"><i></i></span><span class="seg done"><i></i></span><span class="seg done"><i></i></span><span class="seg done"><i></i></span><span class="seg" style="--p:40%"><i></i></span><span class="seg"><i></i></span></div><span class="xpc"><svg class="ic s16"><use href="#i-xp"/></svg>+65</span></div>
+          <p class="meta sess-l">Étape V sur VI · Fluidité · phrase 3 / 8</p>
+          <div class="scroll stack">
+            <div class="blk"><p class="rub">Répète juste après la voix</p>
+            <p class="shad" lang="ru">Мы с подру́гой <u>договори́лись</u> о <u>встре́че</u> у фонта́на.</p>
+            <p class="muted" style="margin-top:6px;font-size:15px">Nous avons fixé un rendez-vous près de la fontaine, avec mon amie.</p></div>
+            <div class="blk">
+            <div class="waves">
+              <div class="wl"><span>Modèle</span><div class="wave" data-seed="3"></div></div>
+              <div class="wl"><span>Toi</span><div class="wave me" data-seed="7"></div></div>
+            </div>
+            <ul class="fb">
+              <li class="y"><svg class="ic"><use href="#i-check"/></svg><span>Rythme proche du modèle.</span></li>
+              <li class="y"><svg class="ic"><use href="#i-check"/></svg><span>Accent bien placé sur <span lang="ru">договори́лись</span>.</span></li>
+              <li class="w"><svg class="ic"><use href="#i-arrow"/></svg><span><span lang="ru">встре́че</span>&nbsp;: appuie davantage sur le <span lang="ru">е́</span>.</span></li>
+            </ul>
+            <p class="note">Retour indicatif. Recommence autant que tu veux&nbsp;: l'XP compte une seule fois par phrase.</p></div>
+          </div>
+          <div class="foot">
+            <div class="mic-wrap">
+              <div class="side"><button class="iconbtn" aria-label="Réécouter le modèle"><svg class="ic"><use href="#i-speaker"/></svg></button>Réécouter</div>
+              <button class="mic" aria-label="Enregistrement en cours, toucher pour arrêter"><svg class="ic"><use href="#i-mic"/></svg></button>
+              <div class="side"><button class="iconbtn" aria-label="Phrase suivante"><svg class="ic flip"><use href="#i-arrow"/></svg></button>Suivante</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </figure></div>
+  </section>
+
+  <!-- 11 ===================================================== -->
+  <section class="shot" id="s11">
+    <div class="shot-head"><p class="p-meta">11</p><h2>Réglages des mécaniques</h2><p class="cap">Un interrupteur par mécanique, objectif réglable en minutes, ligue désactivée par défaut, <b>sons coupés par défaut</b>, relâches plafonnées à 3, mouvement réduit selon le système.</p></div>
+    <div class="pair"><figure class="frame"><figcaption class="p-meta">Clair</figcaption>
+      <div class="phone t-light lang-ru" lang="fr">
+        <div class="view">
+          <div class="scroll">
+            <header class="mast"><div><p class="meta">Réglages</p><p class="logo">Jeu et motivation</p></div></header>
+            <div class="sets"><div class="set"><h3>Objectif et série</h3><ul>
+              <li><div><b>Objectif du jour, en minutes</b><small>20 min = 100 XP. Un changement vaut dès demain.</small></div><span class="seglist" aria-label="Minutes par jour"><span>10</span><span class="on">20</span><span>30</span><span>45</span></span></li>
+              <li><div><b>Série</b><small>Compte les jours prévus à ton planning</small></div><span class="tg on" role="switch" aria-checked="true"></span></li>
+              <li><div><b>Relâches automatiques</b><small>Une offerte chaque lundi, une de plus par objectif de semaine atteint&nbsp;; 3 en réserve au plus</small></div><span class="tg on" role="switch" aria-checked="true"></span></li>
+            </ul></div>
+            <div class="set"><h3>Défis</h3><ul>
+              <li><div><b>Quêtes</b><small>Trois par jour, trois par semaine</small></div><span class="tg on" role="switch" aria-checked="true"></span></li>
+              <li><div><b>Ligue hebdomadaire</b><small>Facultative, sans relégation</small></div><span class="tg" role="switch" aria-checked="false"></span></li>
+              <li><div><b>Rappel</b><small>Un seul par jour, à 8 h 15, jamais entre 21 h 30 et 8 h</small></div><span class="tg on" role="switch" aria-checked="true"></span></li>
+            </ul></div>
+            <div class="set"><h3>Sensations</h3><ul>
+              <li><div><b>Célébrations animées</b><small>Tampons, anneau, éditions spéciales</small></div><span class="tg on" role="switch" aria-checked="true"></span></li>
+              <li><div><b>Sons</b><small>Coupés par défaut. Proposés une fois, après la première séance&nbsp;; muets en mode silencieux</small></div><span class="tg" role="switch" aria-checked="false"></span></li>
+              <li><div><b>Vibrations</b><small>App native seulement&nbsp;; absent de la PWA sur iPhone</small></div><span class="tg on" role="switch" aria-checked="true"></span></li>
+              <li><div><b>Réduire les animations</b><small>Suit le réglage du système (activé)</small></div><span class="tg on" role="switch" aria-checked="true"></span></li>
+            </ul></div></div>
+          </div>
+        </div>
+      </div>
+    </figure></div>
+  </section>
+
+  <footer class="p-foot">Maquettes statiques de travail. Le texte cible en cyrillique et en arabe s'affiche ici avec les polices du système&nbsp;; en production, Literata et Noto Naskh Arabic prennent le relais (voir <code>e-direction-artistique.md</code>). Vérification de la densité&nbsp;: dans chaque téléphone, la zone utile va de 54 px (barre d'état) au haut de la barre d'onglets ou du pied d'action&nbsp;; les blocs de premier niveau qui commencent dans cette zone sont les blocs «&nbsp;au-dessus de la ligne de flottaison&nbsp;».</footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var TABS = {
+    fr: ["Aujourd'hui", "Parcours", "Lire", "Progrès"],
+    en: ["Today", "Path", "Read", "Progress"],
+    ar: ["اليوم", "المسار", "القراءة", "التقدّم"]
+  };
+  var ICONS = ["i-paper", "i-path", "i-book", "i-chart"];
+
+  function tabbar(nav) {
+    var labels = TABS[nav.getAttribute("data-l")] || TABS.fr;
+    var on = Number(nav.getAttribute("data-on"));
+    nav.setAttribute("aria-label", "Navigation");
+    nav.innerHTML = labels.map(function (label, i) {
+      return '<a class="tab' + (i === on ? ' on" aria-current="page' : "") + '"><svg class="ic"><use href="#' + ICONS[i] + '"/></svg>' + label + "</a>";
+    }).join("");
+  }
+
+  function wave(el) {
+    var seed = Number(el.getAttribute("data-seed")) || 1;
+    var html = "";
+    for (var i = 0; i < 44; i++) {
+      var env = Math.sin((i / 43) * Math.PI) * 0.7 + 0.25;
+      var n = Math.abs(Math.sin(i * 1.7 + seed) * Math.cos(i * 0.45 + seed * 0.3));
+      html += '<i style="height:' + Math.max(8, Math.round((env * (0.45 + n * 0.55)) * 100)) + '%"></i>';
+    }
+    el.innerHTML = html;
+  }
+
+  function chrome(phone) {
+    var time = phone.getAttribute("data-time") || "9:41";
+    var sb = document.createElement("div");
+    sb.className = "sb";
+    sb.setAttribute("aria-hidden", "true");
+    sb.innerHTML = "<span>" + time + '</span><span class="sb-r"><svg class="ic fill"><use href="#i-sig"/></svg><svg class="ic"><use href="#i-wifi"/></svg><i class="batt"></i></span>';
+    var island = document.createElement("div");
+    island.className = "island";
+    var hi = document.createElement("div");
+    hi.className = "hi";
+    phone.insertBefore(island, phone.firstChild);
+    phone.insertBefore(sb, phone.firstChild);
+    phone.appendChild(hi);
+  }
+
+  document.querySelectorAll(".tabbar[data-l]").forEach(tabbar);
+  document.querySelectorAll(".wave[data-seed]").forEach(wave);
+  document.querySelectorAll(".phone").forEach(chrome);
+
+  // Each screen is authored once in light, then cloned in dark next to it.
+  document.querySelectorAll(".pair").forEach(function (pair) {
+    var light = pair.querySelector(".frame");
+    var dark = light.cloneNode(true);
+    dark.querySelector("figcaption").textContent = "Sombre";
+    dark.querySelectorAll(".t-light").forEach(function (el) {
+      el.classList.remove("t-light");
+      el.classList.add("t-dark");
+    });
+    // Ids must stay unique once the screen is duplicated.
+    dark.querySelectorAll("[id]").forEach(function (el) { el.id += "-d"; });
+    dark.querySelectorAll("[aria-labelledby]").forEach(function (el) { el.setAttribute("aria-labelledby", el.getAttribute("aria-labelledby") + "-d"); });
+    pair.appendChild(dark);
+  });
+
+  // Page theme switcher (the phones keep their own theme).
+  var root = document.documentElement;
+  var buttons = document.querySelectorAll("[data-set-theme]");
+  function apply(mode) {
+    if (mode === "auto") root.removeAttribute("data-theme");
+    else root.setAttribute("data-theme", mode);
+    buttons.forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-set-theme") === mode)); });
+  }
+  var saved = null;
+  try { saved = localStorage.getItem("dl-maquettes-theme"); } catch (e) { saved = null; }
+  if (saved === "light" || saved === "dark") apply(saved);
+  buttons.forEach(function (b) {
+    b.addEventListener("click", function () {
+      var mode = b.getAttribute("data-set-theme");
+      apply(mode);
+      try { localStorage.setItem("dl-maquettes-theme", mode); } catch (e) { /* private mode */ }
+    });
+  });
+})();
+</script>
+</body>
+</html>
