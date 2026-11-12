@@ -1,0 +1,144 @@
+{
+  "common": {
+    "appName": "Daily Lingua",
+    "nav": {
+      "label": "Navigation",
+      "today": "Today",
+      "path": "Path",
+      "read": "Read",
+      "progress": "Progress"
+    },
+    "actions": {
+      "continue": "Continue",
+      "back": "Back",
+      "cancel": "Cancel",
+      "save": "Save",
+      "close": "Close",
+      "retry": "Try again",
+      "skip": "Skip"
+    },
+    "loading": "One moment…",
+    "minutes": "{count, plural, one {# minute} other {# minutes}}",
+    "levels": {
+      "A0": "I’m just starting",
+      "A1": "I get the basics of everyday life",
+      "A2": "I can handle simple situations",
+      "B1": "I’m independent on familiar topics",
+      "B2": "I’m comfortable on a range of topics",
+      "C1": "I express myself with ease",
+      "C2": "I’ve mastered the language"
+    }
+  },
+  "auth": {
+    "signIn": {
+      "title": "Sign in",
+      "subtitle": "One language session a day, at your own pace.",
+      "email": "Email address",
+      "password": "Password",
+      "submit": "Sign in",
+      "submitting": "Signing in…",
+      "forgotPassword": "Forgot your password?",
+      "noAccount": "No account yet?",
+      "createAccountLink": "Create an account"
+    },
+    "signUp": {
+      "title": "Create your account",
+      "subtitle": "Your progress is saved and follows you across your devices.",
+      "submit": "Create my account",
+      "hasAccount": "Already have an account?",
+      "signInLink": "Sign in",
+      "checkEmail": "Check your inbox: we just sent a confirmation link to {email}.",
+      "confirmed": "Email confirmed. You can sign in now."
+    },
+    "guest": {
+      "trial": "Try without an account",
+      "banner": "You’re trying Daily Lingua without an account. Create one whenever you like to keep your progress.",
+      "upgrade": "Keep my progress"
+    },
+    "passwordReset": {
+      "title": "Forgot your password?",
+      "intro": "Enter your email address and we’ll send you a link to choose a new one.",
+      "submit": "Send the link",
+      "sent": "If an account exists for {email}, a link is on its way.",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm the password",
+      "change": "Change password",
+      "changed": "Password changed."
+    },
+    "signOut": {
+      "action": "Sign out",
+      "confirm": "You’ll be signed out of this device. Your progress stays saved."
+    }
+  },
+  "onboarding": {
+    "stepCount": "Step {current} of {total}",
+    "native": {
+      "title": "Your native language",
+      "hint": "We use it to explain things in the language you understand best."
+    },
+    "target": {
+      "title": "The language you’re learning",
+      "hint": "You can add more later."
+    },
+    "level": {
+      "title": "Where you’re starting from",
+      "hint": "A rough guess is fine: the app adjusts as you go."
+    },
+    "time": {
+      "title": "Your time each day",
+      "hint": "You can change it whenever you like.",
+      "option": "{count, plural, one {# minute a day} other {# minutes a day}}"
+    },
+    "finish": "Get started"
+  },
+  "today": {
+    "title": "Today",
+    "goal": {
+      "progress": "{current} / {target} XP",
+      "caption": "One session is enough to close the ring."
+    },
+    "session": {
+      "firstLabel": "{language} · first session",
+      "duration": "{count, plural, one {# minute, step by step.} other {# minutes, step by step.}}",
+      "nothingToChoose": "Nothing to pick to get going.",
+      "start": "Start the session",
+      "resume": "Resume · step {current} of {total}"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "interfaceLanguage": {
+      "label": "Interface language",
+      "hint": "The app’s text appears in this language."
+    },
+    "nativeLanguage": {
+      "label": "Native language",
+      "hint": "Explanations and translations follow this language."
+    },
+    "timeZone": {
+      "label": "Time zone",
+      "hint": "Your study day rolls over at midnight in this time zone."
+    },
+    "reminder": {
+      "label": "Reminder time",
+      "hint": "One reminder a day, never at night.",
+      "at": "Reminder at {time}",
+      "off": "No reminder"
+    },
+    "saved": "Settings saved."
+  },
+  "errors": {
+    "generic": "Something went wrong. Try again in a moment.",
+    "network": "No connection right now. Your answers are kept on this device.",
+    "unauthenticated": "Your session has expired. Please sign in again.",
+    "invalid": "Some of the information isn’t valid. Check it and try again.",
+    "conflict": "This information changed in the meantime. Reload the page and try again.",
+    "notFound": "We can’t find what you’re looking for.",
+    "invalidCredentials": "Incorrect email address or password.",
+    "emailRequired": "Enter your email address.",
+    "passwordTooShort": "The password must be at least {min} characters long.",
+    "passwordMismatch": "The two passwords don’t match.",
+    "linkExpired": "This link is no longer valid. Ask for a new one.",
+    "botCheck": "Complete the bot check first."
+  }
+}
