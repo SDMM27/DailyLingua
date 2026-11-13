@@ -55,6 +55,9 @@ export function collectErrors(page: Page) {
   page.on("pageerror", (error) => {
     // WebKit reports a link prefetch (`?_rsc=`) cancelled by a full page load (page.goto) this way.
     if (error.message.includes("_rsc=") && error.message.includes("access control checks")) return;
+    // Same for the service worker registration, started on the first page and interrupted when the
+    // test navigates away at once; the next page registers it again.
+    if (error.message.includes("serwist/sw.js") && /load failed|access control checks/i.test(error.message)) return;
     errors.push(`pageerror: ${error.message}`);
   });
   return { errors };
