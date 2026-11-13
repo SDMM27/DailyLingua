@@ -110,6 +110,8 @@ test("a new user signs up, studies, adds a word and deletes the account", async 
   await page.goto("/preferences");
   await page.getByRole("link", { name: "Envoyer un retour" }).click();
   await expect(page).toHaveURL(/\/retour\?depuis=(%2F|\/)preferences$/);
+  // The URL changes while the loading skeleton still shows: wait for the page itself.
+  await expect(page.getByRole("heading", { level: 1, name: "Envoyer un retour" })).toBeVisible();
   await page.getByRole("radio", { name: "Idée" }).check({ force: true });
   await page.getByLabel("Ton message").fill(FEEDBACK_MESSAGE);
   await expectNoHorizontalOverflow(page);
