@@ -11,25 +11,33 @@ import { describe, expect, it } from "vitest";
 const PACKAGES_DIR = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const THIS_FILE = fileURLToPath(import.meta.url);
 
-const PACKAGES = ["schemas", "core", "i18n", "data"] as const;
+const PACKAGES = ["schemas", "core", "i18n", "data", "ai"] as const;
 type PackageName = (typeof PACKAGES)[number];
 
 /** Packages a domain package must never depend on, by name (exact or as a `name/…` subpath). */
 const FORBIDDEN_NAMES = ["react", "react-dom", "next", "next-intl", "server-only"];
 const FORBIDDEN_SCOPES = ["@supabase/", "@anthropic-ai/"];
-/** Scopes a package may use although they are forbidden elsewhere: `data` is the one that talks to Supabase. */
+/**
+ * Scopes a package may use although they are forbidden elsewhere: `data` is the one that talks to
+ * Supabase, `ai` the one that calls the Anthropic SDK.
+ */
 const ALLOWED_SCOPES: Record<PackageName, string[]> = {
   schemas: [],
   core: [],
   i18n: [],
   data: ["@supabase/"],
+  ai: ["@anthropic-ai/"],
 };
-/** Extra rules: `schemas` is the bottom layer and must not import `core`; `i18n` and `data` stand alone. */
+/**
+ * Extra rules: `schemas` is the bottom layer and must not import `core`; `i18n`, `data` and `ai` stand
+ * alone (`data` may import the types of `ai`, to implement its store; `ai` never imports `data`).
+ */
 const FORBIDDEN_BY_PACKAGE: Record<PackageName, string[]> = {
-  schemas: ["@dailylingua/core"],
-  core: [],
-  i18n: ["@dailylingua/core", "@dailylingua/schemas", "@dailylingua/data"],
+  schemas: ["@dailylingua/core", "@dailylingua/ai"],
+  core: ["@dailylingua/ai"],
+  i18n: ["@dailylingua/core", "@dailylingua/schemas", "@dailylingua/data", "@dailylingua/ai"],
   data: ["@dailylingua/core", "@dailylingua/i18n"],
+  ai: ["@dailylingua/core", "@dailylingua/i18n", "@dailylingua/data"],
 };
 
 /** Module specifiers imported by `source`: static, side-effect, re-export, dynamic and `require`. */
@@ -68,7 +76,7 @@ function sourceFiles(dir: string): string[] {
   });
 }
 
-/** Environment reads: `packages/data` receives its client and never reads variables (integration test excepted). */
+/** Environment reads: `packages/data` and `packages/ai` receive their client or keys and never read variables (integration test excepted). */
 const ENV_READ = /\bprocess\s*\.\s*env\b|\bimport\.meta\.env\b|\bprocess\s*\.\s*loadEnvFile\b/;
 const ENV_ALLOWED = /\.integration\.test\.ts$/;
 
@@ -111,6 +119,19 @@ describe("scanner", () => {
     expect(violation("@dailylingua/i18n", data, "data")).not.toBeNull();
   });
 
+  it("lets only ai use the Anthropic SDK, and keeps it away from Supabase and from data", () => {
+    const ai = join(PACKAGES_DIR, "ai", "src", "x.ts");
+    expect(violation("@anthropic-ai/sdk", ai, "ai")).toBeNull();
+    expect(violation("@anthropic-ai/sdk/helpers/zod", ai, "ai")).toBeNull();
+    expect(violation("@anthropic-ai/sdk", join(PACKAGES_DIR, "data", "src", "x.ts"), "data")).not.toBeNull();
+    expect(violation("@supabase/supabase-js", ai, "ai")).not.toBeNull();
+    expect(violation("@dailylingua/data", ai, "ai")).not.toBeNull();
+    expect(violation("react", ai, "ai")).not.toBeNull();
+    expect(violation("next/server", ai, "ai")).not.toBeNull();
+    // data implements the store of ai: it may import its types.
+    expect(violation("@dailylingua/ai", join(PACKAGES_DIR, "data", "src", "x.ts"), "data")).toBeNull();
+  });
+
   it("spots environment reads", () => {
     expect(ENV_READ.test("const a = process.env.X;")).toBe(true);
     expect(ENV_READ.test("process.loadEnvFile('.env')")).toBe(true);
@@ -150,7 +171,7 @@ describe.each(PACKAGES)("%s boundaries", (pkg) => {
     expect(bad).toEqual([]);
   });
 
-  it.runIf(pkg === "data")("reads no environment variable outside its integration test", () => {
+  it.runIf(pkg === "data" || pkg === "ai")("reads no environment variable outside its integration test", () => {
     const found = files
       .filter((file) => !ENV_ALLOWED.test(file) && ENV_READ.test(readFileSync(file, "utf8")))
       .map((file) => relative(PACKAGES_DIR, file));
