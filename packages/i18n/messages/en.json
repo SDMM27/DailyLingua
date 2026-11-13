@@ -126,7 +126,7 @@
     },
     "timeZone": {
       "label": "Time zone",
-      "hint": "Your study day rolls over at midnight in this time zone."
+      "hint": "Your study day rolls over at 4 a.m. in this time zone."
     },
     "reminder": {
       "label": "Reminder time",

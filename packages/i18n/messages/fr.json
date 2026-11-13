@@ -126,7 +126,7 @@
     },
     "timeZone": {
       "label": "Fuseau horaire",
-      "hint": "Ton jour d’étude change à minuit, dans ce fuseau."
+      "hint": "Ton jour d’étude change à 4 h du matin, dans ce fuseau."
     },
     "reminder": {
       "label": "Heure du rappel",
