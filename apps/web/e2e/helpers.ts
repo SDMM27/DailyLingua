@@ -68,3 +68,24 @@ export async function expectNoHorizontalOverflow(page: Page) {
   }));
   expect(scrollWidth, `scrollWidth ${scrollWidth} > innerWidth ${innerWidth}`).toBeLessThanOrEqual(innerWidth);
 }
+
+/** Taps a choice the way a user does: its visible row (the radio itself is visually hidden). */
+async function choose(page: Page, name: string | RegExp) {
+  await page.locator("label").filter({ has: page.getByRole("radio", { name }) }).click();
+}
+
+/** Creates an account through the interface and completes the installation (Italian, A0, 15 minutes); ends on Today, in French. */
+export async function signUpAndInstall(page: Page, email: string) {
+  await page.goto("/sign-up");
+  await page.getByLabel("Adresse e-mail").fill(email);
+  await page.getByLabel("Mot de passe").fill(TEST_PASSWORD);
+  await page.getByRole("button", { name: "Créer mon compte" }).click();
+  await expect(page).toHaveURL(/\/welcome$/);
+  await page.getByRole("button", { name: "Continuer" }).click();
+  await choose(page, /italien/);
+  await page.getByRole("button", { name: "Continuer" }).click();
+  await choose(page, /Je débute/);
+  await page.getByRole("button", { name: "Continuer" }).click();
+  await page.getByRole("button", { name: "Commencer" }).click();
+  await expect(page).toHaveURL(/\/$/);
+}
