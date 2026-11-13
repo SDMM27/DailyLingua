@@ -60,14 +60,14 @@ export function FeedbackForm({ persist, page }: { persist: boolean; page?: strin
         <legend className="mb-2 text-sm font-semibold">De quoi s’agit-il ?</legend>
         <div className="flex flex-wrap gap-2">
           {FEEDBACK_CATEGORIES.map((value) => (
-            <label key={value} className="cursor-pointer">
+            <label key={value} className="relative cursor-pointer">
               <input
                 type="radio"
                 name="category"
                 value={value}
                 checked={category === value}
                 onChange={() => setCategory(value)}
-                className="peer sr-only"
+                className="peer absolute inset-0 z-10 m-0 cursor-pointer appearance-none opacity-0"
               />
               <span className="flex min-h-11 items-center rounded-full border border-line px-4 text-sm font-semibold text-ink-soft peer-checked:border-accent peer-checked:bg-accent peer-checked:text-accent-ink peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-disabled:opacity-50">
                 {FEEDBACK_CATEGORY_LABELS[value]}

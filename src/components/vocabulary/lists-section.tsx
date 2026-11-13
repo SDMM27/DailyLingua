@@ -207,8 +207,8 @@ function NewListForm({
     <form onSubmit={handleSubmit} noValidate className="space-y-3">
       <div className="flex gap-2" role="radiogroup" aria-label="Langue de la liste">
         {languages.map((lang, i) => (
-          <label key={lang} className="flex-1">
-            <input type="radio" name="language" value={lang} defaultChecked={i === 0} className="peer sr-only" />
+          <label key={lang} className="relative flex-1">
+            <input type="radio" name="language" value={lang} defaultChecked={i === 0} className="peer absolute inset-0 z-10 m-0 cursor-pointer appearance-none opacity-0" />
             <span className="flex min-h-11 cursor-pointer items-center justify-center rounded-xl border border-line text-center text-sm font-medium text-ink-soft transition-colors peer-checked:border-ink peer-checked:bg-ink peer-checked:text-paper peer-focus-visible:ring-2 peer-focus-visible:ring-ink">
               {languageInfo(lang).nameFr}
             </span>
