@@ -72,7 +72,20 @@ function sourceFiles(dir: string): string[] {
 const ENV_READ = /\bprocess\s*\.\s*env\b|\bimport\.meta\.env\b|\bprocess\s*\.\s*loadEnvFile\b/;
 const ENV_ALLOWED = /\.integration\.test\.ts$/;
 
+/** Browser globals and clock reads, forbidden in `core/src/offline`. */
+const IMPURE =
+  /\b(?:window|document|navigator|indexedDB|localStorage|sessionStorage|globalThis|self)\b|\bDate\s*\.\s*now\b|\bnew\s+Date\s*\(\s*\)|\bperformance\s*\.\s*now\b/;
+
 describe("scanner", () => {
+  it("spots browser globals and clock reads", () => {
+    for (const bad of ["window.x", "indexedDB.open()", "Date.now()", "new Date()", "performance.now()", "navigator.onLine"]) {
+      expect(IMPURE.test(bad), bad).toBe(true);
+    }
+    for (const good of ["new Date(value)", "now: number", "const windowSize = 1", "Date.UTC(2026, 0, 1)"]) {
+      expect(IMPURE.test(good), good).toBe(false);
+    }
+  });
+
   it("finds every import form", () => {
     const source = [
       'import a from "one";',
@@ -148,6 +161,16 @@ describe.each(PACKAGES)("%s boundaries", (pkg) => {
     const declared = Object.keys({ ...manifest.dependencies, ...manifest.peerDependencies });
     const bad = declared.filter((name) => violation(name, join(PACKAGES_DIR, pkg, "src", "x.ts"), pkg) !== null);
     expect(bad).toEqual([]);
+  });
+
+  it.runIf(pkg === "core")("keeps offline/ pure: no browser global, no clock read (`now` is a parameter)", () => {
+    const found = files
+      .filter((file) => relative(join(PACKAGES_DIR, "core", "src"), file).split(sep)[0] === "offline" && !/\.test\.ts$/.test(file))
+      .flatMap((file) => {
+        const code = readFileSync(file, "utf8").replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, "");
+        return IMPURE.test(code) ? [relative(PACKAGES_DIR, file)] : [];
+      });
+    expect(found).toEqual([]);
   });
 
   it.runIf(pkg === "data")("reads no environment variable outside its integration test", () => {
