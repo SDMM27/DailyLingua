@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { startAssessment } from "@/app/actions/assessment";
 import { ArrowRightIcon } from "@/components/icons";
+import { buttonClass } from "@/components/ui/primitives";
 import type { Language } from "@/lib/schemas/common";
 
 /**
@@ -45,11 +46,7 @@ export function StartAssessmentButton({
         type="button"
         onClick={start}
         disabled={busy}
-        className={
-          variant === "primary"
-            ? "inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-paper disabled:opacity-60"
-            : "inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-line px-5 text-sm font-semibold text-ink hover:bg-surface-sunk disabled:opacity-60"
-        }
+        className={variant === "primary" ? buttonClass.primary : buttonClass.secondary}
       >
         {busy ? "Préparation…" : children}
         {!busy && <ArrowRightIcon width={14} height={14} />}

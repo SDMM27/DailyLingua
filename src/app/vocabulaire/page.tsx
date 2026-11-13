@@ -34,10 +34,8 @@ export default async function VocabularyPage() {
         persist={!repo.isDemo}
         canTranslate={repo.canTranslateVocabulary}
         isGuest={repo.isGuest}
+        retention={<RetentionCard stats={retention} />}
       />
-      <div className="mt-10">
-        <RetentionCard stats={retention} />
-      </div>
     </>
   );
 }

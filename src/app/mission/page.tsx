@@ -51,10 +51,10 @@ export default async function MissionPage() {
       <>
         <PageHeader eyebrow={formatLongDate(today)} title="Mission du jour" />
         <Card>
-          <p className="font-serif text-lg">La mission de ce matin n’est pas encore prête.</p>
-          <p className="mt-2 text-sm text-ink-soft">
+          <p className="font-serif text-xl">La mission de ce matin n’est pas encore prête.</p>
+          <p className="mt-2 text-[15px] text-ink-soft">
             En attendant, tu peux faire tes{" "}
-            <Link href="/vocabulaire" className="font-medium underline underline-offset-4">
+            <Link href="/vocabulaire" className="font-medium text-accent-strong underline underline-offset-4">
               révisions de vocabulaire
             </Link>
             .

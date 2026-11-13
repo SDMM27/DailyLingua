@@ -7,7 +7,7 @@ import { DraftScript } from "@/components/assessment/draft-script";
 import { ListeningPlayer } from "@/components/assessment/listening-player";
 import { YouTubeListeningPlayer } from "@/components/assessment/youtube-listening-player";
 import { ArrowRightIcon } from "@/components/icons";
-import { Card, Eyebrow, LanguageTag, ProgressBar } from "@/components/ui/primitives";
+import { buttonClass, Eyebrow, LanguageTag, ProgressBar } from "@/components/ui/primitives";
 import type { PublicDossier, PublicQuestion } from "@/lib/assessment/public-dossier";
 import { SKILL_NAMES } from "@/lib/assessment/skill-descriptions";
 import type { SpeakingClaim } from "@/lib/assessment/speaking-claims";
@@ -19,6 +19,7 @@ import {
   type AssessmentStepDefinition,
 } from "@/lib/domain/assessment";
 import { languageInfo } from "@/lib/domain/languages";
+import { toRoman } from "@/lib/domain/roman";
 import { ASSESSMENT_ANSWER_MAX, ASSESSMENT_WRITING_MAX, type AssessmentAnswers } from "@/lib/schemas/assessment";
 
 /** The answers are saved this long after the last keystroke. */
@@ -38,10 +39,8 @@ type View = { kind: "steps" } | { kind: "recap" } | { kind: "grading" } | { kind
 
 const isFilled = (value: string | undefined) => value !== undefined && value.trim() !== "";
 
-const BUTTON_PRIMARY =
-  "inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-paper disabled:opacity-60";
-const BUTTON_SECONDARY =
-  "inline-flex min-h-11 items-center justify-center rounded-full border border-line px-5 text-sm font-semibold text-ink-soft hover:text-ink disabled:opacity-60";
+const BUTTON_PRIMARY = buttonClass.primary;
+const BUTTON_SECONDARY = buttonClass.secondary;
 
 /** A multi-line answer: label tied to the field, hint, counter near the limit. */
 function AnswerField({
@@ -69,7 +68,7 @@ function AnswerField({
   const showCounter = value.length >= max * COUNTER_FROM;
   return (
     <div>
-      <label htmlFor={id} className="mb-2 block text-[15px] leading-snug font-medium">
+      <label htmlFor={id} className="mb-2 block font-serif text-lg leading-snug font-semibold">
         {label}
       </label>
       <textarea
@@ -82,7 +81,7 @@ function AnswerField({
         aria-describedby={showCounter ? `${hintId} ${counterId}` : hintId}
         onChange={(e) => onChange(e.target.value)}
         onBlur={onBlur}
-        className="block w-full resize-y rounded-2xl border border-line bg-surface px-4 py-3 text-base leading-relaxed placeholder:text-muted focus:border-ink-soft focus:outline-none"
+        className="block w-full resize-y rounded-xl border border-line bg-surface px-4 py-3 text-base leading-relaxed placeholder:text-muted focus:border-ink focus:outline-none"
       />
       {showCounter && (
         <p id={counterId} className={`mt-1 text-end text-xs ${value.length >= max ? "text-danger" : "text-muted"}`}>
@@ -324,7 +323,7 @@ export function AssessmentRunner({
   );
 
   const header = (
-    <div className="mb-5 flex items-center justify-between gap-3">
+    <div className="mb-6 flex items-center justify-between gap-3 border-b border-line pb-3">
       <LanguageTag language={dossier.language} />
     </div>
   );
@@ -333,15 +332,15 @@ export function AssessmentRunner({
     return (
       <div>
         {header}
-        <Card role="status" aria-live="polite">
+        <section role="status" aria-live="polite" className="max-w-[68ch] border-t border-ink pt-5">
           <Eyebrow>Correction</Eyebrow>
-          <h1 ref={headingRef} tabIndex={-1} className="mt-2 font-serif text-xl font-semibold outline-none">
+          <h1 ref={headingRef} tabIndex={-1} className="sd-display mt-2 text-3xl outline-none">
             Correction en cours…
           </h1>
-          <p className="mt-2 text-[15px] leading-relaxed text-ink-soft">
+          <p className="mt-2 font-serif text-lg leading-relaxed text-ink-soft">
             Ça peut prendre une minute. Garde cette page ouverte : tes réponses sont enregistrées.
           </p>
-        </Card>
+        </section>
       </div>
     );
   }
@@ -350,7 +349,7 @@ export function AssessmentRunner({
     return (
       <div className="pb-safe">
         {header}
-        <p role="alert" className="rounded-2xl bg-danger-soft px-4 py-3 text-sm leading-relaxed text-danger">
+        <p role="alert" className="max-w-[68ch] rounded-2xl bg-danger-soft px-4 py-3 text-sm leading-relaxed text-danger">
           {view.message}
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
@@ -408,22 +407,25 @@ export function AssessmentRunner({
       <div className="pb-safe">
         {header}
         <Eyebrow>Avant de terminer</Eyebrow>
-        <h1 ref={headingRef} tabIndex={-1} className="mt-2 font-serif text-2xl font-semibold outline-none">
+        <h1 ref={headingRef} tabIndex={-1} className="sd-display mt-2 text-4xl outline-none">
           Récapitulatif
         </h1>
-        <p className="mt-2 text-[15px] leading-relaxed text-ink-soft">
+        <p className="mt-2 max-w-[68ch] font-serif text-lg leading-relaxed text-ink-soft">
           Une épreuve laissée vide n’est pas évaluée, sans pénalité. Tu peux revenir sur une étape avant d’envoyer.
         </p>
-        <ul className="mt-5 space-y-2.5">
+        <ul className="mt-6 border-t border-ink md:grid md:grid-cols-2 md:gap-x-10">
           {lines.map((line, index) => (
             <li key={line.step}>
               <button
                 type="button"
                 onClick={() => goTo(index)}
-                className="flex min-h-11 w-full items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3 text-start"
+                className="flex min-h-11 w-full items-center gap-4 border-b border-line py-4 text-start transition-colors hover:bg-surface-sunk"
               >
+                <span aria-hidden="true" className="w-8 shrink-0 font-serif text-2xl font-extrabold text-accent-strong">
+                  {toRoman(index + 1)}
+                </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[15px] font-semibold">{SKILL_NAMES[line.step]}</span>
+                  <span className="block font-serif text-lg font-bold">{SKILL_NAMES[line.step]}</span>
                   <span className={`block text-sm ${line.warn ? "text-ochre" : "text-ink-soft"}`}>{line.text}</span>
                 </span>
                 <ArrowRightIcon width={14} height={14} className="shrink-0 text-muted" />
@@ -431,7 +433,7 @@ export function AssessmentRunner({
             </li>
           ))}
         </ul>
-        <p className="mt-4 text-xs leading-relaxed text-muted">
+        <p className="mt-4 max-w-[68ch] text-xs leading-relaxed text-muted">
           Tes réponses sont envoyées à Anthropic pour être corrigées. Une fois corrigé, le bilan ne peut plus être modifié.
         </p>
         {saveStatus}
@@ -458,24 +460,30 @@ export function AssessmentRunner({
         </Eyebrow>
         <ProgressBar value={stepIndex / ASSESSMENT_STEPS.length} label="Progression du bilan" className="mt-2" />
       </div>
-      <h1 ref={headingRef} tabIndex={-1} className="font-serif text-2xl font-semibold outline-none">
-        {SKILL_NAMES[step]}
-      </h1>
+      <div className="flex items-baseline gap-4 border-t border-ink pt-5">
+        <span aria-hidden="true" className="font-serif text-4xl font-extrabold text-accent-strong">
+          {toRoman(stepIndex + 1)}
+        </span>
+        <h1 ref={headingRef} tabIndex={-1} className="sd-display text-3xl outline-none sm:text-4xl">
+          {SKILL_NAMES[step]}
+        </h1>
+      </div>
 
       {step === "reading" && (
-        <section className="mt-4 space-y-5">
-          <Card>
-            <h2 lang={info.code} dir={info.dir} className="font-serif text-lg font-semibold">
+        <section className="mt-6 grid gap-8 lg:grid-cols-2 lg:gap-0">
+          <article className="lg:pr-10">
+            <h2 lang={info.code} dir={info.dir} className="font-serif text-2xl font-bold italic">
               {dossier.title}
             </h2>
-            <p lang={info.code} dir={info.dir} className="mt-3 text-base leading-relaxed whitespace-pre-line">
+            <p lang={info.code} dir={info.dir} className="mt-3 max-w-[68ch] font-serif text-lg leading-relaxed whitespace-pre-line">
               {dossier.reading.text}
             </p>
-          </Card>
-          <p id={hintId} className="text-sm leading-relaxed text-ink-soft">
-            Réponds en français ou dans la langue, au choix : seul le sens compte.
-          </p>
-          {dossier.reading.questions.map((q) => (
+          </article>
+          <div className="space-y-5 lg:border-l lg:border-line lg:pl-10">
+            <p id={hintId} className="text-sm leading-relaxed text-ink-soft">
+              Réponds en français ou dans la langue, au choix : seul le sens compte.
+            </p>
+            {dossier.reading.questions.map((q) => (
             <AnswerField
               key={q.id}
               label={q.prompt}
@@ -487,12 +495,13 @@ export function AssessmentRunner({
               onBlur={() => void flush()}
             />
           ))}
+          </div>
         </section>
       )}
 
       {step === "listening" && (
-        <section className="mt-4 space-y-5">
-          <Card>
+        <section className="mt-6 grid gap-8 lg:grid-cols-2 lg:gap-0">
+          <div className="lg:pr-10">
             {dossier.listening.video ? (
               <YouTubeListeningPlayer
                 video={dossier.listening.video}
@@ -519,11 +528,12 @@ export function AssessmentRunner({
                 Tu peux écouter le passage {LISTENING_MAX_PLAYS} fois au plus, puis répondre aux questions.
               </p>
             )}
-          </Card>
-          <p id={hintId} className="text-sm leading-relaxed text-ink-soft">
-            Réponds en français ou dans la langue, au choix : seul le sens compte.
-          </p>
-          {dossier.listening.questions.map((q) => (
+          </div>
+          <div className="space-y-5 lg:border-l lg:border-line lg:pl-10">
+            <p id={hintId} className="text-sm leading-relaxed text-ink-soft">
+              Réponds en français ou dans la langue, au choix : seul le sens compte.
+            </p>
+            {dossier.listening.questions.map((q) => (
             <AnswerField
               key={q.id}
               label={q.prompt}
@@ -535,20 +545,22 @@ export function AssessmentRunner({
               onBlur={() => void flush()}
             />
           ))}
+          </div>
         </section>
       )}
 
       {step === "writing" && (
-        <section className="mt-4 space-y-5">
-          <Card>
+        <section className="mt-6 grid gap-8 lg:grid-cols-2 lg:gap-0">
+          <div className="lg:pr-10">
             <Eyebrow>Consigne</Eyebrow>
-            <p className="mt-2 text-[15px] leading-relaxed">{dossier.writing.prompt}</p>
+            <p className="mt-2 max-w-[68ch] font-serif text-xl leading-relaxed">{dossier.writing.prompt}</p>
             <p className="mt-2 text-sm text-ink-soft">Environ {dossier.writing.sentences} phrases.</p>
-          </Card>
-          <p id={hintId} className="sr-only">
-            Écris dans la langue étudiée.
-          </p>
-          <AnswerField
+          </div>
+          <div className="lg:border-l lg:border-line lg:pl-10">
+            <p id={hintId} className="sr-only">
+              Écris dans la langue étudiée.
+            </p>
+            <AnswerField
             label="Ton texte"
             value={answers.writing}
             max={ASSESSMENT_WRITING_MAX}
@@ -558,21 +570,23 @@ export function AssessmentRunner({
             onChange={(text) => change({ answers: { ...latest.current.answers, writing: text } }, "later")}
             onBlur={() => void flush()}
           />
+          </div>
         </section>
       )}
 
       {step === "speaking" && (
-        <section className="mt-4 space-y-4">
-          <p id={hintId} className="rounded-2xl bg-surface-sunk px-4 py-3 text-sm leading-relaxed text-ink-soft">
+        <section className="mt-6">
+          <p id={hintId} className="max-w-[68ch] border-y border-dashed border-line py-3 text-sm leading-relaxed text-ink-soft">
             Ce que tu déclares ici ne sera pas vérifié : réponds honnêtement, c’est pour toi. Une affirmation laissée sans
             réponse compte comme « non ».
           </p>
+          <div className="mt-2 md:grid md:grid-cols-2 md:gap-x-10">
           {claims.map((claim) => {
             const value = answers.speaking[claim.id];
             return (
-              <fieldset key={claim.id} aria-describedby={hintId} className="rounded-3xl border border-line bg-surface p-4">
+              <fieldset key={claim.id} aria-describedby={hintId} className="border-b border-line py-4">
                 <legend className="sr-only">{claim.text}</legend>
-                <p aria-hidden="true" className="text-[15px] leading-snug">
+                <p aria-hidden="true" className="font-serif text-lg leading-snug">
                   {claim.text}
                 </p>
                 <div className="mt-3 grid grid-cols-2 gap-2">
@@ -582,7 +596,7 @@ export function AssessmentRunner({
                   ].map((option) => (
                     <label
                       key={option.label}
-                      className="flex min-h-11 cursor-pointer items-center justify-center rounded-2xl border border-line text-sm font-semibold has-checked:border-ink has-checked:bg-ink has-checked:text-paper has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink"
+                      className="flex min-h-11 cursor-pointer items-center justify-center rounded-full border border-line text-sm font-semibold has-checked:border-ink has-checked:bg-ink has-checked:text-paper has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink"
                     >
                       <input
                         type="radio"
@@ -598,12 +612,13 @@ export function AssessmentRunner({
               </fieldset>
             );
           })}
+          </div>
         </section>
       )}
 
       {saveStatus}
 
-      <div className="mt-5 flex flex-wrap items-center gap-3">
+      <div className="mt-6 flex flex-wrap items-center gap-3">
         {stepIndex > 0 && (
           <button type="button" onClick={() => goTo(stepIndex - 1)} className={BUTTON_SECONDARY}>
             Précédent

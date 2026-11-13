@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { buttonClass } from "@/components/ui/primitives";
 import { canStartListening, LISTENING_MAX_PLAYS } from "@/lib/domain/assessment";
 
 type Status = "idle" | "playing" | "paused" | "error";
@@ -71,7 +72,7 @@ export function ListeningPlayer({
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-sm font-semibold text-ink">{title}</p>
+      <p className="kicker text-accent-strong">{title}</p>
       {/* No `controls`: the only way to play is the button below. */}
       <audio
         ref={audioRef}
@@ -90,7 +91,7 @@ export function ListeningPlayer({
         type="button"
         onClick={press}
         disabled={exhausted}
-        className="inline-flex min-h-11 items-center justify-center self-start rounded-full bg-ink px-6 text-sm font-semibold text-paper disabled:opacity-60"
+        className={`${buttonClass.primary} self-start`}
       >
         {exhausted ? `Tu as utilisé tes ${LISTENING_MAX_PLAYS} écoutes` : label}
       </button>

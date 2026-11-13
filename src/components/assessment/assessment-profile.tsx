@@ -4,12 +4,14 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { applyAssessmentLevel } from "@/app/actions/assessment";
 import { StartAssessmentButton } from "@/components/assessment/start-assessment-button";
-import { Card, Eyebrow } from "@/components/ui/primitives";
+import { buttonClass, Eyebrow, ProgressBar } from "@/components/ui/primitives";
+import { RuledList, ruledItem } from "@/components/ui/ruled-grid";
 import type { PublicDossier } from "@/lib/assessment/public-dossier";
 import { ASSESSMENT_SKILLS, SKILL_DESCRIPTIONS, SKILL_NAMES, type AssessmentSkill } from "@/lib/assessment/skill-descriptions";
 import { receptionLevel } from "@/lib/domain/assessment";
+import { toRoman } from "@/lib/domain/roman";
 import type { AssessmentConfidence, AssessmentResults, AssessmentWritingCriterion } from "@/lib/schemas/assessment";
-import type { CefrLevel, Language } from "@/lib/schemas/common";
+import { CEFR_LEVELS, type CefrLevel, type Language } from "@/lib/schemas/common";
 
 const CONFIDENCE_WORDS: Record<AssessmentConfidence, string> = { low: "faible", medium: "moyenne", high: "élevée" };
 
@@ -88,60 +90,71 @@ export function AssessmentProfile({
   const otherIds = Object.keys(reviewed).filter((id) => !listedIds.has(id));
 
   return (
-    <div className="space-y-6">
-      <section aria-labelledby="profile-title">
+    <div className="space-y-8">
+      <section aria-labelledby="profile-title" className="border-t border-ink pt-5">
         <Eyebrow>Ton bilan</Eyebrow>
-        <h2 id="profile-title" className="mt-1 font-serif text-2xl font-semibold">
+        <h2 id="profile-title" className="sd-display mt-1 text-3xl">
           Ce que tu sais faire
         </h2>
-        <ul className="mt-4 space-y-3">
-          {ASSESSMENT_SKILLS.map((skill) => {
+        <RuledList columns={4} className="mt-4 border-t border-line">
+          {ASSESSMENT_SKILLS.map((skill, index) => {
             const result = results[skill];
             return (
-              <li key={skill}>
-                <Card>
-                  <div className="flex items-baseline justify-between gap-3">
-                    <h3 className="text-[15px] font-semibold">{SKILL_NAMES[skill]}</h3>
-                    {skill === "speaking" && result && (
-                      <span className="rounded-full border border-line px-2.5 py-0.5 text-xs font-medium text-ink-soft">Déclaré</span>
-                    )}
-                  </div>
-                  {result ? (
-                    <>
-                      <p className="mt-1 text-[15px] leading-relaxed">{SKILL_DESCRIPTIONS[skill][result.level]}</p>
-                      <p className="mt-1.5 text-xs text-muted">
-                        <span data-testid={`level-${skill}`}>{result.level}</span> · confiance {CONFIDENCE_WORDS[result.confidence]}
-                        {skill === "speaking" && " · d’après tes affirmations, non vérifié"}
-                      </p>
-                    </>
-                  ) : (
-                    <p className="mt-1 text-[15px] text-muted">Non évaluée</p>
+              <li key={skill} className={ruledItem}>
+                <div className="flex items-baseline justify-between gap-3">
+                  <h3 className="flex items-baseline gap-2 text-[15px] font-semibold">
+                    <span aria-hidden="true" className="font-serif text-xl font-extrabold text-accent-strong">
+                      {toRoman(index + 1)}
+                    </span>
+                    {SKILL_NAMES[skill]}
+                  </h3>
+                  {skill === "speaking" && result && (
+                    <span className="kicker text-muted">Déclaré</span>
                   )}
-                </Card>
+                </div>
+                {result ? (
+                  <>
+                    <p className="sd-display mt-3 text-6xl leading-none text-accent-strong">
+                      <span data-testid={`level-${skill}`}>{result.level}</span>
+                    </p>
+                    <ProgressBar
+                      value={(CEFR_LEVELS.indexOf(result.level) + 1) / CEFR_LEVELS.length}
+                      label={`Niveau en ${SKILL_NAMES[skill].toLowerCase()}`}
+                      className="mt-3"
+                    />
+                    <p className="mt-3 font-serif text-[17px] leading-relaxed">{SKILL_DESCRIPTIONS[skill][result.level]}</p>
+                    <p className="kicker mt-2 text-muted">
+                      confiance {CONFIDENCE_WORDS[result.confidence]}
+                      {skill === "speaking" && " · d’après tes affirmations, non vérifié"}
+                    </p>
+                  </>
+                ) : (
+                  <p className="mt-3 font-serif text-lg italic text-muted">Non évaluée</p>
+                )}
               </li>
             );
           })}
-        </ul>
-        <p className="mt-3 text-xs leading-relaxed text-muted">
+        </RuledList>
+        <p className="mt-3 max-w-[68ch] text-xs leading-relaxed text-muted">
           Ce bilan est indicatif : il ne compte que 3 questions par épreuve, donc une erreur d’inattention peut changer le
           résultat.
         </p>
       </section>
 
       {results.writing && (
-        <p className="rounded-2xl bg-surface-sunk px-4 py-3 text-sm leading-relaxed text-ink-soft">
+        <p className="max-w-[68ch] border-y border-line py-3 font-serif text-lg leading-relaxed text-ink-soft">
           Ton niveau d’écriture a été mis à jour : <strong className="font-semibold text-ink">{results.writing.level}</strong>.
           Les consignes d’écriture de tes missions s’y adaptent.
         </p>
       )}
 
       {proposal && reception && (
-        <Card>
+        <section className="max-w-[68ch] border-t border-ink pt-5">
           <Eyebrow>Niveau des contenus</Eyebrow>
-          <p className="mt-2 font-serif text-lg font-semibold">
+          <p className="mt-2 font-serif text-2xl font-bold italic">
             Régler tes contenus sur {reception} ? (actuellement {currentLevel})
           </p>
-          <p className="mt-1 text-sm leading-relaxed text-ink-soft">
+          <p className="mt-1 font-serif text-lg leading-relaxed text-ink-soft">
             C’est le plus bas de tes niveaux en lecture et en écoute. Il règle la difficulté des articles, des podcasts et des vidéos.
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
@@ -149,7 +162,7 @@ export function AssessmentProfile({
               type="button"
               onClick={apply}
               disabled={applying}
-              className="inline-flex min-h-11 items-center justify-center rounded-full bg-ink px-6 text-sm font-semibold text-paper disabled:opacity-60"
+              className={buttonClass.primary}
             >
               {applying ? "Application…" : "Appliquer"}
             </button>
@@ -157,7 +170,7 @@ export function AssessmentProfile({
               type="button"
               onClick={() => setKept(true)}
               disabled={applying}
-              className="inline-flex min-h-11 items-center justify-center rounded-full border border-line px-5 text-sm font-semibold text-ink-soft hover:text-ink disabled:opacity-60"
+              className={buttonClass.secondary}
             >
               Garder mon niveau
             </button>
@@ -169,7 +182,7 @@ export function AssessmentProfile({
               </p>
             )}
           </div>
-        </Card>
+        </section>
       )}
       {applied && (
         <p role="status" className="rounded-2xl bg-olive-soft px-4 py-3 text-sm font-medium text-olive">
@@ -177,11 +190,11 @@ export function AssessmentProfile({
         </p>
       )}
 
-      <details className="group rounded-3xl border border-line bg-surface">
-        <summary className="flex min-h-11 cursor-pointer items-center px-5 py-3 text-[15px] font-semibold">
+      <details className="group border-y border-ink">
+        <summary className="flex min-h-11 cursor-pointer items-center py-3 font-serif text-xl font-bold italic">
           Voir le détail des corrections
         </summary>
-        <div className="space-y-5 border-t border-line px-5 py-4">
+        <div className="grid gap-x-10 gap-y-6 border-t border-line py-5 md:grid-cols-2">
           {questionLists.map((list) => {
             const entries = list.ids.flatMap((q) => (reviewed[q.id] ? [{ ...q, ...reviewed[q.id] }] : []));
             if (entries.length === 0) return null;
@@ -235,7 +248,7 @@ export function AssessmentProfile({
       </details>
 
       {(higherLevel || canRedo) && (
-        <div className="space-y-4">
+        <div className="flex flex-wrap items-start gap-x-8 gap-y-4">
           {higherLevel && (
             <div>
               <StartAssessmentButton language={language} higher variant="secondary">

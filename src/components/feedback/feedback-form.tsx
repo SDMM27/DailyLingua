@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useId, useState, useTransition } from "react";
 import { sendFeedback } from "@/app/actions/feedback";
-import { Card } from "@/components/ui/primitives";
+import { buttonClass, Card } from "@/components/ui/primitives";
 import {
   FEEDBACK_CATEGORIES,
   FEEDBACK_CATEGORY_LABELS,
@@ -27,7 +27,7 @@ export function FeedbackForm({ persist, page }: { persist: boolean; page?: strin
         <p className="mt-2 text-[15px] leading-relaxed text-ink-soft">
           Ton retour est bien arrivé. C’est grâce à toi que l’app s’améliore.
         </p>
-        <Link href="/" className="mt-5 inline-block rounded-2xl bg-ink px-6 py-3 font-semibold text-paper">
+        <Link href="/" className={`${buttonClass.primary} mt-5`}>
           Retour à l’accueil
         </Link>
       </Card>
@@ -51,7 +51,7 @@ export function FeedbackForm({ persist, page }: { persist: boolean; page?: strin
   return (
     <form onSubmit={submit} className="space-y-5">
       {!persist && (
-        <p className="rounded-2xl border border-dashed border-line px-4 py-2.5 text-sm leading-relaxed text-muted">
+        <p className="rounded-lg border border-dashed border-line px-4 py-2.5 text-sm leading-relaxed text-muted">
           Mode démonstration : l’envoi de retours est désactivé. Il fonctionne avec un compte.
         </p>
       )}
@@ -60,16 +60,16 @@ export function FeedbackForm({ persist, page }: { persist: boolean; page?: strin
         <legend className="mb-2 text-sm font-semibold">De quoi s’agit-il ?</legend>
         <div className="flex flex-wrap gap-2">
           {FEEDBACK_CATEGORIES.map((value) => (
-            <label key={value} className="cursor-pointer">
+            <label key={value} className="relative cursor-pointer">
               <input
                 type="radio"
                 name="category"
                 value={value}
                 checked={category === value}
                 onChange={() => setCategory(value)}
-                className="peer sr-only"
+                className="peer absolute inset-0 z-10 m-0 cursor-pointer appearance-none opacity-0"
               />
-              <span className="block rounded-full border border-line px-4 py-2 text-sm font-semibold text-ink-soft peer-checked:border-ink peer-checked:bg-ink peer-checked:text-paper peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-disabled:opacity-50">
+              <span className="flex min-h-11 items-center rounded-full border border-line px-4 text-sm font-semibold text-ink-soft peer-checked:border-accent peer-checked:bg-accent peer-checked:text-accent-ink peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-disabled:opacity-50">
                 {FEEDBACK_CATEGORY_LABELS[value]}
               </span>
             </label>
@@ -88,7 +88,7 @@ export function FeedbackForm({ persist, page }: { persist: boolean; page?: strin
           disabled={disabled}
           maxLength={FEEDBACK_MESSAGE_MAX}
           rows={7}
-          className="w-full resize-y rounded-2xl border border-line bg-surface px-4 py-3 text-base leading-relaxed focus:border-ink-soft focus:outline-none disabled:opacity-60"
+          className="w-full resize-y rounded-lg border border-line bg-paper px-4 py-3 text-base leading-relaxed focus:border-ink focus:outline-none disabled:opacity-60"
         />
         <p className="mt-1 text-right text-xs text-muted" aria-live="off">
           {message.length} / {FEEDBACK_MESSAGE_MAX}
@@ -97,7 +97,7 @@ export function FeedbackForm({ persist, page }: { persist: boolean; page?: strin
 
       <div aria-live="polite">
         {error && (
-          <p role="alert" className="rounded-2xl bg-danger-soft px-4 py-3 text-sm text-danger">
+          <p role="alert" className="rounded-lg bg-danger-soft px-4 py-3 text-sm text-danger">
             {error}
           </p>
         )}
@@ -106,7 +106,7 @@ export function FeedbackForm({ persist, page }: { persist: boolean; page?: strin
       <button
         type="submit"
         disabled={!canSend}
-        className="w-full rounded-2xl bg-ink px-5 py-3.5 text-[15px] font-semibold text-paper transition-transform active:scale-[0.98] disabled:opacity-50"
+        className={`${buttonClass.primary} w-full`}
       >
         {pending ? "Envoi…" : "Envoyer"}
       </button>

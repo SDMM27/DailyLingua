@@ -5,7 +5,7 @@ import { useState, useSyncExternalStore, type ReactNode } from "react";
 import { savePreferences } from "@/app/actions/preferences";
 import { PlusIcon } from "@/components/icons";
 import { languageStyle } from "@/components/ui/language-style";
-import { Card, Eyebrow, LanguageTag } from "@/components/ui/primitives";
+import { buttonClass, LanguageTag } from "@/components/ui/primitives";
 import { DEFAULT_LANGUAGE_TASTES } from "@/lib/domain/default-preferences";
 import {
   CONTENT_TYPE_LABELS,
@@ -166,8 +166,9 @@ export function PreferencesForm({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10">
       <Section
+        n="I"
         title="Langues"
         hint={
           onboarding && prefs.goals.length === 0
@@ -178,8 +179,8 @@ export function PreferencesForm({
         {prefs.goals.length > 0 && (
           <div className="mb-5">
             {/* Label above the value: side by side, "au plus 30 min par jour" wraps at phone width. */}
-            <span className="block text-sm text-ink-soft">Temps quotidien</span>
-            <p className="font-serif text-2xl font-semibold">
+            <span className="kicker block text-muted">Temps quotidien</span>
+            <p className="sd-display text-3xl">
               {!uniformDays && <span className="font-sans text-base font-normal text-ink-soft">au plus </span>}
               {busiest} min par jour
             </p>
@@ -207,7 +208,7 @@ export function PreferencesForm({
                     key={preset}
                     type="button"
                     onClick={() => applyPreset(preset)}
-                    className="min-h-11 rounded-full border border-line px-3.5 py-1.5 text-sm text-ink-soft transition-colors hover:bg-surface-sunk"
+                    className={`${buttonClass.secondary} !border-line !text-ink-soft text-sm`}
                   >
                     {label}
                   </button>
@@ -216,21 +217,21 @@ export function PreferencesForm({
             )}
           </div>
         )}
-        <ul className="space-y-4">
+        <ul className="lg:grid lg:grid-cols-2">
           {prefs.goals.map((goal) => (
-            <li key={goal.language} className="rounded-2xl border border-line p-4">
+            <li key={goal.language} className="border-t border-line py-5 lg:odd:pr-6 lg:even:border-l lg:even:pl-6">
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <LanguageTag language={goal.language} />
                   {goal.weight === maxWeight && prefs.goals.length > 1 && (
-                    <span className="text-[11px] font-semibold text-muted uppercase">prioritaire</span>
+                    <span className="kicker text-muted">prioritaire</span>
                   )}
                 </div>
                 {prefs.goals.length > 1 && (
                   <button
                     type="button"
                     onClick={() => removeGoal(goal.language)}
-                    className="text-xs font-medium text-muted hover:text-danger"
+                    className="min-h-11 px-2 text-xs font-medium text-muted hover:text-danger"
                   >
                     Retirer
                   </button>
@@ -253,7 +254,7 @@ export function PreferencesForm({
                 <select
                   value={goal.purpose}
                   onChange={(e) => setGoal(goal.language, { purpose: e.target.value as LanguagePurpose })}
-                  className="w-full appearance-none rounded-xl border border-line bg-surface px-3.5 py-2.5 font-semibold focus:border-ink-soft focus:outline-none"
+                  className="min-h-11 w-full appearance-none rounded-xl border border-line bg-surface px-3.5 py-2.5 text-base font-semibold focus:border-ink-soft focus:outline-none"
                 >
                   {LANGUAGE_PURPOSES.map((purpose) => (
                     <option key={purpose} value={purpose}>
@@ -273,7 +274,7 @@ export function PreferencesForm({
                 <input
                   value={goal.focus}
                   onChange={(e) => setGoal(goal.language, { focus: e.target.value })}
-                  className="w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 focus:border-ink-soft focus:outline-none"
+                  className="min-h-11 w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-base focus:border-ink-soft focus:outline-none"
                 />
               </label>
               {goal !== first && (
@@ -399,7 +400,7 @@ export function PreferencesForm({
                       },
                     ]);
                   }}
-                  className="inline-flex items-center gap-1 rounded-full border border-dashed border-line px-3 py-1.5 text-sm text-ink-soft hover:border-ink-soft"
+                  className="inline-flex min-h-11 items-center gap-1 rounded-full border border-dashed border-line px-4 text-sm text-ink-soft hover:border-ink-soft"
                 >
                   <PlusIcon width={14} height={14} />
                   {languageInfo(code).nameFr}
@@ -410,7 +411,7 @@ export function PreferencesForm({
         )}
       </Section>
 
-      <Section title="Difficulté souhaitée">
+      <Section n="II" title="Difficulté souhaitée">
         <div role="radiogroup" aria-label="Difficulté souhaitée" className="grid gap-2 sm:grid-cols-3">
           {DIFFICULTY_MODES.map((mode) => {
             const active = prefs.difficulty === mode;
@@ -421,7 +422,7 @@ export function PreferencesForm({
                 role="radio"
                 aria-checked={active}
                 onClick={() => set("difficulty", mode)}
-                className={`rounded-2xl border px-4 py-3 text-left transition-colors ${
+                className={`min-h-11 rounded-2xl border px-4 py-3 text-left transition-colors ${
                   active ? "border-ink bg-ink text-paper" : "border-line hover:bg-surface-sunk"
                 }`}
               >
@@ -435,7 +436,8 @@ export function PreferencesForm({
         </div>
       </Section>
 
-      <Section title="Mission du matin" hint="Heure de préparation de la mission quotidienne.">
+      <div className="grid gap-10 md:grid-cols-2 md:gap-x-12">
+      <Section n="III" title="Mission du matin" hint="Heure de préparation de la mission quotidienne.">
         <div className="flex items-center justify-between gap-4">
           <label htmlFor="generation-time" className="text-sm text-ink-soft">
             Prête chaque jour à
@@ -445,7 +447,7 @@ export function PreferencesForm({
             type="time"
             value={prefs.generationTime}
             onChange={(e) => set("generationTime", e.target.value)}
-            className="rounded-xl border border-line bg-surface px-3 py-2 font-semibold focus:border-ink-soft focus:outline-none"
+            className="min-h-11 rounded-xl border border-line bg-surface px-3 py-2 text-base font-semibold focus:border-ink-soft focus:outline-none"
           />
         </div>
         <p className="mt-2 text-xs text-muted">
@@ -456,7 +458,7 @@ export function PreferencesForm({
               <button
                 type="button"
                 onClick={() => set("timeZone", device)}
-                className="font-medium text-ink underline underline-offset-4"
+                className="inline-flex min-h-11 items-center font-medium text-accent-strong underline underline-offset-4"
               >
                 Utiliser {device}
               </button>
@@ -466,7 +468,7 @@ export function PreferencesForm({
       </Section>
 
       {!onboarding && (
-        <Section title="Série de jours">
+        <Section n="IV" title="Série de jours">
           <div className="flex min-h-11 items-start gap-3 text-sm">
             <input
               id="show-streak"
@@ -487,13 +489,14 @@ export function PreferencesForm({
           </div>
         </Section>
       )}
+      </div>
 
-      <div className="space-y-3">
+      <div className="space-y-3 border-t border-ink pt-6">
         <button
           type="button"
           onClick={handleSave}
           disabled={saveState.kind === "saving"}
-          className="w-full rounded-2xl bg-ink px-5 py-3.5 text-[15px] font-semibold text-paper transition-transform active:scale-[0.98] disabled:opacity-60"
+          className={`${buttonClass.primary} w-full !min-h-12 md:w-auto md:min-w-56`}
         >
           {saveState.kind === "saving" ? "Enregistrement…" : onboarding ? "Commencer" : "Enregistrer"}
         </button>
@@ -516,13 +519,19 @@ export function PreferencesForm({
   );
 }
 
-function Section({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
+/** A numbered section of the form, opened by a strong rule. */
+function Section({ n, title, hint, children }: { n: string; title: string; hint?: string; children: ReactNode }) {
   return (
-    <Card>
-      <Eyebrow>{title}</Eyebrow>
+    <section className="border-t border-ink pt-5">
+      <div className="flex items-baseline gap-3">
+        <span aria-hidden="true" className="font-serif text-2xl font-extrabold text-accent-strong">
+          {n}
+        </span>
+        <h2 className="font-serif text-2xl font-bold tracking-tight italic">{title}</h2>
+      </div>
       {hint && <p className="mt-1 text-xs text-muted">{hint}</p>}
       <div className="mt-4">{children}</div>
-    </Card>
+    </section>
   );
 }
 
@@ -541,7 +550,7 @@ function LevelSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value as CefrLevel)}
-        className="w-full appearance-none rounded-xl border border-line bg-surface px-3.5 py-2.5 font-semibold focus:border-ink-soft focus:outline-none"
+        className="min-h-11 w-full appearance-none rounded-xl border border-line bg-surface px-3.5 py-2.5 text-base font-semibold focus:border-ink-soft focus:outline-none"
       >
         {CEFR_LEVELS.map((level) => (
           <option key={level} value={level}>
@@ -607,7 +616,7 @@ function ChipGroup<T extends string>({
             type="button"
             aria-pressed={active}
             onClick={() => onToggle(o.value)}
-            className={`min-h-11 rounded-full border px-3.5 py-1.5 text-sm capitalize transition-colors ${
+            className={`min-h-11 rounded-full border px-4 text-sm capitalize transition-colors ${
               active ? "border-ink bg-ink text-paper" : "border-line text-ink-soft hover:bg-surface-sunk"
             }`}
           >

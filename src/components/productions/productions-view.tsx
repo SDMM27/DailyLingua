@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ExternalIcon } from "@/components/icons";
 import { WritingFeedbackCard } from "@/components/mission/writing-feedback-card";
 import { languageStyle } from "@/components/ui/language-style";
-import { Card, Eyebrow, PageHeader, SectionTitle } from "@/components/ui/primitives";
+import { Columns, Eyebrow, PageHeader, SectionTitle } from "@/components/ui/primitives";
 import { formatLongDate } from "@/lib/domain/dates";
 import type { GrammarSuggestion } from "@/lib/domain/grammar-suggestions";
 import { languageInfo } from "@/lib/domain/languages";
@@ -48,8 +48,8 @@ export function ProductionsView({
       </PageHeader>
 
       {withProductions.length > 1 && (
-        <nav aria-label="Filtrer par langue" className="-mx-4 mb-6 overflow-x-auto px-4">
-          <ul className="flex gap-2">
+        <nav aria-label="Filtrer par langue" className="-mx-4 mb-6 overflow-x-auto px-4 md:mx-0 md:overflow-visible md:px-0">
+          <ul className="flex gap-2 md:flex-wrap">
             <FilterChip href="/productions" active={!selected} label="Toutes" />
             {withProductions.map((language) => (
               <FilterChip
@@ -64,49 +64,73 @@ export function ProductionsView({
         </nav>
       )}
 
-      {visible.length === 0 ? (
-        <p className="py-8 text-center text-sm text-muted">Aucune production écrite pour l’instant.</p>
-      ) : (
-        <ProductionStatsPanel stats={productionStats(entries, today, selected)} grammarSuggestions={grammarSuggestions} />
-      )}
-
-      {visibleCards.length > 0 && (
-        <section id="revoir" aria-label="Mes erreurs à revoir" className="mb-10 scroll-mt-4">
-          <SectionTitle>Mes erreurs à revoir</SectionTitle>
-          {/* Remounted on a filter change: the queue is fixed per mount. */}
-          <CorrectionReview key={selected ?? "all"} initialCards={visibleCards} today={today} persist={persist} />
-        </section>
+      {visible.length === 0 && (
+        <>
+          <p className="py-8 text-center text-sm text-muted">Aucune production écrite pour l’instant.</p>
+          {visibleCards.length > 0 && <ReviewSection cards={visibleCards} selected={selected} today={today} persist={persist} />}
+        </>
       )}
 
       {visible.length > 0 && (
-        <ol className="space-y-4">
-          {visible.map((entry) => (
-            <li key={entry.sessionId}>
-              <ProductionCard entry={entry} persist={persist} />
-            </li>
-          ))}
-        </ol>
+        <Columns
+          main={
+            <>
+              {visibleCards.length > 0 && (
+                <ReviewSection cards={visibleCards} selected={selected} today={today} persist={persist} />
+              )}
+              <ol className="border-b border-line">
+                {visible.map((entry) => (
+                  <li key={entry.sessionId} className="border-t border-line">
+                    <ProductionCard entry={entry} persist={persist} />
+                  </li>
+                ))}
+              </ol>
+            </>
+          }
+          aside={
+            <ProductionStatsPanel
+              stats={productionStats(entries, today, selected)}
+              grammarSuggestions={grammarSuggestions}
+            />
+          }
+        />
       )}
     </>
+  );
+}
+
+function ReviewSection({
+  cards,
+  selected,
+  today,
+  persist,
+}: {
+  cards: CorrectionCard[];
+  selected?: Language;
+  today: DateKey;
+  persist: boolean;
+}) {
+  return (
+    <section id="revoir" aria-label="Mes erreurs à revoir" className="mb-10 scroll-mt-4">
+      <SectionTitle>Mes erreurs à revoir</SectionTitle>
+      {/* Remounted on a filter change: the queue is fixed per mount. */}
+      <CorrectionReview key={selected ?? "all"} initialCards={cards} today={today} persist={persist} />
+    </section>
   );
 }
 
 function ProductionCard({ entry, persist }: { entry: ProductionEntry; persist: boolean }) {
   const { feedback } = entry;
   return (
-    <Card>
+    <article className="py-5">
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="font-serif text-lg font-semibold first-letter:uppercase">{formatLongDate(entry.date)}</h2>
-        <span className={`text-xs font-semibold ${languageStyle(entry.language).text}`}>
+        <h2 className="font-serif text-xl font-bold first-letter:uppercase">{formatLongDate(entry.date)}</h2>
+        <span className={`kicker ${languageStyle(entry.language).text}`}>
           {languageInfo(entry.language).nameFr}
         </span>
       </div>
-      <div className="mt-3 flex gap-3">
-        <span
-          className={`w-1 shrink-0 self-stretch rounded-full ${languageStyle(entry.language).bg}`}
-          aria-hidden="true"
-        />
-        <div className="min-w-0 flex-1">
+      <div className="mt-3">
+        <div className="min-w-0 max-w-[68ch]">
           <a
             href={entry.url}
             target="_blank"
@@ -129,7 +153,7 @@ function ProductionCard({ entry, persist }: { entry: ProductionEntry; persist: b
           </p>
           {feedback && (
             <details className="mt-4 text-sm">
-              <summary className="cursor-pointer text-xs font-medium text-ink-soft">Correction</summary>
+              <summary className="flex min-h-11 cursor-pointer items-center text-xs font-medium text-ink-soft">Correction</summary>
               <div className="mt-3">
                 <WritingFeedbackCard
                   language={entry.language}
@@ -147,7 +171,7 @@ function ProductionCard({ entry, persist }: { entry: ProductionEntry; persist: b
           )}
         </div>
       </div>
-    </Card>
+    </article>
   );
 }
 
@@ -167,7 +191,7 @@ function FilterChip({
       <Link
         href={href}
         aria-current={active ? "page" : undefined}
-        className={`inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium transition-colors ${
+        className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium transition-colors ${
           active ? "border-ink bg-ink text-paper" : "border-line text-ink-soft hover:border-ink-soft"
         }`}
       >

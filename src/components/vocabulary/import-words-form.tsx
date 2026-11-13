@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { ActionResult } from "@/app/actions/result";
+import { buttonClass } from "@/components/ui/primitives";
 import { languageInfo } from "@/lib/domain/languages";
 import { markExisting, parseVocabularyPaste, type ParseError } from "@/lib/domain/vocabulary-import";
 import type { Language } from "@/lib/schemas/common";
@@ -19,7 +20,7 @@ import {
 } from "@/lib/schemas/vocabulary";
 
 const inputClass =
-  "w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 placeholder:text-muted focus:border-ink-soft focus:outline-none";
+  "w-full rounded-xl border border-line bg-surface min-h-11 px-3.5 py-2.5 text-base placeholder:text-muted focus:border-ink-soft focus:outline-none";
 
 /** Value of the "list" select for "a new list" (list ids are uuids, they never collide with it). */
 const NEW_LIST = "__new";
@@ -190,11 +191,11 @@ export function ImportWordsForm({
               setOutcome(null);
               setStep("paste");
             }}
-            className="flex-1 rounded-2xl border border-line py-3 font-semibold text-ink-soft"
+            className={`${buttonClass.secondary} flex-1`}
           >
             Importer d’autres mots
           </button>
-          <button type="button" onClick={onClose} className="flex-1 rounded-2xl bg-ink py-3 font-semibold text-paper">
+          <button type="button" onClick={onClose} className={`${buttonClass.primary} flex-1`}>
             Fermer
           </button>
         </div>
@@ -224,7 +225,7 @@ export function ImportWordsForm({
         {rows.length > 0 && (
           <ul aria-label="Mots à importer" className="space-y-3">
             {rows.map((row) => (
-              <li key={row.line} className="rounded-2xl border border-line p-3">
+              <li key={row.line} className="border-t border-line py-3">
                 <label className="flex items-start gap-2.5">
                   <input
                     type="checkbox"
@@ -285,7 +286,7 @@ export function ImportWordsForm({
                 type="button"
                 onClick={translate}
                 disabled={translating}
-                className="w-full rounded-2xl border border-line py-3 font-semibold text-ink-soft hover:bg-surface-sunk disabled:opacity-60"
+                className={`${buttonClass.secondary} w-full`}
               >
                 {translating
                   ? "Traduction en cours…"
@@ -317,7 +318,7 @@ export function ImportWordsForm({
               setFormError(null);
               setStep("paste");
             }}
-            className="flex-1 rounded-2xl border border-line py-3 font-semibold text-ink-soft"
+            className={`${buttonClass.secondary} flex-1`}
           >
             Retour
           </button>
@@ -325,7 +326,7 @@ export function ImportWordsForm({
             type="button"
             onClick={save}
             disabled={pending || kept.length === 0 || missing.length > 0}
-            className="flex-1 rounded-2xl bg-ink py-3 font-semibold text-paper disabled:opacity-60"
+            className={`${buttonClass.primary} flex-1`}
           >
             Enregistrer {kept.length} mot{kept.length > 1 ? "s" : ""}
           </button>
@@ -350,16 +351,16 @@ export function ImportWordsForm({
     >
       <div className="flex gap-2" role="radiogroup" aria-label="Langue des mots">
         {languages.map((lang) => (
-          <label key={lang} className="flex-1">
+          <label key={lang} className="relative flex-1">
             <input
               type="radio"
               name="language"
               value={lang}
               checked={language === lang}
               onChange={() => chooseLanguage(lang)}
-              className="peer sr-only"
+              className="peer absolute inset-0 z-10 m-0 cursor-pointer appearance-none opacity-0"
             />
-            <span className="block cursor-pointer rounded-xl border border-line py-2 text-center text-sm font-medium text-ink-soft transition-colors peer-checked:border-ink peer-checked:bg-ink peer-checked:text-paper peer-focus-visible:ring-2 peer-focus-visible:ring-ink">
+            <span className="flex min-h-11 cursor-pointer items-center justify-center rounded-xl border border-line text-center text-sm font-medium text-ink-soft transition-colors peer-checked:border-ink peer-checked:bg-ink peer-checked:text-paper peer-focus-visible:ring-2 peer-focus-visible:ring-ink">
               {languageInfo(lang).nameFr}
             </span>
           </label>
@@ -417,10 +418,10 @@ export function ImportWordsForm({
         </p>
       )}
       <div className="flex gap-2 pt-1">
-        <button type="button" onClick={onClose} className="flex-1 rounded-2xl border border-line py-3 font-semibold text-ink-soft">
+        <button type="button" onClick={onClose} className={`${buttonClass.secondary} flex-1`}>
           Annuler
         </button>
-        <button type="submit" className="flex-1 rounded-2xl bg-ink py-3 font-semibold text-paper">
+        <button type="submit" className={`${buttonClass.primary} flex-1`}>
           Analyser
         </button>
       </div>

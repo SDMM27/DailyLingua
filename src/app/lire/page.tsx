@@ -78,8 +78,9 @@ export default async function ReadingPage({
         </DemoNotice>
       )}
 
+      <div className="mb-8 border-y border-line py-3 md:flex md:flex-wrap md:items-start md:gap-x-8 md:gap-y-2">
       {languages.length > 1 && (
-        <nav aria-label="Filtrer par langue" className="-mx-4 mb-4 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <nav aria-label="Filtrer par langue" className="-mx-4 mb-2 overflow-x-auto px-4 [scrollbar-width:none] md:mx-0 md:mb-0 md:overflow-visible md:px-0 [&::-webkit-scrollbar]:hidden">
           <ul className="flex gap-2 sm:flex-wrap">
             <FilterChip href={readingHref(undefined, selectedType?.value, selectedTheme)} active={!selected} label="Toutes" />
             {languages.map((language) => (
@@ -95,7 +96,7 @@ export default async function ReadingPage({
         </nav>
       )}
 
-      <nav aria-label="Filtrer par type" className="-mx-4 mb-4 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <nav aria-label="Filtrer par type" className="-mx-4 mb-2 overflow-x-auto px-4 [scrollbar-width:none] md:mx-0 md:mb-0 md:overflow-visible md:px-0 [&::-webkit-scrollbar]:hidden">
         <ul className="flex gap-2 sm:flex-wrap">
           <FilterChip href={readingHref(selected, undefined, selectedTheme)} active={!selectedType} label="Tout" />
           {TYPE_FILTERS.map((filter) => (
@@ -109,7 +110,7 @@ export default async function ReadingPage({
         </ul>
       </nav>
 
-      <nav aria-label="Filtrer par thème" className="-mx-4 mb-4 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <nav aria-label="Filtrer par thème" className="-mx-4 mb-2 overflow-x-auto px-4 [scrollbar-width:none] md:mx-0 md:mb-0 md:overflow-visible md:px-0 [&::-webkit-scrollbar]:hidden">
         <ul className="flex gap-2 sm:flex-wrap">
           <FilterChip href={readingHref(selected, selectedType?.value, undefined)} active={!selectedTheme} label="Tous" />
           {topicChips.map((topic) => (
@@ -122,6 +123,8 @@ export default async function ReadingPage({
           ))}
         </ul>
       </nav>
+
+      </div>
 
       {items.length === 0 ? (
         <Card className="text-center">
@@ -147,15 +150,20 @@ export default async function ReadingPage({
           )}
         </Card>
       ) : (
-        <Card className="py-1 sm:py-2">
+        <div className="grid gap-x-10 gap-y-0 md:grid-cols-2 lg:grid-cols-3">
           {items.map((item) => (
-            <ContentItem key={item.id} item={item} now={now} timeZone={preferences.timeZone} />
+            <div
+              key={item.id}
+              className="relative flex border-t border-line py-6 before:absolute before:top-0 before:-left-5 before:hidden before:h-full before:w-px before:bg-line md:max-lg:even:before:block lg:[&:not(:nth-child(3n+1))]:before:block"
+            >
+              <ContentItem item={item} now={now} timeZone={preferences.timeZone} />
+            </div>
           ))}
-        </Card>
+        </div>
       )}
 
-      <p className="mt-6 text-center text-xs text-muted">
-        <Link href="/lire/sources" className="underline underline-offset-2 hover:text-ink">
+      <p className="mt-8 border-t border-ink pt-4 text-sm text-muted">
+        <Link href="/lire/sources" className="inline-flex min-h-11 items-center underline underline-offset-2 hover:text-ink">
           Sources et licences
         </Link>
       </p>
@@ -179,7 +187,7 @@ function FilterChip({
       <Link
         href={href}
         aria-current={active ? "page" : undefined}
-        className={`inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium transition-colors ${
+        className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium transition-colors ${
           active ? "border-ink bg-ink text-paper" : "border-line text-ink-soft hover:border-ink-soft"
         }`}
       >

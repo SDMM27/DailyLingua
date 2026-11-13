@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ListenButton, useHasLocalVoice } from "@/components/ui/listen-button";
-import { Card, Eyebrow, LanguageTag, ProgressBar } from "@/components/ui/primitives";
+import { buttonClass, Card, Eyebrow, LanguageTag, ProgressBar } from "@/components/ui/primitives";
 import { REVIEW_MODE_LABELS } from "@/lib/domain/labels";
 import {
   checkTypedAnswer,
@@ -25,8 +25,7 @@ const GRADES: { grade: ReviewGrade; label: string; tone: string }[] = [
 
 type ModeChoice = ReviewMode | "mixed";
 
-const PRIMARY_BUTTON =
-  "w-full rounded-2xl bg-ink px-5 py-3.5 text-[15px] font-semibold text-paper transition-transform active:scale-[0.98]";
+const PRIMARY_BUTTON = `${buttonClass.primary} w-full !min-h-12`;
 
 const FEEDBACK: Record<TypedCheck, { text: string; tone: string }> = {
   right: { text: "Juste.", tone: "text-success" },
@@ -56,7 +55,7 @@ export function ReviewSession({
     return (
       <Card>
         <Eyebrow>Révisions du jour</Eyebrow>
-        <p className="mt-2 font-serif text-lg">Aucun mot à revoir aujourd’hui.</p>
+        <p className="mt-2 font-serif text-xl italic">Aucun mot à revoir aujourd’hui.</p>
       </Card>
     );
   }
@@ -78,7 +77,7 @@ export function ReviewSession({
     <Card>
       <div className="flex items-center justify-between">
         <Eyebrow>Révisions du jour</Eyebrow>
-        <span className="text-xs font-medium text-muted">
+        <span className="kicker text-muted">
           {index + 1} / {queue.length}
         </span>
       </div>
@@ -89,7 +88,7 @@ export function ReviewSession({
         <select
           value={choice}
           onChange={(event) => setChoice(event.target.value as ModeChoice)}
-          className="min-h-11 min-w-0 flex-1 rounded-2xl border border-line bg-surface px-3 text-base text-ink"
+          className="min-h-11 min-w-0 flex-1 rounded-full border border-line bg-surface px-4 text-base text-ink"
         >
           <option value="mixed">Mélangé</option>
           {REVIEW_MODES.map((mode) => (
@@ -158,11 +157,11 @@ function ReviewCard({
         {listName && <p className="mt-1.5 text-xs text-muted">Liste : {listName}</p>}
 
         {mode === "flip" || mode === "translate" ? (
-          <p lang={item.language} className="mt-4 font-serif text-3xl font-semibold text-balance">
+          <p lang={item.language} className="sd-display mt-4 text-[clamp(2.25rem,7vw,3.5rem)] leading-[1.05] text-balance">
             {item.term}
           </p>
         ) : mode === "produce" ? (
-          <p className="mt-4 font-serif text-3xl font-semibold text-balance">{item.translation}</p>
+          <p className="sd-display mt-4 text-[clamp(2.25rem,7vw,3.5rem)] leading-[1.05] text-balance">{item.translation}</p>
         ) : mode === "listen" ? (
           <div className="mt-4">
             <ListenButton text={item.term} language={item.language} />
@@ -170,7 +169,7 @@ function ReviewCard({
         ) : (
           cloze && (
             <>
-              <p lang={item.language} className="mt-4 font-serif text-2xl font-semibold text-balance">
+              <p lang={item.language} className="sd-display mt-4 text-[clamp(1.75rem,5vw,2.5rem)] leading-[1.15] text-balance">
                 {cloze.before}＿＿＿{cloze.after}
               </p>
               <p className="mt-2 text-sm text-ink-soft">Indice : {item.translation}</p>
@@ -196,16 +195,16 @@ function ReviewCard({
 
       {mode === "flip" ? (
         revealed ? (
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {GRADES.map(({ grade: g, label, tone }) => (
               <button
                 key={g}
                 type="button"
                 onClick={() => onGrade(g, mode)}
-                className={`flex flex-col items-center rounded-2xl border bg-surface px-1 py-2.5 transition-colors hover:bg-surface-sunk ${tone}`}
+                className={`flex min-h-12 flex-col items-center justify-center rounded-full border bg-surface px-2 py-2 transition-colors hover:bg-surface-sunk ${tone}`}
               >
                 <span className="text-[13px] font-semibold">{label}</span>
-                <span className="text-[10px] text-muted">
+                <span className="font-mono text-[10px] text-muted">
                   {relativeDueLabel(applyReview(item.review, g, today).dueOn, today)}
                 </span>
               </button>
@@ -236,7 +235,7 @@ function ReviewCard({
           <button
             type="button"
             onClick={() => onGrade(result === "right" ? "easy" : "good", mode)}
-            className="min-h-11 w-full rounded-2xl border border-line px-5 text-sm font-semibold text-ink-soft hover:bg-surface-sunk"
+            className={`${buttonClass.secondary} w-full !border-line !text-ink-soft`}
           >
             {result === "right" ? "Trop facile" : "J’avais bon"}
           </button>
@@ -257,7 +256,7 @@ function ReviewCard({
             autoComplete="off"
             autoCorrect="off"
             spellCheck={false}
-            className="min-h-12 w-full rounded-2xl border border-line bg-surface px-4 text-base text-ink"
+            className="min-h-12 w-full rounded-full border border-line bg-surface px-5 text-base text-ink"
           />
           <button type="submit" className={PRIMARY_BUTTON}>
             Vérifier

@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { prepareTodayMission } from "@/app/actions/mission";
 import { TrialOverCard } from "@/components/auth/trial-over-card";
 import { RestDayCard } from "@/components/mission/rest-day-card";
-import { Card, Eyebrow } from "@/components/ui/primitives";
+import { buttonClass, Card, Eyebrow } from "@/components/ui/primitives";
 
 /** Another request is writing the mission: ask again after this delay, at most this many times. */
 const POLL_DELAY_MS = 4000;
@@ -18,9 +18,6 @@ type State =
   | { kind: "no-content" }
   | { kind: "rest-day" }
   | { kind: "signup-required" };
-
-const BUTTON =
-  "mt-4 inline-flex min-h-11 items-center rounded-full bg-ink px-5 text-sm font-semibold text-paper";
 
 /**
  * Shown instead of the mission while there is none: asks the server to write it (the call can
@@ -79,27 +76,27 @@ export function MissionPreparing() {
       <div role="status" aria-live="polite">
         {state.kind === "working" && (
           <>
-            <p className="mt-2 font-serif text-lg">Préparation de ta mission…</p>
+            <p className="mt-2 max-w-[68ch] font-serif text-xl">Préparation de ta mission…</p>
             <p className="mt-2 text-sm text-ink-soft">
               On choisit un contenu récent dans chacune de tes langues et on rédige les exercices. Ça prend
               quelques secondes.
             </p>
           </>
         )}
-        {state.kind === "failed" && <p className="mt-2 font-serif text-lg">{state.message}</p>}
+        {state.kind === "failed" && <p className="mt-2 max-w-[68ch] font-serif text-xl">{state.message}</p>}
         {state.kind === "no-content" && (
-          <p className="mt-2 font-serif text-lg">
+          <p className="mt-2 max-w-[68ch] font-serif text-xl">
             Pas encore de contenu récent dans tes langues. Reviens un peu plus tard.
           </p>
         )}
       </div>
       {state.kind === "failed" && (
-        <button type="button" className={BUTTON} onClick={() => void run()}>
+        <button type="button" className={`${buttonClass.primary} mt-4`} onClick={() => void run()}>
           Réessayer
         </button>
       )}
       {state.kind === "no-content" && (
-        <Link href="/lire" className={BUTTON}>
+        <Link href="/lire" className={`${buttonClass.primary} mt-4`}>
           Voir les lectures
         </Link>
       )}

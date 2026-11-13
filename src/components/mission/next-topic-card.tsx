@@ -1,4 +1,4 @@
-import { Card, Eyebrow, LanguageTag } from "@/components/ui/primitives";
+import { Eyebrow, LanguageTag } from "@/components/ui/primitives";
 import { getRepository } from "@/lib/data/repository";
 import { addDays, isoWeekday } from "@/lib/domain/dates";
 import { WEEKDAY_NAMES } from "@/lib/domain/labels";
@@ -27,14 +27,16 @@ export function dayLabel(date: DateKey, today: DateKey): string {
 /** « Demain, plutôt » for each language: the card itself, without data access (see `NextTopicCard`). */
 export function NextTopicCardView({ rows, today }: { rows: NextTopicRow[]; today: DateKey }) {
   return (
-    <Card>
+    <section className="border-t border-ink pt-5">
       <Eyebrow>Demain, plutôt</Eyebrow>
-      <p className="mt-2 text-sm text-ink-soft">Choisis le thème de ta prochaine mission, langue par langue.</p>
-      <ul className="mt-4 space-y-4">
+      <p className="mt-2 max-w-[68ch] font-serif text-lg text-ink-soft">
+        Choisis le thème de ta prochaine mission, langue par langue.
+      </p>
+      <ul className="mt-5 grid gap-x-10 gap-y-6 md:grid-cols-2 lg:grid-cols-3">
         {rows.map((row) => {
           const day = dayLabel(row.date, today);
           return (
-            <li key={row.language}>
+            <li key={row.language} className="min-w-0 border-t border-line pt-4">
               <div className="mb-1.5 flex items-center gap-2 text-sm">
                 <LanguageTag language={row.language} />
                 <span className="text-ink-soft">{day}</span>
@@ -53,7 +55,7 @@ export function NextTopicCardView({ rows, today }: { rows: NextTopicRow[]; today
           );
         })}
       </ul>
-    </Card>
+    </section>
   );
 }
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { MicIcon, PenIcon } from "@/components/icons";
+import { buttonClass } from "@/components/ui/primitives";
 import type { Language } from "@/lib/schemas/common";
 import { MAX_PRODUCTION_LENGTH, type ProductionTask as ProductionTaskData } from "@/lib/schemas/mission";
 import {
@@ -135,15 +136,15 @@ export function ProductionTask({
 
   return (
     <div>
-      <p className="flex items-center gap-2 text-xs font-semibold tracking-wide text-muted uppercase">
+      <p className="kicker flex items-center gap-2 text-accent-strong">
         <Icon width={15} height={15} />
         {heading}
-        {task.targetLength && <span className="font-normal normal-case">· {task.targetLength}</span>}
+        {task.targetLength && <span className="font-normal text-muted normal-case">· {task.targetLength}</span>}
       </p>
-      <p lang={language} className="mt-2 font-serif text-[17px] leading-relaxed">
+      <p lang={language} className="mt-2 max-w-[68ch] font-serif text-xl leading-relaxed">
         {task.prompt}
       </p>
-      <ul className="mt-3 space-y-1.5">
+      <ul className="mt-3 max-w-[68ch] space-y-1.5">
         {task.hints.map((hint) => (
           <li key={hint} className="flex gap-2 text-[13px] leading-relaxed text-ink-soft">
             <span className="mt-2 size-1 shrink-0 rounded-full bg-muted" aria-hidden="true" />
@@ -166,7 +167,7 @@ export function ProductionTask({
             maxLength={MAX_PRODUCTION_LENGTH}
             readOnly={loading}
             placeholder="Écris ici…"
-            className="w-full resize-y rounded-2xl border border-line bg-surface px-4 py-3 font-serif leading-relaxed placeholder:text-muted focus:border-ink-soft focus:outline-none"
+            className="w-full resize-y rounded-xl border border-ink bg-surface px-4 py-3 font-serif text-base leading-relaxed placeholder:text-muted focus:outline-2 focus:outline-offset-2 focus:outline-accent"
           />
           <p className="mt-1.5 flex justify-between gap-3 text-xs text-muted">
             <span role="status" className={status === "error" ? "text-danger" : ""}>
@@ -184,7 +185,7 @@ export function ProductionTask({
                 type="button"
                 onClick={() => void handleRequestFeedback()}
                 disabled={!canRequest}
-                className="w-full rounded-full bg-ink px-5 py-3 text-[15px] font-semibold text-paper transition-opacity disabled:opacity-40"
+                className={`${buttonClass.primary} w-full sm:w-auto`}
               >
                 {outdated
                   ? `Corriger à nouveau (${attemptsLeft} restante${attemptsLeft > 1 ? "s" : ""})`
@@ -203,8 +204,8 @@ export function ProductionTask({
           )}
 
           {review?.feedback && (
-            <div className="mt-5 rounded-2xl bg-surface-sunk px-4 py-4">
-              <p className="mb-3 text-xs font-semibold tracking-wide text-muted uppercase">Correction</p>
+            <div className="mt-6 border-t border-ink pt-4">
+              <p className="kicker mb-3 text-accent-strong">Correction</p>
               {outdated && (
                 <p className="mb-3 text-[13px] text-ink-soft">
                   Cette correction porte sur une version précédente de ton texte.
@@ -225,7 +226,7 @@ export function ProductionTask({
           )}
         </div>
       ) : (
-        <p className="mt-4 rounded-2xl border border-dashed border-line px-4 py-3 text-[13px] leading-relaxed text-muted">
+        <p className="mt-4 max-w-[68ch] border-y border-dashed border-line py-3 text-[13px] leading-relaxed text-muted">
           Parle à voix haute, même seul·e : le but est la fluidité.
         </p>
       )}

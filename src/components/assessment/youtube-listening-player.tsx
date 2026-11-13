@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { PlayIcon } from "@/components/icons";
+import { buttonClass } from "@/components/ui/primitives";
 import { canStartListening, LISTENING_MAX_PLAYS } from "@/lib/domain/assessment";
 
 /** The slice of the YouTube IFrame Player API this component uses. */
@@ -252,7 +253,7 @@ export function YouTubeListeningPlayer({
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-sm font-semibold text-ink">{title}</p>
+      <p className="kicker text-accent-strong">{title}</p>
       {launched ? (
         <div ref={containerRef} className="aspect-video w-full overflow-hidden rounded-2xl bg-ink [&_iframe]:size-full [&_iframe]:border-0" />
       ) : (
@@ -267,7 +268,7 @@ export function YouTubeListeningPlayer({
         type="button"
         onClick={press}
         disabled={exhausted || status === "loading"}
-        className="inline-flex min-h-11 items-center justify-center self-start rounded-full bg-ink px-6 text-sm font-semibold text-paper disabled:opacity-60"
+        className={`${buttonClass.primary} self-start`}
       >
         {exhausted ? `Tu as utilisé tes ${LISTENING_MAX_PLAYS} écoutes` : label}
       </button>

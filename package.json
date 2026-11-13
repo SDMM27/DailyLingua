@@ -37,6 +37,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",
+    "@sdmm/design": "github:SDMM27/sdmm-design#v1.0.0",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.117.3",
     "@vercel/analytics": "^2.0.1",

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { recordAlphabetPractice } from "@/app/actions/alphabet";
 import { languageStyle } from "@/components/ui/language-style";
 import { ListenButton, useHasLocalVoice } from "@/components/ui/listen-button";
-import { Card, Eyebrow, ProgressBar } from "@/components/ui/primitives";
+import { buttonClass, Eyebrow, ProgressBar } from "@/components/ui/primitives";
 import { GRAMMAR_PASS_RATIO, type GrammarPracticeOutcome } from "@/lib/domain/grammar";
 import { languageInfo } from "@/lib/domain/languages";
 import { relativeDueLabel } from "@/lib/domain/spaced-repetition";
@@ -126,12 +126,12 @@ export function AlphabetPractice({
     const message = finishMessage(finish, today, persist);
     const saving = persist && finish.outcome === null && finish.error === null;
     return (
-      <Card className="text-center">
+      <section className="border-t border-ink pt-5 lg:border-t-0 lg:pt-0">
         <Eyebrow>Ton score</Eyebrow>
-        <p className={`mt-2 font-serif text-5xl font-semibold ${style.text}`}>
+        <p className={`sd-display mt-2 text-6xl ${style.text}`}>
           {finish.correct} / {finish.total}
         </p>
-        <div aria-live="polite" className="mt-3 text-[15px] leading-relaxed text-ink-soft">
+        <div aria-live="polite" className="mt-3 font-serif text-lg leading-relaxed text-ink-soft">
           {saving ? "Enregistrement…" : message}
           {finish.error && (
             <p role="alert" className="rounded-2xl bg-danger-soft px-4 py-3 text-sm text-danger">
@@ -143,18 +143,18 @@ export function AlphabetPractice({
           type="button"
           onClick={restart}
           disabled={saving}
-          className="mt-5 min-h-12 w-full rounded-2xl bg-ink px-5 py-3.5 text-[15px] font-semibold text-paper transition-transform active:scale-[0.98] disabled:opacity-60"
+          className={`${buttonClass.primary} mt-5 w-full sm:w-auto`}
         >
           Recommencer
         </button>
-      </Card>
+      </section>
     );
   }
 
   const inLanguage = optionsInLanguage(exercise);
 
   return (
-    <Card>
+    <section>
       <div className="flex items-center justify-between">
         <Eyebrow>Exercices</Eyebrow>
         <span className="text-xs font-medium text-muted">
@@ -184,7 +184,7 @@ export function AlphabetPractice({
                 dir={inLanguage ? dir : undefined}
                 disabled={answered}
                 onClick={() => choose(i)}
-                className={`min-h-14 rounded-2xl border px-3 py-3 text-center font-serif text-xl ${tone}`}
+                className={`min-h-14 rounded-xl border px-3 py-3 text-center font-serif text-xl ${tone}`}
               >
                 {option}
               </button>
@@ -214,13 +214,13 @@ export function AlphabetPractice({
           <button
             type="button"
             onClick={next}
-            className="mt-5 min-h-12 w-full rounded-2xl bg-ink px-5 py-3.5 text-[15px] font-semibold text-paper transition-transform active:scale-[0.98]"
+            className={`${buttonClass.primary} mt-5 w-full sm:w-auto`}
           >
             {isLast ? "Voir mon score" : "Suivant"}
           </button>
         )}
       </div>
-    </Card>
+    </section>
   );
 }
 
@@ -231,7 +231,7 @@ export function Question({ exercise, language }: { exercise: AlphabetExercise; l
       return (
         <>
           <p className="text-[15px] text-ink-soft">Comment se transcrit cette lettre ?</p>
-          <p lang={language} dir={dir} className="mt-2 font-serif text-6xl font-semibold">
+          <p lang={language} dir={dir} className="sd-display mt-2 text-7xl">
             {letterLabel(exercise)}
           </p>
         </>
@@ -240,7 +240,7 @@ export function Question({ exercise, language }: { exercise: AlphabetExercise; l
       return (
         <>
           <p className="text-[15px] text-ink-soft">Quelle lettre se transcrit comme ci-dessous ?</p>
-          <p className="mt-2 font-serif text-5xl font-semibold">{exercise.latin}</p>
+          <p className="sd-display mt-2 text-6xl">{exercise.latin}</p>
           <p className="mt-1 text-sm text-muted">{exercise.soundFr}</p>
         </>
       );
@@ -248,7 +248,7 @@ export function Question({ exercise, language }: { exercise: AlphabetExercise; l
       return (
         <>
           <p className="text-[15px] text-ink-soft">Comment se lit ce mot, lettre par lettre ?</p>
-          <p lang={language} dir={dir} className="mt-2 font-serif text-4xl font-semibold">
+          <p lang={language} dir={dir} className="sd-display mt-2 text-5xl">
             {exercise.word}
           </p>
         </>

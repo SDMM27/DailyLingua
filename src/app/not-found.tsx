@@ -1,11 +1,12 @@
 import Link from "next/link";
+import { buttonClass, Eyebrow } from "@/components/ui/primitives";
 
 export default function NotFound() {
   return (
-    <div className="py-16 text-center">
-      <p className="text-[11px] font-semibold tracking-[0.14em] text-muted uppercase">404</p>
-      <h1 className="mt-2 font-serif text-3xl font-semibold">Page introuvable</h1>
-      <Link href="/" className="mt-6 inline-block rounded-2xl bg-ink px-6 py-3 font-semibold text-paper">
+    <div className="border-t border-ink py-12 md:py-20">
+      <Eyebrow>404</Eyebrow>
+      <h1 className="sd-display mt-3 text-[clamp(2.5rem,7vw,5rem)] leading-[1.02] text-balance">Page introuvable</h1>
+      <Link href="/" className={`${buttonClass.primary} mt-8`}>
         Retour à l’accueil
       </Link>
     </div>

@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { languageStyle } from "@/components/ui/language-style";
 import { ListenButton } from "@/components/ui/listen-button";
-import { Card, Eyebrow, LanguageTag } from "@/components/ui/primitives";
+import { Eyebrow, LanguageTag } from "@/components/ui/primitives";
+import { RuledList, ruledItem } from "@/components/ui/ruled-grid";
 import { letterLabel } from "@/lib/domain/alphabet";
 import { languageInfo } from "@/lib/domain/languages";
 import { stripStress } from "@/lib/domain/stress";
@@ -31,11 +32,9 @@ export function AlphabetGroupView({
   /** The alphabet has not been reviewed by a native speaker yet. */
   draft: boolean;
 }) {
-  const style = languageStyle(language);
-
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between gap-3">
+    <div>
+      <div className="mb-6 flex items-center justify-between gap-3">
         <Link
           href={`/alphabet?langue=${language}`}
           className="min-h-11 content-center text-sm font-medium text-muted hover:text-ink"
@@ -52,39 +51,45 @@ export function AlphabetGroupView({
         </div>
       </div>
 
-      <header>
-        <Eyebrow className="mb-2">Lettres</Eyebrow>
-        <h1 className="font-serif text-[2rem] leading-[1.1] font-semibold tracking-tight text-balance sm:text-4xl">
-          {group.title}
-        </h1>
-        <p className="mt-3 text-[15px] leading-relaxed text-ink-soft">{group.summary}</p>
+      <header className="mb-8 border-b border-ink pb-6">
+        <Eyebrow className="mb-3">Lettres</Eyebrow>
+        <h1 className="sd-display text-[clamp(2.25rem,5vw,3.5rem)] leading-[1.02] text-balance">{group.title}</h1>
+        <p className="mt-3 max-w-[68ch] font-serif text-lg leading-relaxed text-ink-soft">{group.summary}</p>
       </header>
 
-      <ul aria-label="Les lettres du groupe" className="space-y-3">
-        {letters.map((letter) => (
-          <li key={letter.lower}>
-            <LetterCard letter={letter} language={language} />
-          </li>
-        ))}
-      </ul>
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-0">
+        <div className="min-w-0 space-y-8 lg:pr-10">
+          <RuledList aria-label="Les lettres du groupe" columns={2} className="border-t border-line">
+            {letters.map((letter) => (
+              <li key={letter.lower} className={ruledItem}>
+                <LetterCard letter={letter} language={language} />
+              </li>
+            ))}
+          </RuledList>
 
-      {group.tip && (
-        <Card className={`${style.softBg} border-transparent`}>
-          <Eyebrow>À retenir</Eyebrow>
-          <p className="mt-2 text-[15px] leading-relaxed text-ink-soft">{group.tip}</p>
-        </Card>
-      )}
+          {group.tip && (
+            <section className="max-w-[68ch] border-y border-ink py-4">
+              <Eyebrow>À retenir</Eyebrow>
+              <p className="mt-2 font-serif text-lg leading-relaxed">
+                <span className="sd-mark">{group.tip}</span>
+              </p>
+            </section>
+          )}
+        </div>
 
-      {/* Remounted per group: the exercise state belongs to it. */}
-      <AlphabetPractice
-        key={group.id}
-        groupId={group.id}
-        exercises={exercises}
-        language={language}
-        card={card}
-        today={today}
-        persist={persist}
-      />
+        <aside className="min-w-0 border-t border-ink pt-6 lg:border-t-0 lg:border-l lg:border-line lg:pt-0 lg:pl-10">
+          {/* Remounted per group: the exercise state belongs to it. */}
+          <AlphabetPractice
+            key={group.id}
+            groupId={group.id}
+            exercises={exercises}
+            language={language}
+            card={card}
+            today={today}
+            persist={persist}
+          />
+        </aside>
+      </div>
     </div>
   );
 }
@@ -100,9 +105,9 @@ function LetterCard({ letter, language }: { letter: AlphabetLetter; language: La
   const dir = languageInfo(language).dir;
   const forms = FORM_LABELS.flatMap(([key, label]) => (letter.forms?.[key] ? [{ label, shape: letter.forms[key] }] : []));
   return (
-    <article className="rounded-2xl border border-line bg-surface px-4 py-4">
+    <article>
       <div className="flex items-start gap-4">
-        <p lang={language} dir={dir} aria-label={`Lettre ${letterLabel(letter)}`} className={`shrink-0 font-serif text-5xl leading-none font-semibold ${style.text}`}>
+        <p lang={language} dir={dir} aria-label={`Lettre ${letterLabel(letter)}`} className={`sd-display shrink-0 text-7xl leading-none ${style.text}`}>
           {letter.display ? (
             <span>{letter.display}</span>
           ) : letter.upper === letter.lower ? (
@@ -129,7 +134,7 @@ function LetterCard({ letter, language }: { letter: AlphabetLetter; language: La
         </div>
       </div>
 
-      <p className="mt-3 text-[15px] leading-relaxed text-ink-soft">
+      <p className="mt-3 font-serif text-[17px] leading-relaxed text-ink-soft">
         <span className="text-muted">Son :</span> {letter.soundFr}.
       </p>
 
@@ -149,12 +154,12 @@ function LetterCard({ letter, language }: { letter: AlphabetLetter; language: La
       )}
 
       {letter.kind === "false-friend" && letter.lookalike && (
-        <p className="mt-2 rounded-xl border-l-4 border-ink bg-surface-sunk px-3 py-2 text-[13px] leading-relaxed text-ink">
+        <p className="mt-2 border-y border-dashed border-line py-2 text-[13px] leading-relaxed text-ink">
           <strong>Faux ami</strong> : ressemble à «&nbsp;{letter.lookalike}&nbsp;» mais se lit «&nbsp;{letter.latin}&nbsp;».
         </p>
       )}
       {letter.kind === "sign" && (
-        <p className="mt-2 rounded-xl bg-surface-sunk px-3 py-2 text-[13px] leading-relaxed text-ink-soft">
+        <p className="mt-2 border-y border-dashed border-line py-2 text-[13px] leading-relaxed text-ink-soft">
           Signe sans son propre : il modifie la lecture des lettres voisines.
         </p>
       )}
