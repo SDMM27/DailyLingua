@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { cefrLevelSchema, isoInstantSchema, languageCodeSchema, skillSchema, timeOfDaySchema } from "./common";
+import { cefrLevels, cefrLevelSchema, isoInstantSchema, languageCodeSchema, skillSchema, timeOfDaySchema } from "./common";
 
 const jsonObjectSchema = z.record(z.string(), z.unknown());
 
@@ -63,3 +63,35 @@ export const saveProfileInputSchema = z.object({
   reminderTime: timeOfDaySchema.nullable(),
 });
 export type SaveProfileInput = z.infer<typeof saveProfileInputSchema>;
+
+/** Level declared at the start: one step below A1 is allowed for a true beginner. */
+export const startLevelSchema = z.enum(["A0", ...cefrLevels]);
+export type StartLevel = z.infer<typeof startLevelSchema>;
+
+export const maxEnrollments = 4;
+export const maxDailyMinutesPerDay = 120;
+
+export const enrollmentInputSchema = z.object({
+  language: languageCodeSchema,
+  dailyMinutes: z.number().int().min(5).max(120),
+  days: studyDaysSchema.default([1, 2, 3, 4, 5, 6, 7]),
+  targetLevel: cefrLevelSchema.nullable().default(null),
+  purpose: z.string().max(200).nullable().default(null),
+  startLevel: startLevelSchema.nullable().default(null),
+});
+export type EnrollmentInput = z.infer<typeof enrollmentInputSchema>;
+
+/** The whole learning plan, in order: 1 to 4 languages, no language twice, at most 120 minutes a day in all. */
+export const saveEnrollmentsInputSchema = z
+  .array(enrollmentInputSchema)
+  .min(1)
+  .max(maxEnrollments)
+  .refine((items) => new Set(items.map((item) => item.language)).size === items.length, "Duplicate language")
+  .refine(
+    (items) =>
+      [1, 2, 3, 4, 5, 6, 7].every(
+        (day) => items.reduce((sum, item) => sum + (item.days.includes(day) ? item.dailyMinutes : 0), 0) <= maxDailyMinutesPerDay,
+      ),
+    "More than 120 minutes of study on one day",
+  );
+export type SaveEnrollmentsInput = z.input<typeof saveEnrollmentsInputSchema>;

@@ -42,6 +42,7 @@
     "refonte:typecheck": "npm run typecheck --workspaces --if-present",
     "refonte:lint": "npm run lint --workspaces --if-present",
     "refonte:test": "npm run test --workspaces --if-present",
+    "refonte:build": "npm run build --workspaces --if-present",
     "refonte:check": "npm run refonte:typecheck && npm run refonte:lint && npm run refonte:test"
   },
   "dependencies": {
