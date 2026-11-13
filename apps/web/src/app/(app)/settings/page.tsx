@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { signOut } from "@/app/actions/auth";
 import { InterfaceLanguage } from "@/components/settings/interface-language";
@@ -60,6 +61,12 @@ export default async function SettingsPage() {
             <p className="text-sm text-muted">{ta("confirm")}</p>
           </form>
         </section>
+
+        <p>
+          <Link href="/lab" className="inline-flex min-h-11 items-center text-sm text-muted underline underline-offset-4">
+            {t("lab.link")}
+          </Link>
+        </p>
       </div>
     </>
   );

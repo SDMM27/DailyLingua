@@ -4,12 +4,12 @@ import { safeNextPath } from "./safe-next-path";
 
 describe("isPublic", () => {
   it("lets a visitor reach the sign-in, sign-up and confirmation routes", () => {
-    for (const path of ["/sign-in", "/sign-up", "/auth/confirm"]) expect(isPublic(path)).toBe(true);
+    for (const path of ["/sign-in", "/sign-up", "/auth/confirm", "/offline"]) expect(isPublic(path)).toBe(true);
     expect(isPublic("/auth/confirm/anything")).toBe(true);
   });
 
   it("protects every other route", () => {
-    for (const path of ["/", "/welcome", "/settings", "/settings/extra", "/auth", "/api/anything"]) {
+    for (const path of ["/", "/welcome", "/settings", "/settings/extra", "/auth", "/api/anything", "/lab", "/lab/push-test"]) {
       expect(isPublic(path), path).toBe(false);
     }
   });
@@ -20,7 +20,7 @@ describe("isPublic", () => {
   });
 
   it("lists exactly the public routes", () => {
-    expect(PUBLIC_PATHS).toEqual(["/sign-in", "/sign-up", "/auth/confirm"]);
+    expect(PUBLIC_PATHS).toEqual(["/sign-in", "/sign-up", "/auth/confirm", "/offline"]);
   });
 });
 
