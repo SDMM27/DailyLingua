@@ -1,5 +1,6 @@
 import { fileURLToPath } from "node:url";
 import type { NextConfig } from "next";
+import { withSerwist } from "@serwist/turbopack";
 import createNextIntlPlugin from "next-intl/plugin";
 import { SECURITY_HEADERS } from "./src/lib/security/headers";
 
@@ -30,4 +31,5 @@ const nextConfig: NextConfig = {
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
-export default withNextIntl(nextConfig);
+// Serwist builds the service worker through a route handler (src/app/serwist), which works with Turbopack.
+export default withSerwist(withNextIntl(nextConfig));

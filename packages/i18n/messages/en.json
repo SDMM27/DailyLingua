@@ -28,7 +28,8 @@
       "B2": "I’m comfortable on a range of topics",
       "C1": "I express myself with ease",
       "C2": "I’ve mastered the language"
-    }
+    },
+    "appDescription": "One language session a day, at your own pace."
   },
   "auth": {
     "signIn": {
@@ -172,5 +173,10 @@
     "tooManyRequests": "Too many attempts. Try again in a few minutes.",
     "botCheckLoad": "The bot check couldn’t load. Reload the page.",
     "guestUnavailable": "Trying without an account isn’t available right now."
+  },
+  "offline": {
+    "title": "You are offline",
+    "body": "This page needs the internet. Your answers stay on this device and are sent as soon as the network is back.",
+    "retry": "Try again"
   }
 }

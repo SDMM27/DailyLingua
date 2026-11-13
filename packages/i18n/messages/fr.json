@@ -28,7 +28,8 @@
       "B2": "Je suis à l’aise sur des sujets variés",
       "C1": "Je m’exprime avec aisance",
       "C2": "Je maîtrise la langue"
-    }
+    },
+    "appDescription": "Une séance de langue chaque jour, à ton rythme."
   },
   "auth": {
     "signIn": {
@@ -172,5 +173,10 @@
     "tooManyRequests": "Trop de tentatives. Réessaie dans quelques minutes.",
     "botCheckLoad": "La vérification anti-robot n’a pas pu se charger. Recharge la page.",
     "guestUnavailable": "L’essai sans compte n’est pas disponible pour le moment."
+  },
+  "offline": {
+    "title": "Pas de connexion",
+    "body": "Cette page a besoin d’internet. Tes réponses restent gardées sur cet appareil et partiront dès que le réseau reviendra.",
+    "retry": "Réessayer"
   }
 }
