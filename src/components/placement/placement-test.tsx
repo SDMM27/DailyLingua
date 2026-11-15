@@ -55,6 +55,7 @@ export function PlacementTest({
   persist,
   alphabet,
   assessmentAvailable = false,
+  aiReviewed = false,
 }: {
   language: Language;
   /** The questions of the language; shuffled once per test, the engine picks which to ask. */
@@ -66,6 +67,8 @@ export function PlacementTest({
   alphabet?: { script: AlphabetScript };
   /** A full assessment (a dossier per skill) can be taken for this language: the result proposes it. */
   assessmentAvailable?: boolean;
+  /** The bank passed the AI reviews but no native speaker yet: the intro says so. */
+  aiReviewed?: boolean;
 }) {
   const router = useRouter();
   const info = languageInfo(language);
@@ -165,6 +168,17 @@ export function PlacementTest({
                   Tu le lis déjà ?{" "}
                   <Link href={`/alphabet/${language}/test`} className="font-medium text-accent-strong underline underline-offset-2">
                     Vérifie-le en 10 mots.
+                  </Link>
+                </p>
+              )}
+              {aiReviewed && (
+                <p className="mt-6 text-xs text-muted">
+                  Questions relues par IA, pas encore par un natif.{" "}
+                  <Link
+                    href={`/retour?depuis=/niveau/${language}`}
+                    className="inline-flex min-h-11 items-center font-medium underline underline-offset-2 hover:text-ink"
+                  >
+                    Signaler une erreur
                   </Link>
                 </p>
               )}
