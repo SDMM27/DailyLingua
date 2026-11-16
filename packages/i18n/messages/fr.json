@@ -309,14 +309,17 @@
       "title": "Mode hors ligne",
       "hint": "Mets 3 événements en file, coupe le réseau (mode avion), puis rétablis-le : ils partent tout seuls. L’envoi est factice : rien ne sort de l’appareil.",
       "enqueue": "Mettre 3 événements en file",
+      "enqueueRejected": "Mettre en file un événement refusé",
       "flush": "Envoyer maintenant",
       "network": "Réseau",
       "online": "en ligne",
       "offline": "hors ligne",
       "waiting": "Événements en attente",
+      "rejected": "Événements rejetés",
       "unsupported": "Ce navigateur ne propose pas IndexedDB : la file ne peut pas être gardée.",
       "logQueued": "{count, plural, one {# événement mis en file} other {# événements mis en file}}",
       "logSent": "{count, plural, one {# événement envoyé} other {# événements envoyés}}",
+      "logRejected": "{count, plural, one {# événement refusé} other {# événements refusés}}",
       "logFailed": "échec, prochaine tentative dans {seconds} s"
     }
   }

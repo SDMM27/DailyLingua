@@ -1,6 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = 3200; // not 3000 or 3100, so that the legacy app and its tests can run alongside
+// 3200 by default (not 3000 or 3100, so that the legacy app and its tests can run alongside);
+// E2E_PORT moves it when 3200 is taken.
+const PORT = Number(process.env.E2E_PORT ?? 3200);
 
 export default defineConfig({
   testDir: "./e2e",
@@ -18,7 +20,7 @@ export default defineConfig({
   },
   projects: [{ name: "iphone-webkit" }],
   webServer: {
-    command: "npm run build && npm run start",
+    command: `npm run build && npx next start -p ${PORT}`,
     url: `http://localhost:${PORT}/sign-in`,
     reuseExistingServer: !process.env.CI,
     timeout: 240_000,

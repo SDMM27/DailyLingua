@@ -309,14 +309,17 @@
       "title": "Offline mode",
       "hint": "Queue 3 events, cut the network (airplane mode), then restore it: they leave on their own. Sending is a stand-in: nothing leaves the device.",
       "enqueue": "Queue 3 events",
+      "enqueueRejected": "Queue a refused event",
       "flush": "Send now",
       "network": "Network",
       "online": "online",
       "offline": "offline",
       "waiting": "Events waiting",
+      "rejected": "Rejected events",
       "unsupported": "This browser has no IndexedDB: the queue cannot be kept.",
       "logQueued": "{count, plural, one {# event queued} other {# events queued}}",
       "logSent": "{count, plural, one {# event sent} other {# events sent}}",
+      "logRejected": "{count, plural, one {# event refused} other {# events refused}}",
       "logFailed": "failed, next attempt in {seconds} s"
     }
   }
