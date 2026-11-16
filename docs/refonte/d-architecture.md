@@ -18,7 +18,7 @@
 | i18n | `next-intl`, messages ICU en JSON | Recommandé par la doc Next, compatible Server Components ; les fichiers JSON sont lisibles par l'app native | Paraglide, Lingui : valables, moins répandus |
 | Hors ligne | Service worker avec Serwist + IndexedDB | Option citée par la doc Next 16, exemples Turbopack | `useOffline` de Next (expérimental) : utile en complément, insuffisant seul |
 | IA | SDK Anthropic, Haiku 5.5, Batch et cache de prompt | Décision de budget | — |
-| Voix | Azure Speech (offre gratuite) derrière une interface ; voix de l'appareil en secours | Gratuit d'abord ; fournisseur remplaçable | Dépendre de la reconnaissance du navigateur : inopérante en PWA installée sur iOS |
+| Voix | Azure Speech (offre gratuite) derrière une interface ; voix et reconnaissance de l'appareil quand elles existent | Gratuit d'abord ; fournisseur remplaçable. Le prototype iPhone (2026-11-16, iOS 26.5) montre que la reconnaissance du navigateur marche en PWA installée : elle sert aux exercices courts, Azure à la prise de parole longue et en repli (`prototype-iphone.md` §4) | Dépendre de la seule reconnaissance du navigateur : absente de certains navigateurs, confiance inutilisable pour noter |
 | Push | Web Push (VAPID, `web-push`) | Standard, gratuit, pris en charge par iOS ≥ 16.4 en PWA installée | Service tiers payant |
 | Hébergement | Vercel + GitHub Actions (cron) | Existant | — |
 
