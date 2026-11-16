@@ -89,7 +89,7 @@ Correction (clé serveur), note FSRS, `review_log`, état de carte ; validation 
 ```ts
 function attribute(e, ctx): { day; late } | Reject {
   if (e.occurredAt > e.receivedAt + 5 * MIN) return reject("in_future");
-  if (e.receivedAt - e.occurredAt > 30 * DAY) return reject("too_old");
+  if (e.receivedAt - e.occurredAt > 7 * DAY) return reject("too_old");
   if (e.occurredAt < ctx.servedAt(e) - 1 * MIN) return reject("before_served");
   const tz = ctx.timeZoneAt(e.occurredAt);            // journal des fuseaux, règle des 48 h
   let day = learningDay(e.occurredAt, tz);            // packages/core/src/dates.ts

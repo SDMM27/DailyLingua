@@ -1,6 +1,6 @@
 # Jalon 2 — Points à trancher
 
-Date : 2026-11-16. Specs : `j2-architecture.md` (architecte), `j2-seance-contenu.md` (`pedagogue-didacticien`), `j2-jeu-xp-serie.md` (`game-designer`), `j2-ecrans.md` et `maquettes/j2/j2-ecrans.html` (`designer-ux-mobile`). Aucun code n'est écrit avant la validation de cette liste.
+Date : 2026-11-16. **Validé par le propriétaire le 2026-11-16 : toutes les recommandations sont retenues** (dont l'évaluation payante n° 4 et la version de `@sdmm/design` n° 13). Specs : `j2-architecture.md` (architecte), `j2-seance-contenu.md` (`pedagogue-didacticien`), `j2-jeu-xp-serie.md` (`game-designer`), `j2-ecrans.md` et `maquettes/j2/j2-ecrans.html` (`designer-ux-mobile`). Aucun code n'est écrit avant la validation de cette liste.
 
 ## À trancher par le propriétaire
 
