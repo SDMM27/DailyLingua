@@ -82,4 +82,4 @@ Aucun écran de gestion des rejets pour l'apprenant (jalon 2, avec le vrai point
 
 ## Critères de fin
 
-`npm run refonte:check` et `npm run refonte:build` verts ; e2e de `apps/web` verts (pile Supabase locale déjà lancée ; ne pas utiliser le port 3000 ni 3200, déjà pris) ; `npm run check` vert ; fins de ligne LF (`git ls-files --eol`) ; commits atomiques en anglais (types et logique, file IndexedDB, `/lab` et i18n, prix et doc).
+`npm run refonte:check` et `npm run refonte:build` verts ; e2e de `apps/web` verts (pile Supabase locale déjà lancée ; les ports 3000 et 3200 sont déjà pris par d'autres serveurs qu'il ne faut pas arrêter : rendre le port de `playwright.config.ts` réglable par `E2E_PORT`, 3200 par défaut, et lancer les e2e avec `E2E_PORT=3300`) ; `npm run check` vert ; fins de ligne LF (`git ls-files --eol`) ; commits atomiques en anglais (types et logique, file IndexedDB, `/lab` et i18n, prix et doc).
