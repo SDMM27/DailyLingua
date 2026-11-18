@@ -35,6 +35,8 @@ jobs:
       - run: npm run check
       # Typecheck, lint (import boundaries) and tests of the `packages/*` workspaces.
       - run: npm run refonte:check
+      # Build of apps/web. It reads no Supabase variable at build time (every page is dynamic).
+      - run: npm run refonte:build
       # No Supabase variable: the build is the public demo, which is what we want to verify here.
       - run: npm run build
 
@@ -118,11 +120,20 @@ jobs:
         env:
           CI: "true"
           MISSION_GENERATOR: template # no paid AI call
+      # The new app (apps/web), on the same local stack, after the legacy app's tests. The Supabase
+      # variables are already exported; no service-role key is read by the app itself (the tests use
+      # it only to delete the accounts they create).
+      - name: End-to-end tests (apps/web)
+        run: npm run e2e --workspace @dailylingua/web
+        env:
+          CI: "true"
       - name: Upload the Playwright report
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
-          path: playwright-report/
+          path: |
+            playwright-report/
+            apps/web/playwright-report/
           retention-days: 7
           if-no-files-found: ignore

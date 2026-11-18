@@ -423,6 +423,27 @@ isOneToOne: false
 "migrate_user":
 { Args: { "p_user_id": string }; Returns: Json
                            },
+"save_enrollments":
+{ Args: { "p_enrollments": Json }; Returns: {
+              "active": boolean,
+"created_at": string,
+"daily_minutes": number,
+"days": (number)[],
+"focus": NonNullable<Json>,
+"id": string,
+"language": string,
+"position": number,
+"purpose": string | null,
+"target_level": string | null,
+"updated_at": string,
+"user_id": string
+            }[]
+                          SetofOptions: {
+        from: "*"
+        to: "enrollment"
+        isOneToOne: false
+        isSetofReturn: true
+      } },
 "save_profile":
 { Args: { "p_native_language": string,"p_reminder_time"?: string,"p_time_zone": string,"p_ui_language": string }; Returns: {
               "app_active_since": string | null,
