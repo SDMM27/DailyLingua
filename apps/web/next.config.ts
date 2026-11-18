@@ -19,7 +19,7 @@ const repositoryRoot = fileURLToPath(new URL("../..", import.meta.url));
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   // The workspace packages are shipped as TypeScript sources.
-  transpilePackages: ["@dailylingua/core", "@dailylingua/data", "@dailylingua/i18n", "@dailylingua/schemas"],
+  transpilePackages: ["@dailylingua/ai", "@dailylingua/core", "@dailylingua/data", "@dailylingua/i18n", "@dailylingua/schemas"],
   // node_modules is hoisted at the repository root, above this app.
   turbopack: { root: repositoryRoot },
   outputFileTracingRoot: repositoryRoot,

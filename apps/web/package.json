@@ -12,6 +12,7 @@
     "e2e": "playwright test"
   },
   "dependencies": {
+    "@dailylingua/ai": "*",
     "@dailylingua/core": "*",
     "@dailylingua/data": "*",
     "@dailylingua/i18n": "*",

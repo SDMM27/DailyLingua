@@ -5,6 +5,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { GoalRing } from "@/components/today/goal-ring";
+import { SessionPrefetch } from "@/components/today/session-prefetch";
 import { Button } from "@/components/ui/button";
 import { dailyGoalXp } from "@/lib/goal";
 import { getRequestClient, getSessionProfile, getSessionUser } from "@/lib/session";
@@ -44,6 +45,7 @@ export default async function TodayPage() {
 
   return (
     <>
+      <SessionPrefetch language={enrollment.language} />
       <header className="flex items-baseline justify-between gap-4">
         <p className="sd-display text-xl">{tCommon("appName")}</p>
         <p className="meta text-end">{date}</p>

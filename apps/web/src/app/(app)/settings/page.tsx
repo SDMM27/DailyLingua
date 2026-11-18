@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { signOut } from "@/app/actions/auth";
 import { InterfaceLanguage } from "@/components/settings/interface-language";
 import { LearningSettings } from "@/components/settings/learning-settings";
+import { SignOutForm } from "@/components/settings/sign-out-form";
 import { ThemeChoice } from "@/components/settings/theme-choice";
 import { Button } from "@/components/ui/button";
 import { nativeLanguageOptions, timeZoneOptions } from "@/lib/languages";
@@ -54,12 +54,12 @@ export default async function SettingsPage() {
           <p className="text-sm text-muted">
             {user.email ? t("account.signedInAs", { email: user.email }) : t("account.guest")}
           </p>
-          <form action={signOut} className="space-y-2">
+          <SignOutForm userId={user.id} className="space-y-2">
             <Button type="submit" variant="secondary">
               {ta("action")}
             </Button>
             <p className="text-sm text-muted">{ta("confirm")}</p>
-          </form>
+          </SignOutForm>
         </section>
 
         <p>

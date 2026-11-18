@@ -3,7 +3,8 @@ import { z } from "zod";
 /**
  * Supabase variables, validated on the server. The app has no demo mode: without them it cannot
  * do anything, so a missing or malformed value fails loudly. The service-role key is deliberately
- * not read here: this app only ever acts as the signed-in user (RLS).
+ * not read here: only `service.ts` reads it, for the ingestion routes; everything else acts as the
+ * signed-in user (RLS).
  */
 const supabaseEnvSchema = z.object({
   /** Public: sent to the browser. */

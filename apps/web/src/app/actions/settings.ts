@@ -45,7 +45,11 @@ export async function setInterfaceLanguage(language: string): Promise<SettingsSt
   return { saved: true };
 }
 
-/** Saves the mother tongue, the time zone and the reminder time. */
+/**
+ * Saves the mother tongue, the time zone and the reminder time. Once the app has ingested events, `app.save_profile`
+ * ignores the time zone it receives: the time zone is then followed by the events (`timezone_change`, with the
+ * 48-hour rule in core). The settings screen will be adjusted in PR 2.
+ */
 export async function saveLearningSettings(_previous: SettingsState, formData: FormData): Promise<SettingsState> {
   const parsed = learningSettingsSchema.safeParse({
     nativeLanguage: formData.get("nativeLanguage"),

@@ -5,7 +5,7 @@ import { getSupabaseEnv } from "./env";
 
 /**
  * Supabase client acting as the signed-in user (anon key + session cookies), so RLS applies.
- * This is the only kind of client the app creates: there is no service role here.
+ * The one exception is `service.ts` (service role), used only by the two ingestion routes.
  */
 export async function createSupabaseServerClient(): Promise<AppClient> {
   const env = getSupabaseEnv();

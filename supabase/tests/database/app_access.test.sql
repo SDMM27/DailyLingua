@@ -51,8 +51,8 @@ select 'test', 'm', id from auth.users where id::text like 'c0000000-0000-4000-8
 
 select is((select count(*)::int from pg_tables where schemaname = 'app' and not rowsecurity), 0,
   'row level security is enabled on every table of app');
-select is((select count(*)::int from pg_tables where schemaname = 'app'), 20,
-  'app has its 20 tables');
+select is((select count(*)::int from pg_tables where schemaname = 'app'), 37,
+  'app has its 37 tables');
 select is(
   (select count(*)::int from pg_proc p join pg_namespace n on n.oid = p.pronamespace
    where n.nspname = 'app' and not exists (
@@ -62,8 +62,8 @@ select is(
   (select count(*)::int from pg_proc p join pg_namespace n on n.oid = p.pronamespace
    where n.nspname = 'app'
      and (has_function_privilege('anon', p.oid, 'execute') or has_function_privilege('authenticated', p.oid, 'execute'))
-     and p.proname not in ('save_profile', 'save_enrollments')),
-  0, 'save_profile and save_enrollments are the only functions of app that clients can execute');
+     and p.proname not in ('save_profile', 'save_enrollments', 'save_game_settings', 'save_push_subscription', 'delete_push_subscription', 'report_content')),
+  0, 'the six client functions (save_profile, save_enrollments, save_game_settings, the two push functions, report_content) are the only functions of app that clients can execute');
 select is(
   (select count(*)::int from pg_proc p join pg_namespace n on n.oid = p.pronamespace
    where n.nspname = 'app' and p.proname in ('migrate_user', 'migrate_all', 'verify_migration')
@@ -117,7 +117,7 @@ select is(
   (select array_agg(t.relname::text order by t.relname) from pg_class t
    where t.relnamespace = 'app'::regnamespace and t.relkind = 'r'
      and not has_table_privilege('authenticated', t.oid, 'select')),
-  array['ai_call', 'legacy_map', 'legacy_record'], 'authenticated can read every table except ai_call, legacy_map and legacy_record');
+  array['ai_call', 'error_item', 'event_rate', 'ingest_event', 'ingest_state', 'legacy_map', 'legacy_record', 'push_subscription', 'text_item_key'], 'authenticated can read every table in full except ai_call, error_item and push_subscription (by column), event_rate, ingest_event, ingest_state, legacy_map, legacy_record and text_item_key');
 
 select set_config('request.jwt.claims',
   '{"sub": "c0000000-0000-4000-8000-0000000000a1", "role": "authenticated"}', true);
