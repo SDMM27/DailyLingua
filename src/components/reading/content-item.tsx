@@ -34,34 +34,35 @@ export function ContentItem({ item, now, timeZone }: { item: ContentListItem; no
   const videoId = item.type === "video" ? youtubeVideoId(item.url) : null;
   const published = item.publishedAt ? formatTimeAgo(new Date(item.publishedAt), now, timeZone) : null;
   return (
-    <article className="flex gap-3 border-b border-line py-4 last:border-b-0">
-      <span className={`mt-1.5 w-1 shrink-0 self-stretch rounded-full ${style.bg}`} aria-hidden="true" />
-      <div className="min-w-0 flex-1">
-        <p className="text-xs text-muted">
-          <span className="font-medium text-ink-soft">{item.source.name}</span>
+    <article className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col">
+        <p className="kicker text-muted">
+          <span className={`${style.text} font-bold`}>{info.nameFr}</span>
+          {" · "}
+          <span className="text-ink-soft">{item.source.name}</span>
           {published && ` · ${published}`}
         </p>
-        <h2 className="mt-1">
+        <h2 className="mt-2">
           <a
             href={item.url}
             target="_blank"
             rel="noopener noreferrer"
             lang={item.language}
             dir={info.dir}
-            className="font-serif text-[17px] leading-snug font-semibold text-balance hover:underline"
+            className="font-serif text-xl leading-snug font-bold text-balance hover:underline"
           >
             {item.title}
             <ExternalIcon width={13} height={13} className="ms-1 inline align-baseline text-muted" />
           </a>
         </h2>
         {item.summary !== item.title && (
-          <p lang={item.language} dir={info.dir} className="mt-1.5 line-clamp-3 text-sm leading-relaxed text-ink-soft">
+          <p lang={item.language} dir={info.dir} className="mt-2 line-clamp-4 text-[15px] leading-relaxed text-ink-soft">
             {item.summary}
           </p>
         )}
         {videoId && <WatchHere videoId={videoId} title={item.title} language={item.language} />}
         {item.type === "podcast" && item.audioUrl && <AudioPlayer audioUrl={item.audioUrl} title={item.title} />}
-        <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+        <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-4">
           <Pill>{CONTENT_TYPE_LABELS[item.type]}</Pill>
           <Pill>{item.difficulty}</Pill>
           <Pill>≈ {item.durationMinutes} min</Pill>

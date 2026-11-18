@@ -64,7 +64,7 @@ export function NextTopicForm({
         value={value ?? NO_PREFERENCE}
         disabled={pending}
         onChange={(e) => change(e.target.value)}
-        className="min-h-11 w-full appearance-none rounded-xl border border-line bg-surface px-3.5 py-2.5 text-base font-semibold focus:border-ink-soft focus:outline-none disabled:opacity-60"
+        className="min-h-11 w-full appearance-none rounded-xl border border-ink bg-surface px-3.5 py-2.5 text-base font-semibold focus:outline-2 focus:outline-offset-2 focus:outline-accent disabled:opacity-60"
       >
         <option value={NO_PREFERENCE}>{NO_PREFERENCE_LABEL}</option>
         {TOPICS.map((topic) => {

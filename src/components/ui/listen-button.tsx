@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { findLocalVoice } from "@/components/mission/speech-voices";
+import { buttonClass } from "@/components/ui/primitives";
 import { languageInfo } from "@/lib/domain/languages";
 import type { Language } from "@/lib/schemas/common";
 
-export const PILL_BUTTON_CLASS =
-  "inline-flex min-h-11 items-center justify-center rounded-full border border-line px-5 text-sm font-semibold text-ink-soft hover:bg-surface-sunk";
+export const PILL_BUTTON_CLASS = buttonClass.secondary;
 
 function synthesis(): SpeechSynthesis | null {
   return typeof window !== "undefined" && "speechSynthesis" in window ? window.speechSynthesis : null;
