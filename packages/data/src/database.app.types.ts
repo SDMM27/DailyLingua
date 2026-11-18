@@ -111,6 +111,20 @@ isOneToOne: false
       referencedColumns: ["code"]
     }
                   ]
+                },"content_report": {
+                  Row: {
+                    "created_at": string,"id": string,"note": string | null,"reason": string,"target_id": string,"target_kind": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"id"?: string,"note"?: string | null,"reason": string,"target_id": string,"target_kind": string,"user_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"id"?: string,"note"?: string | null,"reason"?: string,"target_id"?: string,"target_kind"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"correction": {
                   Row: {
                     "created_at": string,"explanation_language": string,"feedback": NonNullable<Json>,"id": string,"input_tokens": number | null,"model": string | null,"output_tokens": number | null,"production_id": string,"prompt_version": string | null,"user_id": string
@@ -130,6 +144,20 @@ isOneToOne: false
       referencedRelation: "production"
       referencedColumns: ["id","user_id"]
     }
+                  ]
+                },"device_cursor": {
+                  Row: {
+                    "device_id": string,"last_day": string | null,"last_seq": number,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "device_id": string,"last_day"?: string | null,"last_seq": number,"user_id": string
+                  }
+                  Update: {
+                    "device_id"?: string,"last_day"?: string | null,"last_seq"?: number,"user_id"?: string
+                  }
+                  Relationships: [
+                    
                   ]
                 },"enrollment": {
                   Row: {
@@ -151,6 +179,40 @@ isOneToOne: false
       referencedColumns: ["code"]
     }
                   ]
+                },"error_item": {
+                  Row: {
+                    "answer": NonNullable<Json>,"correction_id": string,"created_day": string,"error_ref": string,"id": string,"prompt": NonNullable<Json>,"reworked_day": string | null,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "answer": NonNullable<Json>,"correction_id": string,"created_day": string,"error_ref": string,"id"?: string,"prompt": NonNullable<Json>,"reworked_day"?: string | null,"user_id": string
+                  }
+                  Update: {
+                    "answer"?: NonNullable<Json>,"correction_id"?: string,"created_day"?: string,"error_ref"?: string,"id"?: string,"prompt"?: NonNullable<Json>,"reworked_day"?: string | null,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "error_item_correction_id_user_id_fkey"
+      columns: ["correction_id","user_id"]
+isOneToOne: false
+      referencedRelation: "correction"
+      referencedColumns: ["id","user_id"]
+    }
+                  ]
+                },"ingest_state": {
+                  Row: {
+                    "seq": number,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "seq"?: number,"user_id": string
+                  }
+                  Update: {
+                    "seq"?: number,"user_id"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"language": {
                   Row: {
                     "code": string,"created_at": string
@@ -161,6 +223,20 @@ isOneToOne: false
                   }
                   Update: {
                     "code"?: string,"created_at"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"learning_day": {
+                  Row: {
+                    "cause": string,"day": string,"first_activity_at": string | null,"time_zone": string,"user_id": string,"validated": boolean,"xp_verified": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "cause"?: string,"day": string,"first_activity_at"?: string | null,"time_zone": string,"user_id": string,"validated"?: boolean,"xp_verified"?: number
+                  }
+                  Update: {
+                    "cause"?: string,"day"?: string,"first_activity_at"?: string | null,"time_zone"?: string,"user_id"?: string,"validated"?: boolean,"xp_verified"?: number
                   }
                   Relationships: [
                     
@@ -193,16 +269,30 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
-                },"production": {
+                },"notification_log": {
                   Row: {
-                    "created_at": string,"id": string,"language": string,"mode": string,"session_id": string | null,"task": NonNullable<Json>,"text": string,"user_id": string
+                    "day": string,"id": number,"kind": string,"opened_at": string | null,"sent_at": string,"status": string,"template": string,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"id"?: string,"language": string,"mode": string,"session_id"?: string | null,"task"?: NonNullable<Json>,"text": string,"user_id": string
+                    "day": string,"id"?: never,"kind": string,"opened_at"?: string | null,"sent_at"?: string,"status"?: string,"template": string,"user_id": string
                   }
                   Update: {
-                    "created_at"?: string,"id"?: string,"language"?: string,"mode"?: string,"session_id"?: string | null,"task"?: NonNullable<Json>,"text"?: string,"user_id"?: string
+                    "day"?: string,"id"?: never,"kind"?: string,"opened_at"?: string | null,"sent_at"?: string,"status"?: string,"template"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"production": {
+                  Row: {
+                    "client_event_id": string | null,"created_at": string,"id": string,"language": string,"mode": string,"session_id": string | null,"task": NonNullable<Json>,"text": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "client_event_id"?: string | null,"created_at"?: string,"id"?: string,"language": string,"mode": string,"session_id"?: string | null,"task"?: NonNullable<Json>,"text": string,"user_id": string
+                  }
+                  Update: {
+                    "client_event_id"?: string | null,"created_at"?: string,"id"?: string,"language"?: string,"mode"?: string,"session_id"?: string | null,"task"?: NonNullable<Json>,"text"?: string,"user_id"?: string
                   }
                   Relationships: [
                     {
@@ -229,6 +319,20 @@ isOneToOne: false
                   }
                   Update: {
                     "app_active_since"?: string | null,"created_at"?: string,"game_settings"?: NonNullable<Json>,"is_guest"?: boolean,"legacy_migrated_at"?: string | null,"native_language"?: string,"reminder_time"?: string | null,"time_zone"?: string,"ui_language"?: string,"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"push_subscription": {
+                  Row: {
+                    "auth": string,"created_at": string,"endpoint": string,"failures": number,"id": string,"last_success_at": string | null,"p256dh": string,"user_agent": string | null,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "auth": string,"created_at"?: string,"endpoint": string,"failures"?: number,"id"?: string,"last_success_at"?: string | null,"p256dh": string,"user_agent"?: string | null,"user_id": string
+                  }
+                  Update: {
+                    "auth"?: string,"created_at"?: string,"endpoint"?: string,"failures"?: number,"id"?: string,"last_success_at"?: string | null,"p256dh"?: string,"user_agent"?: string | null,"user_id"?: string
                   }
                   Relationships: [
                     
@@ -269,14 +373,14 @@ isOneToOne: false
                   ]
                 },"rewrite": {
                   Row: {
-                    "accepted": boolean | null,"correction_id": string,"created_at": string,"id": string,"sentence_index": number,"text": string,"user_id": string
+                    "accepted": boolean | null,"client_event_id": string | null,"correction_id": string,"created_at": string,"id": string,"sentence_index": number,"text": string,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "accepted"?: boolean | null,"correction_id": string,"created_at"?: string,"id"?: string,"sentence_index": number,"text": string,"user_id": string
+                    "accepted"?: boolean | null,"client_event_id"?: string | null,"correction_id": string,"created_at"?: string,"id"?: string,"sentence_index": number,"text": string,"user_id": string
                   }
                   Update: {
-                    "accepted"?: boolean | null,"correction_id"?: string,"created_at"?: string,"id"?: string,"sentence_index"?: number,"text"?: string,"user_id"?: string
+                    "accepted"?: boolean | null,"client_event_id"?: string | null,"correction_id"?: string,"created_at"?: string,"id"?: string,"sentence_index"?: number,"text"?: string,"user_id"?: string
                   }
                   Relationships: [
                     {
@@ -289,14 +393,14 @@ isOneToOne: false
                   ]
                 },"session": {
                   Row: {
-                    "completed_at": string | null,"created_at": string,"day": string,"id": string,"language": string,"plan": NonNullable<Json>,"started_at": string | null,"status": string,"user_id": string
+                    "completed_at": string | null,"created_at": string,"day": string,"format": number,"id": string,"kind": string,"language": string,"plan": NonNullable<Json>,"served_at": string | null,"started_at": string | null,"status": string,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "completed_at"?: string | null,"created_at"?: string,"day": string,"id"?: string,"language": string,"plan"?: NonNullable<Json>,"started_at"?: string | null,"status"?: string,"user_id": string
+                    "completed_at"?: string | null,"created_at"?: string,"day": string,"format"?: number,"id"?: string,"kind"?: string,"language": string,"plan"?: NonNullable<Json>,"served_at"?: string | null,"started_at"?: string | null,"status"?: string,"user_id": string
                   }
                   Update: {
-                    "completed_at"?: string | null,"created_at"?: string,"day"?: string,"id"?: string,"language"?: string,"plan"?: NonNullable<Json>,"started_at"?: string | null,"status"?: string,"user_id"?: string
+                    "completed_at"?: string | null,"created_at"?: string,"day"?: string,"format"?: number,"id"?: string,"kind"?: string,"language"?: string,"plan"?: NonNullable<Json>,"served_at"?: string | null,"started_at"?: string | null,"status"?: string,"user_id"?: string
                   }
                   Relationships: [
                     {
@@ -306,6 +410,40 @@ isOneToOne: false
       referencedRelation: "language"
       referencedColumns: ["code"]
     }
+                  ]
+                },"session_step": {
+                  Row: {
+                    "language": string,"proof": NonNullable<Json>,"session_id": string,"step": string,"user_id": string,"validated_at": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "language": string,"proof"?: NonNullable<Json>,"session_id": string,"step": string,"user_id": string,"validated_at"?: string | null
+                  }
+                  Update: {
+                    "language"?: string,"proof"?: NonNullable<Json>,"session_id"?: string,"step"?: string,"user_id"?: string,"validated_at"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "session_step_session_id_user_id_language_fkey"
+      columns: ["session_id","user_id","language"]
+isOneToOne: false
+      referencedRelation: "session"
+      referencedColumns: ["id","user_id","language"]
+    }
+                  ]
+                },"setting_change": {
+                  Row: {
+                    "changed_at": string,"effective_day": string,"id": number,"key": string,"user_id": string,"value": NonNullable<Json>
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "changed_at"?: string,"effective_day": string,"id"?: never,"key": string,"user_id": string,"value": NonNullable<Json>
+                  }
+                  Update: {
+                    "changed_at"?: string,"effective_day"?: string,"id"?: never,"key"?: string,"user_id"?: string,"value"?: NonNullable<Json>
+                  }
+                  Relationships: [
+                    
                   ]
                 },"skill_estimate": {
                   Row: {
@@ -329,14 +467,14 @@ isOneToOne: false
                   ]
                 },"streak_state": {
                   Row: {
-                    "best": number,"current": number,"freezes": number,"last_day": string | null,"mode": string,"updated_at": string,"user_id": string
+                    "best": number,"best_set_on": string | null,"current": number,"freezes": number,"freezes_granted_through": string | null,"last_day": string | null,"last_repair_day": string | null,"mode": string,"time_zone_changed_at": string | null,"updated_at": string,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "best"?: number,"current"?: number,"freezes"?: number,"last_day"?: string | null,"mode"?: string,"updated_at"?: string,"user_id": string
+                    "best"?: number,"best_set_on"?: string | null,"current"?: number,"freezes"?: number,"freezes_granted_through"?: string | null,"last_day"?: string | null,"last_repair_day"?: string | null,"mode"?: string,"time_zone_changed_at"?: string | null,"updated_at"?: string,"user_id": string
                   }
                   Update: {
-                    "best"?: number,"current"?: number,"freezes"?: number,"last_day"?: string | null,"mode"?: string,"updated_at"?: string,"user_id"?: string
+                    "best"?: number,"best_set_on"?: string | null,"current"?: number,"freezes"?: number,"freezes_granted_through"?: string | null,"last_day"?: string | null,"last_repair_day"?: string | null,"mode"?: string,"time_zone_changed_at"?: string | null,"updated_at"?: string,"user_id"?: string
                   }
                   Relationships: [
                     
@@ -355,16 +493,124 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
-                },"xp_ledger": {
+                },"text": {
                   Row: {
-                    "amount": number,"attempt_id": number | null,"created_at": string,"day": string,"id": number,"language": string | null,"meta": NonNullable<Json>,"reason": string,"review_log_id": number | null,"user_id": string
+                    "body": string,"checks": NonNullable<Json>,"created_at": string,"density": number,"grammar_point": string | null,"id": string,"language": string,"level_band": string,"model": string | null,"new_words": NonNullable<Json>,"prompt_version": string,"status": string,"theme": string,"title": string,"variant": number,"word_count": number
                   }
                   ComputedFields: never
                   Insert: {
-                    "amount": number,"attempt_id"?: number | null,"created_at"?: string,"day": string,"id"?: never,"language"?: string | null,"meta"?: NonNullable<Json>,"reason": string,"review_log_id"?: number | null,"user_id": string
+                    "body": string,"checks"?: NonNullable<Json>,"created_at"?: string,"density": number,"grammar_point"?: string | null,"id"?: string,"language": string,"level_band": string,"model"?: string | null,"new_words"?: NonNullable<Json>,"prompt_version": string,"status"?: string,"theme": string,"title": string,"variant"?: number,"word_count": number
                   }
                   Update: {
-                    "amount"?: number,"attempt_id"?: number | null,"created_at"?: string,"day"?: string,"id"?: never,"language"?: string | null,"meta"?: NonNullable<Json>,"reason"?: string,"review_log_id"?: number | null,"user_id"?: string
+                    "body"?: string,"checks"?: NonNullable<Json>,"created_at"?: string,"density"?: number,"grammar_point"?: string | null,"id"?: string,"language"?: string,"level_band"?: string,"model"?: string | null,"new_words"?: NonNullable<Json>,"prompt_version"?: string,"status"?: string,"theme"?: string,"title"?: string,"variant"?: number,"word_count"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "text_language_fkey"
+      columns: ["language"]
+isOneToOne: false
+      referencedRelation: "language"
+      referencedColumns: ["code"]
+    }
+                  ]
+                },"text_item": {
+                  Row: {
+                    "id": string,"kind": string,"listening_only": boolean,"position": number,"prompt": NonNullable<Json>,"step": string,"text_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "id"?: string,"kind": string,"listening_only"?: boolean,"position": number,"prompt": NonNullable<Json>,"step": string,"text_id": string
+                  }
+                  Update: {
+                    "id"?: string,"kind"?: string,"listening_only"?: boolean,"position"?: number,"prompt"?: NonNullable<Json>,"step"?: string,"text_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "text_item_text_id_fkey"
+      columns: ["text_id"]
+isOneToOne: false
+      referencedRelation: "text"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"text_item_key": {
+                  Row: {
+                    "accept": NonNullable<Json>,"answer": NonNullable<Json>,"item_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "accept"?: NonNullable<Json>,"answer": NonNullable<Json>,"item_id": string
+                  }
+                  Update: {
+                    "accept"?: NonNullable<Json>,"answer"?: NonNullable<Json>,"item_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "text_item_key_item_id_fkey"
+      columns: ["item_id"]
+isOneToOne: true
+      referencedRelation: "text_item"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"text_read": {
+                  Row: {
+                    "first_read_day": string,"text_id": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "first_read_day": string,"text_id": string,"user_id": string
+                  }
+                  Update: {
+                    "first_read_day"?: string,"text_id"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "text_read_text_id_fkey"
+      columns: ["text_id"]
+isOneToOne: false
+      referencedRelation: "text"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"timezone_change": {
+                  Row: {
+                    "created_at": string,"effective_at": string,"id": number,"time_zone": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"effective_at": string,"id"?: never,"time_zone": string,"user_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"effective_at"?: string,"id"?: never,"time_zone"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"ui_event": {
+                  Row: {
+                    "client_event_id": string,"id": number,"name": string,"occurred_at": string,"received_at": string,"user_id": string,"value": NonNullable<Json>
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "client_event_id": string,"id"?: never,"name": string,"occurred_at": string,"received_at"?: string,"user_id": string,"value"?: NonNullable<Json>
+                  }
+                  Update: {
+                    "client_event_id"?: string,"id"?: never,"name"?: string,"occurred_at"?: string,"received_at"?: string,"user_id"?: string,"value"?: NonNullable<Json>
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"xp_ledger": {
+                  Row: {
+                    "amount": number,"attempt_id": number | null,"created_at": string,"day": string,"id": number,"language": string | null,"league_eligible": boolean,"meta": NonNullable<Json>,"reason": string,"review_log_id": number | null,"rule_version": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "amount": number,"attempt_id"?: number | null,"created_at"?: string,"day": string,"id"?: never,"language"?: string | null,"league_eligible"?: boolean,"meta"?: NonNullable<Json>,"reason": string,"review_log_id"?: number | null,"rule_version"?: string,"user_id": string
+                  }
+                  Update: {
+                    "amount"?: number,"attempt_id"?: number | null,"created_at"?: string,"day"?: string,"id"?: never,"language"?: string | null,"league_eligible"?: boolean,"meta"?: NonNullable<Json>,"reason"?: string,"review_log_id"?: number | null,"rule_version"?: string,"user_id"?: string
                   }
                   Relationships: [
                     {
@@ -398,8 +644,23 @@ isOneToOne: false
 "claim_quota":
 { Args: { "p_day": string,"p_kind": string,"p_limit": number,"p_user_id": string }; Returns: boolean
                            },
+"delete_push_subscription":
+{ Args: { "p_endpoint": string }; Returns: boolean
+                           },
+"ingest_batch":
+{ Args: { "p_expected_seq": number,"p_payload": Json,"p_user_id": string }; Returns: Json
+                           },
+"is_allowed_push_endpoint":
+{ Args: { "p_endpoint": string }; Returns: boolean
+                           },
+"is_valid_game_setting":
+{ Args: { "p_key": string,"p_value": Json }; Returns: boolean
+                           },
 "is_valid_weekdays":
 { Args: { "p_days": (number)[] }; Returns: boolean
+                           },
+"learning_day_at":
+{ Args: { "p_at": string,"p_time_zone": string }; Returns: string
                            },
 "legacy_assessments":
 { Args: { "p_user_id": string }; Returns: {
@@ -440,6 +701,9 @@ isOneToOne: false
 "release_quota":
 { Args: { "p_day": string,"p_kind": string,"p_user_id": string }; Returns: undefined
                            },
+"report_content":
+{ Args: { "p_note"?: string,"p_reason": string,"p_target_id": string,"p_target_kind": string }; Returns: string
+                           },
 "save_enrollments":
 { Args: { "p_enrollments": Json }; Returns: {
               "active": boolean,
@@ -461,6 +725,26 @@ isOneToOne: false
         isOneToOne: false
         isSetofReturn: true
       } },
+"save_game_settings":
+{ Args: { "p_settings": Json }; Returns: {
+              "app_active_since": string | null,
+"created_at": string,
+"game_settings": NonNullable<Json>,
+"is_guest": boolean,
+"legacy_migrated_at": string | null,
+"native_language": string,
+"reminder_time": string | null,
+"time_zone": string,
+"ui_language": string,
+"updated_at": string,
+"user_id": string
+            }
+                          SetofOptions: {
+        from: "*"
+        to: "profile"
+        isOneToOne: true
+        isSetofReturn: false
+      } },
 "save_profile":
 { Args: { "p_native_language": string,"p_reminder_time"?: string,"p_time_zone": string,"p_ui_language": string }; Returns: {
               "app_active_since": string | null,
@@ -481,6 +765,9 @@ isOneToOne: false
         isOneToOne: true
         isSetofReturn: false
       } },
+"save_push_subscription":
+{ Args: { "p_auth": string,"p_endpoint": string,"p_p256dh": string,"p_user_agent"?: string }; Returns: string
+                           },
 "verify_migration":
 { Args: Record<PropertyKey, never>; Returns: {
               "actual": string,"check_name": string,"expected": string,"user_id": string
