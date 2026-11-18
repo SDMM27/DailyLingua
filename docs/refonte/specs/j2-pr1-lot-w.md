@@ -111,3 +111,21 @@ Ordre : (1) `Origin` présent et égal à l'origine de la requête, sinon 403 (C
 ## 10. Hors périmètre (PR 2 et PR 3)
 
 Écrans de la séance, génération des textes, correction écrite et `rewrite_check`, erreur du jour, notifications, `metrics:report`. Le service worker n'est pas modifié.
+
+## 11. Correctifs de la revue de sécurité (`docs/reviews/refonte/j2-pr1-securite.md`)
+
+Décisions de l'architecte sur les constats de la revue S + W. Branche `refonte/j2-secfix` tirée de `refonte/jalon-2`. Migration unique `supabase/migrations/20261118000200_app_ingest_hardening.sql`.
+
+| Constat | Correctif |
+|---|---|
+| **B1** (bloquant) : `save_profile` réécrit `profile.time_zone` librement → contournement de la règle « 1 changement / 48 h » | Nouvelle version de `app.save_profile` (`create or replace`, même signature, mêmes droits) : si `app.ingest_state.seq > 0` pour l'utilisateur, `time_zone` **n'est plus modifié** (la valeur reçue est validée puis ignorée) ; avant toute ingestion, comportement inchangé (l'accueil fixe le fuseau). Dès lors le fuseau ne change plus que par le journal (`timezone_change`, règle des 48 h dans `core`), et le repli de `core` sur `profile.timeZone` est sûr. pgTAP : avant ingestion le fuseau change ; après une ingestion il reste, les autres champs changent. Commentaire dans `apps/web/src/app/actions/settings.ts` : le fuseau est suivi par les événements une fois l'app utilisée (l'écran Réglages sera ajusté au PR 2). |
+| **I2** : `timezone_changes.effective_at` sans borne | Dans une nouvelle version d'`ingest_batch` : `effective_at` ∈ [`now() − 8 jours`, `now() + 5 min`], sinon `23514`. |
+| **I5** : recherche XP « avec source » par `is not distinct from` (pas d'index) | Même nouvelle version : deux branches, `x.attempt_id = v_id_attempt` ou `x.review_log_id = v_id_review`, pour utiliser les index uniques partiels. Le reste du corps est identique à `20261118000100` (vérifier par `diff`). |
+| **I4** : `save_game_settings` sans plafond | Nouvelle version : plus de 50 lignes `setting_change` de l'utilisateur sur les dernières 24 h → `23514`. pgTAP. |
+| **W-I1** : memo sans borne (productions jamais réglées) | `next-memo.ts` : productions gardées seulement si `day` ≥ jour serveur − 4 (au-delà, `production.corrected` ne peut plus être inscrite : borne de jour SQL), et 30 au plus (les plus récentes). Plafond de création : pré-filtre dans `ingest-events.ts`, au plus **10 `production_submitted` acceptées par jour d'apprentissage** (memo du jour serveur + lot) ; au-delà → refus `too_many` (ajouté à `rejectionReasons`, commenté). Test : 11e production refusée ; memo stable après 1 000 productions simulées. |
+| **W-I2** : échecs définitifs traités comme passagers | **Client** (`http-sender.ts`) : 413 avec plus d'un événement → coupe le lot en deux et envoie chaque moitié (récursif, rapports fusionnés) ; 413 sur un seul événement → refusé `invalid_payload` ; 400 ou 415 → tous les événements du lot refusés `invalid_payload` (notre client ne produit jamais ces cas ; mieux vaut les écarter que bloquer la file). 401, 403, 429, 5xx, réseau → passager (inchangé). **Serveur** (`ingest-write.ts`) : toute classe `22xxx` et `23xxx` et `42501` → `refused` (donc isolement), sauf `40001`/`55P03` ; tests. |
+| W-M3 memo illisible | Inchangé (journalisé en erreur) : échouer fermé bloquerait le compte. |
+| W-M4 file conservée à la déconnexion | Accepté : la file est propre au compte (D8) et partira à la reconnexion. |
+| W-M1, W-M2, W-M5, W-M6, W-M7, I3, M1-M11 | Acceptés ou reportés, notés dans la passation (défense en profondeur, PR 2-3). |
+
+Critères : identiques au §9, plus les tests listés ci-dessus.
