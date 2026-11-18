@@ -41,6 +41,8 @@ export const xpZeroReasons = [
   "wrong_language",
   "reread",
   "late",
+  /** A `listening` review in which the audio was never played (`audioPlays` is 0): added to the closed list of the spec. */
+  "no_audio",
 ] as const;
 export const xpZeroReasonSchema = z.enum(xpZeroReasons);
 export type XpZeroReason = z.infer<typeof xpZeroReasonSchema>;

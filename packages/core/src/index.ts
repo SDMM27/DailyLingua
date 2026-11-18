@@ -1,4 +1,5 @@
 export * from "./dates";
+export * from "./game";
 export * from "./grading";
 export * from "./languages";
 export * from "./levels";
