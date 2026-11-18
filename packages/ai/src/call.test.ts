@@ -20,6 +20,15 @@ import type { AiCallRecord, AiStore, QuotaRef } from "./store";
 const NOW = new Date("2026-11-14T10:30:00Z");
 const USER = "00000000-0000-4000-8000-000000000001";
 const BUDGET = 10;
+const ZONE = "Europe/Paris";
+const LEARNER = { id: USER, timeZone: ZONE };
+
+/** Stands in for `learningDay` of `@dailylingua/core`: the day starts at 04:00 local time (this package cannot import it). */
+function learningDayLike(at: Date, timeZone: string): string {
+  const shifted = new Date(at.getTime() - 4 * 3_600_000);
+  return new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).format(shifted);
+}
+const utcDay = (at: Date) => at.toISOString().slice(0, 10);
 
 const answerSchema = z.object({ score: z.number().int().min(0).max(10), comment: z.string() });
 type Answer = z.infer<typeof answerSchema>;
@@ -86,7 +95,7 @@ function input(overrides: Partial<AiCallInput<Answer>> = {}): AiCallInput<Answer
     system: "Tu corriges un texte.",
     messages: [{ role: "user", content: "Je suis aller au marché." }],
     schema: answerSchema,
-    userId: USER,
+    learner: LEARNER,
     ...overrides,
   };
 }
@@ -100,6 +109,7 @@ function setup(steps: Step[] = [okResponse()], storeOptions: Parameters<typeof f
     client: c.client,
     store: s.store,
     now: () => NOW,
+    dayOf: utcDay,
     monthlyBudgetUsd: BUDGET,
     sleep,
     onStoreError,
@@ -221,6 +231,7 @@ describe("circuit breaker", () => {
       client: fakeClient(okResponse()).client,
       store: { ...store, monthSpendUsd },
       now: () => NOW,
+      dayOf: utcDay,
       monthlyBudgetUsd: BUDGET,
     });
     await gateway.call(input());
@@ -229,10 +240,49 @@ describe("circuit breaker", () => {
 });
 
 describe("quota", () => {
-  it("claims the purpose's daily quota (UTC day) before calling", async () => {
+  it("claims the purpose's daily quota (the day `dayOf` gives) before calling", async () => {
     const { gateway, claims } = setup();
     await gateway.call(input({ purpose: "writing_feedback" }));
     expect(claims).toEqual([{ userId: USER, kind: "writing_feedback", day: "2026-11-14", limit: 3 }]);
+  });
+
+  it("uses the day dayOf gives for the instant of now() and the learner's time zone", async () => {
+    const dayOf = vi.fn(() => "2026-01-02");
+    const { store, claims } = fakeStore();
+    const gateway = createAiGateway({ client: fakeClient(okResponse()).client, store, now: () => NOW, dayOf, monthlyBudgetUsd: BUDGET });
+    await gateway.call(input({ learner: { id: USER, timeZone: "Asia/Tokyo" } }));
+    expect(dayOf).toHaveBeenCalledTimes(1);
+    expect(dayOf).toHaveBeenCalledWith(NOW, "Asia/Tokyo");
+    expect(claims[0]?.day).toBe("2026-01-02");
+  });
+
+  it("counts 00:30 in Paris as the day before with a 04:00 learning day", async () => {
+    const night = new Date("2026-03-09T23:30:00Z"); // 00:30 on 2026-03-10 in Paris
+    const { store, claims } = fakeStore();
+    const gateway = createAiGateway({ client: fakeClient(okResponse()).client, store, now: () => night, dayOf: learningDayLike, monthlyBudgetUsd: BUDGET });
+    await gateway.call(input());
+    expect(claims[0]?.day).toBe("2026-03-09");
+  });
+
+  it("calls neither dayOf nor the store's claim for shared generation", async () => {
+    const dayOf = vi.fn(() => "2026-01-02");
+    const { store, claims } = fakeStore();
+    const gateway = createAiGateway({ client: fakeClient(okResponse()).client, store, now: () => NOW, dayOf, monthlyBudgetUsd: BUDGET });
+    await gateway.call(input({ purpose: "graded_text", learner: null }));
+    expect(dayOf).not.toHaveBeenCalled();
+    expect(claims).toEqual([]);
+  });
+
+  it.each(["", "2026-3-9", "2026-03-09T00:00:00Z", "today"])("throws before any call when dayOf returns %j", async (bad) => {
+    const { store, claims, records } = fakeStore();
+    const { client, requests } = fakeClient(okResponse());
+    const gateway = createAiGateway({ client, store, now: () => NOW, dayOf: () => bad, monthlyBudgetUsd: BUDGET });
+    const error = await gateway.call(input()).catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(Error);
+    expect(error).not.toBeInstanceOf(AiError);
+    expect(requests).toEqual([]);
+    expect(claims).toEqual([]);
+    expect(records).toEqual([]);
   });
 
   it("refuses with quota_exceeded, without calling, logging or releasing", async () => {
@@ -245,15 +295,16 @@ describe("quota", () => {
 
   it("claims nothing for shared generation (no learner) or for a purpose without a quota", async () => {
     const { gateway, claims } = setup([okResponse(), okResponse()]);
-    await gateway.call(input({ purpose: "graded_text", userId: null }));
+    await gateway.call(input({ purpose: "graded_text", learner: null }));
     await gateway.call(input({ purpose: "gloss" }));
     expect(claims).toEqual([]);
   });
 
   it("releases the unit when the call fails, and logs the failure with no tokens", async () => {
-    const { gateway, releases, records } = setup([statusError(400)]);
+    const { gateway, releases, records, claims } = setup([statusError(400)]);
     await expect(gateway.call(input())).rejects.toMatchObject({ code: "provider_error" });
     expect(releases).toEqual([{ userId: USER, kind: "writing_feedback", day: "2026-11-14" }]);
+    expect(releases[0]).toEqual(claims[0] && { userId: claims[0].userId, kind: claims[0].kind, day: claims[0].day });
     expect(records).toHaveLength(1);
     expect(records[0]).toMatchObject({ status: "error", inputTokens: 0, outputTokens: 0, costUsd: 0, userId: USER });
   });
@@ -367,6 +418,7 @@ describe("retry and failures", () => {
       client: fakeClient(okResponse()).client,
       store: { ...store, recordCall: async () => Promise.reject(boom) },
       now: () => NOW,
+      dayOf: utcDay,
       monthlyBudgetUsd: BUDGET,
       onStoreError,
     });
@@ -377,6 +429,7 @@ describe("retry and failures", () => {
       client: fakeClient(statusError(400)).client,
       store: { ...store, releaseQuota: async () => Promise.reject(boom) },
       now: () => NOW,
+      dayOf: utcDay,
       monthlyBudgetUsd: BUDGET,
       onStoreError,
     });
@@ -388,7 +441,7 @@ describe("retry and failures", () => {
 describe("configuration", () => {
   it("refuses a model without a price", () => {
     expect(() =>
-      createAiGateway({ client: fakeClient(okResponse()).client, store: fakeStore().store, monthlyBudgetUsd: 1, model: "claude-unknown" }),
+      createAiGateway({ client: fakeClient(okResponse()).client, store: fakeStore().store, dayOf: utcDay, monthlyBudgetUsd: 1, model: "claude-unknown" }),
     ).toThrow(/No price/);
   });
 });

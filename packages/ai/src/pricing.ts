@@ -14,12 +14,11 @@ export interface ModelPrice {
  * Day these prices were read, and where. Re-check before each milestone that depends on them: a
  * provider changes its prices without notice.
  *
- * Source: the Claude API reference loaded in the session of 2026-11-13 (model table cached on
- * 2026-11-03, and its prompt-caching economics: cache reads at 0.1x the input price, 0.05x on
- * Sonnet 5.5 and Opus 5.5; 5-minute cache writes at 1.25x), which agrees with the base prices of
- * docs/plans/roadmap-plateforme.md §6.1 (checked 2026-11-05). Not read from the live price page.
+ * Source: the official price page (platform.claude.com/docs/en/about-claude/pricing), read on
+ * 2026-11-16; Haiku 5.5: 0.10 / 0.50 $ per million tokens, 5-minute cache write 0.125 $, cache read
+ * 0.01 $; Batch -50 %; cache threshold of 512 tokens on the three models.
  */
-export const PRICES_CHECKED_ON = "2026-11-13";
+export const PRICES_CHECKED_ON = "2026-11-16";
 
 /**
  * Haiku 5.5 is priced up to 100K prompt tokens ($0.50 / $2.50 beyond): no prompt of this app comes

@@ -59,8 +59,13 @@ export interface AiCallInput<T> {
   messages: AiMessage[];
   /** The answer is parsed and validated with this schema before it is handed back. */
   schema: ZodType<T>;
-  /** The learner the call is made for; null for shared generation (no quota applies). */
-  userId: string | null;
+  /**
+   * The learner the call is made for; null for shared generation (no quota applies). `timeZone` is the
+   * IANA zone of the learner's profile, read on the server: never a field sent with the request, or a
+   * client could pick the day its quota is counted on. Changing zone can shift the quota window by one
+   * day at most; the risk (a handful of calls at about 0.002 $) is accepted.
+   */
+  learner: { id: string; timeZone: string } | null;
   /** Default "medium", the default of Haiku 5.5, set explicitly so a change of default cannot move the bill. */
   effort?: Effort;
 }
@@ -87,6 +92,12 @@ export interface AiGatewayOptions {
   /** Default `DEFAULT_MODEL`. Must have a price in `MODEL_PRICES`. */
   model?: string;
   now?: () => Date;
+  /**
+   * The learner's learning day (`YYYY-MM-DD`) containing the instant `at`, in `timeZone`. Required, with
+   * no UTC default, so that forgetting it does not compile. The app passes `learningDay` of
+   * `@dailylingua/core` (this package does not import it).
+   */
+  dayOf: (at: Date, timeZone: string) => string;
   /** Per attempt. Default 30 s: the learner is waiting on the screen. */
   timeoutMs?: number;
   /** Pause before the single retry. Default 500 ms. */
@@ -106,6 +117,7 @@ export const BUDGET_WARNING_RATIO = 0.8;
  */
 export const CACHE_MIN_SYSTEM_CHARS = 2000;
 
+const DAY_FORMAT = /^\d{4}-\d{2}-\d{2}$/;
 const DEFAULT_TIMEOUT_MS = 30_000;
 const DEFAULT_RETRY_DELAY_MS = 500;
 
@@ -150,7 +162,7 @@ const NO_USAGE: Required<TokenUsage> = { inputTokens: 0, outputTokens: 0, cacheR
  *
  * 1. circuit breaker: with the month's spend at or over the budget, a non-essential purpose is
  *    refused (`budget_exhausted`) before anything is spent; from 80 % the result carries `budgetWarning`;
- * 2. quota: one unit is claimed before the call (`quota_exceeded` when the day's limit is reached)
+ * 2. quota: one unit of the learner's learning day (`dayOf`) is claimed before the call (`quota_exceeded` when the day's limit is reached)
  *    and given back if the call fails before it is billed (provider error or timeout);
  * 3. call: Haiku 5.5 by default, long instructions marked for the prompt cache, a timeout and a single retry;
  * 4. validation: the answer must parse and satisfy the Zod schema (`invalid_output` otherwise; such a
@@ -199,8 +211,12 @@ export function createAiGateway(options: AiGatewayOptions): AiGateway {
     const budgetWarning = spend >= monthlyBudgetUsd * BUDGET_WARNING_RATIO;
 
     let quota: QuotaRef | null = null;
-    if (input.userId !== null && spec.quotaKind !== null && spec.dailyLimit !== null) {
-      quota = { userId: input.userId, kind: spec.quotaKind, day: at.toISOString().slice(0, 10) };
+    const { learner } = input;
+    if (learner !== null && spec.quotaKind !== null && spec.dailyLimit !== null) {
+      // The day is computed once, from the same instant as the circuit breaker; the release reuses `quota`.
+      const day = options.dayOf(at, learner.timeZone);
+      if (!DAY_FORMAT.test(day)) throw new Error(`dayOf must return YYYY-MM-DD, got "${day}"`);
+      quota = { userId: learner.id, kind: spec.quotaKind, day };
       if (!(await store.claimQuota({ ...quota, limit: spec.dailyLimit }))) throw new AiError("quota_exceeded");
     }
 
@@ -213,7 +229,7 @@ export function createAiGateway(options: AiGatewayOptions): AiGateway {
           ...usage,
           batch: false,
           costUsd: costUsd(model, usage),
-          userId: input.userId,
+          userId: input.learner?.id ?? null,
           status,
         };
         return store.recordCall(entry);

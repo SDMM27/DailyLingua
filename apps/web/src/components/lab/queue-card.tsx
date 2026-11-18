@@ -17,6 +17,7 @@ const LOG_LINES = 12;
 type LogEntry =
   | { kind: "queued"; count: number }
   | { kind: "sent"; count: number }
+  | { kind: "rejected"; count: number }
   | { kind: "failed"; seconds: number }
   | { kind: "error"; message: string };
 
@@ -28,6 +29,7 @@ export function QueueCard() {
   const t = useTranslations("lab");
   const online = useOnlineStatus();
   const [waiting, setWaiting] = useState<number | null>(null);
+  const [rejectedCount, setRejectedCount] = useState<number | null>(null);
   const [log, setLog] = useState<LogEntry[]>([]);
   // The server cannot tell: it renders the controls, the browser may then replace them by the notice.
   const supported = useSyncExternalStore(
@@ -42,6 +44,7 @@ export function QueueCard() {
   const refresh = useCallback(async () => {
     try {
       setWaiting((await queueRef.current?.size()) ?? 0);
+      setRejectedCount((await queueRef.current?.rejectedCount()) ?? 0);
     } catch (error) {
       record({ kind: "error", message: errorMessage(error) });
     }
@@ -61,8 +64,9 @@ export function QueueCard() {
       onResult: (result: FlushResult) => {
         if (result.outcome === "failed") {
           record({ kind: "failed", seconds: Math.max(0, Math.round((result.state.retry.nextAttemptAt - Date.now()) / 1000)) });
-        } else if (delivered > 0) {
-          record({ kind: "sent", count: delivered });
+        } else {
+          if (delivered > 0) record({ kind: "sent", count: delivered });
+          if (result.rejected > 0) record({ kind: "rejected", count: result.rejected });
         }
         delivered = 0;
         void refresh();
@@ -99,12 +103,33 @@ export function QueueCard() {
     }
   }
 
+  async function enqueueRejected() {
+    const queue = queueRef.current;
+    if (!queue) return;
+    try {
+      // The stand-in sender refuses this one for good: it ends in the rejected store, never sent again.
+      await queue.enqueue({
+        clientEventId: crypto.randomUUID(),
+        kind: "lab.demo",
+        payload: { demoReject: true },
+        occurredAt: new Date().toISOString(),
+      });
+      record({ kind: "queued", count: 1 });
+      await refresh();
+      void syncRef.current?.flushNow();
+    } catch (error) {
+      record({ kind: "error", message: errorMessage(error) });
+    }
+  }
+
   const describeEntry = (entry: LogEntry): string => {
     switch (entry.kind) {
       case "queued":
         return t("queue.logQueued", { count: entry.count });
       case "sent":
         return t("queue.logSent", { count: entry.count });
+      case "rejected":
+        return t("queue.logRejected", { count: entry.count });
       case "failed":
         return t("queue.logFailed", { seconds: entry.seconds });
       case "error":
@@ -115,6 +140,7 @@ export function QueueCard() {
   const summary = [
     `${t("queue.network")}: ${t(online ? "queue.online" : "queue.offline")}`,
     `${t("queue.waiting")}: ${waiting ?? t("value.unknown")}`,
+    `${t("queue.rejected")}: ${rejectedCount ?? t("value.unknown")}`,
     ...log.map(describeEntry),
   ].join("\n");
 
@@ -124,6 +150,9 @@ export function QueueCard() {
         <>
           <Button variant="secondary" onClick={enqueue}>
             {t("queue.enqueue")}
+          </Button>
+          <Button variant="secondary" onClick={enqueueRejected}>
+            {t("queue.enqueueRejected")}
           </Button>
           <Button variant="secondary" onClick={() => void syncRef.current?.flushNow()}>
             {t("queue.flush")}

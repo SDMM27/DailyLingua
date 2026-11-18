@@ -91,6 +91,25 @@ test.describe("lab", () => {
     await page.setViewportSize({ width: 360, height: 740 });
     await signUpAndInstall(page, email);
 
+    // A database left by version 1 of the queue (one waiting event, no `rejected` store): the upgrade
+    // to version 2 keeps the event, and the lab then delivers it.
+    await page.evaluate(
+      () =>
+        new Promise<void>((resolve, reject) => {
+          const opening = indexedDB.open("dailylingua-offline", 1);
+          opening.onupgradeneeded = () => {
+            const store = opening.result.createObjectStore("events", { keyPath: "seq", autoIncrement: true });
+            store.createIndex("by-client-event-id", "clientEventId", { unique: true });
+            store.add({ clientEventId: "legacy-v1-event", kind: "lab.demo", payload: { index: 0 }, occurredAt: "2026-11-13T08:00:00.000Z" });
+          };
+          opening.onsuccess = () => {
+            opening.result.close();
+            resolve();
+          };
+          opening.onerror = () => reject(opening.error);
+        }),
+    );
+
     // The link in the settings is discreet but there.
     await page.getByRole("link", { name: "Réglages" }).click();
     await page.getByRole("link", { name: /Outils de test/ }).click();
@@ -116,10 +135,20 @@ test.describe("lab", () => {
     await page.getByRole("button", { name: "Vérifier" }).click();
     await expect(page.locator("pre").filter({ hasText: "Lancée depuis l’écran d’accueil: non" })).toBeVisible();
 
-    // Offline queue: online, three events leave at once.
+    // Offline queue: the event of the version 1 database survived the upgrade and leaves at once.
     const queueCard = page.locator("details").filter({ hasText: "Mode hors ligne" });
+    await expect(queueCard.locator("pre")).toContainText("1 événement envoyé");
+    await expect(queueCard.locator("pre")).toContainText("Événements rejetés: 0");
+
+    // Online, three events leave at once.
     await queueCard.getByRole("button", { name: "Mettre 3 événements en file" }).click();
     await expect(queueCard.locator("pre")).toContainText("3 événements envoyés");
+    await expect(queueCard.locator("pre")).toContainText("Événements en attente: 0");
+
+    // An event the stand-in server always refuses goes to the rejected store and is not sent again.
+    await queueCard.getByRole("button", { name: "Mettre en file un événement refusé" }).click();
+    await expect(queueCard.locator("pre")).toContainText("Événements rejetés: 1");
+    await expect(queueCard.locator("pre")).toContainText("1 événement refusé");
     await expect(queueCard.locator("pre")).toContainText("Événements en attente: 0");
 
     // Offline: they stay in the queue (and in IndexedDB)...

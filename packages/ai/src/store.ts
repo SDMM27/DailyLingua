@@ -20,7 +20,7 @@ export interface AiCallRecord {
 export interface QuotaRef {
   userId: string;
   kind: string;
-  /** Calendar day (UTC), `YYYY-MM-DD`. */
+  /** The learner's learning day, `YYYY-MM-DD`. */
   day: string;
 }
 

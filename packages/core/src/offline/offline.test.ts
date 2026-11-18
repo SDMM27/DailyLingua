@@ -159,3 +159,103 @@ describe("flushQueue", () => {
     expect(result.outcome).toBe("failed");
   });
 });
+
+describe("rejected events", () => {
+  const ids = (events: readonly PendingEvent[]) => events.map((e) => e.clientEventId);
+  const AT = Date.UTC(2026, 10, 16, 9, 0, 0);
+
+  it("moves a refused event to the rejected store with its reason and still delivers the others", async () => {
+    const queue = await queueOf(3);
+    const accepted: string[] = [];
+    const send = async (batch: readonly PendingEvent[]) => {
+      accepted.push(...ids(batch).filter((id) => id !== "e2"));
+      return { rejected: [{ clientEventId: "e2", reason: "invalid_schema" }] };
+    };
+    const result = await flushQueue(queue, send, INITIAL_FLUSH_STATE, AT, options);
+    expect(result).toMatchObject({ outcome: "empty", sent: 2, rejected: 1 });
+    expect(accepted).toEqual(["e1", "e3"]);
+    expect(await queue.size()).toBe(0);
+    expect(await queue.rejectedCount()).toBe(1);
+    expect(await queue.listRejected(10)).toEqual([
+      { ...event(2), reason: "invalid_schema", rejectedAt: new Date(AT).toISOString() },
+    ]);
+    expect(result.state.rejected.size).toBe(0);
+  });
+
+  it("never sends a rejected event again, even when it is enqueued again", async () => {
+    const queue = await queueOf(2);
+    await flushQueue(queue, async () => ({ rejected: [{ clientEventId: "e1", reason: "too_old" }] }), INITIAL_FLUSH_STATE, AT, options);
+    await queue.enqueue(event(1));
+    expect(await queue.size()).toBe(0);
+    await queue.enqueue(event(3));
+    const sent: string[] = [];
+    await flushQueue(queue, async (batch) => void sent.push(...ids(batch)), INITIAL_FLUSH_STATE, AT, options);
+    expect(sent).toEqual(["e3"]);
+    expect(await queue.rejectedCount()).toBe(1);
+  });
+
+  it("treats a sender that resolves with nothing as all accepted", async () => {
+    const queue = await queueOf(2);
+    const result = await flushQueue(queue, async () => undefined, INITIAL_FLUSH_STATE, AT, options);
+    expect(result).toMatchObject({ outcome: "empty", sent: 2, rejected: 0 });
+    expect(await queue.rejectedCount()).toBe(0);
+  });
+
+  it("ignores a refusal for an id that was not in the batch", async () => {
+    const queue = await queueOf(1);
+    const result = await flushQueue(queue, async () => ({ rejected: [{ clientEventId: "ghost", reason: "other" }] }), INITIAL_FLUSH_STATE, AT, options);
+    expect(result).toMatchObject({ sent: 1, rejected: 0 });
+    expect(await queue.rejectedCount()).toBe(0);
+    expect(result.state.rejected.size).toBe(0);
+  });
+
+  it.each(["", "Bad Reason", "with-dash", "x".repeat(65)])("replaces the reason %j by invalid_reason", async (reason) => {
+    const queue = await queueOf(1);
+    await flushQueue(queue, async () => ({ rejected: [{ clientEventId: "e1", reason }] }), INITIAL_FLUSH_STATE, AT, options);
+    expect((await queue.listRejected(10)).map((e) => e.reason)).toEqual(["invalid_reason"]);
+  });
+
+  it("records a refusal at the next call, without sending the event again, when reject fails once", async () => {
+    const memory = await queueOf(2);
+    let failReject = true;
+    const queue: EventQueue = {
+      ...memory,
+      async reject(entries) {
+        if (failReject) throw new Error("storage error");
+        await memory.reject(entries);
+      },
+    };
+    const sent: string[] = [];
+    const send = async (batch: readonly PendingEvent[]) => {
+      sent.push(...ids(batch));
+      return { rejected: [{ clientEventId: "e1", reason: "foreign_session" }] };
+    };
+
+    const first = await flushQueue(queue, send, INITIAL_FLUSH_STATE, AT, options);
+    expect(first.outcome).toBe("failed");
+    expect(first.rejected).toBe(0);
+    expect([...first.state.rejected]).toEqual([["e1", "foreign_session"]]);
+    expect(await memory.size()).toBe(2);
+
+    failReject = false;
+    const second = await flushQueue(queue, send, first.state, first.state.retry.nextAttemptAt, options);
+    expect(second).toMatchObject({ outcome: "empty", sent: 0, rejected: 1 });
+    expect(sent).toEqual(["e1", "e2"]);
+    expect(await memory.size()).toBe(0);
+    expect((await memory.listRejected(10)).map((e) => e.reason)).toEqual(["foreign_session"]);
+    expect(second.state.rejected.size).toBe(0);
+  });
+
+  it("keeps rejected events oldest first, does not duplicate them, and discards them on request", async () => {
+    const queue = await queueOf(3);
+    const entry = (n: number) => ({ clientEventId: `e${n}`, reason: "other", rejectedAt: "2026-11-16T09:00:00.000Z" });
+    await queue.reject([entry(2), entry(1), entry(9)]);
+    await queue.reject([entry(2)]);
+    expect(await queue.size()).toBe(1);
+    expect(await queue.rejectedCount()).toBe(2);
+    expect(ids(await queue.listRejected(1))).toEqual(["e2"]);
+    await queue.discardRejected(["e2", "unknown"]);
+    expect(ids(await queue.listRejected(10))).toEqual(["e1"]);
+    expect(await queue.rejectedCount()).toBe(1);
+  });
+});
