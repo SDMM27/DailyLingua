@@ -10,7 +10,8 @@ describe("ingestErrorCode", () => {
     expect(ingestErrorCode("40001")).toBe("stale");
     expect(ingestErrorCode("55P03")).toBe("busy");
     for (const code of ["22023", "23503", "23505", "23514"]) expect(ingestErrorCode(code)).toBe("refused");
-    for (const code of ["42501", "XX000", "PGRST301", "", null, undefined]) expect(ingestErrorCode(code)).toBe("unavailable");
+    for (const code of ["22001", "22003", "22P02", "22007", "23000", "23502", "23P01", "42501"]) expect(ingestErrorCode(code)).toBe("refused");
+    for (const code of ["XX000", "42P01", "57014", "08006", "21000", "24000", "PGRST301", "", null, undefined]) expect(ingestErrorCode(code)).toBe("unavailable");
   });
 });
 
@@ -30,6 +31,9 @@ describe("callIngestBatch", () => {
     ["23503", "refused"],
     ["23505", "refused"],
     ["23514", "refused"],
+    ["22003", "refused"],
+    ["23502", "refused"],
+    ["42501", "refused"],
     ["57014", "unavailable"],
   ])("maps SQLSTATE %s to %s and keeps the SQL message for the log", async (sqlstate, code) => {
     const { client } = fakeClient({ data: null, error: { code: sqlstate, message: "events: client_event_id already used" } });
