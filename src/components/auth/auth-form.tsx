@@ -33,7 +33,7 @@ export function AuthForm({
         <button
           type="button"
           onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-          className="font-semibold text-ink underline underline-offset-4"
+          className="font-semibold text-accent-strong underline underline-offset-4"
         >
           {mode === "signin" ? "Créer un compte" : "Se connecter"}
         </button>
@@ -68,7 +68,7 @@ function SignInForm({
         <SubmitButton pending={pending || (Boolean(turnstileSiteKey) && !captchaToken)} label="Se connecter" />
       </form>
       <p className="mt-4 text-center text-sm">
-        <Link href="/mot-de-passe-oublie" className="text-ink-soft underline underline-offset-4">
+        <Link href="/mot-de-passe-oublie" className="text-accent-strong underline underline-offset-4">
           Mot de passe oublié ?
         </Link>
       </p>

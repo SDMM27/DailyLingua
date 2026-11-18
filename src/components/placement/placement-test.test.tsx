@@ -218,3 +218,16 @@ describe("PlacementTest alphabet note", () => {
     expect(screen.queryByText(/Tu ne lis pas encore/)).toBeNull();
   });
 });
+
+describe("PlacementTest AI review note", () => {
+  it("says the questions were reviewed by AI only, with a way to report an error", () => {
+    setup({ aiReviewed: true });
+    expect(screen.getByText(/Questions relues par IA, pas encore par un natif\./)).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Signaler une erreur" }).getAttribute("href")).toBe("/retour?depuis=/niveau/it");
+  });
+
+  it("says nothing when the bank has no AI review", () => {
+    setup();
+    expect(screen.queryByText(/relues par IA/)).toBeNull();
+  });
+});

@@ -11,7 +11,7 @@ export function TabBar() {
   return (
     <nav
       aria-label="Navigation principale"
-      className="pb-safe fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/90 backdrop-blur-xl md:hidden"
+      className="pb-safe fixed inset-x-0 bottom-0 z-30 border-t border-ink bg-paper/95 backdrop-blur-xl md:hidden"
     >
       <ul className="mx-auto flex max-w-md">
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
@@ -21,8 +21,10 @@ export function TabBar() {
               <Link
                 href={href}
                 aria-current={active ? "page" : undefined}
-                className={`flex flex-col items-center gap-0.5 pt-2.5 pb-2 text-[11px] font-medium transition-colors ${
-                  active ? "text-ink" : "text-muted"
+                className={`relative flex min-h-14 flex-col items-center justify-center gap-0.5 pt-2 pb-1.5 text-[11px] font-medium transition-colors ${
+                  active
+                    ? "text-accent-strong before:absolute before:inset-x-3 before:top-0 before:h-[3px] before:bg-accent"
+                    : "text-muted"
                 }`}
               >
                 <Icon width={22} height={22} strokeWidth={active ? 2 : 1.7} />

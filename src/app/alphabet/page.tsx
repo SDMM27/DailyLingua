@@ -30,9 +30,9 @@ export default async function AlphabetPage({ searchParams }: { searchParams: Pro
     return (
       <>
         <PageHeader eyebrow="Alphabet" title="Alphabet" />
-        <p className="py-8 text-center text-sm text-muted">
+        <p className="border-t border-ink py-8 font-serif text-lg italic text-muted">
           Aucune de tes langues n’a encore d’alphabet à apprendre ici.{" "}
-          <Link href="/" className="font-medium text-ink underline underline-offset-2">
+          <Link href="/" className="font-medium text-accent-strong underline underline-offset-2">
             Retour à l’accueil
           </Link>
         </p>
