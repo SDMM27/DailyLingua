@@ -2,7 +2,7 @@ import { IngestBatchError, type IngestRows } from "@dailylingua/data";
 import { ingestBatchPayloadSchema } from "@dailylingua/schemas";
 import { describe, expect, it, vi } from "vitest";
 import { CARD, DEVICE, NOW, SESSION, USER, cardRow, rows, uuid } from "@/test/ingest-rows";
-import { IngestTransientError, ingestEvents, MAX_PRODUCTIONS_PER_DAY, MAX_STALE_ATTEMPTS, type IngestStore } from "./ingest-events";
+import { IngestTransientError, ingestEvents, MAX_PRODUCTIONS_PER_24H, MAX_STALE_ATTEMPTS, type IngestStore } from "./ingest-events";
 
 const at = (time: string) => `2026-11-18T${time}.000Z`;
 let sequence = 0;
@@ -122,16 +122,20 @@ describe("ingestEvents: the cap on productions (W-I1)", () => {
   });
   const tooMany = (result: Awaited<ReturnType<typeof run>>) => result.rejected.filter((entry) => entry.reason === "too_many").map((entry) => entry.clientEventId);
 
-  it("refuses the 11th production of a learning day in one batch, and only the ones past the cap", async () => {
-    const events = Array.from({ length: MAX_PRODUCTIONS_PER_DAY + 2 }, (_, i) => production(300 + i, `09:${String(10 + i).padStart(2, "0")}:00`));
+  it("refuses the 11th production of a batch, and only the ones past the cap", async () => {
+    const events = Array.from({ length: MAX_PRODUCTIONS_PER_24H + 2 }, (_, i) => production(300 + i, `09:${String(10 + i).padStart(2, "0")}:00`));
     const result = await run(fakeStore(), events);
     expect(tooMany(result)).toEqual([uuid(310), uuid(311)]);
   });
 
-  it("counts the productions the server already holds for the day", async () => {
-    const existing = Array.from({ length: MAX_PRODUCTIONS_PER_DAY }, (_, i) => ({ id: uuid(400 + i), sessionId: SESSION, language: "it", text: "gia scritto", clientEventId: uuid(450 + i), createdAt: "2026-11-18T08:00:00.000Z" }));
-    const result = await run(fakeStore({ rows: () => rows({ productions: existing }) }), [production(500, "09:10:00"), production(501, "09:11:00", "2026-11-17")]);
-    expect(tooMany(result)).toEqual([uuid(500)]);
+  it("counts the productions received in the last 24 hours, whatever the day of the event", async () => {
+    const result = await run(fakeStore({ rows: () => rows({ recentProductionCount: MAX_PRODUCTIONS_PER_24H }) }), [production(500, "09:10:00"), production(501, "09:11:00", "2026-11-12")]);
+    expect(tooMany(result)).toEqual([uuid(500), uuid(501)]);
+  });
+
+  it("counts the rows of the batch on top of the ones received", async () => {
+    const result = await run(fakeStore({ rows: () => rows({ recentProductionCount: MAX_PRODUCTIONS_PER_24H - 1 }) }), [production(520, "09:10:00"), production(521, "09:11:00")]);
+    expect(tooMany(result)).toEqual([uuid(521)]);
   });
 
   it("lets a replay of a known production through (a duplicate, not a new one)", async () => {
@@ -139,8 +143,7 @@ describe("ingestEvents: the cap on productions (W-I1)", () => {
     const first = fakeStore();
     await run(first, [event]);
     const fingerprint = (first.calls[0]?.payload.events as { fingerprint: string }[])[0]?.fingerprint as string;
-    const existing = Array.from({ length: MAX_PRODUCTIONS_PER_DAY }, (_, i) => ({ id: uuid(650 + i), sessionId: SESSION, language: "it", text: "gia scritto", clientEventId: uuid(680 + i), createdAt: "2026-11-18T08:00:00.000Z" }));
-    const result = await run(fakeStore({ rows: () => rows({ productions: existing, knownEvents: { [event.clientEventId]: fingerprint } }) }), [event]);
+    const result = await run(fakeStore({ rows: () => rows({ recentProductionCount: MAX_PRODUCTIONS_PER_24H, knownEvents: { [event.clientEventId]: fingerprint } }) }), [event]);
     expect(tooMany(result)).toEqual([]);
     expect(result.duplicates).toEqual([event.clientEventId]);
   });
