@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { skipPlacementTest } from "@/app/actions/placement";
+import { buttonClass } from "@/components/ui/primitives";
 import type { Language } from "@/lib/schemas/common";
 
 /** Records that the learner passes on the placement test of a language (level unchanged). */
@@ -31,7 +32,7 @@ export function SkipPlacementButton({ language, persist }: { language: Language;
         type="button"
         onClick={skip}
         disabled={pending}
-        className="min-h-11 rounded-full px-4 text-sm font-medium text-muted hover:text-ink disabled:opacity-60"
+        className={buttonClass.quiet}
       >
         {pending ? "Enregistrement…" : "Plus tard"}
       </button>

@@ -3,9 +3,10 @@
 import { Fragment, useState } from "react";
 import { deleteGrammarCard, recordGrammarPractice } from "@/app/actions/grammar";
 import { languageStyle } from "@/components/ui/language-style";
-import { Card, Eyebrow, ProgressBar } from "@/components/ui/primitives";
+import { buttonClass, Eyebrow, ProgressBar } from "@/components/ui/primitives";
 import { exerciseCorrection, GRAMMAR_PASS_RATIO, isExerciseAnswerCorrect, type GrammarPracticeOutcome } from "@/lib/domain/grammar";
 import { languageInfo } from "@/lib/domain/languages";
+import { toRoman } from "@/lib/domain/roman";
 import { relativeDueLabel } from "@/lib/domain/spaced-repetition";
 import type { DateKey, Language } from "@/lib/schemas/common";
 import { GRAMMAR_GAP, type GrammarCard, type GrammarPoint } from "@/lib/schemas/grammar";
@@ -152,7 +153,7 @@ export function GrammarPractice({
   }
 
   const removeLink = card && persist && (
-    <div className="mt-4 text-center">
+    <div className="mt-4">
       <button type="button" onClick={remove} className="min-h-11 text-xs font-medium text-muted hover:text-danger">
         Retirer de mes révisions
       </button>
@@ -168,12 +169,12 @@ export function GrammarPractice({
     const message = finishMessage(finish, today, persist);
     const saving = persist && finish.outcome === null && finish.error === null;
     return (
-      <Card className="text-center">
+      <section className="border-t border-ink pt-5 lg:border-t-0 lg:pt-0">
         <Eyebrow>Ton score</Eyebrow>
-        <p className={`mt-2 font-serif text-5xl font-semibold ${style.text}`}>
+        <p className={`sd-display mt-2 text-6xl ${style.text}`}>
           {finish.correct} / {finish.total}
         </p>
-        <div aria-live="polite" className="mt-3 text-[15px] leading-relaxed text-ink-soft">
+        <div aria-live="polite" className="mt-3 font-serif text-lg leading-relaxed text-ink-soft">
           {saving ? "Enregistrement…" : message}
           {finish.error && (
             <p role="alert" className="rounded-2xl bg-danger-soft px-4 py-3 text-sm text-danger">
@@ -185,17 +186,17 @@ export function GrammarPractice({
           type="button"
           onClick={restart}
           disabled={saving}
-          className="mt-5 w-full rounded-2xl bg-ink px-5 py-3.5 text-[15px] font-semibold text-paper transition-transform active:scale-[0.98] disabled:opacity-60"
+          className={`${buttonClass.primary} mt-5 w-full sm:w-auto`}
         >
           Recommencer
         </button>
         {removeLink}
-      </Card>
+      </section>
     );
   }
 
   return (
-    <Card>
+    <section>
       <div className="flex items-center justify-between">
         <Eyebrow>Exercices</Eyebrow>
         <span className="text-xs font-medium text-muted">
@@ -213,13 +214,21 @@ export function GrammarPractice({
       >
         {exercise.type === "transform" ? (
           <>
-            <p className="text-[15px] text-ink-soft">{exercise.instruction}</p>
-            <p lang={language} dir={dir} className="mt-2 font-serif text-2xl font-semibold text-balance">
+            <p className="text-[15px] text-ink-soft">
+              <span aria-hidden="true" className="mr-2 font-serif text-xl font-extrabold text-accent-strong">
+                {toRoman(index + 1)}
+              </span>
+              {exercise.instruction}
+            </p>
+            <p lang={language} dir={dir} className="mt-2 font-serif text-2xl font-semibold italic text-balance">
               {exercise.source}
             </p>
           </>
         ) : (
-          <p lang={language} dir={dir} className="font-serif text-2xl font-semibold text-balance">
+          <p lang={language} dir={dir} className="font-serif text-2xl font-semibold italic text-balance">
+            <span aria-hidden="true" className="mr-2 font-extrabold text-accent-strong not-italic">
+              {toRoman(index + 1)}
+            </span>
             <Prompt text={exercise.prompt} hint={exercise.type === "fill" ? exercise.hint : undefined} />
           </p>
         )}
@@ -247,7 +256,7 @@ export function GrammarPractice({
                   aria-pressed={selected}
                   disabled={reveal}
                   onClick={() => setChoice(i)}
-                  className={`min-h-12 rounded-2xl border px-4 py-3 text-start font-serif text-lg ${tone}`}
+                  className={`min-h-12 rounded-xl border px-4 py-3 text-start font-serif text-lg ${tone}`}
                 >
                   {option}
                 </button>
@@ -269,7 +278,7 @@ export function GrammarPractice({
               autoComplete="off"
               spellCheck={false}
               placeholder="Ta réponse"
-              className="block w-full rounded-2xl border border-line bg-paper px-4 py-3 font-serif text-base"
+              className="block w-full rounded-xl border border-ink bg-paper px-4 py-3 font-serif text-base"
             />
           </label>
         )}
@@ -298,7 +307,7 @@ export function GrammarPractice({
             <button
               type="submit"
               disabled={!canCheck}
-              className="w-full rounded-2xl bg-ink px-5 py-3.5 text-[15px] font-semibold text-paper transition-transform active:scale-[0.98] disabled:opacity-50"
+              className={`${buttonClass.primary} w-full sm:w-auto`}
             >
               Vérifier
             </button>
@@ -306,7 +315,7 @@ export function GrammarPractice({
             <button
               type="button"
               onClick={next}
-              className="w-full rounded-2xl bg-ink px-5 py-3.5 text-[15px] font-semibold text-paper transition-transform active:scale-[0.98]"
+              className={`${buttonClass.primary} w-full sm:w-auto`}
             >
               {isLast ? "Voir mon score" : "Suivant"}
             </button>
@@ -314,6 +323,6 @@ export function GrammarPractice({
         </div>
       </form>
       {removeLink}
-    </Card>
+    </section>
   );
 }

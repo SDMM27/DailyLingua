@@ -8,12 +8,12 @@ import {
   type AuthFormState,
   type UpdatePasswordState,
 } from "@/app/actions/auth";
-import { Card } from "@/components/ui/primitives";
+import { buttonClass, Card } from "@/components/ui/primitives";
 import { MIN_PASSWORD_LENGTH } from "@/lib/schemas/auth";
 import { EmailField, Feedback, PasswordField, SubmitButton } from "./auth-fields";
 import { TurnstileWidget } from "./turnstile-widget";
 
-const linkClass = "font-semibold text-ink underline underline-offset-4";
+const linkClass = "font-semibold text-accent-strong underline underline-offset-4";
 
 /** Asks for the e-mail address that receives the reset link. */
 export function RequestResetForm({
@@ -53,12 +53,12 @@ export function NewPasswordForm() {
   if (state.done) {
     return (
       <Card>
-        <p role="status" className="rounded-2xl bg-success-soft px-4 py-3 text-sm text-success">
+        <p role="status" className="rounded-lg bg-success-soft px-4 py-3 text-sm text-success">
           Mot de passe modifié. Tu es connecté.
         </p>
         <Link
           href="/"
-          className="mt-4 block w-full rounded-2xl bg-ink px-5 py-3.5 text-center text-[15px] font-semibold text-paper"
+          className={`${buttonClass.primary} mt-4 w-full`}
         >
           Continuer
         </Link>

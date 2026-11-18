@@ -7,6 +7,7 @@ import { existsSync } from "node:fs";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { LANGUAGE_CODES } from "../src/lib/domain/languages";
 import { checkPlacementBank } from "../src/lib/placement/check-bank";
+import type { PlacementBank } from "../src/lib/schemas/placement";
 
 const codes = process.argv.slice(2).length > 0 ? process.argv.slice(2) : [...LANGUAGE_CODES];
 let failed = false;
@@ -21,8 +22,8 @@ for (const code of codes) {
   const mod = (await import(pathToFileURL(file).href)) as Record<string, unknown>;
   const problems = checkPlacementBank(code, mod[`${code}Bank`]);
   if (problems.length === 0) {
-    const bank = mod[`${code}Bank`] as { items: unknown[] };
-    console.log(`✓ ${code}: ${bank.items.length} questions`);
+    const bank = mod[`${code}Bank`] as PlacementBank;
+    console.log(`✓ ${code}: ${bank.items.length} questions, AI-reviewed: ${bank.aiReview ? "yes" : "no"}`);
   } else {
     failed = true;
     console.log(`✗ ${code}:`);

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { AddSquareIcon, CheckIcon, PhoneIcon, ShareIcon } from "@/components/icons";
-import { Card, Eyebrow, PageHeader } from "@/components/ui/primitives";
+import { Eyebrow, PageHeader } from "@/components/ui/primitives";
 
 export const metadata: Metadata = { title: "Installer l’app" };
 
@@ -11,6 +11,8 @@ interface Step {
   body: ReactNode;
   icon: ReactNode;
 }
+
+const ROMAN = ["I", "II", "III", "IV"];
 
 const STEPS: Step[] = [
   {
@@ -63,40 +65,46 @@ export default function InstallPage() {
         Safari. Pratique pour ouvrir ta mission chaque matin.
       </PageHeader>
 
-      <ol className="space-y-3">
+      <ol className="grid gap-0 border-t border-ink sm:grid-cols-2 lg:grid-cols-4">
         {STEPS.map((step, index) => (
-          <li key={step.title}>
-            <Card className="flex gap-4">
+          <li
+            key={step.title}
+            className="flex min-w-0 flex-col gap-3 border-b border-line py-6 sm:border-l sm:px-6 sm:odd:border-l-0 sm:odd:pl-0 sm:even:pr-0 lg:border-b-0 lg:odd:border-l lg:odd:pl-6 lg:even:pr-6 lg:first:border-l-0 lg:first:pl-0 lg:last:pr-0"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <span className="font-serif text-5xl leading-none font-extrabold text-accent-strong" aria-hidden="true">
+                {ROMAN[index]}
+              </span>
               <span
-                className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-surface-sunk text-ink-soft"
+                className="flex size-11 shrink-0 items-center justify-center rounded-full bg-surface-sunk text-ink-soft"
                 aria-hidden="true"
               >
                 {step.icon}
               </span>
-              <div className="min-w-0">
-                <Eyebrow className="mb-1">Étape {index + 1}</Eyebrow>
-                <h2 className="font-serif text-lg leading-snug font-semibold">{step.title}</h2>
-                <p className="mt-1.5 text-[15px] leading-relaxed text-ink-soft">{step.body}</p>
-              </div>
-            </Card>
+            </div>
+            <div className="min-w-0">
+              <Eyebrow className="mb-1">Étape {index + 1}</Eyebrow>
+              <h2 className="font-serif text-xl leading-snug font-bold">{step.title}</h2>
+              <p className="mt-1.5 text-[15px] leading-relaxed text-ink-soft">{step.body}</p>
+            </div>
           </li>
         ))}
       </ol>
 
-      <Card className="mt-6">
-        <h2 className="font-serif text-lg font-semibold">Et ensuite ?</h2>
-        <p className="mt-1.5 text-[15px] leading-relaxed text-ink-soft">
+      <section className="border-t border-ink pt-6">
+        <h2 className="font-serif text-2xl font-bold tracking-tight italic">Et ensuite ?</h2>
+        <p className="mt-2 max-w-[68ch] text-[15px] leading-relaxed text-ink-soft">
           L’icône <strong>Lingua</strong> apparaît sur ton écran d’accueil. Ouvre-la comme n’importe quelle
           application : tu retrouves ta mission du jour, tes mots et ton historique.
         </p>
-        <p className="mt-3 text-[13px] leading-relaxed text-muted">
+        <p className="mt-3 max-w-[68ch] text-[13px] leading-relaxed text-muted">
           Pas d’option « Sur l’écran d’accueil » ? Vérifie que tu es bien dans Safari (et pas dans une vue
           intégrée à une autre app) et que ton iPhone est à jour.
         </p>
-      </Card>
+      </section>
 
       <p className="mt-6 text-center text-[13px] text-muted">
-        <Link href="/confidentialite" className="underline">
+        <Link href="/confidentialite" className="underline underline-offset-4">
           Politique de confidentialité
         </Link>
       </p>
