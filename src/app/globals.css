@@ -1,18 +1,23 @@
 @import "tailwindcss";
+/* Design system @sdmm/design, thème « dailylingua » : papier crème, accent indigo, titres Newsreader. */
+@import "@sdmm/design/css/all-dailylingua.css";
+@import "@sdmm/design/tailwind/v4.css";
 
 /*
- * Design tokens. Warm "paper and ink" palette with a small set of accents
- * assigned to languages in the registry. Dark mode follows the system.
+ * Tokens de l'app, posés sur ceux du design system (--sd-*). Les noms historiques (paper, surface-sunk,
+ * ink-soft...) restent des alias pour que tout l'existant suive le thème. Les couleurs de langue sont la
+ * palette secondaire. Le sombre suit la même mécanique que le design system : data-theme sur <html>,
+ * sinon la préférence système.
  */
 :root {
-  --paper: #f5f1e8;
-  --surface: #fffcf6;
-  --surface-sunk: #ede7da;
-  --ink: #1d1b17;
-  --ink-soft: #4f4a42;
-  --muted: #857e72;
-  --line: #e2dbcc;
-  /* Language accents: each language in the registry picks one. */
+  /* Les polices chargées par next/font remplacent les familles nommées du design system. */
+  --sd-font-sans: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --sd-font-mono: var(--font-jetbrains), "JetBrains Mono", ui-monospace, monospace;
+  /* Newsreader n'a pas de cyrillique : Literata prend le relais pour le russe et l'ukrainien. */
+  --sd-font-display: var(--font-newsreader), var(--font-literata), Georgia, serif;
+
+  --ink-soft: #3a362f;
+  --marker: rgb(240 180 41 / 0.45);
   --indigo: #33478c;
   --indigo-soft: #e5e9f4;
   --terracotta: #b0502b;
@@ -23,7 +28,7 @@
   --plum-soft: #f1e3ec;
   --teal: #1f6a6a;
   --teal-soft: #dcecea;
-  --ochre: #9a6a12;
+  --ochre: #8a5e0f;
   --ochre-soft: #f4e9d2;
   --berry: #a8364f;
   --berry-soft: #f5e0e4;
@@ -40,14 +45,9 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #141311;
-    --surface: #1d1b18;
-    --surface-sunk: #26231f;
-    --ink: #f1ece2;
-    --ink-soft: #cbc4b7;
-    --muted: #8f887c;
-    --line: #34302a;
+  :root:not([data-theme="light"]) {
+    --ink-soft: #e2dccf;
+    --marker: rgb(143 162 255 / 0.32);
     --indigo: #9eb0ea;
     --indigo-soft: #222a42;
     --terracotta: #e99c78;
@@ -75,14 +75,41 @@
   }
 }
 
+:root[data-theme="dark"] {
+  --ink-soft: #e2dccf;
+  --marker: rgb(143 162 255 / 0.32);
+  --indigo: #9eb0ea;
+  --indigo-soft: #222a42;
+  --terracotta: #e99c78;
+  --terracotta-soft: #3b261c;
+  --olive: #b9c97f;
+  --olive-soft: #2a2f1a;
+  --plum: #dc9ccb;
+  --plum-soft: #35202f;
+  --teal: #84cdc8;
+  --teal-soft: #17302f;
+  --ochre: #e4bb6a;
+  --ochre-soft: #352a14;
+  --berry: #ee98a8;
+  --berry-soft: #3b1d24;
+  --azure: #8fbfe9;
+  --azure-soft: #182a3b;
+  --fern: #9fcf98;
+  --fern-soft: #1c2e1b;
+  --graphite: #b4bfcc;
+  --graphite-soft: #252a31;
+  --success: #7fc29d;
+  --success-soft: #1b3326;
+  --danger: #ec8f86;
+  --danger-soft: #3e1f1c;
+}
+
 @theme inline {
-  --color-paper: var(--paper);
-  --color-surface: var(--surface);
-  --color-surface-sunk: var(--surface-sunk);
-  --color-ink: var(--ink);
+  /* Alias historiques -> design system. */
+  --color-paper: var(--sd-bg);
+  --color-surface-sunk: var(--sd-surface-2);
   --color-ink-soft: var(--ink-soft);
-  --color-muted: var(--muted);
-  --color-line: var(--line);
+  --color-marker: var(--marker);
   --color-indigo: var(--indigo);
   --color-indigo-soft: var(--indigo-soft);
   --color-terracotta: var(--terracotta);
@@ -107,9 +134,12 @@
   --color-success-soft: var(--success-soft);
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
-  --font-sans: var(--font-inter);
-  --font-serif: var(--font-literata);
-  --font-serif-italic: var(--font-literata-italic);
+  --font-serif: var(--sd-font-display);
+  --font-serif-italic: var(--sd-font-display);
+  /* Coins de journal : les cartes passent de « bulles » à des encadrés presque droits. */
+  --radius-xl: 0.375rem;
+  --radius-2xl: 0.5rem;
+  --radius-3xl: 0.625rem;
 }
 
 @layer base {
@@ -119,9 +149,9 @@
   }
 
   body {
-    background: var(--paper);
-    color: var(--ink);
-    font-family: var(--font-sans), system-ui, sans-serif;
+    background: var(--sd-bg);
+    color: var(--sd-ink);
+    font-family: var(--sd-font-sans);
     font-feature-settings: "cv11", "ss01";
     overscroll-behavior-y: none;
   }
@@ -134,10 +164,41 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--ink);
+    outline: 2px solid var(--sd-accent);
     outline-offset: 2px;
-    border-radius: 6px;
+    border-radius: 4px;
   }
+}
+
+/* Gabarit unique : en-tête, bandeau et contenu partagent les mêmes bords sur toute l'app. */
+@utility page-x {
+  width: 100%;
+  max-width: 110rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+  @variant sm {
+    padding-inline: 1.5rem;
+  }
+  @variant lg {
+    padding-inline: 2.5rem;
+  }
+  @variant 2xl {
+    padding-inline: 3rem;
+  }
+}
+
+/* Petites capitales techniques (date, rubriques, métadonnées). */
+@utility kicker {
+  font-family: var(--sd-font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Filets de journal. */
+@utility rule-double {
+  border-bottom: 3px double var(--sd-ink);
 }
 
 @utility pb-safe {
@@ -146,4 +207,17 @@
 
 @utility pt-safe {
   padding-top: env(safe-area-inset-top);
+}
+
+/* Lettrine pour les chapeaux. */
+@utility dropcap {
+  &::first-letter {
+    float: left;
+    font-family: var(--sd-font-display);
+    font-size: 3.4em;
+    line-height: 0.8;
+    font-weight: 800;
+    padding: 0.08em 0.1em 0 0;
+    color: var(--sd-accent-strong);
+  }
 }

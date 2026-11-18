@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
 import { LicenseLink } from "@/components/reading/content-item";
-import { Card, LanguageTag, PageHeader } from "@/components/ui/primitives";
+import { LanguageTag, PageHeader } from "@/components/ui/primitives";
 import { getRepository, requirePreferences } from "@/lib/data/repository";
 import { CONTENT_TYPE_LABELS } from "@/lib/domain/labels";
 import { LANGUAGE_CODES, languageInfo } from "@/lib/domain/languages";
@@ -30,19 +30,17 @@ export default async function SourcesPage() {
         publie.
       </PageHeader>
 
-      <div className="space-y-6">
+      <div className="grid gap-x-10 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
         {groups.map(({ language, sources: list }) => (
-          <section key={language} aria-labelledby={`sources-${language}`}>
-            <h2 id={`sources-${language}`} className="mb-2">
+          <section key={language} aria-labelledby={`sources-${language}`} className="min-w-0">
+            <h2 id={`sources-${language}`} className="mb-3">
               <LanguageTag language={language} />
             </h2>
-            <Card className="py-1 sm:py-2">
-              <ul>
-                {list.map((source) => (
-                  <SourceRow key={source.key} source={source} />
-                ))}
-              </ul>
-            </Card>
+            <ul className="border-t border-ink">
+              {list.map((source) => (
+                <SourceRow key={source.key} source={source} />
+              ))}
+            </ul>
           </section>
         ))}
       </div>
@@ -53,7 +51,7 @@ export default async function SourcesPage() {
 function SourceRow({ source }: { source: SourceInfo }) {
   const info = languageInfo(source.language);
   return (
-    <li className="flex items-baseline justify-between gap-3 border-b border-line py-3 last:border-b-0">
+    <li className="flex items-baseline justify-between gap-3 border-b border-line py-3">
       <div className="min-w-0">
         <a
           href={source.homepage}
@@ -61,7 +59,7 @@ function SourceRow({ source }: { source: SourceInfo }) {
           rel="noopener noreferrer"
           lang={source.language}
           dir={info.dir}
-          className="font-medium hover:underline"
+          className="font-serif text-lg font-bold hover:underline"
         >
           {source.name}
         </a>

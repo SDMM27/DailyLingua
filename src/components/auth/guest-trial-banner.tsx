@@ -18,16 +18,16 @@ export function GuestTrialBanner({ trial, startedToday }: { trial: GuestTrialSta
   return (
     <Link
       href="/creer-mon-compte"
-      className="flex items-center gap-3 rounded-3xl border border-line bg-surface-sunk px-5 py-4 transition-colors hover:bg-surface"
+      className="group flex items-center gap-3 border-y border-ink bg-surface-sunk px-4 py-4 transition-colors hover:bg-surface sm:px-5"
     >
       <span className="min-w-0 flex-1">
         <Eyebrow>{title}</Eyebrow>
-        <span className="mt-1 block font-semibold">Crée ton compte pour continuer</span>
+        <span className="mt-1 block font-serif text-lg font-semibold">Crée ton compte pour continuer</span>
         <span className="text-xs text-muted">
           Garde ta progression, personnalise tes missions et retrouve-les sur un autre appareil.
         </span>
       </span>
-      <ArrowRightIcon width={16} height={16} className="text-muted" />
+      <ArrowRightIcon width={16} height={16} className="text-muted transition-transform group-hover:translate-x-0.5" />
     </Link>
   );
 }

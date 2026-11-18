@@ -1,7 +1,10 @@
 import { z } from "zod";
+import { aiReviewSchema } from "./ai-review";
 import { cefrLevelSchema, dateKeySchema, languageSchema } from "./common";
 import { reviewStateSchema } from "./vocabulary";
 import { CORRECTION_CATEGORIES } from "./writing-feedback";
+
+export { aiReviewSchema, type AiReview } from "./ai-review";
 
 /**
  * Grammar points: curated lessons, one course file per language in `src/lib/grammar/courses/`
@@ -80,13 +83,6 @@ export type GrammarTable = z.infer<typeof grammarTableSchema>;
 
 /** Stable id `<lang>-<level>-<slug>`, e.g. `ru-a2-genitive`. Never reuse or rename one: cards point to it. */
 export const grammarPointIdSchema = z.string().regex(/^[a-z]{2,3}-(a1|a2|b1|b2|c1|c2)-[a-z0-9]+(?:-[a-z0-9]+)*$/);
-
-/**
- * Approved by two independent passes of the reviewer agents, then the arbiter
- * (.claude/agents/relecteur-natif.md, arbitre-relecture.md); `rubric` = version of the grid.
- */
-export const aiReviewSchema = z.object({ on: dateKeySchema, model: text(60), rubric: text(40) });
-export type AiReview = z.infer<typeof aiReviewSchema>;
 
 export const grammarPointSchema = z.object({
   id: grammarPointIdSchema,

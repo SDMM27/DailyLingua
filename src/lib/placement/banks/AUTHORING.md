@@ -7,6 +7,8 @@ Check a bank with `npm run placement:check -- <code>` (all banks without argumen
 ## Shape
 
 - `version`: date of the last change to the questions (`YYYY-MM-DD`). Bump it when questions change.
+- `aiReview` (optional): bank-level record with `on`, `model`, and `rubric`. Add it after the whole
+  bank has passed independent reviews and arbitration. Keep the reports under `docs/reviews/placement/`.
 - One flat list `items` of 60 questions, 10 per level, in the order A1, A2, B1, B2, C1, C2. Within a
   level, in this order:
   - 1 to 4 — `grammar`: a sentence with one gap `___`, four forms to choose from.

@@ -7,7 +7,7 @@ import { readAlphabetDraftPolicy, visibleAlphabet } from "@/lib/alphabets/policy
 import { hasVisibleDossier, readAssessmentDraftPolicy } from "@/lib/assessment/policy";
 import { getRepository, requirePreferences } from "@/lib/data/repository";
 import { isAlphabetComplete } from "@/lib/domain/alphabet";
-import { placementItems } from "@/lib/placement/banks";
+import { placementBank } from "@/lib/placement/banks";
 
 export const metadata: Metadata = { title: "Test de niveau" };
 
@@ -31,11 +31,12 @@ export default async function PlacementPage({ params }: { params: Promise<{ lang
   const assessmentAvailable =
     !repo.isDemo && (await repo.getGuestTrial()) === null && hasVisibleDossier(goal.language, readAssessmentDraftPolicy());
 
-  // Only the questions of this language reach the browser, never the whole map of banks.
+  const bank = placementBank(goal.language);
   return (
     <PlacementTest
       language={goal.language}
-      items={placementItems(goal.language)}
+      items={bank.items}
+      aiReviewed={bank.aiReview !== undefined}
       startLevel={goal.level}
       persist={!repo.isDemo}
       alphabet={needsAlphabet ? { script: alphabet.script } : undefined}

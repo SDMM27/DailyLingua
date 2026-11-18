@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { deleteAccount, type DeleteAccountState } from "@/app/actions/auth";
-import { Card, Eyebrow } from "@/components/ui/primitives";
+import { buttonClass, Card, Eyebrow } from "@/components/ui/primitives";
 
 /** What a guest (no e-mail address) types to confirm. */
 const GUEST_WORD = "supprimer";
@@ -19,7 +19,7 @@ export function DeleteAccount({ email }: { email: string | null }) {
   const matches = typed.trim().toLowerCase() === expected.toLowerCase();
 
   return (
-    <Card className="mt-6">
+    <Card>
       <Eyebrow>Supprimer mon compte</Eyebrow>
       {!open ? (
         <>
@@ -30,7 +30,7 @@ export function DeleteAccount({ email }: { email: string | null }) {
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="mt-4 rounded-full border border-danger/40 px-4 py-2 text-sm font-semibold text-danger"
+            className="mt-4 inline-flex min-h-11 items-center rounded-full border border-danger/40 px-4 text-sm font-semibold text-danger"
           >
             Supprimer mon compte…
           </button>
@@ -49,11 +49,11 @@ export function DeleteAccount({ email }: { email: string | null }) {
             value={typed}
             onChange={(e) => setTyped(e.target.value)}
             aria-label={email ? "Ton adresse e-mail pour confirmer" : "Le mot « supprimer » pour confirmer"}
-            className="w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-base focus:border-ink-soft focus:outline-none"
+            className="w-full min-h-11 rounded-lg border border-line bg-paper px-3.5 py-2.5 text-base focus:border-ink focus:outline-none"
           />
           <div aria-live="polite">
             {state.error && (
-              <p role="alert" className="rounded-2xl bg-danger-soft px-4 py-3 text-sm text-danger">
+              <p role="alert" className="rounded-lg bg-danger-soft px-4 py-3 text-sm text-danger">
                 {state.error}
               </p>
             )}
@@ -65,14 +65,14 @@ export function DeleteAccount({ email }: { email: string | null }) {
                 setOpen(false);
                 setTyped("");
               }}
-              className="flex-1 rounded-2xl border border-line py-3 font-semibold text-ink-soft"
+              className={`${buttonClass.secondary} flex-1`}
             >
               Annuler
             </button>
             <button
               type="submit"
               disabled={!matches || pending}
-              className="flex-1 rounded-2xl bg-danger py-3 font-semibold text-paper disabled:opacity-40"
+              className="min-h-11 flex-1 rounded-full bg-danger px-5 font-semibold text-paper disabled:opacity-40"
             >
               {pending ? "Suppression…" : "Supprimer définitivement"}
             </button>
