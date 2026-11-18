@@ -90,8 +90,9 @@ describe.skipIf(!stackIsUp)("lot W data layer (local database, service role)", (
   });
 
   afterAll(async () => {
-    if (textIds.length > 0) await admin!.schema("app").from("text").delete().in("id", textIds);
+    // The users first: `text_read` points at the text.
     for (const id of userIds) await admin!.auth.admin.deleteUser(id);
+    if (textIds.length > 0) await admin!.schema("app").from("text").delete().in("id", textIds);
   });
 
   it("claimEventRate grants up to the limit and then refuses", async () => {

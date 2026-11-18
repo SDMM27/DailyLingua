@@ -202,7 +202,7 @@ describe("readIngestRows", () => {
 
   it("also reads the productions the memo holds the state of", async () => {
     const data = tables();
-    data.ingest_state = [{ user_id: ME, seq: "4", memo: { v: 1, productions: { [ID(600)]: { day: "2026-11-16" }, "not-an-id": {} } } }];
+    data.ingest_state = [{ user_id: ME, seq: "4", memo: { v: 1, productions: { [ID(600)]: { day: "2026-11-16" }, "not-an-id": {} } } as never }];
     const { client } = tableFake(data);
     const rows = await readIngestRows(client, ME, REFS, (zone) => (zone === "Europe/Paris" ? WINDOW : { from: "x", to: "x" }));
     expect(rows.productions.map((p) => p.id)).toEqual([ID(600)]);
