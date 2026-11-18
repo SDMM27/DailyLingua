@@ -33,6 +33,8 @@ jobs:
       # Typecheck + lint + unit tests. The integration tests skip themselves without a database
       # (they run in the `database` job).
       - run: npm run check
+      # Typecheck, lint (import boundaries) and tests of the `packages/*` workspaces.
+      - run: npm run refonte:check
       # No Supabase variable: the build is the public demo, which is what we want to verify here.
       - run: npm run build
 
