@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PUBLIC_PATHS, isPublic } from "./public-paths";
+import { PUBLIC_PATHS, isApiPath, isPublic } from "./public-paths";
 import { safeNextPath } from "./safe-next-path";
 
 describe("isPublic", () => {
@@ -21,6 +21,17 @@ describe("isPublic", () => {
 
   it("lists exactly the public routes", () => {
     expect(PUBLIC_PATHS).toEqual(["/sign-in", "/sign-up", "/auth/confirm", "/offline"]);
+  });
+});
+
+describe("isApiPath", () => {
+  it("is true for /api and what is under it, and for nothing that only starts like it", () => {
+    for (const path of ["/api", "/api/events", "/api/session/today"]) expect(isApiPath(path), path).toBe(true);
+    for (const path of ["/", "/apis", "/api-docs", "/lab/api", "/settings"]) expect(isApiPath(path), path).toBe(false);
+  });
+
+  it("does not make an API path public: the proxy lets it through, the route authenticates", () => {
+    expect(isPublic("/api/events")).toBe(false);
   });
 });
 

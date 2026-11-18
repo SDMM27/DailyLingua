@@ -50,7 +50,9 @@ export type XpZeroReason = z.infer<typeof xpZeroReasonSchema>;
 /**
  * Permanent refusals of an event (`RejectedDelivery.reason`). The first seven are those of
  * `j2-architecture.md` §2, `before_served` is from `j2-jeu-xp-serie.md` §2.3; `unknown_item` and
- * `unknown_correction` are added for items, texts and corrections the server does not know.
+ * `unknown_correction` are added for items, texts and corrections the server does not know. `server_refused` is
+ * the server's own: the batch the event was in was refused by SQL for good and the event still failed when
+ * replayed alone (`j2-pr1-lot-w.md`, D9).
  */
 export const rejectionReasons = [
   "invalid_payload",
@@ -63,6 +65,7 @@ export const rejectionReasons = [
   "in_future",
   "before_served",
   "duplicate_conflict",
+  "server_refused",
 ] as const;
 export const rejectionReasonSchema = z.enum(rejectionReasons);
 export type RejectionReason = z.infer<typeof rejectionReasonSchema>;

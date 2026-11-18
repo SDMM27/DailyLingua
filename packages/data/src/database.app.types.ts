@@ -199,16 +199,44 @@ isOneToOne: false
       referencedColumns: ["id","user_id"]
     }
                   ]
-                },"ingest_state": {
+                },"event_rate": {
                   Row: {
-                    "seq": number,"user_id": string
+                    "events": number,"user_id": string,"window_start": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "seq"?: number,"user_id": string
+                    "events": number,"user_id": string,"window_start": string
                   }
                   Update: {
-                    "seq"?: number,"user_id"?: string
+                    "events"?: number,"user_id"?: string,"window_start"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"ingest_event": {
+                  Row: {
+                    "client_event_id": string,"fingerprint": string,"kind": string,"received_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "client_event_id": string,"fingerprint": string,"kind": string,"received_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "client_event_id"?: string,"fingerprint"?: string,"kind"?: string,"received_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"ingest_state": {
+                  Row: {
+                    "memo": NonNullable<Json>,"seq": number,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "memo"?: NonNullable<Json>,"seq"?: number,"user_id": string
+                  }
+                  Update: {
+                    "memo"?: NonNullable<Json>,"seq"?: number,"user_id"?: string
                   }
                   Relationships: [
                     
@@ -495,14 +523,14 @@ isOneToOne: false
                   ]
                 },"text": {
                   Row: {
-                    "body": string,"checks": NonNullable<Json>,"created_at": string,"density": number,"grammar_point": string | null,"id": string,"language": string,"level_band": string,"model": string | null,"new_words": NonNullable<Json>,"prompt_version": string,"status": string,"theme": string,"title": string,"variant": number,"word_count": number
+                    "body": string,"checks": NonNullable<Json>,"created_at": string,"density": number,"grammar_point": string | null,"id": string,"language": string,"level_band": string,"listening_segment": Json | null,"model": string | null,"new_words": NonNullable<Json>,"prompt_version": string,"status": string,"theme": string,"title": string,"variant": number,"word_count": number,"writing_task": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "body": string,"checks"?: NonNullable<Json>,"created_at"?: string,"density": number,"grammar_point"?: string | null,"id"?: string,"language": string,"level_band": string,"model"?: string | null,"new_words"?: NonNullable<Json>,"prompt_version": string,"status"?: string,"theme": string,"title": string,"variant"?: number,"word_count": number
+                    "body": string,"checks"?: NonNullable<Json>,"created_at"?: string,"density": number,"grammar_point"?: string | null,"id"?: string,"language": string,"level_band": string,"listening_segment"?: Json | null,"model"?: string | null,"new_words"?: NonNullable<Json>,"prompt_version": string,"status"?: string,"theme": string,"title": string,"variant"?: number,"word_count": number,"writing_task"?: string | null
                   }
                   Update: {
-                    "body"?: string,"checks"?: NonNullable<Json>,"created_at"?: string,"density"?: number,"grammar_point"?: string | null,"id"?: string,"language"?: string,"level_band"?: string,"model"?: string | null,"new_words"?: NonNullable<Json>,"prompt_version"?: string,"status"?: string,"theme"?: string,"title"?: string,"variant"?: number,"word_count"?: number
+                    "body"?: string,"checks"?: NonNullable<Json>,"created_at"?: string,"density"?: number,"grammar_point"?: string | null,"id"?: string,"language"?: string,"level_band"?: string,"listening_segment"?: Json | null,"model"?: string | null,"new_words"?: NonNullable<Json>,"prompt_version"?: string,"status"?: string,"theme"?: string,"title"?: string,"variant"?: number,"word_count"?: number,"writing_task"?: string | null
                   }
                   Relationships: [
                     {
@@ -640,6 +668,9 @@ isOneToOne: false
                            },
 "ai_spend_month":
 { Args: { "p_at": string }; Returns: number
+                           },
+"claim_event_rate":
+{ Args: { "p_count": number,"p_limit": number,"p_user_id": string }; Returns: boolean
                            },
 "claim_quota":
 { Args: { "p_day": string,"p_kind": string,"p_limit": number,"p_user_id": string }; Returns: boolean
