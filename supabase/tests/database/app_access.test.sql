@@ -51,8 +51,8 @@ select 'test', 'm', id from auth.users where id::text like 'c0000000-0000-4000-8
 
 select is((select count(*)::int from pg_tables where schemaname = 'app' and not rowsecurity), 0,
   'row level security is enabled on every table of app');
-select is((select count(*)::int from pg_tables where schemaname = 'app'), 26,
-  'app has its 26 tables');
+select is((select count(*)::int from pg_tables where schemaname = 'app'), 32,
+  'app has its 32 tables');
 select is(
   (select count(*)::int from pg_proc p join pg_namespace n on n.oid = p.pronamespace
    where n.nspname = 'app' and not exists (
@@ -117,7 +117,7 @@ select is(
   (select array_agg(t.relname::text order by t.relname) from pg_class t
    where t.relnamespace = 'app'::regnamespace and t.relkind = 'r'
      and not has_table_privilege('authenticated', t.oid, 'select')),
-  array['ai_call', 'error_item', 'legacy_map', 'legacy_record', 'text_item_key'], 'authenticated can read every table in full except ai_call, error_item (by column), legacy_map, legacy_record and text_item_key');
+  array['ai_call', 'error_item', 'ingest_state', 'legacy_map', 'legacy_record', 'text_item_key'], 'authenticated can read every table in full except ai_call, error_item (by column), ingest_state, legacy_map, legacy_record and text_item_key');
 
 select set_config('request.jwt.claims',
   '{"sub": "c0000000-0000-4000-8000-0000000000a1", "role": "authenticated"}', true);
