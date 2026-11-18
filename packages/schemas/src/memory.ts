@@ -13,7 +13,7 @@ export type CardState = z.infer<typeof cardStateSchema>;
 export const reviewRatingSchema = z.number().int().min(1).max(4);
 export type ReviewRating = z.infer<typeof reviewRatingSchema>;
 
-export const cardSources = ["mission", "manual", "import", "reader", "unit", "feedback", "legacy"] as const;
+export const cardSources = ["mission", "manual", "import", "reader", "unit", "feedback", "legacy", "session"] as const;
 export const cardSourceSchema = z.enum(cardSources);
 export type CardSource = z.infer<typeof cardSourceSchema>;
 

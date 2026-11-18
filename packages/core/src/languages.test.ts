@@ -28,7 +28,9 @@ describe("registry", () => {
 
   it("flags right-to-left and dense scripts", () => {
     expect(languageInfo("ar").dir).toBe("rtl");
-    expect(languageInfo("zh")).toMatchObject({ denseScript: true, unspaced: true });
+    expect(languageInfo("zh")).toMatchObject({ denseScript: true, unspaced: true, charsPerWord: 1.7 });
+    expect(languageInfo("ja").charsPerWord).toBe(2.5);
+    expect(languageInfo("fr")).not.toHaveProperty("charsPerWord");
   });
 
   it("recognises study languages", () => {

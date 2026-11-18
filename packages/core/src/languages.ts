@@ -39,6 +39,11 @@ export interface LanguageInfo {
   /** Words are not separated by spaces (Chinese, Japanese): typed answers are compared without spaces. */
   unspaced?: boolean;
   /**
+   * Characters that stand for one word where words are not separated by spaces (zh 1.7, ja 2.5): lengths
+   * counted in words (minimum length of a production) are the number of characters divided by this factor.
+   */
+  charsPerWord?: number;
+  /**
    * Short vowels and other marks are optional in everyday text (Arabic harakat): typed answers are
    * compared without them.
    */
@@ -77,8 +82,8 @@ export const LANGUAGE_REGISTRY = {
   el: { code: "el", nativeName: "Ελληνικά", greeting: "Καλημέρα", dir: "ltr", accent: "azure" },
   tr: { code: "tr", nativeName: "Türkçe", greeting: "Günaydın", dir: "ltr", accent: "berry" },
   ar: { code: "ar", nativeName: "العربية", greeting: "صباح الخير", dir: "rtl", optionalVowelMarks: true, accent: "fern" },
-  zh: { code: "zh", nativeName: "中文", greeting: "早上好", dir: "ltr", denseScript: true, unspaced: true, speechRegions: ["CN", "TW", "SG"], accent: "berry" },
-  ja: { code: "ja", nativeName: "日本語", greeting: "おはようございます", dir: "ltr", denseScript: true, unspaced: true, accent: "graphite" },
+  zh: { code: "zh", nativeName: "中文", greeting: "早上好", dir: "ltr", denseScript: true, unspaced: true, charsPerWord: 1.7, speechRegions: ["CN", "TW", "SG"], accent: "berry" },
+  ja: { code: "ja", nativeName: "日本語", greeting: "おはようございます", dir: "ltr", denseScript: true, unspaced: true, charsPerWord: 2.5, accent: "graphite" },
   ko: { code: "ko", nativeName: "한국어", greeting: "좋은 아침이에요", dir: "ltr", denseScript: true, accent: "teal" },
   id: { code: "id", nativeName: "Bahasa Indonesia", greeting: "Selamat pagi", dir: "ltr", accent: "ochre" },
 } as const satisfies Record<string, LanguageInfo>;
