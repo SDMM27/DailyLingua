@@ -344,3 +344,106 @@ Importants recommandés avant la mise en production du PR 1 :
 Peuvent suivre dans un lot de durcissement : I2 à I5 (bornes SQL de défense en profondeur, limite de débit des réglages, index de la recherche XP).
 
 Non vérifié : exécution des tests pgTAP et Vitest, plans d'exécution, tests de bout en bout du blocage en tête de file.
+
+---
+
+# Vérification des correctifs (branche `refonte/j2-secfix`)
+
+Vérification ciblée des seuls points corrigés : `git diff refonte/jalon-2...refonte/j2-secfix`, commits c96cc72, 81709a8 et b6534ad. Ce n'est pas une nouvelle revue complète.
+
+Lecture statique uniquement : je n'ai lancé ni les tests ni la base. Décisions de référence : `j2-pr1-lot-w.md` §11.
+
+| Point | Verdict | Détail |
+|---|---|---|
+| **B1** (`save_profile`) | **Corrigé** côté `save_profile`, mais **une régression bloquante apparaît avec I2** (voir R1) | `20261118000200` l.16-68 : dès que `ingest_state.seq > 0`, le fuseau reçu est validé puis ignoré. Les grants sont inchangés. |
+| **I2** (bornes de `effective_at`) | **Corrigé**, avec régression R1 | `ingest_batch` l.639-642 : un `effective_at` hors de [now − 8 j, now + 5 min] donne 23514. Testé (−9 j, +10 min, −7 j). |
+| **I4** (débit de `save_game_settings`) | **Corrigé** | Plus de 50 lignes `setting_change` sur 24 h donnent 23514. Le contrôle a lieu avant l'écriture, donc un appel peut encore ajouter 15 à 30 lignes, soit environ 80 au maximum : acceptable. |
+| **I5** (recherche XP indexable) | **Corrigé** | l.549-553 : une branche par type de source, avec `attempt_id = …` ou `review_log_id = …`. Les index partiels uniques sont donc utilisables (plan d'exécution non vérifié). |
+| **W-I1** (mémo, plafond des productions) | **Partiel** | Mémo : **corrigé**. Les productions des 4 derniers jours sont gardées, 30 au plus : le mémo est borné quel que soit le comportement du client. Plafond de 10 par jour : **contournable**, voir R2. |
+| **W-I2** (tête de file, SQLSTATE) | **Corrigé** | Expéditeur : un 413 coupe le lot en deux, récursivement ; un 413 sur un seul événement, un 400 ou un 415 donnent `invalid_payload` ; 401, 403, 429 et 5xx restent passagers. Serveur : toute la classe 22, toute la classe 23 et 42501 sont `refused`, donc isolés. Reste mineur : pendant l'isolement, une erreur non SQL fait encore échouer tout le lot en 503. Le mémo étant désormais borné, la cause principale (`MemoTooLargeError`) a disparu. |
+| Écart : test pgTAP où le changement futur passe de +1 jour à +2 min | **Accepté** | C'est la conséquence directe de la borne de +5 min. |
+| Écart : la borne de 4 jours remplace la règle des 10 jours pour les productions réglées | **Accepté pour le PR 1**, à revoir au PR 3 | Au PR 3, une correction demandée plus de 4 jours après la production retrouvera une production absente du mémo : `planIngest` devra la relire depuis `app.production`, ou refuser explicitement. |
+
+## R1 (BLOQUANT, nouveau). La ligne de base du journal est datée de la création du profil, que la borne I2 refuse
+
+- **Où** :
+  - `packages/core/src/ingest/plan-ingest.ts` l.226 : au premier changement accepté, le cœur ajoute au journal `{ effectiveAt: profile.createdAt, timeZone: zoneInForce }` ;
+  - l.134 : cette ligne part dans `payload.timezone_changes` ;
+  - `20261118000200` l.639-642 : `effective_at < now() - 8 days` donne 23514.
+- **Effet** : pour tout compte créé il y a plus de 8 jours, ce qui inclut tous les comptes repris de l'ancienne app (`created_at` hérité), **le premier changement de fuseau fait refuser le lot**. Avec le nouveau classement (W-I2), le lot passe en isolement. L'événement qui porte le nouveau `tz` est refusé `server_refused`, et chaque événement suivant émis dans ce fuseau déclenche le même changement, puis le même refus.
+- **Scénario** : un apprenant parisien inscrit depuis un mois part à Tokyo. **Tous** ses événements faits sur place sont refusés pour toujours, et perdus : révisions, séances, série. Ce n'est pas une faille, mais c'est une perte de données silencieuse pour des apprenants honnêtes, introduite par le correctif.
+- **Pourquoi les tests ne l'ont pas vu** : `app_ingest_hardening.test.sql` envoie des `timezone_changes` à la main (−1 h, −7 j) ; aucun test ne fait passer un changement produit par `planIngest` à travers le SQL pour un compte de plus de 8 jours.
+- **Correction** (une des deux) :
+  - en SQL, accepter hors borne la seule ligne de base, c'est-à-dire `effective_at = profile.created_at` quand l'utilisateur n'a encore aucun `timezone_change` ;
+  - ou, mieux, écrire la ligne de base dès l'activation : `save_profile` quand `seq = 0`, ou première ingestion, avec `effective_at = created_at`, en SQL et hors de la borne. Le cœur n'aurait alors plus à l'émettre, et le journal ne serait jamais vide.
+- **Tests** :
+  - pgTAP : un utilisateur dont le profil a 30 jours, un `ingest_batch` avec `[{effective_at: created_at, tz: A}, {effective_at: now() - 1 h, tz: B}]` est accepté ;
+  - intégration (`loop.integration.test.ts`) : un compte de 30 jours envoie un événement avec un autre `tz`, l'événement est accepté et le journal compte 2 lignes.
+
+## R2 (Important). Le plafond de 10 productions par jour se contourne en antidatant de 5 à 7 jours
+
+- **Où** : `apps/web/src/lib/ingest/ingest-events.ts`, `capProductions`.
+- **Problème** : le compte par jour vient de `state.productions`, c'est-à-dire du mémo. Or le mémo ne garde que les productions des 4 derniers jours. Un `production_submitted` daté de J−5 à J−7, encore accepté puisque le refus `too_old` est à 7 jours, trouve donc toujours un compteur à 0 pour ce jour-là.
+- **Scénario** : chaque lot passe 10 productions pour J−5, 10 pour J−6 et 10 pour J−7. Avec le quota de 600 événements par heure, le compte stocke de nouveau environ 600 textes de 4 000 caractères par heure dans `app.production`. Les comptes invités ne coûtent rien. Le mémo, lui, reste borné, donc ce n'est plus une panne : il reste une dépense de stockage.
+- **Correction** : compter en base, avec `select count(*) from app.production where user_id = $1 and created_at > now() - interval '24 hours'` (index `production_user_idx`), ou compter par jour de **réception** plutôt que par jour d'`occurredAt`. On peut aussi refuser `production_submitted` au-delà de 72 h.
+- **Test** : 3 lots de 10 `production_submitted` datés de J−5, J−6 et J−7 : au plus 10 sont acceptés sur 24 h.
+
+## Réponse à la question : reste-t-il un autre moyen que le journal de changer le fuseau d'attribution ?
+
+**Non, après la première ingestion.** Un seul résidu mineur demeure avant elle.
+
+- **`save_profile`** : neutralisé dès que `seq > 0`.
+- **`migrate_user` (resynchronisation)** :
+  - `20261112000900` l.214-226 : le profil n'est réécrit que si `app_active_since is null` ;
+  - `ingest_batch` appelle `mark_active`, de même que toutes les fonctions client, donc après une ingestion la resynchronisation ne touche plus le fuseau ;
+  - `migrate_user` n'est appelable que par `service_role`, depuis `scripts/migration-verify.mts`, jamais depuis l'app.
+- **`GET /api/session/today`** : calcule son jour avec `profile.time_zone`. Une fois `seq > 0`, celui-ci n'est plus modifié que par `ingest_batch` depuis le journal, lui-même soumis à la règle des 48 h du cœur et désormais borné en SQL. C'est cohérent.
+- **`ingest_batch`** : le jour serveur et la fenêtre XP viennent du profil, avec la même conclusion.
+- **Résidu (Mineur)** : tant que `seq = 0`, `save_profile` change encore le fuseau, et la première ingestion l'utilise par repli (journal vide). Un utilisateur repris de l'ancienne app, avec un historique, peut donc choisir **une seule fois** un fuseau avant sa première ingestion. Le gain est d'un jour au plus, et une seule fois, puisque le fuseau est ensuite verrouillé et que tout changement passe par le journal. La correction recommandée pour R1 (ligne de base écrite à l'activation) le ferme aussi.
+- **Point d'attention** : `seq` n'avance que si un lot écrit quelque chose (écart 9). Un lot entièrement refusé laisse `seq = 0`, et donc `save_profile` encore libre, mais sans gain possible : rien n'a été attribué.
+
+## Verdict
+
+**NOT READY.**
+
+- Bloquant : **R1**. La borne I2 refuse la ligne de base du journal émise par le cœur : tous les changements de fuseau des comptes de plus de 8 jours sont perdus.
+- Important : **R2** (plafond des productions contournable par antidatage), à corriger dans ce PR ou juste après. Il ne bloque pas seul.
+- Corrigés : B1 (côté `save_profile`), I2, I4, I5, W-I2, et W-I1 pour la partie mémo.
+
+Une fois R1 corrigé et couvert par le test d'intégration ci-dessus, le PR peut passer en **READY**, R2 étant suivi dans un ticket si on ne le corrige pas tout de suite.
+
+## Vérification R1/R2 (commits f24602b et 4bb2915)
+
+Lecture statique, sans exécuter les tests.
+
+### R1 : corrigé
+
+- **Corps de la fonction** : `20261118000300_app_ingest_baseline.sql`. Comparé ligne à ligne avec `ingest_batch` de `20261118000200`, il n'en diffère que par trois variables (`v_tz_empty`, `v_p_created`, `v_p_tz`), lues une fois juste avant la boucle `timezone_changes`, et par la condition d'exemption. Les révocations et le grant `service_role` sont inchangés.
+- **Fuseau lu avant le lot** : `profile.time_zone` n'est modifié qu'après la boucle (« le profil suit le journal ») ; les sections précédentes n'y touchent pas. `v_p_tz` est donc bien le fuseau d'avant le lot.
+- **Tentatives d'abus** :
+  - *Ligne de base forgée dans un autre fuseau* : elle exige `time_zone = profile.time_zone`, donc 23514 (testé).
+  - *Ligne ancienne qui n'est pas exactement à `created_at`* : 23514 (testé).
+  - *Deux lignes de base* : même `effective_at`, donc l'unicité `(user_id, effective_at)` joue ; une copie identique est ignorée et un autre fuseau donne 23505.
+  - *Ligne de base plus une autre ligne ancienne* : seule la ligne de base est exemptée, l'autre donne 23514 (testé).
+  - *Ligne de base alors que le journal n'est pas vide* : 23514 (testé).
+- **Pourquoi l'exemption n'ouvre rien** : la ligne exemptée dit « depuis la création du compte, le fuseau était celui du profil ». C'est exactement le repli que `timeZoneAt` appliquait déjà au journal vide : elle ne réécrit aucune attribution passée. Elle ne s'applique qu'une fois, et `created_at` n'est modifiable que par `service_role`.
+- **Tests** : pgTAP (profil de 30 jours, ligne de base plus changement récent accepté, 2 lignes journalisées, profil à jour) et `loop.integration.test.ts`, qui fait passer un vrai `planIngest` par le SQL. C'est ce qui manquait.
+
+### R2 : corrigé
+
+- **Comptage en base** : `readIngestRows` compte les `app.production` du compte avec `created_at` dans les 24 dernières heures (`count: exact, head`, index `production_user_idx (user_id, created_at)`). `capProductions` y ajoute, dans l'ordre du lot, les `production_submitted` non encore connus. Au-delà de 10, la raison est `too_many`. Antidater ne sert plus à rien : c'est l'heure de réception qui compte.
+- **Deux lots simultanés** : chacun peut lire le même compte avant le verrou. Le second reçoit alors 40001, et `processWithRetry` relit tout l'état, donc le compte aussi. Le mode isolement relit à chaque événement. Le plafond tient.
+- **Cas limite, accepté** : un `production_submitted` gardé par le plafond puis refusé par `planIngest` consomme une place dans le lot en cours. Le plafond en devient plus strict, jamais plus lâche.
+
+### Résidu connu (Mineur, inchangé)
+
+Tant que `seq = 0`, `save_profile` peut encore choisir le fuseau, une seule fois, avant la première ingestion : au plus un jour de gain. C'est déjà noté plus haut. Il se fermera si la ligne de base est un jour écrite à l'activation.
+
+### Verdict final du PR : READY
+
+Le seul bloquant restant (R1) est corrigé et testé, et R2 l'est aussi. Restent ouverts, non bloquants, à suivre dans un lot de durcissement :
+- **I3** : bornes SQL de défense en profondeur ;
+- **les mineurs de S et de W** ;
+- **l'isolement** : une erreur non SQL fait encore échouer le lot en 503.
+
+Réserve : verdict établi sans avoir exécuté les suites pgTAP et Vitest ; il suppose qu'elles passent sur la base partagée.
