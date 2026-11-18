@@ -1,13 +1,13 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { isPublic } from "@/lib/auth/public-paths";
+import { isApiPath, isPublic } from "@/lib/auth/public-paths";
 import { getSupabaseEnv } from "@/lib/supabase/env";
 
 /**
  * Keeps the Supabase session fresh (refreshed cookies must be written on the response, which
  * Server Components cannot do) and sends signed-out visitors to the sign-in screen.
  * This is an optimistic check on the JWT only: authorisation is Row Level Security, and every page
- * re-validates the user with Supabase Auth.
+ * re-validates the user with Supabase Auth. API routes are not redirected: they answer 401 themselves.
  */
 export async function proxy(request: NextRequest) {
   const env = getSupabaseEnv();
@@ -27,7 +27,7 @@ export async function proxy(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const signedIn = Boolean(data?.claims);
 
-  if (!signedIn && !isPublic(request.nextUrl.pathname)) {
+  if (!signedIn && !isPublic(request.nextUrl.pathname) && !isApiPath(request.nextUrl.pathname)) {
     return NextResponse.redirect(new URL("/sign-in", request.url));
   }
   // A signed-in visitor of /sign-in is sent home by the page itself, after validating the user:
