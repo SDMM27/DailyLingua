@@ -113,9 +113,9 @@ describe.skipIf(!stackIsUp)("lot W data layer (local database, service role)", (
   });
 
   it("inserts the session of the day once, reads it back, and counts it", async () => {
-    const input = { userId: alice, language: "it", day: DAY, kind: "daily" as const, format: 10 as const, plan: plan(null, []), servedAt: "2026-11-18T07:00:00.000Z" };
+    const input = { id: crypto.randomUUID(), userId: alice, language: "it", day: DAY, kind: "daily" as const, format: 10 as const, plan: plan(null, []), servedAt: "2026-11-18T07:00:00.000Z" };
     const first = await insertSession(client, input);
-    const second = await insertSession(client, { ...input, plan: { ...plan(null, []), rewriteSentences: 2 }, servedAt: "2026-11-18T09:00:00.000Z" });
+    const second = await insertSession(client, { ...input, id: crypto.randomUUID(), plan: { ...plan(null, []), rewriteSentences: 2 }, servedAt: "2026-11-18T09:00:00.000Z" });
     expect(second.id).toBe(first.id);
     expect(new Date(second.servedAt!).toISOString()).toBe("2026-11-18T07:00:00.000Z");
     expect((second.plan as StoredSessionPlan).rewriteSentences).toBe(0);

@@ -200,6 +200,14 @@ describe("readIngestRows", () => {
     expect(rows.productions).toEqual([{ id: ID(600), sessionId: ID(10), language: "it", text: "Ciao a tutti", clientEventId: ID(93), createdAt: "2026-11-16T10:00:00+00:00" }]);
   });
 
+  it("also reads the productions the memo holds the state of", async () => {
+    const data = tables();
+    data.ingest_state = [{ user_id: ME, seq: "4", memo: { v: 1, productions: { [ID(600)]: { day: "2026-11-16" }, "not-an-id": {} } } }];
+    const { client } = tableFake(data);
+    const rows = await readIngestRows(client, ME, REFS, (zone) => (zone === "Europe/Paris" ? WINDOW : { from: "x", to: "x" }));
+    expect(rows.productions.map((p) => p.id)).toEqual([ID(600)]);
+  });
+
   it("does not query per event: the number of queries does not grow with the refs", async () => {
     const few = tableFake(tables());
     await readIngestRows(few.client, ME, { ...REFS, cardIds: [ID(20)], clientEventIds: [ID(90)] }, WINDOW);

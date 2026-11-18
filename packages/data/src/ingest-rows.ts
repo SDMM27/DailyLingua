@@ -366,11 +366,13 @@ async function readKnownEvents(client: AppClient, userId: string, clientEventIds
  * Reads, in grouped queries (no query per event), everything `planIngest` needs for these refs. `window` bounds the
  * user's own sessions; the learning days, setting and time zone journals are read whole.
  */
-export async function readIngestRows(client: AppClient, userId: string, refs: IngestRefs, window: DayWindow): Promise<IngestRows> {
+export async function readIngestRows(client: AppClient, userId: string, refs: IngestRefs, window: DayWindow | ((timeZone: string) => DayWindow)): Promise<IngestRows> {
   const db = appSchema(client);
-  const { profile, enrollments } = await readProfileAndEnrollments(client, userId);
+  const [{ profile, enrollments }, state] = await Promise.all([readProfileAndEnrollments(client, userId), readIngestState(client, userId)]);
+  // The memo names the productions whose state it holds: they are read with the ones the events refer to.
+  const productionIds = distinct([...refs.productionIds, ...memoProductionIds(state.memo)]);
 
-  const sessions = await readSessions(client, userId, refs, window);
+  const sessions = await readSessions(client, userId, refs, typeof window === "function" ? window(profile.timeZone) : window);
   const own = sessions.filter((session) => session.userId === userId);
   const plans = own.map((session) => planRefs(session.plan));
   const itemIds = distinct(plans.flatMap((plan) => plan.itemIds));
@@ -391,7 +393,6 @@ export async function readIngestRows(client: AppClient, userId: string, refs: In
     cardFronts,
     recentProductions,
     productions,
-    ingestState,
   ] = await Promise.all([
     db.from("skill_estimate").select("language, skill, level_value").eq("user_id", userId),
     readItems(client, itemIds),
@@ -408,8 +409,7 @@ export async function readIngestRows(client: AppClient, userId: string, refs: In
       ? Promise.resolve([] as { language: string; kind: string; front: string }[])
       : fetchAll((from, to) => db.from("card").select("language, kind, front").eq("user_id", userId).is("deleted_at", null).in("language", languages).order("id").range(from, to)),
     db.from("production").select("text").eq("user_id", userId).order("created_at", { ascending: false }).order("id", { ascending: false }).limit(30),
-    inChunks(refs.productionIds, (chunk) => db.from("production").select("id, session_id, language, text, client_event_id, created_at").eq("user_id", userId).in("id", chunk)),
-    db.from("ingest_state").select("seq, memo").eq("user_id", userId).maybeSingle(),
+    inChunks(productionIds, (chunk) => db.from("production").select("id, session_id, language, text, client_event_id, created_at").eq("user_id", userId).in("id", chunk)),
   ]);
 
   const ownCardIds = cardRows.filter((row) => row.user_id === userId).map((row) => row.id);
@@ -419,7 +419,6 @@ export async function readIngestRows(client: AppClient, userId: string, refs: In
   ]);
 
   const streakRow = unwrap(streak);
-  const stateRow = unwrap(ingestState);
   return {
     profile,
     enrollments,
@@ -438,6 +437,26 @@ export async function readIngestRows(client: AppClient, userId: string, refs: In
     cardFronts: cardFronts.map((row) => `${row.language}|${row.kind}|${row.front.toLowerCase()}`),
     recentProductionTexts: unwrapRows(recentProductions).map((row) => row.text),
     productions: productions.map((row) => ({ id: row.id, sessionId: row.session_id, language: row.language, text: row.text, clientEventId: row.client_event_id, createdAt: row.created_at })),
-    ingestState: { seq: stateRow ? Number(stateRow.seq) : 0, memo: stateRow ? stateRow.memo : {} },
+    ingestState: state,
   };
+}
+
+/** `ingest_state` of the user: the sequence number and the memo (0 and `{}` for an account without a row yet). */
+export async function readIngestState(client: AppClient, userId: string): Promise<{ seq: number; memo: unknown }> {
+  const found = await appSchema(client).from("ingest_state").select("seq, memo").eq("user_id", userId).maybeSingle();
+  const row = unwrap(found);
+  return { seq: row ? Number(row.seq) : 0, memo: row ? row.memo : {} };
+}
+
+/** Ids of the productions a memo holds (`memo.productions` is keyed by production id); anything else gives none. */
+function memoProductionIds(memo: unknown): string[] {
+  const productions = (memo as { productions?: unknown } | null)?.productions;
+  if (productions === null || typeof productions !== "object" || Array.isArray(productions)) return [];
+  return Object.keys(productions).filter((id) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)).slice(0, 500);
+}
+
+/** `skill_estimate` rows of the user, all languages and skills. */
+export async function readSkillEstimates(client: AppClient, userId: string): Promise<SkillEstimateRow[]> {
+  const rows = unwrapRows(await appSchema(client).from("skill_estimate").select("language, skill, level_value").eq("user_id", userId));
+  return rows.map((row) => ({ language: row.language, skill: row.skill, levelValue: Number(row.level_value) }));
 }

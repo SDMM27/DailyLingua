@@ -2,7 +2,7 @@ import type { DateKey, StoredSessionPlan } from "@dailylingua/schemas";
 import { appSchema, type AppClient } from "./client";
 import { DataError } from "./errors";
 import { toCardRow, toSessionRow, readItems, type CardRow, type ItemRow, type SessionRow } from "./ingest-rows";
-import { distinct, fetchAll, inChunks, unwrap, unwrapRows } from "./query";
+import { distinct, fetchAll, unwrap, unwrapRows } from "./query";
 
 /**
  * Reads and the one write of `GET /api/session/today` (`j2-pr1-lot-w.md` section 3). Same rules as `ingest-rows`:
@@ -30,12 +30,6 @@ export async function readPlanningCards(client: AppClient, userId: string, langu
   return rows.map((row) => toCardRow(row));
 }
 
-/** The user's cards by id (any language), not deleted: the cards of a stored packet. */
-export async function readCardsByIds(client: AppClient, userId: string, cardIds: readonly string[]): Promise<CardRow[]> {
-  const rows = await inChunks(cardIds, (chunk) => appSchema(client).from("card").select(CARD_COLUMNS).eq("user_id", userId).is("deleted_at", null).in("id", chunk));
-  return rows.map((row) => toCardRow(row));
-}
-
 /** Reviews of the user since `since` (an instant): the caller keeps the ones of the day before. */
 export async function readRecentReviews(client: AppClient, userId: string, since: string): Promise<{ cardId: string; rating: number; reviewedAt: string }[]> {
   const rows = await fetchAll((from, to) =>
@@ -50,6 +44,21 @@ export async function readLastSessionDay(client: AppClient, userId: string, lang
     await appSchema(client).from("session").select("day").eq("user_id", userId).eq("language", language).in("status", ["started", "completed"]).order("day", { ascending: false }).limit(1),
   );
   return rows[0]?.day ?? null;
+}
+
+/**
+ * `newCardsSuspendedThrough` of the most recent resumption session of the language, among the last five sessions (a
+ * resumption suspends new cards for two days only), or null.
+ */
+export async function readSuspendedThrough(client: AppClient, userId: string, language: string): Promise<DateKey | null> {
+  const rows = unwrapRows(
+    await appSchema(client).from("session").select("plan").eq("user_id", userId).eq("language", language).order("day", { ascending: false }).limit(5),
+  );
+  for (const row of rows) {
+    const plan = row.plan as { resumption?: unknown; newCardsSuspendedThrough?: unknown } | null;
+    if (plan?.resumption === true && typeof plan.newCardsSuspendedThrough === "string") return plan.newCardsSuspendedThrough;
+  }
+  return null;
 }
 
 /** Number of `daily` sessions of format 10 the learner completed in the language (parity decides the alternation). */
@@ -149,6 +158,8 @@ export async function readQuotaUsage(client: AppClient, userId: string, day: Dat
 }
 
 export interface NewSession {
+  /** Chosen by the caller (the options of the packet are drawn from it); a lost race keeps the winner's. */
+  id: string;
   userId: string;
   language: string;
   day: DateKey;
@@ -168,6 +179,7 @@ export async function insertSession(client: AppClient, session: NewSession): Pro
   const db = appSchema(client);
   const { error } = await db.from("session").upsert(
     {
+      id: session.id,
       user_id: session.userId,
       language: session.language,
       day: session.day,

@@ -107,7 +107,7 @@ describe("insertSession", () => {
     resumption: false,
     newCardsSuspendedThrough: null,
   };
-  const input = { userId: ME, language: "it", day: "2026-11-18", kind: "review_only" as const, format: 15 as const, plan, servedAt: "2026-11-18T07:00:00.000Z" };
+  const input = { id: ID(60), userId: ME, language: "it", day: "2026-11-18", kind: "review_only" as const, format: 15 as const, plan, servedAt: "2026-11-18T07:00:00.000Z" };
 
   it("inserts with ON CONFLICT DO NOTHING on (user, language, day, kind), then reads the row", async () => {
     const { client, queries, store } = tableFake({ session: [] });
@@ -116,6 +116,7 @@ describe("insertSession", () => {
     expect(queries[0]?.chain[0]).toContain('"ignoreDuplicates":true');
     expect(store.session).toHaveLength(1);
     expect(row.kind).toBe("review_only");
+    expect(row.id).toBe(ID(60));
     expect(row.servedAt).toBe("2026-11-18T07:00:00.000Z");
   });
 
