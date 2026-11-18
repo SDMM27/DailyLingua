@@ -4,13 +4,16 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(24);
+select plan(31);
 
 insert into auth.users (instance_id, id, aud, role, email) values
   ('00000000-0000-0000-0000-000000000000', 'c0000000-0000-4000-8000-0000000000d1', 'authenticated', 'authenticated', 'h1@test.invalid'),
   ('00000000-0000-0000-0000-000000000000', 'c0000000-0000-4000-8000-0000000000d2', 'authenticated', 'authenticated', 'h2@test.invalid'),
   ('00000000-0000-0000-0000-000000000000', 'c0000000-0000-4000-8000-0000000000d3', 'authenticated', 'authenticated', 'h3@test.invalid'),
-  ('00000000-0000-0000-0000-000000000000', 'c0000000-0000-4000-8000-0000000000d4', 'authenticated', 'authenticated', 'h4@test.invalid');
+  ('00000000-0000-0000-0000-000000000000', 'c0000000-0000-4000-8000-0000000000d4', 'authenticated', 'authenticated', 'h4@test.invalid'),
+  ('00000000-0000-0000-0000-000000000000', 'c0000000-0000-4000-8000-0000000000d5', 'authenticated', 'authenticated', 'h5@test.invalid'),
+  ('00000000-0000-0000-0000-000000000000', 'c0000000-0000-4000-8000-0000000000d6', 'authenticated', 'authenticated', 'h6@test.invalid'),
+  ('00000000-0000-0000-0000-000000000000', 'c0000000-0000-4000-8000-0000000000d7', 'authenticated', 'authenticated', 'h7@test.invalid');
 
 create function pg_temp.ingj(p_user uuid, p_body jsonb) returns jsonb
 language sql as $$
@@ -118,6 +121,38 @@ select lives_ok($$select pg_temp.ingj('c0000000-0000-4000-8000-0000000000d2', js
 select lives_ok($$select pg_temp.ingj('c0000000-0000-4000-8000-0000000000d2', jsonb_build_object('timezone_changes', jsonb_build_array(
   jsonb_build_object('effective_at', now() + interval '4 minutes', 'time_zone', 'Asia/Tokyo'))))$$,
   'a time zone change 4 minutes ahead is accepted');
+reset role;
+
+-- R1: the baseline row of the first change (effective_at = profile.created_at, the zone in force) is exempt ------------
+
+update app.profile set created_at = now() - interval '30 days'
+where user_id in ('c0000000-0000-4000-8000-0000000000d5', 'c0000000-0000-4000-8000-0000000000d6', 'c0000000-0000-4000-8000-0000000000d7');
+insert into app.timezone_change (user_id, effective_at, time_zone)
+values ('c0000000-0000-4000-8000-0000000000d6', now() - interval '1 day', 'Europe/Rome');
+
+set local role service_role;
+select throws_ok($$select pg_temp.ingj('c0000000-0000-4000-8000-0000000000d5', jsonb_build_object('timezone_changes', jsonb_build_array(
+  jsonb_build_object('effective_at', (select created_at from app.profile where user_id = 'c0000000-0000-4000-8000-0000000000d5'), 'time_zone', 'Asia/Tokyo'))))$$,
+  '23514', null, 'a baseline with another zone than the profile one: 23514');
+select throws_ok($$select pg_temp.ingj('c0000000-0000-4000-8000-0000000000d5', jsonb_build_object('timezone_changes', jsonb_build_array(
+  jsonb_build_object('effective_at', (select created_at + interval '1 second' from app.profile where user_id = 'c0000000-0000-4000-8000-0000000000d5'), 'time_zone', 'Europe/Paris'))))$$,
+  '23514', null, 'an old row that is not exactly at the profile creation: 23514');
+select lives_ok($$select pg_temp.ingj('c0000000-0000-4000-8000-0000000000d5', jsonb_build_object('timezone_changes', jsonb_build_array(
+  jsonb_build_object('effective_at', (select created_at from app.profile where user_id = 'c0000000-0000-4000-8000-0000000000d5'), 'time_zone', 'Europe/Paris'),
+  jsonb_build_object('effective_at', now() - interval '1 hour', 'time_zone', 'Europe/Rome'))))$$,
+  'baseline + recent change on an account older than 8 days: accepted');
+reset role;
+select is((select count(*)::int from app.timezone_change where user_id = 'c0000000-0000-4000-8000-0000000000d5'), 2, 'both rows are journaled');
+select is((select time_zone from app.profile where user_id = 'c0000000-0000-4000-8000-0000000000d5'), 'Europe/Rome', 'and the profile follows');
+
+set local role service_role;
+select throws_ok($$select pg_temp.ingj('c0000000-0000-4000-8000-0000000000d6', jsonb_build_object('timezone_changes', jsonb_build_array(
+  jsonb_build_object('effective_at', (select created_at from app.profile where user_id = 'c0000000-0000-4000-8000-0000000000d6'), 'time_zone', 'Europe/Paris'))))$$,
+  '23514', null, 'a baseline when the journal already has a row: 23514');
+select throws_ok($$select pg_temp.ingj('c0000000-0000-4000-8000-0000000000d7', jsonb_build_object('timezone_changes', jsonb_build_array(
+  jsonb_build_object('effective_at', (select created_at from app.profile where user_id = 'c0000000-0000-4000-8000-0000000000d7'), 'time_zone', 'Europe/Paris'),
+  jsonb_build_object('effective_at', now() - interval '20 days', 'time_zone', 'Europe/Rome'))))$$,
+  '23514', null, 'the exemption covers the baseline only, not another old row');
 reset role;
 
 -- I5: the XP lookup with a source names the columns the partial indexes serve ---------------------------------------------
