@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { ArrowRightIcon } from "@/components/icons";
 import { languageStyle } from "@/components/ui/language-style";
-import { Card, PageHeader, SectionTitle } from "@/components/ui/primitives";
+import { PageHeader, SectionTitle } from "@/components/ui/primitives";
+import { RuledList, ruledItem } from "@/components/ui/ruled-grid";
 import { GRAMMAR_LEVELS, grammarPointState } from "@/lib/domain/grammar";
 import type { GrammarSuggestion } from "@/lib/domain/grammar-suggestions";
 import { languageInfo } from "@/lib/domain/languages";
+import { toRoman } from "@/lib/domain/roman";
 import { grammarReviewStatus } from "@/lib/grammar/policy";
 import { STATS_WINDOW_DAYS } from "@/lib/domain/production-stats";
 import { dueItems, relativeDueLabel } from "@/lib/domain/spaced-repetition";
@@ -65,7 +67,7 @@ export function GrammarView({
       </PageHeader>
 
       {userLanguages.length > 1 && (
-        <nav aria-label="Choisir une langue" className="-mx-4 mb-6 overflow-x-auto px-4">
+        <nav aria-label="Choisir une langue" className="-mx-4 mb-6 overflow-x-auto px-4 sm:mx-0 sm:px-0">
           <ul className="flex gap-2">
             {userLanguages.map((l) => (
               <li key={l} className="shrink-0">
@@ -89,7 +91,7 @@ export function GrammarView({
         <p className="-mt-3 mb-6 text-sm">
           <Link
             href={`/alphabet?langue=${language}`}
-            className="inline-flex min-h-11 items-center font-medium text-ink-soft underline underline-offset-2 hover:text-ink"
+            className="inline-flex min-h-11 items-center font-medium text-accent-strong underline underline-offset-2"
           >
             Revoir l’alphabet
           </Link>
@@ -97,7 +99,7 @@ export function GrammarView({
       )}
 
       {points.length === 0 ? (
-        <p className="py-8 text-center text-sm text-muted">
+        <p className="border-t border-ink py-8 font-serif text-lg italic text-muted">
           Les fiches de grammaire arrivent d’abord en russe et en italien.
         </p>
       ) : (
@@ -105,44 +107,43 @@ export function GrammarView({
           {suggestions.length > 0 && (
             <section aria-label="Suggéré par tes erreurs">
               <SectionTitle>Suggéré par tes erreurs</SectionTitle>
-              <ul className="space-y-2">
-                {suggestions.map((suggestion) => (
-                  <li key={suggestion.point.id}>
+              <RuledList>
+                {suggestions.map((suggestion, index) => (
+                  <li key={suggestion.point.id} className={ruledItem}>
                     <PointRow
                       point={suggestion.point}
                       language={language}
                       card={cardOf(suggestion.point)}
                       today={today}
                       note={suggestionReason(suggestion)}
+                      n={index + 1}
                     />
                   </li>
                 ))}
-              </ul>
+              </RuledList>
             </section>
           )}
 
           <section aria-label="À revoir aujourd’hui">
             <SectionTitle>À revoir aujourd’hui</SectionTitle>
             {dueCards.length === 0 ? (
-              <Card>
-                <p className="text-sm text-ink-soft">Aucune fiche à revoir aujourd’hui.</p>
-              </Card>
+              <p className="font-serif text-lg italic text-ink-soft">Aucune fiche à revoir aujourd’hui.</p>
             ) : (
-              <ul className="space-y-2">
-                {dueCards.map((card) => {
+              <RuledList>
+                {dueCards.map((card, index) => {
                   const point = points.find((p) => p.id === card.pointId)!;
                   return (
-                    <li key={card.id}>
-                      <PointRow point={point} language={language} card={card} today={today} />
+                    <li key={card.id} className={ruledItem}>
+                      <PointRow point={point} language={language} card={card} today={today} n={index + 1} />
                     </li>
                   );
                 })}
-              </ul>
+              </RuledList>
             )}
           </section>
 
           {!covered && (
-            <p className="rounded-2xl bg-surface-sunk px-4 py-3 text-sm text-ink-soft">
+            <p className="border-y border-dashed border-line py-3 text-sm text-ink-soft">
               Les fiches vont pour l’instant jusqu’au B1&nbsp;: sers-t’en comme référence.
             </p>
           )}
@@ -163,13 +164,13 @@ export function GrammarView({
                 >
                   {l}
                 </SectionTitle>
-                <ul className="space-y-2">
-                  {inLevel.map((point) => (
-                    <li key={point.id}>
-                      <PointRow point={point} language={language} card={cardOf(point)} today={today} />
+                <RuledList>
+                  {inLevel.map((point, index) => (
+                    <li key={point.id} className={ruledItem}>
+                      <PointRow point={point} language={language} card={cardOf(point)} today={today} n={index + 1} />
                     </li>
                   ))}
-                </ul>
+                </RuledList>
               </section>
             );
           })}
@@ -185,6 +186,7 @@ function PointRow({
   card,
   today,
   note,
+  n,
 }: {
   point: GrammarPoint;
   language: Language;
@@ -192,17 +194,22 @@ function PointRow({
   today: DateKey;
   /** Shown in place of the summary (the reason of a suggestion). */
   note?: string;
+  /** Rank in its list, written as a roman numeral. */
+  n: number;
 }) {
   const state = grammarPointState(card);
   const style = languageStyle(language);
   return (
     <Link
       href={`/grammaire/${language}/${point.id}`}
-      className="group flex items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3 transition-colors hover:bg-surface-sunk"
+      className="group flex min-h-11 items-start gap-4"
     >
+      <span aria-hidden="true" className="w-8 shrink-0 font-serif text-2xl leading-none font-extrabold text-accent-strong">
+        {toRoman(n)}
+      </span>
       <span className="min-w-0 flex-1">
-        <span className="block font-semibold">{point.title}</span>
-        <span className="block text-xs text-muted">{note ?? point.summary}</span>
+        <span className="block font-serif text-xl leading-tight font-bold group-hover:underline">{point.title}</span>
+        <span className="mt-1 block text-sm text-ink-soft">{note ?? point.summary}</span>
         <span className="mt-2 flex flex-wrap items-center gap-1.5">
           <span
             className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${

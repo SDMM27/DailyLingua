@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Card, Eyebrow } from "@/components/ui/primitives";
+import { buttonClass, Card, Eyebrow } from "@/components/ui/primitives";
 
 /** Shown instead of the mission once a guest has used their trial days. */
 export function TrialOverCard() {
@@ -12,7 +12,7 @@ export function TrialOverCard() {
       </p>
       <Link
         href="/creer-mon-compte"
-        className="mt-4 inline-flex min-h-11 items-center rounded-full bg-ink px-5 text-sm font-semibold text-paper"
+        className={`${buttonClass.primary} mt-4`}
       >
         Créer mon compte
       </Link>

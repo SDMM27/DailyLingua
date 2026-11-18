@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Card, Eyebrow, LanguageTag, ProgressBar } from "@/components/ui/primitives";
+import { buttonClass, Card, Eyebrow, LanguageTag, ProgressBar } from "@/components/ui/primitives";
 import { applyReview, relativeDueLabel } from "@/lib/domain/spaced-repetition";
 import type { DateKey } from "@/lib/schemas/common";
 import type { CorrectionCard } from "@/lib/schemas/correction-card";
@@ -37,7 +37,7 @@ export function CorrectionReviewSession({
     return (
       <Card>
         <Eyebrow>Révisions du jour</Eyebrow>
-        <p className="mt-2 font-serif text-lg">Aucune erreur à revoir aujourd’hui.</p>
+        <p className="mt-2 font-serif text-xl italic">Aucune erreur à revoir aujourd’hui.</p>
       </Card>
     );
   }
@@ -66,7 +66,7 @@ export function CorrectionReviewSession({
     <Card>
       <div className="flex items-center justify-between">
         <Eyebrow>Révisions du jour</Eyebrow>
-        <span className="text-xs font-medium text-muted">
+        <span className="kicker text-muted">
           {index + 1} / {queue.length}
         </span>
       </div>
@@ -81,23 +81,23 @@ export function CorrectionReviewSession({
             </span>
           )}
         </div>
-        <p className="mt-4 text-xs font-semibold tracking-wide text-muted uppercase">Passage à corriger</p>
-        <p lang={card.language} className="mt-1 font-serif text-2xl font-semibold text-balance">
+        <p className="kicker mt-4 text-muted">Passage à corriger</p>
+        <p lang={card.language} className="sd-display mt-1 text-[clamp(1.75rem,5vw,2.5rem)] leading-[1.15] text-balance">
           {card.original}
         </p>
 
         {revealed ? (
           <div className="mt-5 space-y-3" aria-live="polite">
             <div>
-              <p className="text-xs font-semibold tracking-wide text-muted uppercase">Correction</p>
-              <p lang={card.language} className="mt-1 font-serif text-2xl font-semibold text-success">
+              <p className="kicker text-muted">Correction</p>
+              <p lang={card.language} className="mt-1 font-serif text-2xl font-bold text-success">
                 {card.corrected}
               </p>
             </div>
             <p className="text-[13px] leading-relaxed text-ink-soft">{card.explanation}</p>
             {attempt.trim() && (
               <div>
-                <p className="text-xs font-semibold tracking-wide text-muted uppercase">Ta version</p>
+                <p className="kicker text-muted">Ta version</p>
                 <p lang={card.language} className="mt-1 font-serif text-lg whitespace-pre-wrap">
                   {attempt}
                 </p>
@@ -106,7 +106,7 @@ export function CorrectionReviewSession({
           </div>
         ) : (
           <label className="mt-5 block">
-            <span className="text-xs font-semibold tracking-wide text-muted uppercase">Ta version (facultatif)</span>
+            <span className="kicker text-muted">Ta version (facultatif)</span>
             <textarea
               lang={card.language}
               value={attempt}
@@ -120,16 +120,16 @@ export function CorrectionReviewSession({
       </div>
 
       {revealed ? (
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {GRADES.map(({ grade: g, label, tone }) => (
             <button
               key={g}
               type="button"
               onClick={() => grade(g)}
-              className={`flex flex-col items-center rounded-2xl border bg-surface px-1 py-2.5 transition-colors hover:bg-surface-sunk ${tone}`}
+              className={`flex min-h-12 flex-col items-center justify-center rounded-full border bg-surface px-2 py-2 transition-colors hover:bg-surface-sunk ${tone}`}
             >
               <span className="text-[13px] font-semibold">{label}</span>
-              <span className="text-[10px] text-muted">
+              <span className="font-mono text-[10px] text-muted">
                 {relativeDueLabel(applyReview(card.review, g, today).dueOn, today)}
               </span>
             </button>
@@ -139,7 +139,7 @@ export function CorrectionReviewSession({
         <button
           type="button"
           onClick={() => setRevealed(true)}
-          className="w-full rounded-2xl bg-ink px-5 py-3.5 text-[15px] font-semibold text-paper transition-transform active:scale-[0.98]"
+          className={`${buttonClass.primary} w-full !min-h-12`}
         >
           Voir la correction
         </button>

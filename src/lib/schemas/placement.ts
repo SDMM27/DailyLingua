@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { aiReviewSchema } from "./ai-review";
 import { cefrLevelSchema, languageSchema, CEFR_LEVELS, type CefrLevel, type Language } from "./common";
 
 /**
@@ -69,6 +70,7 @@ export const placementBankSchema = z
     language: languageSchema,
     /** Bumped when questions change, stored with each result. */
     version: VERSION,
+    aiReview: aiReviewSchema.optional(),
     items: z.array(placementItemSchema).length(CEFR_LEVELS.length * PLACEMENT_BANK_ITEMS_PER_LEVEL),
   })
   .superRefine((bank, ctx) => {

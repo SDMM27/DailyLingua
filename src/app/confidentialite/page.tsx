@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { Card, PageHeader } from "@/components/ui/primitives";
+import { PageHeader } from "@/components/ui/primitives";
 
 export const metadata: Metadata = { title: "Politique de confidentialité" };
 
@@ -10,10 +10,10 @@ const LAST_UPDATED = "26 octobre 2026";
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <Card className="space-y-3 text-[15px] leading-relaxed text-ink-soft">
-      <h2 className="font-serif text-xl font-semibold text-ink">{title}</h2>
-      {children}
-    </Card>
+    <section className="grid gap-3 border-t border-line py-6 md:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] md:gap-10">
+      <h2 className="font-serif text-xl font-bold tracking-tight text-ink italic">{title}</h2>
+      <div className="max-w-[68ch] space-y-3 text-[15px] leading-relaxed text-ink-soft">{children}</div>
+    </section>
   );
 }
 
@@ -24,7 +24,7 @@ export default function PrivacyPage() {
   const contactEmail = process.env.CONTACT_EMAIL?.trim();
 
   return (
-    <div className="space-y-4">
+    <div>
       <PageHeader eyebrow="Version bêta" title="Politique de confidentialité">
         Daily Lingua est en bêta privée. Voici, simplement, ce que l’app fait de tes données. Dernière mise à jour :{" "}
         {LAST_UPDATED}.
@@ -36,7 +36,7 @@ export default function PrivacyPage() {
           {contactEmail ? (
             <>
               Pour toute question ou demande, écris à{" "}
-              <a href={`mailto:${contactEmail}`} className="font-semibold text-ink underline">
+              <a href={`mailto:${contactEmail}`} className="font-semibold text-accent-strong underline underline-offset-4">
                 {contactEmail}
               </a>
               , ou utilise la page « Envoyer un retour » de l’app.
@@ -131,7 +131,7 @@ export default function PrivacyPage() {
         <p>
           Tes données sont conservées tant que ton compte existe. Tu peux les supprimer à tout moment, immédiatement et
           définitivement, depuis{" "}
-          <Link href="/preferences" className="font-semibold text-ink underline">
+          <Link href="/preferences" className="font-semibold text-accent-strong underline underline-offset-4">
             Préférences
           </Link>{" "}
           → « Supprimer mon compte » : toutes tes données personnelles sont effacées, y compris les retours que tu as
@@ -145,7 +145,7 @@ export default function PrivacyPage() {
           données. Tu peux modifier tes préférences et supprimer ton compte toi-même dans l’app ; pour les autres
           demandes, contacte-nous comme indiqué plus haut. Si tu estimes que tes droits ne sont pas respectés, tu peux
           adresser une réclamation à la CNIL (
-          <a href="https://www.cnil.fr" className="font-semibold text-ink underline" rel="noreferrer">
+          <a href="https://www.cnil.fr" className="font-semibold text-accent-strong underline underline-offset-4" rel="noreferrer">
             cnil.fr
           </a>
           ).
@@ -165,7 +165,7 @@ export default function PrivacyPage() {
           classés par fréquence, tirées de{" "}
           <a
             href="https://github.com/rspeer/wordfreq"
-            className="font-semibold text-ink underline"
+            className="font-semibold text-accent-strong underline underline-offset-4"
             rel="noreferrer"
           >
             wordfreq
@@ -178,7 +178,7 @@ export default function PrivacyPage() {
           Les listes que nous en tirons (les 5 000 mots les plus fréquents de chaque langue) sont publiées sous licence{" "}
           <a
             href="https://creativecommons.org/licenses/by-sa/4.0/deed.fr"
-            className="font-semibold text-ink underline"
+            className="font-semibold text-accent-strong underline underline-offset-4"
             rel="noreferrer"
           >
             CC BY-SA 4.0
@@ -186,7 +186,7 @@ export default function PrivacyPage() {
           , avec leurs attributions complètes :{" "}
           <a
             href="https://github.com/SDMM27/DailyLingua/tree/main/src/lib/frequency/data"
-            className="font-semibold text-ink underline"
+            className="font-semibold text-accent-strong underline underline-offset-4"
             rel="noreferrer"
           >
             voir les listes
@@ -195,7 +195,7 @@ export default function PrivacyPage() {
         </p>
       </Section>
 
-      <p className="px-1 pb-2 text-[13px] text-muted">
+      <p className="border-t border-ink pt-4 pb-2 text-[13px] text-muted">
         <Link href="/" className="underline">
           Retour à l’accueil
         </Link>

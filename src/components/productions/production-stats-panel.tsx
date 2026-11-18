@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { languageStyle } from "@/components/ui/language-style";
-import { Card, SectionTitle } from "@/components/ui/primitives";
+import { SectionTitle } from "@/components/ui/primitives";
 import type { GrammarSuggestion } from "@/lib/domain/grammar-suggestions";
 import { languageInfo } from "@/lib/domain/languages";
 import { STATS_WINDOW_DAYS, type CategoryCount, type LanguageProductionStats } from "@/lib/domain/production-stats";
@@ -46,30 +46,30 @@ export function ProductionStatsPanel({
 }) {
   if (stats.length === 0) return null;
   return (
-    <section aria-label="Évolution" className="mb-10">
+    <section aria-label="Évolution">
       <SectionTitle>Évolution</SectionTitle>
       <p className="-mt-1 mb-3 text-[13px] text-ink-soft">
         Les {STATS_WINDOW_DAYS} derniers jours, comparés aux {STATS_WINDOW_DAYS} jours d’avant.
       </p>
-      <div className="space-y-3">
+      <div className="space-y-8">
         {stats.map((s) => (
-          <Card key={s.language}>
-            <h3 className="flex items-center gap-2 text-sm font-semibold">
+          <div key={s.language}>
+            <h3 className="flex flex-wrap items-center gap-2 font-serif text-lg font-bold">
               <span className={`size-2 rounded-full ${languageStyle(s.language).bg}`} aria-hidden="true" />
               {languageInfo(s.language).nameFr}
-              <span className="text-xs font-normal text-muted">
+              <span className="font-sans text-xs font-normal text-muted">
                 · {s.reviewedCount.recent} texte{s.reviewedCount.recent > 1 ? "s" : ""} corrigé
                 {s.reviewedCount.recent > 1 ? "s" : ""}
               </span>
             </h3>
 
             {s.categories.length > 0 && (
-              <ul className="mt-3 space-y-1.5">
+              <ul className="mt-3 border-b border-line">
                 {s.categories.map((c) => (
-                  <li key={c.category} className="flex items-baseline justify-between gap-3 text-sm">
+                  <li key={c.category} className="flex items-baseline justify-between gap-3 border-t border-line py-1.5 text-sm">
                     <span>{CORRECTION_CATEGORY_LABELS[c.category]}</span>
                     <span className="flex items-baseline gap-2">
-                      <span className="font-semibold">{c.recent}</span>
+                      <span className="font-serif text-lg font-bold">{c.recent}</span>
                       <Trend recent={c.recent} previous={c.previous} />
                     </span>
                   </li>
@@ -85,7 +85,7 @@ export function ProductionStatsPanel({
                     <li key={point.id}>
                       <Link
                         href={`/grammaire/${s.language}/${point.id}`}
-                        className="inline-flex min-h-11 items-center font-medium underline underline-offset-2 hover:text-ink-soft"
+                        className="inline-flex min-h-11 items-center font-medium text-accent-strong underline underline-offset-2"
                       >
                         {point.title}
                       </Link>
@@ -95,12 +95,12 @@ export function ProductionStatsPanel({
               </div>
             )}
 
-            <ul className="mt-4 grid grid-cols-2 gap-x-4 gap-y-1.5 border-t border-line pt-3 text-sm">
+            <ul className="mt-4 grid grid-cols-1 border-b border-line text-sm sm:grid-cols-2 sm:gap-x-4 lg:grid-cols-1">
               {WRITING_CRITERIA.map((criterion) => (
-                <li key={criterion} className="flex items-baseline justify-between gap-2">
+                <li key={criterion} className="flex items-baseline justify-between gap-2 border-t border-line py-1.5">
                   <span className="text-ink-soft">{WRITING_CRITERION_LABELS[criterion]}</span>
                   <span>
-                    <span className="font-semibold">{formatScore(s.averages.recent[criterion])}</span>
+                    <span className="font-serif text-lg font-bold">{formatScore(s.averages.recent[criterion])}</span>
                     <span className="text-xs text-muted">
                       {" "}
                       / {WRITING_FEEDBACK_LIMITS.score.max}
@@ -111,7 +111,7 @@ export function ProductionStatsPanel({
                 </li>
               ))}
             </ul>
-          </Card>
+          </div>
         ))}
       </div>
     </section>
