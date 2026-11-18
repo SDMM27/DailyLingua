@@ -1,5 +1,5 @@
 import "server-only";
-import { addDays, deterministicUuid, learningDay, planIngest, type RawEvent, type RejectedDelivery } from "@dailylingua/core";
+import { addDays, deterministicUuid, learningDay, planIngest, type IngestState, type RawEvent, type RejectedDelivery } from "@dailylingua/core";
 import {
   IngestBatchError,
   callIngestBatch,
@@ -27,18 +27,20 @@ export const MAX_STALE_ATTEMPTS = 3;
 export const MAX_PAYLOAD_BYTES = 1_048_576;
 /** Calls the isolation mode makes at most: one per event of a batch. */
 export const MAX_ISOLATION_EVENTS = 50;
+/** `production_submitted` accepted per rolling 24 hours of reception (W-I1): the next ones are `too_many`. */
+export const MAX_PRODUCTIONS_PER_24H = 10;
 
 export type LogFn = (level: "warn" | "error", message: string, data?: Record<string, unknown>) => void;
 
 /** The two things this module needs from the database; the route builds it on the service client, tests fake it. */
 export interface IngestStore {
-  readRows(userId: string, refs: IngestRefs, window: (timeZone: string) => DayWindow): Promise<IngestRows>;
+  readRows(userId: string, refs: IngestRefs, window: (timeZone: string) => DayWindow, now: Date): Promise<IngestRows>;
   callBatch(userId: string, expectedSeq: number, payload: unknown): Promise<IngestBatchResult>;
 }
 
 export function createIngestStore(service: AppClient): IngestStore {
   return {
-    readRows: (userId, refs, window) => readIngestRows(service, userId, refs, window),
+    readRows: (userId, refs, window, now) => readIngestRows(service, userId, refs, window, now),
     callBatch: (userId, expectedSeq, payload) => callIngestBatch(service, userId, expectedSeq, payload),
   };
 }
@@ -76,6 +78,31 @@ const windowOf = (now: Date) => (timeZone: string): DayWindow => {
   return { from: addDays(today, -8), to: addDays(today, 1) };
 };
 
+/**
+ * The cap on productions, applied before `planIngest`: at most 10 accepted per rolling 24 hours of reception, whatever
+ * the day the events claim. The productions the server received in the last 24 hours (`received`, read from the
+ * database) and the ones of this batch, in batch order, count. A replay of an event the ledger knows passes (it is a
+ * duplicate, not a new production); an event without a readable id passes too (the plan refuses it).
+ */
+function capProductions(events: readonly unknown[], state: IngestState, received: number): { kept: unknown[]; rejected: RejectedDelivery[] } {
+  let count = received;
+  const kept: unknown[] = [];
+  const rejected: RejectedDelivery[] = [];
+  for (const event of events) {
+    if (!isRecord(event) || event.kind !== "production_submitted" || typeof event.clientEventId !== "string" || Object.hasOwn(state.knownEvents, event.clientEventId)) {
+      kept.push(event);
+      continue;
+    }
+    if (count >= MAX_PRODUCTIONS_PER_24H) {
+      rejected.push({ clientEventId: event.clientEventId, reason: "too_many" });
+      continue;
+    }
+    count++;
+    kept.push(event);
+  }
+  return { kept, rejected };
+}
+
 interface Outcome {
   rejected: RejectedDelivery[];
   duplicates: string[];
@@ -91,18 +118,19 @@ function memoOf(raw: unknown, log: LogFn, userId: string): IngestMemo | null {
 
 /** One read, one decision, one write, for these events. Throws `IngestBatchError` when SQL refuses or the state moved. */
 async function processOnce(store: IngestStore, userId: string, events: readonly unknown[], now: Date, log: LogFn): Promise<Outcome> {
-  const rows = await store.readRows(userId, extractRefs(events), windowOf(now));
+  const rows = await store.readRows(userId, extractRefs(events), windowOf(now), now);
   const previousMemo = memoOf(rows.ingestState.memo, log, userId);
   const { state, cardModes, skippedSessions } = buildIngestState({ userId, rows, memo: previousMemo });
   if (skippedSessions.length > 0) log("warn", "stored session plans could not be read and were left out", { userId, sessions: skippedSessions });
 
   const { kept, rejected: refusedModes } = filterReviewModes(events, cardModes, state.knownEvents);
-  const plan = planIngest(state, kept as RawEvent[], now);
   const serverDay = learningDay(now, rows.profile.timeZone);
+  const { kept: capped, rejected: tooMany } = capProductions(kept, state, rows.recentProductionCount);
+  const plan = planIngest(state, capped as RawEvent[], now);
 
   // The ledger: the fingerprint of every event this batch accepted, with the kind of the raw event.
   const kindOf = new Map<string, string>();
-  for (const event of kept) if (isRecord(event) && typeof event.clientEventId === "string" && typeof event.kind === "string") kindOf.set(event.clientEventId, event.kind);
+  for (const event of capped) if (isRecord(event) && typeof event.clientEventId === "string" && typeof event.kind === "string") kindOf.set(event.clientEventId, event.kind);
   const ledger = Object.entries(plan.nextState.knownEvents)
     .filter(([id, fingerprint]) => !Object.hasOwn(state.knownEvents, id) && fingerprint !== null && kindOf.has(id))
     .map(([id, fingerprint]) => ({ client_event_id: id, kind: kindOf.get(id) as string, fingerprint: fingerprint as string }));
@@ -117,7 +145,7 @@ async function processOnce(store: IngestStore, userId: string, events: readonly 
 
   const empty = ledger.length === 0 && zeroed.size === 0 && Object.values(plan.payload).every((value) => (Array.isArray(value) ? value.length === 0 : value === null));
   const outcome: Outcome = {
-    rejected: [...plan.rejected, ...refusedModes],
+    rejected: [...plan.rejected, ...refusedModes, ...tooMany],
     duplicates: [...plan.report.duplicates],
   };
   // Nothing to write (replays, refusals): the sequence is left alone.
@@ -160,7 +188,7 @@ function isolationOrder(events: readonly unknown[]): unknown[] {
 }
 
 /**
- * Ingests the events of one delivery for `userId`. A batch SQL refuses for good (22023, 23503, 23505, 23514) is replayed
+ * Ingests the events of one delivery for `userId`. A batch SQL refuses for good (classes 22 and 23, 42501) is replayed
  * event by event, the state read again each time: the one that is refused again is `server_refused`, the others pass
  * (D9). Throws `IngestTransientError` for what a later delivery may fix (busy, unavailable, state moving).
  */

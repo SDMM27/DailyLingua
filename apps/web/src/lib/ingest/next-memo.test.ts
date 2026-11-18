@@ -41,19 +41,33 @@ describe("buildNextMemo", () => {
     expect(Object.keys(capped.texts)).toHaveLength(200);
   });
 
-  it("keeps the productions not settled, and the ones settled less than 10 days ago", () => {
+  it("keeps the productions of the last 4 days, settled or not, and drops the older ones", () => {
     const production = (id: string, day: string, settled: boolean) => [id, { id, day, late: false, settled, correctionDeferred: false }] as const;
     const next = state({
       productions: Object.fromEntries([
         production(uuid(1), "2026-10-01", false),
-        production(uuid(2), "2026-10-01", true),
-        production(uuid(3), "2026-11-10", true),
+        production(uuid(2), "2026-11-13", false),
+        production(uuid(3), "2026-11-14", true),
         production(uuid(4), "2026-11-17", false),
       ]) as unknown as IngestState["productions"],
     });
     const memo = buildNextMemo(null, next, "2026-11-18");
-    expect(Object.keys(memo.productions).sort()).toEqual([uuid(1), uuid(3), uuid(4)].sort());
-    expect(memo.productions[uuid(1)]).toEqual({ day: "2026-10-01", late: false, settled: false, correctionDeferred: false });
+    expect(Object.keys(memo.productions).sort()).toEqual([uuid(3), uuid(4)].sort());
+    expect(memo.productions[uuid(4)]).toEqual({ day: "2026-11-17", late: false, settled: false, correctionDeferred: false });
+  });
+
+  it("keeps at most 30 productions, the most recent, and stays stable after 1000 simulated productions", () => {
+    let memo: IngestMemo | null = null;
+    for (let i = 0; i < 1000; i++) {
+      const day = `2026-11-${String(14 + (i % 5)).padStart(2, "0")}`;
+      const id = uuid(5000 + i);
+      const next = state({ productions: { [id]: { id, day, late: false, settled: false, correctionDeferred: false } } as unknown as IngestState["productions"] });
+      memo = buildNextMemo(memo, next, "2026-11-18");
+    }
+    const kept = Object.values((memo as IngestMemo).productions);
+    expect(kept).toHaveLength(30);
+    expect(kept.every((production) => production.day >= "2026-11-14")).toBe(true);
+    expect(kept.filter((production) => production.day === "2026-11-18")).toHaveLength(30);
   });
 
   it("keeps the catch-up days of the last 60 days, from the memo and the state, once each", () => {

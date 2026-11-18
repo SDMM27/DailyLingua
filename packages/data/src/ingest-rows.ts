@@ -163,6 +163,8 @@ export interface IngestRows {
   cardFronts: string[];
   /** The last 30 productions' texts, newest first. */
   recentProductionTexts: string[];
+  /** Productions of the user received in the last 24 hours (the cap on `production_submitted`, W-I1). */
+  recentProductionCount: number;
   /** Productions referenced by the events or the memo. */
   productions: ProductionRow[];
   ingestState: { seq: number; memo: unknown };
@@ -366,7 +368,7 @@ async function readKnownEvents(client: AppClient, userId: string, clientEventIds
  * Reads, in grouped queries (no query per event), everything `planIngest` needs for these refs. `window` bounds the
  * user's own sessions; the learning days, setting and time zone journals are read whole.
  */
-export async function readIngestRows(client: AppClient, userId: string, refs: IngestRefs, window: DayWindow | ((timeZone: string) => DayWindow)): Promise<IngestRows> {
+export async function readIngestRows(client: AppClient, userId: string, refs: IngestRefs, window: DayWindow | ((timeZone: string) => DayWindow), now: Date = new Date()): Promise<IngestRows> {
   const db = appSchema(client);
   const [{ profile, enrollments }, state] = await Promise.all([readProfileAndEnrollments(client, userId), readIngestState(client, userId)]);
   // The memo names the productions whose state it holds: they are read with the ones the events refer to.
@@ -392,6 +394,7 @@ export async function readIngestRows(client: AppClient, userId: string, refs: In
     knownEvents,
     cardFronts,
     recentProductions,
+    recentProductionCount,
     productions,
   ] = await Promise.all([
     db.from("skill_estimate").select("language, skill, level_value").eq("user_id", userId),
@@ -409,6 +412,7 @@ export async function readIngestRows(client: AppClient, userId: string, refs: In
       ? Promise.resolve([] as { language: string; kind: string; front: string }[])
       : fetchAll((from, to) => db.from("card").select("language, kind, front").eq("user_id", userId).is("deleted_at", null).in("language", languages).order("id").range(from, to)),
     db.from("production").select("text").eq("user_id", userId).order("created_at", { ascending: false }).order("id", { ascending: false }).limit(30),
+    db.from("production").select("id", { count: "exact", head: true }).eq("user_id", userId).gte("created_at", new Date(now.getTime() - 86_400_000).toISOString()),
     inChunks(productionIds, (chunk) => db.from("production").select("id, session_id, language, text, client_event_id, created_at").eq("user_id", userId).in("id", chunk)),
   ]);
 
@@ -436,6 +440,7 @@ export async function readIngestRows(client: AppClient, userId: string, refs: In
     knownEvents,
     cardFronts: cardFronts.map((row) => `${row.language}|${row.kind}|${row.front.toLowerCase()}`),
     recentProductionTexts: unwrapRows(recentProductions).map((row) => row.text),
+    recentProductionCount: (unwrap(recentProductionCount), recentProductionCount.count ?? 0),
     productions: productions.map((row) => ({ id: row.id, sessionId: row.session_id, language: row.language, text: row.text, clientEventId: row.client_event_id, createdAt: row.created_at })),
     ingestState: state,
   };

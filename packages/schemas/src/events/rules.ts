@@ -52,7 +52,8 @@ export type XpZeroReason = z.infer<typeof xpZeroReasonSchema>;
  * `j2-architecture.md` §2, `before_served` is from `j2-jeu-xp-serie.md` §2.3; `unknown_item` and
  * `unknown_correction` are added for items, texts and corrections the server does not know. `server_refused` is
  * the server's own: the batch the event was in was refused by SQL for good and the event still failed when
- * replayed alone (`j2-pr1-lot-w.md`, D9).
+ * replayed alone (`j2-pr1-lot-w.md`, D9). `too_many` is the server's cap on `production_submitted`: at most 10 are
+ * accepted per rolling 24 hours of reception, the next ones are refused for good (`j2-pr1-lot-w.md` section 11, W-I1).
  */
 export const rejectionReasons = [
   "invalid_payload",
@@ -66,6 +67,7 @@ export const rejectionReasons = [
   "before_served",
   "duplicate_conflict",
   "server_refused",
+  "too_many",
 ] as const;
 export const rejectionReasonSchema = z.enum(rejectionReasons);
 export type RejectionReason = z.infer<typeof rejectionReasonSchema>;

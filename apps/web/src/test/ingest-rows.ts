@@ -99,6 +99,7 @@ export function rows(overrides: Partial<IngestRows> = {}): IngestRows {
     knownEvents: {},
     cardFronts: [],
     recentProductionTexts: [],
+    recentProductionCount: 0,
     productions: [],
     ingestState: { seq: 0, memo: {} },
     ...overrides,

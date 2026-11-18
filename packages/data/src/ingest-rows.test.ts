@@ -194,6 +194,19 @@ describe("readIngestRows", () => {
     expect(rows.recentProductionTexts).toEqual(["Ciao a tutti"]);
   });
 
+  it("counts the productions of the user received in the last 24 hours only", async () => {
+    const data = tables();
+    data.production = [
+      { id: ID(610), user_id: ME, session_id: ID(10), language: "it", text: "a", client_event_id: ID(95), created_at: "2026-11-18T08:00:00.000Z" },
+      { id: ID(611), user_id: ME, session_id: ID(10), language: "it", text: "b", client_event_id: ID(96), created_at: "2026-11-17T13:00:00.000Z" },
+      { id: ID(612), user_id: ME, session_id: ID(10), language: "it", text: "c", client_event_id: ID(97), created_at: "2026-11-17T11:00:00.000Z" },
+      { id: ID(613), user_id: OTHER, session_id: ID(10), language: "it", text: "d", client_event_id: ID(98), created_at: "2026-11-18T08:00:00.000Z" },
+    ];
+    const { client } = tableFake(data);
+    const rows = await readIngestRows(client, ME, REFS, WINDOW, new Date("2026-11-18T12:00:00.000Z"));
+    expect(rows.recentProductionCount).toBe(2);
+  });
+
   it("reads productions by id, for the user only", async () => {
     const { client } = tableFake(tables());
     const rows = await readIngestRows(client, ME, { ...REFS, productionIds: [ID(600), ID(601)] }, WINDOW);

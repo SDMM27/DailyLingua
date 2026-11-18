@@ -273,4 +273,15 @@ describe.skipIf(!stackIsUp)("the loop of lot W (local database, service role)", 
     const busy: IngestStore = { readRows: (...args) => real.readRows(...args), callBatch: () => Promise.reject(new IngestBatchError("busy", "55P03", "lock")) };
     await expect(ingestEvents({ store: busy, userId: alice, events: [event("ui_event", 230, { name: "sound_toggled", value: {} })], now, log: () => undefined })).rejects.toThrow(/ingestion failed/);
   });
+
+  it("accepts the first time zone change of an account older than 8 days (the baseline row is exempt from the bound)", async () => {
+    const carol = await createUser("carol");
+    const aged = await app().from("profile").update({ created_at: new Date(Date.now() - 30 * 86_400_000).toISOString() }).eq("user_id", carol);
+    expect(aged.error).toBeNull();
+    const travelling = { clientEventId: crypto.randomUUID(), kind: "ui_event", occurredAt: at(240), payload: { tz: "Europe/Rome", deviceId: DEVICE, seq: ++seq, name: "sound_toggled", value: { on: true } } };
+    const result = await ingestEvents({ store: createIngestStore(service), userId: carol, events: [travelling], now, log: () => undefined });
+    expect(result.rejected).toEqual([]);
+    expect(await count("timezone_change", carol)).toBe(2);
+    expect((await app().from("profile").select("time_zone").eq("user_id", carol).single()).data?.time_zone).toBe("Europe/Rome");
+  });
 });

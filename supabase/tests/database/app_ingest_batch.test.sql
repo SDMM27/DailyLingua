@@ -349,7 +349,7 @@ select throws_ok($$select pg_temp.ingj('c0000000-0000-4000-8000-0000000000a1', j
 select throws_ok($$select pg_temp.ingj('c0000000-0000-4000-8000-0000000000a1', jsonb_build_object('timezone_changes', jsonb_build_array(
   jsonb_build_object('effective_at', now(), 'time_zone', 'Mars/Olympus'))))$$, '22023', null, 'an invalid time zone: 22023');
 select lives_ok($$select pg_temp.ingj('c0000000-0000-4000-8000-0000000000a1', jsonb_build_object('timezone_changes', jsonb_build_array(
-  jsonb_build_object('effective_at', now() + interval '1 day', 'time_zone', 'Asia/Tokyo'))))$$, 'a change in the future is journaled');
+  jsonb_build_object('effective_at', now() + interval '2 minutes', 'time_zone', 'Asia/Tokyo'))))$$, 'a change in the future is journaled');
 select is((select time_zone from app.profile where user_id = 'c0000000-0000-4000-8000-0000000000a1'), 'Europe/Rome', 'but the profile does not follow it yet');
 
 reset role;

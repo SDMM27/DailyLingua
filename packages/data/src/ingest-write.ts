@@ -4,8 +4,9 @@ import { DataError, toDataError } from "./errors";
 
 /**
  * How `app.ingest_batch` failed, in the terms the caller decides on (`j2-pr1-lot-w.md`, D9): `stale` (40001: the
- * state moved, read it again), `busy` (55P03: the user's lock was not obtained), `refused` (22023, 23503, 23505,
- * 23514: SQL refuses this content for good), `unavailable` (anything else, the network included: a passing failure).
+ * state moved, read it again), `busy` (55P03: the user's lock was not obtained), `refused` (every class 22 "data
+ * exception" and class 23 "integrity constraint violation" code, and 42501: SQL refuses this content for good),
+ * `unavailable` (anything else, the network included: a passing failure).
  * The SQL message is kept for the server log only; it never goes into a response.
  */
 export type IngestBatchErrorCode = "stale" | "busy" | "refused" | "unavailable";
@@ -22,12 +23,10 @@ export class IngestBatchError extends Error {
   }
 }
 
-const REFUSED = new Set(["22023", "23503", "23505", "23514"]);
-
 export function ingestErrorCode(sqlstate: string | null | undefined): IngestBatchErrorCode {
   if (sqlstate === "40001") return "stale";
   if (sqlstate === "55P03") return "busy";
-  if (sqlstate && REFUSED.has(sqlstate)) return "refused";
+  if (sqlstate && (sqlstate.startsWith("22") || sqlstate.startsWith("23") || sqlstate === "42501")) return "refused";
   return "unavailable";
 }
 
