@@ -28,6 +28,7 @@
     "content:coverage": "tsx --env-file-if-exists=.env.local scripts/content-coverage.mts",
     "content:topics": "tsx --env-file-if-exists=.env.local scripts/content-topics.mts",
     "content:ingest": "tsx --env-file-if-exists=.env.local scripts/content-ingest.mts",
+    "cost:report": "tsx --env-file-if-exists=.env.local scripts/cost-report.mts",
     "mission:generate": "tsx --env-file-if-exists=.env.local scripts/mission-generate.mts",
     "cron:run": "tsx --env-file-if-exists=.env.local scripts/cron-run.mts",
     "feedback:eval": "tsx --env-file-if-exists=.env.local scripts/writing-feedback-eval.mts",

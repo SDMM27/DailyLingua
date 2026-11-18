@@ -36,6 +36,7 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Not the build assets, nor the icon and the manifest (they must load before sign-in).
-  matcher: ["/((?!_next/static|_next/image|icon|apple-icon|manifest.webmanifest|favicon.ico).*)"],
+  // Not the build assets, nor the icons, the manifest and the service worker (they must load before
+  // sign-in, and the service worker must be fetched without a redirect).
+  matcher: ["/((?!_next/static|_next/image|icon|apple-icon|manifest.webmanifest|serwist/|favicon.ico).*)"],
 };

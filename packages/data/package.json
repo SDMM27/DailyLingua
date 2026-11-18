@@ -12,6 +12,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@dailylingua/ai": "*",
     "@dailylingua/schemas": "*",
     "@supabase/supabase-js": "^2.117.3"
   },

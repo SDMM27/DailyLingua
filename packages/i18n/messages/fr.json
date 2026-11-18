@@ -28,7 +28,8 @@
       "B2": "Je suis à l’aise sur des sujets variés",
       "C1": "Je m’exprime avec aisance",
       "C2": "Je maîtrise la langue"
-    }
+    },
+    "appDescription": "Une séance de langue chaque jour, à ton rythme."
   },
   "auth": {
     "signIn": {
@@ -151,6 +152,9 @@
     "account": {
       "signedInAs": "Connecté avec {email}",
       "guest": "Tu utilises Daily Lingua sans compte."
+    },
+    "lab": {
+      "link": "Outils de test (micro, voix, notifications)"
     }
   },
   "errors": {
@@ -172,5 +176,148 @@
     "tooManyRequests": "Trop de tentatives. Réessaie dans quelques minutes.",
     "botCheckLoad": "La vérification anti-robot n’a pas pu se charger. Recharge la page.",
     "guestUnavailable": "L’essai sans compte n’est pas disponible pour le moment."
+  },
+  "offline": {
+    "title": "Pas de connexion",
+    "body": "Cette page a besoin d’internet. Tes réponses restent gardées sur cet appareil et partiront dès que le réseau reviendra.",
+    "retry": "Réessayer"
+  },
+  "lab": {
+    "title": "Outils de test",
+    "intro": "Cette page vérifie, sur ton téléphone, ce que le navigateur sait faire : micro, voix, notifications, hors ligne. Aucun enregistrement n’est envoyé et rien n’est gardé sur le serveur.",
+    "closedHint": "Touche une carte pour l’ouvrir.",
+    "result": {
+      "label": "Résultat",
+      "copy": "Copier le résultat",
+      "copied": "Résultat copié.",
+      "copyFailed": "Copie impossible : sélectionne le texte.",
+      "empty": "Pas encore de résultat."
+    },
+    "value": {
+      "yes": "oui",
+      "no": "non",
+      "unknown": "inconnu",
+      "none": "aucun",
+      "megabytes": "{value} Mo",
+      "bytes": "{value} octets",
+      "seconds": "{value} s",
+      "error": "erreur : {message}"
+    },
+    "permission": {
+      "granted": "accordée",
+      "denied": "refusée",
+      "prompt": "à demander",
+      "default": "à demander",
+      "unknown": "inconnue"
+    },
+    "environment": {
+      "title": "Installation et stockage",
+      "hint": "Vérifie si l’app est lancée depuis l’écran d’accueil et quelle place le navigateur lui accorde.",
+      "run": "Vérifier",
+      "installed": "Lancée depuis l’écran d’accueil",
+      "userAgent": "Agent utilisateur",
+      "secureContext": "Connexion sécurisée (https)",
+      "serviceWorker": "Service worker",
+      "swUnsupported": "non pris en charge",
+      "swNone": "pas enregistré",
+      "swRegistered": "enregistré, pas encore aux commandes de cette page",
+      "swControlling": "enregistré et aux commandes de cette page",
+      "storageUsed": "Stockage utilisé",
+      "storageQuota": "Quota estimé",
+      "persistedBefore": "Stockage persistant (avant demande)",
+      "persistedAfter": "Stockage persistant (après demande)",
+      "storageUnsupported": "estimation indisponible"
+    },
+    "microphone": {
+      "title": "Micro",
+      "hint": "Enregistre 5 secondes, puis réécoute-les ici.",
+      "run": "Enregistrer 5 secondes",
+      "recording": "Enregistrement… {seconds} s",
+      "privacy": "L’enregistrement reste sur cet appareil : il n’est envoyé nulle part.",
+      "playback": "Réécouter l’enregistrement",
+      "unsupported": "Ce navigateur ne propose pas l’enregistrement audio.",
+      "permission": "Permission du micro",
+      "formats": "Formats acceptés",
+      "formatUsed": "Format utilisé",
+      "size": "Taille du fichier",
+      "chunks": "Morceaux reçus",
+      "duration": "Durée mesurée",
+      "sampleRate": "Fréquence d’échantillonnage",
+      "channels": "Canaux",
+      "denied": "Le micro est refusé : autorise-le dans les réglages du navigateur ou de l’app."
+    },
+    "voices": {
+      "title": "Voix de synthèse",
+      "hint": "Liste les voix pour {language} et lit une phrase d’essai.",
+      "run": "Écouter une phrase",
+      "unsupported": "Ce navigateur ne propose pas la synthèse vocale.",
+      "language": "Langue testée",
+      "total": "Voix installées",
+      "matching": "Voix pour cette langue",
+      "voice": "Voix utilisée",
+      "local": "locale",
+      "remote": "en ligne",
+      "phrase": "Phrase lue",
+      "started": "Lecture démarrée",
+      "ended": "Lecture terminée",
+      "errorCode": "Erreur de lecture",
+      "noVoice": "Aucune voix pour cette langue : la voix par défaut du navigateur est utilisée.",
+      "speaking": "Lecture…"
+    },
+    "recognition": {
+      "title": "Reconnaissance vocale",
+      "hint": "Touche le bouton puis dis une phrase en {language}.",
+      "run": "Essayer",
+      "listening": "J’écoute…",
+      "available": "Disponible",
+      "api": "Interface",
+      "transcript": "Texte reconnu",
+      "confidence": "Confiance",
+      "errorCode": "Erreur",
+      "nothingHeard": "rien entendu",
+      "unsupported": "Ce navigateur ne propose pas la reconnaissance vocale."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "hint": "Demande la permission, abonne cet appareil au Web Push et reçois une notification d’essai.",
+      "enable": "Activer les notifications",
+      "sendTest": "Envoyer une notification d’essai",
+      "notifications": "Notifications",
+      "permission": "Permission",
+      "pushManager": "Web Push",
+      "serviceWorker": "Service worker",
+      "swMissing": "absent (le service worker ne tourne qu’en version de production)",
+      "swReady": "prêt",
+      "subscription": "Abonnement",
+      "subscriptionNote": "L’abonnement s’affiche ici seulement : il n’est enregistré nulle part.",
+      "noKey": "Pas de clé publique VAPID : seule la permission est testée.",
+      "unsupported": "Ce navigateur ne propose pas les notifications. Sur iPhone, installe d’abord l’app sur l’écran d’accueil.",
+      "sendResult": "Réponse du serveur",
+      "sent": "envoyée",
+      "pushDisabled": "envoi désactivé sur le serveur (pas de clé privée)",
+      "gone": "abonnement expiré",
+      "rejected": "refusée par le service de notification ({status})",
+      "failed": "échec ({status})"
+    },
+    "push": {
+      "test": {
+        "title": "Daily Lingua",
+        "body": "Notification d’essai : ça marche."
+      }
+    },
+    "queue": {
+      "title": "Mode hors ligne",
+      "hint": "Mets 3 événements en file, coupe le réseau (mode avion), puis rétablis-le : ils partent tout seuls. L’envoi est factice : rien ne sort de l’appareil.",
+      "enqueue": "Mettre 3 événements en file",
+      "flush": "Envoyer maintenant",
+      "network": "Réseau",
+      "online": "en ligne",
+      "offline": "hors ligne",
+      "waiting": "Événements en attente",
+      "unsupported": "Ce navigateur ne propose pas IndexedDB : la file ne peut pas être gardée.",
+      "logQueued": "{count, plural, one {# événement mis en file} other {# événements mis en file}}",
+      "logSent": "{count, plural, one {# événement envoyé} other {# événements envoyés}}",
+      "logFailed": "échec, prochaine tentative dans {seconds} s"
+    }
   }
 }

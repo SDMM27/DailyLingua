@@ -387,7 +387,18 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "is_valid_weekdays":
+            "ai_spend":
+{ Args: { "p_from": string,"p_to": string }; Returns: {
+              "calls": number,"cost_usd": number,"input_tokens": number,"model": string,"output_tokens": number,"purpose": string
+            }[]
+                           },
+"ai_spend_month":
+{ Args: { "p_at": string }; Returns: number
+                           },
+"claim_quota":
+{ Args: { "p_day": string,"p_kind": string,"p_limit": number,"p_user_id": string }; Returns: boolean
+                           },
+"is_valid_weekdays":
 { Args: { "p_days": (number)[] }; Returns: boolean
                            },
 "legacy_assessments":
@@ -422,6 +433,12 @@ isOneToOne: false
                            },
 "migrate_user":
 { Args: { "p_user_id": string }; Returns: Json
+                           },
+"record_ai_call":
+{ Args: { "p_batch": boolean,"p_cache_read_tokens": number,"p_cache_write_tokens": number,"p_cost_usd": number,"p_input_tokens": number,"p_model": string,"p_output_tokens": number,"p_prompt_version": string,"p_purpose": string,"p_status": string,"p_user_id": string }; Returns: number
+                           },
+"release_quota":
+{ Args: { "p_day": string,"p_kind": string,"p_user_id": string }; Returns: undefined
                            },
 "save_enrollments":
 { Args: { "p_enrollments": Json }; Returns: {

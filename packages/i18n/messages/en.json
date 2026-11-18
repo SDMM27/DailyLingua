@@ -28,7 +28,8 @@
       "B2": "I’m comfortable on a range of topics",
       "C1": "I express myself with ease",
       "C2": "I’ve mastered the language"
-    }
+    },
+    "appDescription": "One language session a day, at your own pace."
   },
   "auth": {
     "signIn": {
@@ -151,6 +152,9 @@
     "account": {
       "signedInAs": "Signed in as {email}",
       "guest": "You’re using Daily Lingua without an account."
+    },
+    "lab": {
+      "link": "Test tools (microphone, voice, notifications)"
     }
   },
   "errors": {
@@ -172,5 +176,148 @@
     "tooManyRequests": "Too many attempts. Try again in a few minutes.",
     "botCheckLoad": "The bot check couldn’t load. Reload the page.",
     "guestUnavailable": "Trying without an account isn’t available right now."
+  },
+  "offline": {
+    "title": "You are offline",
+    "body": "This page needs the internet. Your answers stay on this device and are sent as soon as the network is back.",
+    "retry": "Try again"
+  },
+  "lab": {
+    "title": "Test tools",
+    "intro": "This page checks, on your phone, what the browser can do: microphone, voice, notifications, offline. No recording is sent and nothing is kept on the server.",
+    "closedHint": "Tap a card to open it.",
+    "result": {
+      "label": "Result",
+      "copy": "Copy the result",
+      "copied": "Result copied.",
+      "copyFailed": "Copy failed: select the text.",
+      "empty": "No result yet."
+    },
+    "value": {
+      "yes": "yes",
+      "no": "no",
+      "unknown": "unknown",
+      "none": "none",
+      "megabytes": "{value} MB",
+      "bytes": "{value} bytes",
+      "seconds": "{value} s",
+      "error": "error: {message}"
+    },
+    "permission": {
+      "granted": "granted",
+      "denied": "denied",
+      "prompt": "to be asked",
+      "default": "to be asked",
+      "unknown": "unknown"
+    },
+    "environment": {
+      "title": "Installation and storage",
+      "hint": "Checks whether the app was opened from the home screen and how much room the browser gives it.",
+      "run": "Check",
+      "installed": "Opened from the home screen",
+      "userAgent": "User agent",
+      "secureContext": "Secure connection (https)",
+      "serviceWorker": "Service worker",
+      "swUnsupported": "not supported",
+      "swNone": "not registered",
+      "swRegistered": "registered, not controlling this page yet",
+      "swControlling": "registered and controlling this page",
+      "storageUsed": "Storage used",
+      "storageQuota": "Estimated quota",
+      "persistedBefore": "Persistent storage (before the request)",
+      "persistedAfter": "Persistent storage (after the request)",
+      "storageUnsupported": "estimate unavailable"
+    },
+    "microphone": {
+      "title": "Microphone",
+      "hint": "Records 5 seconds, then plays them back here.",
+      "run": "Record 5 seconds",
+      "recording": "Recording… {seconds} s",
+      "privacy": "The recording stays on this device: it is sent nowhere.",
+      "playback": "Play the recording back",
+      "unsupported": "This browser cannot record audio.",
+      "permission": "Microphone permission",
+      "formats": "Accepted formats",
+      "formatUsed": "Format used",
+      "size": "File size",
+      "chunks": "Chunks received",
+      "duration": "Measured duration",
+      "sampleRate": "Sample rate",
+      "channels": "Channels",
+      "denied": "The microphone is denied: allow it in the browser or app settings."
+    },
+    "voices": {
+      "title": "Speech voices",
+      "hint": "Lists the voices for {language} and reads a trial sentence.",
+      "run": "Hear a sentence",
+      "unsupported": "This browser has no speech synthesis.",
+      "language": "Language tested",
+      "total": "Voices installed",
+      "matching": "Voices for this language",
+      "voice": "Voice used",
+      "local": "local",
+      "remote": "online",
+      "phrase": "Sentence read",
+      "started": "Playback started",
+      "ended": "Playback ended",
+      "errorCode": "Playback error",
+      "noVoice": "No voice for this language: the browser’s default voice is used.",
+      "speaking": "Speaking…"
+    },
+    "recognition": {
+      "title": "Speech recognition",
+      "hint": "Tap the button, then say a sentence in {language}.",
+      "run": "Try it",
+      "listening": "Listening…",
+      "available": "Available",
+      "api": "Interface",
+      "transcript": "Recognised text",
+      "confidence": "Confidence",
+      "errorCode": "Error",
+      "nothingHeard": "nothing heard",
+      "unsupported": "This browser has no speech recognition."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "hint": "Asks for permission, subscribes this device to Web Push and receives a trial notification.",
+      "enable": "Turn notifications on",
+      "sendTest": "Send a trial notification",
+      "notifications": "Notifications",
+      "permission": "Permission",
+      "pushManager": "Web Push",
+      "serviceWorker": "Service worker",
+      "swMissing": "missing (the service worker only runs in the production build)",
+      "swReady": "ready",
+      "subscription": "Subscription",
+      "subscriptionNote": "The subscription is shown here only: it is stored nowhere.",
+      "noKey": "No VAPID public key: only the permission is tested.",
+      "unsupported": "This browser has no notifications. On iPhone, install the app on the home screen first.",
+      "sendResult": "Server answer",
+      "sent": "sent",
+      "pushDisabled": "sending is off on the server (no private key)",
+      "gone": "subscription expired",
+      "rejected": "refused by the notification service ({status})",
+      "failed": "failed ({status})"
+    },
+    "push": {
+      "test": {
+        "title": "Daily Lingua",
+        "body": "Trial notification: it works."
+      }
+    },
+    "queue": {
+      "title": "Offline mode",
+      "hint": "Queue 3 events, cut the network (airplane mode), then restore it: they leave on their own. Sending is a stand-in: nothing leaves the device.",
+      "enqueue": "Queue 3 events",
+      "flush": "Send now",
+      "network": "Network",
+      "online": "online",
+      "offline": "offline",
+      "waiting": "Events waiting",
+      "unsupported": "This browser has no IndexedDB: the queue cannot be kept.",
+      "logQueued": "{count, plural, one {# event queued} other {# events queued}}",
+      "logSent": "{count, plural, one {# event sent} other {# events sent}}",
+      "logFailed": "failed, next attempt in {seconds} s"
+    }
   }
 }
