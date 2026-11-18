@@ -10,7 +10,12 @@ import { MAX_MEMO_BYTES, type DateKey, type IngestMemo } from "@dailylingua/sche
 export const MEMO_DAYS_BEFORE = 10;
 export const MEMO_DAYS_AFTER = 1;
 export const MEMO_MAX_TEXTS = 200;
-export const MEMO_SETTLED_PRODUCTION_DAYS = 10;
+/**
+ * Productions are kept for 4 days only (a `production.corrected` older than that is refused by the SQL day bound, so a
+ * production never settled cannot linger), and 30 at most, the most recent first (W-I1).
+ */
+export const MEMO_PRODUCTION_DAYS = 4;
+export const MEMO_MAX_PRODUCTIONS = 30;
 export const MEMO_CATCH_UP_DAYS = 60;
 
 export class MemoTooLargeError extends Error {
@@ -42,13 +47,18 @@ export function buildNextMemo(previous: IngestMemo | null, nextState: IngestStat
     .sort(([idA, a], [idB, b]) => compare(b.readingEarnedDay ?? "", a.readingEarnedDay ?? "") || compare(idA, idB))
     .slice(0, MEMO_MAX_TEXTS);
 
-  // Productions: the ones not settled, and the ones settled less than 10 days ago (by the day of the submission).
-  const settledFrom = addDays(serverDay, -MEMO_SETTLED_PRODUCTION_DAYS);
-  const productions: IngestMemo["productions"] = { ...(previous?.productions ?? {}) };
+  // Productions: the ones of the last 4 days, settled or not, the 30 most recent at most.
+  const productionsFrom = addDays(serverDay, -MEMO_PRODUCTION_DAYS);
+  const allProductions: IngestMemo["productions"] = { ...(previous?.productions ?? {}) };
   for (const production of Object.values(nextState.productions)) {
-    productions[production.id] = { day: production.day, late: production.late, settled: production.settled, correctionDeferred: production.correctionDeferred };
+    allProductions[production.id] = { day: production.day, late: production.late, settled: production.settled, correctionDeferred: production.correctionDeferred };
   }
-  for (const [id, production] of Object.entries(productions)) if (production.settled && production.day < settledFrom) delete productions[id];
+  const productions: IngestMemo["productions"] = Object.fromEntries(
+    Object.entries(allProductions)
+      .filter(([, production]) => production.day >= productionsFrom)
+      .sort(([idA, a], [idB, b]) => compare(b.day, a.day) || compare(idA, idB))
+      .slice(0, MEMO_MAX_PRODUCTIONS),
+  );
 
   const catchFrom = addDays(serverDay, -MEMO_CATCH_UP_DAYS);
   const catchUpDays = [...new Set([...(previous?.catchUpDays ?? []), ...nextState.catchUpDays])].filter((day) => day >= catchFrom).sort();

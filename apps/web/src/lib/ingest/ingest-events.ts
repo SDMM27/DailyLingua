@@ -1,5 +1,5 @@
 import "server-only";
-import { addDays, deterministicUuid, learningDay, planIngest, type RawEvent, type RejectedDelivery } from "@dailylingua/core";
+import { addDays, deterministicUuid, learningDay, planIngest, type IngestState, type RawEvent, type RejectedDelivery } from "@dailylingua/core";
 import {
   IngestBatchError,
   callIngestBatch,
@@ -27,6 +27,8 @@ export const MAX_STALE_ATTEMPTS = 3;
 export const MAX_PAYLOAD_BYTES = 1_048_576;
 /** Calls the isolation mode makes at most: one per event of a batch. */
 export const MAX_ISOLATION_EVENTS = 50;
+/** `production_submitted` accepted per learning day (W-I1): the memo of productions stays bounded, the next ones are `too_many`. */
+export const MAX_PRODUCTIONS_PER_DAY = 10;
 
 export type LogFn = (level: "warn" | "error", message: string, data?: Record<string, unknown>) => void;
 
@@ -76,6 +78,38 @@ const windowOf = (now: Date) => (timeZone: string): DayWindow => {
   return { from: addDays(today, -8), to: addDays(today, 1) };
 };
 
+/**
+ * The cap on productions, applied before `planIngest`: the ones already known for the learning day (the memo of the
+ * server day, as loaded in `state`) plus the ones of this batch count. A replay of an event the ledger knows passes (it
+ * is a duplicate, not a new production); an event whose instant cannot be read passes too (the plan refuses it).
+ */
+function capProductions(events: readonly unknown[], state: IngestState, timeZone: string): { kept: unknown[]; rejected: RejectedDelivery[] } {
+  const perDay = new Map<string, number>();
+  for (const production of Object.values(state.productions)) perDay.set(production.day, (perDay.get(production.day) ?? 0) + 1);
+  const kept: unknown[] = [];
+  const rejected: RejectedDelivery[] = [];
+  for (const event of events) {
+    if (!isRecord(event) || event.kind !== "production_submitted" || typeof event.clientEventId !== "string" || typeof event.occurredAt !== "string" || Object.hasOwn(state.knownEvents, event.clientEventId)) {
+      kept.push(event);
+      continue;
+    }
+    const instant = new Date(event.occurredAt);
+    if (Number.isNaN(instant.getTime())) {
+      kept.push(event);
+      continue;
+    }
+    const day = learningDay(instant, timeZone);
+    const count = perDay.get(day) ?? 0;
+    if (count >= MAX_PRODUCTIONS_PER_DAY) {
+      rejected.push({ clientEventId: event.clientEventId, reason: "too_many" });
+      continue;
+    }
+    perDay.set(day, count + 1);
+    kept.push(event);
+  }
+  return { kept, rejected };
+}
+
 interface Outcome {
   rejected: RejectedDelivery[];
   duplicates: string[];
@@ -97,12 +131,13 @@ async function processOnce(store: IngestStore, userId: string, events: readonly 
   if (skippedSessions.length > 0) log("warn", "stored session plans could not be read and were left out", { userId, sessions: skippedSessions });
 
   const { kept, rejected: refusedModes } = filterReviewModes(events, cardModes, state.knownEvents);
-  const plan = planIngest(state, kept as RawEvent[], now);
   const serverDay = learningDay(now, rows.profile.timeZone);
+  const { kept: capped, rejected: tooMany } = capProductions(kept, state, rows.profile.timeZone);
+  const plan = planIngest(state, capped as RawEvent[], now);
 
   // The ledger: the fingerprint of every event this batch accepted, with the kind of the raw event.
   const kindOf = new Map<string, string>();
-  for (const event of kept) if (isRecord(event) && typeof event.clientEventId === "string" && typeof event.kind === "string") kindOf.set(event.clientEventId, event.kind);
+  for (const event of capped) if (isRecord(event) && typeof event.clientEventId === "string" && typeof event.kind === "string") kindOf.set(event.clientEventId, event.kind);
   const ledger = Object.entries(plan.nextState.knownEvents)
     .filter(([id, fingerprint]) => !Object.hasOwn(state.knownEvents, id) && fingerprint !== null && kindOf.has(id))
     .map(([id, fingerprint]) => ({ client_event_id: id, kind: kindOf.get(id) as string, fingerprint: fingerprint as string }));
@@ -117,7 +152,7 @@ async function processOnce(store: IngestStore, userId: string, events: readonly 
 
   const empty = ledger.length === 0 && zeroed.size === 0 && Object.values(plan.payload).every((value) => (Array.isArray(value) ? value.length === 0 : value === null));
   const outcome: Outcome = {
-    rejected: [...plan.rejected, ...refusedModes],
+    rejected: [...plan.rejected, ...refusedModes, ...tooMany],
     duplicates: [...plan.report.duplicates],
   };
   // Nothing to write (replays, refusals): the sequence is left alone.
@@ -160,7 +195,7 @@ function isolationOrder(events: readonly unknown[]): unknown[] {
 }
 
 /**
- * Ingests the events of one delivery for `userId`. A batch SQL refuses for good (22023, 23503, 23505, 23514) is replayed
+ * Ingests the events of one delivery for `userId`. A batch SQL refuses for good (classes 22 and 23, 42501) is replayed
  * event by event, the state read again each time: the one that is refused again is `server_refused`, the others pass
  * (D9). Throws `IngestTransientError` for what a later delivery may fix (busy, unavailable, state moving).
  */
