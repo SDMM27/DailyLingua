@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import {
   answerQuestion,
   requestWritingFeedback,
@@ -10,7 +10,7 @@ import {
 } from "@/app/actions/mission";
 import { CheckIcon } from "@/components/icons";
 import { languageStyle } from "@/components/ui/language-style";
-import { Card, Eyebrow, LanguageTag, ProgressBar } from "@/components/ui/primitives";
+import { Eyebrow, LanguageTag, ProgressBar } from "@/components/ui/primitives";
 import { ACTIVITY_LABELS, topicLabel } from "@/lib/domain/labels";
 import type { Language } from "@/lib/schemas/common";
 import type { Topic } from "@/lib/schemas/preferences";
@@ -127,10 +127,10 @@ export function MissionView({
   return (
     <>
       {/* Sticky progress, always visible while scrolling through long content. */}
-      <div className="sticky top-0 z-20 -mx-4 mb-6 border-b border-line bg-paper/90 px-4 py-3 backdrop-blur-xl sm:-mx-6 sm:px-6 md:top-[57px]">
-        <div className="flex items-center justify-between text-xs font-medium">
-          <span className="text-ink-soft">Progression</span>
-          <span>
+      <div className="sticky top-0 z-20 -mx-4 mb-8 border-b border-ink bg-paper/90 px-4 py-3 backdrop-blur-xl sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0">
+        <div className="flex items-baseline justify-between">
+          <span className="kicker text-muted">Progression</span>
+          <span className="font-serif text-base font-bold">
             {doneMinutes} / {total} min
           </span>
         </div>
@@ -138,12 +138,12 @@ export function MissionView({
       </div>
 
       {error && (
-        <p role="alert" className="mb-6 rounded-2xl bg-danger-soft px-4 py-3 text-sm text-danger">
+        <p role="alert" className="mb-6 bg-danger-soft px-4 py-3 text-sm text-danger">
           {error}
         </p>
       )}
 
-      <div className="space-y-12">
+      <div className="space-y-14">
         {mission.sessions.map((session) => (
           <SessionSection
             key={session.id}
@@ -166,15 +166,27 @@ export function MissionView({
         ))}
 
         {finished && (
-          <Card className="text-center" aria-live="polite">
-            <p className="font-serif text-2xl font-semibold">Mission accomplie</p>
-            <p className="mt-1 text-sm text-ink-soft">
+          <div className="rule-double border-t border-ink py-6 text-center" aria-live="polite">
+            <p className="sd-display text-3xl">Mission accomplie</p>
+            <p className="mt-2 text-sm text-ink-soft">
               {total} minutes aujourd’hui · {savedExpressions.size} expressions mises de côté
             </p>
-          </Card>
+          </div>
         )}
       </div>
     </>
+  );
+}
+
+/** Roman numeral heading of an exercise, like the numbered sections of a newspaper feature. */
+function ExerciseTitle({ numeral, children }: { numeral: string; children: ReactNode }) {
+  return (
+    <div className="mb-4 flex items-baseline gap-3 border-b border-ink pb-2">
+      <span aria-hidden="true" className="font-serif text-2xl font-extrabold text-accent-strong">
+        {numeral}
+      </span>
+      <Eyebrow>{children}</Eyebrow>
+    </div>
   );
 }
 
@@ -212,87 +224,101 @@ function SessionSection({
   const { language } = session;
   const style = languageStyle(language);
 
+  // Phones read it top to bottom (article, steps, quiz, expressions, writing). From `lg` the
+  // article and the exercises sit in the main column, steps and expressions in the side column:
+  // the two wrappers are `contents` on phones so that the blocks keep that order.
   return (
-    <section aria-labelledby={`session-${language}`} className="space-y-4">
-      <div className="flex items-center justify-between">
+    <section aria-labelledby={`session-${language}`} className="border-t-[3px] border-ink pt-4">
+      <div className="mb-6 flex items-center justify-between">
         <h2 id={`session-${language}`}>
           <LanguageTag language={language} />
         </h2>
-        <span className="text-sm font-medium text-ink-soft">{sessionMinutes(session)} min</span>
+        <span className="kicker text-muted">{sessionMinutes(session)} min</span>
       </div>
 
-      <ContentCard content={session.content} sessionId={canReportNoAccess ? session.id : undefined} />
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:gap-0">
+        <div className="contents lg:block lg:min-w-0 lg:space-y-12 lg:pr-10">
+          <div className="order-1 min-w-0">
+            <ContentCard content={session.content} sessionId={canReportNoAccess ? session.id : undefined} />
 
-      {requestedTopic && !session.content.topics.includes(requestedTopic) && (
-        <p className="px-1 text-[13px] leading-relaxed text-muted">
-          Pas de contenu {topicLabel(requestedTopic).toLocaleLowerCase("fr")} à ton niveau aujourd’hui : voici un autre sujet.
-        </p>
-      )}
+            {requestedTopic && !session.content.topics.includes(requestedTopic) && (
+              <p className="mt-4 max-w-[68ch] text-[13px] leading-relaxed text-muted">
+                Pas de contenu {topicLabel(requestedTopic).toLocaleLowerCase("fr")} à ton niveau aujourd’hui : voici un autre sujet.
+              </p>
+            )}
+          </div>
 
-      <Card>
-        <Eyebrow className="mb-3">Étapes</Eyebrow>
-        <ul className="space-y-1">
-          {session.activities.map((activity) => {
-            const checked = done.has(activity.id);
-            return (
-              <li key={activity.id}>
-                <button
-                  type="button"
-                  role="checkbox"
-                  aria-checked={checked}
-                  onClick={() => onToggleActivity(activity.id)}
-                  className="-mx-2 flex w-[calc(100%+1rem)] items-center gap-3 rounded-2xl px-2 py-2.5 text-left transition-colors hover:bg-surface-sunk"
-                >
-                  <span
-                    className={`grid size-6 shrink-0 place-items-center rounded-full border-[1.5px] transition-colors ${
-                      checked ? `border-transparent ${style.bg} text-paper` : "border-line"
-                    }`}
-                  >
-                    {checked && <CheckIcon width={14} height={14} strokeWidth={2.6} />}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className={`block text-[15px] ${checked ? "text-muted line-through" : ""}`}>
-                      {activity.title}
-                    </span>
-                    <span className="text-xs text-muted">{ACTIVITY_LABELS[activity.kind]}</span>
-                  </span>
-                  <span className="text-xs font-medium text-muted">{activity.estimatedMinutes} min</span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      </Card>
+          {session.questions.length > 0 && (
+            <div className="order-3 min-w-0">
+              <ExerciseTitle numeral="I">Compréhension</ExerciseTitle>
+              <div className="max-w-[68ch]">
+                <Quiz language={language} questions={session.questions} answers={answers} onAnswer={onAnswer} />
+              </div>
+            </div>
+          )}
 
-      {session.questions.length > 0 && (
-        <Card>
-          <Eyebrow className="mb-4">Compréhension</Eyebrow>
-          <Quiz language={language} questions={session.questions} answers={answers} onAnswer={onAnswer} />
-        </Card>
-      )}
+          <div className="order-5 min-w-0">
+            <ExerciseTitle numeral={session.questions.length > 0 ? "II" : "I"}>Production</ExerciseTitle>
+            <ProductionTask
+              language={language}
+              task={session.production}
+              initialText={draft}
+              onSave={onSaveProduction}
+              onRequestFeedback={onRequestFeedback}
+              initialReview={review}
+            />
+          </div>
+        </div>
 
-      {session.expressions.length > 0 && (
-        <Card>
-          <Eyebrow className="mb-4">À retenir</Eyebrow>
-          <ExpressionList
-            language={language}
-            expressions={session.expressions}
-            saved={savedExpressions}
-            onSave={onSaveExpression}
-          />
-        </Card>
-      )}
+        <aside className="contents lg:block lg:min-w-0 lg:space-y-12 lg:border-l lg:border-line lg:pl-10">
+          <div className="order-2 min-w-0">
+            <Eyebrow className="mb-2">Étapes</Eyebrow>
+            <ul className="divide-y divide-line border-y border-line">
+              {session.activities.map((activity) => {
+                const checked = done.has(activity.id);
+                return (
+                  <li key={activity.id}>
+                    <button
+                      type="button"
+                      role="checkbox"
+                      aria-checked={checked}
+                      onClick={() => onToggleActivity(activity.id)}
+                      className="flex min-h-11 w-full items-center gap-3 px-1 py-2.5 text-left transition-colors hover:bg-surface-sunk"
+                    >
+                      <span
+                        className={`grid size-6 shrink-0 place-items-center rounded-full border-[1.5px] transition-colors ${
+                          checked ? `border-transparent ${style.bg} text-paper` : "border-ink-soft"
+                        }`}
+                      >
+                        {checked && <CheckIcon width={14} height={14} strokeWidth={2.6} />}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className={`block text-[15px] ${checked ? "text-muted line-through" : ""}`}>
+                          {activity.title}
+                        </span>
+                        <span className="text-xs text-muted">{ACTIVITY_LABELS[activity.kind]}</span>
+                      </span>
+                      <span className="text-xs font-medium text-muted">{activity.estimatedMinutes} min</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
 
-      <Card>
-        <ProductionTask
-          language={language}
-          task={session.production}
-          initialText={draft}
-          onSave={onSaveProduction}
-          onRequestFeedback={onRequestFeedback}
-          initialReview={review}
-        />
-      </Card>
+          {session.expressions.length > 0 && (
+            <div className="order-4 min-w-0">
+              <Eyebrow className="mb-2">À retenir</Eyebrow>
+              <ExpressionList
+                language={language}
+                expressions={session.expressions}
+                saved={savedExpressions}
+                onSave={onSaveExpression}
+              />
+            </div>
+          )}
+        </aside>
+      </div>
     </section>
   );
 }

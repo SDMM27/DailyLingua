@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { AuthLayout } from "@/components/auth/auth-layout";
 import { PreferencesForm } from "@/components/preferences/preferences-form";
-import { PageHeader } from "@/components/ui/primitives";
 import { getRepository } from "@/lib/data/repository";
 import { ONBOARDING_DEFAULTS } from "@/lib/domain/default-preferences";
 
@@ -14,12 +14,14 @@ export default async function WelcomePage() {
   const languages = await repo.listAvailableLanguages();
 
   return (
-    <>
-      <PageHeader eyebrow="Bienvenue" title="Quelles langues veux-tu travailler ?">
-        Choisis une à quatre langues, ton niveau et le temps dont tu disposes chaque jour. Tu pourras tout
-        modifier plus tard dans les réglages.
-      </PageHeader>
-      <PreferencesForm initial={ONBOARDING_DEFAULTS} languages={languages} mode="onboarding" persist />
-    </>
+    <AuthLayout
+      wide
+      eyebrow="Bienvenue"
+      title="Quelles langues veux-tu travailler ?"
+      form={<PreferencesForm initial={ONBOARDING_DEFAULTS} languages={languages} mode="onboarding" persist />}
+    >
+      Choisis une à quatre langues, ton niveau et le temps dont tu disposes chaque jour. Tu pourras tout modifier
+      plus tard dans les réglages.
+    </AuthLayout>
   );
 }

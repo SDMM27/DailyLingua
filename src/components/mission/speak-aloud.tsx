@@ -24,10 +24,10 @@ export function SpeakAloud({
 }) {
   const own = !nativeVersion;
   return (
-    <section aria-label="À voix haute" className="mt-5 rounded-2xl border border-line px-4 py-4">
-      <p className="text-xs font-semibold tracking-wide text-muted uppercase">À voix haute</p>
-      <ol className="mt-3 space-y-4">
-        <li className="text-[13px] leading-relaxed text-ink-soft">
+    <section aria-label="À voix haute" className="mt-6 border-t border-ink pt-4">
+      <p className="kicker text-accent-strong">À voix haute</p>
+      <ol className="mt-3 max-w-[68ch] divide-y divide-line [&>li]:py-4 [&>li:first-child]:pt-0">
+        <li className="text-sm leading-relaxed text-ink-soft">
           <span className="block">
             1. {own ? "Lis ton texte" : "Lis la version du natif"} à voix haute, deux fois.
           </span>
@@ -37,7 +37,7 @@ export function SpeakAloud({
             </span>
           )}
         </li>
-        <li className="text-[13px] leading-relaxed text-ink-soft">
+        <li className="text-sm leading-relaxed text-ink-soft">
           <span className="block">
             2. Masque-{own ? "le" : "la"} et redis ton texte de mémoire
             {own ? "" : ", en reprenant les corrections"}.
@@ -46,7 +46,7 @@ export function SpeakAloud({
             {hidden ? "Afficher" : "Masquer"}
           </button>
         </li>
-        <li className="text-[13px] leading-relaxed text-ink-soft">
+        <li className="text-sm leading-relaxed text-ink-soft">
           3. Réponds de nouveau à la consigne à voix haute, sans rien regarder.
         </li>
       </ol>

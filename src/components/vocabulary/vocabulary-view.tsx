@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import {
   addWord,
   createList,
@@ -15,7 +15,7 @@ import {
 import type { ActionResult } from "@/app/actions/result";
 import { PlusIcon } from "@/components/icons";
 import { languageStyle } from "@/components/ui/language-style";
-import { Card, SectionTitle } from "@/components/ui/primitives";
+import { buttonClass, Columns, SectionTitle } from "@/components/ui/primitives";
 import { languageInfo } from "@/lib/domain/languages";
 import {
   applyReview,
@@ -66,6 +66,7 @@ export function VocabularyView({
   persist,
   canTranslate,
   isGuest,
+  retention,
 }: {
   initialItems: VocabularyItem[];
   initialLists: VocabularyList[];
@@ -75,6 +76,8 @@ export function VocabularyView({
   /** Automatic translation of added or imported words is on for this server. */
   canTranslate: boolean;
   isGuest: boolean;
+  /** Retention panel, shown in the side column under the lists. */
+  retention?: ReactNode;
 }) {
   const [items, setItems] = useState(initialItems);
   const [lists, setLists] = useState(initialLists);
@@ -262,137 +265,147 @@ export function VocabularyView({
     .sort((a, b) => a.review.dueOn.localeCompare(b.review.dueOn));
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       {error && (
         <p role="alert" className="rounded-2xl bg-danger-soft px-4 py-3 text-sm text-danger">
           {error}
         </p>
       )}
 
-      <div ref={reviewRef} className="scroll-mt-4 space-y-2">
-        {reviewList && (
-          <div className="flex items-center justify-between gap-3 text-sm">
-            <span className="text-ink-soft">Liste : {reviewList.name}</span>
-            <button
-              type="button"
-              onClick={() => restartReview(items, lists, null)}
-              className="font-medium text-ink underline"
-            >
-              Réviser tous les mots du jour
-            </button>
+      <Columns
+        main={
+          <div className="space-y-10">
+            <div ref={reviewRef} className="scroll-mt-4 space-y-2">
+              {reviewList && (
+                <div className="flex items-center justify-between gap-3 text-sm">
+                  <span className="text-ink-soft">Liste : {reviewList.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => restartReview(items, lists, null)}
+                    className="min-h-11 font-medium text-accent-strong underline underline-offset-4"
+                  >
+                    Réviser tous les mots du jour
+                  </button>
+                </div>
+              )}
+              <ReviewSession key={reviewKey} queue={reviewQueue} lists={lists} today={today} onReviewed={handleReviewed} />
+            </div>
+
+            <section>
+              <SectionTitle
+                action={
+                  panel === null && (
+                    <span className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setPanel("import")}
+                        className="inline-flex min-h-11 items-center rounded-full border border-ink px-4 text-sm font-semibold text-ink hover:bg-surface-sunk"
+                      >
+                        Importer
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPanel("add")}
+                        className={`${buttonClass.primary} !px-4 text-sm`}
+                      >
+                        <PlusIcon width={15} height={15} />
+                        Ajouter
+                      </button>
+                    </span>
+                  )
+                }
+              >
+                Mes mots
+              </SectionTitle>
+
+              {panel === "add" && (
+                <div className="mb-5 border-y border-ink py-5">
+                  <AddWordForm
+                    languages={languages}
+                    lists={lists}
+                    canTranslate={canTranslate}
+                    isGuest={isGuest}
+                    onAdd={handleAdd}
+                    onTranslate={translateWords}
+                    onCancel={() => setPanel(null)}
+                  />
+                </div>
+              )}
+              {panel === "import" && (
+                <div className="mb-5 border-y border-ink py-5">
+                  <ImportWordsForm
+                    languages={languages}
+                    lists={lists}
+                    items={items}
+                    canTranslate={canTranslate}
+                    isGuest={isGuest}
+                    onImport={handleImport}
+                    onTranslate={translateWords}
+                    onClose={() => setPanel(null)}
+                  />
+                </div>
+              )}
+
+              <div className="mb-4 space-y-2">
+                <FilterRow
+                  label="Langue"
+                  options={[
+                    { value: "all" as const, label: "Toutes" },
+                    ...languages.map((l) => ({ value: l, label: languageInfo(l).nameFr })),
+                  ]}
+                  value={languageFilter}
+                  onChange={setLanguageFilter}
+                />
+                <FilterRow label="Statut" options={STATUS_FILTERS} value={statusFilter} onChange={setStatusFilter} />
+                {lists.length > 0 && (
+                  <FilterRow
+                    label="Liste"
+                    options={[
+                      { value: "all", label: "Toutes" },
+                      { value: "none", label: "Sans liste" },
+                      ...lists.map((l) => ({ value: l.id, label: l.name })),
+                    ]}
+                    value={listFilter}
+                    onChange={setListFilter}
+                  />
+                )}
+              </div>
+
+              {visible.length === 0 ? (
+                <p className="py-8 text-center text-sm text-muted">Aucun mot dans cette sélection.</p>
+              ) : (
+                <ul aria-label="Mes mots" className="grid border-b border-line md:grid-cols-2 md:gap-x-0">
+                  {visible.map((item) => (
+                    <WordCard
+                      key={item.id}
+                      item={item}
+                      listName={lists.find((l) => l.id === item.listId)?.name}
+                      today={today}
+                      onToggleKnown={() => handleToggleKnown(item)}
+                      onDelete={() => handleDelete(item)}
+                    />
+                  ))}
+                </ul>
+              )}
+            </section>
           </div>
-        )}
-        <ReviewSession key={reviewKey} queue={reviewQueue} lists={lists} today={today} onReviewed={handleReviewed} />
-      </div>
-
-      <ListsSection
-        lists={lists}
-        items={items}
-        dueCounts={dueCounts}
-        languages={languages}
-        onCreate={handleCreateList}
-        onReview={handleReviewList}
-        onToggle={handleToggleList}
-        onDelete={handleDeleteList}
-      />
-
-      <section>
-        <SectionTitle
-          action={
-            panel === null && (
-              <span className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setPanel("import")}
-                  className="rounded-full border border-line px-3.5 py-1.5 text-sm font-semibold text-ink-soft hover:bg-surface-sunk"
-                >
-                  Importer
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPanel("add")}
-                  className="inline-flex items-center gap-1 rounded-full bg-ink px-3.5 py-1.5 text-sm font-semibold text-paper"
-                >
-                  <PlusIcon width={15} height={15} />
-                  Ajouter
-                </button>
-              </span>
-            )
-          }
-        >
-          Mes mots
-        </SectionTitle>
-
-        {panel === "add" && (
-          <Card className="mb-5">
-            <AddWordForm
-              languages={languages}
-              lists={lists}
-              canTranslate={canTranslate}
-              isGuest={isGuest}
-              onAdd={handleAdd}
-              onTranslate={translateWords}
-              onCancel={() => setPanel(null)}
-            />
-          </Card>
-        )}
-        {panel === "import" && (
-          <Card className="mb-5">
-            <ImportWordsForm
-              languages={languages}
+        }
+        aside={
+          <div className="space-y-10">
+            <ListsSection
               lists={lists}
               items={items}
-              canTranslate={canTranslate}
-              isGuest={isGuest}
-              onImport={handleImport}
-              onTranslate={translateWords}
-              onClose={() => setPanel(null)}
+              dueCounts={dueCounts}
+              languages={languages}
+              onCreate={handleCreateList}
+              onReview={handleReviewList}
+              onToggle={handleToggleList}
+              onDelete={handleDeleteList}
             />
-          </Card>
-        )}
-
-        <div className="mb-4 space-y-2">
-          <FilterRow
-            label="Langue"
-            options={[
-              { value: "all" as const, label: "Toutes" },
-              ...languages.map((l) => ({ value: l, label: languageInfo(l).nameFr })),
-            ]}
-            value={languageFilter}
-            onChange={setLanguageFilter}
-          />
-          <FilterRow label="Statut" options={STATUS_FILTERS} value={statusFilter} onChange={setStatusFilter} />
-          {lists.length > 0 && (
-            <FilterRow
-              label="Liste"
-              options={[
-                { value: "all", label: "Toutes" },
-                { value: "none", label: "Sans liste" },
-                ...lists.map((l) => ({ value: l.id, label: l.name })),
-              ]}
-              value={listFilter}
-              onChange={setListFilter}
-            />
-          )}
-        </div>
-
-        {visible.length === 0 ? (
-          <p className="py-8 text-center text-sm text-muted">Aucun mot dans cette sélection.</p>
-        ) : (
-          <ul aria-label="Mes mots" className="space-y-3">
-            {visible.map((item) => (
-              <WordCard
-                key={item.id}
-                item={item}
-                listName={lists.find((l) => l.id === item.listId)?.name}
-                today={today}
-                onToggleKnown={() => handleToggleKnown(item)}
-                onDelete={() => handleDelete(item)}
-              />
-            ))}
-          </ul>
-        )}
-      </section>
+            {retention}
+          </div>
+        }
+      />
     </div>
   );
 }
@@ -409,14 +422,14 @@ function FilterRow<T extends string>({
   onChange: (value: T) => void;
 }) {
   return (
-    <div role="group" aria-label={label} className="-mx-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none]">
+    <div role="group" aria-label={label} className="-mx-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none] md:mx-0 md:flex-wrap md:overflow-visible md:px-0">
       {options.map((o) => (
         <button
           key={o.value}
           type="button"
           aria-pressed={value === o.value}
           onClick={() => onChange(o.value)}
-          className={`shrink-0 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
+          className={`inline-flex min-h-11 shrink-0 items-center rounded-full border px-4 text-sm font-medium transition-colors ${
             value === o.value ? "border-ink bg-ink text-paper" : "border-line text-ink-soft hover:bg-surface-sunk"
           }`}
         >
@@ -444,14 +457,14 @@ function WordCard({
   const known = item.status === "known";
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   return (
-    <li className="rounded-3xl border border-line bg-surface p-4 sm:p-5">
+    <li className="border-t border-line py-4 md:odd:pr-6 md:even:border-l md:even:pl-6">
       <div className="flex items-start gap-3">
-        <span className={`mt-2.5 size-2 shrink-0 rounded-full ${style.bg}`} aria-hidden="true" />
         <div className="min-w-0 flex-1">
-          <p lang={item.language} className="font-serif text-lg font-semibold">
+          <p lang={item.language} className="flex items-baseline gap-2 font-serif text-xl font-bold">
+            <span className={`size-2 shrink-0 self-center rounded-full ${style.bg}`} aria-hidden="true" />
             {item.term}
           </p>
-          <p className="text-sm text-ink-soft">{item.translation}</p>
+          <p className="text-[15px] text-ink-soft">{item.translation}</p>
           {item.definition && (
             <p lang={item.language} className="mt-1.5 text-[13px] text-ink-soft">
               {item.definition}
@@ -462,7 +475,7 @@ function WordCard({
               {item.example}
             </p>
           )}
-          <p className="mt-2.5 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted">
+          <p className="kicker mt-2.5 flex flex-wrap gap-x-3 gap-y-1 text-muted">
             {listName && <span>Liste : {listName}</span>}
             {item.source && <span>{item.source.name}</span>}
             {!known && <span>Révision {relativeDueLabel(item.review.dueOn, today)}</span>}
@@ -473,20 +486,20 @@ function WordCard({
           type="button"
           onClick={onToggleKnown}
           aria-pressed={known}
-          className={`shrink-0 rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
+          className={`inline-flex min-h-11 shrink-0 items-center rounded-full border px-3.5 text-xs font-semibold transition-colors ${
             known ? "border-success/40 bg-success-soft text-success" : "border-line text-ink-soft hover:bg-surface-sunk"
           }`}
         >
           {known ? "Connu" : "Marquer connu"}
         </button>
       </div>
-      <div className="mt-2 flex justify-end gap-3 text-xs font-medium">
+      <div className="mt-1 flex justify-end gap-3 text-xs font-medium">
         {confirmingDelete ? (
           <>
-            <button type="button" onClick={() => setConfirmingDelete(false)} className="text-muted">
+            <button type="button" onClick={() => setConfirmingDelete(false)} className="min-h-11 px-1 text-muted">
               Annuler
             </button>
-            <button type="button" onClick={onDelete} className="text-danger">
+            <button type="button" onClick={onDelete} className="min-h-11 px-1 text-danger">
               Confirmer la suppression
             </button>
           </>
@@ -495,7 +508,7 @@ function WordCard({
             type="button"
             onClick={() => setConfirmingDelete(true)}
             aria-label={`Supprimer « ${item.term} »`}
-            className="text-muted hover:text-danger"
+            className="min-h-11 px-1 text-muted hover:text-danger"
           >
             Supprimer
           </button>
