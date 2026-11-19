@@ -1,6 +1,13 @@
-# Passation — refonte DailyLingua, jalon 2 (mise à jour du 2026-11-18, après la PR 1)
+# Passation — refonte DailyLingua, jalon 2 (mise à jour du 2026-11-19)
 
-Brief pour une nouvelle session Claude Code (Opus 5.5). Travailler dans le worktree `C:\Users\Administrateur\Documents\DailyLingua\.claude\worktrees\refonte-jalon-2` (branche `refonte/jalon-2`, poussée, à jour de `dev`). Ce document **complète** `passation-suite-refonte.md` (à la racine) : son §1 (rôle d'orchestrateur), son §5 (règles à ne pas enfreindre) et son §6 (format des rapports) restent valables tels quels.
+## Reprise locale du 19 novembre
+
+- Le lot « La séance à l’écran » est sur `codex/jalon-2-seance`, au commit `e532c65`. La séance, les textes gradués et la reprise après rechargement hors ligne sont branchés. La génération payante reste désactivée par défaut.
+- `refonte:check` et le build Webpack passent. WebKit à 390 px a exercé le rechargement hors ligne avec le service worker et un paquet fictif. Les 11 tests de publication passent dans un PostgreSQL éphémère. Le parcours Supabase complet reste à vérifier sur une base locale à jour.
+- Le lot « Expression et rappel » commence sur `codex/jalon-2-expression-rappel` avec `npm run metrics:report -- --month AAAA-MM`. Le rapport lit des agrégats réservés au rôle de service et exige une URL locale. Les trois tests pgTAP couvrent les cohortes, les comptages et les droits.
+- Reprendre à la correction écrite et à la réécriture vérifiée, puis brancher l’erreur du jour et les rappels selon le §3. Aucun des deux lots locaux n’a été déployé.
+
+La branche locale ci-dessus prolonge `refonte/jalon-2`. Les sections qui suivent décrivent l’état après la PR 1 et le périmètre des lots 2 et 3. Ce document complète `passation-suite-refonte.md`, dont les §1, §5 et §6 s’appliquent toujours.
 
 ## 1. À lire avant d'agir
 

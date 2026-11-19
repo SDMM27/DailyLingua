@@ -688,6 +688,8 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
+"metrics_report":
+{ Args: { "p_as_of"?: string,"p_month": string }; Returns: Json },
 "claim_graded_text_job":
 { Args: { "p_density": number,"p_language": string,"p_level": string,"p_theme": string,"p_version": string }; Returns: Json },
 "publish_graded_text":
