@@ -1,4 +1,5 @@
 import "server-only";
+import { z } from "zod";
 import { addDays, deterministicUuid, learningDay, planIngest, type IngestState, type RawEvent, type RejectedDelivery } from "@dailylingua/core";
 import {
   IngestBatchError,
@@ -71,6 +72,7 @@ const reasons: ReadonlySet<string> = new Set(rejectionReasons);
 const asReason = (reason: string): RejectionReason => (reasons.has(reason) ? (reason as RejectionReason) : "invalid_payload");
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null && !Array.isArray(value);
+const eventIdSchema = z.uuid();
 
 /** Days of sessions of the user read around the server day (`ingest-rows`: server day - 8 to + 1). */
 const windowOf = (now: Date) => (timeZone: string): DayWindow => {
@@ -209,6 +211,7 @@ export async function ingestEvents(input: { store: IngestStore; userId: string; 
   const seen = new Set<string>();
   const rejected = outcome.rejected
     .map((entry) => ({ clientEventId: entry.clientEventId, reason: asReason(entry.reason) }))
+    .filter((entry) => eventIdSchema.safeParse(entry.clientEventId).success)
     .filter((entry) => (seen.has(entry.clientEventId) ? false : (seen.add(entry.clientEventId), true)));
   return { rejected, duplicates: outcome.duplicates, report: { rejected } };
 }
@@ -216,7 +219,8 @@ export async function ingestEvents(input: { store: IngestStore; userId: string; 
 async function isolate(store: IngestStore, userId: string, events: readonly unknown[], now: Date, log: LogFn): Promise<Outcome> {
   const rejected: RejectedDelivery[] = [];
   const duplicates = new Set<string>();
-  for (const event of isolationOrder(events).slice(0, MAX_ISOLATION_EVENTS)) {
+  const ordered = isolationOrder(events);
+  for (const event of ordered.slice(0, MAX_ISOLATION_EVENTS)) {
     try {
       const single = await processWithRetry(store, userId, [event], now, log);
       rejected.push(...single.rejected);
@@ -227,6 +231,11 @@ async function isolate(store: IngestStore, userId: string, events: readonly unkn
         log("warn", "an event is refused by the database", { userId, clientEventId: id, sqlstate: error.sqlstate, message: error.message });
         if (id !== null) rejected.push({ clientEventId: id, reason: "server_refused" });
       } else throw toTransient(error, log, userId);
+    }
+  }
+  for (const event of ordered.slice(MAX_ISOLATION_EVENTS)) {
+    if (isRecord(event) && typeof event.clientEventId === "string" && !duplicates.has(event.clientEventId)) {
+      rejected.push({ clientEventId: event.clientEventId, reason: "server_refused" });
     }
   }
   return { rejected, duplicates: [...duplicates] };

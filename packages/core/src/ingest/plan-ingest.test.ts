@@ -41,6 +41,19 @@ describe("planIngest: reviews", () => {
     expect(xpOf(payload)).toBe(3);
   });
 
+  it("grades a review with its named session's mode even if the latest card key is different", () => {
+    const cardId = uuid(31);
+    const s = emptyState({
+      cards: { [cardId]: card(cardId, { optionId: cardId, accept: [], productionAccept: ["parola"] }) },
+      sessions: { [SESSION]: session({ servedCards: { [cardId]: "production" }, wakeCardIds: [cardId] }) },
+    });
+    const event = review(eventWriter(), cardId, iso("09:00:10"), "parola", 3000, "production");
+    const named = { ...event, payload: { ...(event.payload as Record<string, unknown>), sessionId: SESSION } };
+    expect(plan(s, [named]).payload.reviews[0]?.rating).toBe(3);
+    const wrongMode = { ...named, payload: { ...named.payload, mode: "recognition" } };
+    expect(plan(s, [wrongMode]).rejected[0]?.reason).toBe("invalid_payload");
+  });
+
   it("pays 2 XP for a typed answer, with the diacritics tolerance, and a Hard rating for 'almost'", () => {
     const s = emptyState({ cards: { [uuid(31)]: card(uuid(31), { optionId: null, accept: ["perché"] }) } });
     const { payload } = plan(s, [review(eventWriter(), uuid(31), iso("09:00:10"), "perche", 3000, "production")]);

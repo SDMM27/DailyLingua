@@ -29,6 +29,9 @@ import { ingestMemoSchema, languageCodeSchema, sessionPacketSchema, storedSessio
 import { formatOfMinutes } from "@/lib/ingest/format";
 import { writingLevels } from "@/lib/ingest/build-state";
 import type { LogFn } from "@/lib/ingest/ingest-events";
+import type { GenerationResult } from "@/lib/graded-text/generate";
+import { isSameOrigin } from "@/lib/ingest/events-route";
+import { ACCOUNT_HEADER } from "@/lib/offline/account";
 import { buildPacket } from "./build-packet";
 import { pickTextCandidate, planToday } from "./plan-session";
 
@@ -83,6 +86,7 @@ export interface TodayRouteDeps {
   newId(): string;
   /** `connection()` of Next: the date must be the request's, never the build's. */
   connection?(): Promise<void>;
+  prepareText?(options: { language: string; level: string; day: DateKey; stockAvailable(): Promise<boolean> }): Promise<GenerationResult>;
   log?: LogFn;
 }
 
@@ -91,9 +95,10 @@ const json = (body: Record<string, unknown> | SessionPacket, status: number) => 
 
 /** Whole days of review history read to find the reviews of yesterday. */
 const REVIEW_LOOKBACK_DAYS = 3;
+class TextPreparing extends Error {}
 
 /** The packet of `userId` for `language` today: the stored session if there is one, else a new one. */
-export async function todayPacket(deps: Pick<TodayRouteDeps, "store" | "newId">, input: { userId: string; language: string; now: Date; profile: ProfileRow; enrollment: EnrollmentRow; log: LogFn }): Promise<SessionPacket | null> {
+export async function todayPacket(deps: Pick<TodayRouteDeps, "store" | "newId" | "prepareText">, input: { userId: string; language: string; now: Date; profile: ProfileRow; enrollment: EnrollmentRow; log: LogFn }): Promise<SessionPacket | null> {
   const { store } = deps;
   const { userId, language, now, profile, enrollment, log } = input;
   const today = learningDay(now, profile.timeZone);
@@ -111,28 +116,42 @@ export async function todayPacket(deps: Pick<TodayRouteDeps, "store" | "newId">,
     ]);
     // The band of the learner's writing level (B1 without an estimate), never a free string.
     const band = writingLevels(estimates)[language] ?? "B1";
-    const candidate = pickTextCandidate(await store.textCandidates(userId, language, [band]));
-    const text = candidate ? await store.textWithItems(candidate.id) : null;
-    const memo = ingestMemoSchema.safeParse(state.memo);
-    const sessionId = deps.newId();
-    const planned = planToday(
-      {
-        now,
-        today,
-        timeZone: profile.timeZone,
-        format: formatOfMinutes(enrollment.dailyMinutes),
-        cards,
-        recentReviews: reviews,
-        lastSessionDay,
-        completedShortSessions,
-        newCardsToday: memo.success ? (memo.data.days[today]?.newCards ?? 0) : 0,
-        newCardsSuspendedThrough: suspendedThrough,
-        text,
-      },
-      sessionId,
-    );
-    // Written once: a request that lost the race gets the winner's row back and builds the packet from it.
-    session = await store.insertSession({ id: sessionId, userId, language, day: today, kind: planned.kind, format: planned.format, plan: planned.plan, servedAt: now.toISOString() });
+    const candidates = () => store.textCandidates(userId, language, [band]);
+    let candidate = pickTextCandidate(await candidates());
+    if (!candidate && deps.prepareText) {
+      const prepared = await deps.prepareText({ language, level: band, day: today, stockAvailable: async () => (await candidates()).length > 0 })
+        .catch((error: unknown) => {
+          log("warn", "graded text preparation unavailable", { error: error instanceof Error ? error.name : "unknown" });
+          return "unavailable";
+        });
+      // Preparation can take long enough for another device to claim the session.
+      session = await store.sessionOfDay(userId, language, today);
+      if (!session && prepared === "busy") throw new TextPreparing();
+      if (prepared === "published" || prepared === "stock") candidate = pickTextCandidate(await candidates());
+    }
+    if (!session) {
+      const text = candidate ? await store.textWithItems(candidate.id) : null;
+      const memo = ingestMemoSchema.safeParse(state.memo);
+      const sessionId = deps.newId();
+      const planned = planToday(
+        {
+          now,
+          today,
+          timeZone: profile.timeZone,
+          format: formatOfMinutes(enrollment.dailyMinutes),
+          cards,
+          recentReviews: reviews,
+          lastSessionDay,
+          completedShortSessions,
+          newCardsToday: memo.success ? (memo.data.days[today]?.newCards ?? 0) : 0,
+          newCardsSuspendedThrough: suspendedThrough,
+          text,
+        },
+        sessionId,
+      );
+      // Written once: a request that lost the race gets the winner's row back and builds the packet from it.
+      session = await store.insertSession({ id: sessionId, userId, language, day: today, kind: planned.kind, format: planned.format, plan: planned.plan, servedAt: now.toISOString() });
+    }
   }
 
   const plan = storedSessionPlanSchema.safeParse(session.plan);
@@ -163,10 +182,14 @@ export async function todayPacket(deps: Pick<TodayRouteDeps, "store" | "newId">,
 export function createTodayHandler(deps: TodayRouteDeps): (request: Request) => Promise<Response> {
   const log: LogFn = deps.log ?? ((level, message, data) => (level === "error" ? console.error : console.warn)(`[api/session/today] ${message}`, data ?? {}));
 
-  return async function GET(request: Request): Promise<Response> {
+  return async function serveToday(request: Request): Promise<Response> {
+    const canPrepare = request.method === "POST";
+    if (canPrepare && !isSameOrigin(request)) return json({ error: "forbidden" }, 403);
     try {
       const user = await deps.getUser();
       if (!user) return json({ error: "unauthenticated" }, 401);
+      const account = request.headers.get(ACCOUNT_HEADER);
+      if (account !== null && account !== user.id) return json({ error: "unauthenticated" }, 401);
       await deps.connection?.();
 
       // The language must be an active enrollment of the learner: anything else is "not found", whatever it looks like.
@@ -176,7 +199,7 @@ export function createTodayHandler(deps: TodayRouteDeps): (request: Request) => 
       if (!asked.success || !enrollment) return json({ error: "not_found" }, 404);
 
       const now = deps.now();
-      const packet = await todayPacket(deps, { userId: user.id, language: asked.data, now, profile, enrollment, log });
+      const packet = await todayPacket({ ...deps, prepareText: canPrepare ? deps.prepareText : undefined }, { userId: user.id, language: asked.data, now, profile, enrollment, log });
       if (!packet) return json({ error: "unavailable" }, 503);
       const checked = sessionPacketSchema.safeParse(packet);
       if (!checked.success) {
@@ -185,6 +208,9 @@ export function createTodayHandler(deps: TodayRouteDeps): (request: Request) => 
       }
       return json(checked.data, 200);
     } catch (error) {
+      if (error instanceof TextPreparing) {
+        return Response.json({ error: "preparing_text" }, { status: 503, headers: { ...HEADERS, "Retry-After": "5" } });
+      }
       // The message of the database or of a library never goes into a response.
       log("error", "the session route failed", { error: error instanceof Error ? `${error.name}: ${error.message}` : String(error) });
       return json({ error: "unavailable" }, 503);

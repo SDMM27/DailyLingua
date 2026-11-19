@@ -106,12 +106,36 @@ test.describe("account journey", () => {
 
     // Today, first-day state.
     await expect(page).toHaveURL(/\/$/);
-    await expect(page.getByRole("heading", { level: 1, name: /^italien$/i })).toBeVisible();
-    await expect(page.getByText("Niveau de départ : A0")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Les séances arrivent bientôt" })).toBeDisabled();
+    await expect(page.getByRole("heading", { level: 1, name: "Aujourd’hui" })).toBeVisible();
+    await expect(page.getByText(/^italien$/i)).toBeVisible();
+    await expect(page.getByRole("button", { name: "Commencer la séance" })).toBeEnabled();
     await expect(page.getByRole("progressbar", { name: "Objectif du jour : 0 sur 100 XP" })).toBeVisible();
     await expect(page.locator("html")).toHaveAttribute("lang", "fr");
     await expectNoHorizontalOverflow(page);
+
+    // A new navigation offline uses only the public shell and the local signed-in user's packet.
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect(page.getByText("Prête hors ligne")).toBeVisible();
+    await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
+    await page.context().setOffline(true);
+    try {
+      await page.reload({ waitUntil: "domcontentloaded" });
+      await page.getByRole("button", { name: "Commencer la séance" }).click();
+      await expect(page.getByRole("heading", { name: "Bilan" })).toBeVisible();
+      await expect(page.getByRole("status", { name: "" }).filter({ hasText: "Hors ligne" })).toBeVisible();
+      await expectNoHorizontalOverflow(page);
+      await page.emulateMedia({ colorScheme: "dark" });
+      await expectNoHorizontalOverflow(page);
+      await page.getByRole("button", { name: "Séance en pause" }).click();
+      await page.getByRole("button", { name: "Quitter pour l’instant" }).click();
+      await page.getByRole("button", { name: /Reprendre/ }).click();
+      await expect(page.getByRole("heading", { name: "Bilan" })).toBeVisible();
+      await page.getByRole("button", { name: "Terminer" }).click();
+      await expect(page.getByRole("button", { name: "Revoir le bilan" })).toBeVisible();
+    } finally {
+      await page.context().setOffline(false);
+    }
+    await page.reload();
 
     // Settings: the interface language changes at once.
     await page.getByRole("link", { name: "Réglages" }).click();
@@ -125,7 +149,7 @@ test.describe("account journey", () => {
 
     // The choice is stored in the profile: Today follows.
     await page.getByRole("link", { name: "Today" }).click();
-    await expect(page.getByRole("heading", { level: 1, name: "Italian" })).toBeVisible();
+    await expect(page.getByText("Italian", { exact: true })).toBeVisible();
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
 
     // Sign out, then back in (the language is remembered by the cookie).
@@ -133,7 +157,7 @@ test.describe("account journey", () => {
     await page.getByRole("button", { name: "Sign out" }).click();
     await expect(page).toHaveURL(/\/sign-in$/);
     await signInAgain(page, email);
-    await expect(page.getByRole("heading", { level: 1, name: "Italian" })).toBeVisible();
+    await expect(page.getByText("Italian", { exact: true })).toBeVisible();
 
     expect(errors).toEqual([]);
   });

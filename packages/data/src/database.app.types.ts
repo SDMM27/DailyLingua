@@ -255,6 +255,33 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"graded_text_job": {
+                  Row: {
+                    "created_at": string,"density": number,"failure": string | null,"finished_at": string | null,"id": string,"language": string,"level_band": string,"prompt_version": string,"text_id": string | null,"theme": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"density": number,"failure"?: string | null,"finished_at"?: string | null,"id"?: string,"language": string,"level_band": string,"prompt_version": string,"text_id"?: string | null,"theme": string
+                  }
+                  Update: {
+                    "created_at"?: string,"density"?: number,"failure"?: string | null,"finished_at"?: string | null,"id"?: string,"language"?: string,"level_band"?: string,"prompt_version"?: string,"text_id"?: string | null,"theme"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "graded_text_job_language_fkey"
+      columns: ["language"]
+isOneToOne: false
+      referencedRelation: "language"
+      referencedColumns: ["code"]
+    },
+                    {
+      foreignKeyName: "graded_text_job_text_id_fkey"
+      columns: ["text_id"]
+isOneToOne: false
+      referencedRelation: "text"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"learning_day": {
                   Row: {
                     "cause": string,"day": string,"first_activity_at": string | null,"time_zone": string,"user_id": string,"validated": boolean,"xp_verified": number
@@ -661,6 +688,10 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
+"claim_graded_text_job":
+{ Args: { "p_density": number,"p_language": string,"p_level": string,"p_theme": string,"p_version": string }; Returns: Json },
+"publish_graded_text":
+{ Args: { "p_items": Json,"p_job": string,"p_text": Json }; Returns: string },
             "ai_spend":
 { Args: { "p_from": string,"p_to": string }; Returns: {
               "calls": number,"cost_usd": number,"input_tokens": number,"model": string,"output_tokens": number,"purpose": string

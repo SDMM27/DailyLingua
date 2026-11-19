@@ -4,7 +4,7 @@ import { AI_PURPOSES, AI_PURPOSE_NAMES, isAiPurpose, type PurposeSpec } from "./
 describe("purpose registry", () => {
   it("has the seven purposes of the design", () => {
     expect([...AI_PURPOSE_NAMES].sort()).toEqual(
-      ["assessment_grading", "gloss", "graded_text", "rewrite_check", "roleplay", "translation", "writing_feedback"].sort(),
+      ["assessment_grading", "gloss", "graded_text", "graded_text_review", "rewrite_check", "roleplay", "translation", "writing_feedback"].sort(),
     );
   });
 

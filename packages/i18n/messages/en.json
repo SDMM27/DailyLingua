@@ -115,8 +115,64 @@
       "soon": "Sessions are coming soon"
     }
   },
+  "dailySession": {
+    "title": "Today’s session",
+    "generatedText": "Generated text, automatically reviewed",
+    "steps": {
+      "wake": "Warm-up",
+      "reading": "Reading",
+      "workshop": "Workshop",
+      "expression": "Writing",
+      "momentum": "Fluency",
+      "review": "Wrap-up"
+    },
+    "reviewOnly": "Today’s reviews",
+    "progress": "Step {position} of 6",
+    "offline": "Offline",
+    "readyOffline": "Ready offline",
+    "offlineMissing": "Today’s session will download when you’re back online.",
+    "loadError": "The session couldn’t load right now.",
+    "retry": "Try again",
+    "saveError": "This device couldn’t save your progress. Try again.",
+    "dayEnded": "A new learning day has started. Go back to Today to load the new session.",
+    "reopen": "View wrap-up",
+    "pauseTitle": "Session paused",
+    "pauseBody": "You’ll pick up at {step}.",
+    "continue": "Continue",
+    "leave": "Leave for now",
+    "check": "Check",
+    "choose": "Choose your answer",
+    "answer": "Your answer",
+    "correct": "Correct",
+    "almost": "Check the accents",
+    "wrong": "Try to remember",
+    "startReading": "Read the text",
+    "questions": "Go to questions",
+    "readAgain": "Take a little more time to read the passage.",
+    "listen": "Listen to the passage",
+    "audioUnavailable": "There’s no voice available on this device. You can read the passage.",
+    "rereadInstruction": "Read this passage again at your own pace. See if it feels easier this time.",
+    "startReread": "Start rereading",
+    "endReread": "Finish rereading",
+    "wordCount": "{words} words · {minimum} minimum",
+    "submitWriting": "Save my writing",
+    "finish": "Finish",
+    "summaryBody": "Your progress and writing are saved on this device.",
+    "reviewSummaryBody": "Your reviews will count once they sync.",
+    "noReviews": "You have no cards to review today.",
+    "streakDays": "{count, plural, one {# day in a row} other {# days in a row}}",
+    "streakWeeks": "{count, plural, one {# week in a row} other {# weeks in a row}}",
+    "streakBest": "Best · {count}",
+    "streakFreezes": "{count, plural, one {# freeze available} other {# freezes available}}"
+  },
   "settings": {
     "title": "Settings",
+    "game": {
+      "title": "Game",
+      "xpVisible": "Show XP",
+      "streakEnabled": "Show streak",
+      "celebrations": "Animate the wrap-up"
+    },
     "interfaceLanguage": {
       "label": "Interface language",
       "hint": "The app’s text appears in this language."
@@ -127,7 +183,7 @@
     },
     "timeZone": {
       "label": "Time zone",
-      "hint": "Your study day rolls over at 4 a.m. in this time zone."
+      "hint": "Your study day rolls over at 4 a.m. Once you start learning, the time zone follows your device."
     },
     "reminder": {
       "label": "Reminder time",

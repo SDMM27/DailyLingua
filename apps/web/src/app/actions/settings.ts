@@ -1,6 +1,6 @@
 "use server";
 
-import { getProfile, saveProfile } from "@dailylingua/data";
+import { getProfile, saveGameSettings, saveProfile } from "@dailylingua/data";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { saveErrorKey, type SaveErrorKey } from "@/lib/data-errors";
@@ -47,8 +47,7 @@ export async function setInterfaceLanguage(language: string): Promise<SettingsSt
 
 /**
  * Saves the mother tongue, the time zone and the reminder time. Once the app has ingested events, `app.save_profile`
- * ignores the time zone it receives: the time zone is then followed by the events (`timezone_change`, with the
- * 48-hour rule in core). The settings screen will be adjusted in PR 2.
+ * ignores the time zone it receives: the time zone then follows the device that sends learning events.
  */
 export async function saveLearningSettings(_previous: SettingsState, formData: FormData): Promise<SettingsState> {
   const parsed = learningSettingsSchema.safeParse({
@@ -69,6 +68,22 @@ export async function saveLearningSettings(_previous: SettingsState, formData: F
     });
   } catch (error) {
     console.error("saveLearningSettings failed", error);
+    return { error: saveErrorKey(error) };
+  }
+  revalidatePath("/", "layout");
+  return { saved: true };
+}
+
+export async function saveGamePreferences(_previous: SettingsState, formData: FormData): Promise<SettingsState> {
+  const client = await signedInClient();
+  try {
+    await saveGameSettings(client, {
+      xpVisible: formData.get("xpVisible") === "on",
+      streak: { enabled: formData.get("streakEnabled") === "on" },
+      celebrations: formData.get("celebrations") === "on" ? "full" : "reduced",
+    });
+  } catch (error) {
+    console.error("saveGamePreferences failed", error);
     return { error: saveErrorKey(error) };
   }
   revalidatePath("/", "layout");

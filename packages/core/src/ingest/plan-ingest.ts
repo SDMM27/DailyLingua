@@ -189,12 +189,13 @@ class Ingestion {
       if (event.kind === "focus_attempt" && !(this.itemsOfWorkshop(session).includes(p.itemId as string) && this.s.items[p.itemId as string])) return this.no(event, "unknown_item");
       if (event.kind === "fluency_pass" && !this.s.texts[p.textId as string]) return this.no(event, "unknown_item");
       if (event.kind === "production_submitted" && this.s.productions[p.productionId as string]) return this.no(event, "duplicate_conflict");
+      if (event.kind === "review_attempt" && session.servedCards?.[event.payload.cardId] !== event.payload.mode) return this.no(event, "invalid_payload");
     }
     if (event.kind === "review_attempt") {
       const card = this.s.cards[event.payload.cardId];
       if (!card || card.userId !== this.s.userId || card.state === "suspended" || card.state === "known") return this.no(event, "unknown_card");
       if (card.state !== "new" && (card.stability === null || card.difficulty === null || card.lastReviewAt === null)) return this.no(event, "unknown_card");
-      servedAt = card.servedAt;
+      if (!event.payload.sessionId) servedAt = card.servedAt;
     }
     if (event.kind === "rewrite_submitted") {
       const correction = this.s.corrections[event.payload.correctionId];
@@ -381,7 +382,10 @@ class Ingestion {
     const card = this.s.cards[p.cardId] as StateCard;
     const answeredMs = Date.parse(p.answeredAt);
     const elapsedMs = Math.min(answeredMs - Date.parse(p.shownAt), MAX_ANSWER_MS);
-    const graded = gradeCardRecall({ language: card.language, mode: p.mode, answer: p.answer, key: { optionId: card.optionId, accept: card.accept }, tolerance: this.tolerance() });
+    const gradingKey = p.sessionId
+      ? { optionId: p.mode === "production" ? null : card.id, accept: card.productionAccept ?? card.accept }
+      : { optionId: card.optionId, accept: card.accept };
+    const graded = gradeCardRecall({ language: card.language, mode: p.mode, answer: p.answer, key: gradingKey, tolerance: this.tolerance() });
     const rating = ratingFor(graded, { elapsedMs });
     const memory: MemoryState = {
       state: card.state,
@@ -396,7 +400,8 @@ class Ingestion {
     const scheduledAt = new Date(Math.max(answeredMs, memory.lastReviewAt?.getTime() ?? answeredMs));
     const next = schedule(memory, rating, scheduledAt);
     const d = this.day(at.day);
-    const session = this.sessionFor(card.language, at.day);
+    const namedSession = p.sessionId ? this.s.sessions[p.sessionId] : undefined;
+    const session = namedSession ? (namedSession.day === at.day ? namedSession : undefined) : this.sessionFor(card.language, at.day);
     const limit = WAKE_LIMITS[session?.format ?? 15].newCardsPerDay;
     const isNew = card.state === "new";
     const due = isNew ? d.newCards < limit : new Date(card.dueAt).getTime() <= Date.parse(p.shownAt);

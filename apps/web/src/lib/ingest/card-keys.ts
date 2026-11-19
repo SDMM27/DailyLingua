@@ -40,8 +40,9 @@ export function filterReviewModes(
   const kept: unknown[] = [];
   const rejected: { clientEventId: string; reason: "invalid_payload" }[] = [];
   for (const event of events) {
-    const e = event as { clientEventId?: unknown; kind?: unknown; payload?: { cardId?: unknown; mode?: unknown } | null } | null;
-    const expected = e?.kind === "review_attempt" && typeof e.payload?.cardId === "string" ? expectedModes.get(e.payload.cardId) : undefined;
+    const e = event as { clientEventId?: unknown; kind?: unknown; payload?: { cardId?: unknown; mode?: unknown; sessionId?: unknown } | null } | null;
+    // For a named session the planner validates against that particular packet.
+    const expected = e?.kind === "review_attempt" && e.payload?.sessionId === undefined && typeof e.payload?.cardId === "string" ? expectedModes.get(e.payload.cardId) : undefined;
     const known = typeof e?.clientEventId === "string" && Object.hasOwn(knownEvents, e.clientEventId);
     if (expected !== undefined && !known && e?.payload?.mode !== expected && typeof e?.clientEventId === "string") {
       rejected.push({ clientEventId: e.clientEventId, reason: "invalid_payload" });

@@ -82,6 +82,7 @@ export const sessionStartedPayloadSchema = z.strictObject({ ...deviceFields, ses
 
 export const reviewAttemptPayloadSchema = z.strictObject({
   ...deviceFields,
+  sessionId: z.uuid().optional(),
   cardId: z.uuid(),
   mode: reviewModeSchema,
   /** Id of the chosen option, or the typed text. */

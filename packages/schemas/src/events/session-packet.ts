@@ -53,6 +53,7 @@ export const packetTextSchema = z.strictObject({
   /** First and last sentence (0-based, included) of the listening segment. */
   listeningSegment: z.strictObject({ from: z.number().int().min(0), to: z.number().int().min(0) }).nullable(),
   writingTask: z.string().min(1),
+  generationReviewed: z.boolean().optional(),
 });
 
 export const packetItemSchema = z.strictObject({
@@ -106,6 +107,8 @@ export const sessionPacketSchema = z.strictObject({
   text: packetTextSchema.nullable(),
   items: z.array(packetItemSchema).max(60),
   cards: z.array(packetCardSchema).max(120),
+  wakeCardIds: z.array(z.uuid()).max(120).optional(),
+  momentumWords: z.number().int().positive().nullable().optional(),
   errorOfTheDay: packetErrorOfTheDaySchema.nullable(),
   quotas: z.strictObject({ writingFeedback: quotaSchema, rewriteCheck: quotaSchema }),
   serverDay: dateKeySchema,

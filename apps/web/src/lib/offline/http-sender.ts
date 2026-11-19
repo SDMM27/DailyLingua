@@ -1,10 +1,12 @@
 import type { BatchSender, DeliveryReport, PendingEvent } from "@dailylingua/core";
 import { deliveryReportSchema } from "@dailylingua/schemas";
+import { ACCOUNT_HEADER } from "./account";
 
 export const EVENTS_ENDPOINT = "/api/events";
 
 export interface HttpSenderOptions {
   endpoint?: string;
+  userId?: string;
   /** Injected in tests. */
   fetch?: typeof fetch;
 }
@@ -18,7 +20,7 @@ export interface HttpSenderOptions {
  * failure and rejects, so the queue keeps the events and tries again later: 401 (signed out), 403, 429 (rate limit),
  * 5xx, a network error, an answer that is not a delivery report.
  */
-export function createHttpSender({ endpoint = EVENTS_ENDPOINT, fetch: fetcher }: HttpSenderOptions = {}): BatchSender {
+export function createHttpSender({ endpoint = EVENTS_ENDPOINT, userId, fetch: fetcher }: HttpSenderOptions = {}): BatchSender {
   const refuse = (batch: readonly PendingEvent[]): DeliveryReport => ({ rejected: batch.map((event) => ({ clientEventId: event.clientEventId, reason: "invalid_payload" })) });
 
   async function deliver(batch: readonly PendingEvent[]): Promise<DeliveryReport> {
@@ -27,7 +29,7 @@ export function createHttpSender({ endpoint = EVENTS_ENDPOINT, fetch: fetcher }:
       method: "POST",
       credentials: "same-origin",
       cache: "no-store",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...(userId ? { [ACCOUNT_HEADER]: userId } : {}) },
       body: JSON.stringify(batch),
     });
     if (response.status === 413) {

@@ -51,6 +51,14 @@ describe("POST /api/events: guards, in order", () => {
     expect(d.claimRate).not.toHaveBeenCalled();
   });
 
+  it("keeps a browser queue pending when its account differs from the authenticated cookie", async () => {
+    const d = deps();
+    const response = await createEventsHandler(d)(post(events(1), { "x-dailylingua-user": "another-account" }));
+    expect(response.status).toBe(401);
+    expect(d.claimRate).not.toHaveBeenCalled();
+    expect(d.ingest).not.toHaveBeenCalled();
+  });
+
   it("answers 400 to an invalid JSON body or one that is not an array", async () => {
     const handler = createEventsHandler(deps());
     expect((await handler(post("{nope"))).status).toBe(400);
@@ -82,6 +90,16 @@ describe("POST /api/events: guards, in order", () => {
     const result = await readBodyLimited(request, MAX_BATCH_BYTES);
     expect(result).toEqual({ ok: false, reason: "too_large" });
     expect(pulled).toBeLessThan(10);
+  });
+
+  it("keeps the batch retryable when the body stream fails while being read", async () => {
+    const stream = new ReadableStream<Uint8Array>({
+      pull(controller) { controller.error(new Error("connection closed")); },
+    });
+    const d = deps();
+    const request = new Request(URL_, { method: "POST", headers: { Origin: ORIGIN, "Content-Type": "application/json" }, body: stream, duplex: "half" } as RequestInit);
+    expect((await createEventsHandler(d)(request)).status).toBe(503);
+    expect(d.ingest).not.toHaveBeenCalled();
   });
 
   it("answers 429 with Retry-After until the next hour when the allowance is spent, and ingests nothing", async () => {

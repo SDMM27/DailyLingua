@@ -26,7 +26,7 @@ import {
   type StoredSessionPlan,
 } from "@dailylingua/schemas";
 import { z } from "zod";
-import { cardKeyForMode, expectedCardMode } from "./card-keys";
+import { cardAcceptList, cardKeyForMode, expectedCardMode } from "./card-keys";
 import { ringTierOfMinutes } from "./format";
 
 /**
@@ -137,6 +137,7 @@ function ownSession(row: SessionRow, plan: StoredSessionPlan): StateSession | nu
     startedAt: row.startedAt,
     completedAt: row.completedAt,
     requiredSteps: plan.requiredSteps,
+    servedCards: plan.servedCards,
     wakeCardIds: plan.wake.cardIds,
     wakeBudgetMinutes: plan.wake.budgetMinutes,
     errorItemId: plan.wake.errorItemId,
@@ -197,6 +198,7 @@ function stateCard(row: CardRow, timeZone: string, served: { mode: ReviewMode | 
       lastReview: row.lastReview ? { day: learningDay(new Date(row.lastReview.reviewedAt), timeZone), rating: row.lastReview.rating } : null,
       optionId: key.optionId,
       accept: key.accept,
+      productionAccept: cardAcceptList(row),
       servedAt: served.servedAt,
     },
   };

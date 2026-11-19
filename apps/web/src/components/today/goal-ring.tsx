@@ -4,7 +4,7 @@ const RADIUS = 37;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 /** Daily goal ring: four registration marks around an arc that fills with the XP earned today. */
-export function GoalRing({ current, target }: { current: number; target: number }) {
+export function GoalRing({ current, target, showValue = true }: { current: number; target: number; showValue?: boolean }) {
   const t = useTranslations("today.goal");
   const format = useFormatter();
   const ratio = target > 0 ? Math.min(1, current / target) : 0;
@@ -12,9 +12,9 @@ export function GoalRing({ current, target }: { current: number; target: number 
     <div
       role="progressbar"
       aria-valuemin={0}
-      aria-valuemax={target}
-      aria-valuenow={current}
-      aria-label={t("ariaLabel", { current, target })}
+      aria-valuemax={showValue ? target : 100}
+      aria-valuenow={showValue ? Math.min(current, target) : Math.round(ratio * 100)}
+      aria-label={showValue ? t("ariaLabel", { current, target }) : t("label")}
       className="relative size-24 shrink-0"
     >
       <svg viewBox="0 0 100 100" className="size-full -rotate-90 rtl:rotate-90" aria-hidden="true">
@@ -33,11 +33,11 @@ export function GoalRing({ current, target }: { current: number; target: number 
           opacity={ratio > 0 ? 1 : 0}
         />
       </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-center" aria-hidden="true">
+      {showValue && <div className="absolute inset-0 flex flex-col items-center justify-center text-center" aria-hidden="true">
         <span className="text-xs font-semibold leading-tight">
           {t("progress", { current: format.number(current), target: format.number(target) })}
         </span>
-      </div>
+      </div>}
     </div>
   );
 }

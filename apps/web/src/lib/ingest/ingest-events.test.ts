@@ -108,8 +108,8 @@ describe("ingestEvents: the nominal path", () => {
     const store = fakeStore();
     const result = await run(store, [null, 3, "x", [], { clientEventId: "nope" }]);
     expect(store.calls).toHaveLength(0);
-    // Only an entry with a string id can be reported; the others are dropped.
-    expect(result.rejected).toEqual([{ clientEventId: "nope", reason: "invalid_payload" }]);
+    // A malformed id cannot be included in the delivery report.
+    expect(result.report.rejected).toEqual([]);
   });
 });
 

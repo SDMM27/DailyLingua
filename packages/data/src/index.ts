@@ -6,3 +6,5 @@ export * from "./profile";
 export * from "./ingest-rows";
 export * from "./ingest-write";
 export * from "./session-today";
+export * from "./learning-progress";
+export * from "./graded-text";

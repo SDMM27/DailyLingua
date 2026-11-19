@@ -1,4 +1,4 @@
-import { saveProfileInputSchema, type Profile, type SaveProfileInput } from "@dailylingua/schemas";
+import { gameSettingsSchema, saveProfileInputSchema, type GameSettings, type Profile, type SaveProfileInput } from "@dailylingua/schemas";
 import { appSchema, type AppClient } from "./client";
 import { DataError, toDataError } from "./errors";
 import { toProfile } from "./mappers";
@@ -24,4 +24,12 @@ export async function saveProfile(client: AppClient, input: SaveProfileInput): P
   if (error) throw toDataError(error);
   if (!data) throw new DataError("unknown");
   return toProfile(data);
+}
+
+/** Applies a patch to the signed-in learner's preferences and records its effective date. */
+export async function saveGameSettings(client: AppClient, settings: GameSettings): Promise<void> {
+  const parsed = gameSettingsSchema.safeParse(settings);
+  if (!parsed.success) throw new DataError("invalid");
+  const { error } = await appSchema(client).rpc("save_game_settings", { p_settings: parsed.data });
+  if (error) throw toDataError(error);
 }

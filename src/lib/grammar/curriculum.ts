@@ -1,4 +1,4 @@
-import type { CefrLevel, Language } from "@/lib/schemas/common";
+import type { Language } from "../domain/languages";
 import { arCurriculum } from "./curricula/ar";
 import { csCurriculum } from "./curricula/cs";
 import { deCurriculum } from "./curricula/de";
@@ -19,7 +19,7 @@ import { trCurriculum } from "./curricula/tr";
 import { ukCurriculum } from "./curricula/uk";
 import { zhCurriculum } from "./curricula/zh";
 
-export type CurriculumEntry = { id: string; level: CefrLevel; topic: string };
+export type CurriculumEntry = { id: string; level: "A1" | "A2" | "B1"; topic: string };
 
 /** One list per language, in `curricula/<code>.ts`; an empty list = no course yet. */
 const ALL_CURRICULA: Record<Language, readonly CurriculumEntry[]> = {

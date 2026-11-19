@@ -28,6 +28,8 @@ export const AI_PURPOSES = {
    * stock is generated without a learner and has no quota.
    */
   graded_text: { essential: false, quotaKind: "graded_text", dailyLimit: 2, maxOutputTokens: 8000 },
+  /** Shared quality gate before publication of a generated text. */
+  graded_text_review: { essential: false, quotaKind: null, dailyLimit: null, maxOutputTokens: 2400 },
   /** Segmentation, lemmas and glosses for one first language: shared stock, no quota. */
   gloss: { essential: false, quotaKind: null, dailyLimit: null, maxOutputTokens: 8000 },
   /** Translation of a curated content to one first language: shared stock, no quota. */

@@ -289,3 +289,32 @@ describe("GET /api/session/today", () => {
     expect(packet.items.map((item) => item.id)).toEqual(expect.arrayContaining([ITEM(1)]));
   });
 });
+
+describe("paid preparation of the shared reading", () => {
+  const url = "https://app.example.test/api/session/today?language=it";
+  const post = (origin = "https://app.example.test") => new Request(url, { method: "POST", headers: { Origin: origin } });
+
+  it("only calls the generator for an authenticated same-origin POST without stock", async () => {
+    const candidate = { id: TEXT, density: 2, createdAt: "2026-11-01T00:00:00+00:00" };
+    const textCandidates = vi.fn<TodayStore["textCandidates"]>().mockResolvedValueOnce([]).mockResolvedValueOnce([]).mockResolvedValue([candidate]);
+    const fixture = store({ textCandidates });
+    const prepareText = vi.fn(async () => "published" as const);
+    const route = createTodayHandler({ getUser: async () => ({ id: USER }), store: fixture.store, now: () => NOW, newId: () => uuid(777), prepareText });
+    expect((await route(post("https://other.example.test"))).status).toBe(403);
+    expect((await route(new Request(url))).status).toBe(200);
+    expect(prepareText).not.toHaveBeenCalled();
+    const response = await route(post());
+    expect(response.status).toBe(200);
+    expect(prepareText).toHaveBeenCalledTimes(1);
+    expect(sessionPacketSchema.parse(await response.json()).text?.id).toBe(TEXT);
+  });
+
+  it("leaves the session unplanned when another request is preparing the text", async () => {
+    const fixture = store({ textCandidates: async () => [] });
+    const route = createTodayHandler({ getUser: async () => ({ id: USER }), store: fixture.store, now: () => NOW, newId: () => uuid(777), prepareText: async () => "busy" });
+    const response = await route(post());
+    expect(response.status).toBe(503);
+    expect(response.headers.get("retry-after")).toBe("5");
+    expect(fixture.inserted).toHaveLength(0);
+  });
+});

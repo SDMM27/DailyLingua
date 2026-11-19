@@ -4,8 +4,9 @@ import type { FlushResult, PendingEvent } from "@dailylingua/core";
 import { createContext, useContext, useEffect, useMemo, type ReactNode } from "react";
 import { startEventSync, type EventSync } from "@/lib/offline/event-sync";
 import { createHttpSender } from "@/lib/offline/http-sender";
-import { createIndexedDbEventQueue, indexedDbAvailable } from "@/lib/offline/indexeddb-queue";
+import { createIndexedDbEventQueue, indexedDbAvailable, type LocalSessionProgress } from "@/lib/offline/indexeddb-queue";
 import { eventQueueDatabaseName } from "@/lib/offline/names";
+import type { SessionEvent } from "@/lib/session-packet/session-flow";
 
 export interface EventSyncApi {
   userId: string;
@@ -15,6 +16,8 @@ export interface EventSyncApi {
   queueSize(): Promise<number>;
   /** Delivers now; null when the delivery is not started (the app is not shown). */
   flushNow(): Promise<FlushResult | null>;
+  readProgress(sessionId: string): Promise<LocalSessionProgress | undefined>;
+  advanceSession(sessionId: string, revision: number, next: LocalSessionProgress, events: SessionEvent[], occurredAt: string): Promise<boolean>;
 }
 
 const EventSyncContext = createContext<EventSyncApi | null>(null);
@@ -32,9 +35,15 @@ function createEventSync(userId: string): { api: EventSyncApi; start: () => () =
       },
       queueSize: () => queue.size(),
       flushNow: async () => (sync ? sync.flushNow() : null),
+      readProgress: (sessionId) => queue.readProgress(sessionId),
+      async advanceSession(sessionId, revision, next, events, occurredAt) {
+        const saved = await queue.advanceSession(sessionId, revision, next, events, occurredAt);
+        if (saved && events.length > 0) void sync?.flushNow();
+        return saved;
+      },
     },
     start() {
-      sync = startEventSync({ queue, send: createHttpSender() });
+      sync = startEventSync({ queue, send: createHttpSender({ userId }) });
       return () => {
         sync?.stop();
         sync = null;
