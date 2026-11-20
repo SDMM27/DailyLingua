@@ -115,6 +115,32 @@
       "soon": "Sessions are coming soon"
     }
   },
+  "reminderPush": {
+    "title": "Daily Lingua",
+    "weekly_first": "From now on, one reminder a week. Your session is ready whenever you are.",
+    "weekly_summary": "This week: {days, plural, one {# study day} other {# study days}} and {rewrites, plural, one {# sentence rewritten} other {# sentences rewritten}}.",
+    "session": "Your {minutes}-minute session is ready.",
+    "session_alternate": "Have {minutes} minutes for today’s session?"
+  },
+  "writingFeedback": {
+    "title": "Writing feedback",
+    "pending": "Your text is waiting for feedback. You can continue your session.",
+    "disabled": "Your text is saved. Writing feedback is temporarily turned off.",
+    "limit": "Your text is saved. You’ve reached today’s feedback limit.",
+    "unavailable": "Writing feedback is temporarily unavailable.",
+    "failed": "We couldn’t correct this text.",
+    "unsent": "This text couldn’t be sent for feedback.",
+    "retry": "Try again",
+    "details": "View feedback",
+    "scores": { "grammar": "Grammar", "vocabulary": "Vocabulary", "register": "Register", "coherence": "Coherence" },
+    "errorOfTheDay": "Review in an upcoming session",
+    "rewriteLabel": "Rewrite sentence {index} from memory",
+    "checkRewrite": "Check my rewrite",
+    "rewritePending": "Rewrite waiting to be checked.",
+    "accepted": "Rewrite verified.",
+    "tryAgain": "Read the feedback and try again.",
+    "rewriteUnsent": "We couldn’t check this rewrite."
+  },
   "dailySession": {
     "title": "Today’s session",
     "generatedText": "Generated text, automatically reviewed",
@@ -127,6 +153,7 @@
       "review": "Wrap-up"
     },
     "reviewOnly": "Today’s reviews",
+    "errorOfDayInstruction": "Correct the highlighted words.",
     "progress": "Step {position} of 6",
     "offline": "Offline",
     "readyOffline": "Ready offline",
@@ -186,11 +213,21 @@
       "hint": "Your study day rolls over at 4 a.m. Once you start learning, the time zone follows your device."
     },
     "reminder": {
+      "title": "Reminders",
       "label": "Reminder time",
-      "hint": "One reminder a day, never at night.",
       "at": "Reminder at {time}",
       "off": "No reminder",
-      "clear": "Remove the reminder"
+      "clear": "Turn off reminders",
+      "zone": "Current time zone: {zone}. Up to one reminder a day.",
+      "overnight": "This time allows an overnight reminder up to 30 minutes after the selected time.",
+      "weeklySummary": "Receive the Sunday summary",
+      "unsupported": "This browser doesn’t support reminders. On iPhone, open Daily Lingua from its Home Screen icon.",
+      "unavailable": "Reminders are temporarily unavailable.",
+      "saved": "Reminder settings saved.",
+      "blocked": "Allow notifications to enable the reminder on this device.",
+      "failed": "We couldn’t save your reminder settings.",
+      "save": "Save reminder time",
+      "enable": "Enable on this device"
     },
     "saved": "Settings saved.",
     "groups": {

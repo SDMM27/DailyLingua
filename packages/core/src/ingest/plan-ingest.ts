@@ -54,9 +54,10 @@ import {
 import { characterSimilarity, countWords, gradeCardRecall, gradeChoice, gradeTyped, normalizeAnswer, ratingFor, trigramSimilarity, type Graded } from "../grading";
 import { schedule, type MemoryState } from "../memory/fsrs";
 import type { RejectedDelivery } from "../offline/types";
+import { isErrorWorkable } from "../session/adapt";
 import { PLAN_STEPS, WAKE_LIMITS, type PlanStep } from "../session/plan";
 import { deterministicUuid, fingerprint } from "./hash";
-import type { IngestReport, IngestState, PlanIngestResult, RawEvent, StateCard, StateDay, StateItem, StateSession } from "./types";
+import type { IngestReport, IngestState, PlanIngestResult, RawEvent, StateCard, StateDay, StateItem, StateProduction, StateSession } from "./types";
 
 const DAY_MS = 86_400_000;
 const MAX_ANSWER_MS = 600_000;
@@ -213,6 +214,11 @@ class Ingestion {
 
   private itemsOfWorkshop(session: StateSession): string[] {
     return [...session.workshopItemIds, ...(session.errorItemId ? [session.errorItemId] : [])];
+  }
+
+  private wakeItems(session: StateSession): string[] {
+    const item = session.errorItemId ? this.s.items[session.errorItemId] : undefined;
+    return item ? [...session.wakeCardIds, item.id] : session.wakeCardIds;
   }
 
   // ------------------------------------------------------------ attribution
@@ -553,7 +559,10 @@ class Ingestion {
     let xpReason: string | null = null;
     const source = { kind: "attempt" as const, id: event.clientEventId };
     if (isError) {
-      const outcome = errorOfDayReworked({ correct: graded.correct, alreadyReworked: item.reworkedDay !== null });
+      const workable = item.errorOfDay
+        ? item.errorOfDay.createdDay < at.day && isErrorWorkable(item.errorOfDay.createdDay, item.reworkedDay, at.day)
+        : item.reworkedDay === null;
+      const outcome = errorOfDayReworked({ correct: graded.correct, alreadyReworked: !workable });
       if (outcome.amount > 0) {
         const granted = capCount(outcome.amount, { rewardsToday: d.rewards["error_of_day.reworked"] ?? 0, max: COUNT_CAPS["error_of_day.reworked"] as number });
         if (granted.amount > 0) {
@@ -561,11 +570,14 @@ class Ingestion {
           this.emitXp({ rule: "error_of_day.reworked", amount: granted.amount, source, language: item.language, at });
         } else xpReason = granted.zero;
       } else xpReason = outcome.zero;
-      if (graded.correct && item.reworkedDay === null && item.errorItemId) {
+      if (graded.correct && workable && item.errorItemId) {
         item.reworkedDay = at.day;
         this.out.error_items.push({ id: item.errorItemId, reworked_day: at.day });
       }
-      if (!graded.correct && p.try === 1) this.createCard(item, at, event.clientEventId);
+      if (!graded.correct && workable && p.try === 1) this.createCard(item, at, event.clientEventId);
+      const proof = this.proof(session, "wake");
+      const answered = (proof.answered as string[] | undefined) ?? [];
+      if (!answered.includes(item.id)) proof.answered = [...answered, item.id];
     } else {
       const proof = { attempt: p.try, correct: graded.correct, firstWrong: d.counted.includes(wrongKey), alreadyPassedToday: alreadyPassed };
       const outcome = p.try === 1 ? focusFirstTry(proof) : focusSecondTry(proof);
@@ -590,7 +602,7 @@ class Ingestion {
       session_id: session.id,
       language: item.language,
       step: isError ? "wake" : "workshop",
-      exercise_kind: item.kind,
+      exercise_kind: isError ? "error_fix" : item.kind,
       exercise_ref: item.id,
       answer: { value: p.answer, try: p.try },
       result: { verdict: graded.verdict, try: p.try, ...(graded.shown ? { shown: graded.shown } : {}), ...(xpReason && graded.correct ? { xpReason } : {}) },
@@ -598,7 +610,7 @@ class Ingestion {
       duration_ms: Math.max(0, event.occurredMs - Date.parse(p.shownAt)),
       occurred_at: event.occurredAt,
     });
-    this.touchSession(session, isError ? null : "workshop", event, at);
+    this.touchSession(session, isError ? "wake" : "workshop", event, at);
   }
 
   /** A workshop word, or an error item that was failed, becomes a card due the next learning day. */
@@ -606,25 +618,44 @@ class Ingestion {
     if (!item.card) return;
     const fingerKey = `${item.language}|${item.card.kind}|${item.card.front.toLowerCase()}`;
     if (this.s.cardFronts.includes(fingerKey) || this.cardsCreated.has(fingerKey)) return;
+    if (item.origin === "error_of_day") {
+      const d = this.day(at.day);
+      if (d.counted.includes("errorCard")) return;
+      d.counted.push("errorCard");
+    }
     this.cardsCreated.add(fingerKey);
     this.s.cardFronts.push(fingerKey);
     const zone = this.zones.get(eventId) ?? this.s.profile.timeZone;
     const id = deterministicUuid(`card:${this.s.userId}:${fingerKey}`);
     const dueAt = localTime(addDays(at.day, 1), "04:00", zone).toISOString();
-    this.out.cards_created.push({ id, language: item.language, kind: item.card.kind, front: item.card.front, back: item.card.back, back_language: item.card.backLanguage, context: item.card.context, source: "session", payload: { itemId: item.id, ...(item.textId ? { textId: item.textId } : {}) }, state: "new", due_at: dueAt });
+    this.out.cards_created.push({ id, language: item.language, kind: item.card.kind, front: item.card.front, back: item.card.back, back_language: item.card.backLanguage, context: item.card.context, source: item.origin === "error_of_day" ? "feedback" : "session", payload: { itemId: item.id, ...(item.textId ? { textId: item.textId } : {}), ...(item.origin === "error_of_day" ? { errorOfDay: true, accept: item.accept } : {}) }, state: "new", due_at: dueAt });
   }
 
   private onProduction(event: Extract<Parsed, { kind: "production_submitted" }>, at: Attributed): void {
     const p = event.payload;
     const session = this.s.sessions[p.sessionId] as StateSession;
-    this.out.productions.push({ id: p.productionId, client_event_id: event.clientEventId, session_id: session.id, language: session.language, mode: "writing", task: session.readingTextId ? { textId: session.readingTextId } : {}, text: p.text });
-    this.s.productions[p.productionId] = { id: p.productionId, sessionId: session.id, language: session.language, text: p.text, day: at.day, late: at.late, settled: false, correctionDeferred: false, clientEventId: event.clientEventId };
+    const production = { id: p.productionId, sessionId: session.id, language: session.language, text: p.text, day: at.day, late: at.late, settled: false, correctionDeferred: false, clientEventId: event.clientEventId };
+    const initialSimilarity = this.productionSimilarity(production);
+    const task = { initialSimilarity, ...(session.readingTextId ? { textId: session.readingTextId } : {}) };
+    this.out.productions.push({ id: p.productionId, client_event_id: event.clientEventId, session_id: session.id, language: session.language, mode: "writing", task, text: p.text });
+    this.s.productions[p.productionId] = { ...production, initialSimilarity };
+    this.s.recentProductionTexts.unshift({ id: production.id, text: production.text });
+    this.s.recentProductionTexts.length = Math.min(30, this.s.recentProductionTexts.length);
     this.touchSession(session, "expression", event, at);
   }
 
   private onRewrite(event: Extract<Parsed, { kind: "rewrite_submitted" }>, at: Attributed): void {
     const p = event.payload;
     const correction = this.s.corrections[p.correctionId] as IngestState["corrections"][string];
+    const production = this.s.productions[correction.productionId];
+    if (production) {
+      production.feedbackEligible = this.productionHasEligibilityEvidence(production)
+        && this.productionVerdict(production, correction) === null;
+    }
+    if (!production?.feedbackEligible) {
+      this.out.rewrites.push({ client_event_id: event.clientEventId, correction_id: correction.id, sentence_index: p.sentenceIndex, text: p.text, accepted: false });
+      return;
+    }
     const sentence = correction.sentences[p.sentenceIndex] as IngestState["corrections"][string]["sentences"][number];
     const language = correction.language;
     const text = normalizeAnswer(language, p.text);
@@ -632,11 +663,14 @@ class Ingestion {
     const fixedByAi = (this.s.rewriteChecks[event.clientEventId]?.fixedErrorIds ?? []).filter((id) => sentence.errors.some((error) => error.id === id));
     const fixed = fixedByCode.length > 0 || fixedByAi.length > 0;
     const similar = characterSimilarity(language, sentence.text, p.text) >= REWRITE_MIN_SIMILARITY;
+    const verified = (this.s.verifiedSentences ??= {})[correction.id] ??= [];
+    const alreadyVerified = verified.includes(p.sentenceIndex);
     const accepted = fixed && similar;
     this.out.rewrites.push({ client_event_id: event.clientEventId, correction_id: correction.id, sentence_index: p.sentenceIndex, text: p.text, accepted });
     const d = this.day(at.day);
     const session = correction.sessionId ? this.s.sessions[correction.sessionId] : undefined;
-    if (accepted) {
+    if (accepted && !alreadyVerified) {
+      verified.push(p.sentenceIndex);
       const key = `rewrite:${correction.id}:${p.sentenceIndex}`;
       const native = sentence.nativeText !== null && normalizeAnswer(language, sentence.nativeText) === text;
       const outcome = rewriteSentence({ accepted: true, isNativeVersion: native });
@@ -652,7 +686,7 @@ class Ingestion {
     }
     if (session) {
       const proof = this.proof(session, "expression");
-      if (accepted) proof.verifiedRewrites = ((proof.verifiedRewrites as number | undefined) ?? 0) + 1;
+      if (accepted && !alreadyVerified) proof.verifiedRewrites = ((proof.verifiedRewrites as number | undefined) ?? 0) + 1;
       this.touchSession(session, "expression", event, at);
     }
   }
@@ -700,33 +734,59 @@ class Ingestion {
 
   // ------------------------------------------------------------ settlements
 
+  private productionSimilarity(production: StateProduction): number {
+    const session = production.sessionId ? this.s.sessions[production.sessionId] : undefined;
+    const source = session?.readingTextId ? this.s.texts[session.readingTextId]?.body : undefined;
+    const previous = this.s.recentProductionTexts;
+    const ownIndex = previous.findIndex(({ id }) => id === production.id);
+    const others = [
+      ...(source ? [source] : []),
+      ...Object.values(this.s.corrections).filter((c) => c.productionId !== production.id).map((c) => c.nativeVersion),
+      ...previous.slice(ownIndex + 1).map(({ text }) => text),
+    ];
+    return Math.max(0, ...others.map((other) => trigramSimilarity(production.language, production.text, other)));
+  }
+
+  private productionVerdict(production: StateProduction, correction?: IngestState["corrections"][string]) {
+    const level = this.s.profile.writingLevels[production.language] ?? "B1";
+    return productionRejection({
+      words: countWords(production.language, production.text), minWords: PRODUCTION_MIN_WORDS[level],
+      detectedLanguage: correction?.detectedLanguage ?? null, targetLanguage: production.language,
+      similarity: production.initialSimilarity ?? this.productionSimilarity(production),
+    });
+  }
+
+  private productionHasEligibilityEvidence(production: StateProduction): boolean {
+    // An expired memo cannot turn a previously rejected copy into a new source of XP.
+    return !production.creditExpired || production.initialSimilarity !== undefined;
+  }
+
   /** Productions: acceptance for the step, and `production.corrected` once the correction is in the state. */
   private settleProductions(): void {
     for (const production of Object.values(this.s.productions).sort((a, b) => byKey(a.id, b.id))) {
       const session = production.sessionId ? this.s.sessions[production.sessionId] : undefined;
       const correction = Object.values(this.s.corrections).find((c) => c.productionId === production.id);
+      const recurring = correction && Object.values(this.s.items).find((item) =>
+        item.errorOfDay?.correctionId === correction.id && item.errorOfDay.recurring && item.errorOfDay.createdDay === this.serverDay);
       const isNew = this.out.productions.some((row) => row.id === production.id);
-      if (production.settled || (!isNew && !correction)) continue;
-      const level = this.s.profile.writingLevels[production.language] ?? "B1";
-      const source = session?.readingTextId ? this.s.texts[session.readingTextId]?.body : undefined;
-      const others = [
-        ...(source ? [source] : []),
-        ...Object.values(this.s.corrections).filter((c) => c.productionId !== production.id).map((c) => c.nativeVersion),
-        ...this.s.recentProductionTexts.filter((text) => text !== production.text),
-      ];
-      const similarity = Math.max(0, ...others.map((other) => trigramSimilarity(production.language, production.text, other)));
-      const proof = { words: countWords(production.language, production.text), minWords: PRODUCTION_MIN_WORDS[level], detectedLanguage: correction?.detectedLanguage ?? null, targetLanguage: production.language, similarity };
-      const rejection = productionRejection(proof);
+      const defer = production.correctionDeferred && session?.steps.expression?.proof.correctionDeferred !== true;
+      if (!isNew && !correction && !defer) continue;
+      const rejection = this.productionVerdict(production, correction);
+      production.feedbackEligible = rejection === null && correction !== undefined && this.productionHasEligibilityEvidence(production);
+      if (recurring && production.feedbackEligible) this.createCard(recurring, { ok: true, day: this.serverDay, late: false }, production.clientEventId);
+      if (production.settled) continue;
       const at: Attributed = { ok: true, day: production.day, late: production.late };
       if (session) {
         const evidence = this.proof(session, "expression");
-        evidence.accepted = rejection === null;
+        evidence.accepted = rejection === null && this.productionHasEligibilityEvidence(production);
         evidence.correctionReceived = correction !== undefined;
         evidence.correctionDeferred = production.correctionDeferred;
         evidence.hasErrors = correction?.sentences.some((sentence) => sentence.errors.length > 0) ?? false;
         this.touchSession(session, "expression", { occurredAt: this.touchedSessions.get(session.id)?.at ?? this.now.toISOString() }, this.touchedSessions.get(session.id)?.att ?? at);
       }
       if (!correction) continue;
+      production.settled = true;
+      if (production.creditExpired) continue;
       const d = this.day(production.day);
       if (rejection === null) {
         const granted = capCount(15, { rewardsToday: d.rewards["production.corrected"] ?? 0, max: COUNT_CAPS["production.corrected"] as number });
@@ -735,9 +795,7 @@ class Ingestion {
           this.emitXp({ rule: "production.corrected", amount: granted.amount, source: null, language: production.language, at, ref: production.id });
         } else this.zero(production.clientEventId, granted.zero);
       } else this.zero(production.clientEventId, rejection);
-      production.settled = true;
     }
-    if (this.out.productions.length > 0) this.s.recentProductionTexts = [...this.s.recentProductionTexts, ...this.out.productions.map((row) => row.text)].slice(-30);
   }
 
   private finishSessions(): void {
@@ -750,7 +808,7 @@ class Ingestion {
         const proof = entry.proof;
         let ok = false;
         if (session.requiredSteps.includes(step)) {
-          if (step === "wake") ok = wakeValidated(session.wakeCardIds, session.wakeBudgetMinutes, { answered: (proof.answered as string[] | undefined) ?? [], ms: (proof.ms as number | undefined) ?? 0 });
+          if (step === "wake") ok = wakeValidated(this.wakeItems(session), session.wakeBudgetMinutes, { answered: (proof.answered as string[] | undefined) ?? [], ms: (proof.ms as number | undefined) ?? 0 });
           else if (step === "reading") ok = this.s.texts[session.readingTextId ?? ""] ? readingValidated((this.s.texts[session.readingTextId as string] as { wordCount: number }).wordCount, this.readingEvidence(session)) : false;
           else if (step === "workshop") ok = workshopValidated(session.workshopItemIds, (proof.attempted as string[] | undefined) ?? []);
           else if (step === "expression") ok = expressionValidated({ accepted: proof.accepted === true, correctionReceived: proof.correctionReceived === true, correctionDeferred: proof.correctionDeferred === true, hasErrors: proof.hasErrors === true, verifiedRewrites: (proof.verifiedRewrites as number | undefined) ?? 0 });
@@ -765,7 +823,7 @@ class Ingestion {
       // Steps that are required but never touched: validated only if there is nothing to do for them.
       for (const step of session.requiredSteps) {
         if (session.steps[step]) continue;
-        const free = (step === "wake" && session.wakeCardIds.length === 0) || (step === "workshop" && session.workshopItemIds.length === 0);
+        const free = (step === "wake" && this.wakeItems(session).length === 0) || (step === "workshop" && session.workshopItemIds.length === 0);
         if (free) {
           session.steps[step] = { validatedAt: trigger.at, proof: {} };
           this.out.session_steps.push({ session_id: session.id, step, validated_at: trigger.at, proof: {} });

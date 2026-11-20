@@ -43,7 +43,8 @@ self.addEventListener("push", (event) => {
     self.registration.showNotification(payload.title, {
       body: payload.body,
       icon: "/icons/icon-192.png",
-      data: { url: payload.url },
+      data: { url: payload.url, reminderId: payload.reminderId },
+      ...(payload.reminderId ? { tag: `dailylingua-reminder-${payload.reminderId}` } : {}),
     }),
   );
 });
@@ -51,13 +52,20 @@ self.addEventListener("push", (event) => {
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
   const data: unknown = event.notification.data;
-  const url = typeof data === "object" && data !== null && "url" in data && typeof data.url === "string" ? data.url : "/";
+  const notification = data && typeof data === "object" ? data as Record<string, unknown> : {};
+  const url = typeof notification.url === "string" && /^\/(?!\/)[^\s\\]*$/.test(notification.url) ? notification.url : "/";
+  const id = notification.reminderId;
+  const reportOpen = typeof id === "number" && Number.isSafeInteger(id) && id > 0
+    ? fetch("/api/push/opened", {
+      method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    }).catch(() => undefined)
+    : Promise.resolve();
   event.waitUntil(
     (async () => {
       const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
       const open = windows.find((client) => new URL(client.url).pathname === url);
-      if (open) await open.focus();
-      else await self.clients.openWindow(url);
+      await Promise.all([reportOpen, open ? open.focus() : self.clients.openWindow(url)]);
     })(),
   );
 });

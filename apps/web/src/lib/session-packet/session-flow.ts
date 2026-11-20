@@ -5,6 +5,7 @@ type Item = SessionPacket["items"][number];
 type Text = NonNullable<SessionPacket["text"]>;
 
 export type SessionScreen =
+  | { key: string; step: "wake"; kind: "error"; error: NonNullable<SessionPacket["errorOfTheDay"]> }
   | { key: string; step: "wake"; kind: "card"; card: Card }
   | { key: string; step: "reading" | "workshop"; kind: "item"; item: Item }
   | { key: string; step: "reading"; kind: "text"; text: Text }
@@ -20,6 +21,7 @@ export function sessionScreens(packet: SessionPacket): SessionScreen[] {
   const screens: SessionScreen[] = packet.cards
     .filter((card) => wakeIds.has(card.id))
     .map((card) => ({ key: card.id, step: "wake", kind: "card", card }));
+  if (packet.errorOfTheDay) screens.unshift({ key: packet.errorOfTheDay.itemId, step: "wake", kind: "error", error: packet.errorOfTheDay });
   const { text } = packet;
   const hasStep = (step: SessionStep) => packet.steps.some((entry) => entry.step === step);
   if (text && hasStep("reading")) {

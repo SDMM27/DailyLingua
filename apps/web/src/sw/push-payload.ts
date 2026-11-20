@@ -3,6 +3,7 @@ export interface PushPayload {
   body: string;
   /** A path of this app, opened when the notification is tapped. */
   url: string;
+  reminderId?: number;
 }
 
 /**
@@ -18,11 +19,12 @@ export function parsePushPayload(text: string | undefined): PushPayload | null {
     return null;
   }
   if (typeof value !== "object" || value === null) return null;
-  const { title, body, url } = value as Record<string, unknown>;
+  const { title, body, url, reminderId } = value as Record<string, unknown>;
   if (typeof title !== "string" || title.trim() === "") return null;
   return {
     title: title.slice(0, 120),
     body: typeof body === "string" ? body.slice(0, 300) : "",
-    url: typeof url === "string" && /^\/(?![/\\])/.test(url) ? url : "/",
+    url: typeof url === "string" && /^\/(?!\/)[^\s\\]*$/.test(url) ? url : "/",
+    ...(typeof reminderId === "number" && Number.isSafeInteger(reminderId) && reminderId > 0 ? { reminderId } : {}),
   };
 }

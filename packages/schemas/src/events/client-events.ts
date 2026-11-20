@@ -76,7 +76,8 @@ const deviceFields = {
   seq: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER),
 };
 
-const answerSchema = z.string().max(200);
+export const MAX_ANSWER_CHARS = 200;
+const answerSchema = z.string().max(MAX_ANSWER_CHARS);
 
 export const sessionStartedPayloadSchema = z.strictObject({ ...deviceFields, sessionId: z.uuid() });
 

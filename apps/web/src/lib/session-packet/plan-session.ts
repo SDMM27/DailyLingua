@@ -71,6 +71,7 @@ export interface PlanTodayInput {
   completedShortSessions: number;
   newCardsToday: number;
   newCardsSuspendedThrough: DateKey | null;
+  errorItemId?: string | null;
   /** The text of the day with its items, or null (then the session is a review-only one: D6). */
   text: { text: PacketTextRow; items: ItemRow[] } | null;
 }
@@ -104,8 +105,7 @@ export function planToday(input: PlanTodayInput, sessionId: string): PlannedToda
     now,
     today,
     cards: cards.map((card) => toPlanCard(card, ratings.get(card.id)?.rating ?? null)),
-    // The error of the day comes with the written correction (milestone 2, PR 3).
-    errorItemId: null,
+    errorItemId: input.errorItemId ?? null,
     lastSessionDay: input.lastSessionDay,
     completedShortSessions: input.completedShortSessions,
     newCardsToday: input.newCardsToday,

@@ -7,10 +7,12 @@ import { redirect } from "next/navigation";
 import { InterfaceLanguage } from "@/components/settings/interface-language";
 import { GamePreferences } from "@/components/settings/game-preferences";
 import { LearningSettings } from "@/components/settings/learning-settings";
+import { ReminderSettings } from "@/components/settings/reminder-settings";
 import { SignOutForm } from "@/components/settings/sign-out-form";
 import { ThemeChoice } from "@/components/settings/theme-choice";
 import { Button } from "@/components/ui/button";
 import { nativeLanguageOptions, timeZoneOptions } from "@/lib/languages";
+import { vapidPublicKey } from "@/lib/push/env";
 import { getSessionProfile, getSessionUser } from "@/lib/session";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -47,9 +49,13 @@ export default async function SettingsPage() {
           <LearningSettings
             nativeOptions={nativeLanguageOptions(locale)}
             timeZones={timeZoneOptions()}
-            initial={{ nativeLanguage: profile.nativeLanguage, timeZone: profile.timeZone, reminderTime: profile.reminderTime }}
+            initial={{ nativeLanguage: profile.nativeLanguage, timeZone: profile.timeZone }}
           />
         </section>
+
+        <ReminderSettings userId={user.id} publicKey={vapidPublicKey()} timeZone={profile.timeZone}
+          initial={{ enabled: game.notifications.enabled, time: profile.reminderTime ?? game.notifications.time,
+            weeklySummary: game.notifications.weeklySummary }} />
 
         <section aria-labelledby="settings-game" className="space-y-5">
           <h2 id="settings-game" className="meta">{t("game.title")}</h2>

@@ -7,17 +7,26 @@ import type { ReviewMode } from "@dailylingua/schemas";
  * card never served gets the one `cardRecallVariant` of core gives from its stability. Pure.
  */
 
-/** The accepted written forms of a card in `production`: the front, then `payload.accept` (strings only). */
+function isErrorCard(card: { payload?: unknown }): boolean {
+  return (card.payload as { errorOfDay?: unknown } | null | undefined)?.errorOfDay === true;
+}
+
+/** Error cards store the faulty sentence on the front and accept only the passage corrections. */
 export function cardAcceptList(card: Pick<CardRow, "front" | "payload">): string[] {
   const accept = (card.payload as { accept?: unknown } | null)?.accept;
   const extra = Array.isArray(accept) ? accept.filter((value): value is string => typeof value === "string" && value.length > 0) : [];
-  return [...new Set([card.front, ...extra])].slice(0, 50);
+  return [...new Set(isErrorCard(card) ? extra : [card.front, ...extra])].slice(0, 50);
 }
 
 /** The mode a card is expected to be answered in: the served one, else the one its stability gives. */
-export function expectedCardMode(card: Pick<CardRow, "stability" | "context">, served: ReviewMode | undefined): ReviewMode {
+export function expectedCardMode(card: Pick<CardRow, "stability" | "context"> & { payload?: unknown }, served: ReviewMode | undefined): ReviewMode {
   if (served !== undefined) return served;
+  if (isErrorCard(card)) return "production";
   return cardRecallVariant({ stability: card.stability, hasContext: card.context !== null && card.context.trim().length > 0 }).mode;
+}
+
+export function correctionHighlight(card: Pick<CardRow, "context" | "front" | "payload">): string | null {
+  return isErrorCard(card) && card.context && card.front.includes(card.context) ? card.context : null;
 }
 
 /** `recognition` and `listening` are answered by choosing an option whose id is the card id; `production` by typing. */

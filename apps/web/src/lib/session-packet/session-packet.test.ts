@@ -1,10 +1,11 @@
-import type { CardRow, ItemRow, NewSession, PacketTextRow, SessionRow, TextCandidate } from "@dailylingua/data";
+import type { CardRow, ErrorOfDayRow, ItemRow, NewSession, PacketTextRow, SessionRow, TextCandidate } from "@dailylingua/data";
 import { sessionPacketSchema, storedSessionPlanSchema, type SessionPacket } from "@dailylingua/schemas";
 import { describe, expect, it, vi } from "vitest";
 import { CARD, ITEM, NOW, OTHER, TEXT, TODAY, USER, cardRow, itemRow, uuid } from "@/test/ingest-rows";
 import { buildChoiceOptions } from "./options";
 import { pickReadingItems, pickTextCandidate, pickWorkshopItems, planToday, servedMode } from "./plan-session";
 import { createTodayHandler, type TodayStore } from "./today-route";
+import { sessionScreens } from "./session-flow";
 
 const textRow: PacketTextRow = { id: TEXT, language: "it", levelBand: "B1", density: 2, theme: "voyage", title: "Un viaggio", body: "Testo di prova.", wordCount: 3, newWords: [{ word: "casa" }], grammarPoint: null, listeningSegment: { from: 0, to: 1 }, writingTask: "Racconta." };
 const reading = (n: number, extra: Partial<ItemRow> = {}) => itemRow(n, { step: "reading", position: n, ...extra });
@@ -150,6 +151,8 @@ function store(overrides: Partial<TodayStore> = {}) {
     skillEstimates: async () => [{ language: "it", skill: "writing", levelValue: 3.5 }],
     sessionOfDay: async () => null,
     planningCards: async () => pool(6),
+    pendingErrorOfDay: async () => null,
+    errorOfDay: async () => null,
     recentReviews: async () => [],
     lastSessionDay: async () => "2026-11-17",
     completedShortSessions: async () => 0,
@@ -219,6 +222,24 @@ describe("GET /api/session/today", () => {
       }
     }
     expect(packet.cards.find((card) => card.id === CARD(8))).toMatchObject({ mode: "production", accept: ["parola8", "alt"] });
+  });
+
+  it("serves the selected error first, with the verified passage, even on a review-only day", async () => {
+    const error: ErrorOfDayRow = {
+      id: uuid(801), correctionId: uuid(802), language: "it", createdDay: "2026-11-17", reworkedDay: null,
+      sentence: "Io ho andato a Roma.", highlighted: "ho andato", explanation: "Avec l’auxiliaire essere.",
+      explanationLanguage: "fr", sentenceIndex: 0, recurring: false, accept: ["sono andato", "sono arrivato"],
+    };
+    const pendingErrorOfDay = vi.fn(async () => error);
+    const errorOfDay = vi.fn(async () => error);
+    const h = handler({ pendingErrorOfDay, errorOfDay, textCandidates: async () => [] });
+    const packet = sessionPacketSchema.parse(await (await h.get()).json());
+
+    expect(pendingErrorOfDay).toHaveBeenCalledWith(USER, "it", "2026-11-11", TODAY);
+    expect(errorOfDay).toHaveBeenCalledWith(USER, error.id);
+    expect(h.inserted[0]?.plan.wake.errorItemId).toBe(error.id);
+    expect(packet.errorOfTheDay).toMatchObject({ itemId: error.id, explanationLanguage: "fr", accept: error.accept });
+    expect(sessionScreens(packet)[0]).toMatchObject({ key: error.id, kind: "error", step: "wake" });
   });
 
   it("is idempotent: an existing session is served again as it is stored, nothing is inserted", async () => {

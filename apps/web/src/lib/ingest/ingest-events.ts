@@ -5,6 +5,7 @@ import {
   IngestBatchError,
   callIngestBatch,
   readIngestRows,
+  readVerifiedSentences,
   type AppClient,
   type DayWindow,
   type IngestBatchResult,
@@ -16,6 +17,7 @@ import { filterReviewModes } from "./card-keys";
 import { buildIngestState } from "./build-state";
 import { buildNextMemo } from "./next-memo";
 import { extractRefs } from "./refs";
+import type { CheckRewrites } from "./rewrite-checks";
 
 /**
  * The ingestion of a batch of events (`j2-pr1-lot-w.md` section 5): read the state, decide with `planIngest` (core),
@@ -37,12 +39,16 @@ export type LogFn = (level: "warn" | "error", message: string, data?: Record<str
 export interface IngestStore {
   readRows(userId: string, refs: IngestRefs, window: (timeZone: string) => DayWindow, now: Date): Promise<IngestRows>;
   callBatch(userId: string, expectedSeq: number, payload: unknown): Promise<IngestBatchResult>;
+  checkRewrites?: CheckRewrites;
+  readVerifiedSentences?(userId: string, correctionIds: readonly string[]): Promise<IngestState["verifiedSentences"]>;
 }
 
-export function createIngestStore(service: AppClient): IngestStore {
+export function createIngestStore(service: AppClient, checkRewrites?: CheckRewrites): IngestStore {
   return {
     readRows: (userId, refs, window, now) => readIngestRows(service, userId, refs, window, now),
     callBatch: (userId, expectedSeq, payload) => callIngestBatch(service, userId, expectedSeq, payload),
+    checkRewrites,
+    readVerifiedSentences: (userId, ids) => readVerifiedSentences(service, userId, ids),
   };
 }
 
@@ -64,6 +70,7 @@ export interface IngestResult {
   duplicates: string[];
   /** What the route answers. */
   report: DeliveryReportValue;
+  feedbackEligible?: boolean;
 }
 
 const defaultLog: LogFn = (level, message, data) => (level === "error" ? console.error : console.warn)(`[ingest] ${message}`, data ?? {});
@@ -108,6 +115,13 @@ function capProductions(events: readonly unknown[], state: IngestState, received
 interface Outcome {
   rejected: RejectedDelivery[];
   duplicates: string[];
+  feedbackEligible?: boolean;
+}
+
+interface FeedbackTarget {
+  productionId: string;
+  sessionId: string;
+  deferred?: boolean;
 }
 
 function memoOf(raw: unknown, log: LogFn, userId: string): IngestMemo | null {
@@ -119,16 +133,31 @@ function memoOf(raw: unknown, log: LogFn, userId: string): IngestMemo | null {
 }
 
 /** One read, one decision, one write, for these events. Throws `IngestBatchError` when SQL refuses or the state moved. */
-async function processOnce(store: IngestStore, userId: string, events: readonly unknown[], now: Date, log: LogFn): Promise<Outcome> {
-  const rows = await store.readRows(userId, extractRefs(events), windowOf(now), now);
+async function processOnce(store: IngestStore, userId: string, events: readonly unknown[], now: Date, log: LogFn, feedbackTarget?: FeedbackTarget): Promise<Outcome> {
+  const eventRefs = extractRefs(events);
+  const refs = feedbackTarget ? {
+    ...eventRefs,
+    productionIds: [...eventRefs.productionIds, feedbackTarget.productionId],
+    sessionIds: [...eventRefs.sessionIds, feedbackTarget.sessionId],
+  } : eventRefs;
+  const rows = await store.readRows(userId, refs, windowOf(now), now);
   const previousMemo = memoOf(rows.ingestState.memo, log, userId);
-  const { state, cardModes, skippedSessions } = buildIngestState({ userId, rows, memo: previousMemo });
+  const serverDay = learningDay(now, rows.profile.timeZone);
+  const { state, cardModes, skippedSessions } = buildIngestState({ userId, rows, memo: previousMemo, serverDay, feedbackTarget });
+  if (refs.correctionIds?.length && store.readVerifiedSentences) {
+    state.verifiedSentences = await store.readVerifiedSentences(userId, refs.correctionIds);
+  }
   if (skippedSessions.length > 0) log("warn", "stored session plans could not be read and were left out", { userId, sessions: skippedSessions });
 
   const { kept, rejected: refusedModes } = filterReviewModes(events, cardModes, state.knownEvents);
-  const serverDay = learningDay(now, rows.profile.timeZone);
   const { kept: capped, rejected: tooMany } = capProductions(kept, state, rows.recentProductionCount);
-  const plan = planIngest(state, capped as RawEvent[], now);
+  let plan = planIngest(state, capped as RawEvent[], now);
+  if (store.checkRewrites && plan.payload.rewrites.length > 0) {
+    const rewriteChecks = await store.checkRewrites({ state: plan.nextState, rows: plan.payload.rewrites, now });
+    if (Object.values(rewriteChecks).some((check) => check.fixedErrorIds.length > 0)) {
+      plan = planIngest({ ...state, rewriteChecks }, capped as RawEvent[], now);
+    }
+  }
 
   // The ledger: the fingerprint of every event this batch accepted, with the kind of the raw event.
   const kindOf = new Map<string, string>();
@@ -149,6 +178,7 @@ async function processOnce(store: IngestStore, userId: string, events: readonly 
   const outcome: Outcome = {
     rejected: [...plan.rejected, ...refusedModes, ...tooMany],
     duplicates: [...plan.report.duplicates],
+    ...(feedbackTarget ? { feedbackEligible: plan.nextState.productions[feedbackTarget.productionId]?.feedbackEligible === true } : {}),
   };
   // Nothing to write (replays, refusals): the sequence is left alone.
   if (empty) return outcome;
@@ -164,14 +194,14 @@ async function processOnce(store: IngestStore, userId: string, events: readonly 
   if (new TextEncoder().encode(JSON.stringify(checked.data)).length > MAX_PAYLOAD_BYTES) throw new IngestBatchError("refused", null, "the payload is over 1 MiB");
 
   const written = await store.callBatch(userId, rows.ingestState.seq, checked.data);
-  return { rejected: outcome.rejected, duplicates: [...new Set([...outcome.duplicates, ...written.duplicates])] };
+  return { ...outcome, duplicates: [...new Set([...outcome.duplicates, ...written.duplicates])] };
 }
 
 /** `processOnce`, started again from a fresh read when the sequence moved (two tabs, two devices), then a passing failure. */
-async function processWithRetry(store: IngestStore, userId: string, events: readonly unknown[], now: Date, log: LogFn): Promise<Outcome> {
+async function processWithRetry(store: IngestStore, userId: string, events: readonly unknown[], now: Date, log: LogFn, feedbackTarget?: FeedbackTarget): Promise<Outcome> {
   for (let attempt = 1; attempt <= MAX_STALE_ATTEMPTS; attempt++) {
     try {
-      return await processOnce(store, userId, events, now, log);
+      return await processOnce(store, userId, events, now, log, feedbackTarget);
     } catch (error) {
       if (error instanceof IngestBatchError && error.code === "stale") continue;
       throw error;
@@ -194,15 +224,15 @@ function isolationOrder(events: readonly unknown[]): unknown[] {
  * event by event, the state read again each time: the one that is refused again is `server_refused`, the others pass
  * (D9). Throws `IngestTransientError` for what a later delivery may fix (busy, unavailable, state moving).
  */
-export async function ingestEvents(input: { store: IngestStore; userId: string; events: readonly unknown[]; now: Date; log?: LogFn }): Promise<IngestResult> {
+export async function ingestEvents(input: { store: IngestStore; userId: string; events: readonly unknown[]; now: Date; log?: LogFn; feedbackTarget?: FeedbackTarget }): Promise<IngestResult> {
   const { store, userId, events, now } = input;
   const log = input.log ?? defaultLog;
 
   let outcome: Outcome;
   try {
-    outcome = await processWithRetry(store, userId, events, now, log);
+    outcome = await processWithRetry(store, userId, events, now, log, input.feedbackTarget);
   } catch (error) {
-    if (error instanceof IngestBatchError && error.code === "refused") {
+    if (events.length > 0 && error instanceof IngestBatchError && error.code === "refused") {
       log("warn", "a batch was refused by the database and is replayed event by event", { userId, sqlstate: error.sqlstate, message: error.message });
       outcome = await isolate(store, userId, events, now, log);
     } else throw toTransient(error, log, userId);
@@ -213,7 +243,7 @@ export async function ingestEvents(input: { store: IngestStore; userId: string; 
     .map((entry) => ({ clientEventId: entry.clientEventId, reason: asReason(entry.reason) }))
     .filter((entry) => eventIdSchema.safeParse(entry.clientEventId).success)
     .filter((entry) => (seen.has(entry.clientEventId) ? false : (seen.add(entry.clientEventId), true)));
-  return { rejected, duplicates: outcome.duplicates, report: { rejected } };
+  return { ...outcome, rejected, report: { rejected } };
 }
 
 async function isolate(store: IngestStore, userId: string, events: readonly unknown[], now: Date, log: LogFn): Promise<Outcome> {

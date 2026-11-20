@@ -1,11 +1,13 @@
 import { AI_PURPOSES } from "@dailylingua/ai";
-import { learningDay } from "@dailylingua/core";
+import { addDays, ERROR_OF_DAY_WINDOW_DAYS, learningDay } from "@dailylingua/core";
 import {
   countCompletedShortSessions,
   insertSession,
   readIngestState,
+  readErrorOfDayRows,
   readLastSessionDay,
   readPlanningCards,
+  readPendingErrorOfDay,
   readProfileAndEnrollments,
   readQuotaUsage,
   readRecentReviews,
@@ -16,6 +18,7 @@ import {
   readTextWithItems,
   type AppClient,
   type CardRow,
+  type ErrorOfDayRow,
   type ItemRow,
   type NewSession,
   type PacketTextRow,
@@ -47,6 +50,8 @@ export interface TodayStore {
   skillEstimates(userId: string): Promise<SkillEstimateRow[]>;
   sessionOfDay(userId: string, language: string, day: DateKey): Promise<SessionRow | null>;
   planningCards(userId: string, language: string): Promise<CardRow[]>;
+  pendingErrorOfDay(userId: string, language: string, from: DateKey, before: DateKey): Promise<ErrorOfDayRow | null>;
+  errorOfDay(userId: string, id: string): Promise<ErrorOfDayRow | null>;
   recentReviews(userId: string, since: string): Promise<{ cardId: string; rating: number; reviewedAt: string }[]>;
   lastSessionDay(userId: string, language: string): Promise<DateKey | null>;
   completedShortSessions(userId: string, language: string): Promise<number>;
@@ -66,6 +71,8 @@ export function createTodayStore(service: AppClient | (() => AppClient)): TodayS
     skillEstimates: (userId) => readSkillEstimates(client(), userId),
     sessionOfDay: (userId, language, day) => readSessionOfDay(client(), userId, language, day),
     planningCards: (userId, language) => readPlanningCards(client(), userId, language),
+    pendingErrorOfDay: (userId, language, from, before) => readPendingErrorOfDay(client(), userId, language, from, before),
+    errorOfDay: async (userId, id) => (await readErrorOfDayRows(client(), userId, { itemIds: [id] }))[0] ?? null,
     recentReviews: (userId, since) => readRecentReviews(client(), userId, since),
     lastSessionDay: (userId, language) => readLastSessionDay(client(), userId, language),
     completedShortSessions: (userId, language) => countCompletedShortSessions(client(), userId, language),
@@ -105,7 +112,7 @@ export async function todayPacket(deps: Pick<TodayRouteDeps, "store" | "newId" |
 
   let session = await store.sessionOfDay(userId, language, today);
   if (!session) {
-    const [cards, reviews, lastSessionDay, completedShortSessions, suspendedThrough, state, estimates] = await Promise.all([
+    const [cards, reviews, lastSessionDay, completedShortSessions, suspendedThrough, state, estimates, pendingError] = await Promise.all([
       store.planningCards(userId, language),
       store.recentReviews(userId, new Date(now.getTime() - REVIEW_LOOKBACK_DAYS * 86_400_000).toISOString()),
       store.lastSessionDay(userId, language),
@@ -113,6 +120,7 @@ export async function todayPacket(deps: Pick<TodayRouteDeps, "store" | "newId" |
       store.suspendedThrough(userId, language),
       store.ingestState(userId),
       store.skillEstimates(userId),
+      store.pendingErrorOfDay(userId, language, addDays(today, -ERROR_OF_DAY_WINDOW_DAYS), today),
     ]);
     // The band of the learner's writing level (B1 without an estimate), never a free string.
     const band = writingLevels(estimates)[language] ?? "B1";
@@ -145,6 +153,7 @@ export async function todayPacket(deps: Pick<TodayRouteDeps, "store" | "newId" |
           completedShortSessions,
           newCardsToday: memo.success ? (memo.data.days[today]?.newCards ?? 0) : 0,
           newCardsSuspendedThrough: suspendedThrough,
+          errorItemId: pendingError?.id ?? null,
           text,
         },
         sessionId,
@@ -159,16 +168,18 @@ export async function todayPacket(deps: Pick<TodayRouteDeps, "store" | "newId" |
     log("error", "the stored plan of today's session is unreadable", { userId, sessionId: session.id });
     return null;
   }
-  const [cards, textBundle, usage] = await Promise.all([
+  const [cards, textBundle, usage, errorOfDay] = await Promise.all([
     store.planningCards(userId, language),
     plan.data.reading.textId ? store.textWithItems(plan.data.reading.textId) : Promise.resolve(null),
     store.quotaUsage(userId, today, [AI_PURPOSES.writing_feedback.quotaKind, AI_PURPOSES.rewrite_check.quotaKind]),
+    plan.data.wake.errorItemId ? store.errorOfDay(userId, plan.data.wake.errorItemId) : Promise.resolve(null),
   ]);
   return buildPacket({
     session,
     plan: plan.data,
     textBundle,
     cards: new Map(cards.map((card) => [card.id, card])),
+    errorOfDay: errorOfDay?.language === language ? errorOfDay : null,
     quotas: {
       writingFeedback: { used: usage[AI_PURPOSES.writing_feedback.quotaKind] ?? 0, limit: AI_PURPOSES.writing_feedback.dailyLimit },
       rewriteCheck: { used: usage[AI_PURPOSES.rewrite_check.quotaKind] ?? 0, limit: AI_PURPOSES.rewrite_check.dailyLimit },

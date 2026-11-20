@@ -5,9 +5,8 @@ import { z } from "zod";
 import { getSupabaseEnv } from "./env";
 
 /**
- * The service-role client: it bypasses Row Level Security, so it exists for ONE purpose, the two ingestion routes
- * (`POST /api/events`, `GET /api/session/today`), which always pass the user id they validated themselves. It is
- * never created for a page, an action or a component. The key has its own schema: it never goes through
+ * The service-role client bypasses Row Level Security. Learner API routes pass the validated user id.
+ * The scheduled job authenticates with the separate cron secret. The key has its own schema and stays outside
  * `readSupabaseEnv` and never carries the `NEXT_PUBLIC_` prefix, so it cannot reach the browser.
  */
 const serviceEnvSchema = z.object({

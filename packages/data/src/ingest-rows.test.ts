@@ -114,6 +114,41 @@ function tables() {
 }
 
 describe("readIngestRows", () => {
+  it("loads the error served in an owned session and only uses accepted rewrites of that sentence", async () => {
+    const fixture = tables();
+    const errorId = ID(710);
+    const correctionId = ID(711);
+    const storedPlan = plan(null, [], []);
+    fixture.session = [session(ID(10), ME, "2026-11-17", {
+      plan: { ...storedPlan, wake: { ...storedPlan.wake, errorItemId: errorId } },
+    }), session(ID(12), OTHER, "2026-11-17", {
+      plan: { ...storedPlan, wake: { ...storedPlan.wake, errorItemId: ID(720) } },
+    })];
+    const error = {
+      id: errorId, user_id: ME, correction_id: correctionId, language: "it",
+      created_day: "2026-11-16", reworked_day: null,
+      prompt: {
+        sentence: "Io ho andato a Roma.", highlighted: "ho andato", explanation: "Avec être.",
+        explanationLanguage: "fr", sentenceIndex: 0, recurring: false,
+      },
+      answer: { accept: ["sono andato"] },
+    };
+    const attempt = { id: ID(730), user_id: ME, correction_id: correctionId, sentence_index: 0, accepted: true, created_at: "2026-11-16T10:00:00.000Z" };
+    const { client, queries } = tableFake({
+      ...fixture, error_item: [error, { ...error, id: ID(720), user_id: OTHER }],
+      rewrite: [
+        { ...attempt, text: "Io sono arrivato a Roma." },
+        { ...attempt, id: ID(731), text: "Io ho vissuto a Roma.", accepted: false },
+        { ...attempt, id: ID(732), text: "Io sono partito a Roma.", sentence_index: 1 },
+        { ...attempt, id: ID(733), text: "Sono arrivato a Roma." },
+      ],
+    });
+
+    const rows = await readIngestRows(client, ME, { ...REFS, sessionIds: [ID(12)] }, WINDOW);
+    expect(rows.errorItems).toEqual([expect.objectContaining({ id: errorId, accept: ["sono andato", "sono arrivato"] })]);
+    expect(queries.find(({ table }) => table === "error_item")?.chain).toContain(`eq("user_id","${ME}")`);
+  });
+
   it("reads the user's window and the referenced sessions WITHOUT a user filter, and no steps for a foreign session", async () => {
     const { client, queries } = tableFake(tables());
     const rows = await readIngestRows(client, ME, { ...REFS, sessionIds: [ID(12), ID(11)] }, WINDOW);
@@ -191,7 +226,7 @@ describe("readIngestRows", () => {
     const { client } = tableFake(tables());
     const rows = await readIngestRows(client, ME, REFS, WINDOW);
     expect(rows.cardFronts.sort()).toEqual(["it|chunk|mela", "it|word|casa"]);
-    expect(rows.recentProductionTexts).toEqual(["Ciao a tutti"]);
+    expect(rows.recentProductionTexts).toEqual([{ id: ID(600), text: "Ciao a tutti" }]);
   });
 
   it("counts the productions of the user received in the last 24 hours only", async () => {

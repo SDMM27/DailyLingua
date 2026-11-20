@@ -4,10 +4,10 @@ import { useTranslations } from "next-intl";
 import { useActionState, useState } from "react";
 import { saveLearningSettings, type SettingsState } from "@/app/actions/settings";
 import { Button } from "@/components/ui/button";
-import { FormMessage, SelectField, TextField } from "@/components/ui/field";
+import { FormMessage, SelectField } from "@/components/ui/field";
 import type { LanguageOption } from "@/lib/languages";
 
-/** Mother tongue, time zone and reminder: one explicit save for the group. */
+/** Mother tongue and time zone: one explicit save for the group. */
 export function LearningSettings({
   nativeOptions,
   timeZones,
@@ -15,7 +15,7 @@ export function LearningSettings({
 }: {
   nativeOptions: LanguageOption[];
   timeZones: string[];
-  initial: { nativeLanguage: string; timeZone: string; reminderTime: string | null };
+  initial: { nativeLanguage: string; timeZone: string };
 }) {
   const t = useTranslations("settings");
   const tc = useTranslations("common");
@@ -23,7 +23,6 @@ export function LearningSettings({
   const [state, formAction, pending] = useActionState<SettingsState, FormData>(saveLearningSettings, {});
   const [nativeLanguage, setNativeLanguage] = useState(initial.nativeLanguage);
   const [timeZone, setTimeZone] = useState(initial.timeZone);
-  const [reminder, setReminder] = useState(initial.reminderTime ?? "");
 
   // The saved values are always offered, even if the runtime's list does not know them.
   const zones = timeZones.includes(initial.timeZone) ? timeZones : [initial.timeZone, ...timeZones];
@@ -59,21 +58,6 @@ export function LearningSettings({
           </option>
         ))}
       </SelectField>
-      <div className="space-y-1">
-        <TextField
-          label={t("reminder.label")}
-          hint={t("reminder.hint")}
-          name="reminderTime"
-          type="time"
-          value={reminder}
-          onChange={(event) => setReminder(event.target.value)}
-        />
-        {reminder !== "" && (
-          <Button variant="ghost" onClick={() => setReminder("")} className="-ms-3">
-            {t("reminder.clear")}
-          </Button>
-        )}
-      </div>
       {state.error && <FormMessage kind="error">{te(state.error)}</FormMessage>}
       {state.saved && <FormMessage kind="notice">{t("saved")}</FormMessage>}
       <Button type="submit" variant="secondary" disabled={pending}>

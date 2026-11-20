@@ -76,6 +76,7 @@ export const packetCardSchema = z.strictObject({
   front: z.string().min(1),
   back: z.string().nullable(),
   context: z.string().nullable(),
+  correctionHighlight: z.string().optional(),
   /** Id of the right option, in `recognition` mode. */
   correctOptionId: z.string().nullable(),
   options: z.array(z.strictObject({ id: z.string(), text: z.string() })).max(4),
@@ -88,6 +89,7 @@ export const packetErrorOfTheDaySchema = z.strictObject({
   sentence: z.string(),
   highlighted: z.string(),
   explanation: z.string(),
+  explanationLanguage: languageCodeSchema.optional(),
   accept: z.array(z.string()).min(1).max(20),
 });
 

@@ -1,5 +1,6 @@
 import {
   PLAN_STEPS,
+  addDays,
   learningDay,
   valueToLevel,
   type IngestState,
@@ -21,6 +22,7 @@ import {
   sessionFormatSchema,
   storedSessionPlanSchema,
   type CefrLevel,
+  type DateKey,
   type IngestMemo,
   type ReviewMode,
   type StoredSessionPlan,
@@ -204,8 +206,14 @@ function stateCard(row: CardRow, timeZone: string, served: { mode: ReviewMode | 
   };
 }
 
-export function buildIngestState(input: { userId: string; rows: IngestRows; memo: IngestMemo | null }): BuiltIngestState {
-  const { userId, rows, memo } = input;
+export function buildIngestState(input: {
+  userId: string;
+  rows: IngestRows;
+  memo: IngestMemo | null;
+  serverDay?: DateKey;
+  feedbackTarget?: { productionId: string; deferred?: boolean };
+}): BuiltIngestState {
+  const { userId, rows, memo, serverDay, feedbackTarget } = input;
   const timeZone = rows.profile.timeZone;
   const skippedSessions: string[] = [];
 
@@ -240,6 +248,19 @@ export function buildIngestState(input: { userId: string; rows: IngestRows; memo
     const item = language ? stateItem(row, language) : null;
     if (item) items[row.id] = item;
   }
+  for (const row of rows.errorItems ?? []) {
+    const corrected = row.accept[0];
+    if (!corrected) continue;
+    items[row.id] = {
+      id: row.id, language: row.language, textId: null, kind: "cloze", answer: null, accept: row.accept,
+      listeningOnly: false, origin: "error_of_day", errorItemId: row.id, reworkedDay: row.reworkedDay,
+      errorOfDay: { correctionId: row.correctionId, createdDay: row.createdDay, recurring: row.recurring },
+      card: {
+        kind: "correction", front: row.sentence, back: `${corrected}\n${row.explanation}`,
+        backLanguage: row.explanationLanguage, context: row.highlighted,
+      },
+    };
+  }
   const texts: Record<string, StateText> = {};
   for (const row of rows.texts) {
     const language = languageCodeSchema.safeParse(row.language);
@@ -272,22 +293,43 @@ export function buildIngestState(input: { userId: string; rows: IngestRows; memo
   const deviceCursors: IngestState["deviceCursors"] = {};
   for (const row of rows.deviceCursors) deviceCursors[row.deviceId] = { lastSeq: row.lastSeq, lastDay: row.lastDay };
 
-  // Productions: the memo holds their state; one the memo does not know was paid or settled by an earlier version ----
+  // Explicit feedback loads the production even if the bounded memo has already evicted it.
   const productions: Record<string, StateProduction> = {};
+  const correctedIds = new Set(rows.corrections?.map((correction) => correction.productionId));
   for (const row of rows.productions) {
     const language = languageCodeSchema.safeParse(row.language);
     if (!language.success) continue;
     const remembered = memo?.productions[row.id];
+    const target = feedbackTarget?.productionId === row.id;
+    const storedDay = remembered?.day ?? learningDay(new Date(row.createdAt), timeZone);
+    const creditExpired = serverDay !== undefined && storedDay < addDays(serverDay, -3);
+    const hasCorrection = correctedIds.has(row.id);
     productions[row.id] = {
       id: row.id,
       sessionId: row.sessionId,
       language: language.data,
       text: row.text,
-      day: remembered?.day ?? learningDay(new Date(row.createdAt), timeZone),
-      late: remembered?.late ?? false,
-      settled: remembered?.settled ?? true,
-      correctionDeferred: remembered?.correctionDeferred ?? false,
+      day: storedDay,
+      late: remembered?.late ?? creditExpired,
+      settled: remembered?.settled ?? !target,
+      creditExpired: creditExpired || !remembered,
+      correctionDeferred: !hasCorrection && ((target && feedbackTarget?.deferred === true) || remembered?.correctionDeferred === true),
+      ...(row.initialSimilarity === undefined ? {} : { initialSimilarity: row.initialSimilarity }),
       clientEventId: row.clientEventId ?? "",
+    };
+  }
+  const corrections: IngestState["corrections"] = {};
+  for (const row of rows.corrections ?? []) {
+    const production = productions[row.productionId];
+    if (!production) continue;
+    corrections[row.id] = {
+      id: row.id,
+      productionId: row.productionId,
+      sessionId: production.sessionId,
+      language: production.language,
+      detectedLanguage: row.stored.detectedLanguage ?? "und",
+      nativeVersion: row.stored.feedback.nativeVersion,
+      sentences: row.stored.sentences,
     };
   }
 
@@ -305,8 +347,7 @@ export function buildIngestState(input: { userId: string; rows: IngestRows; memo
     items,
     texts,
     cards,
-    // The corrections and the rewrite checks come with the written correction (milestone 2, PR 3).
-    corrections: {},
+    corrections,
     productions,
     days: structuredClone(memo?.days ?? {}),
     learningDays,

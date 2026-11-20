@@ -125,6 +125,11 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"writing_feedback_job": {
+                  Row: { production_id: string; user_id: string; session_id: string; text_hash: string; started_at: string; failed: boolean }
+                  Insert: { production_id: string; user_id: string; session_id: string; text_hash: string; started_at?: string; failed?: boolean }
+                  Update: { failed?: boolean }
+                  Relationships: []
                 },"correction": {
                   Row: {
                     "created_at": string,"explanation_language": string,"feedback": NonNullable<Json>,"id": string,"input_tokens": number | null,"model": string | null,"output_tokens": number | null,"production_id": string,"prompt_version": string | null,"user_id": string
@@ -181,14 +186,14 @@ isOneToOne: false
                   ]
                 },"error_item": {
                   Row: {
-                    "answer": NonNullable<Json>,"correction_id": string,"created_day": string,"error_ref": string,"id": string,"prompt": NonNullable<Json>,"reworked_day": string | null,"user_id": string
+                    "answer": NonNullable<Json>,"correction_id": string,"created_day": string,"error_ref": string,"id": string,"language": string | null,"prompt": NonNullable<Json>,"reworked_day": string | null,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "answer": NonNullable<Json>,"correction_id": string,"created_day": string,"error_ref": string,"id"?: string,"prompt": NonNullable<Json>,"reworked_day"?: string | null,"user_id": string
+                    "answer": NonNullable<Json>,"correction_id": string,"created_day": string,"error_ref": string,"id"?: string,"language"?: string | null,"prompt": NonNullable<Json>,"reworked_day"?: string | null,"user_id": string
                   }
                   Update: {
-                    "answer"?: NonNullable<Json>,"correction_id"?: string,"created_day"?: string,"error_ref"?: string,"id"?: string,"prompt"?: NonNullable<Json>,"reworked_day"?: string | null,"user_id"?: string
+                    "answer"?: NonNullable<Json>,"correction_id"?: string,"created_day"?: string,"error_ref"?: string,"id"?: string,"language"?: string | null,"prompt"?: NonNullable<Json>,"reworked_day"?: string | null,"user_id"?: string
                   }
                   Relationships: [
                     {
@@ -446,6 +451,11 @@ isOneToOne: false
       referencedColumns: ["id","user_id"]
     }
                   ]
+                },"rewrite_check_job": {
+                  Row: { user_id: string; client_event_id: string; fingerprint: string; started_at: string; fixed_error_ids: string[] | null }
+                  Insert: { user_id: string; client_event_id: string; fingerprint: string; started_at?: string; fixed_error_ids?: string[] | null }
+                  Update: { fixed_error_ids?: string[] | null }
+                  Relationships: []
                 },"session": {
                   Row: {
                     "completed_at": string | null,"created_at": string,"day": string,"format": number,"id": string,"kind": string,"language": string,"plan": NonNullable<Json>,"served_at": string | null,"started_at": string | null,"status": string,"user_id": string
@@ -688,11 +698,22 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
+            read_verified_sentences: { Args: { p_user_id: string; p_correction_ids: string[] }; Returns: { correction_id: string; sentence_index: number }[] };
+"configure_reminder":
+{ Args: { p_enabled: boolean; p_time: string; p_weekly_summary: boolean; p_endpoint?: string; p_p256dh?: string; p_auth?: string; p_user_agent?: string; p_reset?: boolean }; Returns: undefined },
+"reminders_due":
+{ Args: { p_at: string; p_after?: string; p_only?: string }; Returns: { user_id: string; day: string; locale: string; delivery_mode: string; template: string; daily_minutes: number; active_days: number; rewrites: number }[] },
+"claim_reminder":
+{ Args: { p_user_id: string; p_day: string; p_at: string; p_template: string; p_mode: string }; Returns: { log_id: number; subscription_id: string; endpoint: string; p256dh: string; auth: string }[] },
+"mark_reminder_opened":
+{ Args: { p_log_id: number }; Returns: undefined },
 "metrics_report":
 { Args: { "p_as_of"?: string,"p_month": string }; Returns: Json },
 "claim_graded_text_job":
 { Args: { "p_density": number,"p_language": string,"p_level": string,"p_theme": string,"p_version": string }; Returns: Json },
-"publish_graded_text":
+  "claim_writing_feedback_job":
+  { Args: { p_user_id: string; p_production_id: string }; Returns: string },
+  "publish_graded_text":
 { Args: { "p_items": Json,"p_job": string,"p_text": Json }; Returns: string },
             "ai_spend":
 { Args: { "p_from": string,"p_to": string }; Returns: {
