@@ -8,4 +8,5 @@ export * from "./memory/fsrs";
 export * from "./memory/legacy-leitner";
 export * from "./memory/queue";
 export * from "./offline";
+export * from "./reader/coverage";
 export * from "./session";

@@ -8,6 +8,10 @@ L’apprenant A2 choisit un texte dans la bibliothèque ou ouvre celui de sa sé
 
 La bibliothèque ne sert que des textes publiés. Les textes authentiques conservent leur source, leur licence et leur attribution. L’audio pré-généré est partagé par texte et adapté à sa langue. Un texte reste accessible si son audio est en préparation.
 
+Le lecteur compare les formes écrites présentes dans le texte aux cartes de vocabulaire marquées comme connues ou en cours de révision avec au moins deux rappels et une échéance future. Chaque occurrence compte. Sans historique exploitable, le lecteur affiche un état d’attente. Le pourcentage décrit les mots retrouvés dans cet historique, avec le nombre repéré sur le total.
+
+Le premier enregistrement est la lecture intégrale de *La lista della spesa*, synthétisée localement avec Piper 1.8 et la voix italienne Paola. Le MP3 est partagé par texte. Pour publier une nouvelle prise, ajouter un fichier versionné dans `apps/web/public/reader-audio/` et renseigner le chemin `audio_path` du texte. [Piper](https://github.com/OHF-Voice/piper1-gpl) · [Voix Paola](https://huggingface.co/paolapersico1/Piper-TTS-Italian/blob/64fe0e5/paola/medium/MODEL_CARD)
+
 ## 2. S’appuyer sur les langues déjà connues
 
 Après le choix de la langue cible, proposer une sélection multiple facultative sous la question « Quelles autres langues comprends-tu ou parles-tu déjà ? ». L’action « Passer » permet de terminer l’inscription. Les réglages permettent d’ajouter ou de retirer une langue à tout moment. Une langue peut servir d’appui même si elle ne figure pas parmi les langues cibles. La langue des explications peut également servir d’appui.

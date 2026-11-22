@@ -22,6 +22,7 @@ test("a published A2 text opens from Today and the library, and saves one review
     await signUpAndInstall(page, email);
     await page.getByRole("link", { name: "Ouvrir dans le lecteur" }).click();
     await expect(page.getByRole("heading", { name: title })).toBeVisible();
+    await expect(page.getByText("Audio en préparation.", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "mercato", exact: true }).click();
     await expect(page.getByText("marché", { exact: true })).toHaveAttribute("lang", "fr");
     await expect(page.locator("article")).toHaveText(sentence);
