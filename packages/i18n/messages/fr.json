@@ -31,6 +31,15 @@
     },
     "appDescription": "Une séance de langue chaque jour, à ton rythme."
   },
+  "reader": {
+    "library": "Bibliothèque",
+    "empty": "Aucun texte à lire pour le moment dans les langues que tu apprends.",
+    "open": "Ouvrir dans le lecteur",
+    "add": "Ajouter à mes révisions",
+    "saving": "Ajout en cours…",
+    "saved": "Ajouté à tes révisions.",
+    "failed": "La carte n’a pas pu être ajoutée. Tu peux réessayer."
+  },
   "auth": {
     "signIn": {
       "title": "Connexion",

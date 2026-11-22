@@ -108,7 +108,7 @@ export async function generateGradedText(cell: TextCell, { store, ai, ranks, sto
       const body = textBody(draft.paragraphs);
       await store.publish(job.id, {
         title: draft.title, body, word_count: countWords(cell.language, body),
-        new_words: draft.words.map(({ lemma, dictionaryForm, definition, sentence }) => ({ lemma, dictionaryForm, definition, sentence })),
+        new_words: draft.words.map(({ lemma, dictionaryForm, definition, sentence, forms }) => ({ lemma, dictionaryForm, definition, sentence, forms })),
         grammar_point: draft.grammar.id, writing_task: draft.writingTask, listening_segment: draft.listening,
         model: generation.model, checks: { review: "approved", review_model: review.model },
       }, buildItems(cell, draft));

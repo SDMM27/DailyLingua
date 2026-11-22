@@ -12,3 +12,4 @@ export * from "./graded-text";
 export * from "./writing-feedback";
 export * from "./rewrite-check";
 export * from "./reminders";
+export * from "./reader";

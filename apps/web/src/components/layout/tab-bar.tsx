@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 
 const TABS = [
   { href: "/", key: "today", icon: "M5 4h11l3 3v13H5zM9 10h6M9 14h6M9 18h4" },
+  { href: "/library", key: "read", icon: "M4 5h5v14H4zM9 5h5v14H9zM15 6l4-1 4 13-4 1z" },
   {
     href: "/settings",
     key: "settings",
@@ -13,7 +14,7 @@ const TABS = [
   },
 ] as const;
 
-/** Bottom navigation of the signed-in screens: two tabs, 44 px at least, clear of the home indicator. */
+/** Bottom navigation of the signed-in screens, clear of the home indicator. */
 export function TabBar() {
   const t = useTranslations("common.nav");
   const pathname = usePathname();
