@@ -182,7 +182,7 @@ export function OnboardingWizard({
               )}
             </>
           )}
-          {step === "target" && (<>
+          {step === "target" && (
             <ChoiceList
               name="target"
               labelledBy={titleId}
@@ -202,14 +202,7 @@ export function OnboardingWizard({
                 ),
               }))}
             />
-            {target && (
-              <details className="mt-5 rounded-xl border border-line px-3 pb-2">
-                <summary className="min-h-11 cursor-pointer py-3 font-semibold">{tk("onboardingTitle")}</summary>
-                <KnownLanguagesPicker options={nativeOptions.filter(({ code }) => code !== native)}
-                  selected={knownLanguages} onChange={setKnownLanguages} />
-              </details>
-            )}
-          </>)}
+          )}
           {step === "level" && (
             <ChoiceList
               name="level"
@@ -233,6 +226,13 @@ export function OnboardingWizard({
 
       <footer className="sticky bottom-0 space-y-3 bg-bg pt-3 pb-[calc(1rem+env(safe-area-inset-bottom))]">
         {error && <FormMessage kind="error">{te(error)}</FormMessage>}
+        {step === "target" && target && (
+          <details className="rounded-xl border border-line px-3 open:pb-3">
+            <summary className="min-h-11 cursor-pointer py-3 text-sm font-semibold">{tk("onboardingTitle")}</summary>
+            <KnownLanguagesPicker options={nativeOptions.filter(({ code }) => code !== native)}
+              selected={knownLanguages} onChange={setKnownLanguages} />
+          </details>
+        )}
         <Button onClick={next} disabled={!canContinue || pending}>
           {pending ? t("saving") : last ? t("finish") : tc("actions.continue")}
         </Button>

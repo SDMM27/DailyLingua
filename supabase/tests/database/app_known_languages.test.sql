@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(10);
+select plan(11);
 
 insert into auth.users (instance_id, id, aud, role, email) values
   ('00000000-0000-0000-0000-000000000000', '184ebe1e-98ac-4f36-8eb2-2dd94e6912fd', 'authenticated', 'authenticated', 'known-languages-one@test.invalid'),
@@ -16,9 +16,14 @@ select set_config('request.jwt.claims', '{"sub":"184ebe1e-98ac-4f36-8eb2-2dd94e6
 select is((select known_languages from app.profile), array[]::text[], 'a new account starts with no known languages');
 select throws_ok($$select app.save_known_languages(array['es', 'es'])$$, '22023', null, 'duplicates are rejected');
 select throws_ok($$select app.save_known_languages(array['es', null])$$, '22023', null, 'null codes are rejected');
-select throws_ok($$select app.save_known_languages(array_fill('es'::text, array[17]))$$, '22023', null, 'oversized lists are rejected');
+select throws_ok($$select app.save_known_languages(array(select 'a' || chr(n) from generate_series(97, 113) as codes(n)))$$,
+  '22023', null, 'oversized lists of distinct codes are rejected');
 select lives_ok($$select app.save_known_languages(array['es', 'eu'])$$, 'a language outside the target registry can be saved');
 select is((select known_languages from app.profile), array['es', 'eu'], 'the list is stored on the caller profile');
+reset role;
+select is((select known_languages from app.profile where user_id = 'f422e032-4f32-4d46-a3dc-edd391ad6107'),
+  array[]::text[], 'saving leaves the other account untouched');
+set local role authenticated;
 select lives_ok($$select app.save_known_languages(array[]::text[])$$, 'the learner can clear the whole list');
 reset role;
 select is((select count(*) from app.profile
