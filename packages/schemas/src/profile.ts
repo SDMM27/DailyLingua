@@ -3,9 +3,14 @@ import { cefrLevels, cefrLevelSchema, isoInstantSchema, languageCodeSchema, skil
 
 const jsonObjectSchema = z.record(z.string(), z.unknown());
 
+export const maxKnownLanguages = 16;
+export const knownLanguagesSchema = z.array(languageCodeSchema).max(maxKnownLanguages)
+  .refine((languages) => new Set(languages).size === languages.length, "Duplicate known language");
+
 export const profileSchema = z.object({
   userId: z.uuid(),
   nativeLanguage: languageCodeSchema,
+  knownLanguages: knownLanguagesSchema.default([]),
   uiLanguage: languageCodeSchema,
   /** IANA zone name. */
   timeZone: z.string().min(1),

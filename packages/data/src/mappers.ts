@@ -33,6 +33,7 @@ export function toProfile(row: ProfileRow): Profile {
   return validated(profileSchema, {
     userId: row.user_id,
     nativeLanguage: row.native_language,
+    knownLanguages: row.known_languages,
     uiLanguage: row.ui_language,
     timeZone: row.time_zone,
     reminderTime: toTimeOfDay(row.reminder_time),

@@ -1,4 +1,4 @@
-import { gameSettingsSchema, saveProfileInputSchema, type GameSettings, type Profile, type SaveProfileInput } from "@dailylingua/schemas";
+import { gameSettingsSchema, knownLanguagesSchema, saveProfileInputSchema, type GameSettings, type Profile, type SaveProfileInput } from "@dailylingua/schemas";
 import { appSchema, type AppClient } from "./client";
 import { DataError, toDataError } from "./errors";
 import { toProfile } from "./mappers";
@@ -31,5 +31,12 @@ export async function saveGameSettings(client: AppClient, settings: GameSettings
   const parsed = gameSettingsSchema.safeParse(settings);
   if (!parsed.success) throw new DataError("invalid");
   const { error } = await appSchema(client).rpc("save_game_settings", { p_settings: parsed.data });
+  if (error) throw toDataError(error);
+}
+
+export async function saveKnownLanguages(client: AppClient, languages: string[]): Promise<void> {
+  const parsed = knownLanguagesSchema.safeParse(languages);
+  if (!parsed.success) throw new DataError("invalid");
+  const { error } = await appSchema(client).rpc("save_known_languages", { p_languages: parsed.data });
   if (error) throw toDataError(error);
 }

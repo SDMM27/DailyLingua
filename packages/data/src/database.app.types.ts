@@ -371,14 +371,14 @@ isOneToOne: false
                   ]
                 },"profile": {
                   Row: {
-                    "app_active_since": string | null,"created_at": string,"game_settings": NonNullable<Json>,"is_guest": boolean,"legacy_migrated_at": string | null,"native_language": string,"reminder_time": string | null,"time_zone": string,"ui_language": string,"updated_at": string,"user_id": string
+                    "app_active_since": string | null,"created_at": string,"game_settings": NonNullable<Json>,"is_guest": boolean,"known_languages": string[],"legacy_migrated_at": string | null,"native_language": string,"reminder_time": string | null,"time_zone": string,"ui_language": string,"updated_at": string,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "app_active_since"?: string | null,"created_at"?: string,"game_settings"?: NonNullable<Json>,"is_guest"?: boolean,"legacy_migrated_at"?: string | null,"native_language"?: string,"reminder_time"?: string | null,"time_zone"?: string,"ui_language"?: string,"updated_at"?: string,"user_id": string
+                    "app_active_since"?: string | null,"created_at"?: string,"game_settings"?: NonNullable<Json>,"is_guest"?: boolean,"known_languages"?: string[],"legacy_migrated_at"?: string | null,"native_language"?: string,"reminder_time"?: string | null,"time_zone"?: string,"ui_language"?: string,"updated_at"?: string,"user_id": string
                   }
                   Update: {
-                    "app_active_since"?: string | null,"created_at"?: string,"game_settings"?: NonNullable<Json>,"is_guest"?: boolean,"legacy_migrated_at"?: string | null,"native_language"?: string,"reminder_time"?: string | null,"time_zone"?: string,"ui_language"?: string,"updated_at"?: string,"user_id"?: string
+                    "app_active_since"?: string | null,"created_at"?: string,"game_settings"?: NonNullable<Json>,"is_guest"?: boolean,"known_languages"?: string[],"legacy_migrated_at"?: string | null,"native_language"?: string,"reminder_time"?: string | null,"time_zone"?: string,"ui_language"?: string,"updated_at"?: string,"user_id"?: string
                   }
                   Relationships: [
                     
@@ -816,6 +816,7 @@ isOneToOne: false
 "created_at": string,
 "game_settings": NonNullable<Json>,
 "is_guest": boolean,
+"known_languages": string[],
 "legacy_migrated_at": string | null,
 "native_language": string,
 "reminder_time": string | null,
@@ -830,12 +831,15 @@ isOneToOne: false
         isOneToOne: true
         isSetofReturn: false
       } },
+"save_known_languages":
+{ Args: { "p_languages": string[] }; Returns: undefined },
 "save_profile":
 { Args: { "p_native_language": string,"p_reminder_time"?: string,"p_time_zone": string,"p_ui_language": string }; Returns: {
               "app_active_since": string | null,
 "created_at": string,
 "game_settings": NonNullable<Json>,
 "is_guest": boolean,
+"known_languages": string[],
 "legacy_migrated_at": string | null,
 "native_language": string,
 "reminder_time": string | null,
