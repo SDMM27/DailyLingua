@@ -145,7 +145,7 @@ export function TodaySession({ language, timeZone, languageName, children, goal,
             ) : <p className="text-muted" role="status">{common("loading")}</p>}
             {saveError && <FormMessage kind="error">{t("saveError")}</FormMessage>}
           </article>
-          {sync && <div className="mt-5"><WritingFeedback sync={sync} /></div>}
+          <div className="mt-5 empty:hidden">{sync && <WritingFeedback sync={sync} />}</div>
           {detail}
         </>
       )}
