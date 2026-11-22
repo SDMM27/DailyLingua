@@ -47,10 +47,15 @@ export async function deleteTestUser(email: string): Promise<void> {
 }
 
 /** Collects console errors and uncaught page exceptions; assert on `.errors` at the end of a test. */
-export function collectErrors(page: Page) {
+export function collectErrors(page: Page, isOffline = () => false) {
   const errors: string[] = [];
   page.on("console", (message) => {
-    if (message.type() === "error") errors.push(`console: ${message.text()}`);
+    if (message.type() !== "error") return;
+    const url = message.location().url;
+    // WebKit reports these failed requests as internal errors during the intentional offline phase.
+    if (isOffline() && message.text() === "Failed to load resource: WebKit encountered an internal error"
+      && ["/manifest.webmanifest", "/api/events"].some((path) => url === new URL(path, page.url()).href)) return;
+    errors.push(`console: ${message.text()}`);
   });
   page.on("pageerror", (error) => {
     // WebKit reports a link prefetch (`?_rsc=`) cancelled by a full page load (page.goto) this way.

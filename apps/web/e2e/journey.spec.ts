@@ -61,7 +61,8 @@ test.describe("account journey", () => {
   });
 
   test("sign up, install, Today in French, switch to English, sign out and back in", async ({ page }) => {
-    const { errors } = collectErrors(page);
+    let offline = false;
+    const { errors } = collectErrors(page, () => offline);
     // The narrowest phone width we support: no screen of the journey may scroll sideways.
     await page.setViewportSize({ width: 360, height: 740 });
 
@@ -117,6 +118,7 @@ test.describe("account journey", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await expect(page.getByText("Prête hors ligne")).toBeVisible();
     await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
+    offline = true;
     await page.context().setOffline(true);
     try {
       await page.reload({ waitUntil: "domcontentloaded" });
@@ -134,6 +136,7 @@ test.describe("account journey", () => {
       await expect(page.getByRole("button", { name: "Revoir le bilan" })).toBeVisible();
     } finally {
       await page.context().setOffline(false);
+      offline = false;
     }
     await page.reload();
 
