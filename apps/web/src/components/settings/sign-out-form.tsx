@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { signOut } from "@/app/actions/auth";
 import { deleteSessionPacketDatabase } from "@/lib/offline/session-packet-store";
+import { forgetOfflineAccount } from "@/lib/offline/account";
 
 /**
  * The sign-out form. The session packets on the phone hold answer keys, so the database of the signed-in user is deleted
@@ -14,6 +15,7 @@ export function SignOutForm({ userId, children, className }: { userId: string; c
     <form
       className={className}
       action={async () => {
+        forgetOfflineAccount(userId);
         await deleteSessionPacketDatabase(userId);
         await signOut();
       }}

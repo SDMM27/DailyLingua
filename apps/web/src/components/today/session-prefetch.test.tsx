@@ -1,14 +1,16 @@
 // @vitest-environment jsdom
 import { render, waitFor } from "@testing-library/react";
+import { learningDay } from "@dailylingua/core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const put = vi.fn<(packet: unknown) => Promise<void>>(async () => undefined);
 const purge = vi.fn<(today: string, queueEmpty: boolean) => Promise<number>>(async () => 0);
+const get = vi.fn<(language: string, day: string) => Promise<unknown>>(async () => null);
 const queueSize = vi.fn(async () => 0);
 let sync: { userId: string; queueSize: () => Promise<number> } | null = { userId: "user-1", queueSize };
 vi.mock("@/components/pwa/event-sync-provider", () => ({ useEventSync: () => sync }));
 vi.mock("@/lib/offline/session-packet-store", () => ({
-  createUserPacketStore: vi.fn(() => ({ put, purge, get: vi.fn() })),
+  createUserPacketStore: vi.fn(() => ({ put, purge, get })),
   indexedDbPacketsAvailable: () => true,
 }));
 
@@ -70,6 +72,17 @@ describe("SessionPrefetch", () => {
     sync = null;
     render(<SessionPrefetch language="it" />).unmount();
     expect(fetcher).not.toHaveBeenCalled();
+  });
+
+  it("restores the current user's packet for the current learning day when offline", async () => {
+    setOnline(false);
+    const date = learningDay(new Date(), packet.timeZone);
+    const cached = { ...packet, session: { ...packet.session, day: date }, serverDay: date };
+    get.mockResolvedValueOnce(cached);
+    const onPacket = vi.fn();
+    render(<SessionPrefetch language="it" timeZone={packet.timeZone} onPacket={onPacket} />);
+    await waitFor(() => expect(onPacket).toHaveBeenCalledWith(cached, true));
+    expect(get).toHaveBeenCalledWith("it", date);
   });
 
   it("stores nothing on an error status or on an answer that is not a packet", async () => {

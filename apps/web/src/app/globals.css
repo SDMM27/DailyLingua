@@ -27,6 +27,10 @@
     overscroll-behavior-block: none;
   }
 
+  main:has([data-daily-session]) + nav {
+    display: none;
+  }
+
   /* iOS zooms on focus when a field is under 16px. */
   input,
   select,
@@ -43,4 +47,15 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--sd-muted);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .session-summary-enter {
+    animation: session-summary-enter 600ms ease-out;
+  }
+}
+
+@keyframes session-summary-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }

@@ -115,8 +115,64 @@
       "soon": "Les séances arrivent bientôt"
     }
   },
+  "dailySession": {
+    "title": "La séance du jour",
+    "generatedText": "Texte généré, vérifié automatiquement",
+    "steps": {
+      "wake": "Réveil",
+      "reading": "Lecture",
+      "workshop": "Atelier",
+      "expression": "Expression",
+      "momentum": "Élan",
+      "review": "Bilan"
+    },
+    "reviewOnly": "Révisions du jour",
+    "progress": "Étape {position} sur 6",
+    "offline": "Hors ligne",
+    "readyOffline": "Prête hors ligne",
+    "offlineMissing": "La séance du jour se téléchargera au retour du réseau.",
+    "loadError": "Impossible de charger la séance pour le moment.",
+    "retry": "Réessayer",
+    "saveError": "Cet appareil n’a pas pu enregistrer ta progression. Réessaie.",
+    "dayEnded": "Un nouveau jour d’étude a commencé. Retourne à Aujourd’hui pour charger la nouvelle séance.",
+    "reopen": "Revoir le bilan",
+    "pauseTitle": "Séance en pause",
+    "pauseBody": "Tu reprendras à l’étape {step}.",
+    "continue": "Continuer",
+    "leave": "Quitter pour l’instant",
+    "check": "Vérifier",
+    "choose": "Choisis ta réponse",
+    "answer": "Ta réponse",
+    "correct": "Juste",
+    "almost": "Attention aux accents",
+    "wrong": "À revoir",
+    "startReading": "Lire le texte",
+    "questions": "Passer aux questions",
+    "readAgain": "Prends encore un instant pour lire le passage.",
+    "listen": "Écouter le passage",
+    "audioUnavailable": "Voix indisponible sur cet appareil. Tu peux lire le passage.",
+    "rereadInstruction": "Relis ce passage à ton rythme. Essaie de lire avec plus d’aisance.",
+    "startReread": "Commencer la relecture",
+    "endReread": "Terminer la relecture",
+    "wordCount": "{words} mots · {minimum} minimum",
+    "submitWriting": "Enregistrer mon texte",
+    "finish": "Terminer",
+    "summaryBody": "Ta progression et ton texte sont enregistrés sur cet appareil.",
+    "reviewSummaryBody": "Tes révisions seront prises en compte dès leur synchronisation.",
+    "noReviews": "Tu n’as aucune carte à réviser aujourd’hui.",
+    "streakDays": "{count, plural, one {# jour de suite} other {# jours de suite}}",
+    "streakWeeks": "{count, plural, one {# semaine de suite} other {# semaines de suite}}",
+    "streakBest": "Record · {count}",
+    "streakFreezes": "{count, plural, one {# gel disponible} other {# gels disponibles}}"
+  },
   "settings": {
     "title": "Réglages",
+    "game": {
+      "title": "Jeu",
+      "xpVisible": "Afficher l’XP",
+      "streakEnabled": "Afficher la série",
+      "celebrations": "Animer le bilan"
+    },
     "interfaceLanguage": {
       "label": "Langue de l’interface",
       "hint": "Les textes de l’app s’affichent dans cette langue."
@@ -127,7 +183,7 @@
     },
     "timeZone": {
       "label": "Fuseau horaire",
-      "hint": "Ton jour d’étude change à 4 h du matin, dans ce fuseau."
+      "hint": "Ton jour d’étude change à 4 h. Après le début de ton apprentissage, le fuseau suit celui de ton appareil."
     },
     "reminder": {
       "label": "Heure du rappel",

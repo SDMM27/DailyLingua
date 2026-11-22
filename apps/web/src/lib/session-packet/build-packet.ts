@@ -47,6 +47,7 @@ function packetText(text: PacketTextRow): SessionPacket["text"] {
     grammarPoint: text.grammarPoint,
     listeningSegment: typeof from === "number" && typeof to === "number" && Number.isInteger(from) && Number.isInteger(to) && from >= 0 && to >= from ? { from, to } : null,
     writingTask: text.writingTask,
+    ...(text.generationReviewed ? { generationReviewed: true } : {}),
   };
 }
 
@@ -117,6 +118,8 @@ export function buildPacket(input: PacketInput): SessionPacket {
     text,
     items: text && textBundle ? packetItems(plan, textBundle.items) : [],
     cards: packetCards(plan, input.cards, session.id, session.language),
+    wakeCardIds: plan.wake.cardIds,
+    momentumWords: plan.momentumWords,
     errorOfTheDay: null,
     quotas: input.quotas,
     serverDay: input.serverDay,

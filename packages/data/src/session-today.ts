@@ -115,6 +115,7 @@ export interface PacketTextRow {
   grammarPoint: string | null;
   listeningSegment: unknown;
   writingTask: string | null;
+  generationReviewed?: boolean;
 }
 
 /** A published text with ALL its items and their keys (the packet serves keys, `j2-architecture.md` A1). */
@@ -122,7 +123,7 @@ export async function readTextWithItems(client: AppClient, textId: string): Prom
   const db = appSchema(client);
   const found = await db
     .from("text")
-    .select("id, language, level_band, density, theme, title, body, word_count, new_words, grammar_point, listening_segment, writing_task, status")
+    .select("id, language, level_band, density, theme, title, body, word_count, new_words, grammar_point, listening_segment, writing_task, status, checks")
     .eq("id", textId)
     .maybeSingle();
   const text = unwrap(found);
@@ -143,6 +144,7 @@ export async function readTextWithItems(client: AppClient, textId: string): Prom
       grammarPoint: text.grammar_point,
       listeningSegment: text.listening_segment,
       writingTask: text.writing_task,
+      ...(text.checks && typeof text.checks === "object" && !Array.isArray(text.checks) && text.checks.review === "approved" ? { generationReviewed: true } : {}),
     },
     items,
   };

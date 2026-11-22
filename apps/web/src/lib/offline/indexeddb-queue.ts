@@ -1,13 +1,32 @@
 import type { EventQueue, PendingEvent, RejectedEvent } from "@dailylingua/core";
+import { clientEventSchema } from "@dailylingua/schemas";
+import type { SessionEvent } from "@/lib/session-packet/session-flow";
 
 const STORE = "events";
 const BY_EVENT_ID = "by-client-event-id";
 const REJECTED_STORE = "rejected";
-const DB_VERSION = 2;
+const SESSION_PROGRESS = "session-progress";
+const DB_VERSION = 3;
 
 /** A stored event: the auto-incremented `seq` is the arrival order (first in, first out). */
 interface StoredEvent extends PendingEvent {
   seq?: number;
+}
+
+export interface LocalSessionProgress {
+  revision: number;
+  position: string;
+  startedAt: string | null;
+}
+
+interface IndexedDbEventQueue extends EventQueue {
+  readProgress(sessionId: string): Promise<LocalSessionProgress | undefined>;
+  advanceSession(sessionId: string, expectedRevision: number, next: LocalSessionProgress, events: SessionEvent[], occurredAt: string): Promise<boolean>;
+}
+
+interface EventDevice {
+  id: string;
+  sequence: number;
 }
 
 function request<T>(req: IDBRequest<T>): Promise<T> {
@@ -36,6 +55,7 @@ function openDatabase(name: string): Promise<IDBDatabase> {
         store.createIndex(BY_EVENT_ID, "clientEventId", { unique: true });
       }
       if (upgrade.oldVersion < 2) database.createObjectStore(REJECTED_STORE, { keyPath: "clientEventId" });
+      if (upgrade.oldVersion < 3) database.createObjectStore(SESSION_PROGRESS);
     };
     opening.onsuccess = () => resolve(opening.result);
     opening.onerror = () => reject(opening.error ?? new Error("IndexedDB cannot be opened"));
@@ -52,11 +72,56 @@ export function indexedDbAvailable(): boolean {
  * `EventQueue` kept in IndexedDB, so that the events survive a closed tab or a restart. Opens the
  * database on first use. Events leave the queue only by `ack` (delivered) or `reject` (refused for good, kept apart).
  */
-export function createIndexedDbEventQueue(databaseName = "dailylingua-offline"): EventQueue {
+export function createIndexedDbEventQueue(databaseName = "dailylingua-offline"): IndexedDbEventQueue {
   let database: Promise<IDBDatabase> | null = null;
-  const open = () => (database ??= openDatabase(databaseName));
+  const open = () => (database ??= openDatabase(databaseName).then((db) => {
+    db.onversionchange = () => {
+      db.close();
+      database = null;
+    };
+    return db;
+  }).catch((error: unknown) => {
+    database = null;
+    throw error;
+  }));
 
   return {
+    async readProgress(sessionId) {
+      const tx = (await open()).transaction(SESSION_PROGRESS, "readonly");
+      return request<LocalSessionProgress | undefined>(tx.objectStore(SESSION_PROGRESS).get(sessionId));
+    },
+    async advanceSession(sessionId, expectedRevision, next, events, occurredAt) {
+      const tx = (await open()).transaction([SESSION_PROGRESS, STORE], "readwrite");
+      const completed = transactionDone(tx);
+      const progress = tx.objectStore(SESSION_PROGRESS);
+      const current = await request<LocalSessionProgress | undefined>(progress.get(sessionId));
+      if ((current?.revision ?? 0) !== expectedRevision) {
+        await completed;
+        return false;
+      }
+      try {
+        if (events.length > 0) {
+          const device = (await request<EventDevice | undefined>(progress.get("device"))) ?? { id: crypto.randomUUID(), sequence: 0 };
+          const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+          const pending = events.map((event) => clientEventSchema.parse({
+            kind: event.kind,
+            payload: { ...event.payload, tz, deviceId: device.id, seq: ++device.sequence },
+            clientEventId: crypto.randomUUID(),
+            occurredAt,
+          }));
+          const queue = tx.objectStore(STORE);
+          for (const event of pending) queue.add(event);
+          progress.put(device, "device");
+        }
+        progress.put(next, sessionId);
+        await completed;
+      } catch (error) {
+        try { tx.abort(); } catch { /* It may already have aborted. */ }
+        await completed.catch(() => undefined);
+        throw error;
+      }
+      return true;
+    },
     async enqueue(event) {
       const tx = (await open()).transaction([STORE, REJECTED_STORE], "readwrite");
       const store = tx.objectStore(STORE);

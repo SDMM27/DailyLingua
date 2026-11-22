@@ -1,4 +1,4 @@
-import type { CardKind, CardState, CefrLevel, DateKey, ExerciseKind, IngestPayload, LanguageCode, RingTier, SessionFormat, SessionKind } from "@dailylingua/schemas";
+import type { CardKind, CardState, CefrLevel, DateKey, ExerciseKind, IngestPayload, LanguageCode, ReviewMode, RingTier, SessionFormat, SessionKind } from "@dailylingua/schemas";
 import type { RejectedDelivery } from "../offline/types";
 import type { SettingChange } from "../game/settings";
 import type { TimeZoneChange } from "../game/attribution";
@@ -56,6 +56,8 @@ export interface IngestState {
 }
 
 export interface StateSession {
+  /** The server's recall mode for each card handed out with this session. */
+  servedCards?: Readonly<Record<string, ReviewMode>>;
   id: string;
   userId: string;
   language: LanguageCode;
@@ -111,6 +113,8 @@ export interface StateText {
 }
 
 export interface StateCard {
+  /** Written answers are also needed if an earlier packet served this card in production mode. */
+  productionAccept?: readonly string[];
   id: string;
   userId: string;
   language: LanguageCode;

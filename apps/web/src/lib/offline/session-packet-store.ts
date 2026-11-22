@@ -95,25 +95,34 @@ function open(name: string): Promise<IDBDatabase> {
 }
 
 export function createIndexedDbPacketBackend(databaseName: string): PacketBackend {
-  let database: Promise<IDBDatabase> | null = null;
-  const db = () => (database ??= open(databaseName));
+  async function transact<T>(mode: IDBTransactionMode, run: (store: IDBObjectStore) => Promise<T>): Promise<T> {
+    const database = await open(databaseName);
+    database.onversionchange = () => database.close();
+    try {
+      const tx = database.transaction(STORE, mode);
+      const completed = done(tx);
+      const [result] = await Promise.all([run(tx.objectStore(STORE)), completed]);
+      return result;
+    } finally {
+      database.close();
+    }
+  }
+
   return {
-    async get(key) {
-      return request((await db()).transaction(STORE, "readonly").objectStore(STORE).get(key));
+    get(key) {
+      return transact("readonly", (store) => request(store.get(key)));
     },
-    async put(entry) {
-      const tx = (await db()).transaction(STORE, "readwrite");
-      tx.objectStore(STORE).put(entry);
-      await done(tx);
+    put(entry) {
+      return transact("readwrite", async (store) => { await request(store.put(entry)); });
     },
     async delete(keys) {
       if (keys.length === 0) return;
-      const tx = (await db()).transaction(STORE, "readwrite");
-      for (const key of keys) tx.objectStore(STORE).delete(key);
-      await done(tx);
+      await transact("readwrite", async (store) => {
+        await Promise.all(keys.map((key) => request(store.delete(key))));
+      });
     },
-    async all() {
-      return request((await db()).transaction(STORE, "readonly").objectStore(STORE).getAll());
+    all() {
+      return transact("readonly", (store) => request(store.getAll()));
     },
   };
 }

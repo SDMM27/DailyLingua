@@ -1,5 +1,6 @@
 import { MAX_BATCH_BYTES, MAX_EVENTS_PER_BATCH, MAX_EVENTS_PER_HOUR, deliveryReportSchema } from "@dailylingua/schemas";
 import type { IngestResult, LogFn } from "./ingest-events";
+import { ACCOUNT_HEADER } from "@/lib/offline/account";
 
 /**
  * The logic of `POST /api/events` (`j2-pr1-lot-w.md` section 6), with its dependencies injected: the route file binds
@@ -88,10 +89,12 @@ export function createEventsHandler(deps: EventsRouteDeps): (request: Request) =
       return json({ error: "unavailable" }, 503);
     }
     if (!user) return json({ error: "unauthenticated" }, 401);
+    const account = request.headers.get(ACCOUNT_HEADER);
+    if (account !== null && account !== user.id) return json({ error: "unauthenticated" }, 401);
 
     // 3. The body.
     const body = await readBodyLimited(request, MAX_BATCH_BYTES);
-    if (!body.ok) return body.reason === "too_large" ? json({ error: "payload_too_large" }, 413) : json({ error: "invalid_body" }, 400);
+    if (!body.ok) return body.reason === "too_large" ? json({ error: "payload_too_large" }, 413) : json({ error: "unavailable" }, 503);
     let events: unknown;
     try {
       events = JSON.parse(body.text);

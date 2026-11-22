@@ -1,4 +1,4 @@
-import { addDays, learningDay, localTime, planDay, type PlanCard } from "@dailylingua/core";
+import { addDays, learningDay, localTime, planDay, type PlanCard, type WorkshopComposition } from "@dailylingua/core";
 import type { CardRow, ItemRow, PacketTextRow, TextCandidate } from "@dailylingua/data";
 import type { DateKey, ReviewMode, SessionFormat, SessionKind, StoredSessionPlan } from "@dailylingua/schemas";
 import { expectedCardMode } from "@/lib/ingest/card-keys";
@@ -31,8 +31,17 @@ export function pickReadingItems(items: readonly ItemRow[], count: number): Item
   return picked.sort(byPosition);
 }
 
-export function pickWorkshopItems(items: readonly ItemRow[], total: number): ItemRow[] {
-  return items.filter((item) => item.step === "workshop").sort(byPosition).slice(0, Math.max(0, total));
+export function pickWorkshopItems(items: readonly ItemRow[], composition: WorkshopComposition | number): ItemRow[] {
+  const workshop = items.filter((item) => item.step === "workshop").sort(byPosition);
+  const groupOf = (item: ItemRow) => (item.prompt as { group?: unknown } | null)?.group;
+  if (typeof composition === "number") return workshop.slice(0, Math.max(0, composition));
+  if (!workshop.some((item) => groupOf(item) === "word-choice")) return workshop.slice(0, composition.total);
+  return [
+    ["word-choice", composition.wordMcq],
+    ["word-gap", composition.wordCloze],
+    ["grammar-gap", composition.grammarCloze],
+    ["grammar-transform", composition.grammarTransform],
+  ].flatMap(([group, count]) => workshop.filter((item) => groupOf(item) === group).slice(0, Number(count)));
 }
 
 const byPosition = (a: ItemRow, b: ItemRow) => a.position - b.position || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
@@ -118,7 +127,7 @@ export function planToday(input: PlanTodayInput, sessionId: string): PlannedToda
   }
 
   const readingItems = input.text ? pickReadingItems(input.text.items, dayPlan.readingQuestions) : [];
-  const workshopItems = input.text && dayPlan.workshop ? pickWorkshopItems(input.text.items, dayPlan.workshop.total) : [];
+  const workshopItems = input.text && dayPlan.workshop ? pickWorkshopItems(input.text.items, dayPlan.workshop) : [];
   const plan: StoredSessionPlan = {
     v: 1,
     steps: dayPlan.steps,
