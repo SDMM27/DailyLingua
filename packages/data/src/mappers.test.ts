@@ -8,6 +8,7 @@ describe("toProfile", () => {
     expect(toProfile(profileRow)).toEqual({
       userId: USER_ID,
       nativeLanguage: "ar",
+      knownLanguages: ["es"],
       uiLanguage: "en",
       timeZone: "Asia/Tokyo",
       reminderTime: "08:15",

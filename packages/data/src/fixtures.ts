@@ -7,6 +7,7 @@ export const INSTANT = "2026-11-12T10:00:00.123456+00:00";
 export const profileRow: ProfileRow = {
   user_id: USER_ID,
   native_language: "ar",
+  known_languages: ["es"],
   ui_language: "en",
   time_zone: "Asia/Tokyo",
   reminder_time: "08:15:00",

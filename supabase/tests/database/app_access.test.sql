@@ -62,7 +62,7 @@ select is(
   (select count(*)::int from pg_proc p join pg_namespace n on n.oid = p.pronamespace
    where n.nspname = 'app'
      and (has_function_privilege('anon', p.oid, 'execute') or has_function_privilege('authenticated', p.oid, 'execute'))
-     and p.proname not in ('save_profile', 'save_enrollments', 'save_game_settings', 'save_push_subscription', 'delete_push_subscription', 'report_content', 'configure_reminder', 'mark_reminder_opened')),
+     and p.proname not in ('save_profile', 'save_enrollments', 'save_game_settings', 'save_known_languages', 'save_push_subscription', 'delete_push_subscription', 'report_content', 'configure_reminder', 'mark_reminder_opened')),
   0, 'only the expected account, settings and report functions are executable by clients');
 select is(
   (select count(*)::int from pg_proc p join pg_namespace n on n.oid = p.pronamespace

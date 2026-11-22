@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { InterfaceLanguage } from "@/components/settings/interface-language";
 import { GamePreferences } from "@/components/settings/game-preferences";
 import { LearningSettings } from "@/components/settings/learning-settings";
+import { KnownLanguageSettings } from "@/components/settings/known-languages";
 import { ReminderSettings } from "@/components/settings/reminder-settings";
 import { SignOutForm } from "@/components/settings/sign-out-form";
 import { ThemeChoice } from "@/components/settings/theme-choice";
@@ -28,6 +29,7 @@ export default async function SettingsPage() {
 
   const [locale, t, ta] = await Promise.all([getLocale(), getTranslations("settings"), getTranslations("auth.signOut")]);
   const game = resolveGameSettings(gameSettingsSchema.safeParse(profile.gameSettings).data);
+  const nativeOptions = nativeLanguageOptions(locale);
 
   return (
     <>
@@ -47,10 +49,11 @@ export default async function SettingsPage() {
             {t("groups.learning")}
           </h2>
           <LearningSettings
-            nativeOptions={nativeLanguageOptions(locale)}
+            nativeOptions={nativeOptions}
             timeZones={timeZoneOptions()}
             initial={{ nativeLanguage: profile.nativeLanguage, timeZone: profile.timeZone }}
           />
+          <KnownLanguageSettings options={nativeOptions} initial={profile.knownLanguages} />
         </section>
 
         <ReminderSettings userId={user.id} publicKey={vapidPublicKey()} timeZone={profile.timeZone}

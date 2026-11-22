@@ -18,6 +18,11 @@ Le panneau du mot affiche un exemple ou un faux ami uniquement s’il existe une
 
 Le pilote porte sur l’espagnol vers l’italien. Par exemple, dans une phrase où l’italien *importante* signifie « important », le panneau peut signaler que l’espagnol *importante* a le même sens. Un faux ami se présente avec une courte phrase et les deux sens. En l’absence de comparaison relue, le panneau affiche le sens et l’action d’ajout aux révisions. Les observations du pilote pourront guider un deuxième lot, du russe vers l’ukrainien.
 
+Dans le texte original *La lista della spesa*, chaque note est liée au sens du mot dans une phrase précise. Les définitions et les exemples ont été rédigés pour le pilote à partir des sens attestés dans les dictionnaires.
+
+- *Importante* a le même sens dans « Per lui è importante comprare tutto in una volta » et « Es importante hacer una lista ». [Treccani](https://www.treccani.it/vocabolario/importante/) · [RAE–ASALE](https://dle.rae.es/importante)
+- Dans le texte italien, *burro* désigne le beurre. Dans « El burro come hierba », le mot espagnol désigne l’âne. [Treccani](https://www.treccani.it/vocabolario/burro/) · [RAE–ASALE](https://dle.rae.es/burro)
+
 ## 3. Ordre de livraison
 
 1. **Premier parcours complet.** Publier un texte A2 de test, brancher sa segmentation, les sens contextuels et l’ajout d’une carte dans la file FSRS. Utiliser le même lecteur depuis la bibliothèque et la séance.

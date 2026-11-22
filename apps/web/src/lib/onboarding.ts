@@ -1,5 +1,5 @@
 import { canLearn, isTargetLanguage, isValidNativeLanguage, isValidTimeZone } from "@dailylingua/core";
-import { startLevelSchema } from "@dailylingua/schemas";
+import { knownLanguagesSchema, startLevelSchema } from "@dailylingua/schemas";
 import { z } from "zod";
 
 export const DAILY_MINUTES_OPTIONS = [10, 15, 20, 30] as const;
@@ -10,6 +10,7 @@ export const completeOnboardingSchema = z
   .object({
     nativeLanguage: z.string().refine(isValidNativeLanguage),
     targetLanguage: z.string().refine(isTargetLanguage),
+    knownLanguages: knownLanguagesSchema.refine((languages) => languages.every(isValidNativeLanguage)).optional(),
     startLevel: startLevelSchema,
     dailyMinutes: z.number().refine((minutes) => (DAILY_MINUTES_OPTIONS as readonly number[]).includes(minutes)),
     timeZone: z.string().refine(isValidTimeZone),

@@ -152,6 +152,7 @@ test.describe("account journey", () => {
 
     // The choice is stored in the profile: Today follows.
     await page.getByRole("link", { name: "Today" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Today" })).toBeVisible();
     await expect(page.getByText("Italian", { exact: true })).toBeVisible();
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
 

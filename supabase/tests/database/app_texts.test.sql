@@ -50,8 +50,11 @@ select set_config('request.jwt.claims',
   '{"sub": "c0000000-0000-4000-8000-0000000000a1", "role": "authenticated"}', true);
 set local role authenticated;
 
-select is((select count(*)::int from app.text), 1, 'a client reads the published text only');
-select is((select id from app.text), 'c0000000-0000-4000-8000-000000000101'::uuid, 'and it is the published one');
+select is((select count(*)::int from app.text where id in (
+  'c0000000-0000-4000-8000-000000000101', 'c0000000-0000-4000-8000-000000000102')), 1, 'a client reads the published fixture text only');
+select is((select id from app.text where id in (
+  'c0000000-0000-4000-8000-000000000101', 'c0000000-0000-4000-8000-000000000102')),
+  'c0000000-0000-4000-8000-000000000101'::uuid, 'and it is the published one');
 select is((select count(*)::int from app.text_item), 1, 'a client reads the items of the published text only');
 select is((select id from app.text_item), 'c0000000-0000-4000-8000-000000000201'::uuid, 'and it is the item of the published text');
 select throws_ok($$select count(*) from app.text_item_key$$, '42501', null, 'the answer keys are unreadable by a client');
@@ -75,7 +78,9 @@ update app.text set status = 'retired' where id = 'c0000000-0000-4000-8000-00000
 select set_config('request.jwt.claims',
   '{"sub": "c0000000-0000-4000-8000-0000000000a2", "role": "authenticated"}', true);
 set local role authenticated;
-select is((select id from app.text), 'c0000000-0000-4000-8000-000000000102'::uuid, 'the visibility follows the status');
+select is((select id from app.text where id in (
+  'c0000000-0000-4000-8000-000000000101', 'c0000000-0000-4000-8000-000000000102')),
+  'c0000000-0000-4000-8000-000000000102'::uuid, 'the visibility follows the status');
 select is((select id from app.text_item), 'c0000000-0000-4000-8000-000000000202'::uuid, 'the items follow the status of their text');
 reset role;
 

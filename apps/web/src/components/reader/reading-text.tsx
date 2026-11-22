@@ -1,6 +1,7 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { languageDisplayName } from "@dailylingua/core";
+import { useLocale, useTranslations } from "next-intl";
 import { Fragment, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { ACCOUNT_HEADER } from "@/lib/offline/account";
@@ -10,11 +11,14 @@ export function ReadingText({ userId, textId, body, language, words }: {
   userId: string; textId: string; body: string; language: string; words: ReaderWord[];
 }) {
   const t = useTranslations("reader");
+  const locale = useLocale();
   const actions = useTranslations("common.actions");
   const [selected, setSelected] = useState<ReaderWord>();
   const [saved, setSaved] = useState<Set<number>>(() => new Set());
   const [failed, setFailed] = useState<number>();
   const [pending, startTransition] = useTransition();
+  const comparison = selected?.comparison;
+  const comparisonLabel = comparison && t(comparison.kind, { language: languageDisplayName(comparison.sourceLanguage, locale) });
 
   function save(word: ReaderWord) {
     setFailed(undefined);
@@ -60,6 +64,16 @@ export function ReadingText({ userId, textId, body, language, words }: {
             <Button variant="ghost" className="shrink-0 px-3 text-inherit!" aria-label={actions("close")} onClick={() => setSelected(undefined)}>×</Button>
           </div>
           <p className="text-sm text-muted" lang={language} dir="auto">{selected.context}</p>
+          {comparison && (
+            <aside aria-label={comparisonLabel}
+              className="space-y-1 border-t border-line pt-3 text-sm">
+              <p className="font-semibold">{comparisonLabel}</p>
+              <p><span lang={comparison.sourceLanguage}>{comparison.sourceWord}</span>
+                {comparison.sourceMeaning && <> · <span lang={comparison.sourceMeaning.language}>{comparison.sourceMeaning.text}</span></>}
+              </p>
+              {comparison.sourceExample && <p lang={comparison.sourceLanguage} dir="auto" className="text-muted">{comparison.sourceExample}</p>}
+            </aside>
+          )}
           {saved.has(selected.from) ? <p role="status">{t("saved")}</p> : (
             <Button disabled={pending} onClick={() => save(selected)}>{t(pending ? "saving" : "add")}</Button>
           )}

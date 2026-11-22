@@ -5,6 +5,7 @@ import { startLevelSchema, type StartLevel } from "@dailylingua/schemas";
 import { useTranslations } from "next-intl";
 import { useEffect, useId, useMemo, useRef, useState, useTransition } from "react";
 import { completeOnboarding } from "@/app/actions/onboarding";
+import { KnownLanguagesPicker } from "@/components/settings/known-languages";
 import { Button } from "@/components/ui/button";
 import { CONTROL_CLASS, FormMessage } from "@/components/ui/field";
 import { DAILY_MINUTES_OPTIONS, DEFAULT_DAILY_MINUTES } from "@/lib/onboarding";
@@ -31,6 +32,7 @@ export function OnboardingWizard({
 }) {
   const t = useTranslations("onboarding");
   const tc = useTranslations("common");
+  const tk = useTranslations("knownLanguages");
   const te = useTranslations("errors");
   const titleId = useId();
   const titleRef = useRef<HTMLHeadingElement>(null);
@@ -39,6 +41,7 @@ export function OnboardingWizard({
   const [stepIndex, setStepIndex] = useState(0);
   const [native, setNative] = useState<string | null>(defaultNative);
   const [target, setTarget] = useState<string | null>(null);
+  const [knownLanguages, setKnownLanguages] = useState<string[]>([]);
   const [level, setLevel] = useState<StartLevel | null>(null);
   const [minutes, setMinutes] = useState<number>(DEFAULT_DAILY_MINUTES);
   const [query, setQuery] = useState("");
@@ -86,6 +89,7 @@ export function OnboardingWizard({
 
   function chooseNative(code: string) {
     setNative(code);
+    setKnownLanguages((languages) => languages.filter((language) => language !== code));
     // The language to learn cannot be the mother tongue.
     if (target !== null && !canLearn(code, target)) setTarget(null);
   }
@@ -102,6 +106,7 @@ export function OnboardingWizard({
       const result = await completeOnboarding({
         nativeLanguage: native,
         targetLanguage: target,
+        ...(knownLanguages.length > 0 ? { knownLanguages } : {}),
         startLevel: level,
         dailyMinutes: minutes,
         timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -221,6 +226,13 @@ export function OnboardingWizard({
 
       <footer className="sticky bottom-0 space-y-3 bg-bg pt-3 pb-[calc(1rem+env(safe-area-inset-bottom))]">
         {error && <FormMessage kind="error">{te(error)}</FormMessage>}
+        {step === "target" && target && (
+          <details className="rounded-xl border border-line px-3 open:pb-3">
+            <summary className="min-h-11 cursor-pointer py-3 text-sm font-semibold">{tk("onboardingTitle")}</summary>
+            <KnownLanguagesPicker options={nativeOptions.filter(({ code }) => code !== native)}
+              selected={knownLanguages} onChange={setKnownLanguages} />
+          </details>
+        )}
         <Button onClick={next} disabled={!canContinue || pending}>
           {pending ? t("saving") : last ? t("finish") : tc("actions.continue")}
         </Button>

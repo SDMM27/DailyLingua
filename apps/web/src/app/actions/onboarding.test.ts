@@ -3,12 +3,14 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const getUser = vi.fn();
 const saveProfile = vi.fn();
 const saveEnrollments = vi.fn();
+const saveKnownLanguages = vi.fn();
 
 vi.mock("@/lib/supabase/server", () => ({ createSupabaseServerClient: async () => ({ auth: { getUser } }) }));
 vi.mock("@dailylingua/data", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@dailylingua/data")>()),
   saveProfile: (...args: unknown[]) => saveProfile(...args),
   saveEnrollments: (...args: unknown[]) => saveEnrollments(...args),
+  saveKnownLanguages: (...args: unknown[]) => saveKnownLanguages(...args),
 }));
 vi.mock("next-intl/server", () => ({ getLocale: async () => "fr" }));
 vi.mock("@/lib/locale-cookie", () => ({ rememberLocale: async () => undefined }));
@@ -58,6 +60,12 @@ describe("completeOnboarding", () => {
       reminderTime: null,
     });
     expect(saveEnrollments).toHaveBeenCalledWith(expect.anything(), [{ language: "it", dailyMinutes: 15, startLevel: "A0" }]);
+    expect(saveKnownLanguages).not.toHaveBeenCalled();
+  });
+
+  it("saves the optional languages before completing the learning plan", async () => {
+    await expect(completeOnboarding({ ...valid, knownLanguages: ["es", "eu"] })).rejects.toThrow("NEXT_REDIRECT /");
+    expect(saveKnownLanguages).toHaveBeenCalledWith(expect.anything(), ["es", "eu"]);
   });
 
   it("turns a data error into a message key", async () => {
