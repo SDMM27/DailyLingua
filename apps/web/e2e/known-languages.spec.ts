@@ -20,9 +20,9 @@ test("the reader offers Spanish comparisons for a declared language and hides th
     await expect(different).toContainText("âne");
     await expect(page.getByText("beurre", { exact: true })).toBeVisible();
     await expectNoHorizontalOverflow(page);
-    await page.screenshot({ path: testInfo.outputPath("reader-comparison-light.png") });
+    await page.screenshot({ path: testInfo.outputPath("reader-comparison-light.png"), animations: "disabled" });
     await page.emulateMedia({ colorScheme: "dark" });
-    await page.screenshot({ path: testInfo.outputPath("reader-comparison-dark.png") });
+    await page.screenshot({ path: testInfo.outputPath("reader-comparison-dark.png"), animations: "disabled" });
 
     await page.getByRole("link", { name: "Réglages" }).click();
     const form = page.getByRole("form", { name: "Langues déjà connues" });
