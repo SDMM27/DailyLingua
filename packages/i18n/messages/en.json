@@ -31,6 +31,15 @@
     },
     "appDescription": "One language session a day, at your own pace."
   },
+  "reader": {
+    "library": "Library",
+    "empty": "There are no texts to read in the languages you’re learning yet.",
+    "open": "Open in reader",
+    "add": "Add to my reviews",
+    "saving": "Adding…",
+    "saved": "Added to your reviews.",
+    "failed": "The card couldn’t be added. You can try again."
+  },
   "auth": {
     "signIn": {
       "title": "Sign in",

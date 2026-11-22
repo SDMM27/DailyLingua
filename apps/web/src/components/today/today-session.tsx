@@ -3,6 +3,7 @@
 import { learningDay } from "@dailylingua/core";
 import type { SessionPacket } from "@dailylingua/schemas";
 import { useLocale, useTranslations } from "next-intl";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState, type ReactNode } from "react";
 import { useEventSync } from "@/components/pwa/event-sync-provider";
@@ -29,6 +30,7 @@ export function TodaySession({ language, timeZone, languageName, children, goal,
   const t = useTranslations("dailySession");
   const today = useTranslations("today");
   const common = useTranslations("common");
+  const reader = useTranslations("reader");
   const locale = useLocale();
   const sync = useEventSync();
   const router = useRouter();
@@ -136,6 +138,9 @@ export function TodaySession({ language, timeZone, languageName, children, goal,
               <>
                 {cached && <p className="text-sm text-muted">{t("readyOffline")}</p>}
                 <Button disabled={starting || !sync} onClick={() => { void begin(); }}>{action}</Button>
+                {online && packet.text && (
+                  <Link href={`/library/${packet.text.id}`} className="inline-flex min-h-11 items-center text-accent-strong">{reader("open")}</Link>
+                )}
               </>
             ) : unavailable ? (
               <>
