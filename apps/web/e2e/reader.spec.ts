@@ -35,6 +35,9 @@ test("a published A2 text opens from Today and the library, and saves one review
     await page.getByRole("button", { name: "mercato", exact: true }).click();
     await page.emulateMedia({ colorScheme: "dark" });
     await expectNoHorizontalOverflow(page);
+    await expect.poll(() => page.getByRole("button", { name: "Fermer" }).evaluate(
+      (button) => getComputedStyle(button).color === getComputedStyle(document.body).color,
+    )).toBe(true);
     await page.screenshot({ path: testInfo.outputPath("reader-dark.png") });
     await page.getByRole("button", { name: "Ajouter à mes révisions" }).click();
     await expect(page.getByRole("status")).toHaveText("Ajouté à tes révisions.");

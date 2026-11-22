@@ -57,7 +57,7 @@ export function ReadingText({ userId, textId, body, language, words }: {
               <h2 className="sd-display break-words text-2xl" lang={language} dir="auto">{selected.front}</h2>
               <p lang={selected.meaningLanguage} dir="auto">{selected.meaning}</p>
             </div>
-            <Button variant="ghost" className="shrink-0 px-3 text-ink!" aria-label={actions("close")} onClick={() => setSelected(undefined)}>×</Button>
+            <Button variant="ghost" className="shrink-0 px-3 text-inherit!" aria-label={actions("close")} onClick={() => setSelected(undefined)}>×</Button>
           </div>
           <p className="text-sm text-muted" lang={language} dir="auto">{selected.context}</p>
           {saved.has(selected.from) ? <p role="status">{t("saved")}</p> : (
