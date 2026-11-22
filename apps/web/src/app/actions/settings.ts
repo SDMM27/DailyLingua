@@ -1,6 +1,8 @@
 "use server";
 
-import { getProfile, saveGameSettings, saveProfile } from "@dailylingua/data";
+import { isValidNativeLanguage } from "@dailylingua/core";
+import { getProfile, saveGameSettings, saveKnownLanguages, saveProfile } from "@dailylingua/data";
+import { knownLanguagesSchema } from "@dailylingua/schemas";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { saveErrorKey, type SaveErrorKey } from "@/lib/data-errors";
@@ -87,5 +89,20 @@ export async function saveGamePreferences(_previous: SettingsState, formData: Fo
     return { error: saveErrorKey(error) };
   }
   revalidatePath("/", "layout");
+  return { saved: true };
+}
+
+export async function saveKnownLanguageSettings(_previous: SettingsState, formData: FormData): Promise<SettingsState> {
+  const parsed = knownLanguagesSchema.safeParse(formData.getAll("language"));
+  if (!parsed.success || !parsed.data.every(isValidNativeLanguage)) return { error: "invalid" };
+  const client = await signedInClient();
+  try {
+    await saveKnownLanguages(client, parsed.data);
+  } catch (error) {
+    console.error("Saving known languages failed", error);
+    return { error: saveErrorKey(error) };
+  }
+  revalidatePath("/settings");
+  revalidatePath("/library/[id]", "page");
   return { saved: true };
 }

@@ -83,7 +83,7 @@ async function choose(page: Page, name: string | RegExp) {
 }
 
 /** Creates an account through the interface and completes the installation (Italian, A0, 15 minutes); ends on Today, in French. */
-export async function signUpAndInstall(page: Page, email: string) {
+export async function signUpAndInstall(page: Page, email: string, knownLanguage?: string) {
   await page.goto("/sign-up");
   await page.getByLabel("Adresse e-mail").fill(email);
   await page.getByLabel("Mot de passe").fill(TEST_PASSWORD);
@@ -91,6 +91,11 @@ export async function signUpAndInstall(page: Page, email: string) {
   await expect(page).toHaveURL(/\/welcome$/);
   await page.getByRole("button", { name: "Continuer" }).click();
   await choose(page, /italien/);
+  if (knownLanguage) {
+    await page.getByText("Autres langues que tu connais (facultatif)", { exact: true }).click();
+    await page.getByRole("searchbox", { name: "Rechercher une langue" }).fill(knownLanguage);
+    await page.getByRole("checkbox", { name: knownLanguage, exact: true }).check();
+  }
   await page.getByRole("button", { name: "Continuer" }).click();
   await choose(page, /Je débute/);
   await page.getByRole("button", { name: "Continuer" }).click();

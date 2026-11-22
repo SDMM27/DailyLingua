@@ -22,4 +22,21 @@ describe("readerWords", () => {
       { ...entry, lemma: "aperti", dictionaryForm: "aperti" },
     ], "it", "fr")).toMatchObject([{ front: "mercato", from: 2, to: 9 }]);
   });
+
+  it("uses a comparison only for its editorial sense and a language the learner knows", () => {
+    const text = "C'è ancora burro.";
+    const butter = {
+      lemma: "burro", dictionaryForm: "burro", definition: "Alimento a base di latte.",
+      sentence: 0, comparisonId: "es-it-burro-butter",
+    };
+    expect(readerWords(text, [butter], "it", "fr")[0]?.comparison).toBeUndefined();
+    expect(readerWords(text, [butter], "it", "fr", ["es"])[0]?.comparison).toMatchObject({
+      kind: "falseFriend", sourceLanguage: "es", sourceMeaning: { text: "âne", language: "fr" },
+    });
+    expect(readerWords(text, [butter], "it", "es")[0]?.comparison).toMatchObject({
+      sourceMeaning: { text: "asno", language: "es" },
+    });
+    const wrongSense = { ...butter, comparisonId: "es-it-importante-significant" };
+    expect(readerWords(text, [wrongSense], "it", "fr", ["es"])[0]?.comparison).toBeUndefined();
+  });
 });

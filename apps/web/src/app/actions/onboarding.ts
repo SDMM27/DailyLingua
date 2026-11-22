@@ -1,6 +1,6 @@
 "use server";
 
-import { saveEnrollments, saveProfile } from "@dailylingua/data";
+import { saveEnrollments, saveKnownLanguages, saveProfile } from "@dailylingua/data";
 import { getLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { rememberLocale } from "@/lib/locale-cookie";
@@ -32,6 +32,7 @@ export async function completeOnboarding(input: unknown): Promise<OnboardingResu
       timeZone: value.timeZone,
       reminderTime: null,
     });
+    if (value.knownLanguages?.length) await saveKnownLanguages(client, value.knownLanguages);
     await saveEnrollments(client, [
       { language: value.targetLanguage, dailyMinutes: value.dailyMinutes, startLevel: value.startLevel },
     ]);

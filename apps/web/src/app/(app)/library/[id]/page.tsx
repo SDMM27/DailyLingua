@@ -24,7 +24,7 @@ export default async function ReaderPage({ params }: PageProps<"/library/[id]">)
       <p className="meta">{text.level_band}</p>
       <h1 className="sd-display mb-6 break-words text-4xl" lang={text.language} dir="auto">{text.title}</h1>
       <ReadingText key={text.id} userId={user.id} textId={text.id} body={text.body} language={text.language}
-        words={readerWords(text.body, text.new_words, text.language, profile.nativeLanguage)} />
+        words={readerWords(text.body, text.new_words, text.language, profile.nativeLanguage, profile.knownLanguages)} />
     </>
   );
 }

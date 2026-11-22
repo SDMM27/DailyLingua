@@ -38,7 +38,18 @@
     "add": "Ajouter à mes révisions",
     "saving": "Ajout en cours…",
     "saved": "Ajouté à tes révisions.",
-    "failed": "La carte n’a pas pu être ajoutée. Tu peux réessayer."
+    "failed": "La carte n’a pas pu être ajoutée. Tu peux réessayer.",
+    "sameMeaning": "Même sens en {language}",
+    "falseFriend": "Faux ami en {language}"
+  },
+  "knownLanguages": {
+    "onboardingTitle": "Autres langues que tu connais (facultatif)",
+    "settingsTitle": "Langues déjà connues",
+    "hint": "Indique les langues que tu comprends ou parles déjà. Le lecteur pourra s’en servir pour t’aider.",
+    "search": "Rechercher une langue",
+    "remove": "Retirer {name}",
+    "noResults": "Aucune langue trouvée.",
+    "limit": "Tu peux sélectionner jusqu’à {count} langues."
   },
   "auth": {
     "signIn": {

@@ -38,7 +38,18 @@
     "add": "Add to my reviews",
     "saving": "Adding…",
     "saved": "Added to your reviews.",
-    "failed": "The card couldn’t be added. You can try again."
+    "failed": "The card couldn’t be added. You can try again.",
+    "sameMeaning": "Same meaning in {language}",
+    "falseFriend": "False friend in {language}"
+  },
+  "knownLanguages": {
+    "onboardingTitle": "Other languages you know (optional)",
+    "settingsTitle": "Languages you already know",
+    "hint": "Add languages you can already understand or speak. The reader can use them to help you.",
+    "search": "Search for a language",
+    "remove": "Remove {name}",
+    "noResults": "No languages found.",
+    "limit": "You can select up to {count} languages."
   },
   "auth": {
     "signIn": {

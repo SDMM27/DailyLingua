@@ -1,6 +1,7 @@
 import { isTargetLanguage, normalizeAnswer } from "@dailylingua/core";
 import { languageCodeSchema } from "@dailylingua/schemas";
 import { z } from "zod";
+import { readerComparison } from "./comparisons";
 
 const wordSchema = z.object({
   lemma: z.string().trim().min(1).max(100),
@@ -9,6 +10,7 @@ const wordSchema = z.object({
   sentence: z.int().min(0).max(99),
   forms: z.array(z.string().trim().min(1).max(100)).max(8).optional(),
   glosses: z.record(languageCodeSchema, z.string().trim().min(1).max(400)).optional(),
+  comparisonId: z.string().max(80).optional(),
 });
 
 export interface ReaderWord {
@@ -18,10 +20,12 @@ export interface ReaderWord {
   meaning: string;
   meaningLanguage: string;
   context: string;
+  comparison?: ReturnType<typeof readerComparison>;
 }
 
 /** Annotates only vocabulary entries that can be located in their source sentence. */
-export function readerWords(body: string, entries: unknown, language: string, explanationLanguage: string): ReaderWord[] {
+export function readerWords(body: string, entries: unknown, language: string, explanationLanguage: string,
+  knownLanguages: readonly string[] = []): ReaderWord[] {
   if (!isTargetLanguage(language) || !Array.isArray(entries) || entries.length === 0) return [];
   const segmenter = new Intl.Segmenter(language, { granularity: "word" });
   const sentenceSegmenter = new Intl.Segmenter(language, { granularity: "sentence" });
@@ -31,17 +35,19 @@ export function readerWords(body: string, entries: unknown, language: string, ex
   for (const entry of entries.slice(0, 8)) {
     const parsed = wordSchema.safeParse(entry);
     if (!parsed.success) continue;
-    const { lemma, dictionaryForm, sentence, definition, glosses, forms = [] } = parsed.data;
+    const { lemma, dictionaryForm, sentence, definition, glosses, forms = [], comparisonId } = parsed.data;
     const source = sentences[sentence];
     if (!source) continue;
     const accepted = new Set([lemma, dictionaryForm, ...forms].map(normalize).filter(Boolean));
     const translated = Object.hasOwn(glosses ?? {}, explanationLanguage) ? glosses?.[explanationLanguage] : undefined;
+    const comparison = readerComparison(comparisonId, language, lemma, explanationLanguage, knownLanguages);
     for (const { segment, index, isWordLike } of segmenter.segment(source.segment)) {
       const from = source.index + index;
       if (!isWordLike || !accepted.has(normalize(segment)) || words.has(from)) continue;
       words.set(from, {
         from, to: from + segment.length, front: dictionaryForm, meaning: translated ?? definition,
         meaningLanguage: translated ? explanationLanguage : language, context: source.segment.trim(),
+        ...(comparison ? { comparison } : {}),
       });
     }
   }
