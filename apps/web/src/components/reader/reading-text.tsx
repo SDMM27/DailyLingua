@@ -2,12 +2,12 @@
 
 import { useTranslations } from "next-intl";
 import { Fragment, useState, useTransition } from "react";
-import { addReaderCard } from "@/app/actions/reader";
 import { Button } from "@/components/ui/button";
+import { ACCOUNT_HEADER } from "@/lib/offline/account";
 import type { ReaderWord } from "@/lib/reader/words";
 
-export function ReadingText({ textId, body, language, words }: {
-  textId: string; body: string; language: string; words: ReaderWord[];
+export function ReadingText({ userId, textId, body, language, words }: {
+  userId: string; textId: string; body: string; language: string; words: ReaderWord[];
 }) {
   const t = useTranslations("reader");
   const actions = useTranslations("common.actions");
@@ -20,7 +20,12 @@ export function ReadingText({ textId, body, language, words }: {
     setFailed(undefined);
     startTransition(async () => {
       try {
-        if (await addReaderCard({ textId, from: word.from })) {
+        const response = await fetch("/api/reader/cards", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", [ACCOUNT_HEADER]: userId },
+          body: JSON.stringify({ textId, from: word.from }),
+        });
+        if (response.status === 204) {
           setSaved((previous) => new Set([...previous, word.from]));
           return;
         }
