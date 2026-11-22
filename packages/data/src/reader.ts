@@ -9,9 +9,10 @@ export async function listReaderTexts(client: AppClient, languages: string[]) {
 }
 
 export async function readReaderText(client: AppClient, id: string) {
-  return unwrap(await appSchema(client).from("text")
+  const result = await appSchema(client).from("text")
     .select("id, language, title, level_band, body, new_words")
-    .eq("status", "published").eq("id", id).maybeSingle());
+    .eq("status", "published").eq("id", id).maybeSingle();
+  return unwrap(result);
 }
 
 /** The service writes only the card assembled from the published text and validated learner. */
