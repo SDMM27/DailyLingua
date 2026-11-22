@@ -156,7 +156,7 @@ describe("buildIngestState: journals and memo", () => {
         textReads: [TEXT],
         knownEvents: { [uuid(77)]: null },
         cardFronts: ["it|word|casa"],
-        recentProductionTexts: ["Ciao"],
+        recentProductionTexts: [{ id: uuid(78), text: "Ciao" }],
       }),
       memo: { v: 1, days: { "2026-11-18": day }, texts: {}, productions: {}, catchUpDays: ["2026-11-10"] },
     });
@@ -168,7 +168,7 @@ describe("buildIngestState: journals and memo", () => {
     expect(state.textReads).toEqual([TEXT]);
     expect(state.knownEvents).toEqual({ [uuid(77)]: null });
     expect(state.cardFronts).toEqual(["it|word|casa"]);
-    expect(state.recentProductionTexts).toEqual(["Ciao"]);
+    expect(state.recentProductionTexts).toEqual([{ id: uuid(78), text: "Ciao" }]);
     expect(state.streak).toEqual({ timeZoneChangedAt: null });
     expect(state.corrections).toEqual({});
     expect(state.rewriteChecks).toEqual({});

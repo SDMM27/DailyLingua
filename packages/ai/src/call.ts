@@ -68,6 +68,8 @@ export interface AiCallInput<T> {
   learner: { id: string; timeZone: string } | null;
   /** Default "medium", the default of Haiku 5.5, set explicitly so a change of default cannot move the bill. */
   effort?: Effort;
+  /** Disables both provider retries and quota release after a potentially billed failure. */
+  retryProvider?: boolean;
 }
 
 export interface AiCallResult<T> {
@@ -181,13 +183,13 @@ export function createAiGateway(options: AiGatewayOptions): AiGateway {
   const retryDelayMs = options.retryDelayMs ?? DEFAULT_RETRY_DELAY_MS;
   const sleep = options.sleep ?? ((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
 
-  async function send(request: AiRequest): Promise<AiResponse> {
+  async function send(request: AiRequest, retryProvider: boolean): Promise<AiResponse> {
     for (let attempt = 0; ; attempt++) {
       try {
         // The SDK's own retries are off: the single retry is this loop's, so it is counted once.
         return await client.messages.create(request, { timeout: timeoutMs, maxRetries: 0 });
       } catch (error) {
-        if (attempt >= 1 || !isRetryable(error)) throw error;
+        if (!retryProvider || attempt >= 1 || !isRetryable(error)) throw error;
         await sleep(retryDelayMs);
       }
     }
@@ -217,7 +219,8 @@ export function createAiGateway(options: AiGatewayOptions): AiGateway {
       const day = options.dayOf(at, learner.timeZone);
       if (!DAY_FORMAT.test(day)) throw new Error(`dayOf must return YYYY-MM-DD, got "${day}"`);
       quota = { userId: learner.id, kind: spec.quotaKind, day };
-      if (!(await store.claimQuota({ ...quota, limit: spec.dailyLimit }))) throw new AiError("quota_exceeded");
+      const limit = input.purpose === "writing_feedback" && spend >= monthlyBudgetUsd ? 1 : spec.dailyLimit;
+      if (!(await store.claimQuota({ ...quota, limit }))) throw new AiError("quota_exceeded");
     }
 
     const record = (status: AiCallStatus, usage: Required<TokenUsage>) =>
@@ -248,9 +251,9 @@ export function createAiGateway(options: AiGatewayOptions): AiGateway {
 
     let response: AiResponse;
     try {
-      response = await send(request);
+      response = await send(request, input.retryProvider ?? true);
     } catch (error) {
-      if (quota) {
+      if (quota && (input.retryProvider !== false || !isRetryable(error))) {
         const toRelease = quota;
         await bestEffort("releaseQuota", () => store.releaseQuota(toRelease));
       }

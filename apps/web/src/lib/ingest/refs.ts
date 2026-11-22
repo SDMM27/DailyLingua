@@ -18,6 +18,7 @@ export function extractRefs(events: readonly unknown[]): IngestRefs {
     cardIds: new Set<string>(),
     textIds: new Set<string>(),
     productionIds: new Set<string>(),
+    correctionIds: new Set<string>(),
     deviceIds: new Set<string>(),
     clientEventIds: new Set<string>(),
   };
@@ -33,6 +34,7 @@ export function extractRefs(events: readonly unknown[]): IngestRefs {
     take(sets.cardIds, payload.cardId);
     take(sets.textIds, payload.textId);
     take(sets.productionIds, payload.productionId);
+    if (event.kind === "rewrite_submitted") take(sets.correctionIds, payload.correctionId);
     take(sets.deviceIds, payload.deviceId);
   }
   return {
@@ -40,6 +42,7 @@ export function extractRefs(events: readonly unknown[]): IngestRefs {
     cardIds: [...sets.cardIds],
     textIds: [...sets.textIds],
     productionIds: [...sets.productionIds],
+    ...(sets.correctionIds.size > 0 ? { correctionIds: [...sets.correctionIds] } : {}),
     deviceIds: [...sets.deviceIds],
     clientEventIds: [...sets.clientEventIds],
   };

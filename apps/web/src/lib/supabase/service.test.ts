@@ -28,14 +28,20 @@ describe("createSupabaseServiceClient", () => {
 });
 
 describe("where the service role is used", () => {
-  it("is read by service.ts only, and imported only by the ingestion routes and their libraries", () => {
+  it("is read by service.ts only and imported only by the authenticated API and cron routes", () => {
     const readers = sourceFiles([".ts", ".tsx"]).filter((file) => file.text.includes("SUPABASE_SERVICE_ROLE_KEY"));
     expect(readers.map((file) => file.path)).toEqual(["lib/supabase/service.ts"]);
     const importers = sourceFiles([".ts", ".tsx"])
       .filter((file) => /from "@\/lib\/supabase\/service"/.test(file.text))
       .map((file) => file.path)
       .sort();
-    expect(importers).toEqual(["app/api/events/route.ts", "app/api/session/today/route.ts"]);
+    expect(importers).toEqual([
+      "app/api/cron/reminders/route.ts",
+      "app/api/events/route.ts",
+      "app/api/production/[id]/feedback/route.ts",
+      "app/api/production/[id]/rewrites/route.ts",
+      "app/api/session/today/route.ts",
+    ]);
   });
 
   it("is server-only", () => {

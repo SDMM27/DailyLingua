@@ -115,6 +115,32 @@
       "soon": "Les séances arrivent bientôt"
     }
   },
+  "reminderPush": {
+    "title": "Daily Lingua",
+    "weekly_first": "Désormais, un seul rappel par semaine. Ta séance est prête quand tu veux.",
+    "weekly_summary": "Cette semaine : {days, plural, one {# jour d’étude} other {# jours d’étude}} et {rewrites, plural, one {# phrase réécrite} other {# phrases réécrites}}.",
+    "session": "Ta séance de {minutes} minutes est prête.",
+    "session_alternate": "Tu as {minutes} minutes pour ta séance d’aujourd’hui ?"
+  },
+  "writingFeedback": {
+    "title": "Correction de ton texte",
+    "pending": "Ton texte est en attente de correction. Tu peux continuer ta séance.",
+    "disabled": "Ton texte est enregistré. La correction est momentanément désactivée.",
+    "limit": "Ton texte est enregistré. Tu as atteint la limite de corrections aujourd’hui.",
+    "unavailable": "La correction est momentanément indisponible.",
+    "failed": "La correction de ce texte a échoué.",
+    "unsent": "Ce texte n’a pas pu partir en correction.",
+    "retry": "Réessayer",
+    "details": "Voir la correction",
+    "scores": { "grammar": "Grammaire", "vocabulary": "Vocabulaire", "register": "Registre", "coherence": "Cohérence" },
+    "errorOfTheDay": "À revoir dans une prochaine séance",
+    "rewriteLabel": "Réécris de mémoire la phrase {index}",
+    "checkRewrite": "Vérifier ma réécriture",
+    "rewritePending": "Réécriture en attente de vérification.",
+    "accepted": "Réécriture vérifiée.",
+    "tryAgain": "Relis la correction et essaie à nouveau.",
+    "rewriteUnsent": "La réécriture n’a pas pu être vérifiée."
+  },
   "dailySession": {
     "title": "La séance du jour",
     "generatedText": "Texte généré, vérifié automatiquement",
@@ -127,6 +153,7 @@
       "review": "Bilan"
     },
     "reviewOnly": "Révisions du jour",
+    "errorOfDayInstruction": "Corrige le passage surligné.",
     "progress": "Étape {position} sur 6",
     "offline": "Hors ligne",
     "readyOffline": "Prête hors ligne",
@@ -186,11 +213,21 @@
       "hint": "Ton jour d’étude change à 4 h. Après le début de ton apprentissage, le fuseau suit celui de ton appareil."
     },
     "reminder": {
+      "title": "Rappels",
       "label": "Heure du rappel",
-      "hint": "Un seul rappel par jour, jamais la nuit.",
       "at": "Rappel à {time}",
       "off": "Pas de rappel",
-      "clear": "Retirer le rappel"
+      "clear": "Désactiver les rappels",
+      "zone": "Fuseau horaire actuel : {zone}. Un rappel par jour au plus.",
+      "overnight": "Cette heure autorise un rappel la nuit, jusqu’à 30 minutes après l’heure choisie.",
+      "weeklySummary": "Recevoir le bilan du dimanche",
+      "unsupported": "Ce navigateur ne permet pas les rappels. Sur iPhone, ouvre Daily Lingua depuis son icône sur l’écran d’accueil.",
+      "unavailable": "Les rappels sont momentanément indisponibles.",
+      "saved": "Réglages du rappel enregistrés.",
+      "blocked": "Autorise les notifications pour activer le rappel sur cet appareil.",
+      "failed": "Impossible d’enregistrer les réglages du rappel.",
+      "save": "Enregistrer l’heure du rappel",
+      "enable": "Activer sur cet appareil"
     },
     "saved": "Réglages enregistrés.",
     "groups": {

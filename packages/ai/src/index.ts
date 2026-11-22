@@ -5,3 +5,5 @@ export * from "./models";
 export * from "./pricing";
 export * from "./purposes";
 export * from "./store";
+export * from "./prompts/writing-feedback";
+export * from "./prompts/rewrite-check";

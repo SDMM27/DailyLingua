@@ -1,0 +1,27 @@
+name: Rappels de Daily Lingua
+
+on:
+  schedule:
+    - cron: "4,19,34,49 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+concurrency:
+  group: daily-lingua-reminders
+  cancel-in-progress: false
+
+jobs:
+  reminders:
+    if: ${{ vars.REFONTE_REMINDERS_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Déclencher les rappels
+        env:
+          APP_URL: ${{ secrets.REFONTE_APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          test -n "$APP_URL" && test -n "$CRON_SECRET"
+          curl --fail --silent --show-error --max-time 70 \
+            --header "Authorization: Bearer $CRON_SECRET" \
+            "${APP_URL%/}/api/cron/reminders" >/dev/null

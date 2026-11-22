@@ -10,10 +10,10 @@ import { ACCOUNT_HEADER } from "@/lib/offline/account";
 
 export interface EventsRouteDeps {
   /** The signed-in user, validated with Supabase Auth, or null. */
-  getUser(): Promise<{ id: string } | null>;
+  getUser(): Promise<{ id: string; isGuest?: boolean } | null>;
   /** Takes `count` events of the hourly allowance (`limit`); false when it would be exceeded. */
   claimRate(userId: string, count: number, limit: number): Promise<boolean>;
-  ingest(input: { userId: string; events: unknown[]; now: Date }): Promise<IngestResult>;
+  ingest(input: { userId: string; events: unknown[]; now: Date; isGuest?: boolean }): Promise<IngestResult>;
   now(): Date;
   log?: LogFn;
 }
@@ -81,7 +81,7 @@ export function createEventsHandler(deps: EventsRouteDeps): (request: Request) =
     if (!request.headers.get("content-type")?.toLowerCase().startsWith("application/json")) return json({ error: "unsupported_media_type" }, 415);
 
     // 2. The user, from the cookie, verified with Supabase Auth.
-    let user: { id: string } | null;
+    let user: { id: string; isGuest?: boolean } | null;
     try {
       user = await deps.getUser();
     } catch (error) {
@@ -119,7 +119,7 @@ export function createEventsHandler(deps: EventsRouteDeps): (request: Request) =
     // 5. The ingestion: what fails here may succeed later (503), and says nothing of the database.
     let result: IngestResult;
     try {
-      result = await deps.ingest({ userId: user.id, events, now });
+      result = await deps.ingest({ userId: user.id, events, now, ...(user.isGuest ? { isGuest: true } : {}) });
     } catch (error) {
       log("error", "the ingestion failed", { userId: user.id, error: error instanceof Error ? error.message : String(error) });
       return json({ error: "unavailable" }, 503);

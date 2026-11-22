@@ -4,7 +4,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(79);
+select plan(80);
 
 insert into auth.users (instance_id, id, aud, role, email) values
   ('00000000-0000-0000-0000-000000000000', 'c0000000-0000-4000-8000-0000000000a1', 'authenticated', 'authenticated', 'u1@test.invalid'),
@@ -108,7 +108,8 @@ select set_config('request.jwt.claims',
   '{"sub": "c0000000-0000-4000-8000-0000000000a2", "role": "authenticated"}', true);
 set local role authenticated;
 select is(app.delete_push_subscription('https://fcm.googleapis.com/a'), false, 'a user cannot delete the subscription of another');
-select lives_ok($$select app.save_push_subscription('https://fcm.googleapis.com/a', 'k1', 'k2', 'ua3')$$, 'the second user takes the endpoint over');
+select throws_ok($$select app.save_push_subscription('https://fcm.googleapis.com/a', 'k1', 'k2', 'ua3')$$, '22023', null, 'knowing the endpoint is insufficient to take it over');
+select lives_ok($$select app.save_push_subscription('https://fcm.googleapis.com/a', 'abc2', 'def2', 'ua3')$$, 'the same browser takes the endpoint over with the existing keys');
 select is((select count(*)::int from app.push_subscription), 1, 'and reads it');
 reset role;
 select is((select user_id from app.push_subscription where endpoint = 'https://fcm.googleapis.com/a'),

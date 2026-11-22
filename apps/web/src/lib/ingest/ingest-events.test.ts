@@ -1,7 +1,7 @@
 import { IngestBatchError, type IngestRows } from "@dailylingua/data";
 import { ingestBatchPayloadSchema } from "@dailylingua/schemas";
 import { describe, expect, it, vi } from "vitest";
-import { CARD, DEVICE, NOW, SESSION, USER, cardRow, rows, uuid } from "@/test/ingest-rows";
+import { CARD, DEVICE, NOW, SESSION, TODAY, USER, cardRow, rows, uuid } from "@/test/ingest-rows";
 import { IngestTransientError, ingestEvents, MAX_PRODUCTIONS_PER_24H, MAX_STALE_ATTEMPTS, type IngestStore } from "./ingest-events";
 
 const at = (time: string) => `2026-11-18T${time}.000Z`;
@@ -38,6 +38,68 @@ function fakeStore(options: { rows?: () => IngestRows; call?: (n: number, payloa
 const run = (store: IngestStore, events: unknown[]) => ingestEvents({ store, userId: USER, events, now: NOW, log: () => undefined });
 
 describe("ingestEvents: the nominal path", () => {
+  it("passes only eligible rewrites to semantic verification and recalculates proof server-side", async () => {
+    const id = uuid(51);
+    const correctionId = uuid(52);
+    const score = { score: 4, comment: "A clear account." };
+    const error = { id: "verb", original: "ho andato", corrected: "sono andato", explanation: "Use essere.", category: "verb" as const };
+    const store = fakeStore({ rows: () => rows({
+      corrections: [{
+        id: correctionId, productionId: id, explanationLanguage: "en", createdAt: NOW.toISOString(),
+        stored: {
+          detectedLanguage: "it",
+          sentences: [{ text: "Io ho andato al mercato ieri.", nativeText: null, errors: [error] }],
+          feedback: { scores: { grammar: score, vocabulary: score, register: score, coherence: score }, corrections: [error], strength: "Clear.", nativeVersion: "Ieri sono andato al mercato." },
+        },
+      }],
+      productions: [{ id, sessionId: SESSION, language: "it", text: Array.from({ length: 70 }, (_, i) => `parola${i}`).join(" "), clientEventId: uuid(56), createdAt: NOW.toISOString(), initialSimilarity: 0 }],
+    }) });
+    const event = (eventId: number, target: string) => ({
+      clientEventId: uuid(eventId), kind: "rewrite_submitted", occurredAt: at("08:10:10"),
+      payload: { tz: "Europe/Paris", deviceId: DEVICE, seq: ++sequence, correctionId: target, sentenceIndex: 0, text: "Io mi sono recato al mercato ieri." },
+    });
+    const check = vi.fn<NonNullable<IngestStore["checkRewrites"]>>(async () => ({ [uuid(53)]: { fixedErrorIds: ["verb"] } }));
+    store.checkRewrites = check;
+    expect((await run(store, [event(53, correctionId), event(54, uuid(55))])).report.rejected)
+      .toEqual([{ clientEventId: uuid(54), reason: "unknown_correction" }]);
+    expect(check).toHaveBeenCalledOnce();
+    expect(check.mock.calls[0]?.[0].rows).toEqual([expect.objectContaining({ client_event_id: uuid(53), accepted: false })]);
+    const payload = ingestBatchPayloadSchema.parse(store.calls[0]?.payload);
+    expect(payload.rewrites).toEqual([expect.objectContaining({ accepted: true })]);
+    expect(payload.xp).toContainEqual(expect.objectContaining({ reason: "rewrite.sentence", amount: 5 }));
+  });
+
+  it("settles the saved correction through empty ingestion and leaves a replay with nothing to write", async () => {
+    const id = uuid(50);
+    const text = Array.from({ length: 130 }, (_, i) => `parola${i}`).join(" ");
+    const score = { score: 4, comment: "A clear account." };
+    const store: Fake = fakeStore({ rows: () => rows({
+      productions: [{ id, sessionId: SESSION, language: "it", text, clientEventId: uuid(51), createdAt: NOW.toISOString() }],
+      corrections: [{
+        id: uuid(52), productionId: id, explanationLanguage: "en", createdAt: NOW.toISOString(),
+        stored: {
+          detectedLanguage: "it",
+          sentences: [],
+          feedback: { scores: { grammar: score, vocabulary: score, register: score, coherence: score }, corrections: [], strength: "Clear.", nativeVersion: "Andò a casa." },
+        },
+      }],
+      ingestState: {
+        seq: store.calls.length,
+        memo: store.calls[0]?.payload.memo ?? {
+          v: 1, days: {}, texts: {}, catchUpDays: [],
+          productions: { [id]: { day: TODAY, late: false, settled: false, correctionDeferred: false } },
+        },
+      },
+    }) });
+    const input = { store, userId: USER, events: [], now: NOW, feedbackTarget: { productionId: id, sessionId: SESSION } };
+    await ingestEvents(input);
+    const payload = ingestBatchPayloadSchema.parse(store.calls[0]?.payload);
+    expect(payload.xp).toEqual([expect.objectContaining({ reason: "production.corrected", amount: 15, meta: expect.objectContaining({ ref: id }) })]);
+    expect(payload.session_steps).toContainEqual(expect.objectContaining({ step: "expression", validated_at: expect.any(String) }));
+    await ingestEvents(input);
+    expect(store.calls).toHaveLength(1);
+  });
+
   it("reads once, decides with planIngest and writes one payload that matches the contract", async () => {
     const store = fakeStore({ rows: () => rows({ ingestState: { seq: 7, memo: {} } }) });
     const event = started(1);

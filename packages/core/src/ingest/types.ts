@@ -51,8 +51,10 @@ export interface IngestState {
   cardFronts: string[];
   /** Results of `rewrite_check`, by the `clientEventId` of the rewrite, computed by the caller before the ingestion. */
   rewriteChecks: Record<string, { fixedErrorIds: string[] }>;
+  /** Accepted sentence indices already recorded for the referenced corrections. */
+  verifiedSentences?: Record<string, number[]>;
   /** Texts of the last 30 productions of the learner (similarity check). */
-  recentProductionTexts: string[];
+  recentProductionTexts: { id: string; text: string }[];
 }
 
 export interface StateSession {
@@ -97,6 +99,7 @@ export interface StateItem {
   /** `error_item.id` for an item made from an error. */
   errorItemId: string | null;
   reworkedDay: DateKey | null;
+  errorOfDay?: { correctionId: string; createdDay: DateKey; recurring: boolean };
   /** The card a workshop word (or a failed error item) becomes. */
   card: { kind: CardKind; front: string; back: string | null; backLanguage: LanguageCode | null; context: string | null } | null;
 }
@@ -156,7 +159,11 @@ export interface StateProduction {
   late: boolean;
   /** `production.corrected` was settled (paid or refused with a reason). */
   settled: boolean;
+  /** Older productions can still get feedback but the original submission cannot earn XP. */
+  creditExpired?: boolean;
   correctionDeferred: boolean;
+  initialSimilarity?: number;
+  feedbackEligible?: boolean;
   /** `client_event_id` of the submission, to name the production in reports. */
   clientEventId: string;
 }

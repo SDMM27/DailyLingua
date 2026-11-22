@@ -1,7 +1,9 @@
 import { storedSessionPlanSchema, type DateKey } from "@dailylingua/schemas";
 import { appSchema, type AppClient } from "./client";
 import { DataError } from "./errors";
+import { readErrorOfDayRows, type ErrorOfDayRow } from "./error-of-day";
 import { chunks, distinct, fetchAll, inChunks, unwrap, unwrapRows } from "./query";
+import { readCorrections, type CorrectionRow } from "./writing-feedback";
 
 /**
  * What `apps/web/src/lib/ingest` needs to decide a batch of events (`j2-pr1-lot-w.md` section 3): typed, camelCase
@@ -16,6 +18,7 @@ export interface IngestRefs {
   cardIds: readonly string[];
   textIds: readonly string[];
   productionIds: readonly string[];
+  correctionIds?: readonly string[];
   deviceIds: readonly string[];
   clientEventIds: readonly string[];
 }
@@ -137,6 +140,7 @@ export interface ProductionRow {
   sessionId: string | null;
   language: string;
   text: string;
+  initialSimilarity?: number;
   clientEventId: string | null;
   createdAt: string;
 }
@@ -147,6 +151,7 @@ export interface IngestRows {
   skillEstimates: SkillEstimateRow[];
   sessions: SessionRow[];
   items: ItemRow[];
+  errorItems?: ErrorOfDayRow[];
   texts: TextRow[];
   cards: CardRow[];
   learningDays: LearningDayRow[];
@@ -162,11 +167,12 @@ export interface IngestRows {
   /** `language|kind|lower(front)` of the learner's cards, in the languages of the sessions read. */
   cardFronts: string[];
   /** The last 30 productions' texts, newest first. */
-  recentProductionTexts: string[];
+  recentProductionTexts: { id: string; text: string }[];
   /** Productions of the user received in the last 24 hours (the cap on `production_submitted`, W-I1). */
   recentProductionCount: number;
   /** Productions referenced by the events or the memo. */
   productions: ProductionRow[];
+  corrections?: CorrectionRow[];
   ingestState: { seq: number; memo: unknown };
 }
 
@@ -293,10 +299,10 @@ async function readSessions(client: AppClient, userId: string, refs: IngestRefs,
 }
 
 /** Ids of the items and the text a stored plan names (an unreadable plan names nothing). */
-function planRefs(plan: unknown): { itemIds: string[]; textId: string | null } {
+function planRefs(plan: unknown): { itemIds: string[]; textId: string | null; errorItemId: string | null } {
   const parsed = storedSessionPlanSchema.safeParse(plan);
-  if (!parsed.success) return { itemIds: [], textId: null };
-  return { itemIds: [...parsed.data.reading.itemIds, ...parsed.data.workshop.itemIds], textId: parsed.data.reading.textId };
+  if (!parsed.success) return { itemIds: [], textId: null, errorItemId: null };
+  return { itemIds: [...parsed.data.reading.itemIds, ...parsed.data.workshop.itemIds], textId: parsed.data.reading.textId, errorItemId: parsed.data.wake.errorItemId };
 }
 
 export async function readItems(client: AppClient, itemIds: readonly string[]): Promise<ItemRow[]> {
@@ -372,9 +378,15 @@ export async function readIngestRows(client: AppClient, userId: string, refs: In
   const db = appSchema(client);
   const [{ profile, enrollments }, state] = await Promise.all([readProfileAndEnrollments(client, userId), readIngestState(client, userId)]);
   // The memo names the productions whose state it holds: they are read with the ones the events refer to.
-  const productionIds = distinct([...refs.productionIds, ...memoProductionIds(state.memo)]);
-
-  const sessions = await readSessions(client, userId, refs, typeof window === "function" ? window(profile.timeZone) : window);
+  const memoAndEventIds = distinct([...refs.productionIds, ...memoProductionIds(state.memo)]);
+  const corrections = await readCorrections(client, userId, { correctionIds: refs.correctionIds, productionIds: memoAndEventIds });
+  const productionIds = distinct([...memoAndEventIds, ...corrections.map((correction) => correction.productionId)]);
+  const productions = await inChunks(productionIds, (chunk) => db.from("production")
+    .select("id, session_id, language, text, client_event_id, created_at, task").eq("user_id", userId).in("id", chunk));
+  const correctedIds = new Set(corrections.map((correction) => correction.productionId));
+  const sessionIds = distinct([...refs.sessionIds, ...productions.flatMap((production) =>
+    production.session_id && correctedIds.has(production.id) ? [production.session_id] : [])]);
+  const sessions = await readSessions(client, userId, { ...refs, sessionIds }, typeof window === "function" ? window(profile.timeZone) : window);
   const own = sessions.filter((session) => session.userId === userId);
   const plans = own.map((session) => planRefs(session.plan));
   const itemIds = distinct(plans.flatMap((plan) => plan.itemIds));
@@ -384,6 +396,7 @@ export async function readIngestRows(client: AppClient, userId: string, refs: In
   const [
     skills,
     items,
+    errorItems,
     texts,
     cardRows,
     learningDays,
@@ -395,10 +408,13 @@ export async function readIngestRows(client: AppClient, userId: string, refs: In
     cardFronts,
     recentProductions,
     recentProductionCount,
-    productions,
   ] = await Promise.all([
     db.from("skill_estimate").select("language, skill, level_value").eq("user_id", userId),
     readItems(client, itemIds),
+    readErrorOfDayRows(client, userId, {
+      itemIds: plans.flatMap((plan) => plan.errorItemId ?? []),
+      correctionIds: corrections.filter((correction) => refs.productionIds.includes(correction.productionId)).map((correction) => correction.id),
+    }),
     readTexts(client, textIds),
     // WITHOUT a user filter: a card of another learner must reach `planIngest` as `unknown_card`. A deleted card does not exist.
     inChunks(refs.cardIds, (chunk) => db.from("card").select(CARD_COLUMNS).is("deleted_at", null).in("id", chunk)),
@@ -411,9 +427,8 @@ export async function readIngestRows(client: AppClient, userId: string, refs: In
     languages.length === 0
       ? Promise.resolve([] as { language: string; kind: string; front: string }[])
       : fetchAll((from, to) => db.from("card").select("language, kind, front").eq("user_id", userId).is("deleted_at", null).in("language", languages).order("id").range(from, to)),
-    db.from("production").select("text").eq("user_id", userId).order("created_at", { ascending: false }).order("id", { ascending: false }).limit(30),
+    db.from("production").select("id, text").eq("user_id", userId).order("created_at", { ascending: false }).order("id", { ascending: false }).limit(30),
     db.from("production").select("id", { count: "exact", head: true }).eq("user_id", userId).gte("created_at", new Date(now.getTime() - 86_400_000).toISOString()),
-    inChunks(productionIds, (chunk) => db.from("production").select("id, session_id, language, text, client_event_id, created_at").eq("user_id", userId).in("id", chunk)),
   ]);
 
   const ownCardIds = cardRows.filter((row) => row.user_id === userId).map((row) => row.id);
@@ -429,6 +444,7 @@ export async function readIngestRows(client: AppClient, userId: string, refs: In
     skillEstimates: unwrapRows(skills).map((row) => ({ language: row.language, skill: row.skill, levelValue: Number(row.level_value) })),
     sessions,
     items,
+    errorItems,
     texts,
     cards: cardRows.map((row) => toCardRow(row, lastReviews.get(row.id) ?? null)),
     learningDays: learningDays.map((row) => ({ day: row.day, timeZone: row.time_zone, xpVerified: row.xp_verified, validated: row.validated, cause: row.cause, firstActivityAt: row.first_activity_at })),
@@ -439,9 +455,15 @@ export async function readIngestRows(client: AppClient, userId: string, refs: In
     textReads: reads.map((row) => row.text_id),
     knownEvents,
     cardFronts: cardFronts.map((row) => `${row.language}|${row.kind}|${row.front.toLowerCase()}`),
-    recentProductionTexts: unwrapRows(recentProductions).map((row) => row.text),
+    recentProductionTexts: unwrapRows(recentProductions).map(({ id, text }) => ({ id, text })),
     recentProductionCount: (unwrap(recentProductionCount), recentProductionCount.count ?? 0),
-    productions: productions.map((row) => ({ id: row.id, sessionId: row.session_id, language: row.language, text: row.text, clientEventId: row.client_event_id, createdAt: row.created_at })),
+    productions: productions.map((row) => {
+      const task = row.task;
+      const similarity = task && typeof task === "object" && !Array.isArray(task) ? task.initialSimilarity : undefined;
+      return { id: row.id, sessionId: row.session_id, language: row.language, text: row.text, clientEventId: row.client_event_id, createdAt: row.created_at,
+        ...(typeof similarity === "number" && similarity >= 0 && similarity <= 1 ? { initialSimilarity: similarity } : {}) };
+    }),
+    corrections,
     ingestState: state,
   };
 }

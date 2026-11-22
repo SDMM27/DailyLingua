@@ -11,6 +11,7 @@ import type { LocalSessionProgress } from "@/lib/offline/indexeddb-queue";
 import { useOnlineStatus } from "@/lib/offline/online-status";
 import { readingEvent, sessionScreens, stepNumber, type SessionEvent } from "@/lib/session-packet/session-flow";
 import { SessionExercise } from "./session-exercise";
+import { WritingFeedback } from "./writing-feedback";
 
 export function SessionPanel({ packet, initial, sync, accentTolerance, animateSummary, onLeave }: {
   packet: SessionPacket;
@@ -25,7 +26,7 @@ export function SessionPanel({ packet, initial, sync, accentTolerance, animateSu
   const [progress, setProgress] = useState(initial);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<"saveError" | "dayEnded" | null>(null);
-  const [feedback, setFeedback] = useState<Graded | null>(null);
+  const [feedback, setFeedback] = useState<(Graded & { explanation?: string; explanationLanguage?: string }) | null>(null);
   const [paused, setPaused] = useState(false);
   const savingRef = useRef(false);
   const heading = useRef<HTMLHeadingElement>(null);
@@ -98,11 +99,12 @@ export function SessionPanel({ packet, initial, sync, accentTolerance, animateSu
         {feedback ? (
           <div className="space-y-4">
             {feedback.shown && <p className="rounded-xl border border-line bg-surface p-4 text-lg" lang={language} dir="auto">{feedback.shown}</p>}
+            {feedback.explanation && <p className="text-muted" lang={feedback.explanationLanguage} dir="auto">{feedback.explanation}</p>}
             <Button onClick={() => setFeedback(null)}>{t("continue")}</Button>
           </div>
         ) : (
           <>
-            {(screen.kind === "card" || screen.kind === "item") && (
+            {(screen.kind === "card" || screen.kind === "item" || screen.kind === "error") && (
               <>
                 {screen.kind === "item" && screen.item.listeningOnly && packet.text && <ListeningPassage text={packet.text} />}
                 <SessionExercise
@@ -112,7 +114,12 @@ export function SessionPanel({ packet, initial, sync, accentTolerance, animateSu
                   language={language}
                   accentTolerance={accentTolerance}
                   busy={saving}
-                  onAnswer={(event, result) => { void save([event], following, null, () => setFeedback(result)); }}
+                  onAnswer={(event, result) => {
+                    const extra = screen.kind === "error" ? {
+                      explanation: screen.error.explanation, explanationLanguage: screen.error.explanationLanguage,
+                    } : {};
+                    void save([event], following, null, () => setFeedback({ ...result, ...extra }));
+                  }}
                 />
               </>
             )}
@@ -148,7 +155,8 @@ export function SessionPanel({ packet, initial, sync, accentTolerance, animateSu
             )}
             {screen.kind === "summary" && (
               <div className={animateSummary && progress.position !== "closed" ? "session-summary-enter space-y-5" : "space-y-5"}>
-                <p>{t(packet.text ? "summaryBody" : screens.some(({ kind }) => kind === "card") ? "reviewSummaryBody" : "noReviews")}</p>
+                <p>{t(packet.text ? "summaryBody" : screens.some(({ kind }) => kind === "card" || kind === "error") ? "reviewSummaryBody" : "noReviews")}</p>
+                <WritingFeedback sync={sync} sessionId={id} />
                 <Button disabled={saving} onClick={() => {
                   if (progress.position === "closed") onLeave(progress);
                   else void save([{ kind: "ui_event", payload: { name: "bilan_closed", value: { sessionId: id } } }], "closed", null, onLeave);

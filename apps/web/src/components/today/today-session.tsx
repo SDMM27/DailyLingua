@@ -13,6 +13,7 @@ import { useOnlineStatus } from "@/lib/offline/online-status";
 import { sessionScreens, stepNumber } from "@/lib/session-packet/session-flow";
 import { SessionPanel } from "./session-panel";
 import { SessionPrefetch } from "./session-prefetch";
+import { WritingFeedback } from "./writing-feedback";
 
 export function TodaySession({ language, timeZone, languageName, children, goal, detail, accentTolerance, animateSummary, prepareText }: {
   language: string;
@@ -144,6 +145,7 @@ export function TodaySession({ language, timeZone, languageName, children, goal,
             ) : <p className="text-muted" role="status">{common("loading")}</p>}
             {saveError && <FormMessage kind="error">{t("saveError")}</FormMessage>}
           </article>
+          <div className="mt-5 empty:hidden">{sync && <WritingFeedback sync={sync} />}</div>
           {detail}
         </>
       )}

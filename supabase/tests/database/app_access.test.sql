@@ -51,8 +51,8 @@ select 'test', 'm', id from auth.users where id::text like 'c0000000-0000-4000-8
 
 select is((select count(*)::int from pg_tables where schemaname = 'app' and not rowsecurity), 0,
   'row level security is enabled on every table of app');
-select is((select count(*)::int from pg_tables where schemaname = 'app'), 38,
-  'app has its 38 tables');
+select is((select count(*)::int from pg_tables where schemaname = 'app'), 40,
+  'app has its 40 tables');
 select is(
   (select count(*)::int from pg_proc p join pg_namespace n on n.oid = p.pronamespace
    where n.nspname = 'app' and not exists (
@@ -62,8 +62,8 @@ select is(
   (select count(*)::int from pg_proc p join pg_namespace n on n.oid = p.pronamespace
    where n.nspname = 'app'
      and (has_function_privilege('anon', p.oid, 'execute') or has_function_privilege('authenticated', p.oid, 'execute'))
-     and p.proname not in ('save_profile', 'save_enrollments', 'save_game_settings', 'save_push_subscription', 'delete_push_subscription', 'report_content')),
-  0, 'the six client functions (save_profile, save_enrollments, save_game_settings, the two push functions, report_content) are the only functions of app that clients can execute');
+     and p.proname not in ('save_profile', 'save_enrollments', 'save_game_settings', 'save_push_subscription', 'delete_push_subscription', 'report_content', 'configure_reminder', 'mark_reminder_opened')),
+  0, 'only the expected account, settings and report functions are executable by clients');
 select is(
   (select count(*)::int from pg_proc p join pg_namespace n on n.oid = p.pronamespace
    where n.nspname = 'app' and p.proname in ('migrate_user', 'migrate_all', 'verify_migration')
@@ -117,7 +117,7 @@ select is(
   (select array_agg(t.relname::text order by t.relname) from pg_class t
    where t.relnamespace = 'app'::regnamespace and t.relkind = 'r'
      and not has_table_privilege('authenticated', t.oid, 'select')),
-  array['ai_call', 'error_item', 'event_rate', 'graded_text_job', 'ingest_event', 'ingest_state', 'legacy_map', 'legacy_record', 'push_subscription', 'text_item_key'], 'authenticated can read the learner tables without exposing internal jobs, journals or answer keys');
+  array['ai_call', 'error_item', 'event_rate', 'graded_text_job', 'ingest_event', 'ingest_state', 'legacy_map', 'legacy_record', 'push_subscription', 'rewrite_check_job', 'text_item_key', 'writing_feedback_job'], 'authenticated can read the learner tables without exposing internal jobs, journals or answer keys');
 
 select set_config('request.jwt.claims',
   '{"sub": "c0000000-0000-4000-8000-0000000000a1", "role": "authenticated"}', true);

@@ -97,6 +97,41 @@ describe("planIngest: reviews", () => {
   });
 });
 
+describe("planIngest: error of the day", () => {
+  const errorId = uuid(91);
+  const error = item(errorId, {
+    textId: null, kind: "cloze", answer: null, accept: ["sono andato", "sono arrivato"], origin: "error_of_day",
+    errorItemId: errorId, errorOfDay: { correctionId: uuid(93), createdDay: "2026-11-11", recurring: false },
+    card: { kind: "correction", front: "Io ho andato a Roma.", back: "sono andato", backLanguage: "fr", context: "ho andato" },
+  });
+  const state = emptyState({ items: { [errorId]: error }, sessions: { [SESSION]: session({ errorItemId: errorId, requiredSteps: ["wake"], kind: "review_only" }) } });
+
+  it("validates wake after the answer and awards the reworked error only once", () => {
+    const ev = eventWriter();
+    const started = plan(state, [ev("session_started", iso("09:00:00"), { sessionId: SESSION })]);
+    expect(started.payload.session_steps.find((step) => step.step === "wake")?.validated_at).toBeFalsy();
+    const focus = (answer: string) => ev("focus_attempt", iso("09:00:15"), { sessionId: SESSION, itemId: errorId, try: 1, shownAt: iso("09:00:10"), answer });
+    const { payload } = plan(started.nextState, [focus("sono arrivato"), focus("sono andato")]);
+    expect(payload.attempts).toHaveLength(2);
+    expect(payload.attempts[0]).toMatchObject({ step: "wake", exercise_kind: "error_fix", correct: true });
+    expect(payload.error_items).toEqual([{ id: errorId, reworked_day: TODAY }]);
+    expect(payload.xp.filter(({ reason }) => reason === "error_of_day.reworked")).toEqual([expect.objectContaining({ amount: 3 })]);
+    expect(payload.session_steps).toContainEqual(expect.objectContaining({ step: "wake", validated_at: iso("09:00:15") }));
+  });
+
+  it("makes one feedback card after a wrong answer and refuses an unserved error", () => {
+    const ev = eventWriter();
+    const wrong = (itemId: string) => ev("focus_attempt", iso("09:00:15"), { sessionId: SESSION, itemId, try: 1, shownAt: iso("09:00:10"), answer: "ho andato" });
+    const { payload, rejected } = plan(state, [wrong(uuid(92)), wrong(errorId), wrong(errorId)]);
+    expect(rejected[0]?.reason).toBe("unknown_item");
+    expect(payload.error_items).toEqual([]);
+    expect(payload.xp.filter(({ reason }) => reason === "error_of_day.reworked")).toEqual([]);
+    expect(payload.cards_created).toEqual([expect.objectContaining({
+      source: "feedback", kind: "correction", payload: { itemId: errorId, errorOfDay: true, accept: error.accept },
+    })]);
+  });
+});
+
 describe("planIngest: refusals", () => {
   const ev = eventWriter();
   const base = emptyState({ cards: { [uuid(31)]: card(uuid(31)), [uuid(33)]: card(uuid(33), { userId: uuid(2) }) }, sessions: { [SESSION]: session({ servedAt: iso("08:00:00") }), [uuid(11)]: session({ id: uuid(11), userId: uuid(2) }) } });
@@ -371,6 +406,56 @@ describe("planIngest: a whole session", () => {
     for (const line of sourceless) expect(typeof line.meta.ref).toBe("string");
     const keys = sourceless.map((line) => JSON.stringify([line.day, line.language, line.reason, line.meta]));
     expect(new Set(keys).size).toBe(keys.length);
+  });
+
+  it("does not reward a sentence already verified, even on a new day", () => {
+    const base = sessionState();
+    base.verifiedSentences = { [uuid(41)]: [0] };
+    base.productions[uuid(71)] = {
+      id: uuid(71), sessionId: SESSION, language: "it", text: words("scritto", 70), day: TODAY,
+      late: false, settled: true, correctionDeferred: false, clientEventId: uuid(72), initialSimilarity: 0,
+    };
+    const event = eventWriter()("rewrite_submitted", iso("09:10:00"), {
+      correctionId: uuid(41), sentenceIndex: 0, text: "Io sono andato al mercato ieri",
+    });
+    const { payload } = plan(base, [event]);
+    expect(payload.rewrites).toEqual([expect.objectContaining({ accepted: true })]);
+    expect(reasons(payload)).not.toContain("rewrite.sentence");
+    expect(payload.session_steps).not.toContainEqual(expect.objectContaining({ proof: expect.objectContaining({ verifiedRewrites: 1 }) }));
+  });
+
+  it("credits only the first matching production and refuses a rewrite from the copy", () => {
+    const base = sessionState();
+    const original = uuid(71);
+    const copy = uuid(72);
+    base.corrections[uuid(42)] = correction(uuid(42), copy, {
+      sentences: base.corrections[uuid(41)]?.sentences ?? [],
+    });
+    const ev = eventWriter();
+    const submission = { sessionId: SESSION, text: words("scritto", 70), composeMs: 120000 };
+    const { payload, nextState } = plan(base, [
+      ev("production_submitted", iso("09:09:00"), { ...submission, productionId: original }),
+      ev("production_submitted", iso("09:09:10"), { ...submission, productionId: copy }),
+      ev("rewrite_submitted", iso("09:10:00"), { correctionId: uuid(42), sentenceIndex: 0, text: "Io sono andato al mercato ieri" }),
+    ]);
+    expect(payload.xp.filter((line) => line.reason === "production.corrected").map((line) => line.meta.ref)).toEqual([original]);
+    expect(payload.productions.map((row) => row.task.initialSimilarity)).toEqual([0, 1]);
+    expect(payload.rewrites).toEqual([expect.objectContaining({ accepted: false })]);
+    expect(nextState.productions[copy]?.feedbackEligible).toBe(false);
+  });
+
+  it("does not grant derived XP when an old correction has no stored originality proof", () => {
+    const base = sessionState();
+    base.productions[uuid(71)] = {
+      id: uuid(71), sessionId: SESSION, language: "it", text: words("scritto", 70), day: TODAY,
+      late: true, settled: true, correctionDeferred: false, clientEventId: uuid(72), creditExpired: true,
+    };
+    const event = eventWriter()("rewrite_submitted", iso("09:10:00"), {
+      correctionId: uuid(41), sentenceIndex: 0, text: "Io sono andato al mercato ieri",
+    });
+    const { payload } = plan(base, [event]);
+    expect(payload.rewrites).toEqual([expect.objectContaining({ accepted: false })]);
+    expect(reasons(payload)).not.toContain("rewrite.sentence");
   });
 
   it("can be cut in two batches, and replayed, with the same outcome", () => {

@@ -46,14 +46,14 @@ export async function setInterfaceLanguage(language: string): Promise<SettingsSt
 }
 
 /**
- * Saves the mother tongue, the time zone and the reminder time. Once the app has ingested events, `app.save_profile`
+ * Saves the mother tongue and the time zone. Once the app has ingested events, `app.save_profile`
  * ignores the time zone it receives: the time zone then follows the device that sends learning events.
  */
 export async function saveLearningSettings(_previous: SettingsState, formData: FormData): Promise<SettingsState> {
   const parsed = learningSettingsSchema.safeParse({
     nativeLanguage: formData.get("nativeLanguage"),
     timeZone: formData.get("timeZone"),
-    reminderTime: formData.get("reminderTime") ?? "",
+    reminderTime: "",
   });
   if (!parsed.success) return { error: "invalid" };
   const client = await signedInClient();
@@ -64,7 +64,7 @@ export async function saveLearningSettings(_previous: SettingsState, formData: F
       nativeLanguage: parsed.data.nativeLanguage,
       uiLanguage: profile.uiLanguage,
       timeZone: parsed.data.timeZone,
-      reminderTime: parsed.data.reminderTime,
+      reminderTime: profile.reminderTime,
     });
   } catch (error) {
     console.error("saveLearningSettings failed", error);

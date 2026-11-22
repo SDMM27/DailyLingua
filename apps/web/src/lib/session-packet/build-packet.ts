@@ -1,6 +1,6 @@
-import type { CardRow, ItemRow, PacketTextRow, SessionRow } from "@dailylingua/data";
+import { toPacketError, type CardRow, type ErrorOfDayRow, type ItemRow, type PacketTextRow, type SessionRow } from "@dailylingua/data";
 import { cefrLevelSchema, cardKindSchema, cardStateSchema, languageCodeSchema, sessionFormatSchema, sessionKindSchema, type DateKey, type SessionPacket, type StoredSessionPlan } from "@dailylingua/schemas";
-import { cardAcceptList } from "@/lib/ingest/card-keys";
+import { cardAcceptList, correctionHighlight } from "@/lib/ingest/card-keys";
 import { buildChoiceOptions } from "./options";
 
 /**
@@ -16,6 +16,7 @@ export interface PacketInput {
   textBundle: { text: PacketTextRow; items: ItemRow[] } | null;
   /** The cards of the language by id (not deleted). */
   cards: ReadonlyMap<string, CardRow>;
+  errorOfDay?: ErrorOfDayRow | null;
   quotas: { writingFeedback: { used: number; limit: number }; rewriteCheck: { used: number; limit: number } };
   serverDay: DateKey;
   timeZone: string;
@@ -90,7 +91,8 @@ function packetCards(plan: StoredSessionPlan, cards: ReadonlyMap<string, CardRow
     if (!card || mode === undefined || !kind?.success || !state?.success || state.data === "suspended" || state.data === "known") continue;
     const base = { id: card.id, kind: kind.data, state: state.data, dueAt: iso(card.dueAt), mode, front: card.front, back: card.back, context: card.context };
     if (mode === "production") {
-      out.push({ ...base, correctOptionId: null, options: [], accept: cardAcceptList(card) });
+      const highlight = correctionHighlight(card);
+      out.push({ ...base, correctOptionId: null, options: [], accept: cardAcceptList(card), ...(highlight ? { correctionHighlight: highlight } : {}) });
       continue;
     }
     const choice = buildChoiceOptions(card, pool, language, sessionId);
@@ -120,7 +122,7 @@ export function buildPacket(input: PacketInput): SessionPacket {
     cards: packetCards(plan, input.cards, session.id, session.language),
     wakeCardIds: plan.wake.cardIds,
     momentumWords: plan.momentumWords,
-    errorOfTheDay: null,
+    errorOfTheDay: input.errorOfDay ? toPacketError(input.errorOfDay) : null,
     quotas: input.quotas,
     serverDay: input.serverDay,
     timeZone: input.timeZone,
