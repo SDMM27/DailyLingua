@@ -251,9 +251,11 @@ function MatchItem({ item, language, locale, locked, wrong, onAnswer }: ViewProp
     if (locked || leftPick === null || rightTaken.has(right)) return;
     commit({ ...pairing, [leftPick]: right }, t("paired", { left: item.pairs[leftPick]!.left, right: item.pairs[right]!.right[locale] }));
   }
-  const side = (state: "idle" | "picked" | "paired") =>
+  // Pair `i` goes with answer `i`. Once the item is locked, a pair that does not match is marked as wrong, never green.
+  const pairWrong = (left: number) => wrong || (locked && pairing[left] !== left);
+  const side = (state: "idle" | "picked" | "paired", failed = false) =>
     `flex min-h-14 w-full items-center rounded-xl border-[1.5px] bg-surface px-3 py-2 text-start text-base ${
-      state === "picked" ? "border-accent shadow-[0_0_0_1px_var(--sd-accent)]" : state === "paired" ? (wrong ? "border-error" : "border-success") : "border-border-strong"
+      state === "picked" ? "border-accent shadow-[0_0_0_1px_var(--sd-accent)]" : state === "paired" ? (failed ? "border-error" : "border-success") : "border-border-strong"
     }`;
 
   return (
@@ -262,7 +264,7 @@ function MatchItem({ item, language, locale, locked, wrong, onAnswer }: ViewProp
         <ul aria-label={t("left")} lang={language} dir="auto" className="space-y-2.5">
           {item.pairs.map((pair, left) => (
             <li key={pair.left}>
-              <button type="button" disabled={locked} aria-pressed={leftPick === left || left in pairing} className={side(left in pairing ? "paired" : leftPick === left ? "picked" : "idle")} onClick={() => pickLeft(left)}>
+              <button type="button" disabled={locked} aria-pressed={leftPick === left || left in pairing} className={side(left in pairing ? "paired" : leftPick === left ? "picked" : "idle", pairWrong(left))} onClick={() => pickLeft(left)}>
                 {left in pairing && <b aria-hidden="true" className="me-2 font-mono text-xs">{left + 1}</b>}
                 {pair.left}
               </button>
@@ -272,7 +274,7 @@ function MatchItem({ item, language, locale, locked, wrong, onAnswer }: ViewProp
         <ul aria-label={t("right")} lang={locale} className="space-y-2.5">
           {rights.map((right) => (
             <li key={right}>
-              <button type="button" disabled={locked || rightTaken.has(right)} className={side(rightTaken.has(right) ? "paired" : "idle")} onClick={() => pickRight(right)}>
+              <button type="button" disabled={locked || rightTaken.has(right)} className={side(rightTaken.has(right) ? "paired" : "idle", pairWrong(Number(Object.entries(pairing).find(([, taken]) => taken === right)?.[0])))} onClick={() => pickRight(right)}>
                 {rightTaken.has(right) && <b aria-hidden="true" className="me-2 font-mono text-xs">{Number(Object.entries(pairing).find(([, taken]) => taken === right)?.[0]) + 1}</b>}
                 {item.pairs[right]!.right[locale]}
               </button>

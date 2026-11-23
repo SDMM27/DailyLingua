@@ -1,24 +1,27 @@
 "use client";
 
 import { gradeUnitTest, stepValidated, type AccentTolerance, type UnitAttempt } from "@dailylingua/core";
-import type { Unit, UnitItem } from "@dailylingua/schemas";
+import { isScriptUnit, type Unit, type UnitItem } from "@dailylingua/schemas";
 import { useTranslations } from "next-intl";
 import { useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { BottomSheet } from "@/components/ui/bottom-sheet";
 import type { UnitEvent } from "@/lib/units/events";
 import {
-  expectedText, firstOpenStep, flatSteps, stepItems, unitFinished, unitStarted, UNIT_TEST_XP_ESTIMATE,
+  expectedText, firstOpenStep, flatSteps, lessonOfItem, stepItems, unitFinished, unitStarted, UNIT_TEST_XP_ESTIMATE,
 } from "@/lib/units/flow";
 import { languageStyle } from "@/lib/units/language-style";
 import type { UnitProgressView } from "@/lib/units/progress";
 import { DialogueStep, type DialoguePrefs } from "./dialogue-step";
 import { ExerciseRunner, type ItemAttempt } from "./exercise-runner";
 import { GrammarInfo, KeyPhrasesInfo } from "./info-steps";
+import { ScriptInfo, scriptHasInfo } from "./script-info";
 import { TestStep } from "./test-step";
+import { useUnitExtras } from "./unit-extras";
 import { UnitIntro } from "./unit-intro";
 import { UnitResult, type MissedPhrase } from "./unit-result";
 import { ShellBody, UnitShell } from "./unit-shell";
+import { WarmupDone, WarmupIntro } from "./warmup-intro";
 
 export interface UnitFlowProps {
   unit: Unit;
@@ -52,26 +55,34 @@ interface Result {
 export function UnitFlow({ unit, progress, locale, tolerance, xpVisible, animate, offline, nextUnit, onEvents, onLeave, onOpenUnit }: UnitFlowProps) {
   const t = useTranslations("unit");
   const sheet = useTranslations("unitSheet");
-  const session = useTranslations("dailySession");
+  const warmup = useTranslations("warmup");
   const actions = useTranslations("common.actions");
   const steps = useMemo(() => flatSteps(unit), [unit]);
-  const [screen, setScreen] = useState<"intro" | "step" | "result">("intro");
-  const [index, setIndex] = useState(() => firstOpenStep(unit, progress));
+  const { openPath, startAtTest, unitXp, warmupItemIds } = useUnitExtras();
+  const [screen, setScreen] = useState<"intro" | "warmup" | "warmupDone" | "step" | "result">(startAtTest ? "step" : "intro");
+  const [index, setIndex] = useState(() => (startAtTest ? Math.max(0, flatSteps(unit).findIndex((step) => step.step === "test")) : firstOpenStep(unit, progress)));
   const [infoDone, setInfoDone] = useState(false);
   const [share, setShare] = useState(0);
-  const [direct, setDirect] = useState(false);
+  const [direct, setDirect] = useState(startAtTest);
   const [xp, setXp] = useState(0);
   const [prefs, setPrefs] = useState<DialoguePrefs>({ translation: false, transliteration: false });
   const [paused, setPaused] = useState(false);
   const [saveError, setSaveError] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
-  const [testRun, setTestRun] = useState(0);
+  const [testRun, setTestRun] = useState(startAtTest ? 1 : 0);
   const attempts = useRef<UnitAttempt[]>([]);
 
   const current = steps[index]!;
   const stepLabels = steps.map((step) => t(`steps.${step.step}`));
   const items = stepItems(unit, current.lesson, current.step);
   const language = unit.language;
+  // The server pays no XP for a unit already passed (reviewing it earns nothing): no estimate is shown then.
+  const payXp = progress?.passedAt == null;
+  const warmupItems = useMemo(() => {
+    const wanted = new Set(warmupItemIds);
+    return unit.items.filter((item) => wanted.has(item.id));
+  }, [unit, warmupItemIds]);
+  const warmupOn = warmupItems.length > 0 && progress?.passedAt == null;
 
   function emit(events: UnitEvent[]) {
     if (events.length === 0) return;
@@ -91,11 +102,11 @@ export function UnitFlow({ unit, progress, locale, tolerance, xpVisible, animate
     if (index + 1 < steps.length) goTo(index + 1);
   }
 
-  function onAttempt(attempt: ItemAttempt) {
-    attempts.current.push({ itemId: attempt.item.id, correct: attempt.correct });
+  function onAttempt(attempt: ItemAttempt, lesson = current.lesson, count = true) {
+    if (count) attempts.current.push({ itemId: attempt.item.id, correct: attempt.correct });
     emit([{
       kind: "unit_item_attempt",
-      payload: { unitId: unit.id, unitVersion: unit.version, lesson: current.lesson, itemId: attempt.item.id, try: attempt.tryNumber, answer: attempt.answer, shownAt: attempt.shownAt },
+      payload: { unitId: unit.id, unitVersion: unit.version, lesson, itemId: attempt.item.id, try: attempt.tryNumber, answer: attempt.answer, shownAt: attempt.shownAt },
     }]);
   }
 
@@ -120,12 +131,27 @@ export function UnitFlow({ unit, progress, locale, tolerance, xpVisible, animate
     setScreen("result");
   }
 
+  // The warm-up replays the missed sentences with the lesson each one comes from, so the server pays them by its rules.
+  function onWarmupAttempt(attempt: ItemAttempt) {
+    const lesson = lessonOfItem(unit, attempt.item.id);
+    if (lesson) onAttempt(attempt, lesson, false);
+  }
+
   const style = languageStyle(language);
   const warning = saveError && <p role="status" className="px-5 pt-2 text-sm text-muted">{t("saveError")}</p>;
 
   if (screen === "intro") {
     const finished = unitFinished(unit, progress);
     const mode = finished ? "review" : unitStarted(unit, progress) ? "resume" : "start";
+    const begin = () => { goTo(finished ? 0 : firstOpenStep(unit, progress)); setScreen("step"); };
+    if (warmupOn) {
+      const label = mode === "resume" ? sheet("resume", { step: firstOpenStep(unit, progress) + 1, steps: steps.length }) : mode === "review" ? sheet("review") : sheet("start");
+      return (
+        <UnitShell style={style} onClose={onLeave} closeLabel={sheet("close")}>
+          <WarmupIntro unit={unit} locale={locale} count={warmupItems.length} unitLabel={label} canSkip onWarmup={() => setScreen("warmup")} onUnit={begin} onSkip={() => startTest(true)} />
+        </UnitShell>
+      );
+    }
     return (
       <UnitShell style={style} onClose={onLeave} closeLabel={sheet("close")}>
         <UnitIntro
@@ -135,9 +161,39 @@ export function UnitFlow({ unit, progress, locale, tolerance, xpVisible, animate
           step={firstOpenStep(unit, progress) + 1}
           steps={steps.length}
           canSkip={progress?.passedAt == null}
-          onStart={() => { goTo(finished ? 0 : firstOpenStep(unit, progress)); setScreen("step"); }}
+          onStart={begin}
           onSkip={() => startTest(true)}
         />
+      </UnitShell>
+    );
+  }
+
+  if (screen === "warmup") {
+    return (
+      <UnitShell style={style} bar={{ steps: [warmup("name")], position: 1, stepProgress: share, xp: null, offline }} onClose={() => setPaused(true)}>
+        {warning}
+        <ExerciseRunner
+          key="warmup"
+          items={warmupItems}
+          language={language}
+          locale={locale}
+          tolerance={tolerance}
+          onAttempt={onWarmupAttempt}
+          onXp={() => undefined}
+          onProgress={setShare}
+          onDone={() => { setShare(0); setScreen("warmupDone"); }}
+        />
+        {paused && <PauseSheet label={warmup("name")} onContinue={() => setPaused(false)} onLeave={onLeave} />}
+      </UnitShell>
+    );
+  }
+
+  if (screen === "warmupDone") {
+    const finished = unitFinished(unit, progress);
+    const unitLabel = unitStarted(unit, progress) ? (finished ? sheet("review") : sheet("resume", { step: firstOpenStep(unit, progress) + 1, steps: steps.length })) : sheet("start");
+    return (
+      <UnitShell style={style} onClose={onLeave} closeLabel={sheet("close")}>
+        <WarmupDone unitLabel={unitLabel} onTest={() => startTest(true)} onUnit={() => { goTo(finished ? 0 : firstOpenStep(unit, progress)); setScreen("step"); }} />
       </UnitShell>
     );
   }
@@ -155,20 +211,22 @@ export function UnitFlow({ unit, progress, locale, tolerance, xpVisible, animate
           passMark={unit.test.passScore}
           canDo={unit.canDo.map((goal) => goal.text[locale])}
           xpTest={xpVisible && progress?.passedAt == null ? UNIT_TEST_XP_ESTIMATE : null}
-          xpKept={direct || !xpVisible ? 0 : xp}
+          xpKept={xpVisible ? unitXp + (progress === null ? xp : 0) : 0}
           missed={result.missed}
           hasNext={nextUnit !== null}
           animate={animate}
           onNext={() => nextUnit && onOpenUnit(nextUnit.id)}
-          onBack={onLeave}
+          onBack={openPath ?? onLeave}
           onRetake={() => startTest(direct)}
         />
       </UnitShell>
     );
   }
 
-  const bar = { steps: stepLabels, position: index + 1, stepProgress: share, xp: xpVisible && !direct ? xp : null, offline };
-  const hasInfo = current.step === "dialogue" || current.step === "key_phrases" || (current.step === "grammar" && unit.grammar !== null);
+  const bar = { steps: stepLabels, position: index + 1, stepProgress: share, xp: xpVisible && !direct && payXp ? xp : null, offline };
+  const hasInfo = isScriptUnit(unit)
+    ? scriptHasInfo(current.step)
+    : current.step === "dialogue" || current.step === "key_phrases" || (current.step === "grammar" && unit.grammar !== null);
   const showInfo = hasInfo && !infoDone;
   const afterInfo = () => (items.length > 0 ? setInfoDone(true) : completeStep());
 
@@ -176,7 +234,9 @@ export function UnitFlow({ unit, progress, locale, tolerance, xpVisible, animate
     <UnitShell style={style} bar={bar} onClose={() => setPaused(true)}>
       {warning}
       {showInfo ? (
-        current.step === "dialogue" ? (
+        isScriptUnit(unit) ? (
+          <ScriptInfo unit={unit} step={current.step} locale={locale} onFinished={afterInfo} />
+        ) : current.step === "dialogue" ? (
           <DialogueStep key="dialogue" language={language} locale={locale} dialogue={unit.dialogue} prefs={prefs} onPrefs={setPrefs} onFinished={afterInfo} />
         ) : current.step === "key_phrases" ? (
           <KeyPhrasesInfo key="key-phrases" phrases={unit.keyPhrases} language={language} locale={locale} onContinue={afterInfo} />
@@ -194,7 +254,7 @@ export function UnitFlow({ unit, progress, locale, tolerance, xpVisible, animate
           tolerance={tolerance}
           context={current.step === "conversation" ? (item) => <ConversationContext unit={unit} item={item} locale={locale} /> : undefined}
           onAttempt={onAttempt}
-          onXp={(gain) => setXp((value) => value + gain)}
+          onXp={(gain) => { if (payXp) setXp((value) => value + gain); }}
           onProgress={setShare}
           onDone={completeStep}
         />
@@ -203,22 +263,31 @@ export function UnitFlow({ unit, progress, locale, tolerance, xpVisible, animate
           <Button onClick={completeStep}>{actions("continue")}</Button>
         </ShellBody>
       )}
-      {paused && (
-        <BottomSheet labelledBy="pause-title" onClose={() => setPaused(false)}>
-          <h2 id="pause-title" data-sheet-title tabIndex={-1} className="font-display text-[22px] leading-tight font-bold">{t("pauseTitle")}</h2>
-          <p className="mt-2 text-muted">{t("pauseBody", { step: stepLabels[index] ?? "" })}</p>
-          <div className="mt-5 space-y-2.5">
-            <Button onClick={() => setPaused(false)}>{actions("continue")}</Button>
-            <Button variant="secondary" className="w-full" onClick={onLeave}>{session("leave")}</Button>
-          </div>
-        </BottomSheet>
-      )}
+      {paused && <PauseSheet label={stepLabels[index] ?? ""} onContinue={() => setPaused(false)} onLeave={onLeave} />}
     </UnitShell>
+  );
+}
+
+/** The pause sheet: nothing is lost, the learner picks up where they stopped. */
+function PauseSheet({ label, onContinue, onLeave }: { label: string; onContinue(): void; onLeave(): void }) {
+  const t = useTranslations("unit");
+  const session = useTranslations("dailySession");
+  const actions = useTranslations("common.actions");
+  return (
+    <BottomSheet labelledBy="pause-title" onClose={onContinue}>
+      <h2 id="pause-title" data-sheet-title tabIndex={-1} className="font-display text-[22px] leading-tight font-bold">{t("pauseTitle")}</h2>
+      <p className="mt-2 text-muted">{t("pauseBody", { step: label })}</p>
+      <div className="mt-5 space-y-2.5">
+        <Button onClick={onContinue}>{actions("continue")}</Button>
+        <Button variant="secondary" className="w-full" onClick={onLeave}>{session("leave")}</Button>
+      </div>
+    </BottomSheet>
   );
 }
 
 /** The conversation's items in the order of the turns (the learner's turns), not of the step's list. */
 function conversationOrder(unit: Unit, items: UnitItem[]): UnitItem[] {
+  if (isScriptUnit(unit)) return items;
   const rank = new Map(unit.conversation.turns.map((turn, position) => [turn.itemId, position]));
   return [...items].sort((a, b) => (rank.get(a.id) ?? 0) - (rank.get(b.id) ?? 0));
 }
@@ -226,6 +295,7 @@ function conversationOrder(unit: Unit, items: UnitItem[]): UnitItem[] {
 /** The turns that come before the learner's turn (since the previous one of the learner), and who the learner plays. */
 function ConversationContext({ unit, item, locale }: { unit: Unit; item: UnitItem; locale: "fr" | "en" }) {
   const t = useTranslations("unit");
+  if (isScriptUnit(unit)) return null;
   const turns = unit.conversation.turns;
   const at = turns.findIndex((turn) => turn.itemId === item.id);
   if (at < 0) return null;

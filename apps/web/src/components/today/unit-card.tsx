@@ -28,6 +28,7 @@ export async function UnitCard({ unit, progress, language, locale }: {
       <Link href={`/parcours/${language}/${unit.id}`} className={`${buttonClass("secondary")} w-full`}>
         {started ? t("continue", { lesson: currentLessonNumber(unit, progress) }) : t("start")}
       </Link>
+      <Link href={`/parcours/${language}`} className="flex min-h-11 items-center justify-center font-semibold text-accent-strong">{t("map")}</Link>
     </article>
   );
 }
