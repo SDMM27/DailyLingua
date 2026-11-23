@@ -595,6 +595,12 @@ describe("planIngest: units", () => {
     expect(payload.attempts.map((row) => row.correct)).toEqual([false, true, false, false, true]);
   });
 
+  it("counts the try on the server: a right answer sent as try 1 after a wrong one earns 1 XP, not 2", () => {
+    const ev = eventWriter();
+    const { payload } = plan(unitState(), [attempt(ev, 10, "q1", "b"), attempt(ev, 20, "q1", "a", 1)]);
+    expect(payload.xp.map((line) => [line.reason, line.amount])).toEqual([["focus.second_try", 1]]);
+  });
+
   it("pays an item once per account: a repeat, the same day or later, earns 0 with already_earned", () => {
     const ev = eventWriter();
     const first = plan(unitState(), [attempt(ev, 10, "q1")]);

@@ -869,9 +869,11 @@ class Ingestion {
     if (graded.correct) {
       if (tried.some((attempt) => attempt.correct) || progress.passedAt !== null) xpReason = "already_earned";
       else {
-        // Never right before: every earlier try of the item was wrong.
-        const proof = { attempt: p.try, correct: true, firstWrong: tried.length > 0, alreadyPassedToday: false };
-        const outcome = p.try === 1 ? focusFirstTry(proof) : focusSecondTry(proof);
+        // Never right before: every earlier try of the item was wrong. The try number is counted by the server from the
+        // known attempts; the client's `try` is never trusted for XP.
+        const attempt = tried.length + 1;
+        const proof = { attempt, correct: true, firstWrong: tried.length > 0, alreadyPassedToday: false };
+        const outcome = attempt === 1 ? focusFirstTry(proof) : focusSecondTry(proof);
         if (outcome.amount > 0) {
           const d = this.day(at.day);
           const key = `unit:${unit.id}:${p.lesson}`;
