@@ -2,7 +2,7 @@ import type { UnitSource } from "@dailylingua/schemas";
 
 /**
  * Russian, unit 1: greeting and introducing yourself (draft, `j4-parcours-debutant.md` §4).
- * Comes after the four writing units E1 to E4 (order 5). Grammar: `ru-a1-gender`, used lightly (он / она,
+ * Comes after the five writing units E1 to E5 (order 6). Grammar: `ru-a1-gender`, used lightly (он / она,
  * no verb "to be" in the present). Stress: combining acute (U+0301) on every word of two syllables or
  * more in the displayed text; accepted answers are written without it (the grader ignores it anyway).
  * Transliteration: letter by letter (`src/lib/alphabets/ru.ts`), stress as an acute on the vowel, except
@@ -13,7 +13,7 @@ export const ruA101Saluer = {
   id: "ru-a1-01-saluer",
   language: "ru",
   level: "A1",
-  order: 5,
+  order: 6,
   kind: "situation",
   title: { fr: "Saluer et se présenter", en: "Greeting and introducing yourself" },
   situation: {
