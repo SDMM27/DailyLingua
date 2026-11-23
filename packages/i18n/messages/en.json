@@ -554,7 +554,7 @@
     "back": "Back to the path",
     "notYet": "Not passed yet",
     "missing": "{count, plural, one {One more correct answer was needed.} other {# more correct answers were needed.}}",
-    "missedBack": "{count, plural, one {The missed sentence comes back} other {The # missed sentences come back}} in your reviews tomorrow",
+    "missedBack": "{count, plural, one {Go over the missed sentence} other {Go over the # missed sentences}} before you retake the test",
     "xpKept": "; you keep your {xp} XP.",
     "end": ".",
     "seeMissed": "{count, plural, one {See the sentence} other {See the # sentences}}",

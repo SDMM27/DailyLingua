@@ -554,7 +554,7 @@
     "back": "Retour au parcours",
     "notYet": "Pas encore validée",
     "missing": "{count, plural, one {Il manquait une réponse.} other {Il manquait # réponses.}}",
-    "missedBack": "{count, plural, one {La phrase manquée revient} other {Les # phrases manquées reviennent}} demain dans tes révisions",
+    "missedBack": "{count, plural, one {Revois la phrase manquée} other {Revois les # phrases manquées}} avant de repasser le test",
     "xpKept": "; tes {xp} XP restent acquis.",
     "end": ".",
     "seeMissed": "{count, plural, one {Voir la phrase} other {Voir les # phrases}}",
