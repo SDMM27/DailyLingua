@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@dailylingua/ai": "*",
+    "@dailylingua/content": "*",
     "@dailylingua/core": "*",
     "@dailylingua/data": "*",
     "@dailylingua/i18n": "*",
