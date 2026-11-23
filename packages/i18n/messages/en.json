@@ -144,7 +144,8 @@
       "meta": "Path · {language}",
       "continue": "Continue · lesson {lesson}",
       "start": "Start the path",
-      "lessons": "Three lessons, about {minutes} min."
+      "lessons": "Three lessons, about {minutes} min.",
+      "map": "See the path"
     }
   },
   "reminderPush": {
@@ -448,6 +449,28 @@
       "logFailed": "failed, next attempt in {seconds} s"
     }
   },
+  "unitScript": {
+    "letterPosition": "Letter {position} of {total}",
+    "upper": "Capital",
+    "lower": "Small",
+    "name": "Name: {name}",
+    "reads": "Read as “{latin}”",
+    "sound": "The sound",
+    "kinds": {
+      "same": "Familiar",
+      "false-friend": "False friend",
+      "new": "New",
+      "sign": "Silent sign"
+    },
+    "falseFriend": "Careful: it looks like the Latin letter “{lookalike}”, but it is not read the same way.",
+    "exampleLabel": "In the word",
+    "listenExample": "Listen to the word {word}",
+    "previous": "Previous letter",
+    "next": "Next letter",
+    "wordsIntro": "Read each word out loud, then tap it to see how it reads and what it means.",
+    "wordToggle": "{word}: show the reading and the meaning",
+    "listenWord": "Listen to {word}"
+  },
   "unitSheet": {
     "meta": "Unit {number} · about {minutes} min",
     "goals": "By the end, you’ll be able to say",
@@ -457,7 +480,9 @@
     "skip": "I already know this",
     "skipValue": "take the test, {count} questions",
     "retake": "Retake the test",
-    "close": "Leave the unit"
+    "close": "Leave the unit",
+    "goalsDone": "Completed on {date}",
+    "warmupNote": "A short warm-up first, then the test."
   },
   "unit": {
     "steps": {
@@ -554,11 +579,46 @@
     "back": "Back to the path",
     "notYet": "Not passed yet",
     "missing": "{count, plural, one {One more correct answer was needed.} other {# more correct answers were needed.}}",
-    "missedBack": "{count, plural, one {Go over the missed sentence} other {Go over the # missed sentences}} before you retake the test",
+    "missedBack": "{count, plural, one {The missed sentence comes back} other {The # missed sentences come back}} tomorrow, before the test",
     "xpKept": "; you keep your {xp} XP.",
     "end": ".",
     "seeMissed": "{count, plural, one {See the sentence} other {See the # sentences}}",
     "retake": "Retake the test now",
     "invalid": "This test couldn’t be graded. Please take it again."
+  },
+  "path": {
+    "meta": "Path · {language}",
+    "level": "Level {level}",
+    "progress": "{done} of {total} units.",
+    "hint": "The order is a suggestion; every stop is open.",
+    "hintWriting": "Writing first, then everyday situations.",
+    "listLabel": "Units of level {level}",
+    "zoneWriting": "Writing · {level}",
+    "zoneSituations": "Situations · {level}",
+    "unitTitle": "{number} · {title}",
+    "currentMeta": "Unit {number} · step {step} of {steps}",
+    "currentMetaWriting": "Writing {number} · step {step} of {steps}",
+    "currentMetaStart": "Unit {number}",
+    "currentMetaStartWriting": "Writing {number}",
+    "minutes": "{minutes} min",
+    "remaining": "{step}. About {minutes} min.",
+    "remainingStart": "About {minutes} min.",
+    "continue": "Continue",
+    "start": "Start",
+    "passedByTest": "passed by test",
+    "a11yDone": "{title}, completed. {canDo}",
+    "a11yCurrent": "{title}, in progress, step {step} of {steps}",
+    "a11yCurrentStart": "{title}, ready to start, about {minutes} min",
+    "a11yTodo": "{title}, not started, about {minutes} min",
+    "allDone": "Every unit of this level is complete."
+  },
+  "warmup": {
+    "title": "{count, plural, one {Review yesterday’s sentence} other {Review yesterday’s # sentences}}",
+    "start": "Start the warm-up",
+    "name": "Warm-up",
+    "meta": "Warm-up · {title}",
+    "doneTitle": "Warm-up done",
+    "doneBody": "You can retake the test now, or go back over the unit first.",
+    "go": "Review now"
   }
 }
