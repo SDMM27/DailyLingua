@@ -48,7 +48,7 @@ export const ruA101Saluer = {
           fr: "Salut ! Moi, c’est Maxime. Et toi, comment tu t’appelles ?",
           en: "Hi! I'm Maxim. And what's your name?",
         },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-01-saluer/d1.mp3",
       },
       {
         id: "d2",
@@ -56,7 +56,7 @@ export const ruA101Saluer = {
         text: "Приве́т! Меня́ зову́т Ле́о. О́чень прия́тно!",
         transliteration: "Privét! Menjá zovút Léo. Óčenʹ prijátno!",
         translation: { fr: "Salut ! Je m’appelle Léo. Enchanté !", en: "Hi! My name is Leo. Nice to meet you!" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-01-saluer/d2.mp3",
       },
       {
         id: "d3",
@@ -64,7 +64,7 @@ export const ruA101Saluer = {
         text: "Мне то́же! Ты отку́да?",
         transliteration: "Mne tóže! Ty otkúda?",
         translation: { fr: "Moi aussi ! Tu viens d’où ?", en: "Same here! Where are you from?" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-01-saluer/d3.mp3",
       },
       {
         id: "d4",
@@ -73,7 +73,7 @@ export const ruA101Saluer = {
         text: "Я францу́з, из Пари́жа. А ты?",
         transliteration: "Ja francúz, iz Paríža. A ty?",
         translation: { fr: "Je suis français, de Paris. Et toi ?", en: "I'm French, from Paris. And you?" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-01-saluer/d4.mp3",
       },
       {
         id: "d5",
@@ -82,7 +82,7 @@ export const ruA101Saluer = {
         text: "Я из Москвы́.",
         transliteration: "Ja iz Moskvý.",
         translation: { fr: "Je suis de Moscou.", en: "I'm from Moscow." },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-01-saluer/d5.mp3",
       },
       {
         id: "d6",
@@ -90,7 +90,7 @@ export const ruA101Saluer = {
         text: "Здо́рово! А кто э́то?",
         transliteration: "Zdórovo! A kto èto?",
         translation: { fr: "Super ! Et c’est qui ?", en: "Great! And who's that?" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-01-saluer/d6.mp3",
       },
       {
         id: "d7",
@@ -98,7 +98,7 @@ export const ruA101Saluer = {
         text: "Э́то А́нна. Она́ то́же из Москвы́.",
         transliteration: "Èto Ánna. Oná tóže iz Moskvý.",
         translation: { fr: "C’est Anna. Elle aussi, elle est de Moscou.", en: "This is Anna. She's from Moscow too." },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-01-saluer/d7.mp3",
       },
       {
         id: "d8",
@@ -110,7 +110,7 @@ export const ruA101Saluer = {
           fr: "Enchanté, Anna ! Bon, je dois y aller. Salut !",
           en: "Nice to meet you, Anna! Well, I have to go. Bye!",
         },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-01-saluer/d8.mp3",
       },
       {
         id: "d9",
@@ -118,10 +118,10 @@ export const ruA101Saluer = {
         text: "Пока́, Ле́о! До встре́чи!",
         transliteration: "Poká, Léo! Do vstréči!",
         translation: { fr: "Salut, Léo ! À la prochaine !", en: "Bye, Leo! See you!" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-01-saluer/d9.mp3",
       },
     ],
-    audio: null,
+    audio: "/unit-audio/ru/ru-a1-01-saluer/dialogue.mp3",
     glosses: [
       {
         form: "приве́т",
@@ -289,14 +289,14 @@ export const ruA101Saluer = {
       text: "Как тебя́ зову́т?",
       translation: { fr: "Comment tu t’appelles ?", en: "What's your name?" },
       lineId: "d1",
-      audio: null,
+      audio: "/unit-audio/ru/ru-a1-01-saluer/k1.mp3",
     },
-    { id: "k2", text: "Меня́ зову́т Ле́о.", translation: { fr: "Je m’appelle Léo.", en: "My name is Leo." }, lineId: "d2", audio: null },
-    { id: "k3", text: "О́чень прия́тно!", translation: { fr: "Enchanté(e) !", en: "Nice to meet you!" }, lineId: "d2", audio: null },
-    { id: "k4", text: "Ты отку́да?", translation: { fr: "Tu viens d’où ?", en: "Where are you from?" }, lineId: "d3", audio: null },
-    { id: "k5", text: "Я францу́з.", translation: { fr: "Je suis français.", en: "I'm French." }, lineId: "d4", audio: null },
-    { id: "k6", text: "Я из Москвы́.", translation: { fr: "Je suis de Moscou.", en: "I'm from Moscow." }, lineId: "d5", audio: null },
-    { id: "k7", text: "Пока́!", translation: { fr: "Salut ! (pour partir)", en: "Bye!" }, lineId: "d8", audio: null },
+    { id: "k2", text: "Меня́ зову́т Ле́о.", translation: { fr: "Je m’appelle Léo.", en: "My name is Leo." }, lineId: "d2", audio: "/unit-audio/ru/ru-a1-01-saluer/k2.mp3" },
+    { id: "k3", text: "О́чень прия́тно!", translation: { fr: "Enchanté(e) !", en: "Nice to meet you!" }, lineId: "d2", audio: "/unit-audio/ru/ru-a1-01-saluer/k3.mp3" },
+    { id: "k4", text: "Ты отку́да?", translation: { fr: "Tu viens d’où ?", en: "Where are you from?" }, lineId: "d3", audio: "/unit-audio/ru/ru-a1-01-saluer/k4.mp3" },
+    { id: "k5", text: "Я францу́з.", translation: { fr: "Je suis français.", en: "I'm French." }, lineId: "d4", audio: "/unit-audio/ru/ru-a1-01-saluer/k5.mp3" },
+    { id: "k6", text: "Я из Москвы́.", translation: { fr: "Je suis de Moscou.", en: "I'm from Moscow." }, lineId: "d5", audio: "/unit-audio/ru/ru-a1-01-saluer/k6.mp3" },
+    { id: "k7", text: "Пока́!", translation: { fr: "Salut ! (pour partir)", en: "Bye!" }, lineId: "d8", audio: "/unit-audio/ru/ru-a1-01-saluer/k7.mp3" },
     {
       id: "k8",
       text: "Здра́вствуйте!",
@@ -305,7 +305,7 @@ export const ruA101Saluer = {
         en: "Hello! (polite: to a stranger, in a shop; with friends, приве́т)",
       },
       lineId: null,
-      audio: null,
+      audio: "/unit-audio/ru/ru-a1-01-saluer/k8.mp3",
     },
   ],
   grammar: {
@@ -645,7 +645,7 @@ export const ruA101Saluer = {
         text: "Приве́т! Я Макси́м. А как тебя́ зову́т?",
         transliteration: "Privét! Ja Maksím. A kak tebjá zovút?",
         translation: { fr: "Salut ! Moi, c’est Maxime. Et toi, comment tu t’appelles ?", en: "Hi! I'm Maxim. And what's your name?" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-01-saluer/c1.mp3",
         itemId: null,
       },
       {
@@ -654,7 +654,7 @@ export const ruA101Saluer = {
         text: "Меня́ зову́т Ле́о. О́чень прия́тно!",
         transliteration: "Menjá zovút Léo. Óčenʹ prijátno!",
         translation: { fr: "Je m’appelle Léo. Enchanté !", en: "My name is Leo. Nice to meet you!" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-01-saluer/c2.mp3",
         itemId: "i20",
       },
       {
@@ -663,7 +663,7 @@ export const ruA101Saluer = {
         text: "Мне то́же! Ты отку́да?",
         transliteration: "Mne tóže! Ty otkúda?",
         translation: { fr: "Moi aussi ! Tu viens d’où ?", en: "Same here! Where are you from?" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-01-saluer/c3.mp3",
         itemId: null,
       },
       {
@@ -672,7 +672,7 @@ export const ruA101Saluer = {
         text: "Я из Пари́жа.",
         transliteration: "Ja iz Paríža.",
         translation: { fr: "Je suis de Paris.", en: "I'm from Paris." },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-01-saluer/c4.mp3",
         itemId: "i21",
       },
       {
@@ -681,7 +681,7 @@ export const ruA101Saluer = {
         text: "Здо́рово! А я из Москвы́.",
         transliteration: "Zdórovo! A ja iz Moskvý.",
         translation: { fr: "Super ! Et moi, je suis de Moscou.", en: "Great! And I'm from Moscow." },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-01-saluer/c5.mp3",
         itemId: null,
       },
       {
@@ -690,7 +690,7 @@ export const ruA101Saluer = {
         text: "Ну, мне пора́. Пока́!",
         transliteration: "Nu, mne porá. Poká!",
         translation: { fr: "Bon, je dois y aller. Salut !", en: "Well, I have to go. Bye!" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-01-saluer/c6.mp3",
         itemId: "i22",
       },
       {
@@ -699,7 +699,7 @@ export const ruA101Saluer = {
         text: "Пока́, Ле́о! До встре́чи!",
         transliteration: "Poká, Léo! Do vstréči!",
         translation: { fr: "Salut, Léo ! À la prochaine !", en: "Bye, Leo! See you!" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-01-saluer/c7.mp3",
         itemId: null,
       },
     ],

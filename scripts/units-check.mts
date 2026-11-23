@@ -8,7 +8,8 @@ import { GRAMMAR_POINT_IDS, UNITS, checkUnit, grammarIdsFor, isPublished } from 
 import { itCurriculum } from "../src/lib/grammar/curricula/it";
 import { ruCurriculum } from "../src/lib/grammar/curricula/ru";
 
-const AUDIO_DIR = fileURLToPath(new URL("../apps/web/public/unit-audio/", import.meta.url));
+// Audio paths are public URLs ("/unit-audio/…"): they resolve against the public folder of the web app.
+const PUBLIC_DIR = fileURLToPath(new URL("../apps/web/public", import.meta.url));
 let failed = false;
 
 // The copied list of A1 grammar ids must match the legacy curricula.
@@ -31,7 +32,7 @@ if (units.length === 0) {
 for (const unit of units) {
   const violations = checkUnit(unit, {
     grammarIds: grammarIdsFor(unit.language),
-    audioExists: (path) => existsSync(`${AUDIO_DIR}${path}`),
+    audioExists: (path) => existsSync(`${PUBLIC_DIR}${path}`),
   });
   const newWords = unit.dialogue.glosses.filter((gloss) => gloss.isNew).length;
   const review = unit.aiReview ? `AI review ${unit.aiReview.reviewedOn} (${unit.aiReview.passes} passes), ${unit.status}` : unit.status;
