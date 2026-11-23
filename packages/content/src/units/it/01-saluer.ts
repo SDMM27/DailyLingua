@@ -701,5 +701,5 @@ export const itA101Saluer = {
     ],
   },
   aiReview: { reviewedOn: "2026-11-23", passes: 2, arbiter: "arbitre-relecture" },
-  status: "reviewed",
+  status: "published",
 } satisfies UnitSource;

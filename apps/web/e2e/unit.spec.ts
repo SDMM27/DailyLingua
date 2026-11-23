@@ -2,8 +2,8 @@ import { expect, test } from "@playwright/test";
 import { collectErrors, deleteTestUser, expectNoHorizontalOverflow, requireLocalSupabase, signUpAndInstall, uniqueEmail } from "./helpers";
 
 /**
- * The unit player on an iPhone-sized screen. The unit is a draft/reviewed one: the server has to run with
- * `UNIT_DRAFTS=show` (the guard otherwise answers 404), and with the local Supabase stack.
+ * The unit player on an iPhone-sized screen. The units are published; the server may still run with
+ * `UNIT_DRAFTS=show`, and it needs the local Supabase stack.
  */
 test.beforeAll(() => {
   requireLocalSupabase();

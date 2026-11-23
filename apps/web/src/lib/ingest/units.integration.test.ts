@@ -108,7 +108,7 @@ describe.skipIf(!stackIsUp)("units through the ingestion (local database, servic
   }
 
   beforeAll(async () => {
-    // Both real units are "reviewed", not yet published: the ingestion grades them only with the draft flag.
+    // The flag is set for the test that holds a unit back to "reviewed"; published units need no flag.
     process.env.UNIT_DRAFTS = "show";
     alice = await createUser("alice");
     bob = await createUser("bob");
@@ -189,9 +189,17 @@ describe.skipIf(!stackIsUp)("units through the ingestion (local database, servic
   });
 
   it("refuses a unit that is not published without the draft flag", async () => {
+    // The real unit is published: hold it back to "reviewed" for this test only (the registry entry is shared).
+    const entry = getUnit(UNIT_ID) as { status: string };
+    const status = entry.status;
+    entry.status = "reviewed";
     delete process.env.UNIT_DRAFTS;
-    const attempt = event("unit_item_attempt", 500, { lesson: "l1", itemId: stepItems("l1", "dialogue")[0], try: 1, answer: "x", shownAt: at(499) });
-    expect((await ingest(bob, [attempt])).rejected).toEqual([{ clientEventId: attempt.clientEventId, reason: "unknown_unit" }]);
-    process.env.UNIT_DRAFTS = "show";
+    try {
+      const attempt = event("unit_item_attempt", 500, { lesson: "l1", itemId: stepItems("l1", "dialogue")[0], try: 1, answer: "x", shownAt: at(499) });
+      expect((await ingest(bob, [attempt])).rejected).toEqual([{ clientEventId: attempt.clientEventId, reason: "unknown_unit" }]);
+    } finally {
+      entry.status = status;
+      process.env.UNIT_DRAFTS = "show";
+    }
   });
 });
