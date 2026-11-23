@@ -35,6 +35,8 @@ jobs:
       - run: npm run check
       # Typecheck, lint (import boundaries) and tests of the `packages/*` workspaces.
       - run: npm run refonte:check
+      # Invariants of the beginner-path units (ids, references, vocabulary, grammar points, audio files).
+      - run: npm run units:check
       # Build of apps/web. It reads no Supabase variable at build time (every page is dynamic).
       - run: npm run refonte:build
       # No Supabase variable: the build is the public demo, which is what we want to verify here.
