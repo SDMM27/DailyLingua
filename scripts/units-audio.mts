@@ -6,6 +6,9 @@
  * it writes a mono MP3 to `apps/web/public/unit-audio/<lang>/<unitId>/<id>.mp3` when the file is missing (or always
  * with `--force`), then records the path in the unit's source file where the field is still `audio: null`.
  *
+ * Writing units (`kind: "script"`) have no dialogue: the example word of every letter (`e1`, `e2`…, in the order of the
+ * letters), every word (`w1`…) and every `listen_mcq` item are synthesised with the voice of the unit.
+ *
  * Setup (once): a Python ≥ 3.9 virtual environment with `piper-tts`, and the cleared voices downloaded with
  * `python -m piper.download_voices --download-dir <dir>/voices <voice>…`. The folder is `DL_TTS_DIR`, by default
  * `%LOCALAPPDATA%/dailylingua/tts` (`venv/` and `voices/` inside). ffmpeg must be in the PATH.
@@ -18,7 +21,7 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSyn
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { promisify } from "node:util";
-import { CLEARED_VOICES, type Unit } from "@dailylingua/schemas";
+import { CLEARED_VOICES, isScriptUnit, type Unit } from "@dailylingua/schemas";
 import { UNITS } from "@dailylingua/content";
 
 const run = promisify(execFile);
@@ -48,11 +51,21 @@ interface Clip {
   path: string;
   /** For the whole dialogue: the line clips to join. */
   parts?: Clip[];
+  /** Letter of a writing unit whose example this is: where `recordPath` looks for the `audio: null` to fill. */
+  letter?: string;
 }
 
 const speak = (text: string) => text.normalize("NFD").replace(/́/g, "").normalize("NFC");
 
 function clipsOf(unit: Unit): Clip[] {
+  if (isScriptUnit(unit)) {
+    const pathOf = (id: string) => `/unit-audio/${unit.language}/${unit.id}/${id}.mp3`;
+    return [
+      ...unit.letters.map((letter, index) => ({ id: `e${index + 1}`, letter: letter.lower, text: letter.example.word, voice: unit.voice, path: letter.example.audio ?? pathOf(`e${index + 1}`) })),
+      ...unit.words.map((word) => ({ id: word.id, text: word.text, voice: unit.voice, path: word.audio ?? pathOf(word.id) })),
+      ...unit.items.flatMap((item) => (item.kind === "listen_mcq" ? [{ id: item.id, text: item.audioText, voice: unit.voice, path: item.audio }] : [])),
+    ];
+  }
   const voiceOf = new Map(unit.dialogue.speakers.map((speaker) => [speaker.id, speaker.voice]));
   const firstVoice = unit.dialogue.speakers[0]?.voice as string;
   const pathOf = (id: string) => `/unit-audio/${unit.language}/${unit.id}/${id}.mp3`;
@@ -92,6 +105,18 @@ function recordPath(source: string, clip: Clip): { source: string; changed: bool
     // The dialogue's own field: the only `audio:` at four spaces of indentation.
     const next = source.replace(/^ {4}audio: null,$/m, `    audio: "${clip.path}",`);
     return { source: next, changed: next !== source };
+  }
+  if (clip.letter !== undefined) {
+    // The example of a letter: the first `audio: null` after `lower: "<letter>"`, before the next letter or the words.
+    const at = source.indexOf(`lower: "${clip.letter}"`);
+    if (at < 0) return { source, changed: false };
+    const after = source.slice(at + 1);
+    const stop = after.search(/upper: "|(?<![A-Za-z])words: \[/);
+    const scope = stop < 0 ? after : after.slice(0, stop);
+    const found = scope.indexOf("audio: null");
+    if (found < 0) return { source, changed: false };
+    const index = at + 1 + found;
+    return { source: `${source.slice(0, index)}audio: "${clip.path}"${source.slice(index + "audio: null".length)}`, changed: true };
   }
   const start = source.search(new RegExp(`(?<![A-Za-z])id: "${clip.id}"`));
   if (start < 0) return { source, changed: false };
@@ -140,7 +165,8 @@ for (const unit of units) {
   // The licence of every voice used ships next to the audio (Piper asks for it).
   const voicesDir = join(PUBLIC, "unit-audio/voices");
   mkdirSync(voicesDir, { recursive: true });
-  for (const voice of new Set(unit.dialogue.speakers.map((speaker) => speaker.voice))) {
+  const voices = isScriptUnit(unit) ? [unit.voice] : unit.dialogue.speakers.map((speaker) => speaker.voice);
+  for (const voice of new Set(voices)) {
     const card = join(TTS, "voices", `${voice}.MODEL_CARD`);
     if (!existsSync(card)) fail(`MODEL_CARD missing for ${voice}: download it next to the voice (${card})`);
     copyFileSync(card, join(voicesDir, `${voice}.MODEL_CARD.txt`));

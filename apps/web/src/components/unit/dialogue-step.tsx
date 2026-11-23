@@ -1,6 +1,6 @@
 "use client";
 
-import type { Unit } from "@dailylingua/schemas";
+import type { SituationUnit } from "@dailylingua/schemas";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { ShellBody, ShellFooter } from "./unit-shell";
 import { TappableText, WordPanel, type PickedWord } from "./tappable-text";
 import { useClip } from "./use-clip";
 
-type Dialogue = Unit["dialogue"];
+type Dialogue = SituationUnit["dialogue"];
 type Line = Dialogue["lines"][number];
 
 const SLOW_RATE = 0.7;

@@ -1,4 +1,4 @@
-import type { UnitSource } from "@dailylingua/schemas";
+import type { SituationUnitSource } from "@dailylingua/schemas";
 
 const l10n = (fr: string, en = fr) => ({ fr, en });
 
@@ -6,7 +6,7 @@ const l10n = (fr: string, en = fr) => ({ fr, en });
 export const FIXTURE_AUDIO = "it/it-a1-01-fixture/i2.mp3";
 
 /** A small valid unit (italian): every invariant of `checkUnit` holds. Tests break one thing at a time. */
-export function fixtureUnit(): UnitSource {
+export function fixtureUnit(): SituationUnitSource {
   const explain = l10n("Explication", "Explanation");
   const line = (n: number, speaker: string, text: string) => ({
     id: `d${n}`,
