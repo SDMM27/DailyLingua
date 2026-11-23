@@ -1,9 +1,11 @@
 import { xpRuleIds } from "@dailylingua/schemas";
 import { describe, expect, it } from "vitest";
 import {
+  COUNT_CAPS,
   DAILY_CAPS,
   RULE_VOLET,
   RULE_XP,
+  SQL_DAILY_XP_BOUND,
   THEORETICAL_DAILY_MAX,
   capCount,
   capFocus,
@@ -27,6 +29,7 @@ import {
   reviewRecognition,
   rewriteSentence,
   sessionComplete,
+  unitComplete,
   type ReviewProof,
 } from "./index";
 
@@ -48,10 +51,18 @@ describe("the scale", () => {
     expect(RULE_VOLET["fluency.pass"]).toBe("fluency");
   });
 
-  it("adds up to the theoretical maximum of 336 XP a day", () => {
-    const { review: r, input, focusPerDay, productions, rewriteXp, errorOfDay, fluencyPasses, sessionComplete: s } = DAILY_CAPS;
-    const total = r + input + focusPerDay + productions * RULE_XP["production.corrected"] + rewriteXp + errorOfDay * RULE_XP["error_of_day.reworked"] + fluencyPasses * RULE_XP["fluency.pass"] + s * RULE_XP["session.complete"];
+  it("adds up to the theoretical maximum of 386 XP a day, under the SQL bound of 400", () => {
+    const { review: r, input, focusPerDay, productions, rewriteXp, errorOfDay, fluencyPasses, sessionComplete: s, unitComplete: u } = DAILY_CAPS;
+    const total = r + input + focusPerDay + productions * RULE_XP["production.corrected"] + rewriteXp + errorOfDay * RULE_XP["error_of_day.reworked"] + fluencyPasses * RULE_XP["fluency.pass"] + s * RULE_XP["session.complete"] + u * RULE_XP["unit.complete"];
     expect(total).toBe(THEORETICAL_DAILY_MAX);
+    expect(THEORETICAL_DAILY_MAX).toBeLessThanOrEqual(SQL_DAILY_XP_BOUND);
+  });
+
+  it("pays 25 XP for a unit passed the first time, nothing again, and no strand", () => {
+    expect(unitComplete({ passed: true, alreadyPassed: false })).toMatchObject({ rule: "unit.complete", amount: 25, volet: null, zero: null });
+    expect(unitComplete({ passed: true, alreadyPassed: true })).toMatchObject({ amount: 0, zero: "already_earned" });
+    expect(unitComplete({ passed: false, alreadyPassed: false })).toMatchObject({ amount: 0, zero: null });
+    expect(COUNT_CAPS["unit.complete"]).toBe(2);
   });
 });
 

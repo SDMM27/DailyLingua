@@ -11,6 +11,8 @@ import {
   type StateProduction,
   type StateSession,
   type StateText,
+  type StateUnitAttempt,
+  type StateUnitProgress,
 } from "@dailylingua/core";
 import type { CardRow, IngestRows, ItemRow, SessionRow, SkillEstimateRow } from "@dailylingua/data";
 import {
@@ -26,7 +28,10 @@ import {
   type IngestMemo,
   type ReviewMode,
   type StoredSessionPlan,
+  type Unit,
+  unitLessonIdSchema,
 } from "@dailylingua/schemas";
+import { getUnit } from "@dailylingua/content";
 import { z } from "zod";
 import { cardAcceptList, cardKeyForMode, expectedCardMode } from "./card-keys";
 import { ringTierOfMinutes } from "./format";
@@ -206,12 +211,44 @@ function stateCard(row: CardRow, timeZone: string, served: { mode: ReviewMode | 
   };
 }
 
+/** The explanation language of unit cards: the native language when it is fr or en, else en. */
+export function explanationLanguageOf(nativeLanguage: string | undefined): "fr" | "en" {
+  return nativeLanguage === "fr" ? "fr" : "en";
+}
+
+/**
+ * The unit part of the state: the current content of the units the events name (from `@dailylingua/content`, every
+ * status: `planIngest` refuses the unpublished ones unless drafts are allowed), their stored progress and the attempts
+ * on their items. A unit the registry does not know is left out (`unknown_unit`).
+ */
+function unitState(unitIds: readonly string[], rows: IngestRows): Pick<IngestState, "units" | "unitProgress" | "unitAttempts" | "unitTestIds"> {
+  const units: Record<string, Unit> = {};
+  for (const id of unitIds) {
+    const unit = getUnit(id);
+    if (unit) units[id] = unit;
+  }
+  const unitProgress: Record<string, StateUnitProgress> = {};
+  for (const row of rows.unitProgress ?? []) {
+    if (!units[row.unitId]) continue;
+    unitProgress[row.unitId] = { version: row.version, steps: { ...row.steps }, bestScore: row.bestScore, testAttempts: row.testAttempts, passedAt: row.passedAt, passedVersion: row.passedVersion };
+  }
+  const unitAttempts: Record<string, StateUnitAttempt[]> = {};
+  for (const row of rows.unitAttempts ?? []) {
+    const lesson = unitLessonIdSchema.safeParse(row.lesson);
+    if (!units[row.unitId] || !lesson.success) continue;
+    (unitAttempts[row.unitId] ??= []).push({ lesson: lesson.data, itemId: row.itemId, try: row.try, correct: row.correct, occurredAt: row.occurredAt, version: row.unitVersion });
+  }
+  return { units, unitProgress, unitAttempts, unitTestIds: [...(rows.unitTestIds ?? [])] };
+}
+
 export function buildIngestState(input: {
   userId: string;
   rows: IngestRows;
   memo: IngestMemo | null;
   serverDay?: DateKey;
   feedbackTarget?: { productionId: string; deferred?: boolean };
+  /** Units the events name (`extractRefs`): only these are injected. */
+  unitIds?: readonly string[];
 }): BuiltIngestState {
   const { userId, rows, memo, serverDay, feedbackTarget } = input;
   const timeZone = rows.profile.timeZone;
@@ -342,6 +379,7 @@ export function buildIngestState(input: {
       writingLevels: writingLevels(rows.skillEstimates),
       answerTolerance: answerTolerance(rows.profile.gameSettings),
       defaultRingTier: ringTierOfMinutes(firstEnrollment?.dailyMinutes),
+      explanationLanguage: explanationLanguageOf(rows.profile.nativeLanguage),
     },
     sessions,
     items,
@@ -361,6 +399,7 @@ export function buildIngestState(input: {
     cardFronts: rows.cardFronts,
     rewriteChecks: {},
     recentProductionTexts: rows.recentProductionTexts,
+    ...unitState(input.unitIds ?? [], rows),
   };
   return { state, cardModes, skippedSessions };
 }

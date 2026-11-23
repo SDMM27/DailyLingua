@@ -1,7 +1,7 @@
 import { textDirection } from "@dailylingua/core";
 import { themeScript } from "@sdmm/design/js";
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono, Newsreader } from "next/font/google";
+import { Inter, JetBrains_Mono, Literata, Newsreader } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { ServiceWorker } from "@/components/pwa/service-worker";
@@ -9,6 +9,8 @@ import { THEME_COLOR_DARK, THEME_COLOR_LIGHT } from "@/lib/pwa";
 import "./globals.css";
 
 const newsreader = Newsreader({ variable: "--font-newsreader", subsets: ["latin"] });
+// Cyrillic serif for Russian and Ukrainian target text (Newsreader has no Cyrillic); the browser fetches the file only when such text is shown.
+const literata = Literata({ variable: "--font-literata", subsets: ["cyrillic"], preload: false });
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 const jetbrainsMono = JetBrains_Mono({ variable: "--font-jetbrains-mono", subsets: ["latin"] });
 
@@ -40,7 +42,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       lang={locale}
       dir={textDirection(locale)}
       suppressHydrationWarning
-      className={`${newsreader.variable} ${inter.variable} ${jetbrainsMono.variable} antialiased`}
+      className={`${newsreader.variable} ${literata.variable} ${inter.variable} ${jetbrainsMono.variable} antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />

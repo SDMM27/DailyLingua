@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { isoInstantSchema } from "../common";
+import { unitIdSchema, unitLessonIdSchema, unitStepSchema, unitVersionSchema } from "../unit";
 
 /** Limits of a delivery (`j2-architecture.md` §2). */
 export const MAX_EVENTS_PER_BATCH = 50;
@@ -156,6 +157,38 @@ export const uiEventPayloadSchema = z.strictObject({
   value: jsonValueSchema.refine((value) => JSON.stringify(value ?? null).length <= MAX_UI_VALUE_BYTES, "value is over 2 KB"),
 });
 
+/** Id of an item inside a unit (`unit.ts`: at most 40 characters). */
+const unitItemIdSchema = z.string().min(1).max(40);
+/** The unit and the version of its content the client graded against (`j4-pr1-architecture.md` §3). */
+const unitFields = { unitId: unitIdSchema, unitVersion: unitVersionSchema };
+
+export const unitItemAttemptPayloadSchema = z.strictObject({
+  ...deviceFields,
+  ...unitFields,
+  lesson: unitLessonIdSchema,
+  itemId: unitItemIdSchema,
+  try: z.number().int().min(1).max(3),
+  answer: answerSchema,
+  shownAt: isoInstantSchema,
+});
+
+export const unitStepCompletedPayloadSchema = z.strictObject({
+  ...deviceFields,
+  ...unitFields,
+  lesson: unitLessonIdSchema,
+  step: unitStepSchema,
+});
+
+export const MAX_UNIT_TEST_ANSWERS = 10;
+
+export const unitTestSubmittedPayloadSchema = z.strictObject({
+  ...deviceFields,
+  ...unitFields,
+  attemptId: z.uuid(),
+  startedAt: isoInstantSchema,
+  answers: z.array(z.strictObject({ itemId: unitItemIdSchema, answer: answerSchema })).min(1).max(MAX_UNIT_TEST_ANSWERS),
+});
+
 const ms = (value: string) => Date.parse(value);
 
 function envelope<K extends string, P extends z.ZodType>(kind: K, payload: P) {
@@ -192,6 +225,17 @@ export const clientEventSchema = z.discriminatedUnion("kind", [
   }),
   envelope("session_step_completed", sessionStepCompletedPayloadSchema),
   envelope("ui_event", uiEventPayloadSchema),
+  envelope("unit_item_attempt", unitItemAttemptPayloadSchema).superRefine((event, ctx) => {
+    if (!(ms(event.payload.shownAt) <= ms(event.occurredAt))) {
+      ctx.addIssue({ code: "custom", message: "Expected shownAt <= occurredAt", path: ["payload", "shownAt"] });
+    }
+  }),
+  envelope("unit_step_completed", unitStepCompletedPayloadSchema),
+  envelope("unit_test_submitted", unitTestSubmittedPayloadSchema).superRefine((event, ctx) => {
+    if (!(ms(event.payload.startedAt) < ms(event.occurredAt))) {
+      ctx.addIssue({ code: "custom", message: "Expected startedAt < occurredAt", path: ["payload", "startedAt"] });
+    }
+  }),
 ]);
 export type ClientEvent = z.infer<typeof clientEventSchema>;
 export type ClientEventKind = ClientEvent["kind"];

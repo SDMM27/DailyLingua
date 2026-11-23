@@ -1,4 +1,4 @@
-import { NetworkOnly, Serwist, type PrecacheEntry, type SerwistGlobalConfig } from "serwist";
+import { CacheableResponsePlugin, CacheFirst, NetworkOnly, RangeRequestsPlugin, Serwist, type PrecacheEntry, type SerwistGlobalConfig } from "serwist";
 import { parsePushPayload } from "./push-payload";
 
 /**
@@ -9,6 +9,9 @@ import { parsePushPayload } from "./push-payload";
  * precache). Pages, Server Component payloads and API answers go to the network and are never
  * stored, so no authenticated response and no user data ever lands in a cache. When a page cannot be
  * fetched, the offline page is served in its place.
+ *
+ * One exception: the audio of the units (`/unit-audio/`) is the same for every visitor (public files of the repository), so
+ * it is cached after the first play and served offline (with range requests, which Safari needs for audio).
  */
 
 declare global {
@@ -26,6 +29,13 @@ const serwist = new Serwist({
   skipWaiting: true,
   clientsClaim: true,
   runtimeCaching: [
+    {
+      matcher: ({ url }) => url.pathname.startsWith("/unit-audio/"),
+      handler: new CacheFirst({
+        cacheName: "unit-audio",
+        plugins: [new CacheableResponsePlugin({ statuses: [200] }), new RangeRequestsPlugin()],
+      }),
+    },
     // Network only: a failure is answered by the offline fallback below, not by a stale page.
     { matcher: ({ request }) => request.mode === "navigate", handler: new NetworkOnly() },
   ],

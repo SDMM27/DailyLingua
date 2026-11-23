@@ -81,6 +81,14 @@ const asReason = (reason: string): RejectionReason => (reasons.has(reason) ? (re
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null && !Array.isArray(value);
 const eventIdSchema = z.uuid();
 
+/**
+ * Units that are not published are graded only with `UNIT_DRAFTS=show` (local work, previews), and never on the
+ * production deployment of Vercel whatever the variable says. Read at call time.
+ */
+export function unitDraftsAllowed(env: Record<string, string | undefined> = process.env): boolean {
+  return env.UNIT_DRAFTS === "show" && env.VERCEL_ENV !== "production";
+}
+
 /** Days of sessions of the user read around the server day (`ingest-rows`: server day - 8 to + 1). */
 const windowOf = (now: Date) => (timeZone: string): DayWindow => {
   const today = learningDay(now, timeZone);
@@ -143,7 +151,7 @@ async function processOnce(store: IngestStore, userId: string, events: readonly 
   const rows = await store.readRows(userId, refs, windowOf(now), now);
   const previousMemo = memoOf(rows.ingestState.memo, log, userId);
   const serverDay = learningDay(now, rows.profile.timeZone);
-  const { state, cardModes, skippedSessions } = buildIngestState({ userId, rows, memo: previousMemo, serverDay, feedbackTarget });
+  const { state, cardModes, skippedSessions } = buildIngestState({ userId, rows, memo: previousMemo, serverDay, feedbackTarget, unitIds: refs.unitIds });
   if (refs.correctionIds?.length && store.readVerifiedSentences) {
     state.verifiedSentences = await store.readVerifiedSentences(userId, refs.correctionIds);
   }
@@ -151,11 +159,12 @@ async function processOnce(store: IngestStore, userId: string, events: readonly 
 
   const { kept, rejected: refusedModes } = filterReviewModes(events, cardModes, state.knownEvents);
   const { kept: capped, rejected: tooMany } = capProductions(kept, state, rows.recentProductionCount);
-  let plan = planIngest(state, capped as RawEvent[], now);
+  const options = { allowDrafts: unitDraftsAllowed() };
+  let plan = planIngest(state, capped as RawEvent[], now, options);
   if (store.checkRewrites && plan.payload.rewrites.length > 0) {
     const rewriteChecks = await store.checkRewrites({ state: plan.nextState, rows: plan.payload.rewrites, now });
     if (Object.values(rewriteChecks).some((check) => check.fixedErrorIds.length > 0)) {
-      plan = planIngest({ ...state, rewriteChecks }, capped as RawEvent[], now);
+      plan = planIngest({ ...state, rewriteChecks }, capped as RawEvent[], now, options);
     }
   }
 

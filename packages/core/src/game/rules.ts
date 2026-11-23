@@ -1,7 +1,7 @@
 import type { ReviewMode, XpRuleId, XpVolet, XpZeroReason } from "@dailylingua/schemas";
 
 /**
- * The `j2.1` XP scale (`j2-jeu-xp-serie.md` §1). One function per rule: each takes the proof that
+ * The XP scale (`j2.1`, plus `unit.complete` in `j4.1`; `j2-jeu-xp-serie.md` §1, `j4-pr1-architecture.md` §4) (`j2-jeu-xp-serie.md` §1). One function per rule: each takes the proof that
  * `planIngest` assembled and says what the rule is worth BEFORE the caps (`caps.ts`) and the yields.
  * No rule reads a clock or a store; nothing here comes from the client except the raw proof facts.
  */
@@ -31,6 +31,7 @@ export const RULE_VOLET: Record<XpRuleId, XpVolet | null> = {
   "error_of_day.reworked": "study",
   "fluency.pass": "fluency",
   "session.complete": null,
+  "unit.complete": null,
 };
 
 /** XP of each rule before the caps. */
@@ -50,6 +51,7 @@ export const RULE_XP = {
   "error_of_day.reworked": 3,
   "fluency.pass": 5,
   "session.complete": 10,
+  "unit.complete": 25,
 } as const satisfies Record<XpRuleId, number>;
 
 const outcome = (rule: XpRuleId, amount: number, zero: XpZeroReason | null = null): RuleOutcome => ({
@@ -272,4 +274,13 @@ export function fluencyPass(proof: FluencyProof): RuleOutcome {
 /** `session.complete` (10 XP): once a day, for a `daily` session whose steps are all validated. */
 export function sessionComplete(proof: { kind: "daily" | "catch_up" | "review_only"; allStepsValidated: boolean }): RuleOutcome {
   return outcome("session.complete", proof.kind === "daily" && proof.allStepsValidated ? RULE_XP["session.complete"] : 0);
+}
+
+/**
+ * `unit.complete` (25 XP): the test of a unit passed (8/10 or more) for the first time by this account. A unit already
+ * passed is worth nothing (`already_earned`); the steps need not have been done ("I already know this").
+ */
+export function unitComplete(proof: { passed: boolean; alreadyPassed: boolean }): RuleOutcome {
+  if (!proof.passed) return outcome("unit.complete", 0);
+  return proof.alreadyPassed ? outcome("unit.complete", 0, "already_earned") : outcome("unit.complete", RULE_XP["unit.complete"]);
 }

@@ -16,13 +16,15 @@ import { SessionPanel } from "./session-panel";
 import { SessionPrefetch } from "./session-prefetch";
 import { WritingFeedback } from "./writing-feedback";
 
-export function TodaySession({ language, timeZone, languageName, children, goal, detail, accentTolerance, animateSummary, prepareText }: {
+export function TodaySession({ language, timeZone, languageName, children, goal, detail, unitCard, accentTolerance, animateSummary, prepareText }: {
   language: string;
   timeZone: string;
   languageName: string;
   children: ReactNode;
   goal: ReactNode;
   detail: ReactNode;
+  /** The way into the beginner path, shown under the session of the day. */
+  unitCard?: ReactNode;
   accentTolerance: "strict" | "lenient";
   animateSummary: boolean;
   prepareText: boolean;
@@ -150,6 +152,7 @@ export function TodaySession({ language, timeZone, languageName, children, goal,
             ) : <p className="text-muted" role="status">{common("loading")}</p>}
             {saveError && <FormMessage kind="error">{t("saveError")}</FormMessage>}
           </article>
+          {unitCard}
           <div className="mt-5 empty:hidden">{sync && <WritingFeedback sync={sync} />}</div>
           {detail}
         </>

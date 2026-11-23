@@ -1,0 +1,8 @@
+Audio of the beginner units: synthesised with Piper (https://github.com/OHF-Voice/piper1-gpl).
+
+Voices (model cards next to this file):
+- ru_RU-denis-medium: dataset CC0 (https://github.com/OHF-Voice/voice-datasets); base model rdh, CC0.
+- ru_RU-dmitri-medium and it_IT-paola-medium: dataset CC0 (https://github.com/OHF-Voice/voice-datasets);
+  fine-tuned from the hifi_tts_92 base model, trained on the Hi-Fi TTS corpus
+  (E. Bakhturina, V. Lavrukhin, B. Ginsburg, Y. Zhang, "Hi-Fi Multi-Speaker English TTS Dataset", 2021,
+  https://www.openslr.org/109/), licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/).

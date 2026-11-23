@@ -11,7 +11,7 @@ import { describe, expect, it } from "vitest";
 const PACKAGES_DIR = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const THIS_FILE = fileURLToPath(import.meta.url);
 
-const PACKAGES = ["schemas", "core", "i18n", "data", "ai"] as const;
+const PACKAGES = ["schemas", "core", "i18n", "data", "ai", "content"] as const;
 type PackageName = (typeof PACKAGES)[number];
 
 /** Packages a domain package must never depend on, by name (exact or as a `name/…` subpath). */
@@ -27,17 +27,19 @@ const ALLOWED_SCOPES: Record<PackageName, string[]> = {
   i18n: [],
   data: ["@supabase/"],
   ai: ["@anthropic-ai/"],
+  content: [],
 };
 /**
  * Extra rules: `schemas` is the bottom layer and must not import `core`; `i18n`, `data` and `ai` stand
  * alone (`data` may import the types of `ai`, to implement its store; `ai` never imports `data`).
  */
 const FORBIDDEN_BY_PACKAGE: Record<PackageName, string[]> = {
-  schemas: ["@dailylingua/core", "@dailylingua/ai"],
-  core: ["@dailylingua/ai"],
-  i18n: ["@dailylingua/core", "@dailylingua/schemas", "@dailylingua/data", "@dailylingua/ai"],
-  data: ["@dailylingua/core", "@dailylingua/i18n"],
-  ai: ["@dailylingua/core", "@dailylingua/i18n", "@dailylingua/data"],
+  schemas: ["@dailylingua/core", "@dailylingua/ai", "@dailylingua/content"],
+  core: ["@dailylingua/ai", "@dailylingua/content"],
+  i18n: ["@dailylingua/core", "@dailylingua/schemas", "@dailylingua/data", "@dailylingua/ai", "@dailylingua/content"],
+  data: ["@dailylingua/core", "@dailylingua/i18n", "@dailylingua/content"],
+  ai: ["@dailylingua/core", "@dailylingua/i18n", "@dailylingua/data", "@dailylingua/content"],
+  content: ["@dailylingua/i18n", "@dailylingua/data", "@dailylingua/ai"],
 };
 
 /** Module specifiers imported by `source`: static, side-effect, re-export, dynamic and `require`. */
@@ -149,6 +151,17 @@ describe("scanner", () => {
     expect(ENV_READ.test("const a = process.env.X;")).toBe(true);
     expect(ENV_READ.test("process.loadEnvFile('.env')")).toBe(true);
     expect(ENV_READ.test("const processor = 1;")).toBe(false);
+  });
+
+  it("keeps core and schemas from importing content, and content from the app-side packages", () => {
+    expect(violation("@dailylingua/content", join(PACKAGES_DIR, "core", "src", "x.ts"), "core")).not.toBeNull();
+    expect(violation("@dailylingua/content", join(PACKAGES_DIR, "schemas", "src", "x.ts"), "schemas")).not.toBeNull();
+    const content = join(PACKAGES_DIR, "content", "src", "x.ts");
+    expect(violation("@dailylingua/core", content, "content")).toBeNull();
+    expect(violation("@dailylingua/schemas", content, "content")).toBeNull();
+    for (const bad of ["@dailylingua/data", "@dailylingua/ai", "@dailylingua/i18n", "react", "next/server", "@supabase/supabase-js"]) {
+      expect(violation(bad, content, "content"), bad).not.toBeNull();
+    }
   });
 
   it("forbids schemas from importing core", () => {

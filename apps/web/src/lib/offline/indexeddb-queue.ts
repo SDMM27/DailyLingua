@@ -1,6 +1,7 @@
 import type { EventQueue, PendingEvent, RejectedEvent } from "@dailylingua/core";
 import { clientEventSchema, type ClientEvent } from "@dailylingua/schemas";
 import type { SessionEvent } from "@/lib/session-packet/session-flow";
+import type { UnitEvent } from "@/lib/units/events";
 import type { LocalWritingFeedback } from "./feedback";
 
 const STORE = "events";
@@ -29,6 +30,8 @@ interface IndexedDbEventQueue extends EventQueue {
   productionDelivery(clientEventId: string): Promise<"queued" | "rejected" | "delivered">;
   enqueueRewrite(productionId: string, sentenceIndex: number, text: string): Promise<void>;
   advanceSession(sessionId: string, expectedRevision: number, next: LocalSessionProgress, events: SessionEvent[], occurredAt: string): Promise<boolean>;
+  /** Queues events that belong to no session (the units), with the device fields. */
+  enqueueDeviceEvents(events: UnitEvent[], occurredAt: string): Promise<void>;
 }
 
 interface EventDevice {
@@ -37,7 +40,7 @@ interface EventDevice {
 }
 
 /** A single installation counter is used for both exercises and rewrites, including across tabs. */
-async function makeEvents(progress: IDBObjectStore, events: SessionEvent[], occurredAt: string): Promise<ClientEvent[]> {
+async function makeEvents(progress: IDBObjectStore, events: (SessionEvent | UnitEvent)[], occurredAt: string): Promise<ClientEvent[]> {
   const device = (await request<EventDevice | undefined>(progress.get("device"))) ?? { id: crypto.randomUUID(), sequence: 0 };
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const pending = events.map((event) => clientEventSchema.parse({
@@ -166,6 +169,21 @@ export function createIndexedDbEventQueue(databaseName = "dailylingua-offline"):
         if (!event) throw new Error("Rewrite could not be created");
         queue.add(event);
         feedback.put({ ...task, attempts: { ...task.attempts, [sentenceIndex]: event.clientEventId } });
+        await completed;
+      } catch (error) {
+        try { tx.abort(); } catch { /* It may already have aborted. */ }
+        await completed.catch(() => undefined);
+        throw error;
+      }
+    },
+    async enqueueDeviceEvents(events, occurredAt) {
+      if (events.length === 0) return;
+      const tx = (await open()).transaction([SESSION_PROGRESS, STORE], "readwrite");
+      const completed = transactionDone(tx);
+      try {
+        const pending = await makeEvents(tx.objectStore(SESSION_PROGRESS), events, occurredAt);
+        const queue = tx.objectStore(STORE);
+        for (const event of pending) queue.add(event);
         await completed;
       } catch (error) {
         try { tx.abort(); } catch { /* It may already have aborted. */ }

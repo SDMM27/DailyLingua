@@ -11,6 +11,104 @@
   --sd-font-display: var(--font-newsreader), "Newsreader", ui-serif, Georgia, serif;
   --sd-font-sans: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
   --sd-font-mono: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, monospace;
+  /* Role tokens of the unit screens (j4-ecrans.md section 1): not in the installed design system yet. */
+  --sd-success: #2f6b4f;
+  --sd-success-soft: #e0eee5;
+  --sd-error: #a33a32;
+  --sd-xp: #8a5a00;
+  --sd-xp-soft: #f6ead0;
+  --sd-border-strong: #8b8478;
+  --sd-accent-soft: #e5e9f4;
+  --sd-scrim: rgb(15 14 12 / 0.42);
+  --sd-word-new: #fbe6a0;
+  --sd-word-new-line: #8a5a00;
+  --sd-radius-sheet: 20px;
+  /* Colour of each language accent (the registry names the accent, never a colour). */
+  --lang-indigo: #33478c; --lang-indigo-soft: #e5e9f4;
+  --lang-terracotta: #b0502b; --lang-terracotta-soft: #f6e6dc;
+  --lang-olive: #5b6b2c; --lang-olive-soft: #e9ecd9;
+  --lang-plum: #7a3b69; --lang-plum-soft: #f1e3ec;
+  --lang-teal: #1f6a6a; --lang-teal-soft: #dcecea;
+  --lang-ochre: #8a5e0f; --lang-ochre-soft: #f4e9d2;
+  --lang-berry: #a8364f; --lang-berry-soft: #f5e0e4;
+  --lang-azure: #24609a; --lang-azure-soft: #dde9f4;
+  --lang-fern: #3d6b3a; --lang-fern-soft: #e1ecdc;
+  --lang-graphite: #4a5563; --lang-graphite-soft: #e4e7eb;
+  --on-lang: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --sd-success: #7fc29d;
+    --sd-success-soft: #1b3326;
+    --sd-error: #ec8f86;
+    --sd-xp: #e8b85a;
+    --sd-xp-soft: #33280f;
+    --sd-border-strong: #6f685e;
+    --sd-accent-soft: #222a42;
+    --sd-scrim: rgb(0 0 0 / 0.62);
+    --sd-word-new: #4b3c13;
+    --sd-word-new-line: #e8b85a;
+    --lang-indigo: #9eb0ea; --lang-indigo-soft: #222a42;
+    --lang-terracotta: #e99c78; --lang-terracotta-soft: #3b261c;
+    --lang-olive: #b9c97f; --lang-olive-soft: #2a2f1a;
+    --lang-plum: #dc9ccb; --lang-plum-soft: #35202f;
+    --lang-teal: #84cdc8; --lang-teal-soft: #17302f;
+    --lang-ochre: #e4bb6a; --lang-ochre-soft: #352a14;
+    --lang-berry: #ee98a8; --lang-berry-soft: #3b1d24;
+    --lang-azure: #8fbfe9; --lang-azure-soft: #182a3b;
+    --lang-fern: #9fcf98; --lang-fern-soft: #1c2e1b;
+    --lang-graphite: #b4bfcc; --lang-graphite-soft: #252a31;
+    --on-lang: #0f0e0c;
+  }
+}
+
+:root[data-theme="dark"] {
+  --sd-success: #7fc29d;
+  --sd-success-soft: #1b3326;
+  --sd-error: #ec8f86;
+  --sd-xp: #e8b85a;
+  --sd-xp-soft: #33280f;
+  --sd-border-strong: #6f685e;
+  --sd-accent-soft: #222a42;
+  --sd-scrim: rgb(0 0 0 / 0.62);
+  --sd-word-new: #4b3c13;
+  --sd-word-new-line: #e8b85a;
+  --lang-indigo: #9eb0ea; --lang-indigo-soft: #222a42;
+  --lang-terracotta: #e99c78; --lang-terracotta-soft: #3b261c;
+  --lang-olive: #b9c97f; --lang-olive-soft: #2a2f1a;
+  --lang-plum: #dc9ccb; --lang-plum-soft: #35202f;
+  --lang-teal: #84cdc8; --lang-teal-soft: #17302f;
+  --lang-ochre: #e4bb6a; --lang-ochre-soft: #352a14;
+  --lang-berry: #ee98a8; --lang-berry-soft: #3b1d24;
+  --lang-azure: #8fbfe9; --lang-azure-soft: #182a3b;
+  --lang-fern: #9fcf98; --lang-fern-soft: #1c2e1b;
+  --lang-graphite: #b4bfcc; --lang-graphite-soft: #252a31;
+  --on-lang: #0f0e0c;
+}
+
+/* Role colours as utilities: bg-success, text-error, border-border-strong, text-lang… */
+@theme inline {
+  --color-success: var(--sd-success);
+  --color-success-soft: var(--sd-success-soft);
+  --color-error: var(--sd-error);
+  --color-xp: var(--sd-xp);
+  --color-xp-soft: var(--sd-xp-soft);
+  --color-border-strong: var(--sd-border-strong);
+  --color-accent-soft: var(--sd-accent-soft);
+  --color-scrim: var(--sd-scrim);
+  --color-word-new: var(--sd-word-new);
+  --color-word-new-line: var(--sd-word-new-line);
+  --color-lang: var(--lang);
+  --color-lang-soft: var(--lang-soft);
+  --color-on-lang: var(--on-lang);
+  --radius-sheet: var(--sd-radius-sheet);
+}
+
+/* Cyrillic serif: Newsreader has none, Literata takes over for target text in Russian and Ukrainian. */
+:lang(ru),
+:lang(uk) {
+  --sd-font-display: var(--font-literata), var(--font-newsreader), Georgia, serif;
 }
 
 @layer base {
@@ -27,7 +125,8 @@
     overscroll-behavior-block: none;
   }
 
-  main:has([data-daily-session]) + nav {
+  main:has([data-daily-session]) + nav,
+  main:has([data-unit]) + nav {
     display: none;
   }
 
@@ -58,4 +157,14 @@
 @keyframes session-summary-enter {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sheet-in {
+  from { transform: translateY(24px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes sheet-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

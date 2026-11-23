@@ -10,3 +10,4 @@ export * from "./memory/queue";
 export * from "./offline";
 export * from "./reader/coverage";
 export * from "./session";
+export * from "./units";

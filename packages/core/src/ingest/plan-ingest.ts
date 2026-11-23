@@ -3,8 +3,12 @@ import {
   clientEventSchema,
   emptyIngestPayload,
   type ClientEvent,
+  type CardKind,
+  type CardSource,
   type DateKey,
   type IngestPayload,
+  type Unit,
+  type UnitLessonId,
   type XpRuleId,
 } from "@dailylingua/schemas";
 import { addDays, learningDay, localTime } from "../dates";
@@ -45,6 +49,7 @@ import {
   rewriteSentence,
   sessionComplete,
   timeZoneAt,
+  unitComplete,
   wakeValidated,
   weekProgress,
   workshopValidated,
@@ -56,8 +61,9 @@ import { schedule, type MemoryState } from "../memory/fsrs";
 import type { RejectedDelivery } from "../offline/types";
 import { isErrorWorkable } from "../session/adapt";
 import { PLAN_STEPS, WAKE_LIMITS, type PlanStep } from "../session/plan";
+import { gradeUnitItem, gradeUnitTest, stepValidated } from "../units";
 import { deterministicUuid, fingerprint } from "./hash";
-import type { IngestReport, IngestState, PlanIngestResult, RawEvent, StateCard, StateDay, StateItem, StateProduction, StateSession } from "./types";
+import type { IngestReport, IngestState, PlanIngestResult, RawEvent, StateCard, StateDay, StateItem, StateProduction, StateSession, StateUnitProgress } from "./types";
 
 const DAY_MS = 86_400_000;
 const MAX_ANSWER_MS = 600_000;
@@ -83,11 +89,37 @@ const byKey = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
  * replay of events already ingested (`state.knownEvents`) writes nothing. Nothing is read from a clock, a store or
  * the network; the answers of the AI (`rewrite_check`) and the corrections come in through the state.
  */
-export function planIngest(state: IngestState, events: readonly RawEvent[], now: Date): PlanIngestResult {
-  return new Ingestion(state, now).run(events);
+export function planIngest(state: IngestState, events: readonly RawEvent[], now: Date, options: PlanIngestOptions = {}): PlanIngestResult {
+  return new Ingestion(state, now, options).run(events);
+}
+
+export interface PlanIngestOptions {
+  /**
+   * Units that are not published (`status` draft or reviewed) are accepted instead of being `unknown_unit`. Only for
+   * local work (`UNIT_DRAFTS=show`), never in production.
+   */
+  allowDrafts?: boolean;
 }
 
 type Parsed = ClientEvent & { fp: string; occurredMs: number };
+type UnitEvent = Extract<Parsed, { kind: "unit_item_attempt" | "unit_step_completed" | "unit_test_submitted" }>;
+
+/** A card to create, whatever made it (a workshop word, a failed error item, a key phrase of a unit). */
+interface NewCard {
+  language: string;
+  kind: CardKind;
+  front: string;
+  back: string | null;
+  backLanguage: string | null;
+  context: string | null;
+  source: CardSource;
+  payload: Record<string, unknown>;
+}
+
+const isUnitEvent = (event: Parsed): event is UnitEvent =>
+  event.kind === "unit_item_attempt" || event.kind === "unit_step_completed" || event.kind === "unit_test_submitted";
+/** The validation of this step turns the key phrases of the unit into cards. */
+const KEY_PHRASES_STEP = "l1:key_phrases";
 
 class Ingestion {
   private readonly s: IngestState;
@@ -107,11 +139,15 @@ class Ingestion {
   private readonly completedDaily = new Map<DateKey, boolean>();
   private readonly newlyCompleted = new Set<string>();
   private readonly cardsCreated = new Set<string>();
+  private readonly touchedUnits = new Set<string>();
+  /** For each test attempt id of the batch, the event that keeps it (the first by instant): the others are duplicates. */
+  private readonly firstTestEvents = new Map<string, string>();
   private lastChangeAt: Date | null;
 
   constructor(
     state: IngestState,
     private readonly now: Date,
+    private readonly options: PlanIngestOptions = {},
   ) {
     this.s = structuredClone(state);
     this.journal = [...this.s.timezoneChanges];
@@ -121,6 +157,9 @@ class Ingestion {
 
   run(raw: readonly RawEvent[]): PlanIngestResult {
     const parsed = this.parseAndDedupe(raw);
+    for (const event of [...parsed].sort(compareEvents)) {
+      if (event.kind === "unit_test_submitted" && !this.firstTestEvents.has(event.payload.attemptId)) this.firstTestEvents.set(event.payload.attemptId, event.clientEventId);
+    }
     const valid = parsed.filter((event) => this.precheck(event));
     this.attributeAll(valid);
     for (const event of [...valid].sort(compareEvents)) {
@@ -128,6 +167,7 @@ class Ingestion {
       this.handle(event);
     }
     this.settleProductions();
+    this.finishUnits();
     this.finishSessions();
     this.finishDays();
     this.finishStreak();
@@ -202,6 +242,10 @@ class Ingestion {
       const correction = this.s.corrections[event.payload.correctionId];
       if (!correction) return this.no(event, "unknown_correction");
       if (event.payload.sentenceIndex >= correction.sentences.length) return this.no(event, "invalid_payload");
+    }
+    if (isUnitEvent(event)) {
+      const refusal = this.unitRefusal(event);
+      if (refusal !== null) return this.no(event, refusal);
     }
     if (servedAt !== null && event.occurredMs < Date.parse(servedAt) - 60_000) return this.no(event, "before_served");
     return true;
@@ -335,6 +379,12 @@ class Ingestion {
   // ----------------------------------------------------------------- events
 
   private handle(event: Parsed): void {
+    // The only refusal that depends on the events before it (the attempts of the batch): decided in instant order.
+    if (event.kind === "unit_step_completed" && !this.unitStepProven(event)) {
+      this.att.delete(event.clientEventId);
+      this.reject(event.clientEventId, "step_not_proven");
+      return;
+    }
     const at = this.att.get(event.clientEventId) as Attributed;
     this.report.accepted++;
     if (at.late) this.report.late++;
@@ -362,6 +412,12 @@ class Ingestion {
       case "ui_event":
         this.out.ui_events.push({ client_event_id: event.clientEventId, name: event.payload.name, value: event.payload.value, occurred_at: event.occurredAt });
         return;
+      case "unit_item_attempt":
+        return this.onUnitItem(event, at);
+      case "unit_step_completed":
+        return this.onUnitStep(event, at);
+      case "unit_test_submitted":
+        return this.onUnitTest(event, at);
     }
   }
 
@@ -616,19 +672,29 @@ class Ingestion {
   /** A workshop word, or an error item that was failed, becomes a card due the next learning day. */
   private createCard(item: StateItem, at: Attributed, eventId: string): void {
     if (!item.card) return;
-    const fingerKey = `${item.language}|${item.card.kind}|${item.card.front.toLowerCase()}`;
-    if (this.s.cardFronts.includes(fingerKey) || this.cardsCreated.has(fingerKey)) return;
+    const fingerKey = cardFingerKey(item.language, item.card.kind, item.card.front);
+    if (this.hasCard(fingerKey)) return;
     if (item.origin === "error_of_day") {
       const d = this.day(at.day);
       if (d.counted.includes("errorCard")) return;
       d.counted.push("errorCard");
     }
+    this.insertCard(fingerKey, { language: item.language, kind: item.card.kind, front: item.card.front, back: item.card.back, backLanguage: item.card.backLanguage, context: item.card.context, source: item.origin === "error_of_day" ? "feedback" : "session", payload: { itemId: item.id, ...(item.textId ? { textId: item.textId } : {}), ...(item.origin === "error_of_day" ? { errorOfDay: true, accept: item.accept } : {}) } }, at, eventId);
+  }
+
+  /** The learner already has a card of this language, kind and front (`cardFronts`), or the batch made one. */
+  private hasCard(fingerKey: string): boolean {
+    return this.s.cardFronts.includes(fingerKey) || this.cardsCreated.has(fingerKey);
+  }
+
+  /** Writes a new card, due at 04:00 the learning day after the action; its id is derived from the learner and the front. */
+  private insertCard(fingerKey: string, card: NewCard, at: Attributed, eventId: string): void {
     this.cardsCreated.add(fingerKey);
     this.s.cardFronts.push(fingerKey);
     const zone = this.zones.get(eventId) ?? this.s.profile.timeZone;
     const id = deterministicUuid(`card:${this.s.userId}:${fingerKey}`);
     const dueAt = localTime(addDays(at.day, 1), "04:00", zone).toISOString();
-    this.out.cards_created.push({ id, language: item.language, kind: item.card.kind, front: item.card.front, back: item.card.back, back_language: item.card.backLanguage, context: item.card.context, source: item.origin === "error_of_day" ? "feedback" : "session", payload: { itemId: item.id, ...(item.textId ? { textId: item.textId } : {}), ...(item.origin === "error_of_day" ? { errorOfDay: true, accept: item.accept } : {}) }, state: "new", due_at: dueAt });
+    this.out.cards_created.push({ id, language: card.language, kind: card.kind, front: card.front, back: card.back, back_language: card.backLanguage, context: card.context, source: card.source, payload: card.payload, state: "new", due_at: dueAt });
   }
 
   private onProduction(event: Extract<Parsed, { kind: "production_submitted" }>, at: Attributed): void {
@@ -730,6 +796,193 @@ class Ingestion {
       text.referenceWpm = wpm;
     }
     this.touchSession(session, "momentum", event, at);
+  }
+
+  // ------------------------------------------------------------------ units
+
+  /** The unit an event names, if the server serves it: present, with the same id, and published unless drafts are allowed. */
+  private unitOf(unitId: string): Unit | undefined {
+    const unit = Object.hasOwn(this.s.units, unitId) ? this.s.units[unitId] : undefined;
+    if (!unit || unit.id !== unitId) return undefined;
+    if (unit.status !== "published" && this.options.allowDrafts !== true) return undefined;
+    return unit;
+  }
+
+  /** Item ids of the steps of a lesson of the unit. */
+  private lessonItemIds(unit: Unit, lesson: UnitLessonId): string[] {
+    return unit.lessons.find((entry) => entry.id === lesson)?.steps.flatMap((step) => step.itemIds) ?? [];
+  }
+
+  /** The permanent refusals of a unit event that do not depend on the other events of the batch. */
+  private unitRefusal(event: UnitEvent): RejectedDelivery["reason"] | null {
+    const unit = this.unitOf(event.payload.unitId);
+    if (!unit) return "unknown_unit";
+    if (unit.version !== event.payload.unitVersion) return "unit_version_mismatch";
+    if (event.kind === "unit_item_attempt") {
+      const { lesson, itemId } = event.payload;
+      if (!this.lessonItemIds(unit, lesson).includes(itemId) || !unit.items.some((item) => item.id === itemId)) return "unknown_item";
+    }
+    if (event.kind === "unit_test_submitted") {
+      const { attemptId, answers } = event.payload;
+      if (this.s.unitTestIds.includes(attemptId) || this.firstTestEvents.get(attemptId) !== event.clientEventId) return "duplicate_test_attempt";
+      const graded = gradeUnitTest(unit, answers, this.tolerance());
+      if (!graded.valid) return graded.reason === "unknown_item" ? "unknown_item" : "invalid_payload";
+    }
+    return null;
+  }
+
+  private progressOf(unit: Unit): StateUnitProgress {
+    const progress = (this.s.unitProgress[unit.id] ??= { version: unit.version, steps: {}, bestScore: null, testAttempts: 0, passedAt: null, passedVersion: null });
+    progress.version = unit.version;
+    this.touchedUnits.add(unit.id);
+    return progress;
+  }
+
+  /**
+   * A step is proven when it is already recorded, or when `stepValidated` holds on the attempts the server knows for
+   * this lesson and this version of the unit (the state's, then the batch's processed so far, in instant order).
+   */
+  private unitStepProven(event: Extract<Parsed, { kind: "unit_step_completed" }>): boolean {
+    const p = event.payload;
+    const unit = this.s.units[p.unitId] as Unit;
+    if (this.s.unitProgress[p.unitId]?.steps[`${p.lesson}:${p.step}`]) return true;
+    const attempts = (this.s.unitAttempts[p.unitId] ?? [])
+      .filter((attempt) => attempt.lesson === p.lesson && attempt.version === unit.version)
+      .sort((a, b) => byKey(a.occurredAt, b.occurredAt));
+    return stepValidated(unit, p.lesson, p.step, attempts);
+  }
+
+  /**
+   * An item of a lesson: graded by the server, an `attempt` row, and `focus.*` XP the first time this account gets the
+   * item right (2 at the first try, 1 at the second), never again, and never for a unit already passed. Caps: those of
+   * the workshop, the "session" being the (unit, lesson) pair, the 40 XP a day shared with the sessions.
+   */
+  private onUnitItem(event: Extract<Parsed, { kind: "unit_item_attempt" }>, at: Attributed): void {
+    const p = event.payload;
+    const unit = this.s.units[p.unitId] as Unit;
+    const item = unit.items.find((entry) => entry.id === p.itemId) as Unit["items"][number];
+    const graded = gradeUnitItem(unit.language, item, p.answer, this.tolerance());
+    const progress = this.progressOf(unit);
+    const history = (this.s.unitAttempts[unit.id] ??= []);
+    const tried = history.filter((attempt) => attempt.itemId === item.id);
+    let xpReason: string | null = null;
+    if (graded.correct) {
+      if (tried.some((attempt) => attempt.correct) || progress.passedAt !== null) xpReason = "already_earned";
+      else {
+        // Never right before: every earlier try of the item was wrong. The try number is counted by the server from the
+        // known attempts; the client's `try` is never trusted for XP.
+        const attempt = tried.length + 1;
+        const proof = { attempt, correct: true, firstWrong: tried.length > 0, alreadyPassedToday: false };
+        const outcome = attempt === 1 ? focusFirstTry(proof) : focusSecondTry(proof);
+        if (outcome.amount > 0) {
+          const d = this.day(at.day);
+          const key = `unit:${unit.id}:${p.lesson}`;
+          const granted = capFocus(outcome.amount, { xpSession: d.focusBySession[key] ?? 0, xpDay: this.xpToday(at.day, (reason) => reason.startsWith("focus.")) });
+          if (granted.amount > 0) {
+            d.focusBySession[key] = (d.focusBySession[key] ?? 0) + granted.amount;
+            this.emitXp({ rule: outcome.rule, amount: granted.amount, source: { kind: "attempt", id: event.clientEventId }, language: unit.language, at });
+          } else xpReason = granted.zero;
+        } else xpReason = outcome.zero;
+      }
+    }
+    this.zero(event.clientEventId, xpReason);
+    history.push({ lesson: p.lesson, itemId: item.id, try: p.try, correct: graded.correct, occurredAt: event.occurredAt, version: unit.version });
+    this.out.attempts.push({
+      client_event_id: event.clientEventId,
+      session_id: null,
+      language: unit.language,
+      step: "unit",
+      exercise_kind: `unit_${item.kind}`,
+      exercise_ref: deterministicUuid(`unit:${unit.id}:${item.id}`),
+      answer: { value: p.answer, try: p.try, unitId: unit.id, unitVersion: unit.version, lesson: p.lesson, itemId: item.id },
+      result: { verdict: graded.correct ? (graded.nearMiss ? "almost" : "right") : "wrong", try: p.try, ...(xpReason ? { xpReason } : {}) },
+      correct: graded.correct,
+      duration_ms: Math.min(Math.max(0, event.occurredMs - Date.parse(p.shownAt)), MAX_ANSWER_MS),
+      occurred_at: event.occurredAt,
+    });
+  }
+
+  /** A step proven by the attempts (checked in `handle`): recorded once; `l1:key_phrases` turns the key phrases into cards. No XP. */
+  private onUnitStep(event: Extract<Parsed, { kind: "unit_step_completed" }>, at: Attributed): void {
+    const p = event.payload;
+    const unit = this.s.units[p.unitId] as Unit;
+    const progress = this.progressOf(unit);
+    const key = `${p.lesson}:${p.step}`;
+    if (progress.steps[key]) return;
+    progress.steps[key] = event.occurredAt;
+    if (key === KEY_PHRASES_STEP) this.createKeyPhraseCards(unit, at, event.clientEventId);
+  }
+
+  /**
+   * The key phrases become `chunk` cards of source `unit`: front the phrase, back its translation in the explanation
+   * language of the learner, context the line of the dialogue it comes from. A front the learner already has is skipped.
+   * Like the workshop words, they are due the next learning day and count in `newCards` when first reviewed.
+   */
+  private createKeyPhraseCards(unit: Unit, at: Attributed, eventId: string): void {
+    const backLanguage = this.s.profile.explanationLanguage;
+    for (const phrase of unit.keyPhrases) {
+      const fingerKey = cardFingerKey(unit.language, "chunk", phrase.text);
+      if (this.hasCard(fingerKey)) continue;
+      const line = phrase.lineId === null ? undefined : unit.dialogue.lines.find((entry) => entry.id === phrase.lineId);
+      this.insertCard(fingerKey, {
+        language: unit.language,
+        kind: "chunk",
+        front: phrase.text,
+        back: phrase.translation[backLanguage],
+        backLanguage,
+        context: line?.text ?? null,
+        source: "unit",
+        payload: { unitId: unit.id, keyPhraseId: phrase.id },
+      }, at, eventId);
+    }
+  }
+
+  /**
+   * A test submission: graded by the server, a `unit_test` row, the attempt counted and the best score kept. The first
+   * pass records `passedAt` and earns `unit.complete` (25 XP, 2 units a learning day; beyond, 0 with `cap_reached`).
+   * The steps need not have been done.
+   */
+  private onUnitTest(event: Extract<Parsed, { kind: "unit_test_submitted" }>, at: Attributed): void {
+    const p = event.payload;
+    const unit = this.s.units[p.unitId] as Unit;
+    const graded = gradeUnitTest(unit, p.answers, this.tolerance());
+    if (!graded.valid) return; // refused in `precheck`
+    const progress = this.progressOf(unit);
+    progress.testAttempts++;
+    progress.bestScore = Math.max(progress.bestScore ?? 0, graded.score);
+    this.s.unitTestIds.push(p.attemptId);
+    this.out.unit_tests.push({ id: p.attemptId, unit_id: unit.id, version: unit.version, client_event_id: event.clientEventId, score: graded.score, passed: graded.passed, missed: graded.missed });
+    const outcome = unitComplete({ passed: graded.passed, alreadyPassed: progress.passedAt !== null });
+    if (graded.passed && progress.passedAt === null) {
+      progress.passedAt = event.occurredAt;
+      progress.passedVersion = unit.version;
+    }
+    if (outcome.amount > 0) {
+      const d = this.day(at.day);
+      const granted = capCount(outcome.amount, { rewardsToday: d.rewards["unit.complete"] ?? 0, max: COUNT_CAPS["unit.complete"] as number });
+      if (granted.amount > 0) {
+        d.rewards["unit.complete"] = (d.rewards["unit.complete"] ?? 0) + 1;
+        this.emitXp({ rule: "unit.complete", amount: granted.amount, source: null, language: unit.language, at, ref: unit.id });
+      } else this.zero(event.clientEventId, granted.zero);
+    } else this.zero(event.clientEventId, outcome.zero);
+  }
+
+  /** One `unit_progress` row per unit the batch touched, with its whole state (SQL merges it with the stored row). */
+  private finishUnits(): void {
+    for (const unitId of [...this.touchedUnits].sort(byKey)) {
+      const unit = this.s.units[unitId] as Unit;
+      const progress = this.s.unitProgress[unitId] as StateUnitProgress;
+      this.out.unit_progress.push({
+        unit_id: unitId,
+        language: unit.language,
+        version: progress.version,
+        steps: { ...progress.steps },
+        best_score: progress.bestScore,
+        test_attempts: progress.testAttempts,
+        passed_at: progress.passedAt,
+        passed_version: progress.passedVersion,
+      });
+    }
   }
 
   // ------------------------------------------------------------ settlements
@@ -931,6 +1184,11 @@ class Ingestion {
       this.out.device_cursors.push({ device_id: deviceId, last_seq: lastSeq, last_day: lastDay });
     }
   }
+}
+
+/** `language|kind|front` lower-cased: how `cardFronts` names a card. */
+function cardFingerKey(language: string, kind: string, front: string): string {
+  return `${language}|${kind}|${front.toLowerCase()}`;
 }
 
 function compareEvents(a: Parsed, b: Parsed): number {

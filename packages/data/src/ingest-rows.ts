@@ -3,6 +3,7 @@ import { appSchema, type AppClient } from "./client";
 import { DataError } from "./errors";
 import { readErrorOfDayRows, type ErrorOfDayRow } from "./error-of-day";
 import { chunks, distinct, fetchAll, inChunks, unwrap, unwrapRows } from "./query";
+import { readKnownUnitTestIds, readUnitAttempts, readUnitProgressRows, type UnitAttemptRow, type UnitProgressRow } from "./unit-progress";
 import { readCorrections, type CorrectionRow } from "./writing-feedback";
 
 /**
@@ -21,6 +22,10 @@ export interface IngestRefs {
   correctionIds?: readonly string[];
   deviceIds: readonly string[];
   clientEventIds: readonly string[];
+  /** Units the events name (ids in the unit id format only). */
+  unitIds?: readonly string[];
+  /** Test attempt ids of the `unit_test_submitted` events. */
+  unitTestIds?: readonly string[];
 }
 
 /** Learning days (included) whose sessions of the user are read: server day - 8 to + 1. */
@@ -33,6 +38,8 @@ export interface ProfileRow {
   timeZone: string;
   createdAt: string;
   gameSettings: unknown;
+  /** The learner's native language (the explanation language of the unit cards). */
+  nativeLanguage?: string;
 }
 
 export interface EnrollmentRow {
@@ -173,6 +180,12 @@ export interface IngestRows {
   /** Productions referenced by the events or the memo. */
   productions: ProductionRow[];
   corrections?: CorrectionRow[];
+  /** `unit_progress` of the units the events name. */
+  unitProgress?: UnitProgressRow[];
+  /** The learner's attempts on the items of those units, oldest first. */
+  unitAttempts?: UnitAttemptRow[];
+  /** Test attempt ids of the batch already recorded (any account). */
+  unitTestIds?: string[];
   ingestState: { seq: number; memo: unknown };
 }
 
@@ -255,13 +268,13 @@ export function toCardRow(row: CardColumns, lastReview: CardRow["lastReview"] = 
 export async function readProfileAndEnrollments(client: AppClient, userId: string): Promise<{ profile: ProfileRow; enrollments: EnrollmentRow[] }> {
   const db = appSchema(client);
   const [profile, enrollments] = await Promise.all([
-    db.from("profile").select("time_zone, created_at, game_settings").eq("user_id", userId).maybeSingle(),
+    db.from("profile").select("time_zone, created_at, game_settings, native_language").eq("user_id", userId).maybeSingle(),
     db.from("enrollment").select("language, daily_minutes").eq("user_id", userId).eq("active", true).order("position").order("language"),
   ]);
   const profileRow = unwrap(profile);
   if (!profileRow) throw new DataError("not_found");
   return {
-    profile: { timeZone: profileRow.time_zone, createdAt: profileRow.created_at, gameSettings: profileRow.game_settings },
+    profile: { timeZone: profileRow.time_zone, createdAt: profileRow.created_at, gameSettings: profileRow.game_settings, nativeLanguage: profileRow.native_language },
     enrollments: unwrapRows(enrollments).map((row) => ({ language: row.language, dailyMinutes: row.daily_minutes })),
   };
 }
@@ -391,7 +404,9 @@ export async function readIngestRows(client: AppClient, userId: string, refs: In
   const plans = own.map((session) => planRefs(session.plan));
   const itemIds = distinct(plans.flatMap((plan) => plan.itemIds));
   const textIds = distinct([...plans.flatMap((plan) => (plan.textId ? [plan.textId] : [])), ...refs.textIds]);
-  const languages = distinct(sessions.map((session) => session.language));
+  const unitIds = distinct(refs.unitIds ?? []);
+  // The language of a unit is the prefix of its id: its key phrases are checked against the cards of that language.
+  const languages = distinct([...sessions.map((session) => session.language), ...unitIds.map((id) => id.split("-")[0] as string)]);
 
   const [
     skills,
@@ -408,6 +423,9 @@ export async function readIngestRows(client: AppClient, userId: string, refs: In
     cardFronts,
     recentProductions,
     recentProductionCount,
+    unitProgress,
+    unitAttempts,
+    unitTestIds,
   ] = await Promise.all([
     db.from("skill_estimate").select("language, skill, level_value").eq("user_id", userId),
     readItems(client, itemIds),
@@ -429,6 +447,9 @@ export async function readIngestRows(client: AppClient, userId: string, refs: In
       : fetchAll((from, to) => db.from("card").select("language, kind, front").eq("user_id", userId).is("deleted_at", null).in("language", languages).order("id").range(from, to)),
     db.from("production").select("id, text").eq("user_id", userId).order("created_at", { ascending: false }).order("id", { ascending: false }).limit(30),
     db.from("production").select("id", { count: "exact", head: true }).eq("user_id", userId).gte("created_at", new Date(now.getTime() - 86_400_000).toISOString()),
+    readUnitProgressRows(client, userId, unitIds),
+    unitIds.length === 0 ? Promise.resolve([] as UnitAttemptRow[]) : readUnitAttempts(client, userId, unitIds),
+    readKnownUnitTestIds(client, refs.unitTestIds ?? []),
   ]);
 
   const ownCardIds = cardRows.filter((row) => row.user_id === userId).map((row) => row.id);
@@ -464,6 +485,9 @@ export async function readIngestRows(client: AppClient, userId: string, refs: In
         ...(typeof similarity === "number" && similarity >= 0 && similarity <= 1 ? { initialSimilarity: similarity } : {}) };
     }),
     corrections,
+    unitProgress,
+    unitAttempts,
+    unitTestIds,
     ingestState: state,
   };
 }

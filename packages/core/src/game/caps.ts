@@ -22,10 +22,15 @@ export const DAILY_CAPS = {
   errorOfDay: 2,
   fluencyPasses: 2,
   sessionComplete: 1,
+  /** Units passed per learning day (`unit.complete`, `j4-pr1-architecture.md` §4). */
+  unitComplete: 2,
 } as const;
 
-/** Theoretical maximum of a day with every cap reached: 120 + 100 + 40 + 30 + 20 + 6 + 10 + 10. */
-export const THEORETICAL_DAILY_MAX = 336;
+/**
+ * Theoretical maximum of a day with every cap reached: 120 + 100 + 40 + 30 + 20 + 6 + 10 + 10 + 50. The items of the
+ * units share the 40 XP of `focus.*` with the workshop; two units passed add 50.
+ */
+export const THEORETICAL_DAILY_MAX = 386;
 /** Safety bound of `ingest_batch` in SQL (`app.xp_ledger` sum of a day). */
 export const SQL_DAILY_XP_BOUND = 400;
 
@@ -74,7 +79,7 @@ export function capReading(amount: number, params: { textsToday: number; xpToday
   return { ...granted, diminished: diminished && granted.amount > 0 };
 }
 
-/** A workshop item: 20 XP a session and 40 XP a day. */
+/** A workshop item: 20 XP a session and 40 XP a day; for a unit item the "session" is the (unit, lesson) pair. */
 export function capFocus(amount: number, params: { xpSession: number; xpDay: number }): Granted {
   const room = Math.min(DAILY_CAPS.focusPerSession - params.xpSession, DAILY_CAPS.focusPerDay - params.xpDay);
   return room <= 0 ? none("cap_reached") : { amount: Math.min(amount, room), zero: null, diminished: false };
@@ -86,7 +91,7 @@ export function capRewrite(amount: number, params: { rewardedForProduction: numb
   return underCeiling(amount, params.xpDay, DAILY_CAPS.rewriteXp);
 }
 
-/** A rule capped by a number of rewards a day (productions 2, error of the day 2, fluency 2, session 1). */
+/** A rule capped by a number of rewards a day (productions 2, error of the day 2, fluency 2, session 1, unit 2). */
 export function capCount(amount: number, params: { rewardsToday: number; max: number }): Granted {
   return params.rewardsToday >= params.max ? none("cap_reached") : { amount, zero: null, diminished: false };
 }
@@ -97,4 +102,5 @@ export const COUNT_CAPS: Partial<Record<XpRuleId, number>> = {
   "error_of_day.reworked": DAILY_CAPS.errorOfDay,
   "fluency.pass": DAILY_CAPS.fluencyPasses,
   "session.complete": DAILY_CAPS.sessionComplete,
+  "unit.complete": DAILY_CAPS.unitComplete,
 };

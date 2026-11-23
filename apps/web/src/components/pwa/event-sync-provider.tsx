@@ -9,6 +9,7 @@ import { requestWritingFeedback, type LocalWritingFeedback } from "@/lib/offline
 import { createIndexedDbEventQueue, indexedDbAvailable, type LocalSessionProgress } from "@/lib/offline/indexeddb-queue";
 import { eventQueueDatabaseName } from "@/lib/offline/names";
 import type { SessionEvent } from "@/lib/session-packet/session-flow";
+import type { UnitEvent } from "@/lib/units/events";
 
 export interface EventSyncApi {
   userId: string;
@@ -25,6 +26,8 @@ export interface EventSyncApi {
   refreshWritingFeedback(): void;
   enqueueRewrite(productionId: string, sentenceIndex: number, text: string): Promise<void>;
   eventDelivery(clientEventId: string): Promise<"queued" | "rejected" | "delivered">;
+  /** Queues events of the units (they belong to no session) and asks for a delivery. */
+  enqueueUnitEvents(events: UnitEvent[]): Promise<void>;
   advanceSession(sessionId: string, revision: number, next: LocalSessionProgress, events: SessionEvent[], occurredAt: string): Promise<boolean>;
 }
 
@@ -64,6 +67,10 @@ function createEventSync(userId: string): { api: EventSyncApi; start: () => () =
         void sync?.flushNow();
       },
       eventDelivery: (clientEventId) => queue.productionDelivery(clientEventId),
+      async enqueueUnitEvents(events) {
+        await queue.enqueueDeviceEvents(events, new Date().toISOString());
+        void sync?.flushNow();
+      },
       async advanceSession(sessionId, revision, next, events, occurredAt) {
         const saved = await queue.advanceSession(sessionId, revision, next, events, occurredAt);
         if (saved && events.length > 0) {

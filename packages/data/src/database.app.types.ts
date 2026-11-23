@@ -666,6 +666,40 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"unit_progress": {
+                  Row: {
+                    "best_score": number | null,"language": string,"passed_at": string | null,"passed_version": string | null,"steps": NonNullable<Json>,"test_attempts": number,"unit_id": string,"updated_at": string,"user_id": string,"version": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "best_score"?: number | null,"language": string,"passed_at"?: string | null,"passed_version"?: string | null,"steps"?: NonNullable<Json>,"test_attempts"?: number,"unit_id": string,"updated_at"?: string,"user_id": string,"version": string
+                  }
+                  Update: {
+                    "best_score"?: number | null,"language"?: string,"passed_at"?: string | null,"passed_version"?: string | null,"steps"?: NonNullable<Json>,"test_attempts"?: number,"unit_id"?: string,"updated_at"?: string,"user_id"?: string,"version"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "unit_progress_language_fkey"
+      columns: ["language"]
+isOneToOne: false
+      referencedRelation: "language"
+      referencedColumns: ["code"]
+    }
+                  ]
+                },"unit_test": {
+                  Row: {
+                    "client_event_id": string,"created_at": string,"id": string,"missed": (string)[],"passed": boolean,"score": number,"unit_id": string,"user_id": string,"version": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "client_event_id": string,"created_at"?: string,"id": string,"missed"?: (string)[],"passed": boolean,"score": number,"unit_id": string,"user_id": string,"version": string
+                  }
+                  Update: {
+                    "client_event_id"?: string,"created_at"?: string,"id"?: string,"missed"?: (string)[],"passed"?: boolean,"score"?: number,"unit_id"?: string,"user_id"?: string,"version"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"xp_ledger": {
                   Row: {
                     "amount": number,"attempt_id": number | null,"created_at": string,"day": string,"id": number,"language": string | null,"league_eligible": boolean,"meta": NonNullable<Json>,"reason": string,"review_log_id": number | null,"rule_version": string,"user_id": string
@@ -740,6 +774,9 @@ isOneToOne: false
                            },
 "is_valid_game_setting":
 { Args: { "p_key": string,"p_value": Json }; Returns: boolean
+                           },
+"is_valid_unit_steps":
+{ Args: { "p_steps": Json }; Returns: boolean
                            },
 "is_valid_weekdays":
 { Args: { "p_days": (number)[] }; Returns: boolean
