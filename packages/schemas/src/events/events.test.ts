@@ -17,6 +17,8 @@ import {
 const ID = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, "0")}`;
 const DEVICE = ID(900);
 const AT = "2026-11-12T10:00:00.000Z";
+const UNIT = "it-a1-01-saluer";
+const VERSION = "0123456789ab";
 const BASE = { tz: "Europe/Paris", deviceId: DEVICE, seq: 1 };
 
 function event(kind: string, payload: Record<string, unknown>, extra: Record<string, unknown> = {}) {
@@ -25,10 +27,11 @@ function event(kind: string, payload: Record<string, unknown>, extra: Record<str
 
 describe("rule identifiers", () => {
   it("are those of the scale, once each", () => {
-    expect(xpRuleIds).toHaveLength(15);
-    expect(new Set(xpRuleIds).size).toBe(15);
+    expect(xpRuleIds).toHaveLength(16);
+    expect(new Set(xpRuleIds).size).toBe(16);
     expect(xpRuleIds).toContain("review.bonus.reconquest");
     expect(xpRuleIds).toContain("session.complete");
+    expect(xpRuleIds).toContain("unit.complete");
   });
 });
 
@@ -44,6 +47,9 @@ describe("clientEventSchema", () => {
     fluency_pass: { sessionId: ID(2), textId: ID(4), startedAt: "2026-11-12T09:58:00.000Z", endedAt: "2026-11-12T09:59:00.000Z" },
     session_step_completed: { sessionId: ID(2), step: "reading" },
     ui_event: { name: "sound_toggled", value: { on: true } },
+    unit_item_attempt: { unitId: UNIT, unitVersion: VERSION, lesson: "l1", itemId: "d-q1", try: 1, answer: "a", shownAt: "2026-11-12T09:59:55.000Z" },
+    unit_step_completed: { unitId: UNIT, unitVersion: VERSION, lesson: "l1", step: "key_phrases" },
+    unit_test_submitted: { unitId: UNIT, unitVersion: VERSION, attemptId: ID(8), startedAt: "2026-11-12T09:55:00.000Z", answers: [{ itemId: "t-1", answer: "a" }] },
   };
 
   it.each(Object.keys(good))("accepts a %s", (kind) => {
@@ -86,6 +92,25 @@ describe("clientEventSchema", () => {
     expect(clientEventSchema.safeParse(event("production_submitted", { ...(good.production_submitted as object), text: "x".repeat(4001) })).success).toBe(false);
     expect(clientEventSchema.safeParse(event("rewrite_submitted", { ...(good.rewrite_submitted as object), text: "x".repeat(501) })).success).toBe(false);
     expect(clientEventSchema.safeParse(event("ui_event", { name: "sound_toggled", value: "x".repeat(3000) })).success).toBe(false);
+  });
+
+  it("checks the unit fields: id, version, lesson, item id, try, answers, and orders the instants", () => {
+    const attempt = good.unit_item_attempt as Record<string, unknown>;
+    const test = good.unit_test_submitted as Record<string, unknown>;
+    expect(clientEventSchema.safeParse(event("unit_item_attempt", { ...attempt, unitId: "Saluer" })).success).toBe(false);
+    expect(clientEventSchema.safeParse(event("unit_item_attempt", { ...attempt, unitVersion: "0123456789AB" })).success).toBe(false);
+    expect(clientEventSchema.safeParse(event("unit_item_attempt", { ...attempt, lesson: "l4" })).success).toBe(false);
+    expect(clientEventSchema.safeParse(event("unit_item_attempt", { ...attempt, itemId: "x".repeat(41) })).success).toBe(false);
+    expect(clientEventSchema.safeParse(event("unit_item_attempt", { ...attempt, try: 0 })).success).toBe(false);
+    expect(clientEventSchema.safeParse(event("unit_item_attempt", { ...attempt, shownAt: "2026-11-12T10:00:01.000Z" })).success).toBe(false);
+    expect(clientEventSchema.safeParse(event("unit_item_attempt", { ...attempt, shownAt: AT })).success).toBe(true);
+    expect(clientEventSchema.safeParse(event("unit_step_completed", { ...(good.unit_step_completed as object), step: "finale" })).success).toBe(false);
+    expect(clientEventSchema.safeParse(event("unit_test_submitted", { ...test, startedAt: AT })).success).toBe(false);
+    expect(clientEventSchema.safeParse(event("unit_test_submitted", { ...test, answers: [] })).success).toBe(false);
+    const eleven = Array.from({ length: 11 }, (_, i) => ({ itemId: `t-${i}`, answer: "a" }));
+    expect(clientEventSchema.safeParse(event("unit_test_submitted", { ...test, answers: eleven })).success).toBe(false);
+    expect(clientEventSchema.safeParse(event("unit_test_submitted", { ...test, answers: [{ itemId: "t-1", answer: "a", correct: true }] })).success).toBe(false);
+    expect(clientEventSchema.safeParse(event("unit_test_submitted", { ...test, attemptId: "attempt-1" })).success).toBe(false);
   });
 
   it("caps a batch at 50 events", () => {
@@ -157,8 +182,23 @@ describe("ingestPayloadSchema", () => {
       timezone_changes: [{ effective_at: AT, time_zone: "Europe/Rome" }],
       device_cursors: [{ device_id: DEVICE, last_seq: 41, last_day: "2026-11-12" }],
       ui_events: [{ client_event_id: ID(13), name: "sound_toggled", value: {}, occurred_at: AT }],
+      unit_progress: [{ unit_id: UNIT, language: "it", version: VERSION, steps: { "l1:dialogue": AT }, best_score: 8, test_attempts: 1, passed_at: AT, passed_version: VERSION }],
+      unit_tests: [{ id: ID(14), unit_id: UNIT, version: VERSION, client_event_id: ID(15), score: 8, passed: true, missed: ["t-3", "t-7"] }],
     };
     expect(ingestPayloadSchema.safeParse(payload).success).toBe(true);
+    expect(ingestPayloadSchema.safeParse({ ...payload, attempts: [{ ...payload.attempts[0], session_id: null, step: "unit", exercise_kind: "unit_mcq" }] }).success).toBe(true);
+  });
+
+  it("refuses a unit row out of format", () => {
+    const empty = emptyIngestPayload();
+    const progress = { unit_id: UNIT, language: "it", version: VERSION, steps: {}, best_score: null, test_attempts: 0, passed_at: null, passed_version: null };
+    expect(ingestPayloadSchema.safeParse({ ...empty, unit_progress: [progress] }).success).toBe(true);
+    expect(ingestPayloadSchema.safeParse({ ...empty, unit_progress: [{ ...progress, steps: { "l4:dialogue": AT } }] }).success).toBe(false);
+    expect(ingestPayloadSchema.safeParse({ ...empty, unit_progress: [{ ...progress, best_score: 11 }] }).success).toBe(false);
+    expect(ingestPayloadSchema.safeParse({ ...empty, unit_progress: [{ ...progress, version: "abc" }] }).success).toBe(false);
+    const test = { id: ID(14), unit_id: UNIT, version: VERSION, client_event_id: ID(15), score: 8, passed: true, missed: [] };
+    expect(ingestPayloadSchema.safeParse({ ...empty, unit_tests: [{ ...test, score: -1 }] }).success).toBe(false);
+    expect(ingestPayloadSchema.safeParse({ ...empty, unit_tests: [{ ...test, unit_id: "unit" }] }).success).toBe(false);
   });
 
   it("refuses an extra key, a camelCase key, a missing key and an XP line out of bounds", () => {

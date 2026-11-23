@@ -3,6 +3,7 @@ import { dateKeySchema, isoInstantSchema, languageCodeSchema } from "../common";
 import { cardKindSchema, cardSourceSchema, cardStateSchema, reviewRatingSchema } from "../memory";
 import { reviewModeSchema, sessionStepSchema, uiEventNameSchema } from "./client-events";
 import { streakModeSchema } from "./game-settings";
+import { unitIdSchema, unitVersionSchema } from "../unit";
 
 /**
  * The `p_payload` of `app.ingest_batch(p_user_id, p_expected_seq, p_payload)`: what `planIngest`
@@ -25,6 +26,12 @@ export const ingestSessionStatuses = ["started", "completed", "abandoned"] as co
 export const learningDayCauses = ["work", "session", "freeze", "rest", "repair", "travel", "off", "none"] as const;
 export const learningDayCauseSchema = z.enum(learningDayCauses);
 export type LearningDayCause = z.infer<typeof learningDayCauseSchema>;
+
+/** `step` of an `attempts` row: a step of the session, or `unit` for an item of a unit (no session). */
+export const attemptStepSchema = z.union([sessionStepSchema, z.literal("unit")]);
+
+/** Key of a validated step of a unit in `unit_progress.steps`: `<lesson>:<step>` (e.g. `l1:key_phrases`). */
+export const UNIT_STEP_KEY_PATTERN = /^l[1-3]:[a-z_]{1,20}$/;
 
 export const xpSourceSchema = z.strictObject({
   kind: z.enum(["attempt", "review"]),
@@ -58,7 +65,7 @@ export const ingestPayloadSchema = z.strictObject({
         client_event_id: z.uuid(),
         session_id: z.uuid().nullable(),
         language: languageCodeSchema,
-        step: sessionStepSchema,
+        step: attemptStepSchema,
         exercise_kind: z.string().min(1).max(40),
         exercise_ref: z.uuid(),
         answer: jsonObjectSchema,
@@ -187,6 +194,38 @@ export const ingestPayloadSchema = z.strictObject({
       }),
     )
     .max(MAX_ROWS),
+  /**
+   * Upserts of `app.unit_progress` (`j4-pr1-architecture.md` §5): SQL merges `steps` (a step already recorded keeps
+   * its instant), keeps the greatest `best_score` and `test_attempts`, and sets `passed_at` once, never clearing it.
+   */
+  unit_progress: z
+    .array(
+      z.strictObject({
+        unit_id: unitIdSchema,
+        language: languageCodeSchema,
+        version: unitVersionSchema,
+        steps: z.record(z.string().regex(UNIT_STEP_KEY_PATTERN), isoInstantSchema),
+        best_score: z.number().int().min(0).max(10).nullable(),
+        test_attempts: z.number().int().min(0),
+        passed_at: isoInstantSchema.nullable(),
+        passed_version: unitVersionSchema.nullable(),
+      }),
+    )
+    .max(MAX_ROWS),
+  /** Inserts of `app.unit_test`: one graded test submission, `id` is the client's `attemptId`. */
+  unit_tests: z
+    .array(
+      z.strictObject({
+        id: z.uuid(),
+        unit_id: unitIdSchema,
+        version: unitVersionSchema,
+        client_event_id: z.uuid(),
+        score: z.number().int().min(0).max(10),
+        passed: z.boolean(),
+        missed: z.array(z.string().min(1).max(40)).max(10),
+      }),
+    )
+    .max(MAX_ROWS),
 });
 export type IngestPayload = z.infer<typeof ingestPayloadSchema>;
 export type IngestXpLine = IngestPayload["xp"][number];
@@ -209,6 +248,8 @@ export function emptyIngestPayload(): IngestPayload {
     timezone_changes: [],
     device_cursors: [],
     ui_events: [],
+    unit_progress: [],
+    unit_tests: [],
   };
 }
 
