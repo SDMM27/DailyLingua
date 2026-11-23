@@ -145,7 +145,9 @@ describe("unit flow", () => {
 
   it("starts at the dialogue, one line at a time, with the audio marked as being prepared", async () => {
     const user = userEvent.setup();
-    flow();
+    // A unit whose audio is not generated yet.
+    const silent = { ...unit, dialogue: { ...unit.dialogue, audio: null, lines: unit.dialogue.lines.map((line) => ({ ...line, audio: null })) } };
+    flow({ unit: silent });
     await user.click(screen.getByRole("button", { name: "Commencer l’unité" }));
     expect(screen.getByRole("progressbar").getAttribute("aria-valuenow")).toBe("1");
     expect(screen.getByText(/réplique 1 sur 9/)).toBeTruthy();
