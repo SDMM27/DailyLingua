@@ -156,3 +156,8 @@ export function stepItems(unit: Pick<Unit, "lessons" | "items" | "test">, lesson
   const ids = step === "test" ? unit.test.itemIds : (unit.lessons.find((entry) => entry.id === lesson)?.steps.find((entry) => entry.step === step)?.itemIds ?? []);
   return ids.flatMap((id) => byId.get(id) ?? []);
 }
+
+/** The lesson an item belongs to (the first one that lists it in a step), or undefined for an item no lesson uses. */
+export function lessonOfItem(unit: Pick<Unit, "lessons">, itemId: string): UnitLessonId | undefined {
+  return unit.lessons.find((lesson) => lesson.steps.some((step) => step.itemIds.includes(itemId)))?.id;
+}
