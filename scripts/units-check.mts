@@ -37,11 +37,14 @@ for (const unit of units) {
   const review = unit.aiReview ? `AI review ${unit.aiReview.reviewedOn} (${unit.aiReview.passes} passes)` : "draft";
   const published = isPublished(unit) ? "published" : "not published";
   const summary = `${unit.id} v${unit.version}: ${unit.items.length} items, ${newWords} new words, ${review}, ${published}`;
-  if (violations.length === 0) {
-    console.log(`✓ ${summary}`);
+  // A draft may wait for its audio (generated locally with Piper); a published unit may not.
+  const blocking = isPublished(unit) ? violations : violations.filter((violation) => violation.code !== "missing_audio");
+  const pending = violations.length - blocking.length;
+  if (blocking.length === 0) {
+    console.log(`✓ ${summary}${pending > 0 ? ` (${pending} audio file(s) to generate before publishing)` : ""}`);
   } else {
     console.log(`✗ ${summary}`);
-    for (const violation of violations) console.log(`    - [${violation.code}] ${violation.message}`);
+    for (const violation of blocking) console.log(`    - [${violation.code}] ${violation.message}`);
     failed = true;
   }
 }
