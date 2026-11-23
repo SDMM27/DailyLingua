@@ -103,3 +103,7 @@ Taux de complétion de l'unité 1 chez les A0, abandon par étape, score moyen a
 | 6 | Unités Écriture : 4 unités à part ou lettres réparties dans les 3 premières situations ? | **4 unités courtes entremêlées** : on garde le test de lecture qui a fait ses preuves, sans retarder le premier dialogue au-delà de deux unités |
 | 7 | Rédaction des 20 unités | Rédigées dans les sessions Claude Code (hors budget API), comme les fiches de grammaire, puis deux passes de relecture IA. Aucune relecture humaine exigée pour publier, mention « relu par IA » |
 | 8 | Bilan de fin de parcours (après l'unité 10) | Test mélangé des unités 6 à 10, puis niveau A1 confirmé ; c'est le premier usage de la règle « un palier est confirmé par un bilan » (`b` §1) |
+| 9 | Accès au parcours : 4e onglet « Parcours » ou entrée depuis « Aujourd'hui » seulement ? | **4e onglet** tant que l'apprenant a un parcours dans sa langue (A0-A2) ; sinon 3 onglets comme aujourd'hui |
+| 10 | Cadenas sur les unités à venir (`e-direction-artistique.md` §6 les prévoit) | **Supprimés**, conformément au point 1 ; corriger la DA |
+| 11 | « Je peux… » d'unité et XP « Descripteur validé » (50 XP, `c-game-design.md`) | Les « Je peux… » d'unité sont des **objectifs d'unité**, validés par le test, sans les 50 XP ; les 50 XP restent réservés aux descripteurs prouvés par la tâche d'évaluation du jalon 6. Sinon une unité vaudrait 175 XP |
+| 12 | XP des exercices d'unité | Barème « exercice de focus » existant : 2 juste du premier coup, 1 au deuxième, plafonds inchangés ; XP gardés si le test échoue |
