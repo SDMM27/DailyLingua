@@ -1,6 +1,6 @@
 # Arbitrage unités Écriture — russe
 
-Fichiers : `packages/content/src/units/ru/e1-lettres-familieres.ts`, `e2-faux-amis.ts`, `e3-formes-nouvelles.ts`, `e4-chuintantes.ts`, `e5-voyelles-signes.ts` · Date : 2026-11-24 · Grille : `j4-pr2.md` §1 (unités `script`) · Passes : `ru-a0-ecriture-A.md`, `ru-a0-ecriture-B.md`
+Fichiers : `packages/content/src/units/ru/e1-lettres-familieres.ts`, `e2-faux-amis.ts`, `e3-formes-nouvelles.ts`, `e4-chuintantes.ts`, `e5-voyelles-signes.ts` · Date : 2026-11-23 · Grille : `j4-pr2.md` §1 (unités `script`) · Passes : `ru-a0-ecriture-A.md`, `ru-a0-ecriture-B.md`
 
 ## Synthèse
 5 unités · 5 approuvées (`status: "reviewed"`, `aiReview` posé) · 0 restent brouillons · 28 corrections appliquées · 1 remarque écartée, 1 retenue en partie

@@ -332,6 +332,6 @@ export const ruA0E1LettresFamilieres = {
     itemIds: ["i02", "i04", "i05", "i06", "i08", "i09", "i10", "i12", "i13", "i14"],
     passScore: 8,
   },
-  aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
+  aiReview: { reviewedOn: "2026-11-23", passes: 2, arbiter: "arbitre-relecture" },
   status: "reviewed",
 } satisfies UnitSource;

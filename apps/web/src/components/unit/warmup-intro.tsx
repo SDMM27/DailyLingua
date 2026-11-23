@@ -6,6 +6,7 @@ import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Icon } from "./icons";
 import { ShellBody, ShellFooter } from "./unit-shell";
+import { useUnitExtras } from "./unit-extras";
 
 /**
  * The entry of a unit that has a warm-up due: the sentences missed at the last test come first (the one primary action),
@@ -23,6 +24,7 @@ export function WarmupIntro({ unit, locale, count, unitLabel, canSkip, onWarmup,
   onSkip(): void;
 }) {
   const t = useTranslations("warmup");
+  const { number } = useUnitExtras();
   const sheet = useTranslations("unitSheet");
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => heading.current?.focus(), []);
@@ -31,7 +33,7 @@ export function WarmupIntro({ unit, locale, count, unitLabel, canSkip, onWarmup,
       <ShellBody>
         <div className="flex flex-col gap-6 pt-2">
           <div>
-            <p className="meta text-lang">{sheet("meta", { number: unit.order, minutes: unit.minutes })}</p>
+            <p className="meta text-lang">{sheet("meta", { number: number ?? unit.order, minutes: unit.minutes })}</p>
             <h1 tabIndex={-1} ref={heading} className="mt-2 font-display text-[30px] leading-tight font-bold tracking-tight" lang={locale}>{unit.title[locale]}</h1>
           </div>
           <section className="rounded-xl border border-line px-4 py-3">

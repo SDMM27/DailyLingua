@@ -24,7 +24,7 @@ function flow(extras: { startAtTest?: boolean; warmupItemIds?: string[]; unitXp?
   const onLeave = vi.fn();
   render(
     <NextIntlClientProvider locale="fr" messages={messages}>
-      <UnitExtrasProvider value={{ pathHref: "/parcours/it", startAtTest: false, unitXp: 0, warmupItemIds: [], ...extras }}>
+      <UnitExtrasProvider value={{ pathHref: "/parcours/it", number: 1, startAtTest: false, unitXp: 0, warmupItemIds: [], ...extras }}>
         <UnitFlow
           unit={unit} progress={null} locale="fr" tolerance="lenient" xpVisible animate={false} offline={false} nextUnit={null}
           onEvents={async (batch) => { events.push(...batch); }} onLeave={onLeave} onOpenUnit={vi.fn()} {...props}

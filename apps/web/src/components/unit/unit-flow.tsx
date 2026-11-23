@@ -212,7 +212,7 @@ export function UnitFlow({ unit, progress, locale, tolerance, xpVisible, animate
           passMark={unit.test.passScore}
           canDo={unit.canDo.map((goal) => goal.text[locale])}
           xpTest={xpVisible && progress?.passedAt == null ? UNIT_TEST_XP_ESTIMATE : null}
-          xpKept={xpVisible ? unitXp + (progress === null ? xp : 0) : 0}
+          xpKept={xpVisible ? unitXp + xp : 0}
           missed={result.missed}
           hasNext={nextUnit !== null}
           animate={animate}

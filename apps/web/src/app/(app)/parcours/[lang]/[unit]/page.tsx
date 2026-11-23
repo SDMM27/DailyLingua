@@ -49,9 +49,12 @@ export default async function UnitPage({ params, searchParams }: PageProps<"/par
   ]);
   const settings = resolveGameSettings(gameSettingsSchema.safeParse(profile.gameSettings).data, enrollment.dailyMinutes);
   const explanation = locale === "fr" ? "fr" : "en";
-  const next = visibleUnitsFor(lang).find((candidate) => candidate.order > unit.order);
+  const visible = visibleUnitsFor(lang);
+  const next = visible.find((candidate) => candidate.order > unit.order);
+  // The number the map shows for this station (its rank among the visible units), not the content order.
+  const number = visible.findIndex((candidate) => candidate.id === unit.id) + 1;
 
-  const extras = { pathHref: `/parcours/${lang}`, startAtTest, unitXp, warmupItemIds: warmups.find((warmup) => warmup.unit.id === unit.id)?.itemIds ?? [] };
+  const extras = { pathHref: `/parcours/${lang}`, number, startAtTest, unitXp, warmupItemIds: warmups.find((warmup) => warmup.unit.id === unit.id)?.itemIds ?? [] };
 
   return (
     <UnitExtrasProvider value={extras}>

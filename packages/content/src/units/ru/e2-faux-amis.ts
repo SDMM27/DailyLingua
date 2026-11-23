@@ -361,6 +361,6 @@ export const ruA0E2FauxAmis = {
     itemIds: ["i02", "i03", "i05", "i06", "i08", "i10", "i11", "i12", "i14", "i16"],
     passScore: 8,
   },
-  aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
+  aiReview: { reviewedOn: "2026-11-23", passes: 2, arbiter: "arbitre-relecture" },
   status: "reviewed",
 } satisfies UnitSource;

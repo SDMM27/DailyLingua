@@ -378,6 +378,6 @@ export const ruA0E5VoyellesSignes = {
     itemIds: ["i02", "i03", "i04", "i05", "i06", "i07", "i09", "i10", "i13", "i15"],
     passScore: 8,
   },
-  aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
+  aiReview: { reviewedOn: "2026-11-23", passes: 2, arbiter: "arbitre-relecture" },
   status: "reviewed",
 } satisfies UnitSource;
