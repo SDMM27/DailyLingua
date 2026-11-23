@@ -139,6 +139,12 @@
       "resume": "Reprendre · étape {current} sur {total}",
       "startLevel": "Niveau de départ : {level}",
       "soon": "Les séances arrivent bientôt"
+    },
+    "unit": {
+      "meta": "Parcours · {language}",
+      "continue": "Continuer · leçon {lesson}",
+      "start": "Commencer le parcours",
+      "lessons": "Trois leçons, environ {minutes} min."
     }
   },
   "reminderPush": {
@@ -441,5 +447,118 @@
       "logRejected": "{count, plural, one {# événement refusé} other {# événements refusés}}",
       "logFailed": "échec, prochaine tentative dans {seconds} s"
     }
+  },
+  "unitSheet": {
+    "meta": "Unité {number} · environ {minutes} min",
+    "goals": "À la fin, tu pourras dire",
+    "start": "Commencer l’unité",
+    "resume": "Reprendre · étape {step} sur {steps}",
+    "review": "Revoir l’unité",
+    "skip": "Je connais déjà",
+    "skipValue": "passer le test, {count} questions",
+    "retake": "Repasser le test",
+    "close": "Quitter l’unité"
+  },
+  "unit": {
+    "steps": {
+      "dialogue": "Dialogue",
+      "key_phrases": "Phrases-clés",
+      "grammar": "Grammaire",
+      "exercises": "Exercices",
+      "conversation": "Conversation",
+      "test": "Test",
+      "letters": "Lettres",
+      "sounds": "Sons",
+      "words": "Mots",
+      "reading": "Lecture"
+    },
+    "stepCount": "{position} / {total}",
+    "progress": "Étape {position} sur {total}, {name}",
+    "pause": "Mettre l’unité en pause",
+    "pauseTitle": "Unité en pause",
+    "pauseBody": "Tu reprendras à l’étape {step}. Rien n’est perdu.",
+    "xp": "XP de l’unité : {xp}",
+    "xpEstimate": "XP de l’unité, estimation avant synchronisation : {xp}",
+    "audioUnavailable": "Audio indisponible pour le moment. Tu peux continuer sans.",
+    "saveError": "Cet appareil n’a pas pu enregistrer ta progression. Tu peux continuer, mais elle ne sera pas gardée.",
+    "keyPhrasesIntro": "Les phrases à retenir. Écoute-les, puis lis-les à voix haute.",
+    "grammarIntro": "À retenir",
+    "conversationYou": "Tu joues {name}. Réponds à ton tour.",
+    "testIntro": "{count} questions. Pas de retour après chaque réponse : tu verras ton score à la fin.",
+    "testCount": "Question {index} sur {total}",
+    "testStart": "Commencer le test",
+    "testFinish": "Voir mon résultat",
+    "testNext": "Question suivante"
+  },
+  "dialogue": {
+    "position": "{title} · réplique {line} sur {total}",
+    "transcript": "Tout le texte",
+    "transcriptTitle": "Le dialogue en entier",
+    "showTranslation": "Voir la traduction",
+    "hideTranslation": "Masquer la traduction",
+    "showTransliteration": "Voir la transcription",
+    "hideTransliteration": "Masquer la transcription",
+    "replay": "Réécouter la réplique",
+    "play": "Écouter la réplique {line}",
+    "pause": "Pause",
+    "previous": "Réplique précédente",
+    "next": "Réplique suivante",
+    "slow": "Lent",
+    "slowA11y": "Vitesse lente ({rate})",
+    "all": "Tout",
+    "allA11y": "Écouter tout le dialogue",
+    "audioUnavailable": "Audio indisponible pour ce dialogue. Tu peux le lire.",
+    "wordNew": "{word}, mot nouveau",
+    "previousLines": "Répliques précédentes",
+    "player": "Audio du dialogue",
+    "wordPanel": "Mot touché"
+  },
+  "wordOrder": {
+    "instruction": "Remets la phrase dans l’ordre",
+    "answer": "Ta phrase",
+    "bank": "Mots à placer",
+    "placed": "{word} placé en position {position}",
+    "removed": "{word} retiré de la phrase",
+    "empty": "Emplacement libre"
+  },
+  "exercise": {
+    "count": "{index} sur {total}",
+    "retry": "Réessayer",
+    "comesBack": "Elle revient en fin d’étape.",
+    "xp": "+{xp} XP",
+    "expected": "La réponse",
+    "listen": "Écouter",
+    "kinds": {
+      "mcq": "Choisis la bonne réponse",
+      "listen_mcq": "Écoute, puis choisis",
+      "cloze": "Complète la phrase",
+      "type": "Écris la réponse",
+      "match": "Associe chaque phrase à sa traduction"
+    },
+    "match": {
+      "left": "Phrases",
+      "right": "Traductions",
+      "paired": "{left} associé à {right}",
+      "reset": "Défaire les associations"
+    }
+  },
+  "unitResult": {
+    "score": "{correct}/{total}",
+    "passMark": "Seuil {passMark}",
+    "scoreA11y": "{correct} réponses justes sur {total}, seuil à {passMark}",
+    "passed": "Unité validée",
+    "xpTest": "+{xp} XP · test réussi",
+    "xpEstimate": "Estimation, confirmée à la synchronisation.",
+    "canDo": "{title} · je peux maintenant",
+    "next": "Unité suivante",
+    "back": "Retour au parcours",
+    "notYet": "Pas encore validée",
+    "missing": "{count, plural, one {Il manquait une réponse.} other {Il manquait # réponses.}}",
+    "missedBack": "{count, plural, one {La phrase manquée revient} other {Les # phrases manquées reviennent}} demain dans tes révisions",
+    "xpKept": "; tes {xp} XP restent acquis.",
+    "end": ".",
+    "seeMissed": "{count, plural, one {Voir la phrase} other {Voir les # phrases}}",
+    "retake": "Repasser le test maintenant",
+    "invalid": "Ce test n’a pas pu être corrigé. Reprends-le."
   }
 }

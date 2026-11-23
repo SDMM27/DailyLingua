@@ -139,6 +139,12 @@
       "resume": "Resume · step {current} of {total}",
       "startLevel": "Starting level: {level}",
       "soon": "Sessions are coming soon"
+    },
+    "unit": {
+      "meta": "Path · {language}",
+      "continue": "Continue · lesson {lesson}",
+      "start": "Start the path",
+      "lessons": "Three lessons, about {minutes} min."
     }
   },
   "reminderPush": {
@@ -441,5 +447,118 @@
       "logRejected": "{count, plural, one {# event refused} other {# events refused}}",
       "logFailed": "failed, next attempt in {seconds} s"
     }
+  },
+  "unitSheet": {
+    "meta": "Unit {number} · about {minutes} min",
+    "goals": "By the end, you’ll be able to say",
+    "start": "Start the unit",
+    "resume": "Resume · step {step} of {steps}",
+    "review": "Review the unit",
+    "skip": "I already know this",
+    "skipValue": "take the test, {count} questions",
+    "retake": "Retake the test",
+    "close": "Leave the unit"
+  },
+  "unit": {
+    "steps": {
+      "dialogue": "Dialogue",
+      "key_phrases": "Key phrases",
+      "grammar": "Grammar",
+      "exercises": "Exercises",
+      "conversation": "Conversation",
+      "test": "Test",
+      "letters": "Letters",
+      "sounds": "Sounds",
+      "words": "Words",
+      "reading": "Reading"
+    },
+    "stepCount": "{position} / {total}",
+    "progress": "Step {position} of {total}, {name}",
+    "pause": "Pause the unit",
+    "pauseTitle": "Unit paused",
+    "pauseBody": "You’ll pick up at step {step}. Nothing is lost.",
+    "xp": "Unit XP: {xp}",
+    "xpEstimate": "Unit XP, estimate before syncing: {xp}",
+    "audioUnavailable": "Audio isn’t available right now. You can carry on without it.",
+    "saveError": "This device couldn’t save your progress. You can carry on, but it won’t be kept.",
+    "keyPhrasesIntro": "The phrases to remember. Listen to them, then read them aloud.",
+    "grammarIntro": "Worth remembering",
+    "conversationYou": "You play {name}. Answer in your turn.",
+    "testIntro": "{count} questions. No feedback after each answer: you’ll see your score at the end.",
+    "testCount": "Question {index} of {total}",
+    "testStart": "Start the test",
+    "testFinish": "See my result",
+    "testNext": "Next question"
+  },
+  "dialogue": {
+    "position": "{title} · line {line} of {total}",
+    "transcript": "Full text",
+    "transcriptTitle": "The whole dialogue",
+    "showTranslation": "Show translation",
+    "hideTranslation": "Hide translation",
+    "showTransliteration": "Show transcription",
+    "hideTransliteration": "Hide transcription",
+    "replay": "Replay this line",
+    "play": "Play line {line}",
+    "pause": "Pause",
+    "previous": "Previous line",
+    "next": "Next line",
+    "slow": "Slow",
+    "slowA11y": "Slow speed ({rate})",
+    "all": "All",
+    "allA11y": "Play the whole dialogue",
+    "audioUnavailable": "Audio isn’t available for this dialogue. You can read it.",
+    "wordNew": "{word}, new word",
+    "previousLines": "Previous lines",
+    "player": "Dialogue audio",
+    "wordPanel": "Selected word"
+  },
+  "wordOrder": {
+    "instruction": "Put the sentence in order",
+    "answer": "Your sentence",
+    "bank": "Words to place",
+    "placed": "{word} placed in position {position}",
+    "removed": "{word} removed from the sentence",
+    "empty": "Empty slot"
+  },
+  "exercise": {
+    "count": "{index} of {total}",
+    "retry": "Try again",
+    "comesBack": "It comes back at the end of this step.",
+    "xp": "+{xp} XP",
+    "expected": "The answer",
+    "listen": "Listen",
+    "kinds": {
+      "mcq": "Choose the right answer",
+      "listen_mcq": "Listen, then choose",
+      "cloze": "Complete the sentence",
+      "type": "Write the answer",
+      "match": "Match each sentence with its translation"
+    },
+    "match": {
+      "left": "Sentences",
+      "right": "Translations",
+      "paired": "{left} paired with {right}",
+      "reset": "Undo the pairings"
+    }
+  },
+  "unitResult": {
+    "score": "{correct}/{total}",
+    "passMark": "Pass mark {passMark}",
+    "scoreA11y": "{correct} of {total} correct, pass mark {passMark}",
+    "passed": "Unit complete",
+    "xpTest": "+{xp} XP · test passed",
+    "xpEstimate": "Estimate, confirmed when your progress syncs.",
+    "canDo": "{title} · I can now",
+    "next": "Next unit",
+    "back": "Back to the path",
+    "notYet": "Not passed yet",
+    "missing": "{count, plural, one {One more correct answer was needed.} other {# more correct answers were needed.}}",
+    "missedBack": "{count, plural, one {The missed sentence comes back} other {The # missed sentences come back}} in your reviews tomorrow",
+    "xpKept": "; you keep your {xp} XP.",
+    "end": ".",
+    "seeMissed": "{count, plural, one {See the sentence} other {See the # sentences}}",
+    "retake": "Retake the test now",
+    "invalid": "This test couldn’t be graded. Please take it again."
   }
 }
