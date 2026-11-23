@@ -64,7 +64,7 @@ export const ruA0E2FauxAmis = {
       name: "эс",
       kind: "false-friend",
       lookalike: "c",
-      sound: { fr: "comme « s » dans « sac », toujours dur, jamais « z » ; pas un c", en: "like the 's' in 'sun', never a 'z'; not a c" },
+      sound: { fr: "comme « s » dans « sac » ; même entre deux voyelles, jamais « z » comme dans « rose » ; pas un c", en: "like the 's' in 'sun', never a 'z'; not a c" },
       example: { word: "сок", translation: { fr: "jus", en: "juice" }, audio: null },
     },
     {
@@ -85,7 +85,7 @@ export const ruA0E2FauxAmis = {
       kind: "false-friend",
       lookalike: "x",
       sound: {
-        fr: "un souffle rauque au fond de la gorge, comme le « j » espagnol ; pas un x",
+        fr: "un « h » frotté au fond de la bouche, comme le « ch » allemand de « Bach » ou le « j » espagnol de « jota », en plus léger ; pas un x",
         en: "a rough breath at the back of the throat, like the 'ch' in Scottish 'loch'; not an x",
       },
       example: { word: "у́хо", translation: { fr: "oreille", en: "ear" }, audio: null },
@@ -150,18 +150,17 @@ export const ruA0E2FauxAmis = {
     {
       id: "i04",
       kind: "mcq",
-      prompt: { fr: "Comment se lit la lettre У ?", en: "How do you read the letter У?" },
+      prompt: { fr: "Quelle lettre latine transcrit У ?", en: "Which Latin letter transcribes У?" },
       options: [
-        { id: "a", text: "ou" },
-        { id: "b", text: "i" },
-        { id: "c", text: "è" },
+        { id: "a", text: "u" },
+        { id: "b", text: "y" },
+        { id: "c", text: "i" },
       ],
       answer: "a",
       audio: null,
-      // REVIEW: options are French-style sounds ("ou"); the Latin transliteration of у is "u".
       explain: {
-        fr: "У ressemble à un y, mais se lit « ou ». En lettres latines, on l’écrit u.",
-        en: "У looks like a y, but reads 'oo'. In Latin letters, it is written u.",
+        fr: "У ressemble à un y, mais se lit « ou » ; en lettres latines, on l’écrit u.",
+        en: "У looks like a y, but reads 'oo'; in Latin letters, it is written u.",
       },
     },
     // Lesson 1, sounds: listen, then pick the letter.
@@ -206,7 +205,7 @@ export const ruA0E2FauxAmis = {
       audioText: "у́хо",
       audio: "/unit-audio/ru/ru-a0-02-faux-amis/i07.mp3",
       explain: {
-        fr: "У́хо (oreille) : le х est un souffle rauque, plus doux que к.",
+        fr: "У́хо (oreille) : le х est un « h » frotté au fond de la bouche, plus doux que к.",
         en: "У́хо (ear): х is a rough breath, softer than к.",
       },
     },
@@ -221,8 +220,8 @@ export const ruA0E2FauxAmis = {
         { left: "нос", right: { fr: "nez", en: "nose" } },
       ],
       explain: {
-        fr: "Сок et нос ont les mêmes lettres que des mots latins (« cok », « hoc »), mais se lisent « sok » et « nos ».",
-        en: "Сок and нос look like Latin 'cok' and 'hoc', but read 'sok' and 'nos'.",
+        fr: "Сок et нос ressemblent à « cok » et « hoc » écrits en lettres latines, mais se lisent « sok » et « nos ».",
+        en: "Сок and нос look like 'cok' and 'hoc' in Latin letters, but read 'sok' and 'nos'.",
       },
     },
     {
@@ -362,6 +361,6 @@ export const ruA0E2FauxAmis = {
     itemIds: ["i02", "i03", "i05", "i06", "i08", "i10", "i11", "i12", "i14", "i16"],
     passScore: 8,
   },
-  aiReview: null,
-  status: "draft",
+  aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
+  status: "reviewed",
 } satisfies UnitSource;

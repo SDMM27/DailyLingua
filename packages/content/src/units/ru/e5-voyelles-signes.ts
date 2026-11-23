@@ -33,8 +33,8 @@ export const ruA0E5VoyellesSignes = {
       kind: "new",
       lookalike: null,
       sound: {
-        fr: "« yo », comme dans « yoyo » ; toujours accentué, donc jamais d’accent ajouté",
-        en: "'yo', as in 'yogurt'; always stressed, so it never takes an extra stress mark",
+        fr: "« yo », comme dans « yoyo » ; toujours accentué, donc jamais d’accent ajouté ; dans les textes courants, on l’écrit souvent е",
+        en: "'yo', as in 'yogurt'; always stressed, so it never takes an extra stress mark; in everyday texts, it is often written е",
       },
       example: { word: "мёд", translation: { fr: "miel", en: "honey" }, audio: null },
     },
@@ -42,7 +42,7 @@ export const ruA0E5VoyellesSignes = {
       upper: "Э",
       lower: "э",
       latin: "è",
-      name: "э оборотное",
+      name: "э оборо́тное",
       kind: "new",
       lookalike: null,
       sound: {
@@ -68,14 +68,14 @@ export const ruA0E5VoyellesSignes = {
       name: "я",
       kind: "new",
       lookalike: null,
-      sound: { fr: "« ya », comme dans « yacht » ; ce n’est pas un R à l’envers", en: "'ya', as in 'yard'; it is not a backwards R" },
+      sound: { fr: "« ya », comme dans « yak » ; ce n’est pas un R à l’envers", en: "'ya', as in 'yard'; it is not a backwards R" },
       example: { word: "я́блоко", translation: { fr: "pomme", en: "apple" }, audio: null },
     },
     {
       upper: "Ь",
       lower: "ь",
       latin: "ʹ",
-      name: "мягкий знак",
+      name: "мя́гкий знак",
       kind: "sign",
       lookalike: null,
       sound: {
@@ -92,10 +92,10 @@ export const ruA0E5VoyellesSignes = {
       kind: "sign",
       lookalike: null,
       sound: {
-        fr: "aucun son : le « signe dur », rare, sépare la consonne de la voyelle qui suit",
-        en: "no sound: the 'hard sign', rare, keeps the consonant apart from the vowel after it",
+        fr: "aucun son : le « signe dur », rare, sépare la consonne de la voyelle qui suit, dont on entend alors le « y » : подъе́зд se dit à peu près « pad-yèst »",
+        en: "no sound: the 'hard sign', rare, keeps the consonant apart from the vowel after it, whose 'y' you then hear: подъе́зд sounds roughly like 'pad-yest'",
       },
-      // REVIEW: подъе́зд (building entrance) replaces объе́кт from ru.ts as the example: more everyday; объе́кт is kept in words.
+      // подъе́зд (building entrance) replaces объе́кт from ru.ts as the example: more everyday; объе́кт is kept in words.
       example: { word: "подъе́зд", translation: { fr: "entrée d’immeuble", en: "building entrance" }, audio: null },
     },
   ],
@@ -111,7 +111,7 @@ export const ruA0E5VoyellesSignes = {
     { id: "w09", text: "друзья́", latin: "druzʹja", translation: { fr: "amis", en: "friends" }, audio: null },
     { id: "w10", text: "Росси́я", latin: "Rossija", translation: { fr: "Russie", en: "Russia" }, audio: null },
     { id: "w11", text: "люблю́", latin: "ljublju", translation: { fr: "j’aime", en: "I love" }, audio: null },
-    { id: "w12", text: "объе́кт", latin: "obʺekt", translation: { fr: "objet", en: "object" }, audio: null },
+    { id: "w12", text: "объе́кт", latin: "obʺekt", translation: { fr: "objet (d’étude), site", en: "object (of study), site" }, audio: null },
   ],
   items: [
     // Lesson 1, letters: recognition.
@@ -195,7 +195,7 @@ export const ruA0E5VoyellesSignes = {
     {
       id: "i06",
       kind: "listen_mcq",
-      prompt: { fr: "Écoute. Quelle voyelle entends-tu ?", en: "Listen. Which vowel do you hear?" },
+      prompt: { fr: "Écoute. Quelle voyelle s’écrit dans ce mot ?", en: "Listen. Which vowel is written in this word?" },
       options: [
         { id: "a", text: "ё" },
         { id: "b", text: "е" },
@@ -220,8 +220,8 @@ export const ruA0E5VoyellesSignes = {
         { left: "семья́", right: { fr: "famille", en: "family" } },
       ],
       explain: {
-        fr: "Dans семья́, le ь sépare м du я : on entend à peu près « sim’-ya ».",
-        en: "In семья́, ь keeps м apart from я: it sounds like 'sim-ya'.",
+        fr: "Dans семья́, le ь adoucit le м, et le я garde son « y » bien audible : on entend à peu près « sim’-ya ».",
+        en: "In семья́, ь softens the м, and я keeps a clear 'y' sound: it sounds roughly like 'sim-ya'.",
       },
     },
     {
@@ -274,7 +274,7 @@ export const ruA0E5VoyellesSignes = {
       id: "i11",
       kind: "type",
       prompt: { fr: "Écris en lettres latines : юг", en: "Write in Latin letters: юг" },
-      // REVIEW: "yug" accepted besides the transliteration "jug" of ru.ts.
+      // "yug" accepted besides the transliteration "jug" of ru.ts.
       accept: ["jug", "yug"],
       explain: { fr: "Ю-г : jug (ou yug), « sud ».", en: "Ю-г: jug (or yug), 'south'." },
     },
@@ -378,6 +378,6 @@ export const ruA0E5VoyellesSignes = {
     itemIds: ["i02", "i03", "i04", "i05", "i06", "i07", "i09", "i10", "i13", "i15"],
     passScore: 8,
   },
-  aiReview: null,
-  status: "draft",
+  aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
+  status: "reviewed",
 } satisfies UnitSource;

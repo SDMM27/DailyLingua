@@ -41,7 +41,7 @@ export const ruA0E3FormesNouvelles = {
       name: "гэ",
       kind: "new",
       lookalike: null,
-      sound: { fr: "comme « g » dans « gare », toujours dur", en: "like the 'g' in 'go', always hard" },
+      sound: { fr: "comme « g » dans « gare », même devant е et и (jamais comme dans « girafe »)", en: "like the 'g' in 'go', always hard" },
       example: { word: "го́род", translation: { fr: "ville", en: "city, town" }, audio: null },
     },
     {
@@ -78,11 +78,11 @@ export const ruA0E3FormesNouvelles = {
       upper: "Л",
       lower: "л",
       latin: "l",
-      // REVIEW: the name эль uses э and ь (taught in E5); names are labels, not words to read.
+      // The name эль uses э and ь (taught in E5); names are labels, not words to read.
       name: "эль",
       kind: "new",
       lookalike: null,
-      sound: { fr: "comme « l » dans « lac », mais plus sombre ; il ressemble à un petit toit", en: "like the 'l' in 'full', a dark l; it looks like a little roof" },
+      sound: { fr: "comme le « l » anglais de « full » : plus sombre que notre « l », la langue un peu creusée ; il ressemble à un petit toit", en: "like the 'l' in 'full', a dark l; it looks like a little roof" },
       example: { word: "ла́мпа", translation: { fr: "lampe", en: "lamp" }, audio: null },
     },
     {
@@ -220,8 +220,8 @@ export const ruA0E3FormesNouvelles = {
         { left: "хлеб", right: { fr: "pain", en: "bread" } },
       ],
       explain: {
-        fr: "Lis lettre par lettre : д-о-м, д-р-у-г, б-р-а-т, х-л-е-б.",
-        en: "Read letter by letter: д-о-м, д-р-у-г, б-р-а-т, х-л-е-б.",
+        fr: "Lis lettre par lettre : д-о-м, д-р-у-г, б-р-а-т, х-л-е-б. En fin de mot, г et б s’entendent « k » et « p » : on dit à peu près « drouk » et « khliép ».",
+        en: "Read letter by letter: д-о-м, д-р-у-г, б-р-а-т, х-л-е-б. At the end of a word, г and б sound like 'k' and 'p': roughly 'drook' and 'khlyep'.",
       },
     },
     {
@@ -348,6 +348,6 @@ export const ruA0E3FormesNouvelles = {
     itemIds: ["i02", "i03", "i05", "i06", "i08", "i09", "i10", "i12", "i13", "i15"],
     passScore: 8,
   },
-  aiReview: null,
-  status: "draft",
+  aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
+  status: "reviewed",
 } satisfies UnitSource;

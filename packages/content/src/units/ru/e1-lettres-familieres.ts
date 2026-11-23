@@ -16,8 +16,8 @@ export const ruA0E1LettresFamilieres = {
   voice: "ru_RU-denis-medium",
   title: { fr: "Les lettres familières", en: "Familiar letters" },
   situation: {
-    fr: "Six lettres russes ressemblent aux nôtres et se lisent presque pareil : avec elles, tu lis déjà tes premiers mots.",
-    en: "Six Russian letters look like ours and read almost the same: with them, you can already read your first words.",
+    fr: "Six lettres russes ressemblent aux nôtres : cinq se lisent presque pareil, et е cache un « y ». Avec elles, tu lis déjà tes premiers mots.",
+    en: "Six Russian letters look like ours: five read almost the same, and е hides a 'y' sound. With them, you can already read your first words.",
   },
   minutes: 8,
   canDo: [
@@ -52,7 +52,7 @@ export const ruA0E1LettresFamilieres = {
       upper: "М",
       lower: "м",
       latin: "m",
-      // REVIEW: the names эм and тэ use э (taught in E5); names are shown as labels, not as words to read.
+      // The names эм and тэ use э (taught in E5); names are shown as labels, not as words to read.
       name: "эм",
       kind: "same",
       lookalike: null,
@@ -67,7 +67,7 @@ export const ruA0E1LettresFamilieres = {
       kind: "same",
       lookalike: null,
       sound: {
-        fr: "comme « o » dans « mot » quand il est accentué ; sans accent, il se prononce plutôt « a »",
+        fr: "comme « o » dans « porte » quand il est accentué ; sans accent, il se prononce plutôt « a »",
         en: "like the 'o' in 'more' when stressed; unstressed, it sounds more like 'a'",
       },
       example: { word: "том", translation: { fr: "tome, volume", en: "volume (of a book)" }, audio: null },
@@ -90,9 +90,9 @@ export const ruA0E1LettresFamilieres = {
       lower: "е",
       latin: "e",
       name: "е",
-      // REVIEW: ru.ts classes е as "same", although it reads "yé"; kept as in the legacy module.
-      kind: "same",
-      lookalike: null,
+      // A false friend: the shape of a Latin e, but it reads "yé" (ru.ts classes it "same").
+      kind: "false-friend",
+      lookalike: "e",
       sound: {
         fr: "« yé », comme dans « yéti » ; après une consonne, il l’adoucit : те́ма se dit à peu près « t’yéma »",
         en: "'ye', as in 'yes'; after a consonant, it softens it: те́ма sounds roughly like 't-yema'",
@@ -332,6 +332,6 @@ export const ruA0E1LettresFamilieres = {
     itemIds: ["i02", "i04", "i05", "i06", "i08", "i09", "i10", "i12", "i13", "i14"],
     passScore: 8,
   },
-  aiReview: null,
-  status: "draft",
+  aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
+  status: "reviewed",
 } satisfies UnitSource;

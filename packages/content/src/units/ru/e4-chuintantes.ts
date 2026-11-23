@@ -32,14 +32,17 @@ export const ruA0E4Chuintantes = {
       name: "жэ",
       kind: "new",
       lookalike: null,
-      sound: { fr: "comme « j » dans « jour », toujours dur", en: "like the 's' in 'pleasure', always hard" },
+      sound: {
+        fr: "comme « j » dans « jour », mais plus grave, la langue plus en arrière ; il ne s’adoucit jamais, même devant е ou и",
+        en: "like the 's' in 'pleasure', but deeper, with the tongue further back; it never softens, even before е or и",
+      },
       example: { word: "жена́", translation: { fr: "épouse, femme (mariée)", en: "wife" }, audio: null },
     },
     {
       upper: "Й",
       lower: "й",
       latin: "j",
-      name: "и краткое",
+      name: "и кра́ткое",
       kind: "new",
       lookalike: null,
       sound: {
@@ -85,7 +88,10 @@ export const ruA0E4Chuintantes = {
       name: "ша",
       kind: "new",
       lookalike: null,
-      sound: { fr: "comme « ch » dans « chat », toujours dur", en: "like the 'sh' in 'shop', always hard" },
+      sound: {
+        fr: "comme « ch » dans « chat », mais plus grave ; il ne s’adoucit jamais, même devant е ou и",
+        en: "like the 'sh' in 'shop', but deeper; it never softens, even before е or и",
+      },
       example: { word: "шарф", translation: { fr: "écharpe", en: "scarf" }, audio: null },
     },
     {
@@ -109,15 +115,15 @@ export const ruA0E4Chuintantes = {
       kind: "new",
       lookalike: null,
       sound: {
-        fr: "un « i » dit avec la langue en arrière, entre « i » et « ou » ; jamais en début de mot",
-        en: "an 'i' said with the tongue pulled back, between 'i' and 'oo'; never at the start of a word",
+        fr: "dis « ou », puis étire les lèvres comme pour « i » sans bouger la langue : un « i » dit la langue en arrière ; jamais en début de mot",
+        en: "say 'oo', then spread your lips as for 'ee' without moving your tongue: an 'i' with the tongue pulled back; never at the start of a word",
       },
       example: { word: "сын", translation: { fr: "fils", en: "son" }, audio: null },
     },
   ],
   words: [
     { id: "w01", text: "мы", latin: "my", translation: { fr: "nous", en: "we" }, audio: null },
-    { id: "w02", text: "ты", latin: "ty", translation: { fr: "tu", en: "you (one friend)" }, audio: null },
+    { id: "w02", text: "ты", latin: "ty", translation: { fr: "tu", en: "you (informal, one person)" }, audio: null },
     { id: "w03", text: "вы", latin: "vy", translation: { fr: "vous", en: "you (polite or plural)" }, audio: null },
     { id: "w04", text: "муж", latin: "muž", translation: { fr: "mari", en: "husband" }, audio: null },
     { id: "w05", text: "ры́ба", latin: "ryba", translation: { fr: "poisson", en: "fish" }, audio: null },
@@ -141,8 +147,8 @@ export const ruA0E4Chuintantes = {
         { left: "ц", right: { fr: "« ts » de « tsé-tsé »", en: "'ts' in 'cats'" } },
       ],
       explain: {
-        fr: "Quatre sons qui s’écrivent avec deux lettres en français, et une seule en russe.",
-        en: "Four sounds that take two letters in English, and only one in Russian.",
+        fr: "En russe, chacun de ces sons s’écrit avec une seule lettre ; en français, il en faut souvent deux ou trois (ch, tch, ts).",
+        en: "In Russian, each of these sounds takes a single letter; English often needs two (sh, ch, ts).",
       },
     },
     {
@@ -179,13 +185,12 @@ export const ruA0E4Chuintantes = {
       kind: "mcq",
       prompt: { fr: "Quelle est la différence entre и et й ?", en: "What is the difference between и and й?" },
       options: [
-        { id: "a", text: "и = i, й = y bref" },
-        { id: "b", text: "и = i, й = ou" },
+        { id: "a", text: "и = i, й = j" },
+        { id: "b", text: "и = i, й = u" },
         { id: "c", text: "и = n, й = i" },
       ],
       answer: "a",
       audio: null,
-      // REVIEW: options mix Latin letters and French-style sounds ("y bref", "ou"); en speakers read them too.
       explain: {
         fr: "Й, c’est и avec un petit arc : un « y » bref, transcrit j, comme dans мой (« moy »).",
         en: "Й is и with a little arc: a short 'y', written j, as in мой ('moy').",
@@ -251,8 +256,8 @@ export const ruA0E4Chuintantes = {
         { left: "у́лица", right: { fr: "rue", en: "street" } },
       ],
       explain: {
-        fr: "Ж en fin de mot se durcit : муж se dit « mouch ».",
-        en: "Ж at the end of a word hardens: муж sounds like 'moosh'.",
+        fr: "En fin de mot, ж perd sa voix et se prononce comme ш : муж se dit « mouch ».",
+        en: "At the end of a word, ж loses its voicing and sounds like ш: муж sounds like 'moosh'.",
       },
     },
     {
@@ -296,7 +301,7 @@ export const ruA0E4Chuintantes = {
       id: "i12",
       kind: "type",
       prompt: { fr: "Écris en lettres latines : муж", en: "Write in Latin letters: муж" },
-      // REVIEW: "muzh" accepted besides the scholarly "muž" (ž is hard to type on a phone).
+      // "muzh" accepted besides the scholarly "muž" (ž is hard to type on a phone).
       accept: ["muž", "muzh"],
       explain: { fr: "М-у-ж : muž (ou muzh), « mari ».", en: "М-у-ж: muž (or muzh), 'husband'." },
     },
@@ -313,7 +318,7 @@ export const ruA0E4Chuintantes = {
       answer: "b",
       audioText: "мы",
       audio: "/unit-audio/ru/ru-a0-04-chuintantes/i13.mp3",
-      explain: { fr: "Мы = nous ; ты = tu ; вы = vous.", en: "Мы = we; ты = you (one friend); вы = you (polite or plural)." },
+      explain: { fr: "Мы = nous ; ты = tu ; вы = vous.", en: "Мы = we; ты = you (informal, one person); вы = you (polite or plural)." },
     },
     {
       id: "i14",
@@ -371,6 +376,6 @@ export const ruA0E4Chuintantes = {
     itemIds: ["i02", "i03", "i05", "i06", "i07", "i08", "i10", "i12", "i13", "i15"],
     passScore: 8,
   },
-  aiReview: null,
-  status: "draft",
+  aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
+  status: "reviewed",
 } satisfies UnitSource;
