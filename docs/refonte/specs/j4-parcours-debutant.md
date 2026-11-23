@@ -124,3 +124,4 @@ Taux de complétion de l'unité 1 chez les A0, abandon par étape, score moyen a
 
   Le MODEL_CARD de chaque voix utilisée est versionné à côté de l'audio et l'attribution est affichée dans « À propos ». Le genre des voix n'est pas indiqué sur les cartes : on l'établit à l'écoute.
 - **À reprendre hors jalon 4** : l'audio de *La lista della spesa* (jalon 3) a été synthétisé avec la Paola de `paolapersico1`, non retenue pour un usage commercial. À régénérer avec `it_IT-paola-medium` (rhasspy).
+- **2026-11-24, PR 2** : l'alphabet russe donne **5 unités Écriture (E1 à E5), toutes avant les situations**, et non 4 unités entremêlées comme au §3 : l'ancien module compte 5 groupes, et le dialogue de l'unité 1 emploie déjà des lettres du dernier (я, ь). Voir `j4-pr2.md` §0.
