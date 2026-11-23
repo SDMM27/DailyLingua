@@ -34,7 +34,7 @@ for (const unit of units) {
     audioExists: (path) => existsSync(`${AUDIO_DIR}${path}`),
   });
   const newWords = unit.dialogue.glosses.filter((gloss) => gloss.isNew).length;
-  const review = unit.aiReview ? `AI review ${unit.aiReview.reviewedOn} (${unit.aiReview.passes} passes)` : "draft";
+  const review = unit.aiReview ? `AI review ${unit.aiReview.reviewedOn} (${unit.aiReview.passes} passes), ${unit.status}` : unit.status;
   const published = isPublished(unit) ? "published" : "not published";
   const summary = `${unit.id} v${unit.version}: ${unit.items.length} items, ${newWords} new words, ${review}, ${published}`;
   // A draft may wait for its audio (generated locally with Piper); a published unit may not.

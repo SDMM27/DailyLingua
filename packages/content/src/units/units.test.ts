@@ -80,7 +80,8 @@ describe("buildRegistry", () => {
 
 describe("isPublished", () => {
   it("is true once an AI review is recorded", () => {
-    expect(isPublished({ aiReview: null })).toBe(false);
-    expect(isPublished({ aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" } })).toBe(true);
+    expect(isPublished({ status: "draft" })).toBe(false);
+    expect(isPublished({ status: "reviewed" })).toBe(false);
+    expect(isPublished({ status: "published" })).toBe(true);
   });
 });

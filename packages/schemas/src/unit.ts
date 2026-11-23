@@ -165,6 +165,9 @@ const turnSchema = z.strictObject({
 });
 
 /** What an author writes: a unit without its `version`. */
+export const unitStatuses = ["draft", "reviewed", "published"] as const;
+export type UnitStatus = (typeof unitStatuses)[number];
+
 export const unitSchema = z.strictObject({
   id: unitIdSchema,
   language: languageCodeSchema,
@@ -192,6 +195,14 @@ export const unitSchema = z.strictObject({
   conversation: z.strictObject({ turns: z.array(turnSchema).min(1) }),
   /** AI review status; the only one (an agent never records a human review). */
   aiReview: z.strictObject({ reviewedOn: dateKeySchema, passes: z.number().int().min(2), arbiter: textSchema }).nullable(),
+  /**
+   * Editorial status: `draft`, then `reviewed` (AI review done, audio may still be missing), then `published` (served in
+   * production; `units:check` then requires every audio file). Reviewed and published need `aiReview`.
+   */
+  status: z.enum(unitStatuses).default("draft"),
+}).refine((unit) => unit.status === "draft" || unit.aiReview !== null, {
+  message: "A reviewed or published unit needs aiReview",
+  path: ["status"],
 });
 /** What an author writes (`transliteration` may be left out); parsing fills it with null. */
 export type UnitSource = z.input<typeof unitSchema>;

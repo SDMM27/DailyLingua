@@ -35,6 +35,6 @@ export function unitsIn(registry: Readonly<Record<UnitId, Unit>>, language: stri
 }
 
 /** A unit is published once an AI review is recorded on it. */
-export function isPublished(unit: Pick<Unit, "aiReview">): boolean {
-  return unit.aiReview !== null;
+export function isPublished(unit: Pick<Unit, "status">): boolean {
+  return unit.status === "published";
 }
