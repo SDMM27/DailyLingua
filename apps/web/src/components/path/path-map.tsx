@@ -148,7 +148,8 @@ function StationRow({ station, language, locale, onOpen, ref }: { station: Stati
         <span className="block text-base leading-snug font-semibold" lang={locale}>{title}</span>
         {done ? (
           <>
-            <span className="mt-0.5 block font-display text-[15px] leading-snug italic" lang={locale}>{station.canDo}</span>
+            {/* Upright for writing units: italic Cyrillic changes letter shapes (т looks like m, д like g). */}
+            <span className={`mt-0.5 block font-display text-[15px] leading-snug ${station.kind === "script" ? "" : "italic"}`} lang={locale}>{station.canDo}</span>
             {station.passedByTest && <span className="block text-[13px] text-muted">{t("passedByTest")}</span>}
           </>
         ) : (
