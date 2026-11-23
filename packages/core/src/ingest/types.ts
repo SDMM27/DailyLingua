@@ -1,4 +1,4 @@
-import type { CardKind, CardState, CefrLevel, DateKey, ExerciseKind, IngestPayload, LanguageCode, ReviewMode, RingTier, SessionFormat, SessionKind } from "@dailylingua/schemas";
+import type { CardKind, CardState, CefrLevel, DateKey, ExerciseKind, IngestPayload, LanguageCode, ReviewMode, RingTier, SessionFormat, SessionKind, Unit, UnitLessonId } from "@dailylingua/schemas";
 import type { RejectedDelivery } from "../offline/types";
 import type { SettingChange } from "../game/settings";
 import type { TimeZoneChange } from "../game/attribution";
@@ -22,6 +22,8 @@ export interface IngestState {
     answerTolerance: "strict" | "lenient";
     /** Ring tier when `ring.tier` was never set: the duration of the learner's session. */
     defaultRingTier: RingTier;
+    /** Language the backs of unit cards are written in: the native language when it is fr or en, else en. */
+    explanationLanguage: "fr" | "en";
   };
   sessions: Record<string, StateSession>;
   items: Record<string, StateItem>;
@@ -55,6 +57,38 @@ export interface IngestState {
   verifiedSentences?: Record<string, number[]>;
   /** Texts of the last 30 productions of the learner (similarity check). */
   recentProductionTexts: { id: string; text: string }[];
+  /** `unit_progress` of the units the batch refers to, by unit id (absent: never touched). */
+  unitProgress: Record<string, StateUnitProgress>;
+  /**
+   * Current content of the units the batch refers to, injected by the caller from `@dailylingua/content` (core never
+   * imports content). A unit absent from here is `unknown_unit`.
+   */
+  units: Record<string, Unit>;
+  /** Attempts already recorded on the items of those units (`attempt` rows of kind `unit_*`), any version, chronological. */
+  unitAttempts: Record<string, StateUnitAttempt[]>;
+  /** Test attempt ids of the batch already recorded (`unit_test.id`, any account): `duplicate_test_attempt`. */
+  unitTestIds: string[];
+}
+
+export interface StateUnitProgress {
+  /** Version of the unit the progress was last written with. */
+  version: string;
+  /** Validated steps, `<lesson>:<step>` → instant of the validation. */
+  steps: Record<string, string>;
+  bestScore: number | null;
+  testAttempts: number;
+  /** First time the test was passed; never cleared. */
+  passedAt: string | null;
+  passedVersion: string | null;
+}
+
+export interface StateUnitAttempt {
+  lesson: UnitLessonId;
+  itemId: string;
+  try: number;
+  correct: boolean;
+  occurredAt: string;
+  version: string;
 }
 
 export interface StateSession {
@@ -176,6 +210,7 @@ export interface StateDay {
   readingTexts: number;
   /** Rewards already paid, by rule paid by count. */
   rewards: Record<string, number>;
+  /** Focus XP by session id, or by `unit:<unitId>:<lesson>` for the items of a unit lesson. */
   focusBySession: Record<string, number>;
   rewardsByCorrection: Record<string, number>;
   /** `review:<cardId>`, `focus1:<itemId>`, `focus2:<itemId>`, `focusWrong:<itemId>`, `reading:<textId>`, `rewrite:<correctionId>:<n>`, `errorItem:<id>`. */

@@ -2,7 +2,7 @@ import { ingestPayloadSchema, isEmptyIngestPayload, type IngestPayload } from "@
 import { describe, expect, it } from "vitest";
 import { HOUR_MS, DAY_MS } from "../game";
 import { planIngest } from "./plan-ingest";
-import { NOW, SESSION, TEXT, TODAY, card, correction, emptyState, eventWriter, item, iso, review, session, text, uuid, words } from "./fixtures";
+import { NOW, SESSION, TEXT, TODAY, UNIT_ID, UNIT_VERSION, card, correction, emptyState, eventWriter, item, iso, review, session, text, unit, uuid, words } from "./fixtures";
 import type { IngestState, RawEvent } from "./types";
 
 /** Plans a batch and checks that the payload obeys the contract of `ingest_batch`. */
@@ -26,7 +26,7 @@ describe("planIngest: reviews", () => {
     expect(payload.reviews[0]).toMatchObject({ card_id: uuid(31), rating: 3, mode: "recognition", reviewed_at: iso("09:00:10") });
     expect(payload.reviews[0]?.card.reps).toBe(4);
     expect(payload.xp).toEqual([
-      expect.objectContaining({ reason: "review.recognition", amount: 1, day: TODAY, language: "it", rule_version: "j2.1", league_eligible: true, source: { kind: "review", client_event_id: payload.reviews[0]?.client_event_id } }),
+      expect.objectContaining({ reason: "review.recognition", amount: 1, day: TODAY, language: "it", rule_version: "j4.1", league_eligible: true, source: { kind: "review", client_event_id: payload.reviews[0]?.client_event_id } }),
     ]);
     expect(payload.xp[0]?.meta).toMatchObject({ occurredDay: TODAY, late: false, long: false, diminished: false, volet: "study" });
     expect(payload.learning_days).toEqual([expect.objectContaining({ day: TODAY, xp_verified: 1, validated: false, cause: "none", time_zone: "Europe/Paris" })]);
@@ -562,5 +562,163 @@ describe("planIngest: the streak across batches", () => {
     const { payload } = plan(s, [review(eventWriter(), uuid(31), "2026-11-12T09:00:10.000Z")], new Date("2026-11-12T10:00:00Z"));
     // Wednesday the 11th is a rest day: the series goes on without a freeze.
     expect(payload.streak).toMatchObject({ freezes: 1 });
+  });
+});
+
+describe("planIngest: units", () => {
+  const unitState = (extra: Partial<IngestState> = {}) => emptyState({ units: { [UNIT_ID]: unit() }, ...extra });
+  const base = { unitId: UNIT_ID, unitVersion: UNIT_VERSION };
+  const at = (seconds: number) => new Date(Date.parse(iso("09:00:00")) + seconds * 1000).toISOString();
+  const attempt = (ev: ReturnType<typeof eventWriter>, seconds: number, itemId: string, answer = "a", tryNo = 1, lesson = "l1") =>
+    ev("unit_item_attempt", at(seconds), { ...base, lesson, itemId, try: tryNo, answer, shownAt: at(seconds - 2) });
+  const step = (ev: ReturnType<typeof eventWriter>, seconds: number, lesson: string, name: string) => ev("unit_step_completed", at(seconds), { ...base, lesson, step: name });
+  const test = (ev: ReturnType<typeof eventWriter>, seconds: number, right: number, attemptId = uuid(700)) =>
+    ev("unit_test_submitted", at(seconds), { ...base, attemptId, startedAt: at(seconds - 60), answers: Array.from({ length: 10 }, (_, i) => ({ itemId: `q${i + 1}`, answer: i < right ? "a" : "b" })) });
+
+  it("pays focus.first_try (2 XP) for an item right at the first try and writes an attempt row without session", () => {
+    const ev = eventWriter();
+    const { payload, rejected } = plan(unitState(), [attempt(ev, 10, "q1")]);
+    expect(rejected).toEqual([]);
+    expect(payload.attempts).toEqual([expect.objectContaining({
+      session_id: null, language: "it", step: "unit", exercise_kind: "unit_mcq", correct: true, duration_ms: 2000,
+      answer: { value: "a", try: 1, unitId: UNIT_ID, unitVersion: UNIT_VERSION, lesson: "l1", itemId: "q1" },
+    })]);
+    expect(payload.attempts[0]?.exercise_ref).toMatch(/^[0-9a-f-]{36}$/);
+    expect(payload.xp).toEqual([expect.objectContaining({ reason: "focus.first_try", amount: 2, rule_version: "j4.1", source: { kind: "attempt", client_event_id: payload.attempts[0]?.client_event_id } })]);
+    expect(payload.unit_progress).toEqual([{ unit_id: UNIT_ID, language: "it", version: UNIT_VERSION, steps: {}, best_score: null, test_attempts: 0, passed_at: null, passed_version: null }]);
+  });
+
+  it("pays focus.second_try (1 XP) after a wrong first try, nothing at the third", () => {
+    const ev = eventWriter();
+    const { payload } = plan(unitState(), [attempt(ev, 10, "q1", "b"), attempt(ev, 20, "q1", "a", 2), attempt(ev, 30, "q2", "b"), attempt(ev, 40, "q2", "b", 2), attempt(ev, 50, "q2", "a", 3)]);
+    expect(payload.xp.map((line) => [line.reason, line.amount])).toEqual([["focus.second_try", 1]]);
+    expect(payload.attempts.map((row) => row.correct)).toEqual([false, true, false, false, true]);
+  });
+
+  it("pays an item once per account: a repeat, the same day or later, earns 0 with already_earned", () => {
+    const ev = eventWriter();
+    const first = plan(unitState(), [attempt(ev, 10, "q1")]);
+    const again = plan(first.nextState, [attempt(ev, 20, "q1")]);
+    expect(again.payload.xp).toEqual([]);
+    expect(again.report.zeroed).toEqual([{ clientEventId: again.payload.attempts[0]?.client_event_id, reason: "already_earned" }]);
+    expect(again.payload.attempts[0]?.result).toMatchObject({ xpReason: "already_earned" });
+    const known = unitState({ unitAttempts: { [UNIT_ID]: [{ lesson: "l2", itemId: "q1", try: 1, correct: true, occurredAt: "2026-11-01T10:00:00.000Z", version: "aaaaaaaaaaaa" }] } });
+    expect(plan(known, [attempt(eventWriter(), 10, "q1")]).payload.xp).toEqual([]);
+  });
+
+  it("caps the items at 20 XP per (unit, lesson) and shares the 40 XP of focus a day with the sessions", () => {
+    const ev = eventWriter();
+    const l2 = Array.from({ length: 12 }, (_, i) => attempt(ev, 10 + i * 10, `q${9 + i}`, "a", 1, "l2"));
+    const { payload, report } = plan(unitState(), [...l2, attempt(ev, 200, "q5")]);
+    expect(xpOf(payload)).toBe(22);
+    expect(report.zeroed.filter((z) => z.reason === "cap_reached")).toHaveLength(2);
+    const busy = unitState({ days: { [TODAY]: { xpByReason: { "focus.first_try": 37 }, reviewSuccesses: 0, newCards: 0, readingTexts: 0, rewards: {}, focusBySession: { [SESSION]: 20 }, rewardsByCorrection: {}, counted: [] } } });
+    const ev2 = eventWriter();
+    const capped = plan(busy, [attempt(ev2, 10, "q1"), attempt(ev2, 20, "q2"), attempt(ev2, 30, "q3")]);
+    expect(xpOf(capped.payload)).toBe(3);
+    expect(capped.report.zeroed.map((z) => z.reason)).toEqual(["cap_reached"]);
+  });
+
+  it("passes the test at 8/10 without any step done: 25 XP, a unit_test row, passed_at and the best score", () => {
+    const ev = eventWriter();
+    const { payload, rejected } = plan(unitState(), [test(ev, 100, 8)]);
+    expect(rejected).toEqual([]);
+    expect(payload.unit_tests).toEqual([{ id: uuid(700), unit_id: UNIT_ID, version: UNIT_VERSION, client_event_id: expect.any(String), score: 8, passed: true, missed: ["q9", "q10"] }]);
+    expect(payload.xp).toEqual([expect.objectContaining({ reason: "unit.complete", amount: 25, source: null, language: "it", meta: expect.objectContaining({ ref: UNIT_ID, volet: null }) })]);
+    expect(payload.unit_progress[0]).toMatchObject({ best_score: 8, test_attempts: 1, passed_at: at(100), passed_version: UNIT_VERSION, steps: {} });
+    expect(payload.learning_days[0]).toMatchObject({ xp_verified: 25, validated: true, cause: "work" });
+  });
+
+  it("fails at 7/10, then a second pass earns nothing and keeps the first passed_at; items after a pass earn nothing", () => {
+    const ev = eventWriter();
+    const failed = plan(unitState(), [test(ev, 100, 7, uuid(701))]);
+    expect(failed.payload.xp).toEqual([]);
+    expect(failed.payload.unit_progress[0]).toMatchObject({ best_score: 7, test_attempts: 1, passed_at: null });
+    const passed = plan(failed.nextState, [test(ev, 200, 9, uuid(702))]);
+    expect(xpOf(passed.payload)).toBe(25);
+    const again = plan(passed.nextState, [test(ev, 300, 10, uuid(703)), attempt(ev, 400, "q1")]);
+    expect(again.payload.xp).toEqual([]);
+    expect(again.report.zeroed.map((z) => z.reason)).toEqual(["already_earned", "already_earned"]);
+    expect(again.payload.unit_progress[0]).toMatchObject({ best_score: 10, test_attempts: 3, passed_at: at(200) });
+  });
+
+  it("caps unit.complete at 2 units a learning day: the third earns 0 with cap_reached but is passed", () => {
+    const day = { xpByReason: { "unit.complete": 50 }, reviewSuccesses: 0, newCards: 0, readingTexts: 0, rewards: { "unit.complete": 2 }, focusBySession: {}, rewardsByCorrection: {}, counted: [] };
+    const { payload, report } = plan(unitState({ days: { [TODAY]: day } }), [test(eventWriter(), 100, 10)]);
+    expect(payload.xp).toEqual([]);
+    expect(report.zeroed.map((z) => z.reason)).toEqual(["cap_reached"]);
+    expect(payload.unit_progress[0]?.passed_at).toBe(at(100));
+  });
+
+  it("refuses an unknown or unpublished unit (unless drafts are allowed), another version and an unknown item", () => {
+    const ev = eventWriter();
+    const other = ev("unit_item_attempt", at(10), { ...base, unitId: "it-a1-02-altro", lesson: "l1", itemId: "q1", try: 1, answer: "a", shownAt: at(8) });
+    const oldVersion = ev("unit_item_attempt", at(11), { ...base, unitVersion: "ffffffffffff", lesson: "l1", itemId: "q1", try: 1, answer: "a", shownAt: at(9) });
+    const outOfLesson = attempt(ev, 12, "q9", "a", 1, "l1");
+    const missing = attempt(ev, 13, "q99");
+    const testOutside = ev("unit_test_submitted", at(14), { ...base, attemptId: uuid(710), startedAt: at(1), answers: [{ itemId: "q11", answer: "a" }] });
+    const testTwice = ev("unit_test_submitted", at(15), { ...base, attemptId: uuid(711), startedAt: at(1), answers: [{ itemId: "q1", answer: "a" }, { itemId: "q1", answer: "a" }] });
+    const { payload, rejected } = plan(unitState(), [other, oldVersion, outOfLesson, missing, testOutside, testTwice]);
+    expect(rejected.map((r) => r.reason)).toEqual(["unknown_unit", "unit_version_mismatch", "unknown_item", "unknown_item", "unknown_item", "invalid_payload"]);
+    expect(isEmptyIngestPayload(payload)).toBe(true);
+
+    const draft = emptyState({ units: { [UNIT_ID]: unit({ status: "reviewed" }) } });
+    const event = attempt(eventWriter(), 10, "q1");
+    expect(plan(draft, [event]).rejected).toEqual([{ clientEventId: event.clientEventId, reason: "unknown_unit" }]);
+    expect(planIngest(draft, [event], NOW, { allowDrafts: true }).rejected).toEqual([]);
+  });
+
+  it("refuses a test attempt id already recorded, or used twice in the batch (the first by instant is kept)", () => {
+    const ev = eventWriter();
+    expect(plan(unitState({ unitTestIds: [uuid(700)] }), [test(ev, 100, 8)]).rejected.map((r) => r.reason)).toEqual(["duplicate_test_attempt"]);
+    const late = test(ev, 300, 8, uuid(720));
+    const early = test(ev, 200, 9, uuid(720));
+    const { payload, rejected } = plan(unitState(), [late, early]);
+    expect(rejected).toEqual([{ clientEventId: late.clientEventId, reason: "duplicate_test_attempt" }]);
+    expect(payload.unit_tests.map((row) => row.score)).toEqual([9]);
+  });
+
+  it("records a step only when the attempts prove it (state + batch), else step_not_proven; no XP", () => {
+    const ev = eventWriter();
+    const unproven = step(ev, 5, "l1", "dialogue");
+    const first = plan(unitState(), [unproven]);
+    expect(first.rejected).toEqual([{ clientEventId: unproven.clientEventId, reason: "step_not_proven" }]);
+    expect(first.payload.unit_progress).toEqual([]);
+    expect(first.payload.device_cursors).toEqual([]);
+    const { payload, rejected } = plan(unitState(), [attempt(ev, 10, "q1", "b"), attempt(ev, 20, "q2", "b"), step(ev, 30, "l1", "dialogue"), attempt(ev, 40, "q5"), attempt(ev, 50, "q6", "b"), step(ev, 60, "l1", "exercises")]);
+    expect(rejected.map((r) => r.reason)).toEqual(["step_not_proven"]);
+    expect(payload.unit_progress[0]?.steps).toEqual({ "l1:dialogue": at(30) });
+    const known = ["q5", "q6", "q7"].map((itemId) => ({ lesson: "l1" as const, itemId, try: 1, correct: true, occurredAt: at(1), version: UNIT_VERSION }));
+    const ev2 = eventWriter(300);
+    const later = plan(unitState({ unitAttempts: { [UNIT_ID]: known } }), [attempt(ev2, 70, "q8", "b"), step(ev2, 80, "l1", "exercises")]);
+    expect(later.rejected).toEqual([]);
+    expect(later.payload.unit_progress[0]?.steps).toEqual({ "l1:exercises": at(80) });
+    expect(later.payload.xp).toEqual([]);
+  });
+
+  it("turns the key phrases into chunk cards at l1:key_phrases, once, skipping fronts the learner has", () => {
+    const ev = eventWriter();
+    const s = unitState({ cardFronts: ["it|chunk|frase 6"] });
+    const { payload, nextState } = plan(s, [attempt(ev, 10, "q3"), attempt(ev, 20, "q4"), step(ev, 30, "l1", "key_phrases")]);
+    expect(payload.cards_created).toHaveLength(5);
+    expect(payload.cards_created[0]).toMatchObject({ language: "it", kind: "chunk", front: "Frase 1", back: "Phrase 1 (fr)", back_language: "fr", context: "Battuta 1", source: "unit", state: "new", payload: { unitId: UNIT_ID, keyPhraseId: "k1" } });
+    expect(payload.cards_created[2]?.context).toBeNull();
+    expect(payload.cards_created[0]?.due_at).toBe("2026-11-13T03:00:00.000Z");
+    expect(payload.unit_progress[0]?.steps).toEqual({ "l1:key_phrases": at(30) });
+    const again = plan(nextState, [step(ev, 40, "l1", "key_phrases")]);
+    expect(again.rejected).toEqual([]);
+    expect(again.payload.cards_created).toEqual([]);
+    const ev2 = eventWriter(500);
+    const english = plan(unitState({ profile: { ...emptyState().profile, explanationLanguage: "en" } }), [attempt(ev2, 10, "q3"), attempt(ev2, 20, "q4"), step(ev2, 30, "l1", "key_phrases")]);
+    expect(english.payload.cards_created[0]).toMatchObject({ back: "Phrase 1 (en)", back_language: "en" });
+  });
+
+  it("writes nothing for a replay of unit events already ingested", () => {
+    const ev = eventWriter();
+    const events = [attempt(ev, 10, "q1"), test(ev, 100, 8)];
+    const first = plan(unitState(), events);
+    const replay = plan(first.nextState, events);
+    expect(isEmptyIngestPayload(replay.payload)).toBe(true);
+    expect(replay.report.duplicates).toHaveLength(2);
   });
 });
