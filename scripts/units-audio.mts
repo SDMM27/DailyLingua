@@ -17,7 +17,7 @@
  * stressed words (здра́вствуйте → "zdrafstvujte") and places the stress correctly without them. They stay on screen.
  */
 import { execFile } from "node:child_process";
-import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { promisify } from "node:util";
@@ -129,6 +129,17 @@ function recordPath(source: string, clip: Clip): { source: string; changed: bool
   return { source: `${source.slice(0, index)}audio: "${clip.path}"${source.slice(index + "audio: null".length)}`, changed: true };
 }
 
+/** The source file that declares this unit (file names do not follow the id: `01-saluer.ts`, `e1-lettres-familieres.ts`). */
+function sourceFileOf(unit: Unit): string {
+  const folder = join(SOURCES, unit.language);
+  const found = readdirSync(folder)
+    .filter((name) => name.endsWith(".ts"))
+    .map((name) => join(folder, name))
+    .filter((file) => readFileSync(file, "utf8").includes(`id: "${unit.id}"`));
+  if (found.length !== 1) fail(`expected one source file declaring ${unit.id} in ${folder}, found ${found.length}`);
+  return found[0] as string;
+}
+
 const units = Object.values(UNITS).filter((unit) => only === null || unit.id === only);
 if (units.length === 0) fail(only ? `unknown unit "${only}"` : "no unit in the registry");
 if (!existsSync(PYTHON)) fail(`Piper is not installed: ${PYTHON} is missing (see the header of this script)`);
@@ -137,8 +148,7 @@ for (const unit of units) {
   const work = join(tmpdir(), `units-audio-${unit.id}`);
   rmSync(work, { recursive: true, force: true });
   mkdirSync(work, { recursive: true });
-  const sourceFile = join(SOURCES, unit.language, `${unit.id.split("-")[2]}-${unit.id.split("-").slice(3).join("-")}.ts`);
-  if (!existsSync(sourceFile)) fail(`source file not found for ${unit.id}: ${sourceFile}`);
+  const sourceFile = sourceFileOf(unit);
   let source = readFileSync(sourceFile, "utf8");
   let made = 0;
   let recorded = 0;
