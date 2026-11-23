@@ -1,4 +1,5 @@
 import type { IngestRefs } from "@dailylingua/data";
+import { UNIT_ID_PATTERN } from "@dailylingua/schemas";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 /** A batch has at most 50 events; this bounds the lists even if a caller forgets to check. */
@@ -10,7 +11,8 @@ const isRecord = (value: unknown): value is Record<string, unknown> => typeof va
  * The ids the delivered events refer to, for `readIngestRows`. The events are NOT trusted: they are raw JSON that
  * `planIngest` validates later, so here a value counts only when it is a string in UUID form (anything else could
  * not be a row id, and a free string must never reach a database filter). An event that is not an object, a payload
- * that is not an object, a missing field: nothing is collected, nothing throws.
+ * that is not an object, a missing field: nothing is collected, nothing throws. A unit id counts only in the unit id
+ * format (`UNIT_ID_PATTERN`).
  */
 export function extractRefs(events: readonly unknown[]): IngestRefs {
   const sets = {
@@ -21,6 +23,8 @@ export function extractRefs(events: readonly unknown[]): IngestRefs {
     correctionIds: new Set<string>(),
     deviceIds: new Set<string>(),
     clientEventIds: new Set<string>(),
+    unitIds: new Set<string>(),
+    unitTestIds: new Set<string>(),
   };
   const take = (set: Set<string>, value: unknown) => {
     if (typeof value === "string" && UUID.test(value) && set.size < MAX_REFS) set.add(value);
@@ -36,6 +40,8 @@ export function extractRefs(events: readonly unknown[]): IngestRefs {
     take(sets.productionIds, payload.productionId);
     if (event.kind === "rewrite_submitted") take(sets.correctionIds, payload.correctionId);
     take(sets.deviceIds, payload.deviceId);
+    if (typeof payload.unitId === "string" && UNIT_ID_PATTERN.test(payload.unitId) && sets.unitIds.size < MAX_REFS) sets.unitIds.add(payload.unitId);
+    if (event.kind === "unit_test_submitted") take(sets.unitTestIds, payload.attemptId);
   }
   return {
     sessionIds: [...sets.sessionIds],
@@ -45,5 +51,7 @@ export function extractRefs(events: readonly unknown[]): IngestRefs {
     ...(sets.correctionIds.size > 0 ? { correctionIds: [...sets.correctionIds] } : {}),
     deviceIds: [...sets.deviceIds],
     clientEventIds: [...sets.clientEventIds],
+    ...(sets.unitIds.size > 0 ? { unitIds: [...sets.unitIds] } : {}),
+    ...(sets.unitTestIds.size > 0 ? { unitTestIds: [...sets.unitTestIds] } : {}),
   };
 }

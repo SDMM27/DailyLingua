@@ -18,7 +18,7 @@ describe("buildIngestState: profile", () => {
       }),
       memo: null,
     });
-    expect(state.profile).toEqual({ timeZone: "Asia/Tokyo", createdAt: "2026-10-01T00:00:00+00:00", writingLevels: { it: "A2", es: "C1", de: "B2" }, answerTolerance: "strict", defaultRingTier: 20 });
+    expect(state.profile).toEqual({ timeZone: "Asia/Tokyo", createdAt: "2026-10-01T00:00:00+00:00", writingLevels: { it: "A2", es: "C1", de: "B2" }, answerTolerance: "strict", defaultRingTier: 20, explanationLanguage: "en" });
   });
 
   it("defaults to a lenient tolerance and a 15 minute ring, and omits a language without an estimate", () => {
