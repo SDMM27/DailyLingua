@@ -560,14 +560,14 @@ isOneToOne: false
                   ]
                 },"text": {
                   Row: {
-                    "body": string,"checks": NonNullable<Json>,"created_at": string,"density": number,"grammar_point": string | null,"id": string,"language": string,"level_band": string,"listening_segment": Json | null,"model": string | null,"new_words": NonNullable<Json>,"prompt_version": string,"status": string,"theme": string,"title": string,"variant": number,"word_count": number,"writing_task": string | null
+                    "audio_path": string | null,"body": string,"checks": NonNullable<Json>,"created_at": string,"density": number,"grammar_point": string | null,"id": string,"language": string,"level_band": string,"listening_segment": Json | null,"model": string | null,"new_words": NonNullable<Json>,"prompt_version": string,"status": string,"theme": string,"title": string,"variant": number,"word_count": number,"writing_task": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "body": string,"checks"?: NonNullable<Json>,"created_at"?: string,"density": number,"grammar_point"?: string | null,"id"?: string,"language": string,"level_band": string,"listening_segment"?: Json | null,"model"?: string | null,"new_words"?: NonNullable<Json>,"prompt_version": string,"status"?: string,"theme": string,"title": string,"variant"?: number,"word_count": number,"writing_task"?: string | null
+                    "audio_path"?: string | null,"body": string,"checks"?: NonNullable<Json>,"created_at"?: string,"density": number,"grammar_point"?: string | null,"id"?: string,"language": string,"level_band": string,"listening_segment"?: Json | null,"model"?: string | null,"new_words"?: NonNullable<Json>,"prompt_version": string,"status"?: string,"theme": string,"title": string,"variant"?: number,"word_count": number,"writing_task"?: string | null
                   }
                   Update: {
-                    "body"?: string,"checks"?: NonNullable<Json>,"created_at"?: string,"density"?: number,"grammar_point"?: string | null,"id"?: string,"language"?: string,"level_band"?: string,"listening_segment"?: Json | null,"model"?: string | null,"new_words"?: NonNullable<Json>,"prompt_version"?: string,"status"?: string,"theme"?: string,"title"?: string,"variant"?: number,"word_count"?: number,"writing_task"?: string | null
+                    "audio_path"?: string | null,"body"?: string,"checks"?: NonNullable<Json>,"created_at"?: string,"density"?: number,"grammar_point"?: string | null,"id"?: string,"language"?: string,"level_band"?: string,"listening_segment"?: Json | null,"model"?: string | null,"new_words"?: NonNullable<Json>,"prompt_version"?: string,"status"?: string,"theme"?: string,"title"?: string,"variant"?: number,"word_count"?: number,"writing_task"?: string | null
                   }
                   Relationships: [
                     {

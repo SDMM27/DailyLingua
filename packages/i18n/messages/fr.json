@@ -40,7 +40,13 @@
     "saved": "Ajouté à tes révisions.",
     "failed": "La carte n’a pas pu être ajoutée. Tu peux réessayer.",
     "sameMeaning": "Même sens en {language}",
-    "falseFriend": "Faux ami en {language}"
+    "falseFriend": "Faux ami en {language}",
+    "beforeReading": "Avant de lire",
+    "coverage": "d’après tes révisions ({recognized} mots repérés sur {total}).",
+    "coverageUnknown": "Pas encore assez de révisions pour estimer les mots que tu connais.",
+    "audioLabel": "Écouter le texte",
+    "audioPending": "Audio en préparation.",
+    "audioUnavailable": "La lecture audio est momentanément indisponible."
   },
   "knownLanguages": {
     "onboardingTitle": "Autres langues que tu connais (facultatif)",

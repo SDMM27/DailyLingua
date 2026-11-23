@@ -1,5 +1,5 @@
 import { appSchema, type AppClient } from "./client";
-import { unwrap, unwrapRows } from "./query";
+import { fetchAll, unwrap, unwrapRows } from "./query";
 
 export async function listReaderTexts(client: AppClient, languages: string[]) {
   if (languages.length === 0) return [];
@@ -10,9 +10,19 @@ export async function listReaderTexts(client: AppClient, languages: string[]) {
 
 export async function readReaderText(client: AppClient, id: string) {
   const result = await appSchema(client).from("text")
-    .select("id, language, title, level_band, body, new_words")
+    .select("id, language, title, level_band, body, new_words, audio_path")
     .eq("status", "published").eq("id", id).maybeSingle();
   return unwrap(result);
+}
+
+/** Exact written forms from the learner's RLS-scoped vocabulary, without archived or overdue reviews. */
+export async function readReaderVocabulary(client: AppClient, language: string, now: Date): Promise<string[]> {
+  const db = appSchema(client);
+  const rows = await fetchAll((from, to) => db.from("card").select("front").eq("language", language)
+    .eq("kind", "word").is("deleted_at", null)
+    .or(`state.eq.known,and(state.eq.review,reps.gte.2,due_at.gt.${now.toISOString()})`)
+    .order("id").range(from, to));
+  return rows.map(({ front }) => front);
 }
 
 /** The service writes only the card assembled from the published text and validated learner. */

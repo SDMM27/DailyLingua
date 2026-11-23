@@ -40,7 +40,13 @@
     "saved": "Added to your reviews.",
     "failed": "The card couldn’t be added. You can try again.",
     "sameMeaning": "Same meaning in {language}",
-    "falseFriend": "False friend in {language}"
+    "falseFriend": "False friend in {language}",
+    "beforeReading": "Before reading",
+    "coverage": "based on your reviews ({recognized} out of {total} words recognized).",
+    "coverageUnknown": "There isn’t enough review history yet to estimate how many words you know.",
+    "audioLabel": "Listen to the text",
+    "audioPending": "Audio is being prepared.",
+    "audioUnavailable": "Audio playback is temporarily unavailable."
   },
   "knownLanguages": {
     "onboardingTitle": "Other languages you know (optional)",
