@@ -33,12 +33,14 @@ interface Feedback {
  * step (`requeue`) for a third and last try, which earns no XP. Every try is reported (`onAttempt`), the XP is an
  * estimate (the server decides).
  */
-export function ExerciseRunner({ items, language, locale, tolerance, requeue = true, context, onAttempt, onXp, onProgress, onDone }: {
+export function ExerciseRunner({ items, language, locale, tolerance, requeue = true, showXp = true, context, onAttempt, onXp, onProgress, onDone }: {
   items: UnitItem[];
   language: string;
   locale: "fr" | "en";
   tolerance: AccentTolerance;
   requeue?: boolean;
+  /** Whether the feedback shows the estimated XP (not in the review of a passed unit, nor in a warm-up). */
+  showXp?: boolean;
   /** What to show above the current item (the previous turns of a conversation). */
   context?(item: UnitItem): ReactNode;
   onAttempt(attempt: ItemAttempt): void;
@@ -115,7 +117,7 @@ export function ExerciseRunner({ items, language, locale, tolerance, requeue = t
       {feedback && (
         <FeedbackSheet
           verdict={feedback.verdict}
-          xp={feedback.xp}
+          xp={showXp ? feedback.xp : null}
           language={language}
           locale={locale}
           expected={feedback.verdict === "wrong" ? expectedText(item, locale) : null}

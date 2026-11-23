@@ -175,6 +175,7 @@ export function UnitFlow({ unit, progress, locale, tolerance, xpVisible, animate
         <ExerciseRunner
           key="warmup"
           items={warmupItems}
+          showXp={false}
           language={language}
           locale={locale}
           tolerance={tolerance}
@@ -254,6 +255,7 @@ export function UnitFlow({ unit, progress, locale, tolerance, xpVisible, animate
           tolerance={tolerance}
           context={current.step === "conversation" ? (item) => <ConversationContext unit={unit} item={item} locale={locale} /> : undefined}
           onAttempt={onAttempt}
+          showXp={payXp && xpVisible}
           onXp={(gain) => { if (payXp) setXp((value) => value + gain); }}
           onProgress={setShare}
           onDone={completeStep}
