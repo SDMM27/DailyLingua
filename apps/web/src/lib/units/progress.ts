@@ -1,3 +1,6 @@
+import { getUnitProgressOne } from "@dailylingua/data";
+import { getRequestClient } from "@/lib/session";
+
 /** What the server knows of a learner's progress in one unit (a read model; the screens never write it). */
 export interface UnitProgressView {
   /** Validated steps by key (`"l1:dialogue"`), with the instant of validation. */
@@ -11,8 +14,7 @@ export interface UnitProgressView {
 
 /** The progress of a user in a unit, or null when nothing is recorded yet. */
 export async function loadUnitProgress(userId: string, unitId: string): Promise<UnitProgressView | null> {
-  // TODO(lot B): read app.unit_progress via @dailylingua/data getUnitProgressOne
-  void userId;
-  void unitId;
-  return null;
+  // The user's own client: RLS restricts app.unit_progress to their rows.
+  const row = await getUnitProgressOne(await getRequestClient(), userId, unitId);
+  return row ? { steps: row.steps, bestScore: row.bestScore, testAttempts: row.testAttempts, passedAt: row.passedAt } : null;
 }
