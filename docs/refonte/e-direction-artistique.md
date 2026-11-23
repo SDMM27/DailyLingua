@@ -25,7 +25,7 @@ Le vocabulaire visuel découle de l'imprimerie, et chaque métaphore porte une m
 | Réparation de série | *Édition de rattrapage*, proposée sans dramatiser |
 | Badge | *Tampon* d'étape réelle (« 500 mots connus », « A2 en lecture ») |
 | Quêtes | *Petites annonces* (en liste, une ligne sobre par quête) |
-| Carte du parcours | *Chemin de fer* (le plan page à page d'un magazine) : une vignette de page par unité |
+| Carte du parcours | *La ligne* : un trait à la couleur de la langue pour le chemin fait, des pointillés pour la suite, une station par unité ; aucune unité verrouillée |
 | Montée de niveau, fin de cahier | *Édition spéciale* : bandeau défilant, gros titre (jamais sur l'accueil) |
 | Ligue (option) | *Tableau des résultats* des pages sportives, divisions nommées par formats de presse |
 
@@ -175,7 +175,7 @@ La ligue n'apparaît jamais sur l'accueil : elle vit derrière l'onglet « Ligue
 
 - **Séance** (rappel, lecteur, production, fluidité) : barre de séance, un exercice, un pied d'action. La grille de correction se replie en une ligne.
 - **Fin de séance** : l'anneau tamponné et un titre, puis une ligne par résultat (XP, mots, erreur du jour, série) ; le relevé détaillé s'ouvre en feuille. « Demain » tient en une phrase au-dessus de « Terminer ».
-- **Parcours** : le chemin de fer du cahier en cours. Les niveaux par compétence sont sur Progrès ; une ligne y mène.
+- **Parcours** : la ligne du niveau en cours. Les niveaux par compétence sont sur Progrès ; une ligne y mène.
 - **Progrès** : les quatre jauges. Mots connus, « Je peux… », projection et série sont des lignes qui ouvrent leur écran.
 - **Quêtes** : une ligne par quête. La ligue est derrière un onglet.
 - **Réglages** : une seule liste, groupée par thème.
@@ -190,7 +190,7 @@ La ligue n'apparaît jamais sur l'accueil : elle vit derrière l'onglet « Ligue
 - **Compteur de série** : sur l'accueil, un petit chiffre avec l'icône du tampon dateur dans la ligne d'état ; le détail (tampon, jours, relâches en réserve sur 3, record, semaine en sept pastilles) s'ouvre d'un toucher. Une série cassée affiche « Nouvelle série, jour 1 » et propose une fois le rattrapage. Aucun compte à rebours.
 - **Ligne de quête** : verbe d'action, avancement chiffré (« 1/3 »), récompense, coche une fois faite. Toujours du travail utile, jamais la seule présence. La petite annonce en pointillés n'est plus utilisée en liste.
 - **Badge** : tampon circulaire, intitulé factuel, date. Les badges à venir montrent leur critère exact.
-- **Nœud du parcours** : vignette de page cornée de 64 px. Fait : coche. Courant : couleur de langue. À venir : pointillés et cadenas, contournables par un test. Bilan : étoile « Édition spéciale ».
+- **Station du parcours** : un point sur la ligne. Fait : pastille pleine à la couleur de langue avec une coche. En cours : anneau à la couleur de langue. À venir : petit rond sur des pointillés, sans cadenas ; toute unité s'ouvre et un test direct (« Je connais déjà ») la valide. Bilan : étoile « Édition spéciale ».
 - **Fin de séance** : une ligne datée et numérotée, anneau tamponné, titre factuel, puis une ligne par résultat (XP gagnés, mots passés en révision, erreur du jour, série). Le relevé d'XP à points de conduite, la liste des mots, l'erreur expliquée et la semaine de série s'ouvrent en feuille. « Demain » en une phrase. Un seul bouton, « Terminer ».
 - **Jauge par compétence** : règle A0-C2 en 7 cases, bande hachurée d'incertitude, niveau en toutes lettres (« B1, début »).
 

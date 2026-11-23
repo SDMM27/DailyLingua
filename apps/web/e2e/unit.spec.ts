@@ -28,10 +28,10 @@ test.describe("unit player", () => {
     await expect(page.getByRole("heading", { level: 1, name: "Saluer et se présenter" })).toBeVisible();
     await expectNoHorizontalOverflow(page);
 
-    // The dialogue, one line at a time; the audio does not exist yet.
+    // The dialogue, one line at a time.
     await page.getByRole("button", { name: "Commencer l’unité" }).click();
     await expect(page.getByRole("progressbar")).toHaveAttribute("aria-valuetext", "Étape 1 sur 6, Dialogue");
-    await expect(page.getByText("Audio en préparation.")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Écouter la réplique 1" })).toBeVisible();
     await page.getByRole("button", { name: "Ciao, mot nouveau" }).first().click();
     await expect(page.getByRole("region", { name: "Mot touché" })).toContainText("salut");
     await expectNoHorizontalOverflow(page);
