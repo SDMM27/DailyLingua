@@ -107,3 +107,20 @@ Taux de complétion de l'unité 1 chez les A0, abandon par étape, score moyen a
 | 10 | Cadenas sur les unités à venir (`e-direction-artistique.md` §6 les prévoit) | **Supprimés**, conformément au point 1 ; corriger la DA |
 | 11 | « Je peux… » d'unité et XP « Descripteur validé » (50 XP, `c-game-design.md`) | Les « Je peux… » d'unité sont des **objectifs d'unité**, validés par le test, sans les 50 XP ; les 50 XP restent réservés aux descripteurs prouvés par la tâche d'évaluation du jalon 6. Sinon une unité vaudrait 175 XP |
 | 12 | XP des exercices d'unité | Barème « exercice de focus » existant : 2 juste du premier coup, 1 au deuxième, plafonds inchangés ; XP gardés si le test échoue |
+
+## Décisions (2026-11-23)
+
+- Maquette retenue : **variante C, « La ligne »** (`.design/j4/variant-c-ligne.html`, spec d'écran dans `j4-ecrans.md`).
+- Points 1 à 12 : **recommandations acceptées**.
+- Voix (vérifiées le 2026-11-23 d'après `docs/COMMERCIAL_USE.md` de piper1-gpl et les MODEL_CARD ; pas un avis juridique) :
+
+| Voix | Licence | Usage |
+|---|---|---|
+| `ru_RU-denis-medium` | CC0 | Oui |
+| `ru_RU-dmitri-medium` | CC0, base Hi-Fi TTS CC BY 4.0 | Oui, avec l'attribution Hi-Fi TTS |
+| `it_IT-paola-medium` (rhasspy, version actuelle) | CC0, base Hi-Fi TTS CC BY 4.0 | Oui, avec l'attribution Hi-Fi TTS |
+| `it_IT-serena-medium` | CC BY 4.0 selon la liste de Piper, carte non lue | À vérifier avant usage (seconde voix italienne) |
+| `ru_RU-irina`, `ru_RU-ruslan` (CC BY-NC-SA), `it_IT-riccardo`, Paola de `paolapersico1` (dérivée de lessac) | Inconnue ou non commerciale | **Non** |
+
+  Le MODEL_CARD de chaque voix utilisée est versionné à côté de l'audio et l'attribution est affichée dans « À propos ». Le genre des voix n'est pas indiqué sur les cartes : on l'établit à l'écoute.
+- **À reprendre hors jalon 4** : l'audio de *La lista della spesa* (jalon 3) a été synthétisé avec la Paola de `paolapersico1`, non retenue pour un usage commercial. À régénérer avec `it_IT-paola-medium` (rhasspy).
