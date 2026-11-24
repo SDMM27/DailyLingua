@@ -38,7 +38,7 @@ test("the Italian A2 reader estimates coverage, plays shared audio, and saves a 
     await expect(before).toContainText("3 mots repérés sur 51");
 
     const audio = before.locator("audio");
-    await expect(audio).toHaveAttribute("src", "/reader-audio/la-lista-della-spesa-v1.mp3");
+    await expect(audio).toHaveAttribute("src", "/reader-audio/la-lista-della-spesa-v2.mp3");
     await audio.evaluate((element: HTMLAudioElement) => element.load());
     await expect.poll(() => audio.evaluate((element: HTMLAudioElement) => element.duration)).toBeGreaterThan(12);
     await expectNoHorizontalOverflow(page);
