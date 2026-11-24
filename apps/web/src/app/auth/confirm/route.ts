@@ -1,5 +1,6 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
+import { claimLegacyDataQuietly } from "@/lib/auth/claim-legacy";
 import { safeNextPath } from "@/lib/auth/safe-next-path";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -27,11 +28,13 @@ export async function GET(request: NextRequest) {
 
   if (tokenHash && type) {
     const { error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
+    if (!error) await claimLegacyDataQuietly(supabase);
     return go(error ? "/sign-in?link=invalid" : next);
   }
 
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!error) await claimLegacyDataQuietly(supabase);
     // With the default template Supabase has already confirmed the address before redirecting here;
     // the usual failure is a link opened in another browser than the one that signed up (no PKCE
     // verifier): the account is fine, only the session is missing.

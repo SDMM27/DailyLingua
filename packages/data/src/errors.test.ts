@@ -14,6 +14,7 @@ describe("codeFromSqlstate", () => {
     ["40001", "conflict"],
     ["P0002", "not_found"],
     ["PGRST116", "not_found"],
+    ["DL429", "rate_limited"],
     ["XX000", "unknown"],
     ["", "unknown"],
   ])("%s -> %s", (sqlstate, code) => {

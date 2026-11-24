@@ -4,6 +4,9 @@ const signInWithPassword = vi.fn();
 const signUp = vi.fn();
 const createSupabaseServerClient = vi.fn(async () => ({ auth: { signInWithPassword, signUp } }));
 
+const claimLegacyDataQuietly = vi.fn<(client: unknown) => Promise<void>>(async () => undefined);
+
+vi.mock("@/lib/auth/claim-legacy", () => ({ claimLegacyDataQuietly: (client: unknown) => claimLegacyDataQuietly(client) }));
 vi.mock("@/lib/supabase/server", () => ({ createSupabaseServerClient: () => createSupabaseServerClient() }));
 vi.mock("next/headers", () => ({ headers: async () => new Headers({ host: "localhost:3200" }) }));
 vi.mock("next/navigation", () => ({
@@ -60,6 +63,19 @@ describe("signIn action", () => {
     signInWithPassword.mockResolvedValue({ error: null });
     await expect(signIn({}, form({ email: " a@b.test ", password: "pw", captchaToken: "tok" }))).rejects.toThrow("NEXT_REDIRECT /");
     expect(signInWithPassword).toHaveBeenCalledWith({ email: "a@b.test", password: "pw", options: { captchaToken: "tok" } });
+  });
+
+  it("claims the data of the old app after a successful sign-in, with the client of the user, before the redirect", async () => {
+    signInWithPassword.mockResolvedValue({ error: null });
+    await expect(signIn({}, form({ email: "a@b.test", password: "pw" }))).rejects.toThrow("NEXT_REDIRECT /");
+    expect(claimLegacyDataQuietly).toHaveBeenCalledTimes(1);
+    expect(claimLegacyDataQuietly).toHaveBeenCalledWith(expect.objectContaining({ auth: expect.anything() }));
+  });
+
+  it("does not claim anything when the sign-in fails", async () => {
+    signInWithPassword.mockResolvedValue({ error: { status: 400, code: "invalid_credentials" } });
+    await signIn({}, form({ email: "a@b.test", password: "pw" }));
+    expect(claimLegacyDataQuietly).not.toHaveBeenCalled();
   });
 });
 

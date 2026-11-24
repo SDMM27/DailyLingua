@@ -1,13 +1,14 @@
 import { DataError, type DataErrorCode } from "@dailylingua/data";
 
 /** Keys of the `errors` messages that a failed save can show. */
-export type SaveErrorKey = "generic" | "unauthenticated" | "invalid" | "conflict" | "notFound";
+export type SaveErrorKey = "generic" | "unauthenticated" | "invalid" | "conflict" | "notFound" | "tooManyRequests";
 
 const KEYS: Record<DataErrorCode, SaveErrorKey> = {
   unauthenticated: "unauthenticated",
   invalid: "invalid",
   conflict: "conflict",
   not_found: "notFound",
+  rate_limited: "tooManyRequests",
   unknown: "generic",
 };
 
