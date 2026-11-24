@@ -121,15 +121,17 @@ export function buildPath(
   const current = stations.find((station) => station.status === "current") ?? null;
   const shown = current ?? stations.at(-1) ?? null;
   const shownUnit = units.find((unit) => unit.id === shown?.id);
+  // A passed bilan confirms its own level, whatever station is current (the order is suggested, never locked).
+  const passedBilan = units.find((unit) => unit.kind === "assessment" && progress.get(unit.id)?.passedAt != null);
   return {
     entries,
     done: stations.filter((station) => station.status === "done").length,
     total: stations.length,
-    level: shownUnit?.level ?? "A1",
+    level: passedBilan?.level ?? shownUnit?.level ?? "A1",
     currentId: current?.id ?? null,
     hasWriting,
     currentIsWriting: current?.kind === "script",
-    confirmed: stations.some((station) => station.kind === "assessment" && station.status === "done"),
+    confirmed: passedBilan !== undefined,
   };
 }
 

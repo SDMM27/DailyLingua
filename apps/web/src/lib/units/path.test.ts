@@ -71,6 +71,14 @@ describe("buildPath", () => {
     expect(after.entries.at(-1)).toMatchObject({ kind: "assessment", status: "done", passedByTest: false });
   });
 
+  it("confirms the bilan's level even when an A0 writing unit is still current (the order is not locked)", () => {
+    const ru = unitsFor("ru");
+    const bilanRu = ru.find((unit) => unit.kind === "assessment");
+    expect(bilanRu).toBeDefined();
+    const path = buildPath(ru, new Map([[bilanRu!.id, view({ passedAt: "2026-11-20T10:00:00Z" })]]), fr);
+    expect(path).toMatchObject({ confirmed: true, level: "A1", currentIsWriting: true });
+  });
+
   it("keeps the last level when everything is done", () => {
     const all = new Map(units.map((unit) => [unit.id, view({ passedAt: "2026-11-20T10:00:00Z" })]));
     expect(buildPath(units, all, fr)).toMatchObject({ currentId: null, done: units.length });
