@@ -109,7 +109,6 @@ export const ruA104Famille = {
       {
         id: "d10",
         speaker: "leo",
-        // REVIEW: ваш (Anna's and Katya's dad, plural "your") rather than твой: both are possible; check it reads naturally.
         text: "Ой, извини́! Ваш па́па о́чень молодо́й!",
         translation: { fr: "Oh, pardon ! Votre père est très jeune !", en: "Oh, sorry! Your dad looks very young!" },
         audio: null,
@@ -124,7 +123,7 @@ export const ruA104Famille = {
         lemma: "твой",
         meaning: { fr: "ta", en: "your (feminine)" },
         note: { fr: "Avec un nom féminin : твоя́ семья́, твоя́ сестра́.", en: "With a feminine noun: твоя́ семья́, твоя́ сестра́." },
-        isNew: false,
+        isNew: true,
       },
       {
         form: "семья́",
@@ -140,7 +139,7 @@ export const ruA104Famille = {
         lemma: "мой",
         meaning: { fr: "mes", en: "my (plural)" },
         note: { fr: "Au pluriel : мои́ роди́тели.", en: "In the plural: мои́ роди́тели." },
-        isNew: false,
+        isNew: true,
       },
       { form: "роди́тели", lemma: "роди́тели", meaning: { fr: "parents", en: "parents" }, note: { fr: "Toujours au pluriel.", en: "Always plural." }, isNew: true },
       {
@@ -159,7 +158,7 @@ export const ruA104Famille = {
         lemma: "твой",
         meaning: { fr: "ton", en: "your (masculine)" },
         note: { fr: "Féminin твоя́, neutre твоё, pluriel твои́.", en: "Feminine твоя́, neuter твоё, plural твои́." },
-        isNew: true,
+        isNew: false,
       },
       { form: "брат", lemma: "брат", meaning: { fr: "frère", en: "brother" }, note: null, isNew: true },
       {
@@ -167,7 +166,7 @@ export const ruA104Famille = {
         lemma: "мой",
         meaning: { fr: "mon", en: "my (masculine)" },
         note: { fr: "Féminin моя́, neutre моё, pluriel мои́.", en: "Feminine моя́, neuter моё, plural мои́." },
-        isNew: true,
+        isNew: false,
       },
       { form: "Тома́", lemma: "Тома́", meaning: { fr: "Thomas (prénom)", en: "Thomas (male name)" }, note: null, isNew: false },
       {
@@ -336,13 +335,6 @@ export const ruA104Famille = {
         isNew: true,
       },
       {
-        form: "де́вушка",
-        lemma: "де́вушка",
-        meaning: { fr: "jeune femme ; petite amie", en: "young woman; girlfriend" },
-        note: { fr: "Твоя́ де́вушка ? = Ta copine ?", en: "Твоя́ де́вушка? = Your girlfriend?" },
-        isNew: true,
-      },
-      {
         form: "ста́ршая",
         lemma: "ста́рший",
         meaning: { fr: "aînée, plus âgée", en: "older (feminine)" },
@@ -358,7 +350,14 @@ export const ruA104Famille = {
         note: { fr: "Masculin краси́вый.", en: "Masculine краси́вый." },
         isNew: true,
       },
-      { form: "ещё", lemma: "ещё", meaning: { fr: "encore", en: "still" }, note: null, isNew: false },
+      {
+        form: "ещё",
+        lemma: "ещё",
+        meaning: { fr: "encore", en: "still" },
+        note: { fr: "Ещё ма́ленький ? — Нет, уже́ студе́нт. (ещё = encore, уже́ = déjà)", en: "Ещё ма́ленький? — Нет, уже́ студе́нт. (ещё = still, уже́ = already)" },
+        isNew: false,
+      },
+      { form: "уже́", lemma: "уже́", meaning: { fr: "déjà", en: "already" }, note: null, isNew: true },
       {
         form: "ма́ленький",
         lemma: "ма́ленький",
@@ -399,14 +398,14 @@ export const ruA104Famille = {
         "Мой (mon), твой (ton), наш (notre), ваш (votre) s’accordent avec le nom possédé : мой брат, моя́ сестра́, моё фо́то ; au pluriel, мои́ роди́тели.",
         "Au féminin : моя́, твоя́, на́ша, ва́ша ; au neutre : моё, твоё, на́ше, ва́ше. Ваш sert aussi à vouvoyer une personne.",
         "Его́ (à lui), её (à elle), их (à eux) ne changent jamais : ils disent qui possède. Э́то Ива́н и его́ жена́. Э́то Жюли́ и её муж.",
-        "Piège : c’est le nom possédé qui compte, pas la personne. Па́па, де́душка, дя́дя finissent en -а ou -я mais sont masculins : мой па́па. Соба́ка est féminin : на́ша соба́ка.",
+        "Piège pour un francophone : « son, sa, ses » se traduit selon le possesseur, pas selon le nom. Le mari de Julie = её муж ; la femme d’Ivan = его́ жена́ (et non её). Autre piège : па́па, де́душка, дя́дя finissent en -а ou -я mais sont masculins : мой па́па. Соба́ка est féminin : на́ша соба́ка.",
         "Её зову́т Ка́тя : ici её veut dire « la », comme меня́ dans меня́ зову́т. C’est la même forme que le possessif.",
       ].join("\n"),
       en: [
         "Мой (my), твой (your), наш (our), ваш (your, plural or polite) agree with the noun owned: мой брат, моя́ сестра́, моё фо́то; in the plural, мои́ роди́тели.",
         "Feminine: моя́, твоя́, на́ша, ва́ша; neuter: моё, твоё, на́ше, ва́ше. Ваш is also the polite \"your\" for one person.",
         "Его́ (his), её (her), их (their) never change: they say who owns. Э́то Ива́н и его́ жена́. Э́то Жюли́ и её муж.",
-        "Trap: the noun owned is what counts, not the owner. Па́па, де́душка, дя́дя end in -а or -я but are masculine: мой па́па. Соба́ка is feminine: на́ша соба́ка.",
+        "Trap: his and her follow the owner, not the noun. Julie's husband = её муж; Ivan's wife = его́ жена́ (not её). Another trap: па́па, де́душка, дя́дя end in -а or -я but are masculine: мой па́па. Соба́ка is feminine: на́ша соба́ка.",
         "Её зову́т Ка́тя: here её means \"her\" as an object, like меня́ in меня́ зову́т. It is the same form as the possessive.",
       ].join("\n"),
     },
@@ -666,7 +665,7 @@ export const ruA104Famille = {
     {
       id: "i21",
       kind: "cloze",
-      before: "Нет, он студе́нт. Он ",
+      before: "Нет, он уже́ студе́нт. Он ",
       after: " мла́дший брат.",
       accept: ["мой"],
       hint: { fr: "mon", en: "my" },
@@ -675,7 +674,7 @@ export const ruA104Famille = {
     {
       id: "i22",
       kind: "mcq",
-      prompt: "Нет, э́то моя́ ___ сестра́, Жюли́.",
+      prompt: "Да, э́то моя́ ___ сестра́, Жюли́.",
       options: [
         { id: "a", text: "ста́рший" },
         { id: "b", text: "ста́ршее" },
@@ -759,24 +758,24 @@ export const ruA104Famille = {
       {
         id: "c4",
         speaker: "leo",
-        text: "Нет, он студе́нт. Он мой мла́дший брат.",
-        translation: { fr: "Non, il est étudiant. C’est mon petit frère.", en: "No, he's a student. He's my younger brother." },
+        text: "Нет, он уже́ студе́нт. Он мой мла́дший брат.",
+        translation: { fr: "Non, il est déjà étudiant. C’est mon petit frère.", en: "No, he's already a student. He's my younger brother." },
         audio: null,
         itemId: "i21",
       },
       {
         id: "c5",
         speaker: "anna",
-        text: "А э́то кто? Твоя́ де́вушка?",
-        translation: { fr: "Et elle, c’est qui ? Ta copine ?", en: "And who's this? Your girlfriend?" },
+        text: "А э́то кто? Твоя́ сестра́?",
+        translation: { fr: "Et elle, c’est qui ? Ta sœur ?", en: "And who's this? Your sister?" },
         audio: null,
         itemId: null,
       },
       {
         id: "c6",
         speaker: "leo",
-        text: "Нет, э́то моя́ ста́ршая сестра́, Жюли́.",
-        translation: { fr: "Non, c’est ma grande sœur, Julie.", en: "No, that's my older sister, Julie." },
+        text: "Да, э́то моя́ ста́ршая сестра́, Жюли́.",
+        translation: { fr: "Oui, c’est ma grande sœur, Julie.", en: "Yes, that's my older sister, Julie." },
         audio: null,
         itemId: "i22",
       },
@@ -799,6 +798,6 @@ export const ruA104Famille = {
       },
     ],
   },
-  aiReview: null,
-  status: "draft",
+  aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
+  status: "reviewed",
 } satisfies UnitSource;

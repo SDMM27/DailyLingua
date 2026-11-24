@@ -74,7 +74,6 @@ export const ruA105OuEst = {
       {
         id: "d6",
         speaker: "passerby",
-        // REVIEW: a cash machine inside a hotel is plausible in central Moscow; "в гости́нице «Москва́»" keeps the name in the nominative (norm).
         text: "Банкома́т? В гости́нице «Москва́», на пло́щади.",
         translation: { fr: "Un distributeur ? Dans l’hôtel « Moskva », sur la place.", en: "A cash machine? In the Moskva hotel, on the square." },
         audio: null,
@@ -206,7 +205,10 @@ export const ruA105OuEst = {
         form: "ря́дом",
         lemma: "ря́дом",
         meaning: { fr: "à côté, tout près", en: "nearby, next to" },
-        note: { fr: "ря́дом с метро́ = à côté du métro : bloc à apprendre tel quel.", en: "ря́дом с метро́ = next to the metro: a chunk to learn as it is." },
+        note: {
+          fr: "ря́дом с метро́ = à côté du métro. Après с, la fin du nom change en général (comme с молоко́м) ; метро́, lui, ne change jamais.",
+          en: "ря́дом с метро́ = next to the metro. After с, the noun's ending usually changes (like с молоко́м); метро́ never changes.",
+        },
         isNew: true,
       },
       { form: "с", lemma: "с", meaning: { fr: "avec", en: "with" }, note: { fr: "Dans le bloc ря́дом с…", en: "In the chunk ря́дом с…" }, isNew: false },
@@ -304,7 +306,6 @@ export const ruA105OuEst = {
       { form: "помо́чь", lemma: "помо́чь", meaning: { fr: "aider", en: "to help" }, note: null, isNew: true },
       { form: "да", lemma: "да", meaning: { fr: "oui", en: "yes" }, note: null, isNew: false },
       { form: "она́", lemma: "она́", meaning: { fr: "elle (nom féminin)", en: "it (feminine noun)" }, note: null, isNew: false },
-      { form: "це́нтре", lemma: "центр", meaning: { fr: "centre", en: "centre" }, note: { fr: "центр → в це́нтре", en: "центр → в це́нтре" }, isNew: true },
       { form: "далеко́", lemma: "далеко́", meaning: { fr: "loin", en: "far" }, note: null, isNew: true },
       { form: "но", lemma: "но", meaning: { fr: "mais", en: "but" }, note: null, isNew: true },
       {
@@ -456,7 +457,6 @@ export const ruA105OuEst = {
       tokens: ["здесь", "Где", "банкома́т"],
       distractors: ["там"],
       answer: "Где здесь банкомат?",
-      // REVIEW: "Где банкомат здесь?" is possible but marked; left out.
       accept: [],
       explain: { fr: "Где здесь… ? : où y a-t-il… par ici ?", en: "Где здесь…?: where's a… around here?" },
     },
@@ -467,7 +467,7 @@ export const ruA105OuEst = {
       tokens: ["не", "Вы", "где", "зна́ете", "метро́"],
       distractors: [],
       answer: "Вы не знаете, где метро?",
-      accept: [],
+      accept: ["Где метро, вы не знаете?"],
       explain: {
         fr: "Вы не зна́ете, где… ? Le не rend la question plus polie, comme « vous ne sauriez pas… ? ».",
         en: "Вы не зна́ете, где…? The не makes the question more polite, like \"you wouldn't know…?\".",
@@ -504,14 +504,20 @@ export const ruA105OuEst = {
     {
       id: "i12",
       kind: "type",
-      prompt: { fr: "Écris en russe : « en ville » (où l’on est)", en: "Write in Russian: \"in town\" (where you are)" },
+      prompt: {
+        fr: "Écris en russe : « en ville » (où l’on est). La ville = го́род.",
+        en: "Write in Russian: \"in town\" (where you are). Town = го́род.",
+      },
       accept: ["в городе"],
       explain: { fr: "Го́род → в го́роде : on ajoute -е.", en: "Го́род → в го́роде: add -е." },
     },
     {
       id: "i13",
       kind: "type",
-      prompt: { fr: "Écris en russe : « dans la rue » (où l’on est)", en: "Write in Russian: \"in the street\" (where you are)" },
+      prompt: {
+        fr: "Écris en russe : « dans la rue » (où l’on est). La rue = у́лица.",
+        en: "Write in Russian: \"in the street\" (where you are). Street = у́лица.",
+      },
       accept: ["на улице"],
       explain: { fr: "На у́лице : на, pas в, et у́лица → у́лице.", en: "На у́лице: на, not в, and у́лица → у́лице." },
     },
@@ -584,7 +590,10 @@ export const ruA105OuEst = {
       ],
       answer: "c",
       audio: null,
-      explain: { fr: "Les noms en -ия font -ии : Росси́я → в Росси́и.", en: "Nouns in -ия take -ии: Росси́я → в Росси́и." },
+      explain: {
+        fr: "Les noms en -ия font -ии : Росси́я → в Росси́и. « Росси́е » n’existe pas.",
+        en: "Nouns in -ия take -ии: Росси́я → в Росси́и. \"Росси́е\" doesn't exist.",
+      },
     },
     // Lesson 3, conversation: the learner answers as Leo.
     {
@@ -669,7 +678,6 @@ export const ruA105OuEst = {
       {
         id: "c1",
         speaker: "passerby",
-        // REVIEW: "Вы тури́ст?" from a helpful passer-by: check that it doesn't sound intrusive.
         text: "Вы тури́ст? Вам помо́чь?",
         translation: { fr: "Vous êtes touriste ? Je peux vous aider ?", en: "Are you a tourist? Can I help you?" },
         audio: null,
@@ -686,8 +694,8 @@ export const ruA105OuEst = {
       {
         id: "c3",
         speaker: "passerby",
-        text: "По́чта? Она́ в це́нтре.",
-        translation: { fr: "La poste ? Elle est dans le centre.", en: "The post office? It's in the centre." },
+        text: "По́чта? Она́ на вокза́ле.",
+        translation: { fr: "La poste ? Elle est à la gare.", en: "The post office? It's at the station." },
         audio: null,
         itemId: null,
       },
@@ -733,6 +741,6 @@ export const ruA105OuEst = {
       },
     ],
   },
-  aiReview: null,
-  status: "draft",
+  aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
+  status: "reviewed",
 } satisfies UnitSource;

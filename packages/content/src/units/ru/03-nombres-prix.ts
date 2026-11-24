@@ -25,7 +25,7 @@ export const ruA103NombresPrix = {
     { id: "cd1", text: { fr: "Je peux demander un prix.", en: "I can ask how much something costs." } },
     {
       id: "cd2",
-      text: { fr: "Je peux comprendre un prix jusqu’à mille roubles.", en: "I can understand a price up to a thousand roubles." },
+      text: { fr: "Je peux comprendre un prix simple en roubles, comme 72 ou 122.", en: "I can understand a simple price in roubles, like 72 or 122." },
     },
     {
       id: "cd3",
@@ -118,7 +118,6 @@ export const ruA103NombresPrix = {
       {
         id: "d10",
         speaker: "seller",
-        // REVIEW: "Вот сда́ча: се́мьдесят во́семь рубле́й." A cashier would often say "Ва́ша сда́ча…" (possessive, unit 4).
         text: "Вот сда́ча: се́мьдесят во́семь рубле́й. Спаси́бо!",
         transliteration: "Vot sdáča: sémʹdesjat vósemʹ rubléj. Spasíbo!",
         translation: { fr: "Voici la monnaie : soixante-dix-huit roubles. Merci !", en: "Here's your change: seventy-eight roubles. Thank you!" },
@@ -153,9 +152,12 @@ export const ruA103NombresPrix = {
       {
         form: "рубле́й",
         lemma: "рубль",
-        meaning: { fr: "roubles (après 5 à 20, et après 0)", en: "roubles (after 5 to 20, and after 0)" },
+        meaning: {
+          fr: "roubles (après un nombre qui finit par 0 ou par 5 à 9, et après 11 à 14)",
+          en: "roubles (after a number ending in 0 or 5 to 9, and after 11 to 14)",
+        },
         note: { fr: "пять рубле́й, пятьдеся́т рубле́й, оди́ннадцать рубле́й", en: "пять рубле́й, пятьдеся́т рубле́й, оди́ннадцать рубле́й" },
-        isNew: false,
+        isNew: true,
       },
       {
         form: "рубля́",
@@ -169,7 +171,7 @@ export const ruA103NombresPrix = {
         lemma: "рубль",
         meaning: { fr: "rouble (après 1)", en: "rouble (after 1)" },
         note: { fr: "оди́н рубль, два́дцать оди́н рубль", en: "оди́н рубль, два́дцать оди́н рубль" },
-        isNew: true,
+        isNew: false,
       },
       { form: "а", lemma: "а", meaning: { fr: "et (pour enchaîner)", en: "and (to move on)" }, note: null, isNew: false },
       {
@@ -284,7 +286,10 @@ export const ruA103NombresPrix = {
         form: "ка́ртой",
         lemma: "ка́рта",
         meaning: { fr: "carte (bancaire)", en: "card" },
-        note: { fr: "Мо́жно ка́ртой ? = Je peux payer par carte ? Apprends le bloc tel quel.", en: "Мо́жно ка́ртой? = Can I pay by card? Learn the chunk as it is." },
+        note: {
+          fr: "Мо́жно ка́ртой ? = Je peux payer par carte ? ка́рта change de fin (-ой) : apprends le bloc tel quel.",
+          en: "Мо́жно ка́ртой? = Can I pay by card? ка́рта changes its ending (-ой): learn the chunk as it is.",
+        },
         isNew: true,
       },
       { form: "да", lemma: "да", meaning: { fr: "oui", en: "yes" }, note: null, isNew: false },
@@ -438,7 +443,6 @@ export const ruA103NombresPrix = {
       tokens: ["сто́ит", "вода́", "Ско́лько"],
       distractors: ["сто"],
       answer: "Сколько стоит вода?",
-      // REVIEW: "Вода сколько стоит?" and "Сколько вода стоит?" are common in speech: accepted.
       accept: ["Вода сколько стоит?", "Сколько вода стоит?"],
       explain: { fr: "Ско́лько сто́ит + la chose. Сто = cent : ne le confonds pas avec сто́ит.", en: "Ско́лько сто́ит + the thing. Сто = a hundred: don't mix it up with сто́ит." },
     },
@@ -727,6 +731,6 @@ export const ruA103NombresPrix = {
       },
     ],
   },
-  aiReview: null,
-  status: "draft",
+  aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
+  status: "reviewed",
 } satisfies UnitSource;

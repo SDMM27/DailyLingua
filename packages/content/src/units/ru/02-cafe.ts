@@ -92,7 +92,6 @@ export const ruA102Cafe = {
       {
         id: "d7",
         speaker: "leo",
-        // REVIEW: "Тогда́ и торт" (и = "aussi" here) rather than "торт то́же": both seem natural; check.
         text: "Отли́чно! Тогда́ и торт, пожа́луйста.",
         transliteration: "Otlíčno! Togdá i tort, požálujsta.",
         translation: { fr: "Parfait ! Alors un gâteau aussi, s’il vous plaît.", en: "Great! Then a cake as well, please." },
@@ -109,7 +108,6 @@ export const ruA102Cafe = {
       {
         id: "d9",
         speaker: "leo",
-        // REVIEW: "а где ло́жка?" is simple and correct; a native might rather say "а ло́жки нет?" (genitive, not taught).
         text: "Спаси́бо! Ой, а где ло́жка?",
         transliteration: "Spasíbo! Oj, a gde lóžka?",
         translation: { fr: "Merci ! Oh, et où est la cuillère ?", en: "Thank you! Oh, where's the spoon?" },
@@ -168,7 +166,7 @@ export const ruA102Cafe = {
       {
         form: "бу́дете",
         lemma: "быть",
-        meaning: { fr: "(vous) allez prendre", en: "(you) will have" },
+        meaning: { fr: "(vous) allez (+ verbe)", en: "(you) will (+ verb)" },
         note: {
           fr: "Что бу́дете пить ? = Qu’est-ce que vous prenez à boire ? Apprends la question en bloc.",
           en: "Что бу́дете пить? = What would you like to drink? Learn the question as a chunk.",
@@ -209,14 +207,14 @@ export const ruA102Cafe = {
         lemma: "молоко́",
         meaning: { fr: "lait", en: "milk" },
         note: { fr: "с молоко́м = au lait", en: "с молоко́м = with milk" },
-        isNew: false,
+        isNew: true,
       },
       {
         form: "молоко́",
         lemma: "молоко́",
         meaning: { fr: "lait", en: "milk" },
         note: { fr: "Neutre (-о) : оно́.", en: "Neuter (-о): оно́." },
-        isNew: true,
+        isNew: false,
       },
       {
         form: "а",
@@ -242,7 +240,7 @@ export const ruA102Cafe = {
         lemma: "быть",
         meaning: { fr: "il y a", en: "there is" },
         note: { fr: "Есть. = Oui, il y en a. (réponse à у вас есть… ?)", en: "Есть. = Yes, we have. (answer to у вас есть…?)" },
-        isNew: true,
+        isNew: false,
       },
       { form: "шокола́дный", lemma: "шокола́дный", meaning: { fr: "au chocolat", en: "chocolate (adj.)" }, note: null, isNew: true },
       {
@@ -373,8 +371,15 @@ export const ruA102Cafe = {
       {
         form: "ещё",
         lemma: "ещё",
-        meaning: { fr: "encore", en: "more, another" },
-        note: { fr: "Ещё чай ? = Encore du thé ?", en: "Ещё чай? = More tea?" },
+        meaning: { fr: "encore, en plus", en: "more, else" },
+        note: { fr: "Что́-нибудь ещё ? = Autre chose ?", en: "Что́-нибудь ещё? = Anything else?" },
+        isNew: true,
+      },
+      {
+        form: "что́-нибудь",
+        lemma: "что́-нибудь",
+        meaning: { fr: "quelque chose", en: "something, anything" },
+        note: { fr: "Что́-нибудь ещё ? = Autre chose ? (le serveur)", en: "Что́-нибудь ещё? = Anything else? (the waiter)" },
         isNew: true,
       },
       {
@@ -413,17 +418,17 @@ export const ruA102Cafe = {
   grammar: {
     summary: {
       fr: [
-        "Chaque nom a un genre, et la fin du mot le montre : consonne ou -й → masculin (торт, чай) ; -а → féminin (ло́жка, вода́) ; -о → neutre (молоко́).",
+        "Chaque nom a un genre, et la fin du mot le montre : consonne ou -й → masculin (торт, чай) ; -а ou -я → féminin (ло́жка, вода́) ; -о ou -е → neutre (молоко́). Les noms en -ь peuvent être masculins ou féminins : apprends leur genre avec eux.",
         "Pour reprendre une chose, on prend le pronom de son genre : он, она́, оно́. Где ло́жка ? — Вот она́. Торт ? Он о́чень вку́сный.",
         "L’adjectif prend le genre du nom : вку́сный торт, вку́сная пи́цца, вку́сное молоко́ (masculin -ый, féminin -ая, neutre -ое).",
-        "Piège : ко́фе est masculin malgré son -е. On dit чёрный ко́фе, et on le reprend par он.",
+        "Piège : ко́фе est masculin malgré son -е. On dit чёрный ко́фе, et on le reprend par он (à l’oral, on entend parfois le neutre, mais la norme est le masculin).",
         "Меню́ et кафе́, mots venus d’ailleurs, sont neutres et ne changent jamais de forme.",
       ].join("\n"),
       en: [
-        "Every noun has a gender, and the end of the word shows it: consonant or -й → masculine (торт, чай); -а → feminine (ло́жка, вода́); -о → neuter (молоко́).",
+        "Every noun has a gender, and the end of the word shows it: consonant or -й → masculine (торт, чай); -а or -я → feminine (ло́жка, вода́); -о or -е → neuter (молоко́). Nouns in -ь can be masculine or feminine: learn their gender with them.",
         "To refer back to a thing, use the pronoun of its gender: он, она́, оно́. Где ло́жка? — Вот она́. Торт? Он о́чень вку́сный.",
         "The adjective takes the gender of the noun: вку́сный торт, вку́сная пи́цца, вку́сное молоко́ (masculine -ый, feminine -ая, neuter -ое).",
-        "Trap: ко́фе is masculine despite its -е. You say чёрный ко́фе, and refer back to it with он.",
+        "Trap: ко́фе is masculine despite its -е. You say чёрный ко́фе, and refer back to it with он (in speech you sometimes hear the neuter, but the norm is masculine).",
         "Меню́ and кафе́, borrowed words, are neuter and never change their form.",
       ].join("\n"),
     },
@@ -537,7 +542,6 @@ export const ruA102Cafe = {
       tokens: ["меню́", "пожа́луйста", "Мо́жно"],
       distractors: ["вот"],
       answer: "Можно меню, пожалуйста?",
-      // REVIEW: both variants seem natural; "Меню, пожалуйста, можно?" is left out (odd).
       accept: ["Можно, пожалуйста, меню?", "Пожалуйста, можно меню?"],
       explain: { fr: "Мо́жно ouvre la demande : Мо́жно меню́ ?", en: "Мо́жно opens the request: Мо́жно меню́?" },
     },
@@ -596,8 +600,7 @@ export const ruA102Cafe = {
       id: "i13",
       kind: "type",
       prompt: { fr: "Écris en russe : « Un café, s’il vous plaît. »", en: "Write in Russian: \"A coffee, please.\"" },
-      // REVIEW: "Пожалуйста, кофе" is accepted as a natural variant; check.
-      accept: ["Кофе, пожалуйста", "Мне кофе, пожалуйста", "Пожалуйста, кофе"],
+      accept: ["Кофе, пожалуйста", "Мне кофе, пожалуйста", "Мне, пожалуйста, кофе", "Пожалуйста, кофе", "Можно кофе, пожалуйста"],
       explain: {
         fr: "Ко́фе, пожа́луйста. Pas besoin de « un » : le russe n’a pas d’article.",
         en: "Ко́фе, пожа́луйста. No need for \"a\": Russian has no articles.",
@@ -818,10 +821,9 @@ export const ruA102Cafe = {
       {
         id: "c7",
         speaker: "waitress",
-        // REVIEW: "Ещё чай?" is colloquial and correct; "Ещё ча́ю?" (partitive) is also common but not taught.
-        text: "Ещё чай?",
-        transliteration: "Eščë čaj?",
-        translation: { fr: "Encore du thé ?", en: "More tea?" },
+        text: "Что́-нибудь ещё?",
+        transliteration: "Čtó-nibudʹ eščë?",
+        translation: { fr: "Autre chose ?", en: "Anything else?" },
         audio: null,
         itemId: null,
       },
@@ -836,6 +838,6 @@ export const ruA102Cafe = {
       },
     ],
   },
-  aiReview: null,
-  status: "draft",
+  aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
+  status: "reviewed",
 } satisfies UnitSource;
