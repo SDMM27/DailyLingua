@@ -6,7 +6,7 @@ Ce document décrit ce qu'il faut faire, dans l'ordre, pour ouvrir la nouvelle a
 
 ## Ce que fait déjà le code
 
-- **Reprise à la connexion** : quand un compte de l'ancienne app se connecte à la préversion (mot de passe ou lien reçu par e-mail), la fonction `app.claim_legacy_data()` recopie ses données de `public` vers `app` (réglages, langues, cartes, productions, bilans). Elle ne le fait que tant que la personne n'a rien fait dans la nouvelle app ; au plus 20 fois par 24 h. Une erreur n'empêche jamais la connexion.
+- **Reprise à la connexion** : quand un compte de l'ancienne app se connecte à la préversion (mot de passe ou lien reçu par e-mail), ou ouvre « Aujourd'hui » plus d'une heure après la dernière reprise, la fonction `app.claim_legacy_data()` recopie ses données de `public` vers `app` (réglages, langues, cartes, productions, bilans). Elle ne le fait que tant que la personne n'a rien fait dans la nouvelle app ; au plus 20 fois par 24 h. Une erreur n'empêche jamais la connexion.
 - **Retours** : Réglages > « Signaler un problème » écrit dans la table `public.feedback` (catégorie, message, page, version). Limite de 20 retours par 24 h et par personne.
 - **Repère « Préversion »** : avec `NEXT_PUBLIC_PREVIEW_LABEL=1`, la mention apparaît au pied des Réglages, à côté de la version (7 premiers caractères du commit).
 
@@ -14,7 +14,7 @@ Un compte repris arrive sur « Aujourd'hui » (il a déjà ses inscriptions) ; u
 
 ## Règle à dire aux volontaires
 
-Après sa **première séance** dans la préversion, ce qu'on fait dans l'ancienne app **n'est plus repris** : les deux apps ne s'écrivent pas l'une dans l'autre. Avant cette première séance, tout ce qui change dans l'ancienne app est repris à la connexion suivante. Il n'y a pas de double écriture à gérer, il faut seulement choisir une app. La redirection automatique de l'ancienne app vers la nouvelle viendra avec la promotion vers `main`.
+Après sa **première séance** dans la préversion, ce qu'on fait dans l'ancienne app **n'est plus repris** : les deux apps ne s'écrivent pas l'une dans l'autre. Avant cette première séance, tout ce qui change dans l'ancienne app est repris : à chaque connexion, et aussi à l'ouverture de « Aujourd'hui » (au plus une fois par heure) pour quelqu'un qui reste connecté. Il n'est donc pas nécessaire de se déconnecter puis de se reconnecter. Il n'y a pas de double écriture à gérer, il faut seulement choisir une app. La redirection automatique de l'ancienne app vers la nouvelle viendra avec la promotion vers `main`.
 
 ## Ordre des étapes
 
@@ -34,15 +34,21 @@ npx supabase db dump --linked --data-only --use-copy --schema public,auth -f ../
 
 # 2. Pile locale propre, avec toutes les migrations
 npx supabase start
-npx supabase db reset
+npx supabase db reset --no-seed
 
-# 3. Restauration dans la pile locale (le dump désactive les déclencheurs pendant le chargement)
+# 3. Vider les tables de public que les migrations remplissent déjà (langues, sources, etc.), sinon le chargement
+#    des données de production échoue sur des clés en double. Le plus sûr : toutes les tables de public.
+psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -v ON_ERROR_STOP=1 -c "do \$\$ declare r record; begin for r in select tablename from pg_tables where schemaname = 'public' loop execute format('truncate table public.%I restart identity cascade', r.tablename); end loop; end \$\$;"
+
+# 4. Restauration dans la pile locale (le dump désactive les déclencheurs pendant le chargement)
 psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -v ON_ERROR_STOP=1 -f ../dailylingua-sauvegardes/prod-data.sql
 
-# 4. Migration de tous les comptes et contrôle (variables de la pile locale)
+# 5. Migration de tous les comptes et contrôle (variables de la pile locale)
 npx supabase status -o env        # recopier API_URL et SERVICE_ROLE_KEY
 NEXT_PUBLIC_SUPABASE_URL=<API_URL> SUPABASE_SERVICE_ROLE_KEY=<SERVICE_ROLE_KEY> npm run migration:verify
 ```
+
+Si `psql` n'est pas installé sur ta machine, remplace-le par `docker exec -i supabase_db_<nom_du_projet> psql -U postgres -v ON_ERROR_STOP=1 < fichier.sql` (le nom du conteneur s'affiche avec `docker ps`). Avant l'étape 4, ouvre `prod-data.sql` : si le dump contient des tables système de `auth` (par exemple `auth.schema_migrations`, `auth.flow_state`), retire-les du fichier ou relance le dump sans elles (`--exclude-table`) : la pile locale a les siennes et un doublon fait échouer le chargement. Seules `auth.users`, `auth.identities` et les tables de comptes comptent.
 
 Lis le rapport affiché : **aucune ligne d'écart, aucun utilisateur en échec** est le seul résultat acceptable. Joins-le à ta décision pour M3.
 
@@ -60,7 +66,16 @@ npx supabase db push --linked --dry-run     # liste ce qui serait appliqué : ri
 npx supabase db push --linked               # seulement si la liste est celle attendue
 ```
 
-Liste attendue : les **73 migrations** de `20261112000100_app_schema_and_identity.sql` à `20261125000200_app_send_feedback.sql` (aucune migration antérieure à `20261112…` : la production les a déjà). Si la liste diffère, arrête-toi.
+Liste attendue : exactement les **36 fichiers `app_*`** de `20261112000100_app_schema_and_identity.sql` à `20261125000300_app_claim_legacy_data_lock.sql`, et rien d'antérieur (la production a déjà toutes les autres migrations, jusqu'à `20261108000100_grant_show_streak.sql` comprise). Si la liste diffère, arrête-toi.
+
+**Accord du propriétaire : exposer le schéma `app` à l'API de données.** `db push` ne le fait pas, et sans cela chaque appel de la nouvelle app échoue (erreur PGRST106, « invalid schema »). Dans Supabase : Project Settings > Data API > **Exposed schemas** : ajouter `app` en gardant `public` et `graphql_public` (la pile locale le fait déjà, `supabase/config.toml` ligne 13). Enregistrer. Vérification, sans donnée personnelle (la liste des langues est lisible par tout compte connecté, mais pas en anonyme : on attend donc une réponse d'autorisation, pas une erreur de schéma) :
+
+```bash
+curl -s -o /dev/null -w "%{http_code}
+" "https://<REF_PROJET_PRODUCTION>.supabase.co/rest/v1/language?select=code"   -H "apikey: <CLE_ANON>" -H "Accept-Profile: app"
+```
+
+`401` ou `403` (permission refusée) : le schéma est exposé, c'est bon. `406` avec le message `PGRST106` : le schéma n'est pas encore exposé. Le vrai test de bout en bout est l'étape 6 (connexion d'un compte existant).
 
 Contrôle après la poussée. **Attention** : `npm run migration:verify` refuse volontairement toute base qui n'est pas locale (il lance la migration de tous les comptes, ce qu'on ne fait jamais depuis un script contre la production). Pour la production :
 

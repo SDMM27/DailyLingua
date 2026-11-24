@@ -3,7 +3,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(29);
+select plan(32);
 
 insert into auth.users (instance_id, id, aud, role, email, is_anonymous) values
   ('00000000-0000-0000-0000-000000000000', 'a0000000-0000-4000-8000-0000000000c1', 'authenticated', 'authenticated', 'claim-a@test.invalid', false),
@@ -110,6 +110,18 @@ select lives_ok($$select app.claim_legacy_data()$$, 'a claim before any write in
 reset role;
 select is((select count(*)::int from app.enrollment where user_id = 'a0000000-0000-4000-8000-0000000000c1'), 3,
   'the language added in the old app is picked up');
+
+-- legacy_migrated_at follows the last resynchronisation (the app uses it to know how fresh the copy is).
+update app.profile set legacy_migrated_at = '2020-01-01 00:00+00' where user_id = 'a0000000-0000-4000-8000-0000000000c1';
+set local role authenticated;
+select lives_ok($$select app.claim_legacy_data()$$, 'another claim before any write');
+reset role;
+select ok((select legacy_migrated_at > now() - interval '1 minute' from app.profile where user_id = 'a0000000-0000-4000-8000-0000000000c1'),
+  'legacy_migrated_at is the time of the last resynchronisation');
+
+-- The claim takes the per-user lock of app.ingest_batch (checked in the function body).
+select ok((select prosrc like '%app.ingest:%' from pg_proc where oid = 'app.claim_legacy_data()'::regprocedure),
+  'claim_legacy_data takes the advisory lock of the ingestion of the user');
 
 -- After the first write in the new app, nothing is resynchronised any more ----------------------------------------------
 

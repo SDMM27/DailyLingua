@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { learningDay, formatLongDate, languageDisplayName, resolveGameSettings } from "@dailylingua/core";
-import { DataError, getLearningProgress, listEnrollments, listSkillEstimates } from "@dailylingua/data";
+import { DataError, getLearningProgress, getProfile, listEnrollments, listSkillEstimates } from "@dailylingua/data";
 import { gameSettingsSchema } from "@dailylingua/schemas";
 import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
@@ -9,6 +9,7 @@ import { GoalRing } from "@/components/today/goal-ring";
 import { UnitCard } from "@/components/today/unit-card";
 import { WarmupCard } from "@/components/today/warmup-card";
 import { TodaySession } from "@/components/today/today-session";
+import { refreshLegacyDataIfStale } from "@/lib/auth/claim-legacy";
 import { dailyGoalXp } from "@/lib/goal";
 import { gradedTextGenerationEnabled } from "@/lib/graded-text/server";
 import { getRequestClient, getSessionProfile, getSessionUser } from "@/lib/session";
@@ -31,7 +32,11 @@ export default async function TodayPage() {
   const client = await getRequestClient();
   let profile, enrollments;
   try {
-    [profile, enrollments] = await Promise.all([getSessionProfile(), listEnrollments(client)]);
+    profile = await getSessionProfile();
+    // Someone who stays signed in never goes through sign-in again: until their first write here, refresh the copy of
+    // their old-app data (at most once an hour), then read the profile again. A failure never blocks the page.
+    if (profile && (await refreshLegacyDataIfStale(client, profile))) profile = await getProfile(client);
+    enrollments = await listEnrollments(client);
   } catch (error) {
     if (error instanceof DataError && error.code === "unauthenticated") redirect("/sign-in");
     throw error;

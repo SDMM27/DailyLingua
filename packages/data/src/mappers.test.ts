@@ -15,6 +15,7 @@ describe("toProfile", () => {
       gameSettings: { sounds: false },
       isGuest: false,
       legacyMigratedAt: null,
+      appActiveSince: null,
       createdAt: INSTANT,
       updatedAt: INSTANT,
     });
