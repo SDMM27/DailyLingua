@@ -33,7 +33,7 @@ export function scriptFixtureUnit(): ScriptUnitSource {
       { id: "c1", text: l10n("Lire six lettres", "Read six letters") },
       { id: "c2", text: l10n("Lire un mot court", "Read a short word") },
     ],
-    voice: "ru_RU-denis-medium",
+    voice: "ru-RU-SvetlanaNeural",
     letters: [
       letter("А", "а", "a", "а", "new", "ма́ма", "maman"),
       letter("К", "к", "k", "ка", "new", "кот", "chat"),

@@ -12,7 +12,7 @@ export const ruA0E3FormesNouvelles = {
   level: "A0",
   order: 3,
   kind: "script",
-  voice: "ru_RU-denis-medium",
+  voice: "ru-RU-SvetlanaNeural",
   title: { fr: "Les formes nouvelles", en: "New shapes" },
   situation: {
     fr: "Sept lettres ont des formes inconnues, mais des sons simples : avec elles, tu lis приве́т et спаси́бо.",

@@ -13,7 +13,7 @@ export const ruA0E4Chuintantes = {
   level: "A0",
   order: 4,
   kind: "script",
-  voice: "ru_RU-denis-medium",
+  voice: "ru-RU-SvetlanaNeural",
   title: { fr: "Les chuintantes et les autres", en: "Hushing sounds and others" },
   situation: {
     fr: "Huit lettres pour les sons « ch », « j », « ts », « tch », et le fameux ы, qui n’existe pas en français.",

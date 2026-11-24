@@ -43,8 +43,8 @@ export function fixtureUnit(): SituationUnitSource {
     dialogue: {
       title: "Al bar",
       speakers: [
-        { id: "anna", name: "Anna", voice: "it_IT-paola-medium" },
-        { id: "marco", name: "Marco", voice: "it_IT-paola-medium" },
+        { id: "anna", name: "Anna", voice: "it-IT-ElsaNeural" },
+        { id: "marco", name: "Marco", voice: "it-IT-ElsaNeural" },
       ],
       lines: [
         line(1, "anna", "Ciao, come ti chiami?"),

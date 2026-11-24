@@ -32,10 +32,9 @@ export const ruA101Saluer = {
   grammarPointId: "ru-a1-gender",
   dialogue: {
     title: "Знако́мство",
-    // REVIEW: the voices' gender is not stated on their cards; two male speakers assumed (Denis, Dmitri).
     speakers: [
-      { id: "maxim", name: "Макси́м", voice: "ru_RU-dmitri-medium" },
-      { id: "leo", name: "Ле́о", voice: "ru_RU-denis-medium" },
+      { id: "maxim", name: "Макси́м", voice: "ru-RU-DmitryNeural" },
+      { id: "leo", name: "Ле́о", voice: "ru-RU-Lev:MAI-Voice-2" },
     ],
     lines: [
       {

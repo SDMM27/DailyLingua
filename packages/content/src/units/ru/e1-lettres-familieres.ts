@@ -13,7 +13,7 @@ export const ruA0E1LettresFamilieres = {
   level: "A0",
   order: 1,
   kind: "script",
-  voice: "ru_RU-denis-medium",
+  voice: "ru-RU-SvetlanaNeural",
   title: { fr: "Les lettres familières", en: "Familiar letters" },
   situation: {
     fr: "Six lettres russes ressemblent aux nôtres : cinq se lisent presque pareil, et е cache un « y ». Avec elles, tu lis déjà tes premiers mots.",

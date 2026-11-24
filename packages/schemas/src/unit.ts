@@ -10,7 +10,11 @@ export type UnitId = z.infer<typeof unitIdSchema>;
  * Voices cleared for the audio of units (licence checked, `j4-parcours-debutant.md`). The audio script and
  * `units:check` refuse any other voice.
  */
-export const CLEARED_VOICES = ["ru_RU-denis-medium", "ru_RU-dmitri-medium", "it_IT-paola-medium"] as const;
+/**
+ * Voices cleared for the units: native neural voices of Azure Speech (commercial use allowed, no attribution required).
+ * The Piper voices used before were fine-tuned from Flemish and English bases and did not sound native.
+ */
+export const CLEARED_VOICES = ["ru-RU-SvetlanaNeural", "ru-RU-DmitryNeural", "ru-RU-Lev:MAI-Voice-2", "it-IT-ElsaNeural", "it-IT-DiegoNeural"] as const;
 export type ClearedVoice = (typeof CLEARED_VOICES)[number];
 
 /** Text in the two languages the interface is explained in; both are mandatory. */

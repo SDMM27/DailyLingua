@@ -13,7 +13,7 @@ export const ruA0E5VoyellesSignes = {
   level: "A0",
   order: 5,
   kind: "script",
-  voice: "ru_RU-denis-medium",
+  voice: "ru-RU-SvetlanaNeural",
   title: { fr: "Voyelles en « y » et signes", en: "'Y' vowels and signs" },
   situation: {
     fr: "Les dernières lettres : quatre voyelles, dont trois commencent par un « y », et deux signes qui ne se prononcent pas.",

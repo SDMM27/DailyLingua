@@ -1,6 +1,6 @@
 /**
- * `npm run units:audio [-- --unit <unitId>] [--force]`: synthesises the audio of the beginner units with Piper
- * (`j4-pr1-architecture.md` §8), on the author's machine only (never in CI).
+ * `npm run units:audio [-- --unit <unitId>] [--force]`: synthesises the audio of the beginner units with the native
+ * neural voices of Azure Speech (`j4-pr1-architecture.md` §8), on the author's machine only (never in CI).
  *
  * For every dialogue line, the whole dialogue, every key phrase, every conversation turn and every `listen_mcq` item,
  * it writes a mono MP3 to `apps/web/public/unit-audio/<lang>/<unitId>/<id>.mp3` when the file is missing (or always
@@ -9,15 +9,14 @@
  * Writing units (`kind: "script"`) have no dialogue: the example word of every letter (`e1`, `e2`…, in the order of the
  * letters), every word (`w1`…) and every `listen_mcq` item are synthesised with the voice of the unit.
  *
- * Setup (once): a Python ≥ 3.9 virtual environment with `piper-tts`, and the cleared voices downloaded with
- * `python -m piper.download_voices --download-dir <dir>/voices <voice>…`. The folder is `DL_TTS_DIR`, by default
- * `%LOCALAPPDATA%/dailylingua/tts` (`venv/` and `voices/` inside). ffmpeg must be in the PATH.
+ * Setup: an Azure Speech resource (the free F0 tier is enough), with `AZURE_SPEECH_KEY` and `AZURE_SPEECH_REGION`
+ * in the environment (for example from `.env.local`, never committed). ffmpeg must be in the PATH.
  *
- * Russian and Ukrainian stress marks (U+0301) are removed before synthesis: Piper's phonemiser mispronounces some
- * stressed words (здра́вствуйте → "zdrafstvujte") and places the stress correctly without them. They stay on screen.
+ * Russian and Ukrainian stress marks (U+0301) are removed before synthesis; they stay on screen. Only the voices of
+ * `CLEARED_VOICES` are accepted. (Piper was used before; its voices were fine-tuned from non-native bases.)
  */
 import { execFile } from "node:child_process";
-import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { promisify } from "node:util";
@@ -28,10 +27,12 @@ const run = promisify(execFile);
 const ROOT = resolve(import.meta.dirname, "..");
 const PUBLIC = join(ROOT, "apps/web/public");
 const SOURCES = join(ROOT, "packages/content/src/units");
-const TTS = process.env.DL_TTS_DIR ?? join(process.env.LOCALAPPDATA ?? join(process.env.HOME ?? "", ".local/share"), "dailylingua/tts");
-const PYTHON = existsSync(join(TTS, "venv/Scripts/python.exe")) ? join(TTS, "venv/Scripts/python.exe") : join(TTS, "venv/bin/python");
+const AZURE_KEY = process.env.AZURE_SPEECH_KEY ?? "";
+const AZURE_REGION = process.env.AZURE_SPEECH_REGION ?? "";
 /** Silence between two lines of the whole dialogue (seconds). */
 const LINE_GAP = 0.5;
+/** Silence kept after a single clip (seconds). */
+const TAIL = 0.2;
 
 const args = process.argv.slice(2);
 const only = args.includes("--unit") ? args[args.indexOf("--unit") + 1] : null;
@@ -80,22 +81,43 @@ function clipsOf(unit: Unit): Clip[] {
   ];
 }
 
+const escapeXml = (text: string) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+
+/** One clip as a WAV file, synthesised by Azure Speech (voice names start with their locale, `ru-RU-…`). */
 async function synthesise(clip: Clip, work: string): Promise<string> {
   if (!(CLEARED_VOICES as readonly string[]).includes(clip.voice)) fail(`voice "${clip.voice}" is not cleared for use (${clip.id})`);
-  const model = join(TTS, "voices", `${clip.voice}.onnx`);
-  if (!existsSync(model)) fail(`voice model missing: ${model}`);
-  const wav = join(work, `${clip.id}.wav`);
-  const input = join(work, `${clip.id}.txt`);
-  writeFileSync(input, speak(clip.text), "utf8");
-  await run(PYTHON, ["-m", "piper", "-m", model, "-i", input, "-f", wav], { env: { ...process.env, PYTHONIOENCODING: "utf-8" } });
-  return wav;
+  const locale = clip.voice.split("-").slice(0, 2).join("-");
+  const ssml = `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="${locale}"><voice name="${escapeXml(clip.voice)}">${escapeXml(speak(clip.text))}</voice></speak>`;
+  for (let attempt = 1; ; attempt++) {
+    const response = await fetch(`https://${AZURE_REGION}.tts.speech.microsoft.com/cognitiveservices/v1`, {
+      method: "POST",
+      headers: {
+        "Ocp-Apim-Subscription-Key": AZURE_KEY,
+        "Content-Type": "application/ssml+xml",
+        "X-Microsoft-OutputFormat": "riff-24khz-16bit-mono-pcm",
+        "User-Agent": "dailylingua-units-audio",
+      },
+      body: ssml,
+    });
+    const audio = Buffer.from(await response.arrayBuffer());
+    if (response.ok && audio.length > 1000) {
+      const wav = join(work, `${clip.id}.wav`);
+      writeFileSync(wav, audio);
+      return wav;
+    }
+    // The free tier limits the request rate: wait and retry a few times.
+    if (attempt >= 5) fail(`Azure Speech refused ${clip.id} (${response.status}, ${audio.length} bytes)`);
+    await new Promise((done) => setTimeout(done, 2000 * attempt));
+  }
 }
 
 async function toMp3(inputs: string[], target: string): Promise<void> {
   mkdirSync(dirname(target), { recursive: true });
-  const filter = inputs.length === 1
-    ? "[0:a]anull[out]"
-    : `${inputs.map((_, i) => `[${i}:a]apad=pad_dur=${LINE_GAP}[a${i}]`).join(";")};${inputs.map((_, i) => `[a${i}]`).join("")}concat=n=${inputs.length}:v=0:a=1[out]`;
+  // Azure pads short utterances with up to a second of silence: trim both ends, then keep a short tail (a longer gap
+  // between the lines of a whole dialogue).
+  const trim = "silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse";
+  const tail = inputs.length === 1 ? TAIL : LINE_GAP;
+  const filter = `${inputs.map((_, i) => `[${i}:a]${trim},apad=pad_dur=${tail}[a${i}]`).join(";")};${inputs.map((_, i) => `[a${i}]`).join("")}concat=n=${inputs.length}:v=0:a=1[out]`;
   await run("ffmpeg", ["-y", "-loglevel", "error", ...inputs.flatMap((file) => ["-i", file]), "-filter_complex", filter, "-map", "[out]", "-ac", "1", "-ar", "22050", "-codec:a", "libmp3lame", "-b:a", "64k", target]);
 }
 
@@ -142,7 +164,7 @@ function sourceFileOf(unit: Unit): string {
 
 const units = Object.values(UNITS).filter((unit) => only === null || unit.id === only);
 if (units.length === 0) fail(only ? `unknown unit "${only}"` : "no unit in the registry");
-if (!existsSync(PYTHON)) fail(`Piper is not installed: ${PYTHON} is missing (see the header of this script)`);
+if (!AZURE_KEY || !AZURE_REGION) fail("AZURE_SPEECH_KEY and AZURE_SPEECH_REGION must be set (see the header of this script)");
 
 for (const unit of units) {
   const work = join(tmpdir(), `units-audio-${unit.id}`);
@@ -172,15 +194,6 @@ for (const unit of units) {
     if (result.changed) recorded++;
   }
   if (recorded > 0) writeFileSync(sourceFile, source, "utf8");
-  // The licence of every voice used ships next to the audio (Piper asks for it).
-  const voicesDir = join(PUBLIC, "unit-audio/voices");
-  mkdirSync(voicesDir, { recursive: true });
-  const voices = isScriptUnit(unit) ? [unit.voice] : unit.dialogue.speakers.map((speaker) => speaker.voice);
-  for (const voice of new Set(voices)) {
-    const card = join(TTS, "voices", `${voice}.MODEL_CARD`);
-    if (!existsSync(card)) fail(`MODEL_CARD missing for ${voice}: download it next to the voice (${card})`);
-    copyFileSync(card, join(voicesDir, `${voice}.MODEL_CARD.txt`));
-  }
   rmSync(work, { recursive: true, force: true });
   console.log(`✓ ${unit.id}: ${made} file(s) generated, ${recorded} path(s) recorded in ${sourceFile.slice(ROOT.length + 1)}`);
 }

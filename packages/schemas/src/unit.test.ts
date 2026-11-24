@@ -198,6 +198,6 @@ describe("unitSchema", () => {
 
 describe("CLEARED_VOICES", () => {
   it("lists the three cleared voices", () => {
-    expect([...CLEARED_VOICES]).toEqual(["ru_RU-denis-medium", "ru_RU-dmitri-medium", "it_IT-paola-medium"]);
+    expect([...CLEARED_VOICES]).toEqual(["ru-RU-SvetlanaNeural", "ru-RU-DmitryNeural", "ru-RU-Lev:MAI-Voice-2", "it-IT-ElsaNeural", "it-IT-DiegoNeural"]);
   });
 });

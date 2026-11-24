@@ -12,7 +12,7 @@ export const ruA0E2FauxAmis = {
   level: "A0",
   order: 2,
   kind: "script",
-  voice: "ru_RU-denis-medium",
+  voice: "ru-RU-SvetlanaNeural",
   title: { fr: "Les faux amis", en: "False friends" },
   situation: {
     fr: "Six lettres ressemblent à des lettres latines mais ne se lisent pas pareil : c’est là que l’œil se trompe.",
