@@ -59,7 +59,7 @@ export const ruA110WeekEnd = {
         id: "d4",
         speaker: "leo",
         text: "Пото́м я до́лго за́втракаю и чита́ю.",
-        translation: { fr: "Ensuite, je prends longtemps mon petit-déjeuner et je lis.", en: "Then I have a long breakfast and read." },
+        translation: { fr: "Ensuite, je prends mon petit-déjeuner sans me presser et je lis.", en: "Then I have a long breakfast and read." },
         audio: null,
       },
       {
@@ -86,7 +86,6 @@ export const ruA110WeekEnd = {
       {
         id: "d8",
         speaker: "leo",
-        // REVIEW: "у меня́" for "at my place" is taught as a chunk (у меня́ есть is known from unit 4).
         text: "Да, я люблю́ гото́вить. Ве́чером друзья́ у́жинают у меня́.",
         translation: { fr: "Oui, j’aime cuisiner. Le soir, des amis dînent chez moi.", en: "Yes, I like cooking. In the evening friends have dinner at my place." },
         audio: null,
@@ -153,13 +152,7 @@ export const ruA110WeekEnd = {
       { form: "смотрю́", lemma: "смотре́ть", meaning: { fr: "(je) regarde", en: "(I) watch" }, note: null, isNew: false },
       { form: "смо́трите", lemma: "смотре́ть", meaning: { fr: "(vous) regardez", en: "(you) watch" }, note: null, isNew: false },
       { form: "смо́трят", lemma: "смотре́ть", meaning: { fr: "(ils, elles) regardent", en: "(they) watch" }, note: null, isNew: false },
-      {
-        form: "смотри́те",
-        lemma: "смотре́ть",
-        meaning: { fr: "regardez !", en: "look!" },
-        note: { fr: "Impératif : смотри́те ! = regardez ! À ne pas confondre avec вы смо́трите.", en: "Imperative: смотри́те! = look! Not to be confused with вы смо́трите." },
-        isNew: false,
-      },
+      { form: "смо́трим", lemma: "смотре́ть", meaning: { fr: "(nous) regardons", en: "(we) watch" }, note: null, isNew: false },
       { form: "смотре́ть", lemma: "смотре́ть", meaning: { fr: "regarder", en: "to watch" }, note: null, isNew: false },
       { form: "фильм", lemma: "фильм", meaning: { fr: "film", en: "film" }, note: null, isNew: false },
       { form: "ве́чером", lemma: "ве́чером", meaning: { fr: "le soir", en: "in the evening" }, note: null, isNew: false },
@@ -250,7 +243,7 @@ export const ruA110WeekEnd = {
       { form: "сре́ду", lemma: "сре́да", meaning: { fr: "mercredi", en: "Wednesday" }, note: { fr: "в сре́ду = (le) mercredi : bloc.", en: "в сре́ду = on Wednesday: a chunk." }, isNew: true },
       { form: "сре́да", lemma: "сре́да", meaning: { fr: "mercredi", en: "Wednesday" }, note: null, isNew: false },
       { form: "понеде́льник", lemma: "понеде́льник", meaning: { fr: "lundi", en: "Monday" }, note: { fr: "в понеде́льник : ne change pas.", en: "в понеде́льник: doesn't change." }, isNew: true },
-      { form: "вто́рник", lemma: "вто́рник", meaning: { fr: "mardi", en: "Tuesday" }, note: null, isNew: true },
+      { form: "вто́рник", lemma: "вто́рник", meaning: { fr: "mardi", en: "Tuesday" }, note: { fr: "Quand ? во вто́рник (во devant вт).", en: "When? во вто́рник (во before вт)." }, isNew: true },
       { form: "четве́рг", lemma: "четве́рг", meaning: { fr: "jeudi", en: "Thursday" }, note: null, isNew: true },
       { form: "у́тром", lemma: "у́тром", meaning: { fr: "le matin", en: "in the morning" }, note: null, isNew: false },
       {
@@ -278,7 +271,7 @@ export const ruA110WeekEnd = {
     { id: "k1", text: "Что ты обы́чно де́лаешь в суббо́ту?", translation: { fr: "Qu’est-ce que tu fais d’habitude le samedi ?", en: "What do you usually do on Saturdays?" }, lineId: "d1", audio: null },
     { id: "k2", text: "В суббо́ту я не рабо́таю.", translation: { fr: "Le samedi, je ne travaille pas.", en: "On Saturdays I don't work." }, lineId: "d2", audio: null },
     { id: "k3", text: "Я встаю́ по́здно.", translation: { fr: "Je me lève tard.", en: "I get up late." }, lineId: "d2", audio: null },
-    { id: "k4", text: "Пото́м я до́лго за́втракаю.", translation: { fr: "Ensuite, je prends longtemps mon petit-déjeuner.", en: "Then I have a long breakfast." }, lineId: "d4", audio: null },
+    { id: "k4", text: "Пото́м я до́лго за́втракаю.", translation: { fr: "Ensuite, je prends mon petit-déjeuner sans me presser.", en: "Then I have a long breakfast." }, lineId: "d4", audio: null },
     { id: "k5", text: "Днём я гуля́ю в па́рке.", translation: { fr: "L’après-midi, je me promène dans le parc.", en: "In the afternoon I go for a walk in the park." }, lineId: "d6", audio: null },
     { id: "k6", text: "Ты гото́вишь?", translation: { fr: "Tu cuisines ?", en: "Do you cook?" }, lineId: "d7", audio: null },
     { id: "k7", text: "Друзья́ у́жинают у меня́.", translation: { fr: "Des amis dînent chez moi.", en: "Friends have dinner at my place." }, lineId: "d8", audio: null },
@@ -365,7 +358,7 @@ export const ruA110WeekEnd = {
       ],
       answer: "a",
       audio: null,
-      explain: { fr: "Рабо́тать est de la 1re conjugaison : ты рабо́таешь.", en: "Рабо́тать is 1st conjugation: ты рабо́таешь." },
+      explain: { fr: "Рабо́тать est de la 1re conjugaison : ты рабо́таешь (pas рабо́тишь).", en: "Рабо́тать is 1st conjugation: ты рабо́таешь (not рабо́тишь)." },
     },
     {
       id: "i06",
@@ -373,12 +366,12 @@ export const ruA110WeekEnd = {
       prompt: "Ты ___ ве́чером?",
       options: [
         { id: "a", text: "гото́вишь" },
-        { id: "b", text: "гото́веешь" },
+        { id: "b", text: "гото́вит" },
         { id: "c", text: "гото́влю" },
       ],
       answer: "a",
       audio: null,
-      explain: { fr: "Гото́вить est de la 2e conjugaison : ты гото́вишь (le л n’apparaît qu’en я : гото́влю).", en: "Гото́вить is 2nd conjugation: ты гото́вишь (the л only appears with я: гото́влю)." },
+      explain: { fr: "Avec ты, 2e conjugaison : ты гото́вишь. Гото́вит va avec он / она́, et le л n’apparaît qu’en я : гото́влю.", en: "With ты, 2nd conjugation: ты гото́вишь. Гото́вит goes with он / она́, and the л only appears with я: гото́влю." },
     },
     {
       id: "i07",
@@ -391,7 +384,7 @@ export const ruA110WeekEnd = {
       ],
       answer: "a",
       audio: null,
-      explain: { fr: "Спать est de la 2e conjugaison, avec л en я : я сплю.", en: "Спать is 2nd conjugation, with л in the я form: я сплю." },
+      explain: { fr: "Спать est de la 2e conjugaison, avec л en я : я сплю (pas спаю́).", en: "Спать is 2nd conjugation, with л in the я form: я сплю (not спаю́)." },
     },
     // Lesson 2, exercises.
     {
@@ -401,7 +394,7 @@ export const ruA110WeekEnd = {
       tokens: ["встаю́", "В", "по́здно", "я", "суббо́ту"],
       distractors: [],
       answer: "В субботу я встаю поздно.",
-      accept: ["В субботу я поздно встаю.", "Я встаю поздно в субботу.", "Я в субботу встаю поздно.", "Я в субботу поздно встаю."],
+      accept: ["В субботу я поздно встаю.", "Я встаю поздно в субботу.", "Я в субботу встаю поздно.", "Я в субботу поздно встаю.", "Я поздно встаю в субботу."],
       explain: { fr: "в суббо́ту = le samedi ; встава́ть → я встаю́.", en: "в суббо́ту = on Saturdays; встава́ть → я встаю́." },
     },
     {
@@ -424,7 +417,7 @@ export const ruA110WeekEnd = {
         { id: "c", text: "В понеде́льник." },
       ],
       answer: "a",
-      audioText: "Я пла́ваю в бассе́йне в сре́ду.",
+      audioText: "В сре́ду я пла́ваю в бассе́йне.",
       audio: "/unit-audio/ru/ru-a1-10-week-end/i10.mp3",
       explain: { fr: "в сре́ду = le mercredi.", en: "в сре́ду = on Wednesday." },
     },
@@ -518,12 +511,12 @@ export const ruA110WeekEnd = {
       prompt: "Вы ___ фильм?",
       options: [
         { id: "a", text: "смо́трите" },
-        { id: "b", text: "смотри́те" },
+        { id: "b", text: "смо́трим" },
         { id: "c", text: "смо́трят" },
       ],
       answer: "a",
       audio: null,
-      explain: { fr: "Вы смо́трите (accent sur о) ; смотри́те ! est un impératif : « regardez ! ».", en: "Вы смо́трите (stress on о); смотри́те! is an imperative: \"look!\"." },
+      explain: { fr: "Avec вы : -ите. Вы смо́трите (мы смо́трим, они́ смо́трят).", en: "With вы: -ите. Вы смо́трите (мы смо́трим, они́ смо́трят)." },
     },
     // Lesson 3, conversation: the learner answers as Leo.
     {
@@ -668,6 +661,6 @@ export const ruA110WeekEnd = {
       },
     ],
   },
-  aiReview: null,
-  status: "draft",
+  aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
+  status: "reviewed",
 } satisfies UnitSource;

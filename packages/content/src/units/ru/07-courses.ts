@@ -112,7 +112,7 @@ export const ruA107Courses = {
         form: "Продавщи́ца",
         lemma: "продавщи́ца",
         meaning: { fr: "vendeuse", en: "shop assistant (woman), stallholder" },
-        note: { fr: "Un vendeur : продаве́ц (unité 3).", en: "A man: продаве́ц (unit 3)." },
+        note: { fr: "Un vendeur : продаве́ц.", en: "A man: продаве́ц." },
         isNew: true,
       },
       { form: "ры́нке", lemma: "ры́нок", meaning: { fr: "marché", en: "market" }, note: { fr: "ры́нок → на ры́нке (на, comme на по́чте)", en: "ры́нок → на ры́нке (на, like на по́чте)" }, isNew: true },
@@ -296,7 +296,6 @@ export const ruA107Courses = {
     { id: "k7", text: "Что́-нибудь ещё?", translation: { fr: "Autre chose ?", en: "Anything else?" }, lineId: "d9", audio: null },
     { id: "k8", text: "Нет, спаси́бо, э́то всё.", translation: { fr: "Non merci, c’est tout.", en: "No, thank you, that's all." }, lineId: "d10", audio: null },
     { id: "k9", text: "Ско́лько с меня́?", translation: { fr: "Je vous dois combien ?", en: "How much do I owe you?" }, lineId: "d10", audio: null },
-    // REVIEW: "Да́йте, пожа́луйста, полкило́." said while pointing at the goods: check that it sounds natural without a noun.
     { id: "k10", text: "Да́йте, пожа́луйста, полкило́.", translation: { fr: "Donnez-m’en un demi-kilo, s’il vous plaît.", en: "Half a kilo, please." }, lineId: null, audio: null },
   ],
   grammar: {
@@ -306,6 +305,7 @@ export const ruA107Courses = {
         "Règle des 7 lettres : après г, к, х, ж, ш, ч, щ, jamais ы, toujours и : гру́ша → гру́ши, бу́лочка → бу́лочки, пирожо́к → пирожки́.",
         "Neutre : -о → -а (яйцо́ → я́йца). L’accent bouge souvent, et un о ou un е peut tomber : огуре́ц → огурцы́.",
         "À apprendre par cœur : я́блоко → я́блоки, друг → друзья́, ребёнок → де́ти.",
+        "Certains mots ne changent jamais, au pluriel non plus : кафе́, метро́, кило́.",
         "Avec un pluriel, le verbe et l’adjectif passent au pluriel aussi : Ско́лько сто́ят помидо́ры ? Они́ сла́дкие.",
       ].join("\n"),
       en: [
@@ -313,6 +313,7 @@ export const ruA107Courses = {
         "Seven-letter rule: after г, к, х, ж, ш, ч, щ, never ы, always и: гру́ша → гру́ши, бу́лочка → бу́лочки, пирожо́к → пирожки́.",
         "Neuter: -о → -а (яйцо́ → я́йца). The stress often moves, and an о or е can drop: огуре́ц → огурцы́.",
         "Learn by heart: я́блоко → я́блоки, друг → друзья́, ребёнок → де́ти.",
+        "Some words never change, not even in the plural: кафе́, метро́, кило́.",
         "With a plural, the verb and the adjective go plural too: Ско́лько сто́ят помидо́ры? Они́ сла́дкие.",
       ].join("\n"),
     },
@@ -381,7 +382,7 @@ export const ruA107Courses = {
       ],
       answer: "a",
       audio: null,
-      explain: { fr: "Masculin terminé par une consonne : + -ы. Бана́н → бана́ны.", en: "Masculine ending in a consonant: + -ы. Бана́н → бана́ны." },
+      explain: { fr: "Masculin terminé par une consonne : + -ы. Бана́н → бана́ны (pas бана́ни).", en: "Masculine ending in a consonant: + -ы. Бана́н → бана́ны (not бана́ни)." },
     },
     {
       id: "i06",
@@ -407,7 +408,7 @@ export const ruA107Courses = {
       ],
       answer: "a",
       audio: null,
-      explain: { fr: "Neutre en -о : -а au pluriel, et l’accent recule. Яйцо́ → я́йца.", en: "Neuter in -о: -а in the plural, and the stress moves back. Яйцо́ → я́йца." },
+      explain: { fr: "Neutre en -о : -а au pluriel, et l’accent recule. Яйцо́ → я́йца (pas я́йцы).", en: "Neuter in -о: -а in the plural, and the stress moves back. Яйцо́ → я́йца (not я́йцы)." },
     },
     // Lesson 2, exercises.
     {
@@ -417,7 +418,7 @@ export const ruA107Courses = {
       tokens: ["сто́ят", "Ско́лько", "я́блоки"],
       distractors: ["сто́ит"],
       answer: "Сколько стоят яблоки?",
-      accept: [],
+      accept: ["Сколько яблоки стоят?", "Яблоки сколько стоят?"],
       explain: { fr: "Plusieurs pommes : сто́ят (pluriel), pas сто́ит.", en: "Several apples: сто́ят (plural), not сто́ит." },
     },
     {
@@ -427,7 +428,7 @@ export const ruA107Courses = {
       tokens: ["есть", "У", "я́йца", "вас"],
       distractors: [],
       answer: "У вас есть яйца?",
-      accept: ["Яйца у вас есть?"],
+      accept: ["Яйца у вас есть?", "Есть у вас яйца?", "У вас яйца есть?"],
       explain: { fr: "У вас есть… ? + le nom au pluriel : я́йца.", en: "У вас есть…? + the noun in the plural: я́йца." },
     },
     {
@@ -552,7 +553,7 @@ export const ruA107Courses = {
       ],
       answer: "a",
       audio: null,
-      explain: { fr: "Яйцо́ → я́йца : -а au pluriel pour un neutre en -о.", en: "Яйцо́ → я́йца: -а in the plural for a neuter in -о." },
+      explain: { fr: "Яйцо́ → я́йца : -а au pluriel pour un neutre en -о (pas я́йцы).", en: "Яйцо́ → я́йца: -а in the plural for a neuter in -о (not я́йцы)." },
     },
     {
       id: "i21",
@@ -648,7 +649,6 @@ export const ruA107Courses = {
       {
         id: "c4",
         speaker: "leo",
-        // REVIEW: eggs are usually sold by the ten ("деся́ток"); "Де́сять" from a foreigner should still sound fine.
         text: "Де́сять, пожа́луйста. И ещё бу́лочки.",
         translation: { fr: "Dix, s’il vous plaît. Et aussi des petits pains.", en: "Ten, please. And some bread rolls too." },
         audio: null,
@@ -688,6 +688,6 @@ export const ruA107Courses = {
       },
     ],
   },
-  aiReview: null,
-  status: "draft",
+  aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
+  status: "reviewed",
 } satisfies UnitSource;

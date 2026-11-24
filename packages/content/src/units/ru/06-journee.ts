@@ -330,14 +330,14 @@ export const ruA106Journee = {
   grammar: {
     summary: {
       fr: [
-        "Au présent, les verbes en -ать (рабо́тать, де́лать, чита́ть, отдыха́ть…) gardent leur radical et prennent : я -ю, ты -ешь, он / она́ -ет, мы -ем, вы -ете, они́ -ют. Рабо́тать → я рабо́таю, ты рабо́таешь, они́ рабо́тают.",
-        "Un seul présent : я рабо́таю = je travaille, je suis en train de travailler. Pas de verbe « être », et jamais l’infinitif après я (я рабо́тать est faux).",
+        "Au présent, la plupart des verbes en -ать (рабо́тать, де́лать, чита́ть, отдыха́ть…) gardent leur radical et prennent : я -ю, ты -ешь, он / она́ -ет, мы -ем, вы -ете, они́ -ют. Рабо́тать → я рабо́таю, ты рабо́таешь, они́ рабо́тают.",
+        "Un seul présent : я рабо́таю = je travaille, je suis en train de travailler. Pas de verbe « être », et le verbe se conjugue toujours : я рабо́таю, jamais я рабо́тать.",
         "Après une consonne, on écrit -у / -ут : жить → я живу́, они́ живу́т. Quand la terminaison est accentuée, е devient ё : ты живёшь, он живёт, мы живём. Встава́ть perd -ва- : я встаю́, ты встаёшь.",
         "L’heure se dit comme les roubles (unité 3) : в час, в два часа́, в семь часо́в. Pour demander : Ско́лько сейча́с вре́мени ?",
       ].join("\n"),
       en: [
-        "In the present, verbs in -ать (рабо́тать, де́лать, чита́ть, отдыха́ть…) keep their stem and take: я -ю, ты -ешь, он / она́ -ет, мы -ем, вы -ете, они́ -ют. Рабо́тать → я рабо́таю, ты рабо́таешь, они́ рабо́тают.",
-        "One present only: я рабо́таю = I work, I'm working. No verb \"to be\", and never the infinitive after я (я рабо́тать is wrong).",
+        "In the present, most verbs in -ать (рабо́тать, де́лать, чита́ть, отдыха́ть…) keep their stem and take: я -ю, ты -ешь, он / она́ -ет, мы -ем, вы -ете, они́ -ют. Рабо́тать → я рабо́таю, ты рабо́таешь, они́ рабо́тают.",
+        "One present only: я рабо́таю = I work, I'm working. No verb \"to be\", and the verb is always conjugated: я рабо́таю, never я рабо́тать.",
         "After a consonant, write -у / -ут: жить → я живу́, они́ живу́т. When the ending is stressed, е becomes ё: ты живёшь, он живёт, мы живём. Встава́ть drops -ва-: я встаю́, ты встаёшь.",
         "The hour works like the roubles (unit 3): в час, в два часа́, в семь часо́в. To ask: Ско́лько сейча́с вре́мени?",
       ].join("\n"),
@@ -444,7 +444,7 @@ export const ruA106Journee = {
       tokens: ["в", "Я", "часо́в", "встаю́", "семь"],
       distractors: ["часа́"],
       answer: "Я встаю в семь часов.",
-      accept: ["В семь часов я встаю."],
+      accept: ["В семь часов я встаю.", "Я в семь часов встаю."],
       explain: { fr: "Après семь (5 à 20) : часо́в. Après два, три, четы́ре : часа́.", en: "After семь (5 to 20): часо́в. After два, три, четы́ре: часа́." },
     },
     {
@@ -679,7 +679,6 @@ export const ruA106Journee = {
       {
         id: "c5",
         speaker: "maxim",
-        // REVIEW: "Ты с на́ми?" for "are you joining us?": check that it sounds natural here.
         text: "Отли́чно! Сего́дня мы обе́даем в кафе́, в це́нтре. Ты с на́ми?",
         translation: { fr: "Parfait ! Aujourd’hui, on déjeune au café, dans le centre. Tu viens avec nous ?", en: "Great! Today we're having lunch at a café in the centre. Are you joining us?" },
         audio: null,
@@ -711,6 +710,6 @@ export const ruA106Journee = {
       },
     ],
   },
-  aiReview: null,
-  status: "draft",
+  aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
+  status: "reviewed",
 } satisfies UnitSource;
