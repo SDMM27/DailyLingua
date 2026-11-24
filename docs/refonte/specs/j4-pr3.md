@@ -49,7 +49,7 @@ Le type `Unit` devient l'union `SituationUnit | ScriptUnit | AssessmentUnit` ; `
 
 ### 2.4 Écrans (style existant, pas de maquette)
 - **Carte** : le bilan est la dernière station, sous un intertitre « Bilan · A1 ». Une fois réussi, l'en-tête de la carte affiche « A1 confirmé » au lieu du niveau.
-- **Feuille d'unité** : objectifs, « 10 questions, sans aide », une seule action « Passer le bilan » (pas de « Je connais déjà », c'est déjà un test).
+- **Feuille d'unité** : objectifs, « 10 questions, sans revoir les leçons », une seule action « Passer le bilan » (pas de « Je connais déjà », c'est déjà un test).
 - **Lecteur** : ouvre directement l'étape test (pas d'introduction de leçons).
 - **Fin** : réussite → « A1 confirmé » et le score ; échec → le score, « Il faut 8 sur 10 », et la liste des unités à revoir (titres des unités sources des items manqués, via `drawnFrom`), « Repasser le bilan » et « Retour au parcours ». Pas de phrase sur l'échauffement.
 - « Aujourd'hui » : inchangé (la séance du texte du jour est déjà proposée à un A1 ; la carte d'unité mène au bilan quand c'est la prochaine unité, et disparaît quand tout est réussi).

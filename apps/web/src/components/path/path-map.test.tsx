@@ -88,7 +88,7 @@ describe("path map", () => {
     ]));
     await user.click(screen.getByRole("button", { name: /Bilan A1, à commencer/ }));
     const sheet = screen.getByRole("dialog", { name: "Bilan A1" });
-    expect(within(sheet).getByText("10 questions, sans aide")).toBeTruthy();
+    expect(within(sheet).getByText("10 questions, sans revoir les leçons")).toBeTruthy();
     const links = within(sheet).getAllByRole("link");
     expect(links.map((link) => [link.textContent, link.getAttribute("href")])).toEqual([["Passer le bilan", "/parcours/it/it-a1-11-bilan"]]);
     expect(within(sheet).queryByText(/Je connais déjà/)).toBeNull();

@@ -617,7 +617,7 @@
   },
   "assessment": {
     "meta": "Bilan · environ {minutes} min",
-    "questions": "{count} questions, sans aide",
+    "questions": "{count} questions, sans revoir les leçons",
     "start": "Passer le bilan",
     "retake": "Repasser le bilan",
     "passed": "{level} confirmé",

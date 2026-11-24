@@ -617,7 +617,7 @@
   },
   "assessment": {
     "meta": "Check-up · about {minutes} min",
-    "questions": "{count} questions, no help",
+    "questions": "{count} questions, without going back to the lessons",
     "start": "Take the check-up",
     "retake": "Retake the check-up",
     "passed": "{level} confirmed",
