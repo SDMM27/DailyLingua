@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { stableStringify } from "@dailylingua/core";
-import { unitSchema, type UnitSource } from "@dailylingua/schemas";
+import { unitSchema, type SituationUnitSource } from "@dailylingua/schemas";
 import { describe, expect, it } from "vitest";
 import { sha256Hex } from "../sha256";
 import { fixtureUnit } from "./__fixtures__/it-fixture";
@@ -28,7 +28,7 @@ describe("unitVersion", () => {
 
   it("does not depend on the order of the keys", () => {
     const unit = fixtureUnit();
-    const reversed = Object.fromEntries(Object.entries(unit).reverse()) as UnitSource;
+    const reversed = Object.fromEntries(Object.entries(unit).reverse()) as SituationUnitSource;
     expect(unitVersion(reversed)).toBe(unitVersion(unit));
   });
 
@@ -48,7 +48,7 @@ describe("unitVersion", () => {
 });
 
 describe("buildRegistry", () => {
-  const second = (): UnitSource => ({ ...fixtureUnit(), id: "it-a1-02-fixture", order: 2 });
+  const second = (): SituationUnitSource => ({ ...fixtureUnit(), id: "it-a1-02-fixture", order: 2 });
 
   it("keys the units by id and adds the version", () => {
     const registry = buildRegistry([fixtureUnit()]);
@@ -70,7 +70,7 @@ describe("buildRegistry", () => {
   });
 
   it("lists the units of a language sorted by order", () => {
-    const ru: UnitSource = { ...fixtureUnit(), id: "ru-a1-01-fixture", language: "ru" };
+    const ru: SituationUnitSource = { ...fixtureUnit(), id: "ru-a1-01-fixture", language: "ru" };
     const registry = buildRegistry([second(), ru, fixtureUnit()]);
     expect(unitsIn(registry, "it").map((unit) => unit.order)).toEqual([1, 2]);
     expect(unitsIn(registry, "ru").map((unit) => unit.id)).toEqual(["ru-a1-01-fixture"]);

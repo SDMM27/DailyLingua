@@ -172,8 +172,8 @@ const turnSchema = z.strictObject({
 export const unitStatuses = ["draft", "reviewed", "published"] as const;
 export type UnitStatus = (typeof unitStatuses)[number];
 
-/** Fields every kind of unit has. */
-const commonFields = {
+/** Fields every kind of unit has, the bilan included. */
+const headerFields = {
   id: unitIdSchema,
   language: languageCodeSchema,
   order: z.number().int().min(1),
@@ -181,9 +181,6 @@ const commonFields = {
   situation: l10nSchema,
   minutes: z.number().int().min(1),
   canDo: z.array(z.strictObject({ id: idSchema, text: l10nSchema })).min(2).max(3),
-  items: z.array(unitItemSchema).min(1),
-  lessons: z.array(lessonSchema).length(3),
-  test: z.strictObject({ itemIds: z.array(idSchema).length(10), passScore: z.literal(8) }),
   /** AI review status; the only one (an agent never records a human review). */
   aiReview: z.strictObject({ reviewedOn: dateKeySchema, passes: z.number().int().min(2), arbiter: textSchema }).nullable(),
   /**
@@ -191,6 +188,14 @@ const commonFields = {
    * production; `units:check` then requires every audio file). Reviewed and published need `aiReview`.
    */
   status: z.enum(unitStatuses).default("draft"),
+};
+
+/** Fields the authors of situation and writing units write. */
+const commonFields = {
+  ...headerFields,
+  items: z.array(unitItemSchema).min(1),
+  lessons: z.array(lessonSchema).length(3),
+  test: z.strictObject({ itemIds: z.array(idSchema).length(10), passScore: z.literal(8) }),
 };
 
 const reviewedNeedsAiReview = {
@@ -262,7 +267,24 @@ const scriptUnitSchema = z
   })
   .refine(reviewedNeedsAiReview.check, reviewedNeedsAiReview.params);
 
-export const unitSchema = z.discriminatedUnion("kind", [situationUnitSchema, scriptUnitSchema]);
+/** One question of a bilan: an item of the test of one of its source units. */
+const drawSchema = z.strictObject({ unit: unitIdSchema, item: idSchema });
+
+/**
+ * The end-of-path assessment (`j4-pr3.md` §2): only a test, made of 10 items drawn from the tests of other units. An
+ * author writes the draws; the registry resolves them into `items`, `lessons`, `test` and `drawnFrom` (`AssessmentUnit`).
+ */
+export const assessmentUnitSourceSchema = z
+  .strictObject({
+    ...headerFields,
+    kind: z.literal("assessment"),
+    level: z.literal("A1"),
+    /** The 10 questions, in the order shown (units mixed). */
+    draws: z.array(drawSchema).length(10),
+  })
+  .refine(reviewedNeedsAiReview.check, reviewedNeedsAiReview.params);
+
+export const unitSchema = z.discriminatedUnion("kind", [situationUnitSchema, scriptUnitSchema, assessmentUnitSourceSchema]);
 
 /** What an author writes (`transliteration` may be left out); parsing fills it with null. */
 export type UnitSource = z.input<typeof unitSchema>;
@@ -270,12 +292,20 @@ export type UnitSource = z.input<typeof unitSchema>;
 export type ParsedUnitSource = z.output<typeof unitSchema>;
 export type SituationUnitSource = Extract<UnitSource, { kind: "situation" }>;
 export type ScriptUnitSource = Extract<UnitSource, { kind: "script" }>;
+export type AssessmentUnitSource = Extract<UnitSource, { kind: "assessment" }>;
+export type UnitDraw = AssessmentUnitSource["draws"][number];
+export type UnitLesson = z.infer<typeof lessonSchema>;
 export type ScriptLetter = ScriptUnitSource["letters"][number];
 export type ScriptWord = ScriptUnitSource["words"][number];
 
 /** Narrows a unit (source or parsed) to a writing unit. */
 export function isScriptUnit<T extends { kind: string }>(unit: T): unit is Extract<T, { kind: "script" }> {
   return unit.kind === "script";
+}
+
+/** Narrows a unit (source or resolved) to the end-of-path assessment. */
+export function isAssessmentUnit<T extends { kind: string }>(unit: T): unit is Extract<T, { kind: "assessment" }> {
+  return unit.kind === "assessment";
 }
 
 /** Languages written in a non-Latin script: the only ones whose lines may carry a transliteration. */
@@ -285,7 +315,19 @@ export const NON_LATIN_LANGUAGES: readonly string[] = ["ru", "uk", "el", "ar", "
 export const unitVersionSchema = z.string().regex(/^[0-9a-f]{12}$/, "Expected 12 hex characters");
 export type UnitVersion = z.infer<typeof unitVersionSchema>;
 
+/** A bilan once the registry has resolved its draws (`j4-pr3.md` §2.1). */
+export type ResolvedAssessmentSource = z.output<typeof assessmentUnitSourceSchema> & {
+  /** The drawn items, ids rewritten `<nn>-<itemId>` (`nn` = number of the source unit). */
+  items: UnitItem[];
+  /** One lesson with one step, the test. */
+  lessons: UnitLesson[];
+  test: { itemIds: string[]; passScore: 8 };
+  /** Rewritten item id to the unit it was drawn from (the fail screen lists those units). */
+  drawnFrom: Record<string, UnitId>;
+};
+
 /** A source and its content hash: what the registry serves. */
-export type Unit = ParsedUnitSource & { version: UnitVersion };
+export type Unit = (Exclude<ParsedUnitSource, { kind: "assessment" }> | ResolvedAssessmentSource) & { version: UnitVersion };
 export type SituationUnit = Extract<Unit, { kind: "situation" }>;
 export type ScriptUnit = Extract<Unit, { kind: "script" }>;
+export type AssessmentUnit = Extract<Unit, { kind: "assessment" }>;

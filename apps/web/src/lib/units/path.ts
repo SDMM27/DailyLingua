@@ -49,7 +49,7 @@ export interface Station {
 
 export interface Zone {
   type: "zone";
-  zone: "writing" | "situations";
+  zone: "writing" | "situations" | "assessment";
   level: string;
 }
 
@@ -64,6 +64,8 @@ export interface PathModel {
   currentId: string | null;
   hasWriting: boolean;
   currentIsWriting: boolean;
+  /** The bilan is passed: the level is confirmed (derived from its `passedAt`, nothing else is stored). */
+  confirmed: boolean;
 }
 
 /** The letters of a writing unit (its `letters` field, upper case); nothing for any other unit. */
@@ -74,7 +76,8 @@ export function scriptLetters(unit: Unit): string[] {
 /**
  * The line of a language: its visible units in order, each with its status. The current station is the first unit not
  * passed, whatever the learner has opened before; zone headings appear only when there are writing units (a path of
- * situations alone has none). Only common fields of the units are read.
+ * situations alone has none), except the one of the bilan, always the last station. Only common fields of the units
+ * are read.
  */
 export function buildPath(
   units: readonly Unit[],
@@ -87,7 +90,8 @@ export function buildPath(
   const entries: PathEntry[] = [];
   let previousKind: Unit["kind"] | null = null;
   units.forEach((unit, index) => {
-    if (hasWriting && unit.kind !== previousKind) entries.push({ type: "zone", zone: unit.kind === "script" ? "writing" : "situations", level: unit.level });
+    if (unit.kind === "assessment") entries.push({ type: "zone", zone: "assessment", level: unit.level });
+    else if (hasWriting && unit.kind !== previousKind) entries.push({ type: "zone", zone: unit.kind === "script" ? "writing" : "situations", level: unit.level });
     previousKind = unit.kind;
     const view = progress.get(unit.id) ?? null;
     const status: StationStatus = view?.passedAt != null ? "done" : index === currentIndex ? "current" : "todo";
@@ -117,14 +121,17 @@ export function buildPath(
   const current = stations.find((station) => station.status === "current") ?? null;
   const shown = current ?? stations.at(-1) ?? null;
   const shownUnit = units.find((unit) => unit.id === shown?.id);
+  // A passed bilan confirms its own level, whatever station is current (the order is suggested, never locked).
+  const passedBilan = units.find((unit) => unit.kind === "assessment" && progress.get(unit.id)?.passedAt != null);
   return {
     entries,
     done: stations.filter((station) => station.status === "done").length,
     total: stations.length,
-    level: shownUnit?.level ?? "A1",
+    level: passedBilan?.level ?? shownUnit?.level ?? "A1",
     currentId: current?.id ?? null,
     hasWriting,
     currentIsWriting: current?.kind === "script",
+    confirmed: passedBilan !== undefined,
   };
 }
 

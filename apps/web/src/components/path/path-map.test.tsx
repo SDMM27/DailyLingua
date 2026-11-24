@@ -19,7 +19,7 @@ const model = (entries: PathModel["entries"], patch: Partial<PathModel> = {}): P
   const stations = entries.filter((entry): entry is Station => entry.type === "station");
   return {
     entries, done: stations.filter((entry) => entry.status === "done").length, total: stations.length, level: "A1",
-    currentId: stations.find((entry) => entry.status === "current")?.id ?? null, hasWriting: false, currentIsWriting: false, ...patch,
+    currentId: stations.find((entry) => entry.status === "current")?.id ?? null, hasWriting: false, currentIsWriting: false, confirmed: false, ...patch,
   };
 };
 const show = (value: PathModel, language = "it") => render(
@@ -60,6 +60,38 @@ describe("path map", () => {
     show(model([station({ id: "it-a1-01-a", number: 1, status: "done" })]));
     expect(screen.queryByRole("link", { name: /Continuer|Commencer/ })).toBeNull();
     expect(screen.getByText("Toutes les unités de ce niveau sont validées.")).toBeTruthy();
+  });
+
+  it("ends the line with the bilan under « Bilan · A1 », and says « A1 confirmé » once it is passed", () => {
+    const bilanLine = (status: Station["status"]): PathModel["entries"] => [
+      station({ id: "it-a1-10-b", number: 1, status: "done" }),
+      { type: "zone", zone: "assessment", level: "A1" },
+      station({ id: "it-a1-11-bilan", number: 2, status: status, kind: "assessment", title: "Bilan A1" }),
+    ];
+    const { unmount } = show(model(bilanLine("current")));
+    expect(screen.getByText("Bilan · A1")).toBeTruthy();
+    expect(screen.getByRole("heading", { level: 1, name: "Niveau A1" })).toBeTruthy();
+    expect(screen.getByText("Bilan de fin de parcours")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Passer le bilan" }).getAttribute("href")).toBe("/parcours/it/it-a1-11-bilan");
+    unmount();
+    show(model(bilanLine("done"), { confirmed: true }));
+    expect(screen.getByRole("heading", { level: 1, name: "A1 confirmé" })).toBeTruthy();
+    expect(screen.queryByRole("heading", { name: "Niveau A1" })).toBeNull();
+  });
+
+  it("opens the sheet of the bilan with one action only: no « Je connais déjà »", async () => {
+    const user = userEvent.setup();
+    show(model([
+      station({ id: "it-a1-10-b", number: 1, status: "done" }),
+      { type: "zone", zone: "assessment", level: "A1" },
+      station({ id: "it-a1-11-bilan", number: 2, status: "current", kind: "assessment", title: "Bilan A1" }),
+    ]));
+    await user.click(screen.getByRole("button", { name: /Bilan A1, à commencer/ }));
+    const sheet = screen.getByRole("dialog", { name: "Bilan A1" });
+    expect(within(sheet).getByText("10 questions, sans revoir les leçons")).toBeTruthy();
+    const links = within(sheet).getAllByRole("link");
+    expect(links.map((link) => [link.textContent, link.getAttribute("href")])).toEqual([["Passer le bilan", "/parcours/it/it-a1-11-bilan"]]);
+    expect(within(sheet).queryByText(/Je connais déjà/)).toBeNull();
   });
 
   it("names the zones of a path with writing units", () => {

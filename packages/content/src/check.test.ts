@@ -1,6 +1,6 @@
-import type { SituationUnitSource, UnitItem, UnitSource } from "@dailylingua/schemas";
+import type { SituationUnitSource, UnitItem } from "@dailylingua/schemas";
 import { describe, expect, it } from "vitest";
-import { checkUnit, wordsOf, type CheckOptions, type UnitViolation } from "./check";
+import { checkUnit, wordsOf, type CheckableUnit, type CheckOptions, type UnitViolation } from "./check";
 import { FIXTURE_AUDIO, fixtureUnit } from "./units/__fixtures__/it-fixture";
 
 const OPTIONS: CheckOptions = {
@@ -8,11 +8,11 @@ const OPTIONS: CheckOptions = {
   audioExists: (path) => path === FIXTURE_AUDIO,
 };
 
-const codes = (unit: UnitSource, options: CheckOptions = OPTIONS): UnitViolation["code"][] =>
+const codes = (unit: CheckableUnit, options: CheckOptions = OPTIONS): UnitViolation["code"][] =>
   checkUnit(unit, options).map((violation) => violation.code);
 
 /** The fixture with one item replaced. */
-function withItem(id: string, patch: Partial<UnitItem>): UnitSource {
+function withItem(id: string, patch: Partial<UnitItem>): SituationUnitSource {
   const unit = fixtureUnit();
   return { ...unit, items: unit.items.map((item) => (item.id === id ? ({ ...item, ...patch } as UnitItem) : item)) };
 }
@@ -81,7 +81,7 @@ describe("checkUnit", () => {
 
   it("flags a test that is not 10 items long or does not pass at 8", () => {
     const unit = fixtureUnit();
-    const short = { ...unit.test, itemIds: unit.test.itemIds.slice(0, 9) } as UnitSource["test"];
+    const short = { ...unit.test, itemIds: unit.test.itemIds.slice(0, 9) } as SituationUnitSource["test"];
     expect(codes({ ...unit, test: short })).toContain("test_size");
     expect(codes({ ...unit, test: { ...unit.test, passScore: 7 as 8 } })).toEqual(["pass_score"]);
   });
@@ -170,7 +170,7 @@ describe("checkUnit", () => {
   it("accepts a transliteration for a language written in Cyrillic", () => {
     const unit = fixtureUnit();
     const lines = unit.dialogue.lines.map((line) => ({ ...line, transliteration: "privet" }));
-    const ru: UnitSource = { ...unit, id: "ru-a1-01-fixture", language: "ru", grammarPointId: null, dialogue: { ...unit.dialogue, lines } };
+    const ru: SituationUnitSource = { ...unit, id: "ru-a1-01-fixture", language: "ru", grammarPointId: null, dialogue: { ...unit.dialogue, lines } };
     // The fixture words are Latin, so only the transliteration rule is under test: no violation of that code.
     expect(codes(ru)).not.toContain("transliteration_latin_script");
   });

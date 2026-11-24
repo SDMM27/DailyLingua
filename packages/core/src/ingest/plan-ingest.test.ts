@@ -2,7 +2,7 @@ import { ingestPayloadSchema, isEmptyIngestPayload, type IngestPayload } from "@
 import { describe, expect, it } from "vitest";
 import { HOUR_MS, DAY_MS } from "../game";
 import { planIngest } from "./plan-ingest";
-import { NOW, SCRIPT_UNIT_ID, SESSION, TEXT, TODAY, UNIT_ID, UNIT_VERSION, card, correction, emptyState, eventWriter, item, iso, review, scriptUnit, session, text, unit, uuid, words } from "./fixtures";
+import { ASSESSMENT_UNIT_ID, NOW, SCRIPT_UNIT_ID, SESSION, TEXT, TODAY, UNIT_ID, UNIT_VERSION, card, correction, emptyState, eventWriter, item, iso, review, scriptUnit, assessmentUnit, session, text, unit, uuid, words } from "./fixtures";
 import type { IngestState, RawEvent } from "./types";
 
 /** Plans a batch and checks that the payload obeys the contract of `ingest_batch`. */
@@ -732,6 +732,45 @@ describe("planIngest: units", () => {
     expect(rejected.map((r) => r.reason)).toEqual(["step_not_proven"]);
     expect(payload.cards_created).toEqual([]);
     expect(payload.unit_progress[0]?.steps).toEqual({ "l1:letters": at(30) });
+  });
+
+  describe("the bilan (unit kind assessment)", () => {
+    const bilan = { unitId: ASSESSMENT_UNIT_ID, unitVersion: UNIT_VERSION };
+    const bilanIds = assessmentUnit().test.itemIds;
+    const bilanState = () => emptyState({ units: { [ASSESSMENT_UNIT_ID]: assessmentUnit() } });
+    const submit = (ev: ReturnType<typeof eventWriter>, seconds: number, right: number, attemptId = uuid(800)) =>
+      ev("unit_test_submitted", at(seconds), { ...bilan, attemptId, startedAt: at(seconds - 60), answers: bilanIds.map((itemId, i) => ({ itemId, answer: i < right ? "a" : "b" })) });
+
+    it("passes at 8/10: passed_at, a unit_test row and 25 XP of unit.complete", () => {
+      const { payload, rejected } = plan(bilanState(), [submit(eventWriter(), 100, 8)]);
+      expect(rejected).toEqual([]);
+      expect(payload.unit_tests).toEqual([expect.objectContaining({ unit_id: ASSESSMENT_UNIT_ID, score: 8, passed: true, missed: bilanIds.slice(8) })]);
+      expect(payload.xp).toEqual([expect.objectContaining({ reason: "unit.complete", amount: 25, meta: expect.objectContaining({ ref: ASSESSMENT_UNIT_ID }) })]);
+      expect(payload.unit_progress[0]).toMatchObject({ unit_id: ASSESSMENT_UNIT_ID, best_score: 8, passed_at: at(100), passed_version: UNIT_VERSION });
+      expect(payload.cards_created).toEqual([]);
+    });
+
+    it("does not pass at 7/10: no passed_at, no XP", () => {
+      const { payload } = plan(bilanState(), [submit(eventWriter(), 100, 7)]);
+      expect(payload.xp).toEqual([]);
+      expect(payload.unit_progress[0]).toMatchObject({ best_score: 7, test_attempts: 1, passed_at: null });
+    });
+
+    it("pays nothing for a second pass and keeps the first passed_at", () => {
+      const ev = eventWriter();
+      const first = plan(bilanState(), [submit(ev, 100, 9, uuid(801))]);
+      const again = plan(first.nextState, [submit(ev, 200, 10, uuid(802))]);
+      expect(again.payload.xp).toEqual([]);
+      expect(again.report.zeroed.map((z) => z.reason)).toEqual(["already_earned"]);
+      expect(again.payload.unit_progress[0]).toMatchObject({ best_score: 10, test_attempts: 2, passed_at: at(100) });
+    });
+
+    it("refuses a unit_item_attempt on an item of the bilan (it belongs to no step)", () => {
+      const event = eventWriter()("unit_item_attempt", at(10), { ...bilan, lesson: "l1", itemId: bilanIds[0], try: 1, answer: "a", shownAt: at(8) });
+      const { payload, rejected } = plan(bilanState(), [event]);
+      expect(rejected).toEqual([{ clientEventId: event.clientEventId, reason: "unknown_item" }]);
+      expect(isEmptyIngestPayload(payload)).toBe(true);
+    });
   });
 
   it("writes nothing for a replay of unit events already ingested", () => {

@@ -2,8 +2,10 @@ import { getUnit, unitsFor } from "@dailylingua/content";
 import { describe, expect, it } from "vitest";
 import { buildPath, hasPath, isPathLevel, minutesLeft, warmupDue } from "./path";
 import type { UnitProgressView } from "./progress";
+import { BILAN_ID, testBilan } from "./test-bilan";
 
-const units = unitsFor("it");
+// The situation units only: the bilan, last of the path, has its own zone heading (tested with `test-bilan`).
+const units = unitsFor("it").filter((unit) => unit.kind !== "assessment");
 const [first] = units;
 const view = (patch: Partial<UnitProgressView> = {}): UnitProgressView => ({ steps: {}, bestScore: null, testAttempts: 0, passedAt: null, ...patch });
 const fr = { locale: "fr" as const };
@@ -49,6 +51,32 @@ describe("buildPath", () => {
     const path = buildPath([script, first!], new Map(), fr);
     expect(path.entries.map((entry) => (entry.type === "zone" ? `zone:${entry.zone}:${entry.level}` : entry.id))).toEqual(["zone:writing:A0", "it-a0-00-fake", "zone:situations:A1", first!.id]);
     expect(path).toMatchObject({ hasWriting: true, currentIsWriting: true, level: "A0" });
+  });
+
+  it("ends the path with the bilan under its own zone heading, even without writing units", () => {
+    const { bilan, sources } = testBilan();
+    const path = buildPath([...sources, bilan], new Map(), fr);
+    expect(path.entries.map((entry) => (entry.type === "zone" ? `zone:${entry.zone}:${entry.level}` : entry.id))).toEqual([...sources.map((unit) => unit.id), "zone:assessment:A1", BILAN_ID]);
+    expect(path.entries.at(-1)).toMatchObject({ kind: "assessment", status: "todo", testSize: 10, started: false, passedByTest: false, number: 6 });
+    expect(path.confirmed).toBe(false);
+  });
+
+  it("makes the bilan current after the last unit, and confirms the level once the bilan is passed", () => {
+    const { bilan, sources } = testBilan();
+    const passed = (id: string) => [id, view({ passedAt: "2026-11-20T10:00:00Z" })] as const;
+    const before = buildPath([...sources, bilan], new Map(sources.map((unit) => passed(unit.id))), fr);
+    expect(before).toMatchObject({ currentId: BILAN_ID, confirmed: false, level: "A1", done: 5, total: 6 });
+    const after = buildPath([...sources, bilan], new Map([...sources, bilan].map((unit) => passed(unit.id))), fr);
+    expect(after).toMatchObject({ currentId: null, confirmed: true, done: 6 });
+    expect(after.entries.at(-1)).toMatchObject({ kind: "assessment", status: "done", passedByTest: false });
+  });
+
+  it("confirms the bilan's level even when an A0 writing unit is still current (the order is not locked)", () => {
+    const ru = unitsFor("ru");
+    const bilanRu = ru.find((unit) => unit.kind === "assessment");
+    expect(bilanRu).toBeDefined();
+    const path = buildPath(ru, new Map([[bilanRu!.id, view({ passedAt: "2026-11-20T10:00:00Z" })]]), fr);
+    expect(path).toMatchObject({ confirmed: true, level: "A1", currentIsWriting: true });
   });
 
   it("keeps the last level when everything is done", () => {

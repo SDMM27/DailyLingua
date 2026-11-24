@@ -20,7 +20,8 @@ export async function loadDueWarmups(userId: string, language: string, timeZone:
   const pending = await getPendingWarmups(await getRequestClient(), userId, language);
   return pending.flatMap(({ unitId, testedAt, itemIds }) => {
     const unit = visibleUnit(unitId);
-    if (!unit || !warmupDue(testedAt, now, timeZone)) return [];
+    // A bilan has no warm-up: its items belong to no step, the server would refuse their attempts.
+    if (!unit || unit.kind === "assessment" || !warmupDue(testedAt, now, timeZone)) return [];
     const known = itemIds.filter((id) => unit.items.some((item) => item.id === id) && lessonOfItem(unit, id) !== undefined);
     return known.length > 0 ? [{ unit, itemIds: known }] : [];
   });

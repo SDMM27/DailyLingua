@@ -1,4 +1,4 @@
-import type { DateKey, ScriptUnit, SituationUnit } from "@dailylingua/schemas";
+import type { AssessmentUnit, DateKey, ScriptUnit, SituationUnit } from "@dailylingua/schemas";
 import type { RawEvent, IngestState, StateCard, StateCorrection, StateItem, StateSession, StateText } from "./types";
 
 /** Fixtures of the ingest tests: a state with one daily session and helpers to write events. */
@@ -189,6 +189,33 @@ export function scriptUnit(): ScriptUnit {
       { id: "l3", steps: [{ step: "test", itemIds: ids(1, 10), threshold: 0 }] },
     ],
     test: { itemIds: ids(1, 10), passScore: 8 },
+    aiReview: { reviewedOn: "2026-11-20", passes: 2, arbiter: "arbitre-relecture" },
+    status: "published",
+  };
+}
+
+export const ASSESSMENT_UNIT_ID = "it-a1-11-bilan";
+
+/** A published bilan: no step item, one lesson with the test step; the test is the ten items `06-q1` to `10-q2`. */
+export function assessmentUnit(): AssessmentUnit {
+  const l10n = (text: string) => ({ fr: `${text} (fr)`, en: `${text} (en)` });
+  const ids = Array.from({ length: 10 }, (_, i) => `${String(6 + Math.floor(i / 2)).padStart(2, "0")}-q${(i % 2) + 1}`);
+  return {
+    id: ASSESSMENT_UNIT_ID,
+    version: UNIT_VERSION,
+    language: "it",
+    level: "A1",
+    order: 11,
+    kind: "assessment",
+    title: l10n("Bilan"),
+    situation: l10n("Situation"),
+    minutes: 10,
+    canDo: [{ id: "c1", text: l10n("Can 1") }, { id: "c2", text: l10n("Can 2") }],
+    draws: ids.map((id, i) => ({ unit: `it-a1-${id.slice(0, 2)}-fixture`, item: `q${(i % 2) + 1}` })),
+    items: ids.map((id) => ({ id, kind: "mcq" as const, prompt: "?", options: [{ id: "a", text: "A" }, { id: "b", text: "B" }], answer: "a", audio: null, explain: l10n("Because") })),
+    lessons: [{ id: "l1", steps: [{ step: "test", itemIds: [], threshold: 0.8 }] }],
+    test: { itemIds: ids, passScore: 8 },
+    drawnFrom: Object.fromEntries(ids.map((id) => [id, `it-a1-${id.slice(0, 2)}-fixture`])),
     aiReview: { reviewedOn: "2026-11-20", passes: 2, arbiter: "arbitre-relecture" },
     status: "published",
   };

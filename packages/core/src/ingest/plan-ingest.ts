@@ -1,7 +1,6 @@
 import {
   RULE_VERSION,
   clientEventSchema,
-  isScriptUnit,
   emptyIngestPayload,
   type ClientEvent,
   type CardKind,
@@ -920,8 +919,8 @@ class Ingestion {
    * Like the workshop words, they are due the next learning day and count in `newCards` when first reviewed.
    */
   private createKeyPhraseCards(unit: Unit, at: Attributed, eventId: string): void {
-    // A writing unit has no key phrases (and no `key_phrases` step), so there is nothing to turn into cards.
-    if (isScriptUnit(unit)) return;
+    // A writing unit and the bilan have no key phrases (and no `key_phrases` step), so there is nothing to turn into cards.
+    if (unit.kind !== "situation") return;
     const backLanguage = this.s.profile.explanationLanguage;
     for (const phrase of unit.keyPhrases) {
       const fingerKey = cardFingerKey(unit.language, "chunk", phrase.text);
