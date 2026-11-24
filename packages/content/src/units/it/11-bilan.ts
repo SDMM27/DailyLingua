@@ -37,5 +37,5 @@ export const itA111Bilan = {
     { unit: "it-a1-09-chez-moi", item: "i06" },
   ],
   aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
-  status: "reviewed",
+  status: "published",
 } satisfies UnitSource;

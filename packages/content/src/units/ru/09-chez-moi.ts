@@ -671,5 +671,5 @@ export const ruA109ChezMoi = {
     ],
   },
   aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
-  status: "reviewed",
+  status: "published",
 } satisfies UnitSource;

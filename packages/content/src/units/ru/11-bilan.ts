@@ -37,5 +37,5 @@ export const ruA111Bilan = {
     { unit: "ru-a1-08-gouts", item: "i14" },
   ],
   aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
-  status: "reviewed",
+  status: "published",
 } satisfies UnitSource;
