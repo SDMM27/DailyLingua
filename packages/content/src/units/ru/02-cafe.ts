@@ -46,7 +46,7 @@ export const ruA102Cafe = {
         text: "Здра́вствуйте! Мо́жно меню́, пожа́луйста?",
         transliteration: "Zdrávstvujte! Móžno menjú, požálujsta?",
         translation: { fr: "Bonjour ! Je peux avoir la carte, s’il vous plaît ?", en: "Hello! Can I have the menu, please?" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-02-cafe/d1.mp3",
       },
       {
         id: "d2",
@@ -54,7 +54,7 @@ export const ruA102Cafe = {
         text: "Вот, пожа́луйста. Что бу́дете пить?",
         transliteration: "Vot, požálujsta. Čto búdete pitʹ?",
         translation: { fr: "Voilà. Qu’est-ce que vous prenez à boire ?", en: "Here you are. What would you like to drink?" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-02-cafe/d2.mp3",
       },
       {
         id: "d3",
@@ -62,7 +62,7 @@ export const ruA102Cafe = {
         text: "Ко́фе, пожа́луйста.",
         transliteration: "Kófe, požálujsta.",
         translation: { fr: "Un café, s’il vous plaît.", en: "A coffee, please." },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-02-cafe/d3.mp3",
       },
       {
         id: "d4",
@@ -71,7 +71,7 @@ export const ruA102Cafe = {
         text: "Чёрный и́ли с молоко́м?",
         transliteration: "Čërnyj íli s molokóm?",
         translation: { fr: "Noir ou au lait ?", en: "Black or with milk?" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-02-cafe/d4.mp3",
       },
       {
         id: "d5",
@@ -79,7 +79,7 @@ export const ruA102Cafe = {
         text: "С молоко́м. А торт у вас есть?",
         transliteration: "S molokóm. A tort u vas estʹ?",
         translation: { fr: "Au lait. Et vous avez du gâteau ?", en: "With milk. And do you have any cake?" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-02-cafe/d5.mp3",
       },
       {
         id: "d6",
@@ -87,7 +87,7 @@ export const ruA102Cafe = {
         text: "Есть, шокола́дный. Он о́чень вку́сный!",
         transliteration: "Estʹ, šokoládnyj. On óčenʹ vkúsnyj!",
         translation: { fr: "Oui, au chocolat. Il est très bon !", en: "Yes, a chocolate one. It's really good!" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-02-cafe/d6.mp3",
       },
       {
         id: "d7",
@@ -95,7 +95,7 @@ export const ruA102Cafe = {
         text: "Отли́чно! Тогда́ и торт, пожа́луйста.",
         transliteration: "Otlíčno! Togdá i tort, požálujsta.",
         translation: { fr: "Parfait ! Alors un gâteau aussi, s’il vous plaît.", en: "Great! Then a cake as well, please." },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-02-cafe/d7.mp3",
       },
       {
         id: "d8",
@@ -103,7 +103,7 @@ export const ruA102Cafe = {
         text: "Вот ко́фе и торт. Прия́тного аппети́та!",
         transliteration: "Vot kófe i tort. Prijátnogo appetíta!",
         translation: { fr: "Voici le café et le gâteau. Bon appétit !", en: "Here's your coffee and cake. Enjoy!" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-02-cafe/d8.mp3",
       },
       {
         id: "d9",
@@ -111,7 +111,7 @@ export const ruA102Cafe = {
         text: "Спаси́бо! Ой, а где ло́жка?",
         transliteration: "Spasíbo! Oj, a gde lóžka?",
         translation: { fr: "Merci ! Oh, et où est la cuillère ?", en: "Thank you! Oh, where's the spoon?" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-02-cafe/d9.mp3",
       },
       {
         id: "d10",
@@ -119,10 +119,10 @@ export const ruA102Cafe = {
         text: "Извини́те! Вот она́.",
         transliteration: "Izviníte! Vot oná.",
         translation: { fr: "Pardon ! La voici.", en: "Sorry! Here it is." },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-02-cafe/d10.mp3",
       },
     ],
-    audio: null,
+    audio: "/unit-audio/ru/ru-a1-02-cafe/dialogue.mp3",
     glosses: [
       {
         form: "здра́вствуйте",
@@ -398,22 +398,22 @@ export const ruA102Cafe = {
       text: "Мо́жно меню́, пожа́луйста?",
       translation: { fr: "Je peux avoir la carte, s’il vous plaît ?", en: "Can I have the menu, please?" },
       lineId: "d1",
-      audio: null,
+      audio: "/unit-audio/ru/ru-a1-02-cafe/k1.mp3",
     },
     {
       id: "k2",
       text: "Что бу́дете пить?",
       translation: { fr: "Qu’est-ce que vous prenez à boire ?", en: "What would you like to drink?" },
       lineId: "d2",
-      audio: null,
+      audio: "/unit-audio/ru/ru-a1-02-cafe/k2.mp3",
     },
-    { id: "k3", text: "Ко́фе, пожа́луйста.", translation: { fr: "Un café, s’il vous plaît.", en: "A coffee, please." }, lineId: "d3", audio: null },
-    { id: "k4", text: "С молоко́м.", translation: { fr: "Au lait.", en: "With milk." }, lineId: "d5", audio: null },
-    { id: "k5", text: "А торт у вас есть?", translation: { fr: "Et vous avez du gâteau ?", en: "And do you have any cake?" }, lineId: "d5", audio: null },
-    { id: "k6", text: "Прия́тного аппети́та!", translation: { fr: "Bon appétit !", en: "Enjoy your meal!" }, lineId: "d8", audio: null },
-    { id: "k7", text: "Спаси́бо!", translation: { fr: "Merci !", en: "Thank you!" }, lineId: "d9", audio: null },
-    { id: "k8", text: "Извини́те!", translation: { fr: "Pardon ! Excusez-moi !", en: "Sorry! Excuse me!" }, lineId: "d10", audio: null },
-    { id: "k9", text: "Счёт, пожа́луйста.", translation: { fr: "L’addition, s’il vous plaît.", en: "The bill, please." }, lineId: null, audio: null },
+    { id: "k3", text: "Ко́фе, пожа́луйста.", translation: { fr: "Un café, s’il vous plaît.", en: "A coffee, please." }, lineId: "d3", audio: "/unit-audio/ru/ru-a1-02-cafe/k3.mp3" },
+    { id: "k4", text: "С молоко́м.", translation: { fr: "Au lait.", en: "With milk." }, lineId: "d5", audio: "/unit-audio/ru/ru-a1-02-cafe/k4.mp3" },
+    { id: "k5", text: "А торт у вас есть?", translation: { fr: "Et vous avez du gâteau ?", en: "And do you have any cake?" }, lineId: "d5", audio: "/unit-audio/ru/ru-a1-02-cafe/k5.mp3" },
+    { id: "k6", text: "Прия́тного аппети́та!", translation: { fr: "Bon appétit !", en: "Enjoy your meal!" }, lineId: "d8", audio: "/unit-audio/ru/ru-a1-02-cafe/k6.mp3" },
+    { id: "k7", text: "Спаси́бо!", translation: { fr: "Merci !", en: "Thank you!" }, lineId: "d9", audio: "/unit-audio/ru/ru-a1-02-cafe/k7.mp3" },
+    { id: "k8", text: "Извини́те!", translation: { fr: "Pardon ! Excusez-moi !", en: "Sorry! Excuse me!" }, lineId: "d10", audio: "/unit-audio/ru/ru-a1-02-cafe/k8.mp3" },
+    { id: "k9", text: "Счёт, пожа́луйста.", translation: { fr: "L’addition, s’il vous plaît.", en: "The bill, please." }, lineId: null, audio: "/unit-audio/ru/ru-a1-02-cafe/k9.mp3" },
   ],
   grammar: {
     summary: {
@@ -770,7 +770,7 @@ export const ruA102Cafe = {
         text: "Здра́вствуйте! Что бу́дете пить?",
         transliteration: "Zdrávstvujte! Čto búdete pitʹ?",
         translation: { fr: "Bonjour ! Qu’est-ce que vous prenez à boire ?", en: "Hello! What would you like to drink?" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-02-cafe/c1.mp3",
         itemId: null,
       },
       {
@@ -779,7 +779,7 @@ export const ruA102Cafe = {
         text: "Чай, пожа́луйста.",
         transliteration: "Čaj, požálujsta.",
         translation: { fr: "Un thé, s’il vous plaît.", en: "A tea, please." },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-02-cafe/c2.mp3",
         itemId: "i20",
       },
       {
@@ -788,7 +788,7 @@ export const ruA102Cafe = {
         text: "Чёрный и́ли зелёный?",
         transliteration: "Čërnyj íli zelënyj?",
         translation: { fr: "Noir ou vert ?", en: "Black or green?" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-02-cafe/c3.mp3",
         itemId: null,
       },
       {
@@ -797,7 +797,7 @@ export const ruA102Cafe = {
         text: "Зелёный. А суп у вас есть?",
         transliteration: "Zelënyj. A sup u vas estʹ?",
         translation: { fr: "Vert. Et vous avez de la soupe ?", en: "Green. And do you have soup?" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-02-cafe/c4.mp3",
         itemId: "i21",
       },
       {
@@ -806,7 +806,7 @@ export const ruA102Cafe = {
         text: "Да, есть. Он о́чень вку́сный!",
         transliteration: "Da, estʹ. On óčenʹ vkúsnyj!",
         translation: { fr: "Oui, il y en a. Elle est très bonne !", en: "Yes, we do. It's really good!" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-02-cafe/c5.mp3",
         itemId: null,
       },
       {
@@ -815,7 +815,7 @@ export const ruA102Cafe = {
         text: "Тогда́ и суп, пожа́луйста.",
         transliteration: "Togdá i sup, požálujsta.",
         translation: { fr: "Alors une soupe aussi, s’il vous plaît.", en: "Then a soup as well, please." },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-02-cafe/c6.mp3",
         itemId: "i22",
       },
       {
@@ -824,7 +824,7 @@ export const ruA102Cafe = {
         text: "Что́-нибудь ещё?",
         transliteration: "Čtó-nibudʹ eščë?",
         translation: { fr: "Autre chose ?", en: "Anything else?" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-02-cafe/c7.mp3",
         itemId: null,
       },
       {
@@ -833,7 +833,7 @@ export const ruA102Cafe = {
         text: "Нет, спаси́бо. Счёт, пожа́луйста.",
         transliteration: "Net, spasíbo. Sčët, požálujsta.",
         translation: { fr: "Non merci. L’addition, s’il vous plaît.", en: "No, thank you. The bill, please." },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-02-cafe/c8.mp3",
         itemId: "i23",
       },
     ],

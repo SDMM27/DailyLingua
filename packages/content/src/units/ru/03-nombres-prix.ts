@@ -46,7 +46,7 @@ export const ruA103NombresPrix = {
         text: "Здра́вствуйте! Ско́лько сто́ит вода́?",
         transliteration: "Zdrávstvujte! Skólʹko stóit vodá?",
         translation: { fr: "Bonjour ! Combien coûte l’eau ?", en: "Hello! How much is the water?" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-03-nombres-prix/d1.mp3",
       },
       {
         id: "d2",
@@ -54,7 +54,7 @@ export const ruA103NombresPrix = {
         text: "Здра́вствуйте! Пятьдеся́т рубле́й.",
         transliteration: "Zdrávstvujte! Pjatʹdesját rubléj.",
         translation: { fr: "Bonjour ! Cinquante roubles.", en: "Hello! Fifty roubles." },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-03-nombres-prix/d2.mp3",
       },
       {
         id: "d3",
@@ -62,7 +62,7 @@ export const ruA103NombresPrix = {
         text: "А пирожо́к? Ско́лько он сто́ит?",
         transliteration: "A pirožók? Skólʹko on stóit?",
         translation: { fr: "Et le pirojok ? Combien il coûte ?", en: "And the pirozhok? How much is it?" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-03-nombres-prix/d3.mp3",
       },
       {
         id: "d4",
@@ -73,7 +73,7 @@ export const ruA103NombresPrix = {
           fr: "Soixante-douze roubles. Il est à la viande, très bon.",
           en: "Seventy-two roubles. It's a meat one, really tasty.",
         },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-03-nombres-prix/d4.mp3",
       },
       {
         id: "d5",
@@ -81,7 +81,7 @@ export const ruA103NombresPrix = {
         text: "Недо́рого! Беру́ всё.",
         transliteration: "Nedórogo! Berú vsë.",
         translation: { fr: "Ce n’est pas cher ! Je prends tout.", en: "That's not expensive! I'll take both." },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-03-nombres-prix/d5.mp3",
       },
       {
         id: "d6",
@@ -89,7 +89,7 @@ export const ruA103NombresPrix = {
         text: "Сто два́дцать два рубля́.",
         transliteration: "Sto dvádcatʹ dva rubljá.",
         translation: { fr: "Cent vingt-deux roubles.", en: "A hundred and twenty-two roubles." },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-03-nombres-prix/d6.mp3",
       },
       {
         id: "d7",
@@ -97,7 +97,7 @@ export const ruA103NombresPrix = {
         text: "Извини́те, ско́лько? Повтори́те, пожа́луйста.",
         transliteration: "Izviníte, skólʹko? Povtoríte, požálujsta.",
         translation: { fr: "Pardon, combien ? Répétez, s’il vous plaît.", en: "Sorry, how much? Could you repeat, please?" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-03-nombres-prix/d7.mp3",
       },
       {
         id: "d8",
@@ -105,7 +105,7 @@ export const ruA103NombresPrix = {
         text: "Сто два́дцать два.",
         transliteration: "Sto dvádcatʹ dva.",
         translation: { fr: "Cent vingt-deux.", en: "A hundred and twenty-two." },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-03-nombres-prix/d8.mp3",
       },
       {
         id: "d9",
@@ -113,7 +113,7 @@ export const ruA103NombresPrix = {
         text: "Вот две́сти рубле́й.",
         transliteration: "Vot dvésti rubléj.",
         translation: { fr: "Voici deux cents roubles.", en: "Here's two hundred roubles." },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-03-nombres-prix/d9.mp3",
       },
       {
         id: "d10",
@@ -121,10 +121,10 @@ export const ruA103NombresPrix = {
         text: "Вот сда́ча: се́мьдесят во́семь рубле́й. Спаси́бо!",
         transliteration: "Vot sdáča: sémʹdesjat vósemʹ rubléj. Spasíbo!",
         translation: { fr: "Voici la monnaie : soixante-dix-huit roubles. Merci !", en: "Here's your change: seventy-eight roubles. Thank you!" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-03-nombres-prix/d10.mp3",
       },
     ],
-    audio: null,
+    audio: "/unit-audio/ru/ru-a1-03-nombres-prix/dialogue.mp3",
     glosses: [
       { form: "здра́вствуйте", lemma: "здра́вствовать", meaning: { fr: "bonjour (poli)", en: "hello (polite)" }, note: null, isNew: false },
       {
@@ -305,22 +305,22 @@ export const ruA103NombresPrix = {
     ],
   },
   keyPhrases: [
-    { id: "k1", text: "Ско́лько сто́ит вода́?", translation: { fr: "Combien coûte l’eau ?", en: "How much is the water?" }, lineId: "d1", audio: null },
-    { id: "k2", text: "Пятьдеся́т рубле́й.", translation: { fr: "Cinquante roubles.", en: "Fifty roubles." }, lineId: "d2", audio: null },
-    { id: "k3", text: "Ско́лько он сто́ит?", translation: { fr: "Combien il coûte ?", en: "How much is it?" }, lineId: "d3", audio: null },
-    { id: "k4", text: "Недо́рого! Беру́ всё.", translation: { fr: "Ce n’est pas cher ! Je prends tout.", en: "That's not expensive! I'll take both." }, lineId: "d5", audio: null },
-    { id: "k5", text: "Повтори́те, пожа́луйста.", translation: { fr: "Répétez, s’il vous plaît.", en: "Could you repeat, please?" }, lineId: "d7", audio: null },
-    { id: "k6", text: "Вот две́сти рубле́й.", translation: { fr: "Voici deux cents roubles.", en: "Here's two hundred roubles." }, lineId: "d9", audio: null },
+    { id: "k1", text: "Ско́лько сто́ит вода́?", translation: { fr: "Combien coûte l’eau ?", en: "How much is the water?" }, lineId: "d1", audio: "/unit-audio/ru/ru-a1-03-nombres-prix/k1.mp3" },
+    { id: "k2", text: "Пятьдеся́т рубле́й.", translation: { fr: "Cinquante roubles.", en: "Fifty roubles." }, lineId: "d2", audio: "/unit-audio/ru/ru-a1-03-nombres-prix/k2.mp3" },
+    { id: "k3", text: "Ско́лько он сто́ит?", translation: { fr: "Combien il coûte ?", en: "How much is it?" }, lineId: "d3", audio: "/unit-audio/ru/ru-a1-03-nombres-prix/k3.mp3" },
+    { id: "k4", text: "Недо́рого! Беру́ всё.", translation: { fr: "Ce n’est pas cher ! Je prends tout.", en: "That's not expensive! I'll take both." }, lineId: "d5", audio: "/unit-audio/ru/ru-a1-03-nombres-prix/k4.mp3" },
+    { id: "k5", text: "Повтори́те, пожа́луйста.", translation: { fr: "Répétez, s’il vous plaît.", en: "Could you repeat, please?" }, lineId: "d7", audio: "/unit-audio/ru/ru-a1-03-nombres-prix/k5.mp3" },
+    { id: "k6", text: "Вот две́сти рубле́й.", translation: { fr: "Voici deux cents roubles.", en: "Here's two hundred roubles." }, lineId: "d9", audio: "/unit-audio/ru/ru-a1-03-nombres-prix/k6.mp3" },
     {
       id: "k7",
       text: "Оди́н рубль, два рубля́, пять рубле́й.",
       translation: { fr: "Un rouble, deux roubles, cinq roubles.", en: "One rouble, two roubles, five roubles." },
       lineId: null,
-      audio: null,
+      audio: "/unit-audio/ru/ru-a1-03-nombres-prix/k7.mp3",
     },
-    { id: "k8", text: "Мо́жно ка́ртой?", translation: { fr: "Je peux payer par carte ?", en: "Can I pay by card?" }, lineId: null, audio: null },
-    { id: "k9", text: "До свида́ния!", translation: { fr: "Au revoir !", en: "Goodbye!" }, lineId: null, audio: null },
-    { id: "k10", text: "Э́то до́рого?", translation: { fr: "C’est cher ?", en: "Is it expensive?" }, lineId: null, audio: null },
+    { id: "k8", text: "Мо́жно ка́ртой?", translation: { fr: "Je peux payer par carte ?", en: "Can I pay by card?" }, lineId: null, audio: "/unit-audio/ru/ru-a1-03-nombres-prix/k8.mp3" },
+    { id: "k9", text: "До свида́ния!", translation: { fr: "Au revoir !", en: "Goodbye!" }, lineId: null, audio: "/unit-audio/ru/ru-a1-03-nombres-prix/k9.mp3" },
+    { id: "k10", text: "Э́то до́рого?", translation: { fr: "C’est cher ?", en: "Is it expensive?" }, lineId: null, audio: "/unit-audio/ru/ru-a1-03-nombres-prix/k10.mp3" },
   ],
   grammar: {
     summary: {
@@ -663,7 +663,7 @@ export const ruA103NombresPrix = {
         text: "Здра́вствуйте!",
         transliteration: "Zdrávstvujte!",
         translation: { fr: "Bonjour !", en: "Hello!" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-03-nombres-prix/c1.mp3",
         itemId: null,
       },
       {
@@ -672,7 +672,7 @@ export const ruA103NombresPrix = {
         text: "Здра́вствуйте! Ско́лько сто́ит шокола́д?",
         transliteration: "Zdrávstvujte! Skólʹko stóit šokolád?",
         translation: { fr: "Bonjour ! Combien coûte le chocolat ?", en: "Hello! How much is the chocolate?" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-03-nombres-prix/c2.mp3",
         itemId: "i20",
       },
       {
@@ -681,7 +681,7 @@ export const ruA103NombresPrix = {
         text: "Девяно́сто де́вять рубле́й.",
         transliteration: "Devjanósto dévjatʹ rubléj.",
         translation: { fr: "Quatre-vingt-dix-neuf roubles.", en: "Ninety-nine roubles." },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-03-nombres-prix/c3.mp3",
         itemId: null,
       },
       {
@@ -690,7 +690,7 @@ export const ruA103NombresPrix = {
         text: "Ско́лько? Повтори́те, пожа́луйста.",
         transliteration: "Skólʹko? Povtoríte, požálujsta.",
         translation: { fr: "Combien ? Répétez, s’il vous plaît.", en: "How much? Could you repeat, please?" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-03-nombres-prix/c4.mp3",
         itemId: "i21",
       },
       {
@@ -699,7 +699,7 @@ export const ruA103NombresPrix = {
         text: "Девяно́сто де́вять.",
         transliteration: "Devjanósto dévjatʹ.",
         translation: { fr: "Quatre-vingt-dix-neuf.", en: "Ninety-nine." },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-03-nombres-prix/c5.mp3",
         itemId: null,
       },
       {
@@ -708,7 +708,7 @@ export const ruA103NombresPrix = {
         text: "Хорошо́, беру́. Мо́жно ка́ртой?",
         transliteration: "Horošó, berú. Móžno kártoj?",
         translation: { fr: "D’accord, je le prends. Je peux payer par carte ?", en: "OK, I'll take it. Can I pay by card?" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-03-nombres-prix/c6.mp3",
         itemId: "i22",
       },
       {
@@ -717,7 +717,7 @@ export const ruA103NombresPrix = {
         text: "Да, коне́чно.",
         transliteration: "Da, konéčno.",
         translation: { fr: "Oui, bien sûr.", en: "Yes, of course." },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-03-nombres-prix/c7.mp3",
         itemId: null,
       },
       {
@@ -726,7 +726,7 @@ export const ruA103NombresPrix = {
         text: "Спаси́бо! До свида́ния!",
         transliteration: "Spasíbo! Do svidánija!",
         translation: { fr: "Merci ! Au revoir !", en: "Thank you! Goodbye!" },
-        audio: null,
+        audio: "/unit-audio/ru/ru-a1-03-nombres-prix/c8.mp3",
         itemId: "i23",
       },
     ],
