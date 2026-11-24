@@ -2,6 +2,8 @@ import type { AppClient } from "./client";
 
 type Row = Record<string, unknown>;
 
+const escapeRegex = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 export interface FakeQuery {
   table: string;
   /** Filters and modifiers in call order, as `method(arg, ...)`. */
@@ -12,7 +14,7 @@ export interface FakeQuery {
 
 /**
  * In-memory test double of an `AppClient` for the read functions: `from(table)` filters the rows given for that table
- * (`eq`, `neq`, `in`, `is`, `not(..., "is", ...)`, `gte`, `lte`, `order`, `range`, `limit`, `maybeSingle`, `count`) and
+ * (`eq` (also on `column->>key`), `neq`, `in`, `is`, `like`, `not(..., "is", ...)`, `gte`, `lte`, `order`, `range`, `limit`, `maybeSingle`, `count`) and
  * records every query, so a test can assert which filters a read used (and which it did not). `upsert` with
  * `ignoreDuplicates` keeps the first row of a conflict. Only for unit tests, never imported by the package itself.
  */
@@ -33,6 +35,14 @@ export function tableFake(tables: Record<string, Row[]>, options: { rpc?: (name:
     let upsert: { rows: Row[]; onConflict: string[]; ignore: boolean } | null = null;
 
     const log = (method: string, args: unknown[]) => record.chain.push(`${method}(${args.map((arg) => JSON.stringify(arg)).join(",")})`);
+    /** A column, or a JSON path `column->>key` (the text of a key of an object column, as PostgREST reads it). */
+    const valueOf = (row: Row, column: string): unknown => {
+      const [name, key] = column.split("->>");
+      if (key === undefined) return row[column];
+      const object = row[name!];
+      const value = typeof object === "object" && object !== null ? (object as Row)[key] : undefined;
+      return value === undefined || value === null ? null : String(value);
+    };
     const compare = (a: unknown, b: unknown) => (a === b ? 0 : (a as string | number) < (b as string | number) ? -1 : 1);
 
     function run() {
@@ -65,11 +75,22 @@ export function tableFake(tables: Record<string, Row[]>, options: { rpc?: (name:
         return builder;
       };
     };
-    add("eq", (column: string, value: unknown) => (row) => row[column] === value);
+    add("eq", (column: string, value: unknown) => (row) => valueOf(row, column) === value);
     add("neq", (column: string, value: unknown) => (row) => row[column] !== value);
     add("in", (column: string, values: unknown[]) => (row) => values.includes(row[column]));
     add("is", (column: string, value: unknown) => (row) => (row[column] ?? null) === value);
     add("not", (column: string, operator: string, value: unknown) => (row) => operator === "is" ? (row[column] ?? null) !== value : true);
+    // `like`: `%` is any run of characters, `_` one character, a backslash makes the next character literal.
+    add("like", (column: string, pattern: string) => {
+      let source = "";
+      for (let i = 0; i < pattern.length; i++) {
+        const char = pattern[i]!;
+        if (char === "\\" && i + 1 < pattern.length) source += escapeRegex(pattern[++i]!);
+        else source += char === "%" ? ".*" : char === "_" ? "." : escapeRegex(char);
+      }
+      const regex = new RegExp(`^${source}$`, "s");
+      return (row) => typeof row[column] === "string" && regex.test(row[column] as string);
+    });
     add("gte", (column: string, value: unknown) => (row) => compare(row[column], value) >= 0);
     add("lte", (column: string, value: unknown) => (row) => compare(row[column], value) <= 0);
     builder.select = (columns?: string, opts?: { count?: string; head?: boolean }) => {

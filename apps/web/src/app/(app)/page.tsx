@@ -7,11 +7,15 @@ import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { GoalRing } from "@/components/today/goal-ring";
 import { UnitCard } from "@/components/today/unit-card";
+import { WarmupCard } from "@/components/today/warmup-card";
 import { TodaySession } from "@/components/today/today-session";
 import { dailyGoalXp } from "@/lib/goal";
 import { gradedTextGenerationEnabled } from "@/lib/graded-text/server";
 import { getRequestClient, getSessionProfile, getSessionUser } from "@/lib/session";
-import { isBeginner, nextUnitToDo } from "@/lib/units/today";
+import { hasPath } from "@/lib/units/path";
+import { nextUnitToDo } from "@/lib/units/today";
+import { visibleUnitsFor } from "@/lib/units/visibility";
+import { loadDueWarmups } from "@/lib/units/warmup";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("today");
@@ -42,9 +46,13 @@ export default async function TodayPage() {
   const date = formatLongDate(day, locale);
   const settings = resolveGameSettings(gameSettingsSchema.safeParse(profile.gameSettings).data, enrollment.dailyMinutes);
   const streak = settings.streak.enabled ? progress.streak : null;
-  // Beginners (A0/A1) with a unit they may open get the way into the path below the session.
+  // Beginners (A0 to A2) with a unit they may open get the way into the path below the session, and the warm-up of
+  // yesterday's missed sentences when there is one.
   const estimates = await listSkillEstimates(client, enrollment.language).catch(() => []);
-  const todo = isBeginner(estimates) ? await nextUnitToDo(user.id, enrollment.language) : null;
+  const onPath = hasPath(estimates, visibleUnitsFor(enrollment.language));
+  const [todo, warmups] = onPath
+    ? await Promise.all([nextUnitToDo(user.id, enrollment.language), loadDueWarmups(user.id, enrollment.language, profile.timeZone).catch(() => [])])
+    : [null, []];
 
   return (
     <TodaySession
@@ -55,7 +63,12 @@ export default async function TodayPage() {
       animateSummary={settings.celebrations === "full"}
       prepareText={gradedTextGenerationEnabled()}
       goal={settings.ring.enabled && <GoalRing current={progress.xp} target={dailyGoalXp(settings.ring.tier)} showValue={settings.xpVisible} />}
-      unitCard={todo && <UnitCard unit={todo.unit} progress={todo.progress} language={enrollment.language} locale={locale} />}
+      unitCard={(todo || warmups.length > 0) && (
+        <>
+          <WarmupCard warmups={warmups} language={enrollment.language} locale={locale} />
+          {todo && <UnitCard unit={todo.unit} progress={todo.progress} language={enrollment.language} locale={locale} />}
+        </>
+      )}
       detail={streak && streak.current > 0 && (
         <details className="mt-5 rounded-xl border border-line bg-surface px-4">
           <summary className="min-h-11 cursor-pointer py-3">

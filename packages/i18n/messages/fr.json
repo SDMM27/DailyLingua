@@ -144,7 +144,8 @@
       "meta": "Parcours · {language}",
       "continue": "Continuer · leçon {lesson}",
       "start": "Commencer le parcours",
-      "lessons": "Trois leçons, environ {minutes} min."
+      "lessons": "Trois leçons, environ {minutes} min.",
+      "map": "Voir le parcours"
     }
   },
   "reminderPush": {
@@ -448,6 +449,28 @@
       "logFailed": "échec, prochaine tentative dans {seconds} s"
     }
   },
+  "unitScript": {
+    "letterPosition": "Lettre {position} sur {total}",
+    "upper": "Majuscule",
+    "lower": "Minuscule",
+    "name": "Nom : {name}",
+    "reads": "Se lit « {latin} »",
+    "sound": "Le son",
+    "kinds": {
+      "same": "Familière",
+      "false-friend": "Faux ami",
+      "new": "Nouvelle",
+      "sign": "Signe muet"
+    },
+    "falseFriend": "Attention : elle ressemble à la lettre latine « {lookalike} », mais ne se lit pas pareil.",
+    "exampleLabel": "Dans le mot",
+    "listenExample": "Écouter le mot {word}",
+    "previous": "Lettre précédente",
+    "next": "Lettre suivante",
+    "wordsIntro": "Lis chaque mot à voix haute, puis touche-le pour voir sa lecture et son sens.",
+    "wordToggle": "{word} : voir la lecture et le sens",
+    "listenWord": "Écouter {word}"
+  },
   "unitSheet": {
     "meta": "Unité {number} · environ {minutes} min",
     "goals": "À la fin, tu pourras dire",
@@ -457,7 +480,9 @@
     "skip": "Je connais déjà",
     "skipValue": "passer le test, {count} questions",
     "retake": "Repasser le test",
-    "close": "Quitter l’unité"
+    "close": "Quitter l’unité",
+    "goalsDone": "Validée le {date}",
+    "warmupNote": "Un court échauffement d’abord, puis le test."
   },
   "unit": {
     "steps": {
@@ -554,11 +579,46 @@
     "back": "Retour au parcours",
     "notYet": "Pas encore validée",
     "missing": "{count, plural, one {Il manquait une réponse.} other {Il manquait # réponses.}}",
-    "missedBack": "{count, plural, one {Revois la phrase manquée} other {Revois les # phrases manquées}} avant de repasser le test",
+    "missedBack": "{count, plural, one {La phrase manquée revient} other {Les # phrases manquées reviennent}} demain, avant le test",
     "xpKept": "; tes {xp} XP restent acquis.",
     "end": ".",
     "seeMissed": "{count, plural, one {Voir la phrase} other {Voir les # phrases}}",
     "retake": "Repasser le test maintenant",
     "invalid": "Ce test n’a pas pu être corrigé. Reprends-le."
+  },
+  "path": {
+    "meta": "Parcours · {language}",
+    "level": "Niveau {level}",
+    "progress": "{done, plural, one {# unité} other {# unités}} sur {total}.",
+    "hint": "L’ordre est conseillé, chaque station s’ouvre.",
+    "hintWriting": "L’écriture d’abord, puis les situations.",
+    "listLabel": "Unités du niveau {level}",
+    "zoneWriting": "Écriture · {level}",
+    "zoneSituations": "Situations · {level}",
+    "unitTitle": "{number} · {title}",
+    "currentMeta": "Unité {number} · étape {step} sur {steps}",
+    "currentMetaWriting": "Écriture {number} · étape {step} sur {steps}",
+    "currentMetaStart": "Unité {number}",
+    "currentMetaStartWriting": "Écriture {number}",
+    "minutes": "{minutes} min",
+    "remaining": "{step}. Environ {minutes} min.",
+    "remainingStart": "Environ {minutes} min.",
+    "continue": "Continuer",
+    "start": "Commencer",
+    "passedByTest": "validée par le test",
+    "a11yDone": "{title}, validée. {canDo}",
+    "a11yCurrent": "{title}, en cours, étape {step} sur {steps}",
+    "a11yCurrentStart": "{title}, à commencer, environ {minutes} min",
+    "a11yTodo": "{title}, pas commencée, environ {minutes} min",
+    "allDone": "Toutes les unités de ce niveau sont validées."
+  },
+  "warmup": {
+    "title": "{count, plural, one {Revoir la phrase d’hier} other {Revoir les # phrases d’hier}}",
+    "start": "Commencer l’échauffement",
+    "name": "Échauffement",
+    "meta": "Échauffement · {title}",
+    "doneTitle": "Échauffement terminé",
+    "doneBody": "Tu peux repasser le test maintenant, ou revoir l’unité d’abord.",
+    "go": "Revoir maintenant"
   }
 }

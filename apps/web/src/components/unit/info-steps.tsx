@@ -1,6 +1,6 @@
 "use client";
 
-import type { Unit } from "@dailylingua/schemas";
+import type { SituationUnit } from "@dailylingua/schemas";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { ClipButton } from "./item-view";
@@ -8,7 +8,7 @@ import { ShellBody, ShellFooter } from "./unit-shell";
 
 /** The key phrases of the unit, each one to listen to: the learner reads them before being asked for them. */
 export function KeyPhrasesInfo({ phrases, language, locale, onContinue }: {
-  phrases: Unit["keyPhrases"];
+  phrases: SituationUnit["keyPhrases"];
   language: string;
   locale: "fr" | "en";
   onContinue(): void;

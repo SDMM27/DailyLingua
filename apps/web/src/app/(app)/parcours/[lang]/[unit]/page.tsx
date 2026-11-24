@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import { resolveGameSettings } from "@dailylingua/core";
-import { DataError, listEnrollments } from "@dailylingua/data";
+import { DataError, getUnitXp, listEnrollments } from "@dailylingua/data";
 import { gameSettingsSchema } from "@dailylingua/schemas";
 import { getLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 import { connection } from "next/server";
+import { UnitExtrasProvider } from "@/components/unit/unit-extras";
 import { UnitPlayer } from "@/components/unit/unit-player";
 import { getRequestClient, getSessionProfile, getSessionUser } from "@/lib/session";
 import { loadUnitProgress } from "@/lib/units/progress";
 import { visibleUnit, visibleUnitsFor } from "@/lib/units/visibility";
+import { loadDueWarmups } from "@/lib/units/warmup";
 
 export async function generateMetadata({ params }: PageProps<"/parcours/[lang]/[unit]">): Promise<Metadata> {
   const unit = visibleUnit((await params).unit);
@@ -16,7 +18,7 @@ export async function generateMetadata({ params }: PageProps<"/parcours/[lang]/[
   return { title: unit?.title[locale] };
 }
 
-export default async function UnitPage({ params }: PageProps<"/parcours/[lang]/[unit]">) {
+export default async function UnitPage({ params, searchParams }: PageProps<"/parcours/[lang]/[unit]">) {
   // Progress and the guard depend on the visitor and on the environment, never on the build.
   await connection();
   const user = await getSessionUser();
@@ -35,23 +37,36 @@ export default async function UnitPage({ params }: PageProps<"/parcours/[lang]/[
 
   const { lang, unit: unitId } = await params;
   const unit = visibleUnit(unitId);
-  // The unit of the language the learner studies, published (or drafts allowed with UNIT_DRAFTS=show). Writing units come later.
-  if (!unit || unit.language !== lang || lang !== enrollment.language || unit.kind !== "situation") notFound();
+  // The unit of the language the learner studies, published (or drafts allowed with UNIT_DRAFTS=show).
+  if (!unit || unit.language !== lang || lang !== enrollment.language) notFound();
 
-  const [progress, locale] = await Promise.all([loadUnitProgress(user.id, unit.id), getLocale()]);
+  const startAtTest = (await searchParams).start === "test";
+  const [progress, locale, unitXp, warmups] = await Promise.all([
+    loadUnitProgress(user.id, unit.id),
+    getLocale(),
+    getUnitXp(client, user.id, unit.id).catch(() => 0),
+    loadDueWarmups(user.id, lang, profile.timeZone).catch(() => []),
+  ]);
   const settings = resolveGameSettings(gameSettingsSchema.safeParse(profile.gameSettings).data, enrollment.dailyMinutes);
   const explanation = locale === "fr" ? "fr" : "en";
-  const next = visibleUnitsFor(lang).find((candidate) => candidate.kind === "situation" && candidate.order > unit.order);
+  const visible = visibleUnitsFor(lang);
+  const next = visible.find((candidate) => candidate.order > unit.order);
+  // The number the map shows for this station (its rank among the visible units), not the content order.
+  const number = visible.findIndex((candidate) => candidate.id === unit.id) + 1;
+
+  const extras = { pathHref: `/parcours/${lang}`, number, startAtTest, unitXp, warmupItemIds: warmups.find((warmup) => warmup.unit.id === unit.id)?.itemIds ?? [] };
 
   return (
-    <UnitPlayer
-      unit={unit}
-      progress={progress}
-      tolerance={settings.answerTolerance.accents}
-      xpVisible={settings.xpVisible}
-      animate={settings.celebrations === "full"}
-      nextUnit={next ? { id: next.id, title: next.title[explanation] } : null}
-      backHref="/"
-    />
+    <UnitExtrasProvider value={extras}>
+      <UnitPlayer
+        unit={unit}
+        progress={progress}
+        tolerance={settings.answerTolerance.accents}
+        xpVisible={settings.xpVisible}
+        animate={settings.celebrations === "full"}
+        nextUnit={next ? { id: next.id, title: next.title[explanation] } : null}
+        backHref="/"
+      />
+    </UnitExtrasProvider>
   );
 }

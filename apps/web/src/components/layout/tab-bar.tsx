@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 
+const PATH_ICON = "M12 3v5M12 16v5M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z";
+
 const TABS = [
   { href: "/", key: "today", icon: "M5 4h11l3 3v13H5zM9 10h6M9 14h6M9 18h4" },
   { href: "/library", key: "read", icon: "M4 5h5v14H4zM9 5h5v14H9zM15 6l4-1 4 13-4 1z" },
@@ -14,18 +16,22 @@ const TABS = [
   },
 ] as const;
 
-/** Bottom navigation of the signed-in screens, clear of the home indicator. */
-export function TabBar() {
+/**
+ * Bottom navigation of the signed-in screens, clear of the home indicator. `pathLanguage` is the language of the beginner
+ * path when the learner has one: the « Parcours » tab then comes second; without it there are three tabs.
+ */
+export function TabBar({ pathLanguage = null }: { pathLanguage?: string | null }) {
   const t = useTranslations("common.nav");
   const pathname = usePathname();
+  const tabs: readonly { href: string; key: "today" | "path" | "read" | "settings"; icon: string }[] = pathLanguage ? [TABS[0], { href: `/parcours/${pathLanguage}`, key: "path", icon: PATH_ICON }, ...TABS.slice(1)] : TABS;
   return (
     <nav
       aria-label={t("label")}
       className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-bg pb-[env(safe-area-inset-bottom)]"
     >
       <ul className="mx-auto flex max-w-md">
-        {TABS.map(({ href, key, icon }) => {
-          const current = href === "/" ? pathname === "/" : pathname.startsWith(href);
+        {tabs.map(({ href, key, icon }) => {
+          const current = href === "/" ? pathname === "/" : pathname.startsWith(key === "path" ? "/parcours" : href);
           return (
             <li key={href} className="flex-1">
               <Link

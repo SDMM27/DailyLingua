@@ -1,11 +1,12 @@
 import { getUnit } from "@dailylingua/content";
+import type { SituationUnit } from "@dailylingua/schemas";
 import { gradeUnitItem } from "@dailylingua/core";
 import { describe, expect, it } from "vitest";
 import { currentLessonNumber, firstOpenStep, flatSteps, matchRightOrder, misplacedTiles, orderTiles, seededShuffle, sentenceOf, serializeMatch, unitFinished, unitStarted } from "./flow";
 import { segmentLine } from "./words";
 
-const it1 = getUnit("it-a1-01-saluer")!;
-const ru1 = getUnit("ru-a1-01-saluer")!;
+const it1 = getUnit("it-a1-01-saluer") as SituationUnit;
+const ru1 = getUnit("ru-a1-01-saluer") as SituationUnit;
 const progress = (steps: string[], passedAt: string | null = null) => ({
   steps: Object.fromEntries(steps.map((key) => [key, "2026-11-23T10:00:00Z"])),
   bestScore: null,

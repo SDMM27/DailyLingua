@@ -2,7 +2,7 @@ import { ingestPayloadSchema, isEmptyIngestPayload, type IngestPayload } from "@
 import { describe, expect, it } from "vitest";
 import { HOUR_MS, DAY_MS } from "../game";
 import { planIngest } from "./plan-ingest";
-import { NOW, SESSION, TEXT, TODAY, UNIT_ID, UNIT_VERSION, card, correction, emptyState, eventWriter, item, iso, review, session, text, unit, uuid, words } from "./fixtures";
+import { NOW, SCRIPT_UNIT_ID, SESSION, TEXT, TODAY, UNIT_ID, UNIT_VERSION, card, correction, emptyState, eventWriter, item, iso, review, scriptUnit, session, text, unit, uuid, words } from "./fixtures";
 import type { IngestState, RawEvent } from "./types";
 
 /** Plans a batch and checks that the payload obeys the contract of `ingest_batch`. */
@@ -717,6 +717,21 @@ describe("planIngest: units", () => {
     const ev2 = eventWriter(500);
     const english = plan(unitState({ profile: { ...emptyState().profile, explanationLanguage: "en" } }), [attempt(ev2, 10, "q3"), attempt(ev2, 20, "q4"), step(ev2, 30, "l1", "key_phrases")]);
     expect(english.payload.cards_created[0]).toMatchObject({ back: "Phrase 1 (en)", back_language: "en" });
+  });
+
+  it("records the steps of a writing unit and creates no key-phrase card", () => {
+    const ev = eventWriter();
+    const writing = { unitId: SCRIPT_UNIT_ID, unitVersion: UNIT_VERSION };
+    const s = emptyState({ units: { [SCRIPT_UNIT_ID]: scriptUnit() } });
+    const { payload, rejected } = plan(s, [
+      ev("unit_item_attempt", at(10), { ...writing, lesson: "l1", itemId: "q1", try: 1, answer: "a", shownAt: at(8) }),
+      ev("unit_item_attempt", at(20), { ...writing, lesson: "l1", itemId: "q2", try: 1, answer: "a", shownAt: at(18) }),
+      ev("unit_step_completed", at(30), { ...writing, lesson: "l1", step: "letters" }),
+      ev("unit_step_completed", at(40), { ...writing, lesson: "l1", step: "key_phrases" }),
+    ]);
+    expect(rejected.map((r) => r.reason)).toEqual(["step_not_proven"]);
+    expect(payload.cards_created).toEqual([]);
+    expect(payload.unit_progress[0]?.steps).toEqual({ "l1:letters": at(30) });
   });
 
   it("writes nothing for a replay of unit events already ingested", () => {

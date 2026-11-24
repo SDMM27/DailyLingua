@@ -1,6 +1,6 @@
-import type { Unit } from "@dailylingua/schemas";
+import type { SituationUnit } from "@dailylingua/schemas";
 
-export type Gloss = Unit["dialogue"]["glosses"][number];
+export type Gloss = SituationUnit["dialogue"]["glosses"][number];
 
 /** A piece of a line: plain text, or a word of the unit's glossary (a button on screen). */
 export type Segment = { text: string; gloss?: Gloss };

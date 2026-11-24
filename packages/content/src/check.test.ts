@@ -1,4 +1,4 @@
-import type { UnitItem, UnitSource } from "@dailylingua/schemas";
+import type { SituationUnitSource, UnitItem, UnitSource } from "@dailylingua/schemas";
 import { describe, expect, it } from "vitest";
 import { checkUnit, wordsOf, type CheckOptions, type UnitViolation } from "./check";
 import { FIXTURE_AUDIO, fixtureUnit } from "./units/__fixtures__/it-fixture";
@@ -88,7 +88,7 @@ describe("checkUnit", () => {
 
   it("flags a dialogue that does not have exactly two speakers", () => {
     const unit = fixtureUnit();
-    const one = { ...unit.dialogue, speakers: unit.dialogue.speakers.slice(0, 1) } as UnitSource["dialogue"];
+    const one = { ...unit.dialogue, speakers: unit.dialogue.speakers.slice(0, 1) } as SituationUnitSource["dialogue"];
     expect(codes({ ...unit, dialogue: one })).toEqual(expect.arrayContaining(["speaker_count", "unknown_speaker"]));
   });
 
@@ -108,7 +108,7 @@ describe("checkUnit", () => {
 
   it("flags a voice that is not cleared", () => {
     const unit = fixtureUnit();
-    const speakers = [{ ...unit.dialogue.speakers[0]!, voice: "it_IT-riccardo-x_low" }, unit.dialogue.speakers[1]!] as UnitSource["dialogue"]["speakers"];
+    const speakers = [{ ...unit.dialogue.speakers[0]!, voice: "it_IT-riccardo-x_low" }, unit.dialogue.speakers[1]!] as SituationUnitSource["dialogue"]["speakers"];
     expect(codes({ ...unit, dialogue: { ...unit.dialogue, speakers } })).toEqual(["voice_not_cleared"]);
   });
 

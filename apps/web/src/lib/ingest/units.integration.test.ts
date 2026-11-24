@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { getUnit } from "@dailylingua/content";
 import { getUnitProgress, getUnitProgressOne, type AppClient, type AppDatabase } from "@dailylingua/data";
-import type { UnitItem } from "@dailylingua/schemas";
+import type { SituationUnit, UnitItem } from "@dailylingua/schemas";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createIngestStore, ingestEvents } from "./ingest-events";
 
@@ -66,7 +66,7 @@ describe.skipIf(!stackIsUp)("units through the ingestion (local database, servic
   const admin = stackIsUp ? createClient<AppDatabase>(url!, serviceKey!, { auth: { persistSession: false } }) : null;
   const service = admin as unknown as AppClient;
   const app = () => admin!.schema("app");
-  const unit = getUnit(UNIT_ID)!;
+  const unit = getUnit(UNIT_ID) as SituationUnit;
   const runId = `${Date.now()}`;
   const users: { id: string; email: string; password: string }[] = [];
   let alice = "";

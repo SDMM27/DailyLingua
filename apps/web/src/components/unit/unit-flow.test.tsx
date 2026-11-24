@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { getUnit } from "@dailylingua/content";
 import { loadMessages } from "@dailylingua/i18n";
-import type { UnitItem } from "@dailylingua/schemas";
+import type { SituationUnit, UnitItem } from "@dailylingua/schemas";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
@@ -11,7 +11,7 @@ import { ExerciseRunner, type ItemAttempt } from "./exercise-runner";
 import { UnitFlow } from "./unit-flow";
 
 const messages = await loadMessages("fr");
-const unit = getUnit("it-a1-01-saluer")!;
+const unit = getUnit("it-a1-01-saluer") as SituationUnit;
 const item = (id: string): UnitItem => unit.items.find((entry) => entry.id === id)!;
 
 function wrap(node: React.ReactNode) {

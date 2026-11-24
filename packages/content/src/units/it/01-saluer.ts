@@ -27,10 +27,9 @@ export const itA101Saluer = {
   grammarPointId: "it-a1-essere-avere",
   dialogue: {
     title: "Piacere!",
-    // REVIEW: a single cleared Italian voice for now, so Leo (a man) is read by it_IT-paola-medium too.
     speakers: [
-      { id: "giulia", name: "Giulia", voice: "it_IT-paola-medium" },
-      { id: "leo", name: "Leo", voice: "it_IT-paola-medium" },
+      { id: "giulia", name: "Giulia", voice: "it-IT-ElsaNeural" },
+      { id: "leo", name: "Leo", voice: "it-IT-DiegoNeural" },
     ],
     lines: [
       {

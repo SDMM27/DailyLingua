@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { CLEARED_VOICES, unitIdSchema, unitItemSchema, unitSchema, unitStepSchema, type UnitSource } from "./index";
+import { CLEARED_VOICES, isScriptUnit, unitIdSchema, unitItemSchema, unitSchema, unitStepSchema, type ParsedUnitSource, type SituationUnitSource } from "./index";
 
 const l10n = (text: string) => ({ fr: `${text} fr`, en: `${text} en` });
 
-function validUnit(): UnitSource {
+function validUnit(): SituationUnitSource {
   const items = Array.from({ length: 10 }, (_, i) => ({
     id: `i${i + 1}`,
     kind: "mcq" as const,
@@ -64,6 +64,11 @@ function validUnit(): UnitSource {
     conversation: { turns: [{ id: "t1", speaker: "s1", text: "Ciao", translation: l10n("Salut"), audio: null, itemId: null }] },
     aiReview: null,
   };
+}
+
+function situation(unit: ParsedUnitSource) {
+  if (!isScriptUnit(unit)) return unit;
+  throw new Error("expected a situation unit");
 }
 
 describe("unitIdSchema", () => {
@@ -172,13 +177,13 @@ describe("unitSchema", () => {
 
   it("defaults the transliteration of lines and turns to null and accepts a text", () => {
     const unit = validUnit();
-    const parsed = unitSchema.parse(unit);
+    const parsed = situation(unitSchema.parse(unit));
     expect(parsed.dialogue.lines.every((line) => line.transliteration === null)).toBe(true);
     expect(parsed.conversation.turns[0]?.transliteration).toBeNull();
     const line = { ...unit.dialogue.lines[0]!, transliteration: "privet" };
     const turn = { ...unit.conversation.turns[0]!, transliteration: "privet" };
     const withText = { ...unit, dialogue: { ...unit.dialogue, lines: [line, ...unit.dialogue.lines.slice(1)] }, conversation: { turns: [turn] } };
-    const out = unitSchema.parse(withText);
+    const out = situation(unitSchema.parse(withText));
     expect(out.dialogue.lines[0]?.transliteration).toBe("privet");
     expect(out.conversation.turns[0]?.transliteration).toBe("privet");
     expect(unitSchema.safeParse({ ...unit, dialogue: { ...unit.dialogue, lines: [{ ...line, transliteration: "" }, ...unit.dialogue.lines.slice(1)] } }).success).toBe(false);
@@ -193,6 +198,6 @@ describe("unitSchema", () => {
 
 describe("CLEARED_VOICES", () => {
   it("lists the three cleared voices", () => {
-    expect([...CLEARED_VOICES]).toEqual(["ru_RU-denis-medium", "ru_RU-dmitri-medium", "it_IT-paola-medium"]);
+    expect([...CLEARED_VOICES]).toEqual(["ru-RU-SvetlanaNeural", "ru-RU-DmitryNeural", "ru-RU-Lev:MAI-Voice-2", "it-IT-ElsaNeural", "it-IT-DiegoNeural"]);
   });
 });

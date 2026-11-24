@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Icon } from "./icons";
 import { ShellBody, ShellFooter } from "./unit-shell";
+import { useUnitExtras } from "./unit-extras";
 
 /** What the unit teaches, and the way in: start, resume or review; or « Je connais déjà », straight to the test. */
 export function UnitIntro({ unit, locale, mode, step, steps, canSkip, onStart, onSkip }: {
@@ -18,13 +19,14 @@ export function UnitIntro({ unit, locale, mode, step, steps, canSkip, onStart, o
   onSkip(): void;
 }) {
   const t = useTranslations("unitSheet");
+  const { number } = useUnitExtras();
   const label = mode === "resume" ? t("resume", { step, steps }) : mode === "review" ? t("review") : t("start");
   return (
     <>
       <ShellBody>
         <div className="flex flex-col gap-6 pt-2">
           <div>
-            <p className="meta text-lang">{t("meta", { number: unit.order, minutes: unit.minutes })}</p>
+            <p className="meta text-lang">{t("meta", { number: number ?? unit.order, minutes: unit.minutes })}</p>
             <h1 tabIndex={-1} className="mt-2 font-display text-[30px] leading-tight font-bold tracking-tight" lang={locale}>{unit.title[locale]}</h1>
             <p className="mt-2 text-muted" lang={locale}>{unit.situation[locale]}</p>
           </div>

@@ -10,7 +10,11 @@ export type UnitId = z.infer<typeof unitIdSchema>;
  * Voices cleared for the audio of units (licence checked, `j4-parcours-debutant.md`). The audio script and
  * `units:check` refuse any other voice.
  */
-export const CLEARED_VOICES = ["ru_RU-denis-medium", "ru_RU-dmitri-medium", "it_IT-paola-medium"] as const;
+/**
+ * Voices cleared for the units: native neural voices of Azure Speech (commercial use allowed, no attribution required).
+ * The Piper voices used before were fine-tuned from Flemish and English bases and did not sound native.
+ */
+export const CLEARED_VOICES = ["ru-RU-SvetlanaNeural", "ru-RU-DmitryNeural", "ru-RU-Lev:MAI-Voice-2", "it-IT-ElsaNeural", "it-IT-DiegoNeural"] as const;
 export type ClearedVoice = (typeof CLEARED_VOICES)[number];
 
 /** Text in the two languages the interface is explained in; both are mandatory. */
@@ -168,31 +172,18 @@ const turnSchema = z.strictObject({
 export const unitStatuses = ["draft", "reviewed", "published"] as const;
 export type UnitStatus = (typeof unitStatuses)[number];
 
-export const unitSchema = z.strictObject({
+/** Fields every kind of unit has. */
+const commonFields = {
   id: unitIdSchema,
   language: languageCodeSchema,
-  level: z.enum(["A0", "A1"]),
   order: z.number().int().min(1),
-  kind: z.enum(["situation", "script"]),
   title: l10nSchema,
   situation: l10nSchema,
   minutes: z.number().int().min(1),
   canDo: z.array(z.strictObject({ id: idSchema, text: l10nSchema })).min(2).max(3),
-  /** Id of the grammar curriculum point the unit covers, or null. */
-  grammarPointId: z.string().min(1).nullable(),
-  dialogue: z.strictObject({
-    title: textSchema,
-    speakers: z.array(speakerSchema).length(2),
-    lines: z.array(lineSchema).min(6).max(10),
-    audio: audioPathSchema,
-    glosses: z.array(glossSchema),
-  }),
-  keyPhrases: z.array(keyPhraseSchema).min(6).max(10),
-  grammar: z.strictObject({ summary: l10nSchema, itemIds: z.array(idSchema).min(2) }).nullable(),
   items: z.array(unitItemSchema).min(1),
   lessons: z.array(lessonSchema).length(3),
   test: z.strictObject({ itemIds: z.array(idSchema).length(10), passScore: z.literal(8) }),
-  conversation: z.strictObject({ turns: z.array(turnSchema).min(1) }),
   /** AI review status; the only one (an agent never records a human review). */
   aiReview: z.strictObject({ reviewedOn: dateKeySchema, passes: z.number().int().min(2), arbiter: textSchema }).nullable(),
   /**
@@ -200,14 +191,92 @@ export const unitSchema = z.strictObject({
    * production; `units:check` then requires every audio file). Reviewed and published need `aiReview`.
    */
   status: z.enum(unitStatuses).default("draft"),
-}).refine((unit) => unit.status === "draft" || unit.aiReview !== null, {
-  message: "A reviewed or published unit needs aiReview",
-  path: ["status"],
+};
+
+const reviewedNeedsAiReview = {
+  check: (unit: { status: UnitStatus; aiReview: unknown }) => unit.status === "draft" || unit.aiReview !== null,
+  params: { message: "A reviewed or published unit needs aiReview", path: ["status"] },
+};
+
+/** A situation unit: a dialogue, its key phrases, a grammar point, exercises and a conversation. */
+const situationUnitSchema = z
+  .strictObject({
+    ...commonFields,
+    kind: z.literal("situation"),
+    level: z.enum(["A0", "A1"]),
+    /** Id of the grammar curriculum point the unit covers, or null. */
+    grammarPointId: z.string().min(1).nullable(),
+    dialogue: z.strictObject({
+      title: textSchema,
+      speakers: z.array(speakerSchema).length(2),
+      lines: z.array(lineSchema).min(6).max(10),
+      audio: audioPathSchema,
+      glosses: z.array(glossSchema),
+    }),
+    keyPhrases: z.array(keyPhraseSchema).min(6).max(10),
+    grammar: z.strictObject({ summary: l10nSchema, itemIds: z.array(idSchema).min(2) }).nullable(),
+    conversation: z.strictObject({ turns: z.array(turnSchema).min(1) }),
+  })
+  .refine(reviewedNeedsAiReview.check, reviewedNeedsAiReview.params);
+
+/** What a script unit teaches about one letter. */
+export const LETTER_KINDS = ["same", "false-friend", "new", "sign"] as const;
+
+const letterSchema = z.strictObject({
+  upper: textSchema,
+  lower: textSchema,
+  /** Letter-by-letter transliteration (the system of the legacy alphabet module; `units:check` recomputes it). */
+  latin: textSchema,
+  /** Name of the letter (e.g. "бэ"). */
+  name: textSchema,
+  kind: z.enum(LETTER_KINDS),
+  /** For a false friend: the misleading Latin letter. Null otherwise (`checkUnit` enforces it). */
+  lookalike: textSchema.nullable(),
+  /** The sound, described for a French or English speaker. */
+  sound: l10nSchema,
+  example: z.strictObject({ word: textSchema, translation: l10nSchema, audio: audioPathSchema }),
 });
+
+const scriptWordSchema = z.strictObject({
+  id: idSchema,
+  text: textSchema,
+  latin: textSchema,
+  translation: l10nSchema,
+  audio: audioPathSchema,
+});
+
+/**
+ * A writing unit: it teaches one group of letters of a script (`j4-pr2.md` §1). No dialogue, key phrases, grammar nor
+ * conversation. Its steps are `letters`, `sounds` (lesson 1), `words`, `reading` (lesson 2) and the test (lesson 3).
+ */
+const scriptUnitSchema = z
+  .strictObject({
+    ...commonFields,
+    kind: z.literal("script"),
+    level: z.literal("A0"),
+    /** Voice of the audio of the examples and words (`units:audio`; `checkUnit` refuses an uncleared one). */
+    voice: textSchema,
+    letters: z.array(letterSchema).min(4).max(8),
+    /** Words readable with the letters of this unit and of the writing units before it. */
+    words: z.array(scriptWordSchema).min(8).max(14),
+  })
+  .refine(reviewedNeedsAiReview.check, reviewedNeedsAiReview.params);
+
+export const unitSchema = z.discriminatedUnion("kind", [situationUnitSchema, scriptUnitSchema]);
+
 /** What an author writes (`transliteration` may be left out); parsing fills it with null. */
 export type UnitSource = z.input<typeof unitSchema>;
 /** A parsed unit source. */
 export type ParsedUnitSource = z.output<typeof unitSchema>;
+export type SituationUnitSource = Extract<UnitSource, { kind: "situation" }>;
+export type ScriptUnitSource = Extract<UnitSource, { kind: "script" }>;
+export type ScriptLetter = ScriptUnitSource["letters"][number];
+export type ScriptWord = ScriptUnitSource["words"][number];
+
+/** Narrows a unit (source or parsed) to a writing unit. */
+export function isScriptUnit<T extends { kind: string }>(unit: T): unit is Extract<T, { kind: "script" }> {
+  return unit.kind === "script";
+}
 
 /** Languages written in a non-Latin script: the only ones whose lines may carry a transliteration. */
 export const NON_LATIN_LANGUAGES: readonly string[] = ["ru", "uk", "el", "ar", "zh", "ja", "ko"];
@@ -218,3 +287,5 @@ export type UnitVersion = z.infer<typeof unitVersionSchema>;
 
 /** A source and its content hash: what the registry serves. */
 export type Unit = ParsedUnitSource & { version: UnitVersion };
+export type SituationUnit = Extract<Unit, { kind: "situation" }>;
+export type ScriptUnit = Extract<Unit, { kind: "script" }>;
