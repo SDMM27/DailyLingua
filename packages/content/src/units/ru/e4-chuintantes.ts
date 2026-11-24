@@ -377,5 +377,5 @@ export const ruA0E4Chuintantes = {
     passScore: 8,
   },
   aiReview: { reviewedOn: "2026-11-23", passes: 2, arbiter: "arbitre-relecture" },
-  status: "reviewed",
+  status: "published",
 } satisfies UnitSource;
