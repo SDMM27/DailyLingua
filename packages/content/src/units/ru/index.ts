@@ -1,4 +1,8 @@
 import { ruA101Saluer } from "./01-saluer";
+import { ruA102Cafe } from "./02-cafe";
+import { ruA103NombresPrix } from "./03-nombres-prix";
+import { ruA104Famille } from "./04-famille";
+import { ruA105OuEst } from "./05-ou-est";
 import { ruA0E1LettresFamilieres } from "./e1-lettres-familieres";
 import { ruA0E2FauxAmis } from "./e2-faux-amis";
 import { ruA0E3FormesNouvelles } from "./e3-formes-nouvelles";
@@ -13,4 +17,8 @@ export const RU_UNITS = [
   ruA0E4Chuintantes,
   ruA0E5VoyellesSignes,
   ruA101Saluer,
+  ruA102Cafe,
+  ruA103NombresPrix,
+  ruA104Famille,
+  ruA105OuEst,
 ] as const;
