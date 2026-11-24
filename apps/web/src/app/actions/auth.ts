@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { claimLegacyDataQuietly } from "@/lib/auth/claim-legacy";
 import { authErrorCode, signInSchema, signUpSchema, type AuthErrorCode } from "@/lib/auth/schemas";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -45,6 +46,8 @@ export async function signIn(_previous: AuthFormState, formData: FormData): Prom
     const rejected = error.status !== undefined && error.status >= 400 && error.status < 500;
     return { email, error: rejected ? "invalidCredentials" : "generic" };
   }
+  // A user of the old app finds their data again; a failure here never blocks the sign-in.
+  await claimLegacyDataQuietly(supabase);
   redirect("/");
 }
 

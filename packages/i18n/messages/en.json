@@ -279,9 +279,27 @@
       "signedInAs": "Signed in as {email}",
       "guest": "You’re using Daily Lingua without an account."
     },
+    "feedback": {
+      "title": "Report a problem",
+      "intro": "A bug, an idea, a mistake in some content: tell us, we read everything.",
+      "categoryLabel": "Type of feedback",
+      "categories": {
+        "bug": "A bug",
+        "idee": "An idea",
+        "contenu": "A content mistake",
+        "autre": "Something else"
+      },
+      "messageLabel": "Your message",
+      "messageHint": "Say what you were doing and what happened. At least 3 characters, at most 2,000.",
+      "send": "Send",
+      "sending": "Sending…",
+      "sent": "Thanks, your feedback has been sent."
+    },
     "lab": {
       "link": "Test tools (microphone, voice, notifications)"
-    }
+    },
+    "version": "Version {version}",
+    "preview": "Preview"
   },
   "errors": {
     "generic": "Something went wrong. Try again in a moment.",

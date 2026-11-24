@@ -40,6 +40,7 @@ export function toProfile(row: ProfileRow): Profile {
     gameSettings: row.game_settings,
     isGuest: row.is_guest,
     legacyMigratedAt: row.legacy_migrated_at,
+    appActiveSince: row.app_active_since,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   });

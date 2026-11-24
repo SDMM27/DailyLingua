@@ -5,6 +5,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { InterfaceLanguage } from "@/components/settings/interface-language";
+import { FeedbackForm } from "@/components/settings/feedback-form";
 import { GamePreferences } from "@/components/settings/game-preferences";
 import { LearningSettings } from "@/components/settings/learning-settings";
 import { KnownLanguageSettings } from "@/components/settings/known-languages";
@@ -12,6 +13,7 @@ import { ReminderSettings } from "@/components/settings/reminder-settings";
 import { SignOutForm } from "@/components/settings/sign-out-form";
 import { ThemeChoice } from "@/components/settings/theme-choice";
 import { Button } from "@/components/ui/button";
+import { appVersion, isPreviewLabelled } from "@/lib/app-version";
 import { nativeLanguageOptions, timeZoneOptions } from "@/lib/languages";
 import { vapidPublicKey } from "@/lib/push/env";
 import { getSessionProfile, getSessionUser } from "@/lib/session";
@@ -65,6 +67,13 @@ export default async function SettingsPage() {
           <GamePreferences xpVisible={game.xpVisible} streakEnabled={game.streak.enabled} celebrations={game.celebrations === "full"} />
         </section>
 
+        <section aria-labelledby="settings-feedback" className="space-y-5">
+          <h2 id="settings-feedback" className="meta">
+            {t("feedback.title")}
+          </h2>
+          <FeedbackForm />
+        </section>
+
         <section aria-labelledby="settings-account" className="space-y-3">
           <h2 id="settings-account" className="meta">
             {t("groups.account")}
@@ -84,6 +93,11 @@ export default async function SettingsPage() {
           <Link href="/lab" className="inline-flex min-h-11 items-center text-sm text-muted underline underline-offset-4">
             {t("lab.link")}
           </Link>
+        </p>
+
+        <p className="text-sm text-muted">
+          {t("version", { version: appVersion() })}
+          {isPreviewLabelled() && <> · {t("preview")}</>}
         </p>
       </div>
     </>

@@ -17,7 +17,10 @@ export const profileSchema = z.object({
   reminderTime: timeOfDaySchema.nullable(),
   gameSettings: jsonObjectSchema,
   isGuest: z.boolean(),
+  /** Last resynchronisation from the old app (null: never). */
   legacyMigratedAt: isoInstantSchema.nullable(),
+  /** Set at the first write in the new app: from then on the old app is no longer copied. */
+  appActiveSince: isoInstantSchema.nullable().default(null),
   createdAt: isoInstantSchema,
   updatedAt: isoInstantSchema,
 });

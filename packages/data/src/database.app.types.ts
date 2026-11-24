@@ -301,6 +301,20 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"legacy_claim_log": {
+                  Row: {
+                    "claimed_at": string,"id": number,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "claimed_at"?: string,"id"?: never,"user_id": string
+                  }
+                  Update: {
+                    "claimed_at"?: string,"id"?: never,"user_id"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"legacy_map": {
                   Row: {
                     "app_id": string,"app_table": string,"legacy_id": string,"legacy_table": string,"migrated_at": string,"user_id": string
@@ -737,6 +751,10 @@ isOneToOne: false
 { Args: { p_enabled: boolean; p_time: string; p_weekly_summary: boolean; p_endpoint?: string; p_p256dh?: string; p_auth?: string; p_user_agent?: string; p_reset?: boolean }; Returns: undefined },
 "reminders_due":
 { Args: { p_at: string; p_after?: string; p_only?: string }; Returns: { user_id: string; day: string; locale: string; delivery_mode: string; template: string; daily_minutes: number; active_days: number; rewrites: number }[] },
+"claim_legacy_data":
+{ Args: Record<PropertyKey, never>; Returns: Json },
+"send_feedback":
+{ Args: { p_category: string; p_message: string; p_page?: string; p_app_version?: string }; Returns: undefined },
 "claim_reminder":
 { Args: { p_user_id: string; p_day: string; p_at: string; p_template: string; p_mode: string }; Returns: { log_id: number; subscription_id: string; endpoint: string; p256dh: string; auth: string }[] },
 "mark_reminder_opened":

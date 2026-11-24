@@ -1,5 +1,5 @@
 /** Stable, UI-safe error codes: the interface maps them to messages, never to Postgres text. */
-export const dataErrorCodes = ["unauthenticated", "invalid", "conflict", "not_found", "unknown"] as const;
+export const dataErrorCodes = ["unauthenticated", "invalid", "conflict", "not_found", "rate_limited", "unknown"] as const;
 export type DataErrorCode = (typeof dataErrorCodes)[number];
 
 /**
@@ -24,6 +24,8 @@ export function codeFromSqlstate(sqlstate: string | null | undefined): DataError
   if (!sqlstate) return "unknown";
   if (sqlstate === "28000" || sqlstate === "42501" || sqlstate === "PGRST301" || sqlstate === "PGRST302") return "unauthenticated";
   if (sqlstate === "P0002" || sqlstate === "PGRST116") return "not_found";
+  // DL429: the rate limit of the database (feedback: 20 per 24 hours).
+  if (sqlstate === "DL429") return "rate_limited";
   // 23514: check violation (native language, duplicate, more than 4 languages, more than 120 minutes a day).
   if (sqlstate === "23505" || sqlstate === "23514" || sqlstate === "40001" || sqlstate === "40P01") return "conflict";
   // Data exception (22xxx), other integrity violations (23xxx: not-null, foreign key).

@@ -279,9 +279,27 @@
       "signedInAs": "Connecté avec {email}",
       "guest": "Tu utilises Daily Lingua sans compte."
     },
+    "feedback": {
+      "title": "Signaler un problème",
+      "intro": "Un bug, une idée, une erreur dans un contenu : dis-le-nous, on lit tout.",
+      "categoryLabel": "Type de retour",
+      "categories": {
+        "bug": "Un bug",
+        "idee": "Une idée",
+        "contenu": "Une erreur de contenu",
+        "autre": "Autre chose"
+      },
+      "messageLabel": "Ton message",
+      "messageHint": "Dis ce que tu faisais et ce qui s’est passé. 3 caractères au moins, 2 000 au plus.",
+      "send": "Envoyer",
+      "sending": "Envoi…",
+      "sent": "Merci, ton retour est bien envoyé."
+    },
     "lab": {
       "link": "Outils de test (micro, voix, notifications)"
-    }
+    },
+    "version": "Version {version}",
+    "preview": "Préversion"
   },
   "errors": {
     "generic": "Quelque chose n’a pas marché. Réessaie dans un instant.",

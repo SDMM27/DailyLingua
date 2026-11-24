@@ -92,6 +92,7 @@ const profile = {
   gameSettings: {},
   isGuest: false,
   legacyMigratedAt: null,
+  appActiveSince: null,
   createdAt: INSTANT,
   updatedAt: INSTANT,
 };
