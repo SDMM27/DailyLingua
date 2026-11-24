@@ -18,15 +18,18 @@ export async function UnitCard({ unit, progress, language, locale }: {
   locale: string;
 }) {
   const t = await getTranslations("today.unit");
+  const assessment = await getTranslations("assessment");
   const explanation = locale === "fr" ? "fr" : "en";
   const started = unitStarted(unit, progress);
+  // The bilan has no lessons: the card says what it is and leads straight to it.
+  const bilan = unit.kind === "assessment";
   return (
     <article aria-labelledby="unit-card-title" style={languageStyle(language)} className="mt-5 space-y-3 rounded-card border border-line bg-surface p-5">
       <p className="meta text-lang">{t("meta", { language: languageDisplayName(language, locale) })}</p>
       <h2 id="unit-card-title" className="sd-display text-2xl" lang={explanation}>{unit.title[explanation]}</h2>
-      <p className="text-sm text-muted">{t("lessons", { minutes: unit.minutes })}</p>
+      <p className="text-sm text-muted">{bilan ? assessment("questions", { count: unit.test.itemIds.length }) : t("lessons", { minutes: unit.minutes })}</p>
       <Link href={`/parcours/${language}/${unit.id}`} className={`${buttonClass("secondary")} w-full`}>
-        {started ? t("continue", { lesson: currentLessonNumber(unit, progress) }) : t("start")}
+        {bilan ? assessment("start") : started ? t("continue", { lesson: currentLessonNumber(unit, progress) }) : t("start")}
       </Link>
       <Link href={`/parcours/${language}`} className="flex min-h-11 items-center justify-center font-semibold text-accent-strong">{t("map")}</Link>
     </article>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { resolveGameSettings } from "@dailylingua/core";
 import { DataError, getUnitXp, listEnrollments } from "@dailylingua/data";
-import { gameSettingsSchema } from "@dailylingua/schemas";
+import { gameSettingsSchema, isAssessmentUnit } from "@dailylingua/schemas";
 import { getLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 import { connection } from "next/server";
@@ -54,7 +54,17 @@ export default async function UnitPage({ params, searchParams }: PageProps<"/par
   // The number the map shows for this station (its rank among the visible units), not the content order.
   const number = visible.findIndex((candidate) => candidate.id === unit.id) + 1;
 
-  const extras = { pathHref: `/parcours/${lang}`, number, startAtTest, unitXp, warmupItemIds: warmups.find((warmup) => warmup.unit.id === unit.id)?.itemIds ?? [] };
+  // A bilan names, for each of its questions, the unit it comes from: the fail screen lists those to review.
+  const sources = isAssessmentUnit(unit)
+    ? Object.fromEntries(
+        [...new Set(Object.values(unit.drawnFrom))].flatMap((id) => {
+          const source = visible.find((candidate) => candidate.id === id);
+          return source ? [[id, { number: visible.indexOf(source) + 1, title: source.title[explanation] }]] : [];
+        }),
+      )
+    : {};
+
+  const extras = { pathHref: `/parcours/${lang}`, number, startAtTest, unitXp, warmupItemIds: warmups.find((warmup) => warmup.unit.id === unit.id)?.itemIds ?? [], sources };
 
   return (
     <UnitExtrasProvider value={extras}>

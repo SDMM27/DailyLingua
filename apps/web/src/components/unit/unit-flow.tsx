@@ -1,7 +1,7 @@
 "use client";
 
 import { gradeUnitTest, stepValidated, type AccentTolerance, type UnitAttempt } from "@dailylingua/core";
-import { isScriptUnit, type Unit, type UnitItem } from "@dailylingua/schemas";
+import { isAssessmentUnit, isScriptUnit, type Unit, type UnitItem } from "@dailylingua/schemas";
 import { useTranslations } from "next-intl";
 import { useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import {
 } from "@/lib/units/flow";
 import { languageStyle } from "@/lib/units/language-style";
 import type { UnitProgressView } from "@/lib/units/progress";
+import { AssessmentResult, type ReviewUnit } from "./assessment-result";
 import { DialogueStep, type DialoguePrefs } from "./dialogue-step";
 import { ExerciseRunner, type ItemAttempt } from "./exercise-runner";
 import { GrammarInfo, KeyPhrasesInfo } from "./info-steps";
@@ -44,6 +45,8 @@ interface Result {
   total: number;
   passed: boolean;
   missed: MissedPhrase[];
+  /** Bilan only: the units to go over, from the missed questions. */
+  review: ReviewUnit[];
 }
 
 /**
@@ -58,7 +61,10 @@ export function UnitFlow({ unit, progress, locale, tolerance, xpVisible, animate
   const warmup = useTranslations("warmup");
   const actions = useTranslations("common.actions");
   const steps = useMemo(() => flatSteps(unit), [unit]);
-  const { openPath, startAtTest, unitXp, warmupItemIds } = useUnitExtras();
+  const { openPath, startAtTest: asked, unitXp, warmupItemIds, sources } = useUnitExtras();
+  // The bilan is only a test: it opens on it, with no lessons before.
+  const bilan = isAssessmentUnit(unit);
+  const startAtTest = asked || bilan;
   const [screen, setScreen] = useState<"intro" | "warmup" | "warmupDone" | "step" | "result">(startAtTest ? "step" : "intro");
   const [index, setIndex] = useState(() => (startAtTest ? Math.max(0, flatSteps(unit).findIndex((step) => step.step === "test")) : firstOpenStep(unit, progress)));
   const [infoDone, setInfoDone] = useState(false);
@@ -127,7 +133,10 @@ export function UnitFlow({ unit, progress, locale, tolerance, xpVisible, animate
       const text = item ? expectedText(item, locale) : null;
       return item && text ? [{ text, note: item.explain[locale] }] : [];
     });
-    setResult({ correct: graded.score, total: graded.total, passed: graded.passed, missed });
+    // The units the missed questions of a bilan come from, each once, in the order of the path.
+    const sourceIds = isAssessmentUnit(unit) ? [...new Set(graded.missed.flatMap((id) => unit.drawnFrom[id] ?? []))] : [];
+    const review = sourceIds.flatMap((id): ReviewUnit[] => (sources[id] ? [{ id, ...sources[id] }] : [])).sort((a, b) => a.number - b.number);
+    setResult({ correct: graded.score, total: graded.total, passed: graded.passed, missed, review });
     setScreen("result");
   }
 
@@ -199,6 +208,25 @@ export function UnitFlow({ unit, progress, locale, tolerance, xpVisible, animate
     );
   }
 
+  if (screen === "result" && result && bilan) {
+    return (
+      <UnitShell style={style}>
+        <AssessmentResult
+          locale={locale}
+          level={unit.level}
+          passed={result.passed}
+          correct={result.correct}
+          total={result.total}
+          passMark={unit.test.passScore}
+          review={result.review}
+          animate={animate}
+          onBack={openPath ?? onLeave}
+          onRetake={() => startTest(true)}
+        />
+      </UnitShell>
+    );
+  }
+
   if (screen === "result" && result) {
     return (
       <UnitShell style={style}>
@@ -225,9 +253,11 @@ export function UnitFlow({ unit, progress, locale, tolerance, xpVisible, animate
   }
 
   const bar = { steps: stepLabels, position: index + 1, stepProgress: share, xp: xpVisible && !direct && payXp ? xp : null, offline };
-  const hasInfo = isScriptUnit(unit)
-    ? scriptHasInfo(current.step)
-    : current.step === "dialogue" || current.step === "key_phrases" || (current.step === "grammar" && unit.grammar !== null);
+  const hasInfo = bilan
+    ? false
+    : isScriptUnit(unit)
+      ? scriptHasInfo(current.step)
+      : current.step === "dialogue" || current.step === "key_phrases" || (current.step === "grammar" && unit.grammar !== null);
   const showInfo = hasInfo && !infoDone;
   const afterInfo = () => (items.length > 0 ? setInfoDone(true) : completeStep());
 
@@ -235,9 +265,9 @@ export function UnitFlow({ unit, progress, locale, tolerance, xpVisible, animate
     <UnitShell style={style} bar={bar} onClose={() => setPaused(true)}>
       {warning}
       {showInfo ? (
-        isScriptUnit(unit) ? (
+        unit.kind === "script" ? (
           <ScriptInfo unit={unit} step={current.step} locale={locale} onFinished={afterInfo} />
-        ) : current.step === "dialogue" ? (
+        ) : unit.kind !== "situation" ? null : current.step === "dialogue" ? (
           <DialogueStep key="dialogue" language={language} locale={locale} dialogue={unit.dialogue} prefs={prefs} onPrefs={setPrefs} onFinished={afterInfo} />
         ) : current.step === "key_phrases" ? (
           <KeyPhrasesInfo key="key-phrases" phrases={unit.keyPhrases} language={language} locale={locale} onContinue={afterInfo} />
@@ -289,7 +319,7 @@ function PauseSheet({ label, onContinue, onLeave }: { label: string; onContinue(
 
 /** The conversation's items in the order of the turns (the learner's turns), not of the step's list. */
 function conversationOrder(unit: Unit, items: UnitItem[]): UnitItem[] {
-  if (isScriptUnit(unit)) return items;
+  if (unit.kind !== "situation") return items;
   const rank = new Map(unit.conversation.turns.map((turn, position) => [turn.itemId, position]));
   return [...items].sort((a, b) => (rank.get(a.id) ?? 0) - (rank.get(b.id) ?? 0));
 }
@@ -297,7 +327,7 @@ function conversationOrder(unit: Unit, items: UnitItem[]): UnitItem[] {
 /** The turns that come before the learner's turn (since the previous one of the learner), and who the learner plays. */
 function ConversationContext({ unit, item, locale }: { unit: Unit; item: UnitItem; locale: "fr" | "en" }) {
   const t = useTranslations("unit");
-  if (isScriptUnit(unit)) return null;
+  if (unit.kind !== "situation") return null;
   const turns = unit.conversation.turns;
   const at = turns.findIndex((turn) => turn.itemId === item.id);
   if (at < 0) return null;

@@ -20,7 +20,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { promisify } from "node:util";
-import { CLEARED_VOICES, isScriptUnit, type Unit } from "@dailylingua/schemas";
+import { CLEARED_VOICES, isAssessmentUnit, isScriptUnit, type AssessmentUnit, type Unit } from "@dailylingua/schemas";
 import { UNITS } from "@dailylingua/content";
 
 const run = promisify(execFile);
@@ -58,7 +58,7 @@ interface Clip {
 
 const speak = (text: string) => text.normalize("NFD").replace(/́/g, "").normalize("NFC");
 
-function clipsOf(unit: Unit): Clip[] {
+function clipsOf(unit: Exclude<Unit, AssessmentUnit>): Clip[] {
   if (isScriptUnit(unit)) {
     const pathOf = (id: string) => `/unit-audio/${unit.language}/${unit.id}/${id}.mp3`;
     return [
@@ -152,7 +152,7 @@ function recordPath(source: string, clip: Clip): { source: string; changed: bool
 }
 
 /** The source file that declares this unit (file names do not follow the id: `01-saluer.ts`, `e1-lettres-familieres.ts`). */
-function sourceFileOf(unit: Unit): string {
+function sourceFileOf(unit: Exclude<Unit, AssessmentUnit>): string {
   const folder = join(SOURCES, unit.language);
   const found = readdirSync(folder)
     .filter((name) => name.endsWith(".ts"))
@@ -162,7 +162,10 @@ function sourceFileOf(unit: Unit): string {
   return found[0] as string;
 }
 
-const units = Object.values(UNITS).filter((unit) => only === null || unit.id === only);
+// A bilan has no audio of its own: its items point at the audio files of the units they are drawn from.
+const units = Object.values(UNITS)
+  .filter((unit): unit is Exclude<Unit, AssessmentUnit> => !isAssessmentUnit(unit))
+  .filter((unit) => only === null || unit.id === only);
 if (units.length === 0) fail(only ? `unknown unit "${only}"` : "no unit in the registry");
 if (!AZURE_KEY || !AZURE_REGION) fail("AZURE_SPEECH_KEY and AZURE_SPEECH_REGION must be set (see the header of this script)");
 

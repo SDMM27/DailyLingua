@@ -5,7 +5,7 @@
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { GRAMMAR_POINT_IDS, UNITS, checkUnit, grammarIdsFor, isPublished } from "@dailylingua/content";
-import { isScriptUnit } from "@dailylingua/schemas";
+import { isAssessmentUnit, isScriptUnit } from "@dailylingua/schemas";
 import { ruAlphabet } from "../src/lib/alphabets/ru";
 import { itCurriculum } from "../src/lib/grammar/curricula/it";
 import { ruCurriculum } from "../src/lib/grammar/curricula/ru";
@@ -49,10 +49,13 @@ for (const unit of units) {
     audioExists: (path) => existsSync(`${PUBLIC_DIR}${path}`),
     knownLetters: lettersBefore(unit.language, unit.order),
     letterLatin: letterLatinOf(unit.language),
+    units: UNITS,
   });
   const content = isScriptUnit(unit)
     ? `${unit.letters.length} letters, ${unit.words.length} words`
-    : `${unit.dialogue.glosses.filter((gloss) => gloss.isNew).length} new words`;
+    : isAssessmentUnit(unit)
+      ? `bilan: ${unit.draws.length} draws from ${new Set(unit.draws.map((draw) => draw.unit)).size} units`
+      : `${unit.dialogue.glosses.filter((gloss) => gloss.isNew).length} new words`;
   const review = unit.aiReview ? `AI review ${unit.aiReview.reviewedOn} (${unit.aiReview.passes} passes), ${unit.status}` : unit.status;
   const published = isPublished(unit) ? "published" : "not published";
   const summary = `${unit.id} v${unit.version}: ${unit.items.length} items, ${content}, ${review}, ${published}`;

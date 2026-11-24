@@ -610,7 +610,21 @@
     "a11yCurrent": "{title}, in progress, step {step} of {steps}",
     "a11yCurrentStart": "{title}, ready to start, about {minutes} min",
     "a11yTodo": "{title}, not started, about {minutes} min",
-    "allDone": "Every unit of this level is complete."
+    "allDone": "Every unit of this level is complete.",
+    "zoneAssessment": "Check-up · {level}",
+    "levelConfirmed": "{level} confirmed",
+    "currentMetaStartAssessment": "End-of-path check-up"
+  },
+  "assessment": {
+    "meta": "Check-up · about {minutes} min",
+    "questions": "{count} questions, no help",
+    "start": "Take the check-up",
+    "retake": "Retake the check-up",
+    "passed": "{level} confirmed",
+    "notYet": "Not yet",
+    "need": "You need {passMark} out of {total}.",
+    "toReview": "Units to review before retaking the check-up",
+    "back": "Back to the path"
   },
   "warmup": {
     "title": "{count, plural, one {Review yesterday’s sentence} other {Review yesterday’s # sentences}}",

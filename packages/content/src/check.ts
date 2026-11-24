@@ -1,8 +1,12 @@
 import { normalizeAnswer } from "@dailylingua/core";
 import {
-  CLEARED_VOICES, NON_LATIN_LANGUAGES, UNIT_ID_PATTERN, isScriptUnit,
-  type ScriptUnitSource, type SituationUnitSource, type UnitItem, type UnitSource, type UnitStep,
+  CLEARED_VOICES, NON_LATIN_LANGUAGES, UNIT_ID_PATTERN, isAssessmentUnit, isScriptUnit,
+  type ResolvedAssessmentSource, type ScriptUnitSource, type SituationUnitSource, type Unit, type UnitId, type UnitItem, type UnitSource, type UnitStatus, type UnitStep,
 } from "@dailylingua/schemas";
+import { unitNumber } from "./units/registry";
+
+/** What `checkUnit` checks: a situation or writing source, or a bilan once the registry has resolved it. */
+export type CheckableUnit = Exclude<UnitSource, { kind: "assessment" }> | (Omit<ResolvedAssessmentSource, "status"> & { status?: UnitStatus });
 
 /** One broken invariant of a unit (`j4-pr1-architecture.md` §1.3). */
 export interface UnitViolation {
@@ -29,7 +33,12 @@ export interface UnitViolation {
     | "letter_duplicate"
     | "lookalike"
     | "letter_unknown"
-    | "latin_mismatch";
+    | "latin_mismatch"
+    | "draw_duplicate"
+    | "draw_source"
+    | "draw_not_in_test"
+    | "draw_coverage"
+    | "draw_status";
   message: string;
 }
 
@@ -48,6 +57,8 @@ export interface CheckOptions {
    * legacy alphabet module. When given, the `latin` of every letter and word is recomputed and compared.
    */
   letterLatin?: Readonly<Record<string, string>>;
+  /** Bilans only: the registry the drawn units are looked up in. Default: none (every draw is then an unknown unit). */
+  units?: Readonly<Record<UnitId, Unit>>;
 }
 
 /** The words of a text, lower-cased and normalised for the language: letters and digits, elisions split at the apostrophe. */
@@ -56,33 +67,35 @@ export function wordsOf(language: string, text: string): string[] {
 }
 
 /** Every `itemIds` reference of the unit, with where it comes from. */
-function itemReferences(unit: UnitSource): { ref: string; where: string }[] {
+function itemReferences(unit: CheckableUnit): { ref: string; where: string }[] {
   const refs: { ref: string; where: string }[] = [];
-  if (!isScriptUnit(unit) && unit.grammar) for (const ref of unit.grammar.itemIds) refs.push({ ref, where: "grammar.itemIds" });
+  if (unit.kind === "situation" && unit.grammar) for (const ref of unit.grammar.itemIds) refs.push({ ref, where: "grammar.itemIds" });
   for (const lesson of unit.lessons) {
     for (const step of lesson.steps) for (const ref of step.itemIds) refs.push({ ref, where: `${lesson.id}:${step.step}` });
   }
   for (const ref of unit.test.itemIds) refs.push({ ref, where: "test.itemIds" });
-  if (!isScriptUnit(unit)) {
+  if (unit.kind === "situation") {
     for (const turn of unit.conversation.turns) if (turn.itemId !== null) refs.push({ ref: turn.itemId, where: `conversation.${turn.id}` });
   }
   return refs;
 }
 
 /** The audio paths of the unit that are not null. */
-function audioPaths(unit: UnitSource): { path: string; where: string }[] {
+function audioPaths(unit: CheckableUnit): { path: string; where: string }[] {
   const found: { path: string | null; where: string }[] = [
     ...(isScriptUnit(unit)
       ? [
           ...unit.letters.map((letter) => ({ path: letter.example.audio, where: `letter ${letter.lower} example` })),
           ...unit.words.map((word) => ({ path: word.audio, where: `word ${word.id}` })),
         ]
-      : [
-          { path: unit.dialogue.audio, where: "dialogue.audio" },
-          ...unit.dialogue.lines.map((line) => ({ path: line.audio, where: `line ${line.id}` })),
-          ...unit.keyPhrases.map((phrase) => ({ path: phrase.audio, where: `key phrase ${phrase.id}` })),
-          ...unit.conversation.turns.map((turn) => ({ path: turn.audio, where: `turn ${turn.id}` })),
-        ]),
+      : isAssessmentUnit(unit)
+        ? []
+        : [
+            { path: unit.dialogue.audio, where: "dialogue.audio" },
+            ...unit.dialogue.lines.map((line) => ({ path: line.audio, where: `line ${line.id}` })),
+            ...unit.keyPhrases.map((phrase) => ({ path: phrase.audio, where: `key phrase ${phrase.id}` })),
+            ...unit.conversation.turns.map((turn) => ({ path: turn.audio, where: `turn ${turn.id}` })),
+          ]),
     ...unit.items.flatMap((item) =>
       item.kind === "mcq" || item.kind === "listen_mcq" ? [{ path: item.audio, where: `item ${item.id}` }] : [],
     ),
@@ -269,12 +282,45 @@ function checkScript(unit: ScriptUnitSource, options: CheckOptions, add: Add): v
   }
 }
 
+/** The units whose number (the two digits of the id) a bilan has to cover: 6 to 10. */
+const BILAN_COVERED_NUMBERS = ["06", "07", "08", "09", "10"] as const;
+const STATUS_RANK: Record<string, number> = { draft: 0, reviewed: 1, published: 2 };
+
+/**
+ * Invariants of a bilan (`j4-pr3.md` §2.2): ten distinct draws, each from the test of a situation unit of the same
+ * language and an earlier order, covering units 6 to 10, from units at least as advanced as the bilan itself.
+ */
+function checkAssessment(unit: Extract<CheckableUnit, { kind: "assessment" }>, options: CheckOptions, add: Add): void {
+  const registry = options.units ?? {};
+  const keys = unit.draws.map((draw) => `${draw.unit}/${draw.item}`);
+  for (const key of new Set(keys.filter((value, index) => keys.indexOf(value) !== index))) add("draw_duplicate", `draw ${key} is used twice`);
+  for (const draw of unit.draws) {
+    const source = Object.hasOwn(registry, draw.unit) ? registry[draw.unit] : undefined;
+    const label = `draw ${draw.unit}/${draw.item}`;
+    if (!source) {
+      add("draw_source", `${label}: the unit does not exist`);
+      continue;
+    }
+    if (source.kind !== "situation") add("draw_source", `${label}: ${draw.unit} is a ${source.kind} unit, only situation units can be drawn from`);
+    if (source.language !== unit.language) add("draw_source", `${label}: ${draw.unit} is not a "${unit.language}" unit`);
+    if (source.order >= unit.order) add("draw_source", `${label}: ${draw.unit} (order ${source.order}) does not come before the bilan (order ${unit.order})`);
+    if (!source.test.itemIds.includes(draw.item)) add("draw_not_in_test", `${label}: the item is not in the test of ${draw.unit}`);
+    if ((STATUS_RANK[source.status] ?? 0) < (STATUS_RANK[unit.status ?? "draft"] ?? 0)) {
+      add("draw_status", `${label}: ${draw.unit} is ${source.status}, the bilan is ${unit.status ?? "draft"}`);
+    }
+  }
+  const drawn = new Set(unit.draws.map((draw) => unitNumber(draw.unit)));
+  for (const number of BILAN_COVERED_NUMBERS) {
+    if (!drawn.has(number)) add("draw_coverage", `no draw from unit ${number}: the bilan covers units 6 to 10`);
+  }
+}
+
 /**
  * Checks every invariant of a unit that code can check. Pure: audio and grammar ids come in through the
  * options. Returns every violation found (an empty list means the unit is valid); it does not parse, so run
  * `unitSchema` first.
  */
-export function checkUnit(unit: UnitSource, options: CheckOptions): UnitViolation[] {
+export function checkUnit(unit: CheckableUnit, options: CheckOptions): UnitViolation[] {
   const violations: UnitViolation[] = [];
   const add: Add = (code, message) => violations.push({ code, message });
 
@@ -284,7 +330,8 @@ export function checkUnit(unit: UnitSource, options: CheckOptions): UnitViolatio
     add("bad_id", `id "${unit.id}" does not match the language "${unit.language}" and level "${unit.level}"`);
   }
   const lessonIds = unit.lessons.map((lesson) => lesson.id).join(",");
-  if (lessonIds !== "l1,l2,l3") add("lesson_ids", `lessons must be l1, l2, l3 in order (found ${lessonIds || "none"})`);
+  const expectedLessons = isAssessmentUnit(unit) ? "l1" : "l1,l2,l3";
+  if (lessonIds !== expectedLessons) add("lesson_ids", `lessons must be ${expectedLessons.replaceAll(",", ", ")} in order (found ${lessonIds || "none"})`);
 
   // Unique ids, by scope.
   dupes(add, "items", unit.items.map((item) => item.id));
@@ -311,7 +358,8 @@ export function checkUnit(unit: UnitSource, options: CheckOptions): UnitViolatio
   const seenInSteps = new Set(
     unit.lessons.flatMap((lesson) => lesson.steps.filter((step) => step.step !== "test").flatMap((step) => step.itemIds)),
   );
-  for (const id of unit.test.itemIds) {
+  // The items of a bilan are seen in their own unit.
+  for (const id of isAssessmentUnit(unit) ? [] : unit.test.itemIds) {
     if (!seenInSteps.has(id)) add("test_item_unseen", `test item ${id} is not practised in any step`);
   }
   if (unit.test.itemIds.length !== 10) add("test_size", `the test has ${unit.test.itemIds.length} items, expected 10`);
@@ -319,6 +367,7 @@ export function checkUnit(unit: UnitSource, options: CheckOptions): UnitViolatio
   dupes(add, "test items", unit.test.itemIds);
 
   if (isScriptUnit(unit)) checkScript(unit, options, add);
+  else if (isAssessmentUnit(unit)) checkAssessment(unit, options, add);
   else checkSituation(unit, options, add);
 
   // Audio files.

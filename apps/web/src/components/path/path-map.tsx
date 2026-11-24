@@ -14,6 +14,8 @@ const STEP_KEYS = {
   test: "steps.test", letters: "steps.letters", sounds: "steps.sounds", words: "steps.words", reading: "steps.reading",
 } as const satisfies Record<UnitStep, string>;
 
+const ZONE_KEYS = { writing: "zoneWriting", situations: "zoneSituations", assessment: "zoneAssessment" } as const satisfies Record<Zone["zone"], string>;
+
 const RAIL = {
   solid: "before:start-5 before:border-s-4 before:border-lang",
   dashed: "before:start-[21px] before:border-s-2 before:border-dashed before:border-border-strong",
@@ -45,7 +47,7 @@ export function PathMap({ language, languageName, locale, model }: { language: s
     <div className="flex flex-col gap-6">
       <header>
         <p className="meta">{t("meta", { language: languageName })}</p>
-        <h1 ref={title} tabIndex={-1} className="mt-1.5 font-display text-[30px] leading-tight font-bold tracking-tight">{t("level", { level: model.level })}</h1>
+        <h1 ref={title} tabIndex={-1} className="mt-1.5 font-display text-[30px] leading-tight font-bold tracking-tight">{t(model.confirmed ? "levelConfirmed" : "level", { level: model.level })}</h1>
         <p className="mt-1.5 text-sm text-muted">
           <b className="font-semibold text-ink">{t("progress", { done: model.done, total: model.total })}</b>{" "}
           {t(model.currentIsWriting ? "hintWriting" : "hint")}
@@ -77,7 +79,7 @@ function ZoneRow({ zone, rail }: { zone: Zone; rail: "solid" | "dashed" }) {
   return (
     <li className={`${ROW} ${RAIL[rail]}`}>
       <span aria-hidden="true" className="relative z-10 mt-2 h-1 w-6 justify-self-center rounded-sm bg-ink" />
-      <p className="meta uppercase">{t(zone.zone === "writing" ? "zoneWriting" : "zoneSituations", { level: zone.level })}</p>
+      <p className="meta uppercase">{t(ZONE_KEYS[zone.zone], { level: zone.level })}</p>
     </li>
   );
 }
@@ -85,7 +87,9 @@ function ZoneRow({ zone, rail }: { zone: Zone; rail: "solid" | "dashed" }) {
 function StationRow({ station, language, locale, onOpen, ref }: { station: Station; language: string; locale: "fr" | "en"; onOpen(): void; ref?: React.Ref<HTMLLIElement> }) {
   const t = useTranslations("path");
   const unit = useTranslations("unit");
+  const assessment = useTranslations("assessment");
   const writing = station.kind === "script";
+  const bilan = station.kind === "assessment";
   const letter = station.letters[0];
   const title = t("unitTitle", { number: station.number, title: station.title });
   const lettersLabel = station.letters.join(", ");
@@ -116,9 +120,11 @@ function StationRow({ station, language, locale, onOpen, ref }: { station: Stati
         {marker}
         <div className="min-w-0">
           <p className="meta text-lang">
-            {step
-              ? t(writing ? "currentMetaWriting" : "currentMeta", { number: station.number, step: step.position, steps: step.total })
-              : t(writing ? "currentMetaStartWriting" : "currentMetaStart", { number: station.number })}
+            {bilan
+              ? t("currentMetaStartAssessment")
+              : step
+                ? t(writing ? "currentMetaWriting" : "currentMeta", { number: station.number, step: step.position, steps: step.total })
+                : t(writing ? "currentMetaStartWriting" : "currentMetaStart", { number: station.number })}
           </p>
           <h2 className="mt-1">
             <button
@@ -133,7 +139,7 @@ function StationRow({ station, language, locale, onOpen, ref }: { station: Stati
           </h2>
           {listed && <p lang={language} aria-label={lettersLabel} className="text-[15px] text-muted">{listed}</p>}
           <p className="text-sm text-muted">{step ? t("remaining", { step: stepName, minutes }) : t("remainingStart", { minutes })}</p>
-          <Link href={`/parcours/${language}/${station.id}`} className={`${buttonClass("primary")} mt-3.5`}>{t(station.started ? "continue" : "start")}</Link>
+          <Link href={`/parcours/${language}/${station.id}`} className={`${buttonClass("primary")} mt-3.5`}>{bilan ? assessment("start") : t(station.started ? "continue" : "start")}</Link>
         </div>
       </li>
     );

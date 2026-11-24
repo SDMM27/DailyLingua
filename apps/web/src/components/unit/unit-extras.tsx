@@ -15,15 +15,18 @@ export interface UnitExtras {
   unitXp: number;
   /** Missed sentences of the last failed test to redo first; empty when there is no warm-up. */
   warmupItemIds: string[];
+  /** Bilan only: the units its questions are drawn from, by id, with their station number and title. */
+  sources: Record<string, { number: number; title: string }>;
 }
 
-const NONE: UnitExtras = { openPath: null, number: null, startAtTest: false, unitXp: 0, warmupItemIds: [] };
+const NONE: UnitExtras = { openPath: null, number: null, startAtTest: false, unitXp: 0, warmupItemIds: [], sources: {} };
+const NO_SOURCES: UnitExtras["sources"] = {};
 const UnitExtrasContext = createContext<UnitExtras>(NONE);
 
-export function UnitExtrasProvider({ value, children }: { value: Omit<UnitExtras, "openPath"> & { pathHref: string }; children: ReactNode }) {
+export function UnitExtrasProvider({ value, children }: { value: Omit<UnitExtras, "openPath" | "sources"> & { pathHref: string; sources?: UnitExtras["sources"] }; children: ReactNode }) {
   const router = useRouter();
-  const { pathHref, number, startAtTest, unitXp, warmupItemIds } = value;
-  const extras = useMemo(() => ({ openPath: () => router.push(pathHref), number, startAtTest, unitXp, warmupItemIds }), [router, pathHref, number, startAtTest, unitXp, warmupItemIds]);
+  const { pathHref, number, startAtTest, unitXp, warmupItemIds, sources = NO_SOURCES } = value;
+  const extras = useMemo(() => ({ openPath: () => router.push(pathHref), number, startAtTest, unitXp, warmupItemIds, sources }), [router, pathHref, number, startAtTest, unitXp, warmupItemIds, sources]);
   return <UnitExtrasContext value={extras}>{children}</UnitExtrasContext>;
 }
 

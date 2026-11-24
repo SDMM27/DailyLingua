@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CLEARED_VOICES, isScriptUnit, unitIdSchema, unitItemSchema, unitSchema, unitStepSchema, type ParsedUnitSource, type SituationUnitSource } from "./index";
+import { CLEARED_VOICES, unitIdSchema, unitItemSchema, unitSchema, unitStepSchema, type ParsedUnitSource, type SituationUnitSource } from "./index";
 
 const l10n = (text: string) => ({ fr: `${text} fr`, en: `${text} en` });
 
@@ -67,7 +67,7 @@ function validUnit(): SituationUnitSource {
 }
 
 function situation(unit: ParsedUnitSource) {
-  if (!isScriptUnit(unit)) return unit;
+  if (unit.kind === "situation") return unit;
   throw new Error("expected a situation unit");
 }
 

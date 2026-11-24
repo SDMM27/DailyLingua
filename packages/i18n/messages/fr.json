@@ -610,7 +610,21 @@
     "a11yCurrent": "{title}, en cours, étape {step} sur {steps}",
     "a11yCurrentStart": "{title}, à commencer, environ {minutes} min",
     "a11yTodo": "{title}, pas commencée, environ {minutes} min",
-    "allDone": "Toutes les unités de ce niveau sont validées."
+    "allDone": "Toutes les unités de ce niveau sont validées.",
+    "zoneAssessment": "Bilan · {level}",
+    "levelConfirmed": "{level} confirmé",
+    "currentMetaStartAssessment": "Bilan de fin de parcours"
+  },
+  "assessment": {
+    "meta": "Bilan · environ {minutes} min",
+    "questions": "{count} questions, sans aide",
+    "start": "Passer le bilan",
+    "retake": "Repasser le bilan",
+    "passed": "{level} confirmé",
+    "notYet": "Pas encore",
+    "need": "Il faut {passMark} sur {total}.",
+    "toReview": "Unités à revoir avant de repasser le bilan",
+    "back": "Retour au parcours"
   },
   "warmup": {
     "title": "{count, plural, one {Revoir la phrase d’hier} other {Revoir les # phrases d’hier}}",
