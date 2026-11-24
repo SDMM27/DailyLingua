@@ -37,6 +37,7 @@
     "placement:check": "tsx scripts/placement-check.mts",
     "units:check": "tsx scripts/units-check.mts",
     "units:audio": "tsx scripts/units-audio.mts",
+    "reader:audio": "tsx --env-file-if-exists=.env.local scripts/reader-audio.mts",
     "grammar:check": "tsx scripts/grammar-check.mts",
     "grammar:apply": "tsx scripts/grammar-apply-patch.mts",
     "assessment:check": "tsx scripts/assessment-check.mts",
