@@ -33,7 +33,6 @@ export const itA110WeekEnd = {
       {
         id: "d1",
         speaker: "chiara",
-        // REVIEW: teacher and adult student on tu, as in most language schools; check it sounds natural.
         text: "Leo, che programmi hai per il fine settimana?",
         translation: { fr: "Leo, qu’est-ce que tu as de prévu ce week-end ?", en: "Leo, what are your plans for the weekend?" },
         audio: null,
@@ -86,7 +85,6 @@ export const itA110WeekEnd = {
       {
         id: "d8",
         speaker: "leo",
-        // REVIEW: "ceno dalla famiglia di Giulia" vs the more usual "ceno dai genitori di Giulia" / "ceno da Giulia".
         text: "La sera ceno dalla famiglia di Giulia. Sua madre prepara il tiramisù!",
         translation: {
           fr: "Le soir, je dîne chez la famille de Giulia. Sa mère prépare le tiramisu !",
@@ -150,13 +148,13 @@ export const itA110WeekEnd = {
         isNew: false,
       },
       { form: "fino", lemma: "fino", meaning: { fr: "jusque", en: "until" }, note: null, isNew: false },
-      { form: "alle", lemma: "a", meaning: { fr: "à (avec l’heure)", en: "at (with times)" }, note: null, isNew: false },
+      { form: "alle", lemma: "a + le", meaning: { fr: "à (avec l’heure)", en: "at (with times)" }, note: null, isNew: false },
       { form: "nove", lemma: "nove", meaning: { fr: "neuf", en: "nine" }, note: null, isNew: false },
       { form: "poi", lemma: "poi", meaning: { fr: "puis, ensuite", en: "then" }, note: null, isNew: false },
       { form: "prendo", lemma: "prendere", meaning: { fr: "je prends", en: "I have, I take" }, note: null, isNew: false },
       { form: "un", lemma: "uno", meaning: { fr: "un", en: "a" }, note: null, isNew: false },
       { form: "cappuccino", lemma: "cappuccino", meaning: { fr: "cappuccino", en: "cappuccino" }, note: null, isNew: false },
-      { form: "al", lemma: "a", meaning: { fr: "au", en: "at the" }, note: null, isNew: false },
+      { form: "al", lemma: "a + il", meaning: { fr: "au", en: "at the" }, note: null, isNew: false },
       { form: "bar", lemma: "bar", meaning: { fr: "café, bar", en: "café, bar" }, note: null, isNew: false },
       { form: "e", lemma: "e", meaning: { fr: "et", en: "and" }, note: null, isNew: false },
       { form: "dopo", lemma: "dopo", meaning: { fr: "après", en: "afterwards" }, note: null, isNew: false },
@@ -176,16 +174,16 @@ export const itA110WeekEnd = {
       { form: "pomeriggio", lemma: "pomeriggio", meaning: { fr: "après-midi", en: "afternoon" }, note: null, isNew: false },
       { form: "leggo", lemma: "leggere", meaning: { fr: "je lis", en: "I read" }, note: null, isNew: false },
       { form: "libro", lemma: "libro", meaning: { fr: "livre", en: "book" }, note: null, isNew: false },
-      { form: "nel", lemma: "in", meaning: { fr: "dans le (in + il)", en: "in the" }, note: null, isNew: false },
+      { form: "nel", lemma: "in + il", meaning: { fr: "dans le (in + il)", en: "in the" }, note: null, isNew: false },
       { form: "parco", lemma: "parco", meaning: { fr: "parc", en: "park" }, note: null, isNew: false },
       { form: "sera", lemma: "sera", meaning: { fr: "soir", en: "evening" }, note: null, isNew: false },
       { form: "ceno", lemma: "cenare", meaning: { fr: "je dîne", en: "I have dinner" }, note: null, isNew: false },
       {
         form: "dalla",
-        lemma: "da",
+        lemma: "da + la",
         meaning: { fr: "chez la", en: "at the (someone's place)" },
         note: { fr: "Da + la : dalla famiglia di Giulia = chez la famille de Giulia. Avec un prénom, sans article : da Giulia.", en: "Da + la: dalla famiglia di Giulia = at Giulia's family's. With a name, no article: da Giulia." },
-        isNew: true,
+        isNew: false,
       },
       { form: "da", lemma: "da", meaning: { fr: "chez", en: "at (someone's place)" }, note: null, isNew: false },
       { form: "famiglia", lemma: "famiglia", meaning: { fr: "famille", en: "family" }, note: null, isNew: false },
@@ -218,6 +216,7 @@ export const itA110WeekEnd = {
         note: { fr: "Buono devant un nom masculin devient buon : buon fine settimana !", en: "Buono before a masculine noun becomes buon: buon fine settimana!" },
         isNew: false,
       },
+      { form: "buona", lemma: "buono", meaning: { fr: "bonne", en: "good (feminine)" }, note: null, isNew: false },
       {
         form: "weekend",
         lemma: "weekend",
@@ -239,6 +238,7 @@ export const itA110WeekEnd = {
       { form: "amici", lemma: "amico", meaning: { fr: "amis", en: "friends" }, note: null, isNew: false },
       { form: "con", lemma: "con", meaning: { fr: "avec", en: "with" }, note: null, isNew: false },
       { form: "lunedì", lemma: "lunedì", meaning: { fr: "lundi", en: "Monday" }, note: { fr: "Les jours de lunedì à venerdì ne changent pas au pluriel.", en: "The days from lunedì to venerdì are the same in the plural." }, isNew: true },
+      { form: "martedì", lemma: "martedì", meaning: { fr: "mardi", en: "Tuesday" }, note: null, isNew: true },
       { form: "mercoledì", lemma: "mercoledì", meaning: { fr: "mercredi", en: "Wednesday" }, note: null, isNew: true },
       { form: "giovedì", lemma: "giovedì", meaning: { fr: "jeudi", en: "Thursday" }, note: null, isNew: true },
       { form: "venerdì", lemma: "venerdì", meaning: { fr: "vendredi", en: "Friday" }, note: null, isNew: true },
@@ -304,7 +304,7 @@ export const itA110WeekEnd = {
       options: [
         { id: "a", text: "alle nove" },
         { id: "b", text: "alle otto" },
-        { id: "c", text: "mezzogiorno" },
+        { id: "c", text: "a mezzogiorno" },
       ],
       answer: "a",
       audio: null,
@@ -402,7 +402,7 @@ export const itA110WeekEnd = {
     {
       id: "i10",
       kind: "order",
-      prompt: { fr: "Remets dans l’ordre : « Le soir, je dîne avec les amis. »", en: "Put in order: \"In the evening I have dinner with friends.\"" },
+      prompt: { fr: "Remets dans l’ordre : « Le soir, je dîne avec des amis. »", en: "Put in order: \"In the evening I have dinner with friends.\"" },
       tokens: ["gli", "La", "ceno", "amici", "sera", "con"],
       distractors: ["cena"],
       answer: "La sera ceno con gli amici.",
@@ -412,7 +412,7 @@ export const itA110WeekEnd = {
     {
       id: "i11",
       kind: "listen_mcq",
-      prompt: { fr: "Écoute. Qu’est-ce qu’il fait dimanche ?", en: "Listen. What is he doing on Sunday?" },
+      prompt: { fr: "Écoute. Qu’est-ce qu’elle fait dimanche ?", en: "Listen. What is she doing on Sunday?" },
       options: [
         { id: "a", text: "va al cinema" },
         { id: "b", text: "va al mare" },
@@ -426,7 +426,7 @@ export const itA110WeekEnd = {
     {
       id: "i12",
       kind: "listen_mcq",
-      prompt: { fr: "Écoute. Quand est-ce qu’il lit ?", en: "Listen. When does he read?" },
+      prompt: { fr: "Écoute. Quand est-ce qu’elle lit ?", en: "Listen. When does she read?" },
       options: [
         { id: "a", text: "la mattina" },
         { id: "b", text: "il pomeriggio" },
@@ -441,14 +441,17 @@ export const itA110WeekEnd = {
       id: "i13",
       kind: "type",
       prompt: { fr: "Écris en italien : « Bon week-end ! »", en: "Write in Italian: \"Have a nice weekend!\"" },
-      accept: ["Buon fine settimana", "Buon weekend"],
-      explain: { fr: "Buon fine settimana (fine settimana est masculin : buon). On dit aussi buon weekend.", en: "Buon fine settimana (fine settimana is masculine: buon). People also say buon weekend." },
+      accept: ["Buon fine settimana", "Buona fine settimana", "Buon weekend"],
+      explain: {
+        fr: "Buon fine settimana : il fine settimana (le week-end) est masculin. On entend aussi très souvent buona fine settimana, et buon weekend.",
+        en: "Buon fine settimana: il fine settimana (the weekend) is masculine. You'll also often hear buona fine settimana, and buon weekend.",
+      },
     },
     {
       id: "i14",
       kind: "type",
       prompt: { fr: "Écris en italien : « Après, je dîne à la maison. »", en: "Write in Italian: \"Afterwards I have dinner at home.\"" },
-      accept: ["Dopo ceno a casa", "Poi ceno a casa", "Dopo io ceno a casa"],
+      accept: ["Dopo ceno a casa", "Poi ceno a casa", "Dopo io ceno a casa", "Poi io ceno a casa"],
       explain: { fr: "Dopo (ou poi) + ceno a casa.", en: "Dopo (or poi) + ceno a casa." },
     },
     {
@@ -465,10 +468,10 @@ export const itA110WeekEnd = {
       kind: "match",
       pairs: [
         { left: "lunedì", right: { fr: "lundi", en: "Monday" } },
+        { left: "martedì", right: { fr: "mardi", en: "Tuesday" } },
         { left: "mercoledì", right: { fr: "mercredi", en: "Wednesday" } },
         { left: "giovedì", right: { fr: "jeudi", en: "Thursday" } },
         { left: "venerdì", right: { fr: "vendredi", en: "Friday" } },
-        { left: "domenica", right: { fr: "dimanche", en: "Sunday" } },
       ],
       explain: { fr: "De lunedì à venerdì, l’accent est sur le ì final.", en: "From lunedì to venerdì, the stress is on the final ì." },
     },
@@ -490,7 +493,7 @@ export const itA110WeekEnd = {
       kind: "cloze",
       before: "Prima dormo, ",
       after: " prendo un cappuccino.",
-      accept: ["poi", "dopo"],
+      accept: ["poi", "dopo", "e poi"],
       hint: { fr: "ensuite", en: "then" },
       explain: { fr: "Prima… poi… = d’abord… ensuite…", en: "Prima… poi… = first… then…" },
     },
@@ -639,6 +642,6 @@ export const itA110WeekEnd = {
       },
     ],
   },
-  aiReview: null,
-  status: "draft",
+  aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
+  status: "reviewed",
 } satisfies UnitSource;

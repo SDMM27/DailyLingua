@@ -33,7 +33,6 @@ export const itA108Gouts = {
       {
         id: "d1",
         speaker: "giulia",
-        // REVIEW: "ceni da noi?" as an invitation and the inverted "Cucina mia madre" (= c’est ma mère qui cuisine): natural?
         text: "Senti, Leo, sabato sera ceni da noi? Cucina mia madre.",
         translation: {
           fr: "Dis, Leo, samedi soir, tu dînes chez nous ? C’est ma mère qui cuisine.",
@@ -58,11 +57,10 @@ export const itA108Gouts = {
       {
         id: "d4",
         speaker: "leo",
-        // REVIEW: two clauses on purpose (piace + singular, piacciono + plural); a native might say "mi piacciono la pasta e le verdure".
         text: "Non molto, ma mi piace tutto. Mi piace molto la pasta e mi piacciono le verdure.",
         translation: {
-          fr: "Pas beaucoup, mais j’aime tout. J’aime beaucoup les pâtes, et j’aime les légumes.",
-          en: "Not much, but I like everything. I really like pasta, and I like vegetables.",
+          fr: "Pas très bien, mais j’aime tout. J’aime beaucoup les pâtes, et j’aime les légumes.",
+          en: "Not really, but I like everything. I really like pasta, and I like vegetables.",
         },
         audio: null,
       },
@@ -193,7 +191,7 @@ export const itA108Gouts = {
       { form: "molto", lemma: "molto", meaning: { fr: "beaucoup ; très", en: "a lot; very" }, note: null, isNew: false },
       { form: "ma", lemma: "ma", meaning: { fr: "mais", en: "but" }, note: null, isNew: false },
       { form: "mi", lemma: "mi", meaning: { fr: "me, à moi", en: "me, to me" }, note: null, isNew: false },
-      { form: "tutto", lemma: "tutto", meaning: { fr: "tout", en: "everything" }, note: null, isNew: true },
+      { form: "tutto", lemma: "tutto", meaning: { fr: "tout", en: "everything" }, note: null, isNew: false },
       { form: "pasta", lemma: "pasta", meaning: { fr: "pâtes", en: "pasta" }, note: null, isNew: false },
       { form: "e", lemma: "e", meaning: { fr: "et", en: "and" }, note: null, isNew: false },
       { form: "le", lemma: "il", meaning: { fr: "les (féminin)", en: "the (feminine plural)" }, note: null, isNew: false },
@@ -242,7 +240,7 @@ export const itA108Gouts = {
       { form: "tanto", lemma: "tanto", meaning: { fr: "tellement, beaucoup", en: "so much, a lot" }, note: null, isNew: true },
       { form: "allora", lemma: "allora", meaning: { fr: "alors", en: "then" }, note: null, isNew: false },
       { form: "tiramisù", lemma: "tiramisù", meaning: { fr: "tiramisu", en: "tiramisu" }, note: { fr: "Accent sur le ù final.", en: "Stress on the final ù." }, isNew: true },
-      { form: "alle", lemma: "a", meaning: { fr: "à (avec l’heure)", en: "at (with times)" }, note: null, isNew: false },
+      { form: "alle", lemma: "a + le", meaning: { fr: "à (avec l’heure)", en: "at (with times)" }, note: null, isNew: false },
       { form: "otto", lemma: "otto", meaning: { fr: "huit", en: "eight" }, note: null, isNew: false },
       { form: "perfetto", lemma: "perfetto", meaning: { fr: "parfait", en: "perfect" }, note: null, isNew: false },
       { form: "tu", lemma: "tu", meaning: { fr: "tu", en: "you" }, note: null, isNew: false },
@@ -477,7 +475,7 @@ export const itA108Gouts = {
         fr: "Quelqu’un te dit « Mi piace la pasta ». Toi aussi, tu aimes ça. Écris en italien : « Moi aussi ! »",
         en: "Someone says \"Mi piace la pasta\". You like it too. Write in Italian: \"Me too!\"",
       },
-      accept: ["Anche a me"],
+      accept: ["Anche a me", "Anche a me piace", "Anche a me piace la pasta"],
       explain: {
         fr: "Avec piacere, on dit anche a me (« à moi aussi »), pas anche io.",
         en: "With piacere you say anche a me (\"to me too\"), not anche io.",
@@ -693,6 +691,6 @@ export const itA108Gouts = {
       },
     ],
   },
-  aiReview: null,
-  status: "draft",
+  aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
+  status: "reviewed",
 } satisfies UnitSource;

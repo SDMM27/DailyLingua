@@ -67,7 +67,6 @@ export const itA106Journee = {
       {
         id: "d5",
         speaker: "giulia",
-        // REVIEW: a one-hour lunch break (13:30-14:30) after working until one; check the schedule sounds plausible.
         text: "Sì, torno in ufficio alle due e mezza e lavoro fino alle sette. E tu?",
         translation: {
           fr: "Oui, je retourne au bureau à deux heures et demie et je travaille jusqu’à sept heures. Et toi ?",
@@ -175,7 +174,7 @@ export const itA106Journee = {
       },
       {
         form: "dalle",
-        lemma: "da",
+        lemma: "da + le",
         meaning: { fr: "de, à partir de (avec l’heure)", en: "from (with times)" },
         note: { fr: "Da + le. Dalle nove alle cinque = de neuf heures à cinq heures.", en: "Da + le. Dalle nove alle cinque = from nine to five." },
         isNew: true,
@@ -218,10 +217,10 @@ export const itA106Journee = {
       },
       {
         form: "all'",
-        lemma: "a",
+        lemma: "a + l'",
         meaning: { fr: "à (devant une voyelle)", en: "at (before a vowel)" },
         note: { fr: "A + l'. All'una = à une heure.", en: "A + l'. All'una = at one o'clock." },
-        isNew: true,
+        isNew: false,
       },
       {
         form: "una",
@@ -260,10 +259,10 @@ export const itA106Journee = {
       { form: "ufficio", lemma: "ufficio", meaning: { fr: "bureau (lieu de travail)", en: "office" }, note: { fr: "Masculin : l'ufficio, in ufficio.", en: "Masculine: l'ufficio, in ufficio." }, isNew: true },
       {
         form: "alle",
-        lemma: "a",
+        lemma: "a + le",
         meaning: { fr: "à (avec l’heure)", en: "at (with times)" },
         note: { fr: "A + le : alle due, alle otto. L’heure est féminin pluriel (le ore).", en: "A + le: alle due, alle otto. Hours are feminine plural (le ore)." },
-        isNew: true,
+        isNew: false,
       },
       { form: "due", lemma: "due", meaning: { fr: "deux", en: "two" }, note: null, isNew: false },
       { form: "cinque", lemma: "cinque", meaning: { fr: "cinq", en: "five" }, note: null, isNew: false },
@@ -341,7 +340,7 @@ export const itA106Journee = {
       { form: "miei", lemma: "mio", meaning: { fr: "mes", en: "my" }, note: null, isNew: false },
       { form: "genitori", lemma: "genitore", meaning: { fr: "parents", en: "parents" }, note: null, isNew: false },
       { form: "davanti", lemma: "davanti", meaning: { fr: "devant", en: "in front of, outside" }, note: null, isNew: false },
-      { form: "al", lemma: "a", meaning: { fr: "au (a + il)", en: "at the, to the" }, note: null, isNew: false },
+      { form: "al", lemma: "a + il", meaning: { fr: "au (a + il)", en: "at the, to the" }, note: null, isNew: false },
       { form: "tuo", lemma: "tuo", meaning: { fr: "ton", en: "your" }, note: null, isNew: false },
       { form: "tua", lemma: "tuo", meaning: { fr: "ta", en: "your" }, note: null, isNew: false },
       { form: "anche", lemma: "anche", meaning: { fr: "aussi", en: "also, too" }, note: { fr: "Anche io ! = Moi aussi !", en: "Anche io! = Me too!" }, isNew: false },
@@ -506,7 +505,7 @@ export const itA106Journee = {
       tokens: ["alle", "Lavoro", "nove", "cinque", "dalle"],
       distractors: ["sono"],
       answer: "Lavoro dalle nove alle cinque.",
-      accept: [],
+      accept: ["Dalle nove alle cinque lavoro."],
       explain: { fr: "Dalle (de) + heure, alle (à) + heure.", en: "Dalle (from) + time, alle (to) + time." },
     },
     {
@@ -517,7 +516,10 @@ export const itA106Journee = {
       distractors: ["è"],
       answer: "Che ore sono?",
       accept: [],
-      explain: { fr: "Mot à mot : « Quelles heures sont ? ». Le verbe est au pluriel : sono.", en: "Literally \"What hours are they?\". The verb is plural: sono." },
+      explain: {
+        fr: "Mot à mot : « Quelles heures sont ? ». Le verbe est au pluriel : sono. On entend aussi « Che ora è ? », au singulier.",
+        en: "Literally \"What hours are they?\". The verb is plural: sono. You'll also hear \"Che ora è?\", in the singular.",
+      },
     },
     {
       id: "i10",
@@ -570,9 +572,9 @@ export const itA106Journee = {
     {
       id: "i14",
       kind: "type",
-      prompt: { fr: "Écris en italien : « Nous déjeunons ensemble tous les jours. »", en: "Write in Italian: \"We have lunch together every day.\"" },
-      accept: ["Pranziamo insieme ogni giorno", "Noi pranziamo insieme ogni giorno", "Ogni giorno pranziamo insieme", "Ogni giorno noi pranziamo insieme"],
-      explain: { fr: "Pranzare avec noi : pranziamo. Le pronom noi est facultatif. Tous les jours = ogni giorno (ogni ne change jamais).", en: "Pranzare with noi: pranziamo. The pronoun noi is optional. Every day = ogni giorno (ogni never changes)." },
+      prompt: { fr: "Écris en italien : « Nous déjeunons ensemble chaque jour. »", en: "Write in Italian: \"We have lunch together every day.\"" },
+      accept: ["Pranziamo insieme ogni giorno", "Noi pranziamo insieme ogni giorno", "Ogni giorno pranziamo insieme", "Ogni giorno noi pranziamo insieme", "Pranziamo ogni giorno insieme", "Noi pranziamo ogni giorno insieme"],
+      explain: { fr: "Pranzare avec noi : pranziamo. Le pronom noi est facultatif. Chaque jour = ogni giorno (ogni ne change jamais).", en: "Pranzare with noi: pranziamo. The pronoun noi is optional. Every day = ogni giorno (ogni never changes)." },
     },
     {
       id: "i15",
@@ -763,6 +765,6 @@ export const itA106Journee = {
       },
     ],
   },
-  aiReview: null,
-  status: "draft",
+  aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
+  status: "reviewed",
 } satisfies UnitSource;

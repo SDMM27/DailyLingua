@@ -103,7 +103,6 @@ export const itA107Courses = {
       {
         id: "d10",
         speaker: "leo",
-        // REVIEW: "ho la mia borsa" for a shopping bag; "ho già la borsa" or "ho la mia borsa della spesa" may sound more natural.
         text: "No, grazie, ho la mia borsa. Arrivederci!",
         translation: { fr: "Non merci, j’ai mon sac. Au revoir !", en: "No, thanks, I've got my bag. Goodbye!" },
         audio: null,
@@ -184,7 +183,7 @@ export const itA107Courses = {
       { form: "euro", lemma: "euro", meaning: { fr: "euro(s)", en: "euro(s)" }, note: { fr: "Ne change pas : un euro, due euro.", en: "Never changes: un euro, due euro." }, isNew: false },
       {
         form: "al",
-        lemma: "a",
+        lemma: "a + il",
         meaning: { fr: "au ; le (dans un prix)", en: "per (in a price)" },
         note: { fr: "Due euro al chilo = deux euros le kilo.", en: "Due euro al chilo = two euros a kilo." },
         isNew: false,
@@ -211,7 +210,7 @@ export const itA107Courses = {
       {
         form: "etti",
         lemma: "etto",
-        meaning: { fr: "fois cent grammes", en: "hundred grams" },
+        meaning: { fr: "cent grammes (pluriel de etto)", en: "hundred grams (plural of etto)" },
         note: {
           fr: "Un etto = 100 grammes ; due etti = 200 grammes. C’est l’unité habituelle pour le jambon et le fromage.",
           en: "Un etto = 100 grams; due etti = 200 grams. The usual unit for ham and cheese.",
@@ -245,6 +244,8 @@ export const itA107Courses = {
         isNew: true,
       },
       { form: "così", lemma: "così", meaning: { fr: "ainsi, comme ça", en: "like this, so" }, note: null, isNew: true },
+      { form: "è", lemma: "essere", meaning: { fr: "(c’)est", en: "(it) is" }, note: null, isNew: false },
+      { form: "tutto", lemma: "tutto", meaning: { fr: "tout", en: "everything, all" }, note: { fr: "È tutto, grazie = c’est tout, merci.", en: "È tutto, grazie = that's all, thanks." }, isNew: true },
       { form: "grazie", lemma: "grazie", meaning: { fr: "merci", en: "thank you" }, note: null, isNew: false },
       { form: "quant'è", lemma: "quanto + essere", meaning: { fr: "ça fait combien", en: "how much is it" }, note: null, isNew: false },
       {
@@ -337,14 +338,14 @@ export const itA107Courses = {
       fr: [
         "Rappel du pluriel : -o → -i (il pomodoro, i pomodori), -a → -e (la bottiglia, le bottiglie), -e → -i, au masculin comme au féminin (il limone, i limoni).",
         "Les féminins en -ca font -che pour garder le son « k » : la pesca, le pesche. Ne changent pas : les mots en voyelle accentuée ou en consonne, et euro (due caffè, due euro).",
-        "L’adjectif s’accorde en genre et en nombre et se place souvent après le nom : pomodori freschi, pesche fresche, mele rosse. Les adjectifs en -e n’ont que deux formes : verde, verdi.",
+        "L’adjectif s’accorde en genre et en nombre et se place souvent après le nom : pomodori freschi, pesche fresche, mele rosse. Les adjectifs en -e n’ont que deux formes : dolce, dolci.",
         "Quantité + di + nom sans article : un chilo di pomodori, mezzo chilo di pesche, due etti di prosciutto (un etto = 100 g), una bottiglia di latte.",
         "Le prix « le kilo » se dit al chilo : due euro al chilo.",
       ].join("\n"),
       en: [
         "Plural reminder: -o → -i (il pomodoro, i pomodori), -a → -e (la bottiglia, le bottiglie), -e → -i, masculine or feminine (il limone, i limoni).",
         "Feminine nouns in -ca become -che to keep the \"k\" sound: la pesca, le pesche. Unchanged: words ending in a stressed vowel or a consonant, and euro (due caffè, due euro).",
-        "Adjectives agree in gender and number and often come after the noun: pomodori freschi, pesche fresche, mele rosse. Adjectives in -e have only two forms: verde, verdi.",
+        "Adjectives agree in gender and number and often come after the noun: pomodori freschi, pesche fresche, mele rosse. Adjectives in -e have only two forms: dolce, dolci.",
         "Quantity + di + noun with no article: un chilo di pomodori, mezzo chilo di pesche, due etti di prosciutto (un etto = 100 g), una bottiglia di latte.",
         "The price per kilo is al chilo: due euro al chilo.",
       ].join("\n"),
@@ -468,7 +469,7 @@ export const itA107Courses = {
     {
       id: "i11",
       kind: "listen_mcq",
-      prompt: { fr: "Écoute. Qu’est-ce qu’il demande ?", en: "Listen. What does he ask for?" },
+      prompt: { fr: "Écoute. Qu’est-ce qu’elle demande ?", en: "Listen. What does she ask for?" },
       options: [
         { id: "a", text: "mezzo chilo di mele e un litro di latte" },
         { id: "b", text: "un chilo di mele e un litro di latte" },
@@ -497,8 +498,20 @@ export const itA107Courses = {
       id: "i13",
       kind: "type",
       prompt: { fr: "Dans un magasin, écris en italien : « Ce sera tout, merci. »", en: "In a shop, write in Italian: \"That's all, thanks.\"" },
-      accept: ["Basta così, grazie", "Basta così grazie", "Grazie, basta così", "Sì, basta così, grazie"],
-      explain: { fr: "Basta così = ça suffit comme ça, c’est tout.", en: "Basta così = that's enough, that's all." },
+      accept: [
+        "Basta così, grazie",
+        "Grazie, basta così",
+        "Sì, basta così, grazie",
+        "No, basta così, grazie",
+        "No, grazie, basta così",
+        "Basta, grazie",
+        "È tutto, grazie",
+        "Grazie, è tutto",
+      ],
+      explain: {
+        fr: "Basta così = ça suffit comme ça, c’est tout. On dit aussi è tutto, grazie (c’est tout, merci).",
+        en: "Basta così = that's enough, that's all. You can also say è tutto, grazie (that's all, thanks).",
+      },
     },
     {
       id: "i14",
@@ -693,6 +706,6 @@ export const itA107Courses = {
       },
     ],
   },
-  aiReview: null,
-  status: "draft",
+  aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
+  status: "reviewed",
 } satisfies UnitSource;
