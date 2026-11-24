@@ -13,7 +13,7 @@ export const itA104Famille = {
   kind: "situation",
   title: { fr: "La famille", en: "The family" },
   situation: {
-    fr: "Chez Giulia, à Rome, Leo regarde une photo de sa famille. Puis c’est à lui de parler de la sienne.",
+    fr: "Chez Giulia, à Rome, Leo regarde une photo de la famille de Giulia. Puis c’est à lui de parler de la sienne.",
     en: "At Giulia's place in Rome, Leo looks at a photo of her family. Then it's his turn to talk about his.",
   },
   minutes: 30,
@@ -61,7 +61,6 @@ export const itA104Famille = {
       {
         id: "d5",
         speaker: "giulia",
-        // REVIEW: "il più piccolo" for "the youngest" (vs "il più giovane").
         text: "Sono i miei fratelli, Marco e Luca. Luca è il più piccolo.",
         translation: { fr: "Ce sont mes frères, Marco et Luca. Luca, c’est le plus jeune.", en: "They're my brothers, Marco and Luca. Luca is the youngest." },
         audio: null,
@@ -175,7 +174,7 @@ export const itA104Famille = {
       { form: "Paolo", lemma: "Paolo", meaning: { fr: "Paolo (prénom masculin)", en: "Paolo (male name)" }, note: null, isNew: false },
       { form: "e", lemma: "e", meaning: { fr: "et", en: "and" }, note: null, isNew: false },
       { form: "madre", lemma: "madre", meaning: { fr: "mère", en: "mother" }, note: null, isNew: true },
-      { form: "Lucia", lemma: "Lucia", meaning: { fr: "Lucia (prénom féminin)", en: "Lucia (female name)" }, note: { fr: "« loutchia ».", en: "\"loo-chee-ah\"." }, isNew: false },
+      { form: "Lucia", lemma: "Lucia", meaning: { fr: "Lucia (prénom féminin)", en: "Lucia (female name)" }, note: { fr: "« loutchìa » (accent sur le i).", en: "\"loo-CHEE-ah\" (stress on the i)." }, isNew: false },
       { form: "molto", lemma: "molto", meaning: { fr: "très", en: "very" }, note: null, isNew: true },
       {
         form: "simpatica",
@@ -218,8 +217,6 @@ export const itA104Famille = {
         isNew: true,
       },
       { form: "piccolo", lemma: "piccolo", meaning: { fr: "petit, jeune", en: "small, young" }, note: null, isNew: true },
-      // REVIEW: "mio fratello grande" is colloquial; "fratello maggiore / più grande" is more standard.
-      { form: "grande", lemma: "grande", meaning: { fr: "grand, aîné", en: "big, older" }, note: { fr: "Mio fratello grande = mon grand frère.", en: "Mio fratello grande = my older brother." }, isNew: true },
       {
         form: "ho",
         lemma: "avere",
@@ -260,13 +257,6 @@ export const itA104Famille = {
         note: { fr: "Faux ami : « mes parents » (père et mère) = i miei genitori.", en: "False friend for French speakers: \"mes parents\" (mother and father) = i miei genitori." },
         isNew: true,
       },
-      {
-        form: "bambini",
-        lemma: "bambino",
-        meaning: { fr: "enfants (petits)", en: "children (young)" },
-        note: { fr: "Un bambino, una bambina : un petit garçon, une petite fille.", en: "Un bambino, una bambina: a little boy, a little girl." },
-        isNew: true,
-      },
       { form: "di", lemma: "di", meaning: { fr: "de", en: "from, of" }, note: null, isNew: false },
       { form: "Parigi", lemma: "Parigi", meaning: { fr: "Paris", en: "Paris" }, note: null, isNew: false },
       { form: "sì", lemma: "sì", meaning: { fr: "oui", en: "yes" }, note: null, isNew: false },
@@ -298,7 +288,6 @@ export const itA104Famille = {
         isNew: true,
       },
       { form: "gatto", lemma: "gatto", meaning: { fr: "chat", en: "cat" }, note: null, isNew: true },
-      { form: "cane", lemma: "cane", meaning: { fr: "chien", en: "dog" }, note: null, isNew: true },
       { form: "o", lemma: "o", meaning: { fr: "ou", en: "or" }, note: null, isNew: false },
       {
         form: "città",
@@ -325,11 +314,6 @@ export const itA104Famille = {
         isNew: true,
       },
       { form: "papà", lemma: "papà", meaning: { fr: "papa", en: "dad" }, note: null, isNew: true },
-      { form: "noi", lemma: "noi", meaning: { fr: "nous", en: "we, us" }, note: null, isNew: true },
-      { form: "nostro", lemma: "nostro", meaning: { fr: "notre", en: "our" }, note: { fr: "Nostra madre, il nostro gatto.", en: "Nostra madre, il nostro gatto." }, isNew: true },
-      { form: "voi", lemma: "voi", meaning: { fr: "vous (à plusieurs)", en: "you (plural)" }, note: null, isNew: true },
-      { form: "vostro", lemma: "vostro", meaning: { fr: "votre (à plusieurs)", en: "your (plural)" }, note: null, isNew: true },
-      { form: "sposato", lemma: "sposato", meaning: { fr: "marié", en: "married" }, note: { fr: "Pour une femme : sposata.", en: "For a woman: sposata." }, isNew: true },
       { form: "Giulia", lemma: "Giulia", meaning: { fr: "Giulia (prénom féminin)", en: "Giulia (female name)" }, note: null, isNew: false },
       { form: "Roma", lemma: "Roma", meaning: { fr: "Rome", en: "Rome" }, note: null, isNew: false },
     ],
@@ -349,17 +333,19 @@ export const itA104Famille = {
     summary: {
       fr: [
         "Le possessif se met avec l’article : la mia famiglia, il suo ragazzo, i miei fratelli, le mie sorelle.",
-        "Il s’accorde avec ce qu’on possède, pas avec le possesseur : il suo ragazzo = son copain (celui de Camille) ; sua madre = sa mère, à lui ou à elle.",
-        "Piège : pas d’article devant un nom de parenté au singulier : mio padre, mia madre, tua sorella. Au pluriel, l’article revient : i miei fratelli, i tuoi genitori.",
+        "Comme en français, il s’accorde avec ce qu’on possède, pas avec le possesseur : il suo ragazzo = son copain (celui de Camille) ; sua madre = sa mère, à lui ou à elle.",
+        "Piège : pas d’article devant un nom de parenté au singulier : mio padre, mia madre, tua sorella. L’article revient au pluriel (i miei fratelli, i tuoi genitori) et devant un nom de parenté avec un adjectif (il mio fratello più piccolo). Avec mamma et papà, il est facultatif : la mia mamma ou mia mamma.",
         "Loro (leur) ne change jamais et garde toujours l’article, même pour la famille : il loro gatto, il loro padre.",
-        "Les formes : io → mio, mia, miei, mie ; tu → tuo, tua, tuoi, tue ; lui / lei → suo, sua, suoi, sue ; noi → nostro ; voi → vostro.",
+        "Les formes : io → mio, mia, miei, mie ; tu → tuo, tua, tuoi, tue ; lui / lei → suo, sua, suoi, sue ; noi → nostro, nostra, nostri, nostre ; voi → vostro, vostra, vostri, vostre ; loro → il loro, la loro, i loro, le loro.",
+        "Faux ami : i genitori = les parents (le père et la mère) ; i parenti = la famille au sens large (oncles, cousins…).",
       ].join("\n"),
       en: [
         "The possessive goes with the article: la mia famiglia, il suo ragazzo, i miei fratelli, le mie sorelle.",
-        "It agrees with what is owned, not with the owner: il suo ragazzo = her boyfriend (Camille's); sua madre = his or her mother.",
-        "Trap: no article before a singular family noun: mio padre, mia madre, tua sorella. In the plural the article comes back: i miei fratelli, i tuoi genitori.",
+        "As in French, it agrees with what is owned, not with the owner: il suo ragazzo = her boyfriend (Camille's); sua madre = his or her mother.",
+        "Trap: no article before a singular family noun: mio padre, mia madre, tua sorella. The article comes back in the plural (i miei fratelli, i tuoi genitori) and when the family noun has an adjective (il mio fratello più piccolo). With mamma and papà it's optional: la mia mamma or mia mamma.",
         "Loro (their) never changes and always keeps the article, even for family: il loro gatto, il loro padre.",
-        "The forms: io → mio, mia, miei, mie; tu → tuo, tua, tuoi, tue; lui / lei → suo, sua, suoi, sue; noi → nostro; voi → vostro.",
+        "The forms: io → mio, mia, miei, mie; tu → tuo, tua, tuoi, tue; lui / lei → suo, sua, suoi, sue; noi → nostro, nostra, nostri, nostre; voi → vostro, vostra, vostri, vostre; loro → il loro, la loro, i loro, le loro.",
+        "False friend for French speakers: i genitori = parents (mother and father); i parenti = relatives (uncles, cousins…).",
       ].join("\n"),
     },
     itemIds: ["i05", "i06", "i07"],
@@ -543,13 +529,16 @@ export const itA104Famille = {
       id: "i16",
       kind: "match",
       pairs: [
-        { left: "padre", right: { fr: "père", en: "father" } },
-        { left: "madre", right: { fr: "mère", en: "mother" } },
-        { left: "fratello", right: { fr: "frère", en: "brother" } },
-        { left: "sorella", right: { fr: "sœur", en: "sister" } },
         { left: "nonna", right: { fr: "grand-mère", en: "grandmother" } },
+        { left: "zio", right: { fr: "oncle", en: "uncle" } },
+        { left: "cugina", right: { fr: "cousine", en: "cousin (female)" } },
+        { left: "figlio", right: { fr: "fils", en: "son" } },
+        { left: "moglie", right: { fr: "femme, épouse", en: "wife" } },
       ],
-      explain: { fr: "Les mots de la famille.", en: "Family words." },
+      explain: {
+        fr: "Les mots de la famille. Au féminin : nonna, zia, cugina, figlia ; au masculin : nonno, zio, cugino, figlio.",
+        en: "Family words. Feminine: nonna, zia, cugina, figlia; masculine: nonno, zio, cugino, figlio.",
+      },
     },
     {
       id: "i17",
@@ -592,6 +581,34 @@ export const itA104Famille = {
       answer: "a",
       audio: null,
       explain: { fr: "Madre est féminin (tua) et nom de parenté au singulier (pas d’article).", en: "Madre is feminine (tua) and a singular family noun (no article)." },
+    },
+    {
+      id: "i23",
+      kind: "match",
+      pairs: [
+        { left: "marito", right: { fr: "mari", en: "husband" } },
+        { left: "mamma", right: { fr: "maman", en: "mum" } },
+        { left: "papà", right: { fr: "papa", en: "dad" } },
+        { left: "figlia", right: { fr: "fille (enfant)", en: "daughter" } },
+        { left: "zia", right: { fr: "tante", en: "aunt" } },
+      ],
+      explain: { fr: "Papà prend un accent sur le a final.", en: "Papà has an accent on the final a." },
+    },
+    {
+      id: "i24",
+      kind: "mcq",
+      prompt: { fr: "« Mes parents » (mon père et ma mère) se dit :", en: "\"My parents\" (my mother and father) is:" },
+      options: [
+        { id: "a", text: "i miei genitori" },
+        { id: "b", text: "i miei parenti" },
+        { id: "c", text: "i miei fratelli" },
+      ],
+      answer: "a",
+      audio: null,
+      explain: {
+        fr: "Faux ami : i genitori = le père et la mère ; i parenti = la famille au sens large (oncles, cousins…).",
+        en: "False friend for French speakers: i genitori = mother and father; i parenti = relatives (uncles, cousins…).",
+      },
     },
     // Lesson 3, conversation: the learner answers as Leo.
     {
@@ -640,7 +657,7 @@ export const itA104Famille = {
         { step: "grammar", itemIds: ["i05", "i06", "i07"], threshold: 0.5 },
         {
           step: "exercises",
-          itemIds: ["i08", "i09", "i10", "i11", "i12", "i13", "i14", "i15", "i16", "i17", "i18", "i19"],
+          itemIds: ["i08", "i09", "i10", "i11", "i12", "i13", "i14", "i15", "i16", "i17", "i18", "i19", "i23", "i24"],
           threshold: 0.6,
         },
       ],
@@ -718,6 +735,6 @@ export const itA104Famille = {
       },
     ],
   },
-  aiReview: null,
-  status: "draft",
+  aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
+  status: "reviewed",
 } satisfies UnitSource;

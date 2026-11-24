@@ -44,7 +44,6 @@ export const itA105OuEst = {
         audio: null,
       },
       {
-        // REVIEW: adverbial "è lontano?" (invariable) after "una farmacia"; "è lontana?" is also heard.
         id: "d3",
         speaker: "leo",
         text: "È lontano?",
@@ -173,8 +172,6 @@ export const itA105OuEst = {
         note: { fr: "Di + l' = dell' : la fermata dell'autobus = l’arrêt du bus.", en: "Di + l' = dell': la fermata dell'autobus = the bus stop." },
         isNew: true,
       },
-      { form: "della", lemma: "di + la", meaning: { fr: "de la", en: "of the" }, note: { fr: "Di + la = della.", en: "Di + la = della." }, isNew: true },
-      { form: "del", lemma: "di + il", meaning: { fr: "du", en: "of the" }, note: { fr: "Di + il = del.", en: "Di + il = del." }, isNew: true },
       { form: "nel", lemma: "in + il", meaning: { fr: "dans le", en: "in the" }, note: { fr: "In + il = nel : nel parco.", en: "In + il = nel: nel parco." }, isNew: true },
       { form: "nella", lemma: "in + la", meaning: { fr: "dans la", en: "in the" }, note: { fr: "In + la = nella.", en: "In + la = nella." }, isNew: true },
       {
@@ -184,7 +181,6 @@ export const itA105OuEst = {
         note: { fr: "Su + la = sulla : sulla destra = sur la droite.", en: "Su + la = sulla: sulla destra = on the right." },
         isNew: true,
       },
-      { form: "sul", lemma: "su + il", meaning: { fr: "sur le", en: "on the" }, note: { fr: "Su + il = sul.", en: "Su + il = sul." }, isNew: true },
       { form: "stazione", lemma: "stazione", meaning: { fr: "gare", en: "station" }, note: { fr: "Féminin : la stazione, alla stazione.", en: "Feminine: la stazione, alla stazione." }, isNew: true },
       { form: "è", lemma: "essere", meaning: { fr: "il est, elle est, c’est", en: "he is, she is, it is" }, note: null, isNew: false },
       {
@@ -257,7 +253,7 @@ export const itA105OuEst = {
         note: { fr: "Accanto a + lieu : accanto alla chiesa.", en: "Accanto a + place: accanto alla chiesa." },
         isNew: true,
       },
-      { form: "chiesa", lemma: "chiesa", meaning: { fr: "église", en: "church" }, note: { fr: "« kiéza ».", en: "\"kyeh-za\"." }, isNew: true },
+      { form: "chiesa", lemma: "chiesa", meaning: { fr: "église", en: "church" }, note: { fr: "« kiéza » (ou « kiéssa » dans le Centre et le Sud).", en: "\"kyeh-za\" (or \"kyeh-sa\" in central and southern Italy)." }, isNew: true },
       { form: "perfetto", lemma: "perfetto", meaning: { fr: "parfait", en: "perfect" }, note: null, isNew: true },
       { form: "mille", lemma: "mille", meaning: { fr: "mille", en: "a thousand" }, note: { fr: "Grazie mille = merci beaucoup.", en: "Grazie mille = thanks a lot." }, isNew: false },
       { form: "prego", lemma: "prego", meaning: { fr: "je vous en prie", en: "you're welcome" }, note: null, isNew: false },
@@ -303,14 +299,14 @@ export const itA105OuEst = {
       fr: [
         "« Il y a » : c'è devant un singulier (c'è una farmacia), ci sono devant un pluriel (ci sono due ristoranti). En question, même phrase avec le ton : c'è un bar qui vicino ?",
         "C'è… ? demande s’il en existe un ; dov'è… ? cherche un lieu précis : dov'è la stazione ?",
-        "A, di, in, su se soudent à l’article : a + il = al (davanti al bar), a + la = alla (vicino alla stazione), di + l' = dell' (la fermata dell'autobus), in + il = nel (nel parco), su + la = sulla (sulla destra).",
+        "A, di, in, su (et da) se soudent à l’article : a + il = al (davanti al bar), a + la = alla (vicino alla stazione), di + l' = dell' (la fermata dell'autobus), in + il = nel (nel parco), su + la = sulla (sulla destra). Da fait de même : da + il = dal.",
         "Vicino, davanti et accanto se construisent avec a : vicino alla stazione, davanti al bar, accanto alla chiesa.",
         "Sans article : a destra, a sinistra, a piedi, a Roma (a devant une ville) ; in via Cavour, in piazza.",
       ].join("\n"),
       en: [
         "\"There is / there are\": c'è before a singular (c'è una farmacia), ci sono before a plural (ci sono due ristoranti). As a question, same sentence with a rising tone: c'è un bar qui vicino?",
         "C'è…? asks whether there is one; dov'è…? looks for a specific place: dov'è la stazione?",
-        "A, di, in, su merge with the article: a + il = al (davanti al bar), a + la = alla (vicino alla stazione), di + l' = dell' (la fermata dell'autobus), in + il = nel (nel parco), su + la = sulla (sulla destra).",
+        "A, di, in, su (and da) merge with the article: a + il = al (davanti al bar), a + la = alla (vicino alla stazione), di + l' = dell' (la fermata dell'autobus), in + il = nel (nel parco), su + la = sulla (sulla destra). Da works the same way: da + il = dal.",
         "Vicino, davanti and accanto take a: vicino alla stazione, davanti al bar, accanto alla chiesa.",
         "No article: a destra, a sinistra, a piedi, a Roma (a before a city); in via Cavour, in piazza.",
       ].join("\n"),
@@ -506,19 +502,18 @@ export const itA105OuEst = {
       options: [
         { id: "a", text: "nel" },
         { id: "b", text: "nella" },
-        { id: "c", text: "al" },
+        { id: "c", text: "alla" },
       ],
       answer: "a",
       audio: null,
-      explain: { fr: "Dans le parc : in + il = nel. Parco est masculin.", en: "In the park: in + il = nel. Parco is masculine." },
+      explain: { fr: "Dans le parc : in + il = nel. Parco est masculin (nella, alla : féminin).", en: "In the park: in + il = nel. Parco is masculine (nella, alla: feminine)." },
     },
     {
       id: "i18",
       kind: "cloze",
       before: "Il museo è ",
       after: " destra.",
-      // REVIEW: "a destra" is just as natural; the hint (su + la) is what restricts the answer to sulla.
-      accept: ["sulla"],
+      accept: ["sulla", "a"],
       hint: { fr: "su + la", en: "su + la" },
       explain: { fr: "Su + la = sulla. Sulla destra = sur la droite (on dit aussi a destra).", en: "Su + la = sulla. Sulla destra = on the right (a destra works too)." },
     },
@@ -534,6 +529,18 @@ export const itA105OuEst = {
       answer: "a",
       audio: null,
       explain: { fr: "È lontano ? = C’est loin ?", en: "È lontano? = Is it far?" },
+    },
+    {
+      id: "i24",
+      kind: "match",
+      pairs: [
+        { left: "il supermercato", right: { fr: "le supermarché", en: "the supermarket" } },
+        { left: "l'ospedale", right: { fr: "l’hôpital", en: "the hospital" } },
+        { left: "in centro", right: { fr: "en ville, au centre", en: "in town, downtown" } },
+        { left: "la banca", right: { fr: "la banque", en: "the bank" } },
+        { left: "il museo", right: { fr: "le musée", en: "the museum" } },
+      ],
+      explain: { fr: "In centro, sans article : en ville.", en: "In centro, no article: in town." },
     },
     // Lesson 3, conversation: the learner answers as Leo.
     {
@@ -595,7 +602,7 @@ export const itA105OuEst = {
         { step: "grammar", itemIds: ["i05", "i06", "i07"], threshold: 0.5 },
         {
           step: "exercises",
-          itemIds: ["i08", "i09", "i10", "i11", "i12", "i13", "i14", "i15", "i16", "i17", "i18", "i19"],
+          itemIds: ["i08", "i09", "i10", "i11", "i12", "i13", "i14", "i15", "i16", "i17", "i18", "i19", "i24"],
           threshold: 0.6,
         },
       ],
@@ -681,6 +688,6 @@ export const itA105OuEst = {
       },
     ],
   },
-  aiReview: null,
-  status: "draft",
+  aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
+  status: "reviewed",
 } satisfies UnitSource;

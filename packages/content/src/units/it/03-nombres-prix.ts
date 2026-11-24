@@ -41,7 +41,6 @@ export const itA103NombresPrix = {
       {
         id: "d2",
         speaker: "leo",
-        // REVIEW: "un biglietto dell'autobus" is perhaps more frequent; "per l'autobus" avoids the articulated preposition (unit 5).
         text: "Buongiorno! Quanto costa un biglietto per l'autobus?",
         translation: { fr: "Bonjour ! Combien coûte un ticket de bus ?", en: "Good morning! How much is a bus ticket?" },
         audio: null,
@@ -77,7 +76,7 @@ export const itA103NombresPrix = {
       {
         id: "d7",
         speaker: "rita",
-        // REVIEW: 1.30 € per stamp is assumed for a postcard to France (2 × 1.50 + 4 × 0.50 + 4 × 1.30 = 10.20); check the current rate.
+        // Illustrative prices, not an official tariff: 2 × 1.50 + 4 × 0.50 + 4 × 1.30 = 10.20.
         text: "Ecco i biglietti, le cartoline e i francobolli. Sono dieci euro e venti.",
         translation: { fr: "Voici les tickets, les cartes postales et les timbres. Ça fait dix euros vingt.", en: "Here are the tickets, the postcards and the stamps. That's ten euros twenty." },
         audio: null,
@@ -131,6 +130,13 @@ export const itA103NombresPrix = {
         lemma: "costare",
         meaning: { fr: "coûte", en: "costs" },
         note: { fr: "Un seul objet : quanto costa ? Plusieurs : quanto costano ?", en: "One thing: quanto costa? Several: quanto costano?" },
+        isNew: true,
+      },
+      {
+        form: "fa",
+        lemma: "fare",
+        meaning: { fr: "fait", en: "makes" },
+        note: { fr: "Quanto fa ? = Ça fait combien ? (comme quant'è ?).", en: "Quanto fa? = How much is it? (like quant'è?)." },
         isNew: true,
       },
       { form: "costano", lemma: "costare", meaning: { fr: "coûtent", en: "cost (plural)" }, note: null, isNew: false },
@@ -224,21 +230,21 @@ export const itA103NombresPrix = {
         lemma: "il",
         meaning: { fr: "les (masculin)", en: "the (masculine plural)" },
         note: { fr: "Pluriel de il : il biglietto, i biglietti.", en: "Plural of il: il biglietto, i biglietti." },
-        isNew: true,
+        isNew: false,
       },
       {
         form: "gli",
         lemma: "il",
         meaning: { fr: "les (masculin)", en: "the (masculine plural)" },
         note: { fr: "Pluriel de lo et de l' masculin : gli scontrini, gli amici.", en: "Plural of lo and masculine l': gli scontrini, gli amici." },
-        isNew: true,
+        isNew: false,
       },
       {
         form: "le",
         lemma: "il",
         meaning: { fr: "les (féminin)", en: "the (feminine plural)" },
         note: { fr: "Pluriel de la et de l' féminin : le cartoline, le amiche.", en: "Plural of la and feminine l': le cartoline, le amiche." },
-        isNew: true,
+        isNew: false,
       },
       { form: "il", lemma: "il", meaning: { fr: "le (article)", en: "the" }, note: null, isNew: false },
       {
@@ -341,17 +347,19 @@ export const itA103NombresPrix = {
     summary: {
       fr: [
         "Les noms en -o (souvent masculins) font -i au pluriel : il biglietto, i biglietti ; il francobollo, i francobolli.",
-        "Les noms en -a (souvent féminins) font -e : la cartolina, le cartoline. Les noms en -e, masculins ou féminins, font -i : il giornale, i giornali.",
+        "Les noms féminins en -a font -e : la cartolina, le cartoline. Les noms en -e, masculins ou féminins, font -i : il giornale, i giornali.",
         "Ne changent pas : les mots qui finissent par une voyelle accentuée ou par une consonne (un caffè, due caffè ; un autobus, due autobus), et euro (un euro, venti euro).",
         "Les féminins en -ca font -che pour garder le son « k » : l'amica, le amiche. Au masculin, c’est variable : l'amico, gli amici.",
         "L’article passe aussi au pluriel : il → i (i biglietti), lo et l' masculin → gli (gli amici), la et l' féminin → le (le cartoline).",
+        "Les nombres : 0 zero, 1 uno, 2 due, 3 tre, 4 quattro, 5 cinque, 6 sei, 7 sette, 8 otto, 9 nove, 10 dieci ; 20 venti, 30 trenta, 40 quaranta, 50 cinquanta, 60 sessanta, 70 settanta, 80 ottanta, 90 novanta, 100 cento.",
       ].join("\n"),
       en: [
         "Nouns in -o (mostly masculine) take -i in the plural: il biglietto, i biglietti; il francobollo, i francobolli.",
-        "Nouns in -a (mostly feminine) take -e: la cartolina, le cartoline. Nouns in -e, masculine or feminine, take -i: il giornale, i giornali.",
+        "Feminine nouns in -a take -e: la cartolina, le cartoline. Nouns in -e, masculine or feminine, take -i: il giornale, i giornali.",
         "No change: words ending in a stressed vowel or a consonant (un caffè, due caffè; un autobus, due autobus), and euro (un euro, venti euro).",
         "Feminine nouns in -ca take -che to keep the hard \"k\" sound: l'amica, le amiche. In the masculine it varies: l'amico, gli amici.",
         "The article goes plural too: il → i (i biglietti), lo and masculine l' → gli (gli amici), la and feminine l' → le (le cartoline).",
+        "Numbers: 0 zero, 1 uno, 2 due, 3 tre, 4 quattro, 5 cinque, 6 sei, 7 sette, 8 otto, 9 nove, 10 dieci; 20 venti, 30 trenta, 40 quaranta, 50 cinquanta, 60 sessanta, 70 settanta, 80 ottanta, 90 novanta, 100 cento.",
       ].join("\n"),
     },
     itemIds: ["i05", "i06", "i07"],
@@ -513,8 +521,8 @@ export const itA103NombresPrix = {
       id: "i14",
       kind: "type",
       prompt: { fr: "À la caisse, écris en italien : « Ça fait combien ? »", en: "At the till, write in Italian: \"How much is it?\"" },
-      accept: ["Quant'è", "Quanto è", "Quanto costa"],
-      explain: { fr: "Quant'è ? (quanto + è). Quanto costa ? est juste aussi.", en: "Quant'è? (quanto + è). Quanto costa? is right too." },
+      accept: ["Quant'è", "Quanto è", "Quanto costa", "Quanto fa"],
+      explain: { fr: "Quant'è ? (quanto + è). Quanto costa ? et quanto fa ? sont justes aussi.", en: "Quant'è? (quanto + è). Quanto costa? and quanto fa? are right too." },
     },
     {
       id: "i15",
@@ -533,8 +541,12 @@ export const itA103NombresPrix = {
         { left: "le cartoline", right: { fr: "les cartes postales", en: "the postcards" } },
         { left: "i francobolli", right: { fr: "les timbres", en: "the stamps" } },
         { left: "i giornali", right: { fr: "les journaux", en: "the newspapers" } },
+        { left: "gli amici", right: { fr: "les amis", en: "the friends" } },
       ],
-      explain: { fr: "I devant un masculin pluriel, le devant un féminin pluriel.", en: "I before a masculine plural, le before a feminine plural." },
+      explain: {
+        fr: "I devant un masculin pluriel, gli devant un masculin pluriel qui commence par une voyelle (ou s + consonne, z), le devant un féminin pluriel.",
+        en: "I before a masculine plural, gli before a masculine plural starting with a vowel (or s + consonant, z), le before a feminine plural.",
+      },
     },
     {
       id: "i17",
@@ -574,6 +586,30 @@ export const itA103NombresPrix = {
       answer: "a",
       audio: null,
       explain: { fr: "Posso pagare con la carta ? = Je peux payer par carte ?", en: "Posso pagare con la carta? = Can I pay by card?" },
+    },
+    {
+      id: "i24",
+      kind: "match",
+      pairs: [
+        { left: "zero", right: { fr: "0", en: "0" } },
+        { left: "sei", right: { fr: "6", en: "6" } },
+        { left: "otto", right: { fr: "8", en: "8" } },
+        { left: "trenta", right: { fr: "30", en: "30" } },
+        { left: "cento", right: { fr: "100", en: "100" } },
+      ],
+      explain: { fr: "Zero (0), sei (6), otto (8), trenta (30) et cento (100).", en: "Zero (0), sei (6), otto (8), trenta (30) and cento (100)." },
+    },
+    {
+      id: "i25",
+      kind: "match",
+      pairs: [
+        { left: "quaranta", right: { fr: "40", en: "40" } },
+        { left: "cinquanta", right: { fr: "50", en: "50" } },
+        { left: "sessanta", right: { fr: "60", en: "60" } },
+        { left: "ottanta", right: { fr: "80", en: "80" } },
+        { left: "novanta", right: { fr: "90", en: "90" } },
+      ],
+      explain: { fr: "Les dizaines finissent par -anta (sauf venti et trenta) : quaranta, cinquanta, sessanta, ottanta, novanta.", en: "The tens end in -anta (except venti and trenta): quaranta, cinquanta, sessanta, ottanta, novanta." },
     },
     // Lesson 3, conversation: the learner answers as Leo.
     {
@@ -635,7 +671,7 @@ export const itA103NombresPrix = {
         { step: "grammar", itemIds: ["i05", "i06", "i07"], threshold: 0.5 },
         {
           step: "exercises",
-          itemIds: ["i08", "i09", "i10", "i11", "i12", "i13", "i14", "i15", "i16", "i17", "i18", "i19"],
+          itemIds: ["i08", "i09", "i10", "i11", "i12", "i13", "i14", "i15", "i16", "i17", "i18", "i19", "i24", "i25"],
           threshold: 0.6,
         },
       ],
@@ -721,6 +757,6 @@ export const itA103NombresPrix = {
       },
     ],
   },
-  aiReview: null,
-  status: "draft",
+  aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
+  status: "reviewed",
 } satisfies UnitSource;

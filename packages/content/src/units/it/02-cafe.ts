@@ -30,7 +30,6 @@ export const itA102Cafe = {
     ],
     lines: [
       {
-        // REVIEW: many baristas say tu to a young customer (cosa prendi?); Lei kept as the safe default for a learner.
         id: "d1",
         speaker: "sara",
         text: "Buongiorno! Cosa prende?",
@@ -68,7 +67,6 @@ export const itA102Cafe = {
       {
         id: "d6",
         speaker: "leo",
-        // REVIEW: sugar sachets are usually on the counter; asking for it is plausible but check it sounds natural.
         text: "Naturale. E lo zucchero, dov'è?",
         translation: { fr: "Plate. Et le sucre, il est où ?", en: "Still. And the sugar, where is it?" },
         audio: null,
@@ -140,21 +138,21 @@ export const itA102Cafe = {
         lemma: "uno",
         meaning: { fr: "un (article)", en: "a, an" },
         note: { fr: "Masculin, devant s + consonne ou z : uno scontrino.", en: "Masculine, before s + consonant or z: uno scontrino." },
-        isNew: true,
+        isNew: false,
       },
       {
         form: "una",
         lemma: "uno",
         meaning: { fr: "une (article)", en: "a, an (feminine)" },
         note: { fr: "Féminin : una spremuta.", en: "Feminine: una spremuta." },
-        isNew: true,
+        isNew: false,
       },
       {
         form: "un'",
         lemma: "uno",
         meaning: { fr: "une (devant une voyelle)", en: "a, an (feminine, before a vowel)" },
         note: { fr: "Féminin seulement : un'acqua, un'amica. Au masculin, pas d’apostrophe : un amico.", en: "Feminine only: un'acqua, un'amica. Masculine has no apostrophe: un amico." },
-        isNew: true,
+        isNew: false,
       },
       {
         form: "caffè",
@@ -171,7 +169,6 @@ export const itA102Cafe = {
         form: "cornetto",
         lemma: "cornetto",
         meaning: { fr: "croissant", en: "croissant" },
-        // REVIEW: regional split cornetto (centre/south) / brioche (north) stated broadly.
         note: { fr: "Masculin. Dans le Nord, on dit plutôt brioche.", en: "Masculine. In the North, people often say brioche." },
         isNew: true,
       },
@@ -202,21 +199,21 @@ export const itA102Cafe = {
         lemma: "il",
         meaning: { fr: "le (article)", en: "the" },
         note: { fr: "Masculin, devant s + consonne ou z : lo zucchero, lo scontrino.", en: "Masculine, before s + consonant or z: lo zucchero, lo scontrino." },
-        isNew: true,
+        isNew: false,
       },
       {
         form: "la",
         lemma: "il",
         meaning: { fr: "la (article)", en: "the (feminine)" },
         note: { fr: "Féminin, devant une consonne : la spremuta.", en: "Feminine, before a consonant: la spremuta." },
-        isNew: true,
+        isNew: false,
       },
       {
         form: "l'",
         lemma: "il",
         meaning: { fr: "le, la (devant une voyelle)", en: "the (before a vowel)" },
         note: { fr: "Masculin et féminin : l'amico, l'acqua.", en: "Masculine and feminine: l'amico, l'acqua." },
-        isNew: true,
+        isNew: false,
       },
       {
         form: "altro",
@@ -247,14 +244,17 @@ export const itA102Cafe = {
         form: "frizzante",
         lemma: "frizzante",
         meaning: { fr: "gazeuse, pétillante", en: "sparkling, fizzy" },
-        note: { fr: "zz se prononce « dz » : « fridzannté ».", en: "zz sounds like \"dz\": \"freed-zahn-teh\"." },
+        note: { fr: "zz se prononce « ts » : « fritsannté ».", en: "zz sounds like \"ts\": \"freet-tsahn-teh\"." },
         isNew: true,
       },
       {
         form: "zucchero",
         lemma: "zucchero",
         meaning: { fr: "sucre", en: "sugar" },
-        note: { fr: "Masculin, commence par z : lo zucchero. cch se prononce « k » : « tsoukkéro ».", en: "Masculine, starts with z: lo zucchero. cch sounds like k: \"tsook-keh-ro\"." },
+        note: {
+          fr: "Masculin, commence par z : lo zucchero. Le z se prononce « dz » (« ts » à Rome), cch se prononce « kk » : « dzoukkéro ».",
+          en: "Masculine, starts with z: lo zucchero. The z sounds like \"dz\" (\"ts\" in Rome), cch like a long k: \"dzook-keh-ro\".",
+        },
         isNew: true,
       },
       {
@@ -310,8 +310,6 @@ export const itA102Cafe = {
         note: { fr: "Un caffè macchiato, ou un macchiato.", en: "Un caffè macchiato, or just un macchiato." },
         isNew: true,
       },
-      { form: "tè", lemma: "tè", meaning: { fr: "thé", en: "tea" }, note: { fr: "Masculin : un tè, il tè.", en: "Masculine: un tè, il tè." }, isNew: true },
-      { form: "latte", lemma: "latte", meaning: { fr: "lait", en: "milk" }, note: { fr: "Masculin : il latte.", en: "Masculine: il latte." }, isNew: true },
       {
         form: "spremuta",
         lemma: "spremuta",
@@ -357,13 +355,6 @@ export const itA102Cafe = {
         note: { fr: "En Italie, le bar est l’endroit où l’on prend le café et le cornetto du matin.", en: "In Italy, the bar is where you have your morning coffee and cornetto." },
         isNew: true,
       },
-      {
-        form: "certo",
-        lemma: "certo",
-        meaning: { fr: "bien sûr", en: "sure, of course" },
-        note: null,
-        isNew: true,
-      },
       { form: "subito", lemma: "subito", meaning: { fr: "tout de suite", en: "right away" }, note: null, isNew: true },
       { form: "Leo", lemma: "Leo", meaning: { fr: "Leo (prénom masculin)", en: "Leo (male name)" }, note: null, isNew: false },
       { form: "Giulia", lemma: "Giulia", meaning: { fr: "Giulia (prénom féminin)", en: "Giulia (female name)" }, note: null, isNew: false },
@@ -386,16 +377,16 @@ export const itA102Cafe = {
     summary: {
       fr: [
         "L’article s’accorde avec le nom et change selon la première lettre du mot qui suit.",
-        "Le (défini), masculin : il devant une consonne (il caffè, il cornetto), lo devant s + consonne ou z (lo scontrino, lo zucchero), l' devant une voyelle (l'amico). Féminin : la (la spremuta), l' devant une voyelle (l'acqua).",
+        "Le (défini), masculin : il devant une consonne (il caffè, il cornetto), lo devant s + consonne ou z, et aussi devant gn, ps, y (lo scontrino, lo zucchero), l' devant une voyelle (l'amico). Féminin : la (la spremuta), l' devant une voyelle (l'acqua).",
         "Un (indéfini) : un (un caffè, un amico), uno là où on dit lo (uno scontrino), una (una spremuta), et un' devant une voyelle, au féminin seulement : un'acqua, un'amica, mais un amico, sans apostrophe.",
-        "Le genre suit souvent la finale : -o masculin (il cornetto), -a féminin (la spremuta). Caffè et tè sont masculins.",
+        "Le genre suit souvent la finale : -o masculin (il cornetto), -a féminin (la spremuta). Caffè et tè (le thé) sont masculins.",
         "Au pluriel, il devient i, lo et l' (masculin) deviennent gli, la et l' (féminin) deviennent le : ce sera pour l’unité suivante.",
       ].join("\n"),
       en: [
         "The article agrees with the noun and changes with the first letter of the word that follows.",
-        "The (definite), masculine: il before a consonant (il caffè, il cornetto), lo before s + consonant or z (lo scontrino, lo zucchero), l' before a vowel (l'amico). Feminine: la (la spremuta), l' before a vowel (l'acqua).",
+        "The (definite), masculine: il before a consonant (il caffè, il cornetto), lo before s + consonant or z, and also before gn, ps, y (lo scontrino, lo zucchero), l' before a vowel (l'amico). Feminine: la (la spremuta), l' before a vowel (l'acqua).",
         "A (indefinite): un (un caffè, un amico), uno where you'd say lo (uno scontrino), una (una spremuta), and un' before a vowel, in the feminine only: un'acqua, un'amica, but un amico, with no apostrophe.",
-        "The gender often shows in the ending: -o masculine (il cornetto), -a feminine (la spremuta). Caffè and tè are masculine.",
+        "The gender often shows in the ending: -o masculine (il cornetto), -a feminine (la spremuta). Caffè and tè (tea) are masculine.",
         "In the plural, il becomes i, lo and masculine l' become gli, la and feminine l' become le: that's for the next unit.",
       ].join("\n"),
     },
@@ -556,14 +547,14 @@ export const itA102Cafe = {
       id: "i13",
       kind: "type",
       prompt: { fr: "Écris en italien : « Merci beaucoup ! »", en: "Write in Italian: \"Thanks a lot!\"" },
-      accept: ["Grazie mille"],
-      explain: { fr: "Grazie mille, mot à mot « mille mercis ».", en: "Grazie mille, literally \"a thousand thanks\"." },
+      accept: ["Grazie mille", "Mille grazie"],
+      explain: { fr: "Grazie mille, mot à mot « mille mercis ». Mille grazie se dit aussi.", en: "Grazie mille, literally \"a thousand thanks\". Mille grazie works too." },
     },
     {
       id: "i14",
       kind: "type",
       prompt: { fr: "Au bar, écris en italien : « Un café, s’il vous plaît. »", en: "In a bar, write in Italian: \"A coffee, please.\"" },
-      accept: ["Un caffè, per favore", "Un caffè per favore", "Per favore, un caffè", "Vorrei un caffè, per favore", "Vorrei un caffè per favore"],
+      accept: ["Un caffè, per favore", "Un caffè per favore", "Per favore, un caffè", "Vorrei un caffè, per favore", "Vorrei un caffè per favore", "Prendo un caffè, per favore", "Prendo un caffè per favore"],
       explain: {
         fr: "Un caffè, per favore. Caffè prend un accent sur le e final.",
         en: "Un caffè, per favore. Caffè has an accent on the final e.",
@@ -761,6 +752,6 @@ export const itA102Cafe = {
       },
     ],
   },
-  aiReview: null,
-  status: "draft",
+  aiReview: { reviewedOn: "2026-11-24", passes: 2, arbiter: "arbitre-relecture" },
+  status: "reviewed",
 } satisfies UnitSource;
