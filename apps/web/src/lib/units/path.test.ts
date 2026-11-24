@@ -4,7 +4,8 @@ import { buildPath, hasPath, isPathLevel, minutesLeft, warmupDue } from "./path"
 import type { UnitProgressView } from "./progress";
 import { BILAN_ID, testBilan } from "./test-bilan";
 
-const units = unitsFor("it");
+// The situation units only: the bilan, last of the path, has its own zone heading (tested with `test-bilan`).
+const units = unitsFor("it").filter((unit) => unit.kind !== "assessment");
 const [first] = units;
 const view = (patch: Partial<UnitProgressView> = {}): UnitProgressView => ({ steps: {}, bestScore: null, testAttempts: 0, passedAt: null, ...patch });
 const fr = { locale: "fr" as const };

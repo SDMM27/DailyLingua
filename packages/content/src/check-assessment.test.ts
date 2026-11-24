@@ -39,6 +39,18 @@ describe("checkUnit on a bilan", () => {
     expect(codesOf(resolved, { ...options, units })).toEqual(["draw_not_in_test"]);
   });
 
+  it("flags a draw whose rewritten id would not fit an event's 40-character itemId", () => {
+    const { resolved, options } = setup();
+    const [first, ...rest] = resolved.draws as [UnitDraw, ...UnitDraw[]];
+    const long = "i".repeat(38);
+    const units = withUnit(options.units ?? {}, first.unit, (unit) => ({
+      ...unit,
+      items: unit.items.map((item) => (item.id === first.item ? { ...item, id: long } : item)),
+      test: { ...unit.test, itemIds: unit.test.itemIds.map((id) => (id === first.item ? long : id)) },
+    }));
+    expect(codesOf({ ...resolved, draws: [{ ...first, item: long }, ...rest] }, { ...options, units })).toContain("bad_id");
+  });
+
   it("flags the same draw twice", () => {
     const { resolved, options } = setup();
     const [first, , ...rest] = resolved.draws as [UnitDraw, UnitDraw, ...UnitDraw[]];

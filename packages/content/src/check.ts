@@ -304,6 +304,8 @@ function checkAssessment(unit: Extract<CheckableUnit, { kind: "assessment" }>, o
     if (source.kind !== "situation") add("draw_source", `${label}: ${draw.unit} is a ${source.kind} unit, only situation units can be drawn from`);
     if (source.language !== unit.language) add("draw_source", `${label}: ${draw.unit} is not a "${unit.language}" unit`);
     if (source.order >= unit.order) add("draw_source", `${label}: ${draw.unit} (order ${source.order}) does not come before the bilan (order ${unit.order})`);
+    // The rewritten id (`<nn>-<itemId>`) must still fit the 40 characters of an event's itemId.
+    if (`${unitNumber(draw.unit)}-${draw.item}`.length > 40) add("bad_id", `${label}: the rewritten item id is longer than 40 characters`);
     if (!source.test.itemIds.includes(draw.item)) add("draw_not_in_test", `${label}: the item is not in the test of ${draw.unit}`);
     if ((STATUS_RANK[source.status] ?? 0) < (STATUS_RANK[unit.status ?? "draft"] ?? 0)) {
       add("draw_status", `${label}: ${draw.unit} is ${source.status}, the bilan is ${unit.status ?? "draft"}`);
