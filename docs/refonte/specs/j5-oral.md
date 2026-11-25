@@ -28,7 +28,11 @@ Le propriétaire a demandé d'enchaîner les jalons sans être consulté ; ces c
 6. **Jeu de rôle : scénarios curés** dans `@dailylingua/content` (situation, rôle de l'IA, 3 objectifs, en fr et en), joués dans la langue cible au niveau de l'apprenant ; **1 partie par jour** (quota `roleplay` existant, 1/jour), 8 tours de l'apprenant au plus, chaque tour sous un quota technique `roleplay_turn` (10/jour). Nouvelle règle **`roleplay.completed` = 15 XP, volet output, 1/jour**, accordée par le serveur au bilan si l'apprenant a écrit au moins 3 tours, au moins le seuil de mots de son niveau en tout, et que la langue détectée est la langue cible. Le jeu de rôle **vocal** = même partie, saisie par la reconnaissance de l'appareil et répliques lues par la voix de l'appareil : aucun coût en plus, donc livré avec l'écrit.
 7. **Volets** : répétition → fluidité ; dictée → input (écoute) ; jeu de rôle → output.
 8. **Confidentialité** : à la première utilisation du micro, une phrase dit que la reconnaissance passe par le service vocal du téléphone (Apple ou Google selon l'appareil) et que DailyLingua ne reçoit que le texte. La page de confidentialité est mise à jour dans la PR 2.
-9. **Maquettes** : variante choisie par l'orchestrateur, la plus proche de `e-direction-artistique.md` (noté dans la PR 1).
+9. **Maquettes** : deux variantes (`designer`) ; retenue **A « Le pupitre »** (<https://claude.ai/artifact/FM8FuSqYsDVYofpULbu5hQ>), prolongement du lecteur d'unité, la plus proche de `e-direction-artistique.md` (registre d'atelier réservé aux succès, feuille calme à double filet, un exercice et un pied d'action). La variante B « L'épreuve » (marques de correcteur) n'est pas retenue ; sa notation au caret pourra entrer dans la feuille de A plus tard.
+10. **Nom** : « À voix haute » au lieu d'« Atelier oral », pour ne pas confondre avec l'étape « Atelier » de la séance.
+11. **Sans reconnaissance**, la répétition est « répète et juge-toi » sans enregistrement local (pas de MediaRecorder au jalon 5) ; la réécoute de soi côte à côte viendra avec Azure.
+12. **Mode « Dire »** : pas de retouche de la transcription (elle masquerait le signal de la décision 2) ; « Recommencer » seulement. Le micro reprend la couleur `accent`, jamais celle de la langue.
+13. **Bilan du jeu de rôle** : titre « Partie terminée » (pas de titre par scénario) ; les erreurs du jeu de rôle ne deviennent pas des cartes au jalon 5.
 
 ## 3. Découpage en PR (vers `dev`)
 
