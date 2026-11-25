@@ -588,6 +588,7 @@
       "heard": "Your phone understood: “{text}”",
       "missing": "not heard",
       "substituted": "heard differently",
+      "near": "close: one letter off, check the ending",
       "restart": "Start over",
       "retry": "Try again",
       "skip": "Move on",

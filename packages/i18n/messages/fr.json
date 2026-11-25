@@ -588,6 +588,7 @@
       "heard": "Ton téléphone a compris : « {text} »",
       "missing": "pas entendu",
       "substituted": "entendu autrement",
+      "near": "presque : une lettre d’écart, vérifie la terminaison",
       "restart": "Recommencer",
       "retry": "Réessayer",
       "skip": "Passer à la suite",

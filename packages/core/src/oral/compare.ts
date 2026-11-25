@@ -9,6 +9,8 @@ export interface OralToken {
   /** The model's word for `ok`, `missing` and `wrong`; the word of the transcript for `extra`. */
   text: string;
   status: OralStatus;
+  /** An `ok` word the device heard one letter off (a near match): right for the XP, never for a perfect score. */
+  near?: true;
 }
 
 export interface SpokenComparison {
@@ -105,20 +107,22 @@ function align<T>(model: readonly T[], spoken: readonly T[], same: (a: T, b: T) 
 
 /**
  * Compares what the device heard with the model sentence, word by word (`j5-pr1-atelier-oral.md` §2). Pure. A word one
- * letter off (five letters or more) counts right. The ratio is the right words over the longer of the two sentences, and
+ * letter off (five letters or more) counts right but marks the token `near` and keeps the ratio under 1. The ratio is the right words over the longer of the two sentences, and
  * is never 1 for a sentence that is not exactly the model's words.
  */
 export function compareSpoken(language: string, model: string, transcript: string): SpokenComparison {
   const expected = wordsOf(language, model);
   const heard = wordsOf(language, transcript);
-  const tokens: OralToken[] = align(expected, heard, sameWord).map((step) => ({
-    text: (step.op === "extra" ? heard[step.spoken as number] : expected[step.model as number]) as string,
-    status: step.op,
-  }));
+  const tokens: OralToken[] = align(expected, heard, sameWord).map((step) => {
+    const text = (step.op === "extra" ? heard[step.spoken as number] : expected[step.model as number]) as string;
+    const near = step.op === "ok" && heard[step.spoken as number] !== text;
+    return near ? { text, status: step.op, near: true } : { text, status: step.op };
+  });
   const right = tokens.filter((token) => token.status === "ok").length;
   const longest = Math.max(expected.length, heard.length);
   if (longest === 0) return { ratio: 0, tokens };
-  if (right === longest) return { ratio: 1, tokens };
+  // A near match ("stanco" for "stanca") may be an agreement error: it counts, but the sentence is not perfect.
+  if (right === longest && !tokens.some((token) => token.near)) return { ratio: 1, tokens };
   // Never a perfect score for a sentence that is not exactly right, whatever the rounding.
   return { ratio: Math.min(Math.round((right / longest) * 100) / 100, 0.99), tokens };
 }

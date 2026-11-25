@@ -25,10 +25,15 @@ describe("compareSpoken", () => {
     expect(result.ratio).toBe(0.67);
   });
 
-  it("accepts a word of five letters or more spelled one letter off, never a shorter one", () => {
-    expect(compareSpoken("it", "Sono stanca", "sono stanco").ratio).toBe(1);
-    expect(compareSpoken("it", "Arrivederci", "arrivedeci").ratio).toBe(1);
-    expect(compareSpoken("it", "Arrivederci", "arrivederchi").ratio).toBe(1);
+  it("accepts a word of five letters or more spelled one letter off, never a shorter one, and never as a perfect score", () => {
+    const agreement = compareSpoken("it", "Sono stanca", "sono stanco");
+    expect(agreement.ratio).toBe(0.99);
+    expect(agreement.tokens.map((token) => token.status)).toEqual(["ok", "ok"]);
+    expect(agreement.tokens[1]?.near).toBe(true);
+    expect(agreement.tokens[0]?.near).toBeUndefined();
+    expect(compareSpoken("it", "Arrivederci", "arrivedeci").ratio).toBe(0.99);
+    expect(compareSpoken("it", "Arrivederci", "arrivederchi").ratio).toBe(0.99);
+    expect(compareSpoken("it", "Arrivederci", "arrivederci").ratio).toBe(1);
     expect(compareSpoken("it", "Arrivederci", "arrivedeccci").ratio).toBe(0);
     expect(compareSpoken("it", "Il pane", "il pone").tokens[1]?.status).toBe("wrong");
     expect(compareSpoken("it", "Vino rosso", "vini rosso").ratio).toBe(0.5);
