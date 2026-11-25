@@ -9,7 +9,7 @@ export interface OralToken {
   /** The model's word for `ok`, `missing` and `wrong`; the word of the transcript for `extra`. */
   text: string;
   status: OralStatus;
-  /** An \`ok\` word the device heard one letter off (a near match): right for the XP, never for a perfect score. */
+  /** An `ok` word the device heard one letter off (a near match): right for the XP, never for a perfect score. */
   near?: true;
 }
 
