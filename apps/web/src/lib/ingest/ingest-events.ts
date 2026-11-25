@@ -16,7 +16,7 @@ import { ingestBatchPayloadSchema, ingestMemoSchema, rejectionReasons, type Deli
 import { filterReviewModes } from "./card-keys";
 import { buildIngestState } from "./build-state";
 import { buildNextMemo } from "./next-memo";
-import { extractRefs } from "./refs";
+import { extractRefs, extractSentenceIds } from "./refs";
 import type { CheckRewrites } from "./rewrite-checks";
 
 /**
@@ -151,7 +151,8 @@ async function processOnce(store: IngestStore, userId: string, events: readonly 
   const rows = await store.readRows(userId, refs, windowOf(now), now);
   const previousMemo = memoOf(rows.ingestState.memo, log, userId);
   const serverDay = learningDay(now, rows.profile.timeZone);
-  const { state, cardModes, skippedSessions } = buildIngestState({ userId, rows, memo: previousMemo, serverDay, feedbackTarget, unitIds: refs.unitIds });
+  const allowDrafts = unitDraftsAllowed();
+  const { state, cardModes, skippedSessions } = buildIngestState({ userId, rows, memo: previousMemo, serverDay, feedbackTarget, unitIds: refs.unitIds, sentenceIds: extractSentenceIds(events), allowDrafts });
   if (refs.correctionIds?.length && store.readVerifiedSentences) {
     state.verifiedSentences = await store.readVerifiedSentences(userId, refs.correctionIds);
   }
@@ -159,7 +160,7 @@ async function processOnce(store: IngestStore, userId: string, events: readonly 
 
   const { kept, rejected: refusedModes } = filterReviewModes(events, cardModes, state.knownEvents);
   const { kept: capped, rejected: tooMany } = capProductions(kept, state, rows.recentProductionCount);
-  const options = { allowDrafts: unitDraftsAllowed() };
+  const options = { allowDrafts };
   let plan = planIngest(state, capped as RawEvent[], now, options);
   if (store.checkRewrites && plan.payload.rewrites.length > 0) {
     const rewriteChecks = await store.checkRewrites({ state: plan.nextState, rows: plan.payload.rewrites, now });

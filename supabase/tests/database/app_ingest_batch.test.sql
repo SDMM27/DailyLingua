@@ -293,12 +293,12 @@ select throws_ok($$select pg_temp.ingj('c0000000-0000-4000-8000-0000000000a2', j
   'day', (select d from today), 'amount', 5, 'reason', 'Bad Reason!'))))$$, '22023', null, 'a reason outside the identifier shape: 22023');
 select lives_ok($$select pg_temp.ingj('c0000000-0000-4000-8000-0000000000a2', jsonb_build_object('xp',
   (select jsonb_agg(jsonb_build_object('day', (select d from today) - 2, 'amount', 100, 'reason', 'x.cap', 'meta', jsonb_build_object('i', g)))
-   from generate_series(1, 4) g)))$$, '400 XP in a day (four lines of 100) are accepted');
+   from generate_series(1, 5) g)))$$, '500 XP in a day (five lines of 100) are accepted');
 select throws_ok($$select pg_temp.ingj('c0000000-0000-4000-8000-0000000000a2', jsonb_build_object('xp', jsonb_build_array(jsonb_build_object(
-  'day', (select d from today) - 2, 'amount', 1, 'reason', 'x.over'))))$$, '23514', null, 'one more XP the same day: 23514 (sum above 400)');
+  'day', (select d from today) - 2, 'amount', 1, 'reason', 'x.over'))))$$, '23514', null, 'one more XP the same day: 23514 (sum above 500)');
 select throws_ok($$select pg_temp.ingj('c0000000-0000-4000-8000-0000000000a2', jsonb_build_object('xp',
   (select jsonb_agg(jsonb_build_object('day', (select d from today), 'amount', 100, 'reason', 'x.cap', 'meta', jsonb_build_object('i', g)))
-   from generate_series(1, 5) g)))$$, '23514', null, 'five lines of 100 in one batch: 23514');
+   from generate_series(1, 6) g)))$$, '23514', null, 'six lines of 100 in one batch: 23514');
 select is((select coalesce(sum(amount), 0)::int from app.xp_ledger where user_id = 'c0000000-0000-4000-8000-0000000000a2' and day = (select d from today)), 0,
   'and none of them was kept');
 select lives_ok($$select pg_temp.ingj('c0000000-0000-4000-8000-0000000000a1', jsonb_build_object('xp', jsonb_build_array(jsonb_build_object(

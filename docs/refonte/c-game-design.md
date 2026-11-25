@@ -46,8 +46,8 @@ Une carte n'est comptée qu'une fois par jour pour l'XP (le premier succès du j
 | Erreur du jour retravaillée (micro-exercice du lendemain) | 3 | Exercice réussi portant sur une erreur de la veille | 2/jour |
 | Passage de fluidité | 5 | Relecture ou redite chronométrée terminée ; vitesse ≥ 90 % du passage précédent ; texte déjà compris | 2/jour |
 | Minute d'oral vérifiée (production libre, jeu de rôle IA) | 3 par minute de parole de l'apprenant | Durée de voix détectée ; transcription en langue cible ; débit ≥ 30 mots/min (A1-A2) ou 60 (B1+) | 30 XP/jour (10 min de parole) |
-| Phrase de shadowing | 1 | Correspondance transcription ↔ modèle ≥ 60 % | 30/jour |
-| Phrase de dictée | 1 (2 si ≥ 95 % des caractères justes) | ≥ 80 % des caractères justes | 30 XP/jour |
+| Phrase de shadowing (règle `shadowing.sentence`, volet fluidité, barème `j5.1`) | 1 | Correspondance transcription de l'appareil ↔ modèle ≥ 60 % (mot à mot, notée par le serveur) ; durée de parole ≥ 250 ms par mot du modèle ; une fois par phrase et par jour | 30 XP/jour |
+| Phrase de dictée (règle `dictation.sentence`, volet input, barème `j5.1`) | 1 (2 si ≥ 95 % des caractères justes) | ≥ 80 % des caractères justes, corrigés par le serveur ; réponse ≥ 1 s après l'affichage ; une fois par phrase et par jour | 30 XP/jour |
 | Unité du parcours débutant terminée (règle `unit.complete`, barème `j4.1`) | 25 | Test de fin d'unité ≥ 80 % noté par le serveur, une seule fois par unité ; les items des leçons paient comme le focus (2 puis 1), une seule fois par item, plafond 20 XP par leçon et 40 XP/jour partagé avec la séance | 2 unités/jour |
 | Descripteur « Je peux… » validé | 50 | Validation par la tâche d'évaluation (W), une seule fois | Aucun (rare par nature) |
 | Séance complète | 10 | Toutes les étapes du format choisi validées par leur preuve | 1/jour |

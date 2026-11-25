@@ -19,7 +19,7 @@ export function words(prefix: string, count: number): string {
 export function emptyState(overrides: Partial<IngestState> = {}): IngestState {
   return {
     userId: USER,
-    profile: { timeZone: "Europe/Paris", createdAt: "2026-10-01T00:00:00.000Z", writingLevels: { it: "B1" }, answerTolerance: "lenient", defaultRingTier: 15, explanationLanguage: "fr" },
+    profile: { timeZone: "Europe/Paris", createdAt: "2026-10-01T00:00:00.000Z", writingLevels: { it: "B1" }, answerTolerance: "lenient", defaultRingTier: 15, explanationLanguage: "fr", enrolledLanguages: ["it"] },
     sessions: {},
     items: {},
     texts: {},
@@ -42,6 +42,7 @@ export function emptyState(overrides: Partial<IngestState> = {}): IngestState {
     units: {},
     unitAttempts: {},
     unitTestIds: [],
+    oralSentences: {},
     ...overrides,
   };
 }

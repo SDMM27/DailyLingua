@@ -24,15 +24,22 @@ export const DAILY_CAPS = {
   sessionComplete: 1,
   /** Units passed per learning day (`unit.complete`, `j4-pr1-architecture.md` §4). */
   unitComplete: 2,
+  /** XP of `shadowing.sentence` and of `dictation.sentence` a day (`j5-pr1-atelier-oral.md` §4). */
+  shadowing: 30,
+  dictation: 30,
 } as const;
 
 /**
- * Theoretical maximum of a day with every cap reached: 120 + 100 + 40 + 30 + 20 + 6 + 10 + 10 + 50. The items of the
- * units share the 40 XP of `focus.*` with the workshop; two units passed add 50.
+ * Theoretical maximum of a day with every cap reached: 120 + 100 + 40 + 30 + 20 + 6 + 10 + 10 + 50 + 30 + 30. The items
+ * of the units share the 40 XP of `focus.*` with the workshop; two units passed add 50; the oral workshop adds 30 XP of
+ * repetition and 30 XP of dictation (446 since `j5.1`, 386 before).
  */
-export const THEORETICAL_DAILY_MAX = 386;
-/** Safety bound of `ingest_batch` in SQL (`app.xp_ledger` sum of a day). */
-export const SQL_DAILY_XP_BOUND = 400;
+export const THEORETICAL_DAILY_MAX = 446;
+/**
+ * Safety bound of `ingest_batch` in SQL (`app.xp_ledger` sum of a day): 500 since the migration `20261126000100` (it was
+ * 400), which also leaves room for `roleplay.completed` (15 XP) of a later PR.
+ */
+export const SQL_DAILY_XP_BOUND = 500;
 
 export interface Granted {
   amount: number;
@@ -83,6 +90,11 @@ export function capReading(amount: number, params: { textsToday: number; xpToday
 export function capFocus(amount: number, params: { xpSession: number; xpDay: number }): Granted {
   const room = Math.min(DAILY_CAPS.focusPerSession - params.xpSession, DAILY_CAPS.focusPerDay - params.xpDay);
   return room <= 0 ? none("cap_reached") : { amount: Math.min(amount, room), zero: null, diminished: false };
+}
+
+/** A sentence of the oral workshop: 30 XP a day for each of the two activities (`ceiling` is `DAILY_CAPS.shadowing` or `.dictation`). */
+export function capOral(amount: number, params: { xpToday: number; ceiling: number }): Granted {
+  return underCeiling(amount, params.xpToday, params.ceiling);
 }
 
 /** A rewarded rewrite: 2 sentences per production and 20 XP a day. */

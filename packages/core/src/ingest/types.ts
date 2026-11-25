@@ -1,4 +1,4 @@
-import type { CardKind, CardState, CefrLevel, DateKey, ExerciseKind, IngestPayload, LanguageCode, ReviewMode, RingTier, SessionFormat, SessionKind, Unit, UnitLessonId } from "@dailylingua/schemas";
+import type { CardKind, CardState, CefrLevel, DateKey, ExerciseKind, IngestPayload, LanguageCode, OralSentence, ReviewMode, RingTier, SessionFormat, SessionKind, Unit, UnitLessonId } from "@dailylingua/schemas";
 import type { RejectedDelivery } from "../offline/types";
 import type { SettingChange } from "../game/settings";
 import type { TimeZoneChange } from "../game/attribution";
@@ -24,6 +24,8 @@ export interface IngestState {
     defaultRingTier: RingTier;
     /** Language the backs of unit cards are written in: the native language when it is fr or en, else en. */
     explanationLanguage: "fr" | "en";
+    /** Languages the learner is enrolled in (active enrollments): the oral workshop only takes sentences of these. */
+    enrolledLanguages: string[];
   };
   sessions: Record<string, StateSession>;
   items: Record<string, StateItem>;
@@ -68,6 +70,12 @@ export interface IngestState {
   unitAttempts: Record<string, StateUnitAttempt[]>;
   /** Test attempt ids of the batch already recorded (`unit_test.id`, any account): `duplicate_test_attempt`. */
   unitTestIds: string[];
+  /**
+   * Sentences of the oral workshop the batch refers to, by id (`<unitId>#<lineId>`), injected by the caller from
+   * `@dailylingua/content` like `units`. A sentence absent from here is `unknown_sentence`. What was already paid today
+   * is in `days[day].counted` (`oral:<activity>:<sentenceId>`) and `days[day].xpByReason`.
+   */
+  oralSentences: Record<string, OralSentence>;
 }
 
 export interface StateUnitProgress {
@@ -213,7 +221,7 @@ export interface StateDay {
   /** Focus XP by session id, or by `unit:<unitId>:<lesson>` for the items of a unit lesson. */
   focusBySession: Record<string, number>;
   rewardsByCorrection: Record<string, number>;
-  /** `review:<cardId>`, `focus1:<itemId>`, `focus2:<itemId>`, `focusWrong:<itemId>`, `reading:<textId>`, `rewrite:<correctionId>:<n>`, `errorItem:<id>`. */
+  /** `review:<cardId>`, `focus1:<itemId>`, `focus2:<itemId>`, `focusWrong:<itemId>`, `reading:<textId>`, `rewrite:<correctionId>:<n>`, `errorItem:<id>`, `oral:<activity>:<sentenceId>`. */
   counted: string[];
 }
 

@@ -85,6 +85,8 @@ describe("deliveryReportSchema", () => {
   it("knows the reasons, server_refused and too_many included", () => {
     expect(rejectionReasons).toContain("server_refused");
     expect(rejectionReasons).toContain("too_many");
+    expect(rejectionReasons).toContain("unknown_sentence");
+    expect(rejectionReasons).toContain("wrong_language");
     expect(deliveryReportSchema.safeParse({ rejected: [{ clientEventId: ID(1), reason: "server_refused" }] }).success).toBe(true);
     expect(deliveryReportSchema.safeParse({ rejected: [{ clientEventId: ID(1), reason: "whatever" }] }).success).toBe(false);
     expect(deliveryReportSchema.safeParse({ rejected: [] }).success).toBe(true);

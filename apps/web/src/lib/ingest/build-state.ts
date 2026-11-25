@@ -26,12 +26,13 @@ import {
   type CefrLevel,
   type DateKey,
   type IngestMemo,
+  type OralSentence,
   type ReviewMode,
   type StoredSessionPlan,
   type Unit,
   unitLessonIdSchema,
 } from "@dailylingua/schemas";
-import { getUnit } from "@dailylingua/content";
+import { getOralSentence, getUnit } from "@dailylingua/content";
 import { z } from "zod";
 import { cardAcceptList, cardKeyForMode, expectedCardMode } from "./card-keys";
 import { ringTierOfMinutes } from "./format";
@@ -241,6 +242,19 @@ function unitState(unitIds: readonly string[], rows: IngestRows): Pick<IngestSta
   return { units, unitProgress, unitAttempts, unitTestIds: [...(rows.unitTestIds ?? [])] };
 }
 
+/**
+ * The oral sentences the events name, from `@dailylingua/content` (core never imports it). Only the ones the server
+ * serves: published, or any status with drafts allowed. A sentence left out is `unknown_sentence`.
+ */
+function oralSentencesOf(sentenceIds: readonly string[], allowDrafts: boolean): Record<string, OralSentence> {
+  const sentences: Record<string, OralSentence> = {};
+  for (const id of sentenceIds) {
+    const sentence = getOralSentence(id, { includeDrafts: allowDrafts });
+    if (sentence) sentences[id] = sentence;
+  }
+  return sentences;
+}
+
 export function buildIngestState(input: {
   userId: string;
   rows: IngestRows;
@@ -249,6 +263,10 @@ export function buildIngestState(input: {
   feedbackTarget?: { productionId: string; deferred?: boolean };
   /** Units the events name (`extractRefs`): only these are injected. */
   unitIds?: readonly string[];
+  /** Sentences of the oral workshop the events name (`extractSentenceIds`): only these are injected. */
+  sentenceIds?: readonly string[];
+  /** Unpublished units and their sentences are served (`UNIT_DRAFTS=show`, never in production). */
+  allowDrafts?: boolean;
 }): BuiltIngestState {
   const { userId, rows, memo, serverDay, feedbackTarget } = input;
   const timeZone = rows.profile.timeZone;
@@ -380,6 +398,7 @@ export function buildIngestState(input: {
       answerTolerance: answerTolerance(rows.profile.gameSettings),
       defaultRingTier: ringTierOfMinutes(firstEnrollment?.dailyMinutes),
       explanationLanguage: explanationLanguageOf(rows.profile.nativeLanguage),
+      enrolledLanguages: rows.enrollments.map((enrollment) => enrollment.language),
     },
     sessions,
     items,
@@ -400,6 +419,7 @@ export function buildIngestState(input: {
     rewriteChecks: {},
     recentProductionTexts: rows.recentProductionTexts,
     ...unitState(input.unitIds ?? [], rows),
+    oralSentences: oralSentencesOf(input.sentenceIds ?? [], input.allowDrafts === true),
   };
   return { state, cardModes, skippedSessions };
 }

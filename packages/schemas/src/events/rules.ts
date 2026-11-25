@@ -2,9 +2,10 @@ import { z } from "zod";
 
 /**
  * Version of the XP scale written in `xp_ledger.rule_version` (`j2-jeu-xp-serie.md` §1). `j4.1` adds
- * `unit.complete` and the XP of unit items (`j4-pr1-architecture.md` §4); the other rules are those of `j2.1`.
+ * `unit.complete` and the XP of unit items (`j4-pr1-architecture.md` §4); `j5.1` adds `shadowing.sentence` and
+ * `dictation.sentence` (`j5-pr1-atelier-oral.md` §4); the other rules are those of `j2.1`.
  */
-export const RULE_VERSION = "j4.1";
+export const RULE_VERSION = "j5.1";
 
 /** Stable XP rule identifiers (`xp_ledger.reason`), exactly those of `j2-jeu-xp-serie.md` §1. */
 export const xpRuleIds = [
@@ -25,6 +26,10 @@ export const xpRuleIds = [
   "session.complete",
   /** A unit test passed for the first time (`j4-pr1-architecture.md` §4). */
   "unit.complete",
+  /** A sentence repeated aloud, recognised by the device, at 60 % or more (`j5-pr1-atelier-oral.md` §4). */
+  "shadowing.sentence",
+  /** A sentence typed from dictation, 80 % or more of the characters right (1 XP), 95 % (2 XP). */
+  "dictation.sentence",
 ] as const;
 export const xpRuleIdSchema = z.enum(xpRuleIds);
 export type XpRuleId = z.infer<typeof xpRuleIdSchema>;
@@ -63,7 +68,9 @@ export type XpZeroReason = z.infer<typeof xpZeroReasonSchema>;
  * accepted per rolling 24 hours of reception, the next ones are refused for good (`j2-pr1-lot-w.md` section 11, W-I1).
  * The last four are those of the units (`j4-pr1-architecture.md` §4): a unit absent or not published, an event on
  * another version of the unit (no grading on an old version), a test attempt id already used, a step whose
- * validation the server cannot prove from the attempts it knows.
+ * validation the server cannot prove from the attempts it knows. The last two are those of the oral workshop
+ * (`j5-pr1-atelier-oral.md` §4): a sentence the server does not serve, and a sentence of a language the learner is
+ * not enrolled in.
  */
 export const rejectionReasons = [
   "invalid_payload",
@@ -82,6 +89,8 @@ export const rejectionReasons = [
   "unit_version_mismatch",
   "duplicate_test_attempt",
   "step_not_proven",
+  "unknown_sentence",
+  "wrong_language",
 ] as const;
 export const rejectionReasonSchema = z.enum(rejectionReasons);
 export type RejectionReason = z.infer<typeof rejectionReasonSchema>;
