@@ -4,6 +4,21 @@
 
 Ce document décrit ce qu'il faut faire, dans l'ordre, pour ouvrir la nouvelle app à quelques proches sur une adresse distincte. **Rien ici n'est exécuté par le code de la PR** : chaque étape marquée **« accord du propriétaire »** touche la production, la sauvegarde de données réelles ou un service externe, et se fait pas à pas, après ton accord.
 
+## Ce qui a été fait (2026-11-25)
+
+L'ancienne app n'avait plus d'utilisateurs actifs (9 comptes). Le propriétaire a donc choisi de **remplacer l'ancienne app** au lieu d'ouvrir une adresse distincte :
+
+- M2 sur une copie de la production : 9 comptes repris, aucun écart à `app.verify_migration()`, deuxième passe sans doublon ;
+- M3 : les 36 migrations `app_*` appliquées en production ; le contrôle de l'ancienne app est resté vert ;
+- schéma `app` ajouté aux schémas exposés de la Data API ;
+- **projet Vercel existant `daily_lingua`** (`dailylingua-ashen.vercel.app`) basculé : Root Directory `apps/web`, Framework Preset Next.js, branche de production **`dev`**. Ses variables d'environnement existantes servent telles quelles (mêmes noms). Retour arrière : Root Directory vide, Framework Preset « Other », branche de production `main`, puis redéployer ;
+- `REFONTE_APP_URL` doit pointer vers l'adresse de ce projet ;
+- les workflows `scheduled-jobs.yml` (missions, ingestion) et `deploy-smoke.yml` visent des routes de l'ancienne app : à désactiver, puis à retirer ou adapter lors de la promotion vers `main`.
+
+Le projet `daily-lingua-preversion` créé pour l'adresse distincte n'est plus utile.
+
+**Turnstile** : la vérification anti-robot n'accepte que les domaines déclarés dans le widget Cloudflare. Toute nouvelle adresse (domaine personnalisé, autre projet) doit y être ajoutée, sinon connexion et inscription échouent.
+
 ## Ce que fait déjà le code
 
 - **Reprise à la connexion** : quand un compte de l'ancienne app se connecte à la préversion (mot de passe ou lien reçu par e-mail), ou ouvre « Aujourd'hui » plus d'une heure après la dernière reprise, la fonction `app.claim_legacy_data()` recopie ses données de `public` vers `app` (réglages, langues, cartes, productions, bilans). Elle ne le fait que tant que la personne n'a rien fait dans la nouvelle app ; au plus 20 fois par 24 h. Une erreur n'empêche jamais la connexion.
