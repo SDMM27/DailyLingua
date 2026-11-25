@@ -1,6 +1,6 @@
 # Jalon 5, PR 1 — Atelier oral : anticipation, répétition, dictée
 
-Complète [j5-oral.md](j5-oral.md) (périmètre et décisions). Fait foi pour les données, la notation et l'XP de l'atelier. Aucun appel à l'API, aucune migration attendue (`app.attempt.step`, `exercise_kind` et `app.xp_ledger.reason` ne sont pas contraints en base ; à revérifier dans `app.ingest_batch` avant de coder : si une liste blanche existe, la PR devient Sensible et s'arrête avant fusion).
+Complète [j5-oral.md](j5-oral.md) (périmètre et décisions). Fait foi pour les données, la notation et l'XP de l'atelier. Aucun appel à l'API. `app.attempt.step`, `exercise_kind` et `app.xp_ledger.reason` ne sont pas contraints en base, mais **`app.ingest_batch` refuse un jour au-delà de 400 XP** (`SQL_DAILY_XP_BOUND`) et la somme des plafonds passe de 386 à 446 avec les deux règles orales. Une migration recrée donc la fonction à l'identique avec une borne de **500** (marge pour `roleplay.completed` de la PR 3). La PR touche une fonction `security definer` : **niveau Sensible, arrêt avant fusion**.
 
 ## 1. Phrases (`packages/content`)
 

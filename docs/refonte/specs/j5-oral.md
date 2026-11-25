@@ -34,7 +34,7 @@ Le propriétaire a demandé d'enchaîner les jalons sans être consulté ; ces c
 
 | PR | Contenu | Niveau | Spec |
 |---|---|---|---|
-| **5.1 Atelier oral** | Interface `speech` client, comparaison et dictée pures, événement `oral_attempt`, règles `shadowing.sentence` et `dictation.sentence`, choix des phrases, écran de l'atelier, carte « Aujourd'hui » | Standard (XP et ingestion : revue Opus) ; pas de migration attendue | [j5-pr1-atelier-oral.md](j5-pr1-atelier-oral.md) |
+| **5.1 Atelier oral** | Interface `speech` client, comparaison et dictée pures, événement `oral_attempt`, règles `shadowing.sentence` et `dictation.sentence`, choix des phrases, écran de l'atelier, carte « Aujourd'hui » | Sensible (borne SQL d'XP du jour relevée de 400 à 500 dans `app.ingest_batch`) : arrêt avant fusion | [j5-pr1-atelier-oral.md](j5-pr1-atelier-oral.md) |
 | **5.2 Dire au lieu d'écrire** | Mode « Dire » de l'étape Expression, `production_submitted.mode`, consigne de transcription dans la correction, micro dans la réécriture, page de confidentialité | Sensible (chemin de coût IA, changement de prompt) : arrêt avant fusion | [j5-pr2-production-orale.md](j5-pr2-production-orale.md) |
 | **5.3 Jeu de rôle** | Scénarios, table `app.roleplay` (RLS), routes serveur, prompts, règle `roleplay.completed`, écran écrit et vocal | Sensible (migration, coût IA) : arrêt avant fusion | [j5-pr3-jeu-de-role.md](j5-pr3-jeu-de-role.md) |
 
