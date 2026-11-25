@@ -58,7 +58,7 @@ test.describe("À voix haute", () => {
       // Today: a secondary card under the session, one button.
       await expect(page.getByRole("heading", { level: 2, name: "Cinq minutes à voix haute" })).toBeVisible();
       await expectNoHorizontalOverflow(page);
-      await page.getByRole("link", { name: "Ouvrir" }).click();
+      await page.getByRole("link", { name: "Ouvrir", exact: true }).click();
       await expect(page).toHaveURL(/\/oral$/);
 
       // Entry: full screen, no tab bar, what is in it and where the voice goes.
@@ -164,7 +164,7 @@ test.describe("À voix haute", () => {
     });
     await page.setViewportSize({ width: 390, height: 844 });
     await signUpAndInstall(page, email);
-    await page.getByRole("link", { name: "Ouvrir" }).click();
+    await page.getByRole("link", { name: "Ouvrir", exact: true }).click();
     await page.getByRole("button", { name: "Commencer" }).click();
     await page.getByRole("button", { name: "Écouter la réponse" }).click();
     await page.getByRole("button", { name: "Pas encore" }).click();

@@ -83,6 +83,8 @@ export async function expectNoHorizontalOverflow(page: Page) {
  */
 export async function expectNoAxeViolations(page: Page) {
   // A sheet that is still fading in has text at half opacity, which no contrast rule can judge: wait for the finite animations.
+  // After a client-side navigation the streamed <title> lands a moment later: wait for it, or `document-title` flickers.
+  await page.waitForFunction(() => document.title.trim() !== "");
   await page.evaluate(() => Promise.all(document.getAnimations().filter((animation) => animation.effect?.getComputedTiming().iterations !== Infinity).map((animation) => animation.finished)));
   await page.addScriptTag({ path: require.resolve("axe-core/axe.min.js") });
   const violations = await page.evaluate(async () => {

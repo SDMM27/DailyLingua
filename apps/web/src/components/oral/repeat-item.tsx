@@ -31,6 +31,8 @@ const MAX_TRIES = 2;
 interface Attempt {
   comparison: SpokenComparison;
   transcript: string;
+  /** An earlier try on this sentence already passed: the server pays a sentence once a day, so no XP is shown again. */
+  passedBefore: boolean;
 }
 
 /** What the device heard, live, as the learner speaks. */
@@ -77,8 +79,9 @@ export function RepeatItem({ sentence, language, locale, index, total, xpVisible
   function onFinal(transcript: string) {
     const comparison = compareSpoken(language, sentence.text, transcript);
     onEvent(oralAttemptEvent({ sentence, activity: "shadowing", answer: transcript, recognizer: "device", selfRating: null, shownAt: shownAt.current, startedAt: startedAt.current }));
+    const passedBefore = (best.current ?? 0) >= SHADOWING_MIN_RATIO;
     best.current = Math.max(best.current ?? 0, comparison.ratio);
-    setAttempt({ comparison, transcript });
+    setAttempt({ comparison, transcript, passedBefore });
     setTries((value) => value + 1);
   }
 
@@ -162,7 +165,7 @@ export function RepeatItem({ sentence, language, locale, index, total, xpVisible
           sentence={sentence}
           language={language}
           attempt={attempt}
-          showXp={xpVisible}
+          showXp={xpVisible && !attempt.passedBefore}
           canRetry={tries < MAX_TRIES}
           onContinue={() => finish((best.current ?? 0) >= SHADOWING_MIN_RATIO)}
           onRetry={again}
