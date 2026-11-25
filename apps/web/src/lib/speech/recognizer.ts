@@ -65,14 +65,15 @@ const DENIED = new Set(["not-allowed", "service-not-allowed"]);
  * A recognizer for one sentence in `language`, or null when the browser has no `SpeechRecognition` /
  * `webkitSpeechRecognition`. One utterance (`continuous = false`) with interim results. It ends by itself when the
  * learner stops speaking; `onFinal` then carries the whole text (or `onError("no-speech")` when nothing was heard).
+ * With `continuous` it keeps listening through pauses until `stop()` (or until the engine ends it): a few sentences.
  */
-export function createRecognizer(language: string): Recognizer | null {
+export function createRecognizer(language: string, { continuous = false }: { continuous?: boolean } = {}): Recognizer | null {
   const Recognition = recognitionConstructor();
   if (!Recognition) return null;
   const engine = new Recognition();
   engine.lang = recognitionTag(language);
   engine.interimResults = true;
-  engine.continuous = false;
+  engine.continuous = continuous;
   engine.maxAlternatives = 1;
 
   let heard = "";

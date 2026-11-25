@@ -248,6 +248,13 @@ describe("readIngestRows", () => {
     expect(rows.productions).toEqual([{ id: ID(600), sessionId: ID(10), language: "it", text: "Ciao a tutti", clientEventId: ID(93), createdAt: "2026-11-16T10:00:00+00:00" }]);
   });
 
+  it("reads the speaking time of a spoken production from its task", async () => {
+    const data = { ...tables(), production: [{ ...tables().production[0]!, task: { initialSimilarity: 0.2, speakingMs: 42_000 } }] };
+    const { client } = tableFake(data);
+    const rows = await readIngestRows(client, ME, { ...REFS, productionIds: [ID(600)] }, WINDOW);
+    expect(rows.productions[0]).toMatchObject({ initialSimilarity: 0.2, speakingMs: 42_000 });
+  });
+
   it("also reads the productions the memo holds the state of", async () => {
     const data = tables();
     data.ingest_state = [{ user_id: ME, seq: "4", memo: { v: 1, productions: { [ID(600)]: { day: "2026-11-16" }, "not-an-id": {} } } as never }];

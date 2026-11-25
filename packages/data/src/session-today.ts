@@ -46,6 +46,14 @@ export async function readLastSessionDay(client: AppClient, userId: string, lang
   return rows[0]?.day ?? null;
 }
 
+/** When the learner last sent a spoken production in the language (an instant), or null. */
+export async function readLastSpokenProductionAt(client: AppClient, userId: string, language: string): Promise<string | null> {
+  const rows = unwrapRows(
+    await appSchema(client).from("production").select("created_at").eq("user_id", userId).eq("language", language).eq("mode", "spoken").order("created_at", { ascending: false }).limit(1),
+  );
+  return rows[0]?.created_at ?? null;
+}
+
 /**
  * `newCardsSuspendedThrough` of the most recent resumption session of the language, among the last five sessions (a
  * resumption suspends new cards for two days only), or null.

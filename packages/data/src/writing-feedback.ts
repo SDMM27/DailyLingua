@@ -50,7 +50,7 @@ export function createWritingFeedbackStore(client: AppClient) {
       const productionResult = await db.from("production").select("id, session_id, language, text, mode, client_event_id")
         .eq("id", productionId).eq("user_id", userId).maybeSingle();
       const production = unwrap(productionResult);
-      if (!production?.session_id || production.mode !== "writing" || !production.client_event_id) return null;
+      if (!production?.session_id || (production.mode !== "writing" && production.mode !== "spoken") || !production.client_event_id) return null;
       const [profileResult, sessionResult, enrollmentResult, skillsResult] = await Promise.all([
         db.from("profile").select("native_language, time_zone").eq("user_id", userId).maybeSingle(),
         db.from("session").select("plan, format").eq("id", production.session_id).eq("user_id", userId).maybeSingle(),
@@ -74,6 +74,7 @@ export function createWritingFeedbackStore(client: AppClient) {
         format: session.format,
         language: production.language,
         text: production.text,
+        mode: production.mode === "spoken" ? "spoken" as const : "writing" as const,
         task: text?.writing_task ?? null,
         nativeLanguage: profile.native_language,
         timeZone: profile.time_zone,

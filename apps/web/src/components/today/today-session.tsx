@@ -156,7 +156,7 @@ export function TodaySession({ language, timeZone, languageName, children, goal,
           </article>
           {unitCard}
           {oralCard}
-          <div className="mt-5 empty:hidden">{sync && <WritingFeedback sync={sync} />}</div>
+          <div className="mt-5 empty:hidden">{sync && <WritingFeedback sync={sync} language={language} />}</div>
           {detail}
         </>
       )}

@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { CARD, ITEM, NOW, OTHER, TEXT, TODAY, USER, cardRow, itemRow, uuid } from "@/test/ingest-rows";
 import { buildChoiceOptions } from "./options";
 import { pickReadingItems, pickTextCandidate, pickWorkshopItems, planToday, servedMode } from "./plan-session";
+import { suggestSpoken } from "./build-packet";
 import { createTodayHandler, type TodayStore } from "./today-route";
 import { sessionScreens } from "./session-flow";
 
@@ -155,6 +156,7 @@ function store(overrides: Partial<TodayStore> = {}) {
     errorOfDay: async () => null,
     recentReviews: async () => [],
     lastSessionDay: async () => "2026-11-17",
+    lastSpokenProductionAt: async () => null,
     completedShortSessions: async () => 0,
     suspendedThrough: async () => null,
     ingestState: async () => ({ seq: 0, memo: {} }),
@@ -204,6 +206,21 @@ describe("GET /api/session/today", () => {
     expect(packet.timeZone).toBe("Europe/Paris");
     expect(packet.steps.map((step) => step.step)).toEqual(["wake", "reading", "workshop", "expression", "momentum"]);
     expect(h.inserted[0]?.plan.servedCards).toEqual(Object.fromEntries(packet.cards.map((card) => [card.id, card.mode])));
+  });
+
+  it("suggests speaking only when no spoken production was sent in the last 7 learning days", async () => {
+    const suggested = async (lastSpokenProductionAt: string | null) =>
+      sessionPacketSchema.parse(await (await handler({ lastSpokenProductionAt: async () => lastSpokenProductionAt }).get()).json()).expression;
+    expect(await suggested(null)).toEqual({ suggestSpoken: true });
+    expect(await suggested("2026-11-13T10:00:00+00:00")).toEqual({ suggestSpoken: false });
+    expect(await suggested("2026-11-11T10:00:00+00:00")).toEqual({ suggestSpoken: true });
+  });
+
+  it("counts the learning days in the learner time zone, today included", () => {
+    expect(suggestSpoken("2026-11-19T12:00:00Z", "2026-11-25", "Europe/Paris")).toBe(false); // 6 days ago
+    expect(suggestSpoken("2026-11-18T12:00:00Z", "2026-11-25", "Europe/Paris")).toBe(true); // 7 days ago
+    // 03:00 in Paris belongs to the previous learning day (the day changes at 04:00).
+    expect(suggestSpoken("2026-11-19T02:00:00Z", "2026-11-25", "Europe/Paris")).toBe(true);
   });
 
   it("serves each choice card with four options that include the card itself, and typed cards with their forms", async () => {
