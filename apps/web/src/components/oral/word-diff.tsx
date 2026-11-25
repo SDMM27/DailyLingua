@@ -8,7 +8,18 @@ import { Fragment } from "react";
 const MARKS = {
   missing: "text-error underline decoration-dotted decoration-2 underline-offset-4",
   wrong: "text-error underline decoration-wavy decoration-2 underline-offset-4",
+  /** Heard one letter off: counted, but maybe an ending (agreement) the learner should check. */
+  near: "underline decoration-dashed decoration-1 underline-offset-4",
 } as const;
+
+type Mark = keyof typeof MARKS;
+
+function markOf(token: OralToken): Mark | null {
+  if (token.status === "missing" || token.status === "wrong") return token.status;
+  return token.near ? "near" : null;
+}
+
+const LABEL: Record<Mark, "missing" | "substituted" | "near"> = { missing: "missing", wrong: "substituted", near: "near" };
 
 const MAX_ROWS = 3;
 
@@ -20,7 +31,7 @@ const MAX_ROWS = 3;
 export function WordDiff({ language, tokens, transcript }: { language: string; tokens: OralToken[]; transcript: string }) {
   const t = useTranslations("oral.repeat");
   const model = tokens.filter((token) => token.status !== "extra");
-  const problems = model.filter((token) => token.status === "missing" || token.status === "wrong");
+  const problems = model.filter((token) => markOf(token) !== null);
   // Where words are not separated by spaces (Chinese, Japanese) the tokens are characters and are drawn joined.
   const gap = isTargetLanguage(language) && languageInfo(language).unspaced ? "" : " ";
   return (
@@ -29,10 +40,15 @@ export function WordDiff({ language, tokens, transcript }: { language: string; t
         {model.map((token, index) => (
           <Fragment key={index}>
             {index > 0 && gap}
-            <span className={token.status === "ok" ? undefined : MARKS[token.status as "missing" | "wrong"]}>
-              {token.text}
-              {token.status !== "ok" && <span className="sr-only"> ({t(token.status === "missing" ? "missing" : "substituted")})</span>}
-            </span>
+            {(() => {
+              const mark = markOf(token);
+              return (
+                <span className={mark ? MARKS[mark] : undefined}>
+                  {token.text}
+                  {mark && <span className="sr-only"> ({t(LABEL[mark])})</span>}
+                </span>
+              );
+            })()}
           </Fragment>
         ))}
       </p>
@@ -41,8 +57,8 @@ export function WordDiff({ language, tokens, transcript }: { language: string; t
         <ul className="grid gap-1">
           {problems.slice(0, MAX_ROWS).map((token, index) => (
             <li key={index} className="flex flex-wrap items-baseline gap-x-3 text-sm text-muted">
-              <b className="font-display text-base font-semibold text-error" lang={language} dir="auto">{token.text}</b>
-              {t(token.status === "missing" ? "missing" : "substituted")}
+              <b className={`font-display text-base font-semibold ${markOf(token) === "near" ? "text-ink" : "text-error"}`} lang={language} dir="auto">{token.text}</b>
+              {t(LABEL[markOf(token) as Mark])}
             </li>
           ))}
         </ul>

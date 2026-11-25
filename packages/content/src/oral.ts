@@ -1,4 +1,4 @@
-import { countWords, normalizeAnswer } from "@dailylingua/core";
+import { countWords, ignoreInnerPunctuation, normalizeAnswer } from "@dailylingua/core";
 import type { OralSentence, SituationUnit, Unit } from "@dailylingua/schemas";
 import { UNITS, unitsFor } from "./units";
 
@@ -41,7 +41,7 @@ export function oralSentences(language: string, options: OralOptions = {}): Oral
   for (const unit of unitsFor(language)) {
     if (!served(unit, options)) continue;
     for (const sentence of sentencesOf(unit)) {
-      const key = normalizeAnswer(language, sentence.text);
+      const key = normalizeAnswer(language, ignoreInnerPunctuation(sentence.text));
       if (seen.has(key)) continue;
       seen.add(key);
       found.push(sentence);
