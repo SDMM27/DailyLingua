@@ -10,10 +10,11 @@ import { deleteTestUser, expectNoHorizontalOverflow, requireLocalSupabase, signU
 const port = Number(process.env.E2E_EXPRESSION_AI_PORT ?? 0);
 const score = { score: 4, comment: "La réponse est claire." };
 const original = "Io andare al mercato ogni sabato.";
-const corrected = "Io vado al mercato ogni sabato.";
 const production = `${original} Compro frutta fresca, pane e formaggio per la mia famiglia. Al ritorno preparo il pranzo con mia sorella. Ci piace parlare con i venditori e conoscere le loro ricette. Dopo pranzo portiamo un dolce ai nostri vicini e restiamo con loro fino a sera. È il mio momento preferito della settimana.`;
 // What the recognition gives: no capitals, no punctuation.
 const transcript = production.toLocaleLowerCase().replace(/[.,]/g, "");
+// Without punctuation the transcript is a single sentence: its native version is the whole corrected transcript.
+const correctedTranscript = transcript.replace("io andare", "io vado");
 const practiceLabel = /Entraînement à l.oral/;
 
 function installFakeRecognition(page: Page) {
@@ -58,7 +59,7 @@ test.describe("spoken production", () => {
         grammar: score, vocabulary: score, register: score, coherence: score,
         corrections: [{ original: "io andare", corrected: "io vado", explanation: "Conjugue le verbe à la première personne.", category: "verb" }],
         strength: "Tu racontes ta journée avec des détails précis.",
-        nativeVersion: production.replace(original, corrected),
+        nativeVersion: correctedTranscript,
         detectedLanguage: "it",
       }) }],
     }));
@@ -147,10 +148,10 @@ test.describe("spoken production", () => {
 
       // The rewrite can be spoken: the field is filled and stays editable.
       await page.getByText("Voir la correction", { exact: true }).click();
-      await say(page, corrected);
+      await say(page, correctedTranscript);
       await page.getByRole("button", { name: "Dicter la phrase 1" }).click();
       await page.getByRole("button", { name: "Arrêter la dictée" }).click();
-      await expect(page.getByRole("textbox", { name: /Réécris de mémoire/ })).toHaveValue(corrected);
+      await expect(page.getByRole("textbox", { name: /Réécris de mémoire/ })).toHaveValue(correctedTranscript);
       await page.getByRole("button", { name: "Vérifier ma réécriture" }).click();
       await expect(page.getByText("Réécriture vérifiée.")).toBeVisible({ timeout: 25_000 });
 
