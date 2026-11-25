@@ -58,6 +58,8 @@ export interface LanguageInfo {
    * another variety (a "zh-HK" voice speaks Cantonese, not Mandarin). Absent: any region.
    */
   speechRegions?: readonly string[];
+  /** BCP 47 tag the speech recognition listens for (`SpeechRecognition.lang`): the language with the region the devices ship a model for. */
+  speech: string;
   /**
    * Colour of the language in the UI. There are fewer accents than languages: the languages
    * people are most likely to study together get distinct accents.
@@ -66,26 +68,26 @@ export interface LanguageInfo {
 }
 
 export const LANGUAGE_REGISTRY = {
-  fr: { code: "fr", nativeName: "Français", greeting: "Bonjour", dir: "ltr", accent: "azure" },
-  ru: { code: "ru", nativeName: "Русский", greeting: "Доброе утро", dir: "ltr", markStress: true, accent: "indigo" },
-  it: { code: "it", nativeName: "Italiano", greeting: "Buongiorno", dir: "ltr", accent: "terracotta" },
-  es: { code: "es", nativeName: "Español", greeting: "Buenos días", dir: "ltr", accent: "ochre" },
-  de: { code: "de", nativeName: "Deutsch", greeting: "Guten Morgen", dir: "ltr", capitalizedCommonNouns: true, accent: "teal" },
-  en: { code: "en", nativeName: "English", greeting: "Good morning", dir: "ltr", accent: "plum" },
-  pt: { code: "pt", nativeName: "Português", greeting: "Bom dia", dir: "ltr", accent: "olive" },
-  nl: { code: "nl", nativeName: "Nederlands", greeting: "Goedemorgen", dir: "ltr", accent: "azure" },
-  sv: { code: "sv", nativeName: "Svenska", greeting: "God morgon", dir: "ltr", accent: "fern" },
-  pl: { code: "pl", nativeName: "Polski", greeting: "Dzień dobry", dir: "ltr", accent: "berry" },
-  cs: { code: "cs", nativeName: "Čeština", greeting: "Dobré ráno", dir: "ltr", accent: "graphite" },
-  uk: { code: "uk", nativeName: "Українська", greeting: "Доброго ранку", dir: "ltr", markStress: true, accent: "azure" },
-  ro: { code: "ro", nativeName: "Română", greeting: "Bună dimineața", dir: "ltr", accent: "fern" },
-  el: { code: "el", nativeName: "Ελληνικά", greeting: "Καλημέρα", dir: "ltr", accent: "azure" },
-  tr: { code: "tr", nativeName: "Türkçe", greeting: "Günaydın", dir: "ltr", accent: "berry" },
-  ar: { code: "ar", nativeName: "العربية", greeting: "صباح الخير", dir: "rtl", optionalVowelMarks: true, accent: "fern" },
-  zh: { code: "zh", nativeName: "中文", greeting: "早上好", dir: "ltr", denseScript: true, unspaced: true, charsPerWord: 1.7, speechRegions: ["CN", "TW", "SG"], accent: "berry" },
-  ja: { code: "ja", nativeName: "日本語", greeting: "おはようございます", dir: "ltr", denseScript: true, unspaced: true, charsPerWord: 2.5, accent: "graphite" },
-  ko: { code: "ko", nativeName: "한국어", greeting: "좋은 아침이에요", dir: "ltr", denseScript: true, accent: "teal" },
-  id: { code: "id", nativeName: "Bahasa Indonesia", greeting: "Selamat pagi", dir: "ltr", accent: "ochre" },
+  fr: { code: "fr", nativeName: "Français", greeting: "Bonjour", dir: "ltr", speech: "fr-FR", accent: "azure" },
+  ru: { code: "ru", nativeName: "Русский", greeting: "Доброе утро", dir: "ltr", markStress: true, speech: "ru-RU", accent: "indigo" },
+  it: { code: "it", nativeName: "Italiano", greeting: "Buongiorno", dir: "ltr", speech: "it-IT", accent: "terracotta" },
+  es: { code: "es", nativeName: "Español", greeting: "Buenos días", dir: "ltr", speech: "es-ES", accent: "ochre" },
+  de: { code: "de", nativeName: "Deutsch", greeting: "Guten Morgen", dir: "ltr", capitalizedCommonNouns: true, speech: "de-DE", accent: "teal" },
+  en: { code: "en", nativeName: "English", greeting: "Good morning", dir: "ltr", speech: "en-GB", accent: "plum" },
+  pt: { code: "pt", nativeName: "Português", greeting: "Bom dia", dir: "ltr", speech: "pt-PT", accent: "olive" },
+  nl: { code: "nl", nativeName: "Nederlands", greeting: "Goedemorgen", dir: "ltr", speech: "nl-NL", accent: "azure" },
+  sv: { code: "sv", nativeName: "Svenska", greeting: "God morgon", dir: "ltr", speech: "sv-SE", accent: "fern" },
+  pl: { code: "pl", nativeName: "Polski", greeting: "Dzień dobry", dir: "ltr", speech: "pl-PL", accent: "berry" },
+  cs: { code: "cs", nativeName: "Čeština", greeting: "Dobré ráno", dir: "ltr", speech: "cs-CZ", accent: "graphite" },
+  uk: { code: "uk", nativeName: "Українська", greeting: "Доброго ранку", dir: "ltr", markStress: true, speech: "uk-UA", accent: "azure" },
+  ro: { code: "ro", nativeName: "Română", greeting: "Bună dimineața", dir: "ltr", speech: "ro-RO", accent: "fern" },
+  el: { code: "el", nativeName: "Ελληνικά", greeting: "Καλημέρα", dir: "ltr", speech: "el-GR", accent: "azure" },
+  tr: { code: "tr", nativeName: "Türkçe", greeting: "Günaydın", dir: "ltr", speech: "tr-TR", accent: "berry" },
+  ar: { code: "ar", nativeName: "العربية", greeting: "صباح الخير", dir: "rtl", optionalVowelMarks: true, speech: "ar-SA", accent: "fern" },
+  zh: { code: "zh", nativeName: "中文", greeting: "早上好", dir: "ltr", denseScript: true, unspaced: true, charsPerWord: 1.7, speechRegions: ["CN", "TW", "SG"], speech: "zh-CN", accent: "berry" },
+  ja: { code: "ja", nativeName: "日本語", greeting: "おはようございます", dir: "ltr", denseScript: true, unspaced: true, charsPerWord: 2.5, speech: "ja-JP", accent: "graphite" },
+  ko: { code: "ko", nativeName: "한국어", greeting: "좋은 아침이에요", dir: "ltr", denseScript: true, speech: "ko-KR", accent: "teal" },
+  id: { code: "id", nativeName: "Bahasa Indonesia", greeting: "Selamat pagi", dir: "ltr", speech: "id-ID", accent: "ochre" },
 } as const satisfies Record<string, LanguageInfo>;
 
 export type Language = keyof typeof LANGUAGE_REGISTRY;

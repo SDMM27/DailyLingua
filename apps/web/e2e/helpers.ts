@@ -77,6 +77,22 @@ export async function expectNoHorizontalOverflow(page: Page) {
   expect(scrollWidth, `scrollWidth ${scrollWidth} > innerWidth ${innerWidth}`).toBeLessThanOrEqual(innerWidth);
 }
 
+/**
+ * The screen has no WCAG 2.0/2.1 A or AA violation by axe (`axe-core` is injected in the page: no network, no extra
+ * test dependency). Colour contrast is included; run it in light and in dark.
+ */
+export async function expectNoAxeViolations(page: Page) {
+  // A sheet that is still fading in has text at half opacity, which no contrast rule can judge: wait for the finite animations.
+  await page.evaluate(() => Promise.all(document.getAnimations().filter((animation) => animation.effect?.getComputedTiming().iterations !== Infinity).map((animation) => animation.finished)));
+  await page.addScriptTag({ path: require.resolve("axe-core/axe.min.js") });
+  const violations = await page.evaluate(async () => {
+    const axe = (window as unknown as { axe: { run(context: Document, options: object): Promise<{ violations: { id: string; nodes: { target: unknown[] }[] }[] }> } }).axe;
+    const result = await axe.run(document, { runOnly: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] });
+    return result.violations.map((violation) => `${violation.id}: ${violation.nodes.map((node) => node.target.join(" ")).join(" | ")}`);
+  });
+  expect(violations).toEqual([]);
+}
+
 /** Taps a choice the way a user does: its visible row (the radio itself is visually hidden). */
 async function choose(page: Page, name: string | RegExp) {
   await page.locator("label").filter({ has: page.getByRole("radio", { name }) }).click();

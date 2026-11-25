@@ -15,6 +15,9 @@ const PATHS = {
   test: <><path d="M6 3.5h9l3 3v14H6z" /><path d="M9 11l2 2 4-4M9 17h6" /></>,
   ring: <circle cx="12" cy="12" r="6.5" />,
   translate: <><path d="M4 5h9M8.5 3v2M6 5c.5 3 2.5 5.5 5 6.5M11 5c-.5 3-2.5 6-6 7.5" /><path d="M13 20l4-9 4 9M14.5 17h5" /></>,
+  mic: <><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" /></>,
+  info: <><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" strokeWidth="2.2" /></>,
+  stop: <rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor" stroke="none" />,
   xp: <path d="M12 3c.9 4.6 2.6 6.3 8 9-5.4 2.7-7.1 4.4-8 9-.9-4.6-2.6-6.3-8-9 5.4-2.7 7.1-4.4 8-9z" fill="currentColor" stroke="none" />,
 } satisfies Record<string, ReactNode>;
 

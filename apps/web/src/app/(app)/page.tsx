@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { oralSentences } from "@dailylingua/content";
 import { learningDay, formatLongDate, languageDisplayName, resolveGameSettings } from "@dailylingua/core";
 import { DataError, getLearningProgress, getProfile, listEnrollments, listSkillEstimates } from "@dailylingua/data";
 import { gameSettingsSchema } from "@dailylingua/schemas";
@@ -6,12 +7,15 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { GoalRing } from "@/components/today/goal-ring";
+import { OralCard } from "@/components/today/oral-card";
 import { UnitCard } from "@/components/today/unit-card";
 import { WarmupCard } from "@/components/today/warmup-card";
 import { TodaySession } from "@/components/today/today-session";
 import { refreshLegacyDataIfStale } from "@/lib/auth/claim-legacy";
 import { dailyGoalXp } from "@/lib/goal";
 import { gradedTextGenerationEnabled } from "@/lib/graded-text/server";
+import { unitDraftsAllowed } from "@/lib/ingest/ingest-events";
+import { ORAL_DICTATION_COUNT, ORAL_SENTENCE_COUNT } from "@/lib/oral/select-oral";
 import { getRequestClient, getSessionProfile, getSessionUser } from "@/lib/session";
 import { hasPath } from "@/lib/units/path";
 import { nextUnitToDo } from "@/lib/units/today";
@@ -59,6 +63,9 @@ export default async function TodayPage() {
     ? await Promise.all([nextUnitToDo(user.id, enrollment.language), loadDueWarmups(user.id, enrollment.language, profile.timeZone).catch(() => [])])
     : [null, []];
 
+  // « À voix haute » is offered when the language has sentences to say (published units, drafts only where allowed).
+  const oralCount = Math.min(oralSentences(enrollment.language, { includeDrafts: unitDraftsAllowed() }).length, ORAL_SENTENCE_COUNT + ORAL_DICTATION_COUNT);
+
   return (
     <TodaySession
       language={enrollment.language}
@@ -74,6 +81,7 @@ export default async function TodayPage() {
           {todo && <UnitCard unit={todo.unit} progress={todo.progress} language={enrollment.language} locale={locale} />}
         </>
       )}
+      oralCard={oralCount > 0 && <OralCard language={enrollment.language} locale={locale} count={oralCount} />}
       detail={streak && streak.current > 0 && (
         <details className="mt-5 rounded-xl border border-line bg-surface px-4">
           <summary className="min-h-11 cursor-pointer py-3">

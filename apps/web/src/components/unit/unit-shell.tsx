@@ -14,6 +14,8 @@ export interface UnitBarProps {
   /** XP of the unit, estimated; hidden when null (XP hidden in the settings). */
   xp: number | null;
   offline: boolean;
+  /** The name shown for the current position, when it is not `steps[position - 1]` (the workshop: several screens per item). */
+  label?: string;
 }
 
 /**
@@ -32,7 +34,7 @@ export function UnitShell({ style, bar, onClose, closeLabel, children }: {
   const t = useTranslations("unit");
   const session = useTranslations("dailySession");
   const total = bar?.steps.length ?? 0;
-  const name = bar ? (bar.steps[bar.position - 1] ?? "") : "";
+  const name = bar ? (bar.label ?? bar.steps[bar.position - 1] ?? "") : "";
   const fill = bar && total > 0 ? Math.min(1, Math.max(0, (bar.position - 1 + bar.stepProgress) / total)) : 0;
   return (
     <section data-unit style={style} className="fixed inset-0 z-20 bg-bg text-ink">
@@ -48,6 +50,7 @@ export function UnitShell({ style, bar, onClose, closeLabel, children }: {
               <div
                 className="min-w-0 flex-1"
                 role="progressbar"
+                aria-label={name}
                 aria-valuemin={1}
                 aria-valuemax={total}
                 aria-valuenow={bar.position}
@@ -65,7 +68,7 @@ export function UnitShell({ style, bar, onClose, closeLabel, children }: {
                 {bar.offline ? (
                   <span className="meta" role="status">{session("offline")}</span>
                 ) : bar.xp !== null ? (
-                  <span className="inline-flex items-center gap-1 font-mono text-sm font-medium text-xp" aria-label={t("xpEstimate", { xp: bar.xp })}>
+                  <span role="img" className="inline-flex items-center gap-1 font-mono text-sm font-medium text-xp" aria-label={t("xpEstimate", { xp: bar.xp })}>
                     <Icon name="xp" className="size-3.5" />
                     <span aria-hidden="true">≈{bar.xp}</span>
                   </span>
