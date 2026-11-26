@@ -4,5 +4,6 @@ export * from "./memory";
 export * from "./oral";
 export * from "./profile";
 export * from "./reading-calibration";
+export * from "./roleplay";
 export * from "./unit";
 export * from "./writing-feedback";

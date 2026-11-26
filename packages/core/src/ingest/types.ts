@@ -76,6 +76,25 @@ export interface IngestState {
    * is in `days[day].counted` (`oral:<activity>:<sentenceId>`) and `days[day].xpByReason`.
    */
   oralSentences: Record<string, OralSentence>;
+  /**
+   * The role plays the batch names (`roleplay_completed`), by id, injected by the caller from the learner's own rows
+   * (`app.roleplay`): a game of another account is absent, hence `unknown_roleplay`. `paid` is true when
+   * `roleplay.completed` was already earned for it (`xp_ledger.meta.ref`).
+   */
+  roleplays: Record<string, StateRoleplay>;
+}
+
+export interface StateRoleplay {
+  id: string;
+  language: string;
+  /** Writing level the game was started at (CEFR): sets the words the learner must have written. */
+  level: string;
+  status: "active" | "finished" | "abandoned";
+  /** The learner's turns, as stored: the server counts their words, not the client. */
+  learnerTurns: string[];
+  /** Language the review detected, or null. */
+  detectedLanguage: string | null;
+  paid: boolean;
 }
 
 export interface StateUnitProgress {

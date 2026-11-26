@@ -26,8 +26,8 @@ export interface EventSyncApi {
   refreshWritingFeedback(): void;
   enqueueRewrite(productionId: string, sentenceIndex: number, text: string): Promise<void>;
   eventDelivery(clientEventId: string): Promise<"queued" | "rejected" | "delivered">;
-  /** Queues events of the units (they belong to no session) and asks for a delivery. */
-  enqueueUnitEvents(events: UnitEvent[]): Promise<void>;
+  /** Queues events outside the daily session and asks for a delivery. */
+  enqueueUnitEvents(events: UnitEvent[], occurredAt?: string): Promise<void>;
   advanceSession(sessionId: string, revision: number, next: LocalSessionProgress, events: SessionEvent[], occurredAt: string): Promise<boolean>;
 }
 
@@ -67,8 +67,8 @@ function createEventSync(userId: string): { api: EventSyncApi; start: () => () =
         void sync?.flushNow();
       },
       eventDelivery: (clientEventId) => queue.productionDelivery(clientEventId),
-      async enqueueUnitEvents(events) {
-        await queue.enqueueDeviceEvents(events, new Date().toISOString());
+      async enqueueUnitEvents(events, occurredAt = new Date().toISOString()) {
+        await queue.enqueueDeviceEvents(events, occurredAt);
         void sync?.flushNow();
       },
       async advanceSession(sessionId, revision, next, events, occurredAt) {

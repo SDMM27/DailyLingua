@@ -227,6 +227,9 @@ export const oralAttemptPayloadSchema = z.strictObject({
   endedAt: isoInstantSchema,
 });
 
+/** A finished role play (`j5-pr3-jeu-de-role.md` §2): the server reads the game, nothing of it comes from the client. */
+export const roleplayCompletedPayloadSchema = z.strictObject({ ...deviceFields, roleplayId: z.uuid() });
+
 const ms = (value: string) => Date.parse(value);
 
 function envelope<K extends string, P extends z.ZodType>(kind: K, payload: P) {
@@ -274,6 +277,7 @@ export const clientEventSchema = z.discriminatedUnion("kind", [
       ctx.addIssue({ code: "custom", message: "Expected startedAt < occurredAt", path: ["payload", "startedAt"] });
     }
   }),
+  envelope("roleplay_completed", roleplayCompletedPayloadSchema),
   envelope("oral_attempt", oralAttemptPayloadSchema).superRefine((event, ctx) => {
     const { shownAt, startedAt, endedAt, activity, recognizer, selfRating, answer } = event.payload;
     const issue = (message: string, key: string) => ctx.addIssue({ code: "custom", message, path: ["payload", key] });

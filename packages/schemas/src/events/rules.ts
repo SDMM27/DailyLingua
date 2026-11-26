@@ -3,9 +3,9 @@ import { z } from "zod";
 /**
  * Version of the XP scale written in `xp_ledger.rule_version` (`j2-jeu-xp-serie.md` §1). `j4.1` adds
  * `unit.complete` and the XP of unit items (`j4-pr1-architecture.md` §4); `j5.1` adds `shadowing.sentence` and
- * `dictation.sentence` (`j5-pr1-atelier-oral.md` §4); the other rules are those of `j2.1`.
+ * `dictation.sentence` (`j5-pr1-atelier-oral.md` §4); `j5.2` adds `roleplay.completed` (`j5-pr3-jeu-de-role.md` §2); the other rules are those of `j2.1`.
  */
-export const RULE_VERSION = "j5.1";
+export const RULE_VERSION = "j5.2";
 
 /** Stable XP rule identifiers (`xp_ledger.reason`), exactly those of `j2-jeu-xp-serie.md` §1. */
 export const xpRuleIds = [
@@ -30,6 +30,8 @@ export const xpRuleIds = [
   "shadowing.sentence",
   /** A sentence typed from dictation, 80 % or more of the characters right (1 XP), 95 % (2 XP). */
   "dictation.sentence",
+  /** A role play finished with at least 3 learner turns, the words of the writing level, in the target language (`j5-pr3-jeu-de-role.md` §2). */
+  "roleplay.completed",
 ] as const;
 export const xpRuleIdSchema = z.enum(xpRuleIds);
 export type XpRuleId = z.infer<typeof xpRuleIdSchema>;
@@ -91,6 +93,8 @@ export const rejectionReasons = [
   "step_not_proven",
   "unknown_sentence",
   "wrong_language",
+  /** A `roleplay_completed` event naming a game that is not a finished game of this account (`j5-pr3-jeu-de-role.md` §2). */
+  "unknown_roleplay",
 ] as const;
 export const rejectionReasonSchema = z.enum(rejectionReasons);
 export type RejectionReason = z.infer<typeof rejectionReasonSchema>;

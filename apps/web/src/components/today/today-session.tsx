@@ -16,7 +16,7 @@ import { SessionPanel } from "./session-panel";
 import { SessionPrefetch } from "./session-prefetch";
 import { WritingFeedback } from "./writing-feedback";
 
-export function TodaySession({ language, timeZone, languageName, children, goal, detail, unitCard, oralCard, accentTolerance, animateSummary, prepareText }: {
+export function TodaySession({ language, timeZone, languageName, children, goal, detail, unitCard, oralCard, roleplayAvailable, accentTolerance, animateSummary, prepareText }: {
   language: string;
   timeZone: string;
   languageName: string;
@@ -27,6 +27,7 @@ export function TodaySession({ language, timeZone, languageName, children, goal,
   unitCard?: ReactNode;
   /** « À voix haute », under the way into the path, when the language has sentences to say. */
   oralCard?: ReactNode;
+  roleplayAvailable?: boolean;
   accentTolerance: "strict" | "lenient";
   animateSummary: boolean;
   prepareText: boolean;
@@ -35,6 +36,7 @@ export function TodaySession({ language, timeZone, languageName, children, goal,
   const today = useTranslations("today");
   const common = useTranslations("common");
   const reader = useTranslations("reader");
+  const roleplay = useTranslations("roleplay");
   const locale = useLocale();
   const sync = useEventSync();
   const router = useRouter();
@@ -156,6 +158,9 @@ export function TodaySession({ language, timeZone, languageName, children, goal,
           </article>
           {unitCard}
           {oralCard}
+          {roleplayAvailable && finished && online && (
+            <Link href="/roleplay" className="mt-4 inline-flex min-h-11 items-center text-accent-strong">{roleplay("open")}</Link>
+          )}
           <div className="mt-5 empty:hidden">{sync && <WritingFeedback sync={sync} language={language} />}</div>
           {detail}
         </>

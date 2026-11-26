@@ -43,6 +43,7 @@ export function emptyState(overrides: Partial<IngestState> = {}): IngestState {
     unitAttempts: {},
     unitTestIds: [],
     oralSentences: {},
+    roleplays: {},
     ...overrides,
   };
 }
