@@ -38,10 +38,11 @@ function event(kind: string, payload: Record<string, unknown>, extra: Record<str
 
 describe("rule identifiers", () => {
   it("are those of the scale, once each", () => {
-    expect(xpRuleIds).toHaveLength(18);
-    expect(new Set(xpRuleIds).size).toBe(18);
+    expect(xpRuleIds).toHaveLength(19);
+    expect(new Set(xpRuleIds).size).toBe(19);
     expect(xpRuleIds).toContain("shadowing.sentence");
     expect(xpRuleIds).toContain("dictation.sentence");
+    expect(xpRuleIds).toContain("roleplay.completed");
     expect(xpRuleIds).toContain("review.bonus.reconquest");
     expect(xpRuleIds).toContain("session.complete");
     expect(xpRuleIds).toContain("unit.complete");
@@ -64,6 +65,7 @@ describe("clientEventSchema", () => {
     unit_step_completed: { unitId: UNIT, unitVersion: VERSION, lesson: "l1", step: "key_phrases" },
     unit_test_submitted: { unitId: UNIT, unitVersion: VERSION, attemptId: ID(8), startedAt: "2026-11-12T09:55:00.000Z", answers: [{ itemId: "t-1", answer: "a" }] },
     oral_attempt: { ...ORAL },
+    roleplay_completed: { roleplayId: ID(700) },
   };
 
   it.each(Object.keys(good))("accepts a %s", (kind) => {
@@ -169,6 +171,14 @@ describe("clientEventSchema", () => {
     expect(accepts({ activity: "dictation", recognizer: "none", answer: "buongiorno", selfRating: null })).toBe(true);
     expect(accepts({ activity: "dictation", recognizer: "none", selfRating: "got_it" })).toBe(false);
     for (const extra of ["ratio", "accuracy", "xp", "score", "correct"]) expect(accepts({ [extra]: 1 })).toBe(false);
+  });
+
+  it("checks the role play completion: a game id and nothing else (no xp, score or turns from the client)", () => {
+    const accepts = (payload: Record<string, unknown>) => clientEventSchema.safeParse(event("roleplay_completed", payload)).success;
+    expect(accepts({ roleplayId: ID(700) })).toBe(true);
+    expect(accepts({})).toBe(false);
+    expect(accepts({ roleplayId: "game-1" })).toBe(false);
+    for (const extra of ["xp", "score", "turns", "words", "status"]) expect(accepts({ roleplayId: ID(700), [extra]: 1 })).toBe(false);
   });
 
   it("caps a batch at 50 events", () => {

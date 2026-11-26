@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import { AI_PURPOSES, AI_PURPOSE_NAMES, isAiPurpose, type PurposeSpec } from "./purposes";
 
 describe("purpose registry", () => {
-  it("has the seven purposes of the design", () => {
+  it("has the purposes of the design", () => {
     expect([...AI_PURPOSE_NAMES].sort()).toEqual(
-      ["assessment_grading", "gloss", "graded_text", "graded_text_review", "rewrite_check", "roleplay", "translation", "writing_feedback"].sort(),
+      ["assessment_grading", "gloss", "graded_text", "graded_text_review", "rewrite_check", "roleplay", "roleplay_review", "roleplay_turn", "translation", "writing_feedback"].sort(),
     );
   });
 
@@ -24,10 +24,12 @@ describe("purpose registry", () => {
     expect(AI_PURPOSES.writing_feedback.dailyLimit).toBe(3);
     expect(AI_PURPOSES.roleplay.dailyLimit).toBe(1);
     expect(AI_PURPOSES.graded_text.dailyLimit).toBe(2);
+    expect(AI_PURPOSES.roleplay_turn).toMatchObject({ quotaKind: "roleplay_turn", dailyLimit: 10, maxOutputTokens: 800 });
+    expect(AI_PURPOSES.roleplay_review).toMatchObject({ quotaKind: "roleplay_turn", dailyLimit: 10, maxOutputTokens: 2000 });
   });
 
   it("stops role play, on-demand texts and stock generation first, never the session", () => {
-    for (const name of ["roleplay", "graded_text", "gloss", "translation"] as const) {
+    for (const name of ["roleplay", "roleplay_turn", "roleplay_review", "graded_text", "gloss", "translation"] as const) {
       expect(AI_PURPOSES[name].essential, name).toBe(false);
     }
     for (const name of ["writing_feedback", "rewrite_check", "assessment_grading"] as const) {

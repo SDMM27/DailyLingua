@@ -46,7 +46,7 @@ async function makeEvents(progress: IDBObjectStore, events: (SessionEvent | Unit
   const pending = events.map((event) => clientEventSchema.parse({
     kind: event.kind,
     payload: { ...event.payload, tz, deviceId: device.id, seq: ++device.sequence },
-    clientEventId: crypto.randomUUID(),
+    clientEventId: event.kind === "roleplay_completed" ? event.payload.roleplayId : crypto.randomUUID(),
     occurredAt,
   }));
   progress.put(device, "device");
@@ -183,7 +183,11 @@ export function createIndexedDbEventQueue(databaseName = "dailylingua-offline"):
       try {
         const pending = await makeEvents(tx.objectStore(SESSION_PROGRESS), events, occurredAt);
         const queue = tx.objectStore(STORE);
-        for (const event of pending) queue.add(event);
+        for (const event of pending) {
+          // The result screen can reopen after reload or in another tab. Reuse the same completion event for a game.
+          if (event.kind === "roleplay_completed" && await request(queue.index(BY_EVENT_ID).getKey(event.clientEventId)) !== undefined) continue;
+          queue.add(event);
+        }
         await completed;
       } catch (error) {
         try { tx.abort(); } catch { /* It may already have aborted. */ }

@@ -34,8 +34,15 @@ export const AI_PURPOSES = {
   gloss: { essential: false, quotaKind: null, dailyLimit: null, maxOutputTokens: 8000 },
   /** Translation of a curated content to one first language: shared stock, no quota. */
   translation: { essential: false, quotaKind: null, dailyLimit: null, maxOutputTokens: 6000 },
-  /** Written role play: 1 a day (g-budget §5.2). */
+  /** Opening of a role play game, written or spoken: 1 a day (g-budget §5.2). */
   roleplay: { essential: false, quotaKind: "roleplay", dailyLimit: 1, maxOutputTokens: 3000 },
+  /**
+   * One turn of the written or spoken role play: the character's reply and the objectives reached. 10 a day, shared with
+   * `roleplay_review` (a game is the opening, up to 8 turns and a review).
+   */
+  roleplay_turn: { essential: false, quotaKind: "roleplay_turn", dailyLimit: 10, maxOutputTokens: 800 },
+  /** Review of a finished role play: objectives, errors and better phrasings. Same technical quota as the turns. */
+  roleplay_review: { essential: false, quotaKind: "roleplay_turn", dailyLimit: 10, maxOutputTokens: 2000 },
   /** Grading of the skills assessment: the learner is waiting, and it is rare. */
   assessment_grading: { essential: true, quotaKind: "assessment_grading", dailyLimit: 3, maxOutputTokens: 8000 },
 } as const satisfies Record<string, PurposeSpec>;

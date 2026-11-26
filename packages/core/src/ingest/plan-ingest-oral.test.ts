@@ -72,7 +72,7 @@ describe("planIngest: oral workshop", () => {
         reason: "shadowing.sentence",
         amount: 1,
         language: "it",
-        rule_version: "j5.1",
+        rule_version: "j5.2",
         source: { kind: "attempt", client_event_id: payload.attempts[0]?.client_event_id },
         meta: expect.objectContaining({ volet: "fluency" }),
       }),
@@ -155,7 +155,7 @@ describe("planIngest: oral workshop", () => {
     const ev = eventWriter();
     const exact = plan(oralState(), [dictation(ev, 30, "Vorrei un caffè per favore.")]);
     expect(exact.payload.xp).toEqual([
-      expect.objectContaining({ reason: "dictation.sentence", amount: 2, rule_version: "j5.1", meta: expect.objectContaining({ volet: "input" }) }),
+      expect.objectContaining({ reason: "dictation.sentence", amount: 2, rule_version: "j5.2", meta: expect.objectContaining({ volet: "input" }) }),
     ]);
     expect(exact.payload.attempts[0]).toMatchObject({ exercise_kind: "oral_dictation", step: "oral", correct: true, duration_ms: 20_000, result: { accuracy: 1, declared: false } });
     // 26 characters: one wrong letter is 96 %, two are 92 %, six are 77 %.

@@ -4,7 +4,7 @@
  */
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { GRAMMAR_POINT_IDS, UNITS, checkUnit, grammarIdsFor, isPublished } from "@dailylingua/content";
+import { GRAMMAR_POINT_IDS, ROLEPLAY_SCENARIOS, UNITS, checkRoleplayScenarios, checkUnit, grammarIdsFor, isPublished } from "@dailylingua/content";
 import { isAssessmentUnit, isScriptUnit } from "@dailylingua/schemas";
 import { ruAlphabet } from "../src/lib/alphabets/ru";
 import { itCurriculum } from "../src/lib/grammar/curricula/it";
@@ -93,6 +93,16 @@ for (const [language, alphabet] of Object.entries(alphabets)) {
   } else {
     console.log(`✓ ${language} alphabet: ${taught.length}/${expected.length} letters taught by ${scripts.length} writing unit(s)${complete ? "" : ` (${missing.length} to come)`}`);
   }
+}
+
+// The role play scenarios: valid, unique ids, every level from A1 to C2 has one (`j5-pr3-jeu-de-role.md` §1).
+const roleplayProblems = checkRoleplayScenarios(ROLEPLAY_SCENARIOS);
+if (roleplayProblems.length > 0) {
+  console.log(`✗ role play: ${roleplayProblems.length} problem(s)`);
+  for (const problem of roleplayProblems) console.log(`    - ${problem}`);
+  failed = true;
+} else {
+  console.log(`✓ role play: ${ROLEPLAY_SCENARIOS.length} scenarios, A1 to C2 covered`);
 }
 
 process.exit(failed ? 1 : 0);

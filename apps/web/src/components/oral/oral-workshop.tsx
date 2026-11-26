@@ -3,7 +3,7 @@
 import type { AccentTolerance } from "@dailylingua/core";
 import type { OralSelfRating } from "@dailylingua/schemas";
 import { useTranslations } from "next-intl";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { BottomSheet } from "@/components/ui/bottom-sheet";
 import { Button } from "@/components/ui/button";
 import { UnitShell } from "@/components/unit/unit-shell";
@@ -31,6 +31,7 @@ export interface OralWorkshopProps {
   /** Whether the queue has delivered everything (asked again when the connection changes). */
   checkDelivery(): Promise<boolean>;
   onLeave(): void;
+  roleplayCard?: ReactNode;
 }
 
 type Screen = { kind: "anticipate" | "repeat" | "dictation"; index: number };
@@ -43,7 +44,7 @@ const DELIVERY_POLL_MS = 4000;
  * then the dictations. Everything is graded here for the immediate feedback (the content is in the packet, which also
  * works offline); the server grades again from the events and decides the XP. Close opens the pause sheet.
  */
-export function OralWorkshop({ packet, languageName, units, locale, tolerance, xpVisible, offline, onEvents, checkDelivery, onLeave }: OralWorkshopProps) {
+export function OralWorkshop({ packet, languageName, units, locale, tolerance, xpVisible, offline, onEvents, checkDelivery, onLeave, roleplayCard }: OralWorkshopProps) {
   const t = useTranslations("oral");
   const unit = useTranslations("unit");
   const session = useTranslations("dailySession");
@@ -105,7 +106,7 @@ export function OralWorkshop({ packet, languageName, units, locale, tolerance, x
   if (phase === "entry") {
     return (
       <UnitShell style={style} onClose={onLeave} closeLabel={t("pause")}>
-        <OralEntry languageName={languageName} minutes={ORAL_MINUTES} count={distinct} dictated={dictation.length} units={units} onStart={() => setPhase("run")} />
+        <OralEntry languageName={languageName} minutes={ORAL_MINUTES} count={distinct} dictated={dictation.length} units={units} onStart={() => setPhase("run")} roleplayCard={roleplayCard} />
       </UnitShell>
     );
   }

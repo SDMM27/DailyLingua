@@ -27,17 +27,19 @@ export const DAILY_CAPS = {
   /** XP of `shadowing.sentence` and of `dictation.sentence` a day (`j5-pr1-atelier-oral.md` §4). */
   shadowing: 30,
   dictation: 30,
+  /** `roleplay.completed` rewards a learning day (`j5-pr3-jeu-de-role.md` §2: one game a day). */
+  roleplay: 1,
 } as const;
 
 /**
- * Theoretical maximum of a day with every cap reached: 120 + 100 + 40 + 30 + 20 + 6 + 10 + 10 + 50 + 30 + 30. The items
+ * Theoretical maximum of a day with every cap reached: 120 + 100 + 40 + 30 + 20 + 6 + 10 + 10 + 50 + 30 + 30 + 15. The items
  * of the units share the 40 XP of `focus.*` with the workshop; two units passed add 50; the oral workshop adds 30 XP of
- * repetition and 30 XP of dictation (446 since `j5.1`, 386 before).
+ * repetition and 30 XP of dictation (446 since `j5.1`, 386 before); a finished role play adds 15 (461 since `j5.2`).
  */
-export const THEORETICAL_DAILY_MAX = 446;
+export const THEORETICAL_DAILY_MAX = 461;
 /**
  * Safety bound of `ingest_batch` in SQL (`app.xp_ledger` sum of a day): 500 since the migration `20261126000100` (it was
- * 400), which also leaves room for `roleplay.completed` (15 XP) of a later PR.
+ * 400), which also leaves room for `roleplay.completed` (15 XP).
  */
 export const SQL_DAILY_XP_BOUND = 500;
 
@@ -115,4 +117,5 @@ export const COUNT_CAPS: Partial<Record<XpRuleId, number>> = {
   "fluency.pass": DAILY_CAPS.fluencyPasses,
   "session.complete": DAILY_CAPS.sessionComplete,
   "unit.complete": DAILY_CAPS.unitComplete,
+  "roleplay.completed": DAILY_CAPS.roleplay,
 };

@@ -470,6 +470,26 @@ isOneToOne: false
                   Insert: { user_id: string; client_event_id: string; fingerprint: string; started_at?: string; fixed_error_ids?: string[] | null }
                   Update: { fixed_error_ids?: string[] | null }
                   Relationships: []
+                },"roleplay": {
+                  Row: {
+                    "created_at": string,"finished_at": string | null,"id": string,"language": string,"level": string,"objectives_met": (boolean)[],"review": Json | null,"scenario_id": string,"status": string,"turns": NonNullable<Json>,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"finished_at"?: string | null,"id"?: string,"language": string,"level": string,"objectives_met"?: (boolean)[],"review"?: Json | null,"scenario_id": string,"status"?: string,"turns"?: NonNullable<Json>,"user_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"finished_at"?: string | null,"id"?: string,"language"?: string,"level"?: string,"objectives_met"?: (boolean)[],"review"?: Json | null,"scenario_id"?: string,"status"?: string,"turns"?: NonNullable<Json>,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "roleplay_language_fkey"
+      columns: ["language"]
+isOneToOne: false
+      referencedRelation: "language"
+      referencedColumns: ["code"]
+    }
+                  ]
                 },"session": {
                   Row: {
                     "completed_at": string | null,"created_at": string,"day": string,"format": number,"id": string,"kind": string,"language": string,"plan": NonNullable<Json>,"served_at": string | null,"started_at": string | null,"status": string,"user_id": string

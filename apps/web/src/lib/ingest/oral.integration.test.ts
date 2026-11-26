@@ -122,7 +122,7 @@ describe.skipIf(!stackIsUp)("the oral workshop through the ingestion (local data
     const dictation = await xp(alice, "dictation.sentence");
     expect(shadowing.total).toBe(1);
     expect(dictation.total).toBe(2);
-    expect([...shadowing.rows, ...dictation.rows].every((row) => row.rule_version === "j5.1")).toBe(true);
+    expect([...shadowing.rows, ...dictation.rows].every((row) => row.rule_version === "j5.2")).toBe(true);
     expect(shadowing.rows[0]?.meta).toMatchObject({ volet: "fluency" });
     expect(dictation.rows[0]?.meta).toMatchObject({ volet: "input" });
     expect(await xp(alice, "anticipation")).toMatchObject({ total: 0 });

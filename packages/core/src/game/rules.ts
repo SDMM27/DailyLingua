@@ -1,8 +1,8 @@
-import type { ReviewMode, XpRuleId, XpVolet, XpZeroReason } from "@dailylingua/schemas";
+import { MIN_ROLEPLAY_TURNS_FOR_XP, type ReviewMode, type XpRuleId, type XpVolet, type XpZeroReason } from "@dailylingua/schemas";
 import { DICTATION_HIGH_ACCURACY, DICTATION_MIN_ACCURACY, MIN_DICTATION_MS, MIN_SPEAKING_MS_PER_WORD, SHADOWING_MIN_RATIO } from "../oral/thresholds";
 
 /**
- * The XP scale (`j2.1`, plus `unit.complete` in `j4.1` and the oral rules in `j5.1`; `j2-jeu-xp-serie.md` §1,
+ * The XP scale (`j2.1`, plus `unit.complete` in `j4.1` and the oral rules in `j5.1`, `roleplay.completed` in `j5.2`; `j2-jeu-xp-serie.md` §1,
  * `j4-pr1-architecture.md` §4, `j5-pr1-atelier-oral.md` §4). One function per rule: each takes the proof that
  * `planIngest` assembled and says what the rule is worth BEFORE the caps (`caps.ts`) and the yields.
  * No rule reads a clock or a store; nothing here comes from the client except the raw proof facts.
@@ -36,6 +36,7 @@ export const RULE_VOLET: Record<XpRuleId, XpVolet | null> = {
   "unit.complete": null,
   "shadowing.sentence": "fluency",
   "dictation.sentence": "input",
+  "roleplay.completed": "output",
 };
 
 /** XP of each rule before the caps. */
@@ -59,6 +60,7 @@ export const RULE_XP = {
   "shadowing.sentence": 1,
   /** The most a dictation pays (accuracy of 95 % and over); from 80 % it pays `DICTATION_PARTIAL_XP`. */
   "dictation.sentence": 2,
+  "roleplay.completed": 15,
 } as const satisfies Record<XpRuleId, number>;
 
 const outcome = (rule: XpRuleId, amount: number, zero: XpZeroReason | null = null): RuleOutcome => ({
@@ -339,4 +341,25 @@ export function dictationSentence(proof: DictationProof): RuleOutcome {
   if (proof.elapsedMs < MIN_DICTATION_MS) return outcome("dictation.sentence", 0, "too_fast");
   if (proof.alreadyCountedToday) return outcome("dictation.sentence", 0, "already_counted_today");
   return outcome("dictation.sentence", proof.accuracy >= DICTATION_HIGH_ACCURACY ? RULE_XP["dictation.sentence"] : DICTATION_PARTIAL_XP);
+}
+
+export interface RoleplayProof {
+  /** The game is `finished` and belongs to this account (a refusal otherwise, before the rule). */
+  turns: number;
+  words: number;
+  minWords: number;
+  /** Language the review detected, or null when it did not say. */
+  detectedLanguage: string | null;
+  targetLanguage: string;
+}
+
+/**
+ * `roleplay.completed` (15 XP, strand output): a finished game with at least `MIN_ROLEPLAY_TURNS_FOR_XP` learner turns,
+ * the words of the writing level in all and the target language detected. Short: `too_short`; another language, or a
+ * review that did not name one: `wrong_language`. Nothing is read from the client (`j5-pr3-jeu-de-role.md` §2).
+ */
+export function roleplayCompleted(proof: RoleplayProof): RuleOutcome {
+  if (proof.turns < MIN_ROLEPLAY_TURNS_FOR_XP || proof.words < proof.minWords) return outcome("roleplay.completed", 0, "too_short");
+  if (proof.detectedLanguage !== proof.targetLanguage) return outcome("roleplay.completed", 0, "wrong_language");
+  return outcome("roleplay.completed", RULE_XP["roleplay.completed"]);
 }

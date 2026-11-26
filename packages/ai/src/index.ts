@@ -7,3 +7,4 @@ export * from "./purposes";
 export * from "./store";
 export * from "./prompts/writing-feedback";
 export * from "./prompts/rewrite-check";
+export * from "./prompts/roleplay";

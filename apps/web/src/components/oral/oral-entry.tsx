@@ -1,12 +1,13 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/unit/icons";
 import { ShellBody, ShellFooter } from "@/components/unit/unit-shell";
 
 /** The way into « À voix haute »: what the three parts are, where the sentences come from, where the voice goes. */
-export function OralEntry({ languageName, minutes, count, dictated, units, onStart }: {
+export function OralEntry({ languageName, minutes, count, dictated, units, onStart, roleplayCard }: {
   languageName: string;
   minutes: number;
   /** Different sentences in the series. */
@@ -16,6 +17,7 @@ export function OralEntry({ languageName, minutes, count, dictated, units, onSta
   /** Titles of the units the sentences come from. */
   units: string[];
   onStart(): void;
+  roleplayCard?: ReactNode;
 }) {
   const t = useTranslations("oral");
   const rows = [
@@ -48,6 +50,7 @@ export function OralEntry({ languageName, minutes, count, dictated, units, onSta
             <Icon name="info" className="mt-0.5 size-[18px]" />
             {t("entry.privacy")}
           </p>
+          {roleplayCard}
         </div>
       </ShellBody>
       <ShellFooter>

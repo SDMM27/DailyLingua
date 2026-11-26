@@ -41,6 +41,7 @@ describe("where the service role is used", () => {
       "app/api/production/[id]/feedback/route.ts",
       "app/api/production/[id]/rewrites/route.ts",
       "app/api/reader/cards/route.ts",
+      "app/api/roleplay/_handlers.ts",
       "app/api/session/today/route.ts",
     ]);
   });
