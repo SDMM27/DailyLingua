@@ -25,7 +25,10 @@ const sample = readingCalibrationSampleSchema.safeParse(input);
 if (!sample.success) {
   console.error("Paires de calibrage invalides. Vérifie le format décrit dans la fiche du jalon 6.");
   for (const issue of sample.error.issues) {
-    console.error(`Entrée ${issue.path[0] ?? "racine"} : ${issue.code === "custom" ? issue.message : issue.path.slice(1).join(".")}`);
+    const [index, ...fields] = issue.path;
+    const location = index === undefined ? "Racine" : `Entrée ${index}`;
+    const problem = issue.code === "custom" ? issue.message : `Format invalide (${fields.join(".") || "valeur"})`;
+    console.error(`${location} : ${problem}`);
   }
   process.exit(1);
 }
