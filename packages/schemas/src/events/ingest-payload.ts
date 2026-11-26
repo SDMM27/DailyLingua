@@ -122,7 +122,7 @@ export const ingestPayloadSchema = z.strictObject({
         client_event_id: z.uuid(),
         session_id: z.uuid().nullable(),
         language: languageCodeSchema,
-        mode: z.literal("writing"),
+        mode: z.enum(["writing", "spoken"]),
         task: jsonObjectSchema,
         text: z.string(),
       }),

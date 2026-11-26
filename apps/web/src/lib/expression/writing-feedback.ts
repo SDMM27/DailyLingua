@@ -132,6 +132,7 @@ export async function requestWritingFeedback(
     targetLevel: targetLevel.success ? targetLevel.data : level,
     purpose: context.purpose && purposes.has(context.purpose) ? context.purpose : null,
     task: context.task,
+    inputMode: context.mode === "spoken" ? "speech_transcript" : "typed",
     text: context.text,
   });
 

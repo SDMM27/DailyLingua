@@ -15,7 +15,28 @@ export interface EvalCase {
   trap?: boolean;
   /** Overrides the band's least number of corrections. */
   minCorrections?: number;
+  /** The text is the automatic transcript of speech (no punctuation, no capitals): see `transcriptProblems`. */
+  inputMode?: "speech_transcript";
+  /** Passages of a transcript with a real error, each of which must be covered by a correction. */
+  mustCorrect?: string[];
   request: WritingFeedbackRequest;
+}
+
+const normalizeForm = (value: string) => value.normalize("NFC").toLocaleLowerCase().replace(/[\p{P}\s]+/gu, " ").trim();
+
+/**
+ * What is wrong with the corrections of a speech transcript (`j5-pr2-production-orale.md` §4): a real error that was lost,
+ * or a correction that only changes punctuation or capitals. Empty when the review is right.
+ */
+export function transcriptProblems(evalCase: EvalCase, corrections: readonly { original: string; corrected: string }[]): string[] {
+  if (evalCase.inputMode !== "speech_transcript") return [];
+  const lost = (evalCase.mustCorrect ?? [])
+    .filter((passage) => !corrections.some(({ original }) => normalizeForm(original).includes(normalizeForm(passage))))
+    .map((passage) => `faute perdue : « ${passage} »`);
+  const cosmetic = corrections
+    .filter(({ original, corrected }) => normalizeForm(original) === normalizeForm(corrected))
+    .map(({ original }) => `correction de ponctuation ou de majuscule : « ${original} »`);
+  return [...lost, ...cosmetic];
 }
 
 /** Bands on the mean of the four scores, and the least a fair or weak text must be corrected on. */
@@ -183,6 +204,51 @@ export const EVAL_CASES: EvalCase[] = [
     request: {
       ...italian,
       text: "À mon avis, travailler à la maison est plus agréable, parce que je n'ai pas besoin de prendre le train et je suis plus concentré. Mais mes collègues me manquent parfois.",
+    },
+  },
+  // Transcripts of speech (the text of "Say it"): lowercase, no punctuation, with real errors the review must keep.
+  {
+    id: "it-A2-transcript-agreement",
+    expected: "fair",
+    trap: true,
+    inputMode: "speech_transcript",
+    mustCorrect: ["le mie amiche sono simpatico", "una casa molto grande"],
+    request: {
+      ...italian, level: "A2", mode: "spoken",
+      text: "il fine settimana scorso sono andata al mare con le mie amiche sono simpatico e abbiamo mangiato in una casa molto grande ma il mare era freddo e noi non abbiamo fatto il bagno",
+    },
+  },
+  {
+    id: "it-A2-transcript-auxiliary",
+    expected: "fair",
+    trap: true,
+    inputMode: "speech_transcript",
+    mustCorrect: ["ho andato", "ho arrivato"],
+    request: {
+      ...italian, level: "A2", mode: "spoken",
+      text: "ieri ho andato al lavoro in bicicletta e ho arrivato tardi perche pioveva molto poi ho mangiato un panino con i miei colleghi e la sera sono tornato a casa stanco",
+    },
+  },
+  {
+    id: "ru-B1-transcript-case",
+    expected: "fair",
+    trap: true,
+    inputMode: "speech_transcript",
+    mustCorrect: ["с мой друг", "в московский"],
+    request: {
+      ...russian, level: "B1", targetLevel: "B2", mode: "spoken",
+      text: "в субботу я ходил в театр с мой друг мы смотрели спектакль в московский театр и потом долго гуляли по городу было очень холодно но нам было весело",
+    },
+  },
+  {
+    id: "ru-B1-transcript-agreement",
+    expected: "fair",
+    trap: true,
+    inputMode: "speech_transcript",
+    mustCorrect: ["в красивый город", "моя брат"],
+    request: {
+      ...russian, level: "B1", targetLevel: "B2", mode: "spoken",
+      text: "летом мы жили в красивый город на юге россии там работает моя брат он врач мы много плавали и ели свежие фрукты я хочу поехать туда ещё раз",
     },
   },
 ];

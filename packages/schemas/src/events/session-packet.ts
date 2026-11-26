@@ -113,6 +113,8 @@ export const sessionPacketSchema = z.strictObject({
   momentumWords: z.number().int().positive().nullable().optional(),
   errorOfTheDay: packetErrorOfTheDaySchema.nullable(),
   quotas: z.strictObject({ writingFeedback: quotaSchema, rewriteCheck: quotaSchema }),
+  /** Absent in a packet kept before "Say it" existed: read as "do not suggest". */
+  expression: z.strictObject({ suggestSpoken: z.boolean() }).optional(),
   serverDay: dateKeySchema,
   timeZone: z.string().min(1),
 });

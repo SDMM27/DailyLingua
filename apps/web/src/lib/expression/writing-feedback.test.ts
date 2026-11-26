@@ -14,7 +14,7 @@ const input = { userId: USER, productionId: PRODUCTION, now: NOW };
 const sentence = "Ieri io andare al mercato con mio fratello.";
 const nextSentence = "Noi avere comprato alcune mele.";
 const context = {
-  productionId: PRODUCTION, sessionId: SESSION, format: 15, language: "it", nativeLanguage: "en",
+  productionId: PRODUCTION, sessionId: SESSION, format: 15, language: "it", nativeLanguage: "en", mode: "writing" as "writing" | "spoken",
   text: `${sentence} ${nextSentence}`, task: "Racconta la tua giornata.", timeZone: "Europe/Paris",
   targetLevel: "B2", purpose: "travel", skillEstimates: [],
 };
@@ -86,6 +86,19 @@ describe("written feedback", () => {
       expect(store.save).toHaveBeenCalledOnce();
     },
   );
+
+  it("tells the model whether the text was typed or is a speech transcript, and keeps the constant paragraph in the system prompt", async () => {
+    const typed = setup();
+    await requestWritingFeedback(input, typed.deps);
+    expect(JSON.parse(typed.create.mock.calls[0]![0].messages[0]!.content)).toMatchObject({ inputMode: "typed" });
+
+    const spoken = setup({ mode: "spoken" });
+    await requestWritingFeedback(input, spoken.deps);
+    const request = spoken.create.mock.calls[0]![0];
+    expect(JSON.parse(request.messages[0]!.content)).toMatchObject({ inputMode: "speech_transcript", text: context.text });
+    expect(JSON.stringify(request.system)).toContain("When inputMode is speech_transcript");
+    expect(JSON.stringify(request.system)).not.toContain(context.text);
+  });
 
   it("allows exactly one charged call across simultaneous requests and retries XP settlement with the saved feedback", async () => {
     const { deps, create, store, quota, reconcile } = setup();

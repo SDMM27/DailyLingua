@@ -714,9 +714,11 @@ class Ingestion {
     const session = this.s.sessions[p.sessionId] as StateSession;
     const production = { id: p.productionId, sessionId: session.id, language: session.language, text: p.text, day: at.day, late: at.late, settled: false, correctionDeferred: false, clientEventId: event.clientEventId };
     const initialSimilarity = this.productionSimilarity(production);
-    const task = { initialSimilarity, ...(session.readingTextId ? { textId: session.readingTextId } : {}) };
-    this.out.productions.push({ id: p.productionId, client_event_id: event.clientEventId, session_id: session.id, language: session.language, mode: "writing", task, text: p.text });
-    this.s.productions[p.productionId] = { ...production, initialSimilarity };
+    // `speakingMs` lives in the row's `task` so a later ingest (the correction arriving) reads it back.
+    const spoken = p.mode === "spoken" ? { speakingMs: p.speakingMs ?? 0 } : null;
+    const task = { initialSimilarity, ...spoken, ...(session.readingTextId ? { textId: session.readingTextId } : {}) };
+    this.out.productions.push({ id: p.productionId, client_event_id: event.clientEventId, session_id: session.id, language: session.language, mode: spoken ? "spoken" : "writing", task, text: p.text });
+    this.s.productions[p.productionId] = { ...production, initialSimilarity, ...spoken };
     this.s.recentProductionTexts.unshift({ id: production.id, text: production.text });
     this.s.recentProductionTexts.length = Math.min(30, this.s.recentProductionTexts.length);
     this.touchSession(session, "expression", event, at);
@@ -1104,6 +1106,7 @@ class Ingestion {
       words: countWords(production.language, production.text), minWords: PRODUCTION_MIN_WORDS[level],
       detectedLanguage: correction?.detectedLanguage ?? null, targetLanguage: production.language,
       similarity: production.initialSimilarity ?? this.productionSimilarity(production),
+      ...(production.speakingMs === undefined ? {} : { speakingMs: production.speakingMs }),
     });
   }
 
