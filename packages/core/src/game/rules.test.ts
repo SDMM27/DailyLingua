@@ -32,6 +32,7 @@ import {
   reviewRecognition,
   rewriteSentence,
   sessionComplete,
+  roleplayCompleted,
   unitComplete,
   type ReviewProof,
 } from "./index";
@@ -54,9 +55,9 @@ describe("the scale", () => {
     expect(RULE_VOLET["fluency.pass"]).toBe("fluency");
   });
 
-  it("adds up to the theoretical maximum of 446 XP a day, under the SQL bound of 500", () => {
-    const { review: r, input, focusPerDay, productions, rewriteXp, errorOfDay, fluencyPasses, sessionComplete: s, unitComplete: u, shadowing, dictation } = DAILY_CAPS;
-    const total = r + input + focusPerDay + productions * RULE_XP["production.corrected"] + rewriteXp + errorOfDay * RULE_XP["error_of_day.reworked"] + fluencyPasses * RULE_XP["fluency.pass"] + s * RULE_XP["session.complete"] + u * RULE_XP["unit.complete"] + shadowing + dictation;
+  it("adds up to the theoretical maximum of 461 XP a day, under the SQL bound of 500", () => {
+    const { review: r, input, focusPerDay, productions, rewriteXp, errorOfDay, fluencyPasses, sessionComplete: s, unitComplete: u, shadowing, dictation, roleplay } = DAILY_CAPS;
+    const total = r + input + focusPerDay + productions * RULE_XP["production.corrected"] + rewriteXp + errorOfDay * RULE_XP["error_of_day.reworked"] + fluencyPasses * RULE_XP["fluency.pass"] + s * RULE_XP["session.complete"] + u * RULE_XP["unit.complete"] + shadowing + dictation + roleplay * RULE_XP["roleplay.completed"];
     expect(total).toBe(THEORETICAL_DAILY_MAX);
     expect(THEORETICAL_DAILY_MAX).toBeLessThanOrEqual(SQL_DAILY_XP_BOUND);
   });
@@ -300,5 +301,25 @@ describe("oral rules", () => {
     expect(capOral(2, { xpToday: 28, ceiling: DAILY_CAPS.dictation }).amount).toBe(2);
     expect(capOral(2, { xpToday: 29, ceiling: DAILY_CAPS.dictation }).amount).toBe(1);
     expect(capOral(1, { xpToday: 30, ceiling: DAILY_CAPS.shadowing })).toMatchObject({ amount: 0, zero: "cap_reached" });
+  });
+});
+
+describe("roleplay.completed", () => {
+  const proof = (extra: Partial<Parameters<typeof roleplayCompleted>[0]> = {}) =>
+    roleplayCompleted({ turns: 3, words: 60, minWords: 60, detectedLanguage: "it", targetLanguage: "it", ...extra });
+
+  it("pays 15 XP in the output strand for a finished game of 3 turns, the words of the level and the target language", () => {
+    expect(proof()).toMatchObject({ rule: "roleplay.completed", amount: 15, volet: "output", zero: null });
+    expect(RULE_XP["roleplay.completed"]).toBe(15);
+  });
+
+  it("pays nothing for fewer than 3 turns or fewer words than the level asks (too_short)", () => {
+    expect(proof({ turns: 2 })).toMatchObject({ amount: 0, zero: "too_short" });
+    expect(proof({ words: 59 })).toMatchObject({ amount: 0, zero: "too_short" });
+  });
+
+  it("pays nothing when the language detected is not the target one, or is missing (wrong_language)", () => {
+    expect(proof({ detectedLanguage: "fr" })).toMatchObject({ amount: 0, zero: "wrong_language" });
+    expect(proof({ detectedLanguage: null })).toMatchObject({ amount: 0, zero: "wrong_language" });
   });
 });

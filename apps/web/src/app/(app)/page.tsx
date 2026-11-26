@@ -82,6 +82,7 @@ export default async function TodayPage() {
         </>
       )}
       oralCard={oralCount > 0 && <OralCard language={enrollment.language} locale={locale} count={oralCount} />}
+      roleplayAvailable={!user.isGuest}
       detail={streak && streak.current > 0 && (
         <details className="mt-5 rounded-xl border border-line bg-surface px-4">
           <summary className="min-h-11 cursor-pointer py-3">

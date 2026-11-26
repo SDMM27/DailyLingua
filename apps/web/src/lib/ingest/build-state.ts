@@ -421,6 +421,7 @@ export function buildIngestState(input: {
     recentProductionTexts: rows.recentProductionTexts,
     ...unitState(input.unitIds ?? [], rows),
     oralSentences: oralSentencesOf(input.sentenceIds ?? [], input.allowDrafts === true),
+    roleplays: Object.fromEntries((rows.roleplays ?? []).map((game) => [game.id, game])),
   };
   return { state, cardModes, skippedSessions };
 }

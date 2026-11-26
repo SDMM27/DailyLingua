@@ -6,6 +6,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 import { connection } from "next/server";
 import { OralWorkshopPlayer } from "@/components/oral/oral-workshop-player";
+import { RoleplayCard } from "@/components/roleplay/roleplay-card";
 import { explanationLanguageOf } from "@/lib/ingest/build-state";
 import { buildOralPacket } from "@/lib/oral/build-oral-packet";
 import { getRequestClient, getSessionProfile, getSessionUser } from "@/lib/session";
@@ -55,6 +56,7 @@ export default async function OralPage() {
       tolerance={settings.answerTolerance.accents}
       xpVisible={settings.xpVisible}
       backHref="/"
+      roleplayCard={!user.isGuest && <RoleplayCard />}
     />
   );
 }

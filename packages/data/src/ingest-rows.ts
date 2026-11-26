@@ -4,6 +4,7 @@ import { DataError } from "./errors";
 import { readErrorOfDayRows, type ErrorOfDayRow } from "./error-of-day";
 import { chunks, distinct, fetchAll, inChunks, unwrap, unwrapRows } from "./query";
 import { readKnownUnitTestIds, readUnitAttempts, readUnitProgressRows, type UnitAttemptRow, type UnitProgressRow } from "./unit-progress";
+import { readIngestRoleplays, type IngestRoleplayRow } from "./roleplay";
 import { readCorrections, type CorrectionRow } from "./writing-feedback";
 
 /**
@@ -26,6 +27,8 @@ export interface IngestRefs {
   unitIds?: readonly string[];
   /** Test attempt ids of the `unit_test_submitted` events. */
   unitTestIds?: readonly string[];
+  /** Role plays named by `roleplay_completed` events. */
+  roleplayIds?: readonly string[];
 }
 
 /** Learning days (included) whose sessions of the user are read: server day - 8 to + 1. */
@@ -188,6 +191,8 @@ export interface IngestRows {
   unitAttempts?: UnitAttemptRow[];
   /** Test attempt ids of the batch already recorded (any account). */
   unitTestIds?: string[];
+  /** The own games of the learner the events name, with the proof the server holds. */
+  roleplays?: IngestRoleplayRow[];
   ingestState: { seq: number; memo: unknown };
 }
 
@@ -428,6 +433,7 @@ export async function readIngestRows(client: AppClient, userId: string, refs: In
     unitProgress,
     unitAttempts,
     unitTestIds,
+    roleplays,
   ] = await Promise.all([
     db.from("skill_estimate").select("language, skill, level_value").eq("user_id", userId),
     readItems(client, itemIds),
@@ -452,6 +458,7 @@ export async function readIngestRows(client: AppClient, userId: string, refs: In
     readUnitProgressRows(client, userId, unitIds),
     unitIds.length === 0 ? Promise.resolve([] as UnitAttemptRow[]) : readUnitAttempts(client, userId, unitIds),
     readKnownUnitTestIds(client, refs.unitTestIds ?? []),
+    readIngestRoleplays(client, userId, refs.roleplayIds ?? []),
   ]);
 
   const ownCardIds = cardRows.filter((row) => row.user_id === userId).map((row) => row.id);
@@ -492,6 +499,7 @@ export async function readIngestRows(client: AppClient, userId: string, refs: In
     unitProgress,
     unitAttempts,
     unitTestIds,
+    roleplays,
     ingestState: state,
   };
 }
