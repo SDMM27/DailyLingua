@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readerWords } from "./words";
+import { readerCardLemma, readerWords } from "./words";
 
 describe("readerWords", () => {
   const entry = { lemma: "mercato", dictionaryForm: "mercato", definition: "Luogo di vendita.", sentence: 1 };
@@ -21,6 +21,19 @@ describe("readerWords", () => {
       { ...entry, sentence: 0, forms: ["mercati"] },
       { ...entry, lemma: "aperti", dictionaryForm: "aperti" },
     ], "it", "fr")).toMatchObject([{ front: "mercato", from: 2, to: 9 }]);
+  });
+
+  it("resolves forms to their editorial lemma and withholds ambiguous or edited source spans", () => {
+    const text = "I mercati sono aperti.";
+    const inflected = { ...entry, sentence: 0, forms: ["mercati"] };
+    const card = { from: 2, front: "mercato", context: text };
+    expect(readerCardLemma(text, [inflected], "it", card)).toEqual({ lemma: "mercato", definition: entry.definition });
+    expect(readerCardLemma(text, [inflected], "it", { ...card, context: body })).toBeNull();
+    expect(readerCardLemma(text, [inflected, { ...inflected, definition: "Insieme delle vendite." }], "it", card)).toBeNull();
+    const russian = "Я покупаю продукты.";
+    expect(readerCardLemma(russian, [{
+      lemma: "проду́кт", dictionaryForm: "проду́кт", forms: ["продукты"], definition: "Пища.", sentence: 0,
+    }], "ru", { from: 10, front: "проду́кт", context: russian })).toMatchObject({ lemma: "продукт" });
   });
 
   it("uses a comparison only for its editorial sense and a language the learner knows", () => {
