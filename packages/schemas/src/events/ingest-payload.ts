@@ -27,8 +27,8 @@ export const learningDayCauses = ["work", "session", "freeze", "rest", "repair",
 export const learningDayCauseSchema = z.enum(learningDayCauses);
 export type LearningDayCause = z.infer<typeof learningDayCauseSchema>;
 
-/** `step` of an `attempts` row: a step of the session, or `unit` for an item of a unit (no session). */
-export const attemptStepSchema = z.union([sessionStepSchema, z.literal("unit")]);
+/** `step` of an `attempts` row: a step of the session, `unit` for an item of a unit, `oral` for a sentence of the oral workshop (no session). */
+export const attemptStepSchema = z.union([sessionStepSchema, z.literal("unit"), z.literal("oral")]);
 
 /** Key of a validated step of a unit in `unit_progress.steps`: `<lesson>:<step>` (e.g. `l1:key_phrases`). */
 export const UNIT_STEP_KEY_PATTERN = /^l[1-3]:[a-z_]{1,20}$/;

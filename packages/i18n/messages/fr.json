@@ -502,6 +502,105 @@
     "goalsDone": "Validée le {date}",
     "warmupNote": "Un court échauffement d’abord, puis le test."
   },
+  "oral": {
+    "card": {
+      "meta": "À voix haute · {language}",
+      "title": "Cinq minutes à voix haute",
+      "body": "{count} phrases de tes unités : dire, répéter, écrire ce que tu entends.",
+      "open": "Ouvrir"
+    },
+    "entry": {
+      "meta": "À voix haute · {language} · {minutes} min",
+      "sources": "{count} phrases tirées de tes unités : {units}",
+      "privacy": "La reconnaissance passe par le service vocal de ton téléphone. DailyLingua ne reçoit que le texte, jamais ta voix.",
+      "start": "Commencer",
+      "list": "Au programme"
+    },
+    "steps": {
+      "anticipate": "Anticiper",
+      "repeat": "Répéter",
+      "dictation": "Dictée",
+      "anticipateHint": "Le sens s’affiche : dis la phrase avant de l’entendre.",
+      "repeatHint": "Juste après la voix. Ton téléphone compare, mot à mot.",
+      "dictationHint": "{count} phrases à écrire, au caractère près."
+    },
+    "pause": "Mettre « À voix haute » en pause",
+    "pauseTitle": "« À voix haute » en pause",
+    "pauseBody": "Ce que tu as déjà dit est gardé.",
+    "declared": "Déclaré · sans XP",
+    "privacySheet": {
+      "title": "Avant de parler",
+      "body": "Ton téléphone transforme ta voix en texte avec son propre service vocal (Apple ou Google). DailyLingua ne reçoit que le texte.",
+      "ok": "Compris"
+    },
+    "anticipate": {
+      "instruction": "Dis-le en {language} · phrase {index} sur {total}",
+      "hint": "À voix haute, même approximativement. Puis écoute.",
+      "reveal": "Écouter la réponse",
+      "question": "Tu l’avais ?",
+      "had": "Je l’avais",
+      "almost": "Presque",
+      "notYet": "Pas encore"
+    },
+    "repeat": {
+      "instruction": "Répète après la voix · phrase {index} sur {total}",
+      "idle": "Écoute, puis touche le micro et répète.",
+      "mic": "Répéter la phrase",
+      "listening": "Je t’écoute.",
+      "tapToStop": "Touche pour arrêter.",
+      "stop": "Arrêter et comparer",
+      "hearing": "Ce que ton téléphone comprend",
+      "replay": "Réécouter",
+      "slow": "Lent",
+      "good": "Bien repris",
+      "again": "À reprendre",
+      "score": "{matched} mots sur {total} · {percent} %",
+      "heard": "Ton téléphone a compris : « {text} »",
+      "missing": "pas entendu",
+      "substituted": "entendu autrement",
+      "near": "presque : une lettre d’écart, vérifie la terminaison",
+      "restart": "Recommencer",
+      "retry": "Réessayer",
+      "skip": "Passer à la suite",
+      "chunkTip": "Réécoute en lent, puis répète par morceaux : {a}, puis {b}.",
+      "retryTip": "Réécoute en lent, puis répète la phrase entière.",
+      "disclaimer": "La reconnaissance peut lisser des fautes : ce n’est pas une note de prononciation.",
+      "unsupported": "Ce navigateur ne reconnaît pas la parole. Répète après la voix, puis juge-toi toi-même.",
+      "closeQ": "C’était proche ?",
+      "close": "Proche",
+      "notYet": "Pas encore",
+      "micDenied": "Le micro est bloqué. Autorise-le dans les réglages du navigateur, ou juge-toi toi-même.",
+      "noSpeech": "On n’a rien entendu, réessaie.",
+      "failed": "La reconnaissance n’a pas marché. Répète après la voix, puis juge-toi toi-même."
+    },
+    "dictation": {
+      "instruction": "Écris ce que tu entends · {index} sur {total}",
+      "listen": "Écouter",
+      "plays": "Écoutée {count, plural, one {# fois} other {# fois}} · autant que tu veux",
+      "field": "Ta dictée",
+      "rules": "Accents et apostrophes comptent ; la ponctuation et les majuscules, non.",
+      "almost": "Presque tout",
+      "again": "À reprendre",
+      "score": "{correct} caractères sur {total} · {percent} %",
+      "sentence": "La phrase",
+      "legend": "Barré : en trop. Pointillé : manquant. Ondulé : à corriger."
+    },
+    "end": {
+      "title": "« À voix haute » terminé",
+      "xpPending": "≈ +{xp} XP · en attente du réseau",
+      "xpSent": "≈ +{xp} XP · envoyé au serveur",
+      "repeated": "Phrases répétées",
+      "repeatedValue": "{count}, dont {passed} au-dessus de 60 %",
+      "dictation": "Dictée",
+      "dictationValue": "{count} phrases · {percent} % en moyenne",
+      "anticipation": "Anticipation",
+      "anticipationValue": "« Je l’avais » {had} sur {total}",
+      "declared": "déclaré",
+      "review": "À revoir demain",
+      "reviewValue": "{count, plural, one {# phrase} other {# phrases}}",
+      "tomorrow": "Demain, d’autres phrases de tes unités."
+    }
+  },
   "unit": {
     "steps": {
       "dialogue": "Dialogue",

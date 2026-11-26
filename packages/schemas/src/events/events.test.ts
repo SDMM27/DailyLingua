@@ -19,6 +19,17 @@ const DEVICE = ID(900);
 const AT = "2026-11-12T10:00:00.000Z";
 const UNIT = "it-a1-01-saluer";
 const VERSION = "0123456789ab";
+const ORAL = {
+  sentenceId: `${"it-a1-01-saluer"}#l1`,
+  unitVersion: "0123456789ab",
+  activity: "shadowing",
+  answer: "buongiorno",
+  recognizer: "device",
+  selfRating: null,
+  shownAt: "2026-11-12T09:59:50.000Z",
+  startedAt: "2026-11-12T09:59:55.000Z",
+  endedAt: "2026-11-12T09:59:58.000Z",
+};
 const BASE = { tz: "Europe/Paris", deviceId: DEVICE, seq: 1 };
 
 function event(kind: string, payload: Record<string, unknown>, extra: Record<string, unknown> = {}) {
@@ -27,8 +38,10 @@ function event(kind: string, payload: Record<string, unknown>, extra: Record<str
 
 describe("rule identifiers", () => {
   it("are those of the scale, once each", () => {
-    expect(xpRuleIds).toHaveLength(16);
-    expect(new Set(xpRuleIds).size).toBe(16);
+    expect(xpRuleIds).toHaveLength(18);
+    expect(new Set(xpRuleIds).size).toBe(18);
+    expect(xpRuleIds).toContain("shadowing.sentence");
+    expect(xpRuleIds).toContain("dictation.sentence");
     expect(xpRuleIds).toContain("review.bonus.reconquest");
     expect(xpRuleIds).toContain("session.complete");
     expect(xpRuleIds).toContain("unit.complete");
@@ -50,6 +63,7 @@ describe("clientEventSchema", () => {
     unit_item_attempt: { unitId: UNIT, unitVersion: VERSION, lesson: "l1", itemId: "d-q1", try: 1, answer: "a", shownAt: "2026-11-12T09:59:55.000Z" },
     unit_step_completed: { unitId: UNIT, unitVersion: VERSION, lesson: "l1", step: "key_phrases" },
     unit_test_submitted: { unitId: UNIT, unitVersion: VERSION, attemptId: ID(8), startedAt: "2026-11-12T09:55:00.000Z", answers: [{ itemId: "t-1", answer: "a" }] },
+    oral_attempt: { ...ORAL },
   };
 
   it.each(Object.keys(good))("accepts a %s", (kind) => {
@@ -111,6 +125,34 @@ describe("clientEventSchema", () => {
     expect(clientEventSchema.safeParse(event("unit_test_submitted", { ...test, answers: eleven })).success).toBe(false);
     expect(clientEventSchema.safeParse(event("unit_test_submitted", { ...test, answers: [{ itemId: "t-1", answer: "a", correct: true }] })).success).toBe(false);
     expect(clientEventSchema.safeParse(event("unit_test_submitted", { ...test, attemptId: "attempt-1" })).success).toBe(false);
+  });
+
+  it("checks the oral attempt: ids, activities, self-rating, answer and the order of the instants", () => {
+    const accepts = (payload: Record<string, unknown>) => clientEventSchema.safeParse(event("oral_attempt", { ...ORAL, ...payload })).success;
+    expect(accepts({})).toBe(true);
+    expect(accepts({ sentenceId: "" })).toBe(false);
+    expect(accepts({ sentenceId: "x".repeat(81) })).toBe(false);
+    expect(accepts({ sentenceId: "x".repeat(80) })).toBe(true);
+    expect(accepts({ unitVersion: "0123456789AB" })).toBe(false);
+    expect(accepts({ activity: "karaoke" })).toBe(false);
+    expect(accepts({ recognizer: "cloud" })).toBe(false);
+    expect(accepts({ answer: "x".repeat(201) })).toBe(false);
+    // Instants: shownAt <= startedAt < endedAt <= occurredAt.
+    expect(accepts({ shownAt: ORAL.startedAt })).toBe(true);
+    expect(accepts({ shownAt: "2026-11-12T09:59:56.000Z" })).toBe(false);
+    expect(accepts({ endedAt: ORAL.startedAt })).toBe(false);
+    expect(accepts({ endedAt: AT })).toBe(true);
+    expect(accepts({ endedAt: "2026-11-12T10:00:01.000Z" })).toBe(false);
+    // Self-rating: exactly for an anticipation and a repetition without recognition.
+    expect(accepts({ selfRating: "got_it" })).toBe(false);
+    expect(accepts({ recognizer: "none", selfRating: null })).toBe(false);
+    expect(accepts({ recognizer: "none", selfRating: "almost", answer: "" })).toBe(true);
+    expect(accepts({ activity: "anticipation", recognizer: "none", answer: "", selfRating: "not_yet" })).toBe(true);
+    expect(accepts({ activity: "anticipation", recognizer: "none", answer: "", selfRating: null })).toBe(false);
+    expect(accepts({ activity: "anticipation", recognizer: "none", answer: "ciao", selfRating: "got_it" })).toBe(false);
+    expect(accepts({ activity: "dictation", recognizer: "none", answer: "buongiorno", selfRating: null })).toBe(true);
+    expect(accepts({ activity: "dictation", recognizer: "none", selfRating: "got_it" })).toBe(false);
+    for (const extra of ["ratio", "accuracy", "xp", "score", "correct"]) expect(accepts({ [extra]: 1 })).toBe(false);
   });
 
   it("caps a batch at 50 events", () => {
@@ -187,6 +229,8 @@ describe("ingestPayloadSchema", () => {
     };
     expect(ingestPayloadSchema.safeParse(payload).success).toBe(true);
     expect(ingestPayloadSchema.safeParse({ ...payload, attempts: [{ ...payload.attempts[0], session_id: null, step: "unit", exercise_kind: "unit_mcq" }] }).success).toBe(true);
+    expect(ingestPayloadSchema.safeParse({ ...payload, attempts: [{ ...payload.attempts[0], session_id: null, step: "oral", exercise_kind: "oral_dictation" }] }).success).toBe(true);
+    expect(ingestPayloadSchema.safeParse({ ...payload, attempts: [{ ...payload.attempts[0], session_id: null, step: "karaoke" }] }).success).toBe(false);
   });
 
   it("refuses a unit row out of format", () => {

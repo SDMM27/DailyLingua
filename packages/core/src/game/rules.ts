@@ -1,7 +1,9 @@
 import type { ReviewMode, XpRuleId, XpVolet, XpZeroReason } from "@dailylingua/schemas";
+import { DICTATION_HIGH_ACCURACY, DICTATION_MIN_ACCURACY, MIN_DICTATION_MS, MIN_SPEAKING_MS_PER_WORD, SHADOWING_MIN_RATIO } from "../oral/thresholds";
 
 /**
- * The XP scale (`j2.1`, plus `unit.complete` in `j4.1`; `j2-jeu-xp-serie.md` §1, `j4-pr1-architecture.md` §4) (`j2-jeu-xp-serie.md` §1). One function per rule: each takes the proof that
+ * The XP scale (`j2.1`, plus `unit.complete` in `j4.1` and the oral rules in `j5.1`; `j2-jeu-xp-serie.md` §1,
+ * `j4-pr1-architecture.md` §4, `j5-pr1-atelier-oral.md` §4). One function per rule: each takes the proof that
  * `planIngest` assembled and says what the rule is worth BEFORE the caps (`caps.ts`) and the yields.
  * No rule reads a clock or a store; nothing here comes from the client except the raw proof facts.
  */
@@ -32,6 +34,8 @@ export const RULE_VOLET: Record<XpRuleId, XpVolet | null> = {
   "fluency.pass": "fluency",
   "session.complete": null,
   "unit.complete": null,
+  "shadowing.sentence": "fluency",
+  "dictation.sentence": "input",
 };
 
 /** XP of each rule before the caps. */
@@ -52,6 +56,9 @@ export const RULE_XP = {
   "fluency.pass": 5,
   "session.complete": 10,
   "unit.complete": 25,
+  "shadowing.sentence": 1,
+  /** The most a dictation pays (accuracy of 95 % and over); from 80 % it pays `DICTATION_PARTIAL_XP`. */
+  "dictation.sentence": 2,
 } as const satisfies Record<XpRuleId, number>;
 
 const outcome = (rule: XpRuleId, amount: number, zero: XpZeroReason | null = null): RuleOutcome => ({
@@ -283,4 +290,49 @@ export function sessionComplete(proof: { kind: "daily" | "catch_up" | "review_on
 export function unitComplete(proof: { passed: boolean; alreadyPassed: boolean }): RuleOutcome {
   if (!proof.passed) return outcome("unit.complete", 0);
   return proof.alreadyPassed ? outcome("unit.complete", 0, "already_earned") : outcome("unit.complete", RULE_XP["unit.complete"]);
+}
+
+/** XP of a dictation at 80 % of accuracy and over, below `DICTATION_HIGH_ACCURACY`. */
+export const DICTATION_PARTIAL_XP = 1;
+
+export interface ShadowingProof {
+  /** Share of right words of the comparison with the model (`compareSpoken`). */
+  ratio: number;
+  /** `endedAt - startedAt` in ms: how long the learner spoke. */
+  speakingMs: number;
+  /** Words of the model sentence. */
+  words: number;
+  /** This sentence was already paid in repetition today. */
+  alreadyCountedToday: boolean;
+}
+
+/**
+ * `shadowing.sentence` (1 XP): a sentence repeated and recognised at 60 % or more. Spoken faster than 250 ms a word
+ * earns 0 (`too_fast`), a sentence paid already today 0 (`already_counted_today`). Below 60 % nothing is owed.
+ */
+export function shadowingSentence(proof: ShadowingProof): RuleOutcome {
+  if (proof.ratio < SHADOWING_MIN_RATIO) return outcome("shadowing.sentence", 0);
+  if (proof.speakingMs < MIN_SPEAKING_MS_PER_WORD * proof.words) return outcome("shadowing.sentence", 0, "too_fast");
+  if (proof.alreadyCountedToday) return outcome("shadowing.sentence", 0, "already_counted_today");
+  return outcome("shadowing.sentence", RULE_XP["shadowing.sentence"]);
+}
+
+export interface DictationProof {
+  /** Accuracy of the typed text (`gradeDictation`). */
+  accuracy: number;
+  /** `endedAt - shownAt` in ms. */
+  elapsedMs: number;
+  /** This sentence was already paid in dictation today. */
+  alreadyCountedToday: boolean;
+}
+
+/**
+ * `dictation.sentence`: 1 XP from 80 % of accuracy, 2 XP from 95 %. Answered in under a second after the sentence was
+ * shown earns 0 (`too_fast`), a sentence paid already today 0 (`already_counted_today`). Below 80 % nothing is owed.
+ */
+export function dictationSentence(proof: DictationProof): RuleOutcome {
+  if (proof.accuracy < DICTATION_MIN_ACCURACY) return outcome("dictation.sentence", 0);
+  if (proof.elapsedMs < MIN_DICTATION_MS) return outcome("dictation.sentence", 0, "too_fast");
+  if (proof.alreadyCountedToday) return outcome("dictation.sentence", 0, "already_counted_today");
+  return outcome("dictation.sentence", proof.accuracy >= DICTATION_HIGH_ACCURACY ? RULE_XP["dictation.sentence"] : DICTATION_PARTIAL_XP);
 }

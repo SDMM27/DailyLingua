@@ -9,7 +9,10 @@ import {
   THEORETICAL_DAILY_MAX,
   capCount,
   capFocus,
+  capOral,
   capReading,
+  dictationSentence,
+  shadowingSentence,
   capReview,
   capRewrite,
   errorOfDayReworked,
@@ -51,9 +54,9 @@ describe("the scale", () => {
     expect(RULE_VOLET["fluency.pass"]).toBe("fluency");
   });
 
-  it("adds up to the theoretical maximum of 386 XP a day, under the SQL bound of 400", () => {
-    const { review: r, input, focusPerDay, productions, rewriteXp, errorOfDay, fluencyPasses, sessionComplete: s, unitComplete: u } = DAILY_CAPS;
-    const total = r + input + focusPerDay + productions * RULE_XP["production.corrected"] + rewriteXp + errorOfDay * RULE_XP["error_of_day.reworked"] + fluencyPasses * RULE_XP["fluency.pass"] + s * RULE_XP["session.complete"] + u * RULE_XP["unit.complete"];
+  it("adds up to the theoretical maximum of 446 XP a day, under the SQL bound of 500", () => {
+    const { review: r, input, focusPerDay, productions, rewriteXp, errorOfDay, fluencyPasses, sessionComplete: s, unitComplete: u, shadowing, dictation } = DAILY_CAPS;
+    const total = r + input + focusPerDay + productions * RULE_XP["production.corrected"] + rewriteXp + errorOfDay * RULE_XP["error_of_day.reworked"] + fluencyPasses * RULE_XP["fluency.pass"] + s * RULE_XP["session.complete"] + u * RULE_XP["unit.complete"] + shadowing + dictation;
     expect(total).toBe(THEORETICAL_DAILY_MAX);
     expect(THEORETICAL_DAILY_MAX).toBeLessThanOrEqual(SQL_DAILY_XP_BOUND);
   });
@@ -257,5 +260,45 @@ describe("caps and yields", () => {
   it("caps the rules paid by count", () => {
     expect(capCount(15, { rewardsToday: 1, max: DAILY_CAPS.productions }).amount).toBe(15);
     expect(capCount(15, { rewardsToday: 2, max: DAILY_CAPS.productions }).zero).toBe("cap_reached");
+  });
+});
+
+describe("oral rules", () => {
+  const spoken = (extra: Partial<Parameters<typeof shadowingSentence>[0]> = {}) => shadowingSentence({ ratio: 0.8, speakingMs: 3000, words: 4, alreadyCountedToday: false, ...extra });
+  const typed = (extra: Partial<Parameters<typeof dictationSentence>[0]> = {}) => dictationSentence({ accuracy: 1, elapsedMs: 8000, alreadyCountedToday: false, ...extra });
+
+  it("pays 1 XP in the fluency strand for a repetition at 60 % and over", () => {
+    expect(spoken({ ratio: 0.6 })).toMatchObject({ rule: "shadowing.sentence", amount: 1, volet: "fluency", zero: null });
+    expect(spoken({ ratio: 1 }).amount).toBe(1);
+    expect(spoken({ ratio: 0.59 })).toMatchObject({ amount: 0, zero: null });
+  });
+
+  it("refuses a repetition spoken faster than 250 ms a word, or already paid today", () => {
+    expect(spoken({ speakingMs: 999 })).toMatchObject({ amount: 0, zero: "too_fast" });
+    expect(spoken({ speakingMs: 1000 }).amount).toBe(1);
+    expect(spoken({ alreadyCountedToday: true })).toMatchObject({ amount: 0, zero: "already_counted_today" });
+    expect(spoken({ ratio: 0.3, speakingMs: 1 })).toMatchObject({ amount: 0, zero: null });
+  });
+
+  it("pays a dictation 1 XP from 80 % and 2 XP from 95 %, in the input strand", () => {
+    expect(typed({ accuracy: 0.79 })).toMatchObject({ amount: 0, zero: null });
+    expect(typed({ accuracy: 0.8 })).toMatchObject({ rule: "dictation.sentence", amount: 1, volet: "input", zero: null });
+    expect(typed({ accuracy: 0.94 }).amount).toBe(1);
+    expect(typed({ accuracy: 0.95 }).amount).toBe(2);
+    expect(typed({ accuracy: 1 }).amount).toBe(2);
+  });
+
+  it("refuses a dictation answered within a second, or already paid today", () => {
+    expect(typed({ elapsedMs: 999 })).toMatchObject({ amount: 0, zero: "too_fast" });
+    expect(typed({ elapsedMs: 1000 }).amount).toBe(2);
+    expect(typed({ alreadyCountedToday: true })).toMatchObject({ amount: 0, zero: "already_counted_today" });
+  });
+
+  it("caps each activity at 30 XP a day", () => {
+    expect(DAILY_CAPS.shadowing).toBe(30);
+    expect(DAILY_CAPS.dictation).toBe(30);
+    expect(capOral(2, { xpToday: 28, ceiling: DAILY_CAPS.dictation }).amount).toBe(2);
+    expect(capOral(2, { xpToday: 29, ceiling: DAILY_CAPS.dictation }).amount).toBe(1);
+    expect(capOral(1, { xpToday: 30, ceiling: DAILY_CAPS.shadowing })).toMatchObject({ amount: 0, zero: "cap_reached" });
   });
 });

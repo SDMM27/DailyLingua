@@ -7,6 +7,7 @@ import {
   type CardSource,
   type DateKey,
   type IngestPayload,
+  type OralSentence,
   type Unit,
   type UnitLessonId,
   type XpRuleId,
@@ -15,6 +16,7 @@ import { addDays, learningDay, localTime } from "../dates";
 import {
   CLOCK_ROLLBACK_MS,
   COUNT_CAPS,
+  DAILY_CAPS,
   PRODUCTION_MIN_WORDS,
   REWRITE_MIN_SIMILARITY,
   RULE_VOLET,
@@ -25,11 +27,13 @@ import {
   buildSettingsHistory,
   capCount,
   capFocus,
+  capOral,
   capReading,
   capReview,
   capRewrite,
   dayStatuses,
   daysSkippedByTimeZoneChange,
+  dictationSentence,
   errorOfDayReworked,
   expressionValidated,
   fluencyPass,
@@ -48,6 +52,7 @@ import {
   reviewOutcome,
   rewriteSentence,
   sessionComplete,
+  shadowingSentence,
   timeZoneAt,
   unitComplete,
   wakeValidated,
@@ -58,6 +63,7 @@ import {
 } from "../game";
 import { characterSimilarity, countWords, gradeCardRecall, gradeChoice, gradeTyped, normalizeAnswer, ratingFor, trigramSimilarity, type Graded } from "../grading";
 import { schedule, type MemoryState } from "../memory/fsrs";
+import { DICTATION_MIN_ACCURACY, SHADOWING_MIN_RATIO, compareSpoken, gradeDictation } from "../oral";
 import type { RejectedDelivery } from "../offline/types";
 import { isErrorWorkable } from "../session/adapt";
 import { PLAN_STEPS, WAKE_LIMITS, type PlanStep } from "../session/plan";
@@ -247,6 +253,10 @@ class Ingestion {
       const refusal = this.unitRefusal(event);
       if (refusal !== null) return this.no(event, refusal);
     }
+    if (event.kind === "oral_attempt") {
+      const refusal = this.oralRefusal(event);
+      if (refusal !== null) return this.no(event, refusal);
+    }
     if (servedAt !== null && event.occurredMs < Date.parse(servedAt) - 60_000) return this.no(event, "before_served");
     return true;
   }
@@ -418,6 +428,8 @@ class Ingestion {
         return this.onUnitStep(event, at);
       case "unit_test_submitted":
         return this.onUnitTest(event, at);
+      case "oral_attempt":
+        return this.onOral(event, at);
     }
   }
 
@@ -985,6 +997,90 @@ class Ingestion {
         passed_version: progress.passedVersion,
       });
     }
+  }
+
+  // ------------------------------------------------------------------- oral
+
+  /** The sentence the server serves under this id, if any (`unknown_sentence`: absent, or an id that is not a key of the state). */
+  private oralSentenceOf(sentenceId: string): OralSentence | undefined {
+    return Object.hasOwn(this.s.oralSentences, sentenceId) ? this.s.oralSentences[sentenceId] : undefined;
+  }
+
+  /** The permanent refusals of an oral attempt: unknown sentence, other version of its unit, a language the learner does not study. */
+  private oralRefusal(event: Extract<Parsed, { kind: "oral_attempt" }>): RejectedDelivery["reason"] | null {
+    const sentence = this.oralSentenceOf(event.payload.sentenceId);
+    if (!sentence) return "unknown_sentence";
+    if (sentence.unitVersion !== event.payload.unitVersion) return "unit_version_mismatch";
+    if (!this.s.profile.enrolledLanguages.includes(sentence.language)) return "wrong_language";
+    return null;
+  }
+
+  /**
+   * A sentence of the oral workshop: graded by the server, an `attempt` row (step `oral`, no session) and, for a
+   * repetition the device recognised or a dictation, `shadowing.sentence` or `dictation.sentence` XP. Once a sentence
+   * and an activity a learning day (only a paid sentence counts as seen), 30 XP a day for each activity. The
+   * anticipation and a repetition without recognition are self-rated: `declared`, never paid. Nothing the client sends
+   * is a score; the transcript is the client's word, hence the caps (`j5-oral.md` decision 4).
+   */
+  private onOral(event: Extract<Parsed, { kind: "oral_attempt" }>, at: Attributed): void {
+    const p = event.payload;
+    const sentence = this.oralSentenceOf(p.sentenceId) as OralSentence;
+    const language = sentence.language;
+    const d = this.day(at.day);
+    const speakingMs = Date.parse(p.endedAt) - Date.parse(p.startedAt);
+    const typingMs = Date.parse(p.endedAt) - Date.parse(p.shownAt);
+    const declared = p.activity === "anticipation" || (p.activity === "shadowing" && p.recognizer === "none");
+    let result: Record<string, unknown>;
+    let correct: boolean;
+    let xpReason: string | null = null;
+    if (declared) {
+      result = { declared: true };
+      correct = p.selfRating === "got_it";
+    } else if (p.activity === "shadowing") {
+      const { ratio } = compareSpoken(language, sentence.text, p.answer);
+      const key = `oral:shadowing:${p.sentenceId}`;
+      const outcome = shadowingSentence({ ratio, speakingMs, words: sentence.words, alreadyCountedToday: d.counted.includes(key) });
+      correct = ratio >= SHADOWING_MIN_RATIO;
+      xpReason = outcome.zero;
+      if (outcome.amount > 0) {
+        const granted = capOral(outcome.amount, { xpToday: this.xpToday(at.day, (reason) => reason === "shadowing.sentence"), ceiling: DAILY_CAPS.shadowing });
+        xpReason = granted.zero;
+        if (granted.amount > 0) {
+          d.counted.push(key);
+          this.emitXp({ rule: outcome.rule, amount: granted.amount, source: { kind: "attempt", id: event.clientEventId }, language, at });
+        }
+      }
+      result = { ratio, declared: false, ...(xpReason ? { xpReason } : {}) };
+    } else {
+      const { accuracy } = gradeDictation(language, sentence.text, p.answer, this.tolerance());
+      const key = `oral:dictation:${p.sentenceId}`;
+      const outcome = dictationSentence({ accuracy, elapsedMs: typingMs, alreadyCountedToday: d.counted.includes(key) });
+      correct = accuracy >= DICTATION_MIN_ACCURACY;
+      xpReason = outcome.zero;
+      if (outcome.amount > 0) {
+        const granted = capOral(outcome.amount, { xpToday: this.xpToday(at.day, (reason) => reason === "dictation.sentence"), ceiling: DAILY_CAPS.dictation });
+        xpReason = granted.zero;
+        if (granted.amount > 0) {
+          d.counted.push(key);
+          this.emitXp({ rule: outcome.rule, amount: granted.amount, source: { kind: "attempt", id: event.clientEventId }, language, at });
+        }
+      }
+      result = { accuracy, declared: false, ...(xpReason ? { xpReason } : {}) };
+    }
+    this.zero(event.clientEventId, xpReason);
+    this.out.attempts.push({
+      client_event_id: event.clientEventId,
+      session_id: null,
+      language,
+      step: "oral",
+      exercise_kind: `oral_${p.activity}`,
+      exercise_ref: deterministicUuid(`oral:${p.sentenceId}`),
+      answer: { text: p.answer, recognizer: p.recognizer, selfRating: p.selfRating, sentenceId: p.sentenceId, unitVersion: p.unitVersion },
+      result,
+      correct,
+      duration_ms: Math.min(Math.max(0, p.activity === "dictation" ? typingMs : speakingMs), MAX_ANSWER_MS),
+      occurred_at: event.occurredAt,
+    });
   }
 
   // ------------------------------------------------------------ settlements

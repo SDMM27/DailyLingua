@@ -33,6 +33,15 @@ describe("registry", () => {
     expect(languageInfo("fr")).not.toHaveProperty("charsPerWord");
   });
 
+  it("gives each language the BCP 47 tag its speech recognition listens for, of its own language", () => {
+    for (const [key, info] of Object.entries(LANGUAGE_REGISTRY)) {
+      expect(info.speech, key).toMatch(/^[a-z]{2,3}-[A-Z]{2}$/);
+      expect(info.speech.startsWith(`${key}-`), key).toBe(true);
+    }
+    expect(languageInfo("it").speech).toBe("it-IT");
+    expect(languageInfo("ru").speech).toBe("ru-RU");
+  });
+
   it("recognises study languages", () => {
     expect(isTargetLanguage("fr")).toBe(true);
     expect(isTargetLanguage("yo")).toBe(false);

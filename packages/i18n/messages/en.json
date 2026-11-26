@@ -502,6 +502,105 @@
     "goalsDone": "Completed on {date}",
     "warmupNote": "A short warm-up first, then the test."
   },
+  "oral": {
+    "card": {
+      "meta": "Out loud · {language}",
+      "title": "Five minutes out loud",
+      "body": "{count} sentences from your units: say, repeat, write what you hear.",
+      "open": "Open"
+    },
+    "entry": {
+      "meta": "Out loud · {language} · {minutes} min",
+      "sources": "{count} sentences from your units: {units}",
+      "privacy": "Speech recognition runs through your phone’s voice service. DailyLingua only receives the text, never your voice.",
+      "start": "Start",
+      "list": "What’s in it"
+    },
+    "steps": {
+      "anticipate": "Anticipate",
+      "repeat": "Repeat",
+      "dictation": "Dictation",
+      "anticipateHint": "You see the meaning: say the sentence before you hear it.",
+      "repeatHint": "Right after the voice. Your phone compares, word by word.",
+      "dictationHint": "{count} sentences to write, letter by letter."
+    },
+    "pause": "Pause “Out loud”",
+    "pauseTitle": "“Out loud” paused",
+    "pauseBody": "What you have already said is kept.",
+    "declared": "Self-rated · no XP",
+    "privacySheet": {
+      "title": "Before you speak",
+      "body": "Your phone turns your voice into text with its own voice service (Apple or Google). DailyLingua only receives the text.",
+      "ok": "Got it"
+    },
+    "anticipate": {
+      "instruction": "Say it in {language} · sentence {index} of {total}",
+      "hint": "Out loud, even roughly. Then listen.",
+      "reveal": "Hear the answer",
+      "question": "Did you have it?",
+      "had": "Got it",
+      "almost": "Almost",
+      "notYet": "Not yet"
+    },
+    "repeat": {
+      "instruction": "Repeat after the voice · sentence {index} of {total}",
+      "idle": "Listen, then tap the mic and repeat.",
+      "mic": "Repeat the sentence",
+      "listening": "Listening.",
+      "tapToStop": "Tap to stop.",
+      "stop": "Stop and compare",
+      "hearing": "What your phone hears",
+      "replay": "Replay",
+      "slow": "Slow",
+      "good": "Well repeated",
+      "again": "Try it again",
+      "score": "{matched} of {total} words · {percent}%",
+      "heard": "Your phone understood: “{text}”",
+      "missing": "not heard",
+      "substituted": "heard differently",
+      "near": "close: one letter off, check the ending",
+      "restart": "Start over",
+      "retry": "Try again",
+      "skip": "Move on",
+      "chunkTip": "Replay slowly, then repeat in chunks: {a}, then {b}.",
+      "retryTip": "Replay slowly, then repeat the whole sentence.",
+      "disclaimer": "Recognition can smooth over mistakes: this isn’t a pronunciation grade.",
+      "unsupported": "This browser can’t recognise speech. Repeat after the voice, then judge for yourself.",
+      "closeQ": "Was it close?",
+      "close": "Close",
+      "notYet": "Not yet",
+      "micDenied": "The mic is blocked. Allow it in your browser settings, or judge for yourself.",
+      "noSpeech": "We didn’t hear anything, try again.",
+      "failed": "Recognition didn’t work. Repeat after the voice, then judge for yourself."
+    },
+    "dictation": {
+      "instruction": "Write what you hear · {index} of {total}",
+      "listen": "Listen",
+      "plays": "Played {count, plural, one {once} other {# times}} · as often as you like",
+      "field": "Your dictation",
+      "rules": "Accents and apostrophes count; punctuation and capitals don’t.",
+      "almost": "Nearly all",
+      "again": "Try it again",
+      "score": "{correct} of {total} characters · {percent}%",
+      "sentence": "The sentence",
+      "legend": "Struck through: extra. Dotted: missing. Wavy: to fix."
+    },
+    "end": {
+      "title": "“Out loud” done",
+      "xpPending": "≈ +{xp} XP · waiting for the network",
+      "xpSent": "≈ +{xp} XP · sent to the server",
+      "repeated": "Sentences repeated",
+      "repeatedValue": "{count}, {passed} above 60%",
+      "dictation": "Dictation",
+      "dictationValue": "{count} sentences · {percent}% on average",
+      "anticipation": "Anticipation",
+      "anticipationValue": "“Got it” {had} of {total}",
+      "declared": "self-rated",
+      "review": "Back tomorrow",
+      "reviewValue": "{count, plural, one {# sentence} other {# sentences}}",
+      "tomorrow": "Tomorrow, more sentences from your units."
+    }
+  },
   "unit": {
     "steps": {
       "dialogue": "Dialogue",

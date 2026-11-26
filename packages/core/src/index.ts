@@ -7,6 +7,7 @@ export * from "./levels";
 export * from "./memory/fsrs";
 export * from "./memory/legacy-leitner";
 export * from "./memory/queue";
+export * from "./oral";
 export * from "./offline";
 export * from "./reader/coverage";
 export * from "./session";

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { isoInstantSchema } from "../common";
+import { MAX_ORAL_SENTENCE_ID_CHARS } from "../oral";
 import { unitIdSchema, unitLessonIdSchema, unitStepSchema, unitVersionSchema } from "../unit";
 
 /** Limits of a delivery (`j2-architecture.md` §2). */
@@ -189,6 +190,31 @@ export const unitTestSubmittedPayloadSchema = z.strictObject({
   answers: z.array(z.strictObject({ itemId: unitItemIdSchema, answer: answerSchema })).min(1).max(MAX_UNIT_TEST_ANSWERS),
 });
 
+export const oralActivities = ["anticipation", "shadowing", "dictation"] as const;
+export const oralActivitySchema = z.enum(oralActivities);
+export type OralActivity = z.infer<typeof oralActivitySchema>;
+
+export const oralSelfRatings = ["got_it", "almost", "not_yet"] as const;
+export const oralSelfRatingSchema = z.enum(oralSelfRatings);
+export type OralSelfRating = z.infer<typeof oralSelfRatingSchema>;
+
+/**
+ * A sentence of the oral workshop (`j5-pr1-atelier-oral.md` §3). `answer` is the device's transcription (shadowing),
+ * the typed text (dictation) or empty (anticipation). `startedAt` and `endedAt` bound the speaking or the typing.
+ */
+export const oralAttemptPayloadSchema = z.strictObject({
+  ...deviceFields,
+  sentenceId: z.string().min(1).max(MAX_ORAL_SENTENCE_ID_CHARS),
+  unitVersion: unitVersionSchema,
+  activity: oralActivitySchema,
+  answer: answerSchema,
+  recognizer: z.enum(["device", "none"]),
+  selfRating: oralSelfRatingSchema.nullable(),
+  shownAt: isoInstantSchema,
+  startedAt: isoInstantSchema,
+  endedAt: isoInstantSchema,
+});
+
 const ms = (value: string) => Date.parse(value);
 
 function envelope<K extends string, P extends z.ZodType>(kind: K, payload: P) {
@@ -235,6 +261,18 @@ export const clientEventSchema = z.discriminatedUnion("kind", [
     if (!(ms(event.payload.startedAt) < ms(event.occurredAt))) {
       ctx.addIssue({ code: "custom", message: "Expected startedAt < occurredAt", path: ["payload", "startedAt"] });
     }
+  }),
+  envelope("oral_attempt", oralAttemptPayloadSchema).superRefine((event, ctx) => {
+    const { shownAt, startedAt, endedAt, activity, recognizer, selfRating, answer } = event.payload;
+    const issue = (message: string, key: string) => ctx.addIssue({ code: "custom", message, path: ["payload", key] });
+    if (!(ms(shownAt) <= ms(startedAt))) issue("Expected shownAt <= startedAt", "startedAt");
+    if (!(ms(startedAt) < ms(endedAt))) issue("Expected startedAt < endedAt", "endedAt");
+    if (!(ms(endedAt) <= ms(event.occurredAt))) issue("Expected endedAt <= occurredAt", "endedAt");
+    // A self-rating exists exactly where nothing else judges: the anticipation and a repetition without recognition.
+    const selfRated = activity === "anticipation" || (activity === "shadowing" && recognizer === "none");
+    if (selfRated && selfRating === null) issue("Expected a selfRating", "selfRating");
+    if (!selfRated && selfRating !== null) issue("Expected no selfRating", "selfRating");
+    if (activity === "anticipation" && answer !== "") issue("Expected an empty answer", "answer");
   }),
 ]);
 export type ClientEvent = z.infer<typeof clientEventSchema>;
