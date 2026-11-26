@@ -72,7 +72,7 @@ Avant de modifier `skill_estimate`, valider avec le pilote le seuil de promotion
 #### Rapport d’observation local
 
 ```sh
-npm run progress:observe -- --user UUID --language it --from 2026-11-01 --through 2026-11-26
+npm run --silent progress:observe -- --user UUID --language it --from 2026-11-01 --through 2026-11-26
 ```
 
 Utiliser une base Supabase locale ou une copie servie en local, avec `NEXT_PUBLIC_SUPABASE_URL` et `SUPABASE_SERVICE_ROLE_KEY` dans l’environnement local. La période couvre au plus 90 jours. Le rapport JSON contient les résultats par niveau des cinq premiers supports complets, le nombre de séances avec trop peu de questions écrites et le nombre de lemmes prouvés. Chaque rapport porte sur un compte et une langue. Il ne contient ni réponses ni texte de production et n’effectue aucune écriture.

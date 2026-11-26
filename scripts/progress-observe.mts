@@ -7,7 +7,7 @@ import { dateKeySchema } from "@dailylingua/schemas";
 import { z } from "zod";
 import { readerCardLemma } from "../apps/web/src/lib/reader/words";
 
-const usage = "npm run progress:observe -- --user UUID --language ru|it --from AAAA-MM-JJ [--through AAAA-MM-JJ]";
+const usage = "npm run --silent progress:observe -- --user UUID --language ru|it --from AAAA-MM-JJ [--through AAAA-MM-JJ]";
 const { values } = parseArgs({ options: {
   user: { type: "string" }, language: { type: "string" }, from: { type: "string" },
   through: { type: "string" }, help: { type: "boolean" },

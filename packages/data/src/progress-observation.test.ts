@@ -17,7 +17,7 @@ describe("the progress observation", () => {
     }));
     const items = sessions.flatMap(({ textId, itemIds }) => itemIds.map((id) => ({ id, text_id: textId })));
     const attempts = items.map(({ id, text_id }, index) => ({
-      id: index + 1, exercise_ref: id, session_id: text_id, correct: text_id !== "0", client_event_id: id,
+      id: index + 1, exercise_ref: id, session_id: text_id, correct: text_id !== "0" || id === "0b", client_event_id: id,
     }));
     const retry = { ...attempts[0]!, id: 99, correct: true, client_event_id: "retry" };
     const evidence = { sessions, items, attempts: [retry, ...attempts, ...attempts], reviews: [], cards: [], rewardDays: new Map() };
