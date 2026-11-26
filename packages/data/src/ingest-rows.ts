@@ -148,6 +148,8 @@ export interface ProductionRow {
   language: string;
   text: string;
   initialSimilarity?: number;
+  /** Time spent speaking, for a spoken production. */
+  speakingMs?: number;
   clientEventId: string | null;
   createdAt: string;
 }
@@ -481,8 +483,10 @@ export async function readIngestRows(client: AppClient, userId: string, refs: In
     productions: productions.map((row) => {
       const task = row.task;
       const similarity = task && typeof task === "object" && !Array.isArray(task) ? task.initialSimilarity : undefined;
+      const speakingMs = task && typeof task === "object" && !Array.isArray(task) ? task.speakingMs : undefined;
       return { id: row.id, sessionId: row.session_id, language: row.language, text: row.text, clientEventId: row.client_event_id, createdAt: row.created_at,
-        ...(typeof similarity === "number" && similarity >= 0 && similarity <= 1 ? { initialSimilarity: similarity } : {}) };
+        ...(typeof similarity === "number" && similarity >= 0 && similarity <= 1 ? { initialSimilarity: similarity } : {}),
+        ...(typeof speakingMs === "number" && Number.isFinite(speakingMs) && speakingMs >= 0 ? { speakingMs } : {}) };
     }),
     corrections,
     unitProgress,

@@ -24,13 +24,18 @@ export interface RecognitionHandlers {
 
 const subscribeNothing = () => () => undefined;
 
+/** Whether this browser can recognise speech (the server render assumes it can: the screens that ask are client ones). */
+export function useSpeechSupported(): boolean {
+  return useSyncExternalStore(subscribeNothing, speechRecognitionSupported, () => true);
+}
+
 /**
  * Listens for one sentence at a time in `language`. `start()` must run from a tap. The state returns to `idle` with
  * `reset()`. Where the browser cannot recognise speech the status is `unavailable` from the first client render on
  * (the server render assumes it can: the workshop is a client screen).
  */
 export function useRecognition(language: string, handlers: RecognitionHandlers = {}) {
-  const supported = useSyncExternalStore(subscribeNothing, speechRecognitionSupported, () => true);
+  const supported = useSpeechSupported();
   const [state, setState] = useState<RecognitionState>(IDLE);
   const recognizer = useRef<Recognizer | null>(null);
   const latest = useRef(handlers);

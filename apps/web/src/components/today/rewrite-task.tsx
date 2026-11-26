@@ -6,25 +6,35 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import type { EventSyncApi } from "@/components/pwa/event-sync-provider";
 import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/unit/icons";
 import { ACCOUNT_HEADER } from "@/lib/offline/account";
 import { useOnlineStatus } from "@/lib/offline/online-status";
+import { useRecognition } from "@/lib/speech/use-recognition";
+import { useSpeechPrivacy } from "./speech-privacy";
 
 const resultSchema = z.object({ accepted: z.boolean() });
 type Sentence = Extract<WritingFeedbackResponse, { status: "ready" }>["sentences"][number];
 type Outcome = "accepted" | "tryAgain" | "rewriteUnsent";
 
-export function RewriteTask({ sync, productionId, sentence, index, attemptId }: {
+export function RewriteTask({ sync, productionId, sentence, index, language, attemptId }: {
   sync: EventSyncApi;
   productionId: string;
   sentence: Sentence;
   index: number;
+  /** The studied language, for the optional microphone. */
+  language: string;
   attemptId?: string;
 }) {
   const t = useTranslations("writingFeedback");
+  const x = useTranslations("expression");
   const online = useOnlineStatus();
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(false);
+  const privacy = useSpeechPrivacy();
+  // The dictation fills the field; the learner can still touch it up.
+  const recognition = useRecognition(language, { onFinal: (heard) => setText(heard) });
+  const listening = recognition.status === "listening";
   const [settled, setSettled] = useState<{ id: string; outcome: Outcome }>();
   const outcome = settled?.id === attemptId ? settled?.outcome : undefined;
   const pending = Boolean(attemptId && !outcome);
@@ -85,9 +95,25 @@ export function RewriteTask({ sync, productionId, sentence, index, attemptId }: 
           <label className="block">
             <span>{t("rewriteLabel", { index: index + 1 })}</span>
             <textarea value={text} onChange={(event) => setText(event.target.value)} maxLength={MAX_REWRITE_CHARS}
-              dir="auto" className="mt-1 min-h-24 w-full rounded-xl border border-line bg-surface p-3 text-[17px]" />
+              dir="auto" lang={language} className="mt-1 min-h-24 w-full rounded-xl border border-line bg-surface p-3 text-[17px]" />
           </label>
-          <Button type="submit" variant="secondary" disabled={!text.trim() || submitting}>{t("checkRewrite")}</Button>
+          <div className="flex items-center gap-2">
+            <Button type="submit" variant="secondary" className="flex-1" disabled={!text.trim() || submitting}>{t("checkRewrite")}</Button>
+            {recognition.status !== "unavailable" && (
+              <button
+                type="button"
+                aria-label={x(listening ? "micStop" : "micRewrite", { index: index + 1 })}
+                aria-pressed={listening}
+                onClick={() => (listening ? recognition.stop() : privacy.ask(recognition.start))}
+                className={`grid size-11 shrink-0 place-items-center rounded-full border border-border-strong ${listening ? "bg-surface text-accent-strong shadow-[inset_0_0_0_2px_var(--sd-accent-strong)]" : "bg-accent text-accent-ink"}`}
+              >
+                <Icon name={listening ? "stop" : "mic"} className="size-5" />
+              </button>
+            )}
+          </div>
+          {listening && <p className="text-sm text-muted" role="status" lang={language} dir="auto">{recognition.transcript}</p>}
+          {recognition.status === "error" && recognition.error !== "no-speech" && <p className="text-sm text-muted" role="status">{x(recognition.error === "denied" ? "denied" : "failed")}</p>}
+          {privacy.sheet}
         </>
       )}
       {(pending || outcome || error) && <p className="text-muted" role="status">{t(error ? "rewriteUnsent" : outcome ?? "rewritePending")}</p>}

@@ -18,7 +18,7 @@ Complète [j5-oral.md](j5-oral.md) (décisions 1, 2, 5, 8) et s'appuie sur l'int
 - `packages/data/src/writing-feedback.ts` accepte `mode in ('writing','spoken')` là où il filtre `writing`.
 - Correction (`packages/ai/src/prompts/writing-feedback.ts`) : `WritingFeedbackPromptInput` reçoit `inputMode: "typed" | "speech_transcript"` ; le prompt système gagne un paragraphe constant : « When inputMode is speech_transcript, the text is an automatic transcript of the learner's speech. Ignore punctuation and capitalisation (do not score or correct them). Do not list a spelling correction when the two forms sound the same. Judge grammar, vocabulary, register and coherence as usual; never assume a form the transcript does not show. » `WRITING_FEEDBACK_PROMPT_VERSION` est incrémentée. Même `purpose` (`writing_feedback`), même quota, même cache.
 - Paquet de séance : `expression.suggestSpoken` calculé par le serveur (dernière production `spoken` du compte).
-- **Pas de migration.**
+- **Une migration minimale** (`20261126000200_app_writing_feedback_spoken.sql`) : `app.claim_writing_feedback_job` ne réclamait que les productions `mode = 'writing'`, une production orale restait donc sans correction (`not_found`) ; la fonction est recréée à l'identique avec `mode in ('writing', 'spoken')`. Aucune table ni colonne ne change ; `speakingMs` vit dans `production.task`.
 
 ## 3. Confidentialité
 
@@ -29,6 +29,7 @@ Complète [j5-oral.md](j5-oral.md) (décisions 1, 2, 5, 8) et s'appuie sur l'int
 - Vitest : schéma de l'événement (avec et sans `mode`), ingestion `spoken` (mode écrit, `too_short` sous 15 s), filtre de `writing-feedback`, construction du message avec `inputMode`, `suggestSpoken`.
 - e2e WebKit 390 px avec `SpeechRecognition` simulée : passer en « Dire », dicter, envoyer, correction affichée (IA simulée comme dans les e2e existants), réécriture au micro ; repli sans reconnaissance (sélecteur absent).
 - **Évaluation du prompt** (`feedback:eval`, payante, manuelle) : à lancer par le propriétaire avant fusion, avec 4 transcriptions orales ajoutées au jeu d'évaluation (2 italiennes, 2 russes, dont des fautes d'accord et d'auxiliaire). Critère : aucune faute réelle perdue par rapport au même texte tapé, aucune correction de ponctuation.
+  - Limite constatée à l'implémentation : `feedback:eval` (`scripts/writing-feedback-eval.mts`) appelle l'ancien correcteur (`src/lib/generation/`), dont `mode: "spoken"` désigne un script à dire à voix haute, non une transcription ; il n'utilise pas `inputMode` ni le nouveau prompt de `packages/ai`. Les 4 cas ajoutés (`inputMode: "speech_transcript"`, `mustCorrect`, contrôle `transcriptProblems`) doivent être adaptés pour passer par le nouveau prompt avant l'exécution payante.
 
 ## 5. Lots
 

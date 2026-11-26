@@ -212,6 +212,7 @@ export function createIndexedDbEventQueue(databaseName = "dailylingua-offline"):
                 clientEventId: event.clientEventId,
                 sessionId,
                 createdAt: occurredAt,
+                ...(event.payload.mode === "spoken" ? { spoken: { transcript: event.payload.text } } : {}),
               } satisfies LocalWritingFeedback);
             }
           }

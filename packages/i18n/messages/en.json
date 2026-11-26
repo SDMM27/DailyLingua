@@ -227,6 +227,10 @@
   },
   "settings": {
     "title": "Settings",
+    "data": {
+      "title": "Data",
+      "voice": "When you speak to practise (“Speak”, “Out loud”), speech recognition is done by your phone’s own service (Apple or Google), not by Daily Lingua. We only receive the recognised text, never a recording of your voice. That text is handled like written text: it is sent for correction and stays in your journal."
+    },
     "game": {
       "title": "Game",
       "xpVisible": "Show XP",
@@ -501,6 +505,32 @@
     "close": "Leave the unit",
     "goalsDone": "Completed on {date}",
     "warmupNote": "A short warm-up first, then the test."
+  },
+  "expression": {
+    "write": "Write",
+    "say": "Speak",
+    "mode": "Answer mode",
+    "sayHint": "Speak for about a minute, two at most. Your phone writes down what it hears; the correction works on that text.",
+    "start": "Start speaking",
+    "resume": "Keep speaking",
+    "stop": "Stop",
+    "target": "Target {target} · {max} max",
+    "elapsed": "{elapsed} · target {target}",
+    "heard": "What your phone hears",
+    "understoodTitle": "What your phone understood",
+    "understood": "What your phone understood · {duration}",
+    "practice": "Speaking practice",
+    "smoothing": "Recognition can correct some mistakes without telling you; what it did not hear cannot be corrected.",
+    "send": "Send for correction",
+    "redo": "Start over",
+    "textOnly": "Only the text is sent, not the recording",
+    "quota": "{count, plural, one {# correction left today} other {# corrections left today}}",
+    "maxReached": "Two minutes: listening stopped.",
+    "denied": "The microphone is not allowed on this device. You can write instead.",
+    "noSpeech": "I heard nothing. Try again, speaking close to the microphone.",
+    "failed": "Speech recognition did not work. Try again, or write your text.",
+    "micRewrite": "Speak sentence {index}",
+    "micStop": "Stop dictating"
   },
   "oral": {
     "card": {

@@ -370,6 +370,7 @@ export function buildIngestState(input: {
       creditExpired: creditExpired || !remembered,
       correctionDeferred: !hasCorrection && ((target && feedbackTarget?.deferred === true) || remembered?.correctionDeferred === true),
       ...(row.initialSimilarity === undefined ? {} : { initialSimilarity: row.initialSimilarity }),
+      ...(row.speakingMs === undefined ? {} : { speakingMs: row.speakingMs }),
       clientEventId: row.clientEventId ?? "",
     };
   }

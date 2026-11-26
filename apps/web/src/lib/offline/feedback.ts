@@ -6,6 +6,8 @@ export interface LocalWritingFeedback {
   clientEventId: string;
   sessionId: string;
   createdAt: string;
+  /** A spoken production keeps its transcript, shown above the correction (« Ce que ton téléphone a compris »). */
+  spoken?: { transcript: string };
   response?: WritingFeedbackResponse;
   retryAfter?: number;
   attempts?: Record<number, string>;

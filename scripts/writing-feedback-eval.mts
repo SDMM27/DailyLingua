@@ -13,7 +13,7 @@
 import { parseArgs } from "node:util";
 import { readWritingFeedbackConfig } from "@/lib/generation/config";
 import { createClaudeWritingReviewer } from "@/lib/generation/writing-feedback";
-import { EVAL_CASES, EXPECTED_BANDS, type ExpectedQuality } from "@/lib/generation/writing-feedback-eval-set";
+import { EVAL_CASES, EXPECTED_BANDS, transcriptProblems, type ExpectedQuality } from "@/lib/generation/writing-feedback-eval-set";
 import { WRITING_CRITERIA, type WritingFeedback } from "@/lib/schemas/writing-feedback";
 
 const { values } = parseArgs({
@@ -60,6 +60,7 @@ for (const evalCase of EVAL_CASES) {
         feedback.corrections.length < (evalCase.minCorrections ?? band.minCorrections)
           ? `moins de ${evalCase.minCorrections ?? band.minCorrections} corrections`
           : null,
+        ...transcriptProblems(evalCase, feedback.corrections),
         feedback.nativeVersion ? null : "pas de version native",
         feedback.corrections.every((c) => c.category) ? null : "correction sans catégorie",
       ].filter(Boolean);

@@ -1,3 +1,4 @@
+import { addDays, learningDay } from "@dailylingua/core";
 import { toPacketError, type CardRow, type ErrorOfDayRow, type ItemRow, type PacketTextRow, type SessionRow } from "@dailylingua/data";
 import { cefrLevelSchema, cardKindSchema, cardStateSchema, languageCodeSchema, sessionFormatSchema, sessionKindSchema, type DateKey, type SessionPacket, type StoredSessionPlan } from "@dailylingua/schemas";
 import { cardAcceptList, correctionHighlight } from "@/lib/ingest/card-keys";
@@ -18,6 +19,8 @@ export interface PacketInput {
   cards: ReadonlyMap<string, CardRow>;
   errorOfDay?: ErrorOfDayRow | null;
   quotas: { writingFeedback: { used: number; limit: number }; rewriteCheck: { used: number; limit: number } };
+  /** "Say it" is the default of the expression step (no spoken production in the last `SPOKEN_SUGGESTION_DAYS` learning days). */
+  suggestSpoken?: boolean;
   serverDay: DateKey;
   timeZone: string;
   /** Fallback when the stored session has no `served_at`. */
@@ -102,6 +105,14 @@ function packetCards(plan: StoredSessionPlan, cards: ReadonlyMap<string, CardRow
   return out.slice(0, 120);
 }
 
+/** Learning days (today included) without a spoken production before the expression step suggests "Say it". */
+export const SPOKEN_SUGGESTION_DAYS = 7;
+
+/** Whether the last spoken production (an instant, or null for none) is older than the last `SPOKEN_SUGGESTION_DAYS` learning days. */
+export function suggestSpoken(lastSpokenAt: string | null, today: DateKey, timeZone: string): boolean {
+  return lastSpokenAt === null || learningDay(new Date(lastSpokenAt), timeZone) <= addDays(today, -SPOKEN_SUGGESTION_DAYS);
+}
+
 /** The packet of a stored session. The result is checked against `sessionPacketSchema` by the caller. */
 export function buildPacket(input: PacketInput): SessionPacket {
   const { session, plan, textBundle } = input;
@@ -124,6 +135,7 @@ export function buildPacket(input: PacketInput): SessionPacket {
     momentumWords: plan.momentumWords,
     errorOfTheDay: input.errorOfDay ? toPacketError(input.errorOfDay) : null,
     quotas: input.quotas,
+    expression: { suggestSpoken: input.suggestSpoken ?? false },
     serverDay: input.serverDay,
     timeZone: input.timeZone,
   };

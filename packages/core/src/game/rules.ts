@@ -205,6 +205,8 @@ export function focusSecondTry(proof: FocusProof): RuleOutcome {
 /** Minimum length of a production in words, by writing level (`j2-jeu-xp-serie.md` §1). */
 export const PRODUCTION_MIN_WORDS = { A1: 20, A2: 35, B1: 60, B2: 90, C1: 120, C2: 120 } as const;
 export const PRODUCTION_MAX_SIMILARITY = 0.5;
+/** Shortest dictation of a spoken production: a minute is asked, this is the floor against an empty send. */
+export const SPOKEN_MIN_MS = 15_000;
 
 export interface ProductionProof {
   words: number;
@@ -214,11 +216,13 @@ export interface ProductionProof {
   targetLanguage: string;
   /** Highest similarity with the source text, the native versions given and the last 30 productions (0 to 1). */
   similarity: number;
+  /** Time spent speaking, for a spoken production only. */
+  speakingMs?: number;
 }
 
 /** Why a production is not accepted (length, language, similarity), or null when it is. Order: length, language, similarity. */
 export function productionRejection(proof: ProductionProof): XpZeroReason | null {
-  if (proof.words < proof.minWords) return "too_short";
+  if (proof.words < proof.minWords || (proof.speakingMs !== undefined && proof.speakingMs < SPOKEN_MIN_MS)) return "too_short";
   if (proof.detectedLanguage !== null && proof.detectedLanguage !== proof.targetLanguage) return "wrong_language";
   if (proof.similarity >= PRODUCTION_MAX_SIMILARITY) return "too_similar";
   return null;

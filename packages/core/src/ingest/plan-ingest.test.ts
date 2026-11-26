@@ -408,6 +408,48 @@ describe("planIngest: a whole session", () => {
     expect(new Set(keys).size).toBe(keys.length);
   });
 
+  describe("spoken productions", () => {
+    const spoken = (speakingMs: number) => {
+      const submission = { sessionId: SESSION, text: words("scritto", 70), composeMs: 90000 };
+      return plan(sessionState(), [
+        eventWriter()("production_submitted", iso("09:09:00"), { ...submission, productionId: uuid(71), mode: "spoken", speakingMs }),
+      ]);
+    };
+
+    it("writes the mode and the speaking time of the production", () => {
+      const { payload, rejected } = spoken(60_000);
+      expect(rejected).toEqual([]);
+      expect(payload.productions).toEqual([expect.objectContaining({ mode: "spoken", task: expect.objectContaining({ speakingMs: 60_000 }) })]);
+    });
+
+    it("pays production.corrected from 15 seconds of speaking", () => {
+      expect(reasons(spoken(15_000).payload)).toContain("production.corrected");
+    });
+
+    it("corrects a dictation under 15 seconds but pays no XP for it (too_short)", () => {
+      const { payload, report } = spoken(14_999);
+      expect(reasons(payload)).not.toContain("production.corrected");
+      expect(report.zeroed).toContainEqual(expect.objectContaining({ reason: "too_short" }));
+    });
+
+    it("keeps writing for an event without a mode (queued before spoken productions existed)", () => {
+      const { payload } = plan(sessionState(), [
+        eventWriter()("production_submitted", iso("09:09:00"), { sessionId: SESSION, productionId: uuid(71), text: words("scritto", 70), composeMs: 90000 }),
+      ]);
+      expect(payload.productions).toEqual([expect.objectContaining({ mode: "writing", task: expect.not.objectContaining({ speakingMs: expect.anything() }) })]);
+    });
+
+    it("judges a stored spoken production again with its speaking time", () => {
+      const base = sessionState();
+      base.productions[uuid(71)] = {
+        id: uuid(71), sessionId: SESSION, language: "it", text: words("scritto", 70), day: TODAY,
+        late: false, settled: false, correctionDeferred: false, clientEventId: uuid(72), initialSimilarity: 0, speakingMs: 5_000,
+      };
+      const { payload } = plan(base, [eventWriter()("rewrite_submitted", iso("09:10:00"), { correctionId: uuid(41), sentenceIndex: 0, text: "Io sono andato al mercato ieri" })]);
+      expect(reasons(payload)).not.toContain("production.corrected");
+    });
+  });
+
   it("does not reward a sentence already verified, even on a new day", () => {
     const base = sessionState();
     base.verifiedSentences = { [uuid(41)]: [0] };
