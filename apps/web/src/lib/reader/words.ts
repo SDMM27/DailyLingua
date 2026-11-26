@@ -23,15 +23,17 @@ export interface ReaderWord {
   comparison?: ReturnType<typeof readerComparison>;
 }
 
+type LemmaIdentity = { lemma: string; definition: string };
+
 /** Annotates only vocabulary entries that can be located in their source sentence. */
-export function readerWords(body: string, entries: unknown, language: string, explanationLanguage: string,
-  knownLanguages: readonly string[] = []): ReaderWord[] {
-  if (!isTargetLanguage(language) || !Array.isArray(entries) || entries.length === 0) return [];
+function annotateWords(body: string, entries: unknown, language: string, explanationLanguage: string,
+  knownLanguages: readonly string[]) {
+  const matches = new Map<number, { word: ReaderWord; identity: LemmaIdentity | null }>();
+  if (!isTargetLanguage(language) || !Array.isArray(entries) || entries.length === 0) return matches;
   const segmenter = new Intl.Segmenter(language, { granularity: "word" });
   const sentenceSegmenter = new Intl.Segmenter(language, { granularity: "sentence" });
   const sentences = Array.from(sentenceSegmenter.segment(body)).filter(({ segment }) => segment.trim());
   const normalize = (value: string) => normalizeAnswer(language, value).replaceAll("ς", "σ");
-  const words = new Map<number, ReaderWord>();
   for (const entry of entries.slice(0, 8)) {
     const parsed = wordSchema.safeParse(entry);
     if (!parsed.success) continue;
@@ -43,13 +45,34 @@ export function readerWords(body: string, entries: unknown, language: string, ex
     const comparison = readerComparison(comparisonId, language, lemma, explanationLanguage, knownLanguages);
     for (const { segment, index, isWordLike } of segmenter.segment(source.segment)) {
       const from = source.index + index;
-      if (!isWordLike || !accepted.has(normalize(segment)) || words.has(from)) continue;
-      words.set(from, {
+      if (!isWordLike || !accepted.has(normalize(segment))) continue;
+      const identity = { lemma: lemma.toLocaleLowerCase(language).normalize("NFC").replaceAll("\u0301", "").normalize("NFC"),
+        definition: definition.normalize("NFC").replace(/\s+/g, " ") };
+      const previous = matches.get(from);
+      if (previous) {
+        if (previous.identity?.lemma !== identity.lemma || previous.identity.definition !== identity.definition) previous.identity = null;
+        continue;
+      }
+      const word = {
         from, to: from + segment.length, front: dictionaryForm, meaning: translated ?? definition,
         meaningLanguage: translated ? explanationLanguage : language, context: source.segment.trim(),
         ...(comparison ? { comparison } : {}),
-      });
+      };
+      matches.set(from, { word, identity });
     }
   }
-  return [...words.values()].sort((left, right) => left.from - right.from);
+  return matches;
+}
+
+export function readerWords(body: string, entries: unknown, language: string, explanationLanguage: string,
+  knownLanguages: readonly string[] = []): ReaderWord[] {
+  return [...annotateWords(body, entries, language, explanationLanguage, knownLanguages).values()]
+    .map(({ word }) => word).sort((left, right) => left.from - right.from);
+}
+
+/** Resolves a saved card only when its source span is still identifiable and has a single meaning. */
+export function readerCardLemma(body: string, entries: unknown, language: string,
+  card: { from: number; front: string; context: string | null }): LemmaIdentity | null {
+  const match = annotateWords(body, entries, language, language, []).get(card.from);
+  return match?.word.front === card.front && match.word.context === card.context ? match.identity : null;
 }
