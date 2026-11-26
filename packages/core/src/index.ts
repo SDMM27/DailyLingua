@@ -10,5 +10,6 @@ export * from "./memory/queue";
 export * from "./oral";
 export * from "./offline";
 export * from "./reader/coverage";
+export * from "./reading-calibration";
 export * from "./session";
 export * from "./units";
