@@ -19,7 +19,8 @@ test.describe("path map", () => {
     await signUpAndInstall(page, email);
 
     const tabs = page.getByRole("navigation", { name: "Navigation" });
-    await expect(tabs.getByRole("link")).toHaveCount(4);
+    await expect(tabs.getByRole("link")).toHaveCount(5);
+    await expect(tabs.getByRole("link", { name: "Progrès" })).toHaveAttribute("href", "/progress");
     await tabs.getByRole("link", { name: "Parcours" }).click();
     await expect(page).toHaveURL(/\/parcours\/it$/);
     await expect(page.getByRole("heading", { level: 1, name: /Niveau A\d/ })).toBeVisible();

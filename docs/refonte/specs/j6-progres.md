@@ -9,7 +9,7 @@ Ajouter une entrée « Progrès » dans la navigation de la préversion. La page
 | Affichage | Source | Règle |
 |---|---|---|
 | Lire, écouter, écrire, parler | `skill_estimate` | Présenter le niveau et l’origine de l’estimation. Afficher « Non mesuré » si la ligne manque, « Déclaré » à l’inscription ou « Repris de l’ancienne app » après migration. |
-| « Je peux… » validés | Progression des unités et bilans réussis | Afficher le descripteur et le lien vers l’unité si le contenu est disponible dans la langue cible. |
+| « Je peux… » validés | Progression des unités et bilans réussis | Afficher le descripteur si le contenu est disponible dans la langue sélectionnée. Pour la langue principale, le titre mène à l’unité. |
 | Jours d’étude récents | `learning_day` | Afficher les sept jours d’apprentissage du compte, toutes langues confondues, selon le fuseau du profil et la limite de journée déjà utilisée par la séance. |
 
 Étendre `packages/data` en conservant la lecture avec le client authentifié et les politiques RLS. Le chargeur borne chaque requête à son usage et filtre par langue les données rattachées à un apprentissage. `getLearningProgress` garde son contrat pour les appels existants qui affichent l’XP et la série. La page fonctionne avec un compte neuf ou migré, y compris lorsque des compétences ou des unités sont absentes.
