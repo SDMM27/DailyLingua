@@ -4,7 +4,7 @@ Le russe et l’italien sont les deux seules langues cibles des jalons restants.
 
 ## 6.1 — Tableau de progrès
 
-Ajouter une entrée « Progrès » dans la navigation de la préversion. La page porte sur la langue active et présente quatre compétences, les « Je peux… » validés et l’activité récente. Sur mobile, les cartes se suivent dans l’ordre de lecture. À 1280 et 1440 px, la navigation et les cartes utilisent la largeur disponible, avec une largeur de lecture bornée pour les textes. Prévoir les libellés français et anglais.
+Ajouter une entrée « Progrès » dans la navigation de la préversion. La page porte sur la langue active et présente quatre compétences, les « Je peux… » validés et l’activité récente. La variante compacte place les jours d’étude en premier sur mobile, puis le tableau des compétences et les acquis. À 1280 et 1440 px, les jours d’étude et les acquis occupent la colonne gauche, avec le tableau à droite. Prévoir les libellés français et anglais.
 
 | Affichage | Source | Règle |
 |---|---|---|

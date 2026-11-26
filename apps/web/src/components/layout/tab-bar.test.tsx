@@ -9,8 +9,8 @@ const pathname = vi.hoisted(() => ({ value: "/" }));
 vi.mock("next/navigation", () => ({ usePathname: () => pathname.value }));
 
 const messages = await loadMessages("fr");
-const show = (pathLanguage?: string | null) => render(
-  <NextIntlClientProvider locale="fr" messages={messages}><TabBar pathLanguage={pathLanguage} /></NextIntlClientProvider>,
+const show = (pathLanguage?: string | null, hasProgress = false) => render(
+  <NextIntlClientProvider locale="fr" messages={messages}><TabBar pathLanguage={pathLanguage} hasProgress={hasProgress} /></NextIntlClientProvider>,
 );
 const names = () => within(screen.getByRole("navigation")).getAllByRole("link").map((link) => link.textContent);
 
@@ -29,5 +29,13 @@ describe("tab bar", () => {
     show("it");
     expect(screen.getByRole("link", { name: "Parcours" }).getAttribute("aria-current")).toBe("page");
     expect(screen.getByRole("link", { name: "Aujourd’hui" }).getAttribute("aria-current")).toBeNull();
+  });
+  it("links to Progress for pilot learners and marks the active tab", () => {
+    pathname.value = "/progress";
+    show("ru", true);
+    expect(names()).toEqual(["Aujourd’hui", "Parcours", "Lire", "Progrès", "Réglages"]);
+    const link = screen.getByRole("link", { name: "Progrès" });
+    expect(link.getAttribute("href")).toBe("/progress");
+    expect(link.getAttribute("aria-current")).toBe("page");
   });
 });

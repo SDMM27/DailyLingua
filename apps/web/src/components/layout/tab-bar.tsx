@@ -18,12 +18,18 @@ const TABS = [
 
 /**
  * Bottom navigation of the signed-in screens, clear of the home indicator. `pathLanguage` is the language of the beginner
- * path when the learner has one: the « Parcours » tab then comes second; without it there are three tabs.
+ * path when the learner has one: the « Parcours » tab then comes second; the Progress tab is available to pilot learners.
  */
-export function TabBar({ pathLanguage = null }: { pathLanguage?: string | null }) {
+export function TabBar({ pathLanguage = null, hasProgress = false }: { pathLanguage?: string | null; hasProgress?: boolean }) {
   const t = useTranslations("common.nav");
   const pathname = usePathname();
-  const tabs: readonly { href: string; key: "today" | "path" | "read" | "settings"; icon: string }[] = pathLanguage ? [TABS[0], { href: `/parcours/${pathLanguage}`, key: "path", icon: PATH_ICON }, ...TABS.slice(1)] : TABS;
+  const tabs = [
+    TABS[0],
+    ...(pathLanguage ? [{ href: `/parcours/${pathLanguage}`, key: "path", icon: PATH_ICON } as const] : []),
+    TABS[1],
+    ...(hasProgress ? [{ href: "/progress", key: "progress", icon: "M4 19h16M7 15v-3M12 15V8M17 15V4" } as const] : []),
+    TABS[2],
+  ];
   return (
     <nav
       aria-label={t("label")}

@@ -1,5 +1,6 @@
-import { listEnrollments, listSkillEstimates } from "@dailylingua/data";
+import { listSkillEstimates } from "@dailylingua/data";
 import { cache } from "react";
+import { getProgressLanguages } from "@/lib/progress-languages";
 import { getRequestClient, getSessionUser } from "@/lib/session";
 import { hasPath } from "./path";
 import { visibleUnitsFor } from "./visibility";
@@ -12,12 +13,12 @@ export const getPathLanguage = cache(async (): Promise<string | null> => {
   if (!(await getSessionUser())) return null;
   try {
     const client = await getRequestClient();
-    const enrollment = (await listEnrollments(client))[0];
-    if (!enrollment) return null;
-    const estimates = await listSkillEstimates(client, enrollment.language);
-    return hasPath(estimates, visibleUnitsFor(enrollment.language)) ? enrollment.language : null;
+    const { primary } = await getProgressLanguages();
+    if (!primary) return null;
+    const estimates = await listSkillEstimates(client, primary);
+    return hasPath(estimates, visibleUnitsFor(primary)) ? primary : null;
   } catch {
-    // The tab is a convenience: without it the three other tabs still work.
+    // The tab is a convenience: without it the other tabs still work.
     return null;
   }
 });
