@@ -526,6 +526,8 @@
     "textOnly": "Only the text is sent, not the recording",
     "quota": "{count, plural, one {# correction left today} other {# corrections left today}}",
     "maxReached": "Two minutes: listening stopped.",
+    "tooLong": "Shorten your text before sending it (maximum {limit} characters).",
+    "transcriptTooLong": "Switch to Write to shorten your transcript (maximum {limit} characters).",
     "denied": "The microphone is not allowed on this device. You can write instead.",
     "noSpeech": "I heard nothing. Try again, speaking close to the microphone.",
     "failed": "Speech recognition did not work. Try again, or write your text.",

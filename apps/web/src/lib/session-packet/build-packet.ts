@@ -135,7 +135,7 @@ export function buildPacket(input: PacketInput): SessionPacket {
     momentumWords: plan.momentumWords,
     errorOfTheDay: input.errorOfDay ? toPacketError(input.errorOfDay) : null,
     quotas: input.quotas,
-    expression: { suggestSpoken: input.suggestSpoken ?? false },
+    ...(input.suggestSpoken !== undefined ? { expression: { suggestSpoken: input.suggestSpoken } } : {}),
     serverDay: input.serverDay,
     timeZone: input.timeZone,
   };

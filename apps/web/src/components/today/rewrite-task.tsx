@@ -16,7 +16,7 @@ const resultSchema = z.object({ accepted: z.boolean() });
 type Sentence = Extract<WritingFeedbackResponse, { status: "ready" }>["sentences"][number];
 type Outcome = "accepted" | "tryAgain" | "rewriteUnsent";
 
-export function RewriteTask({ sync, productionId, sentence, index, language, attemptId }: {
+export function RewriteTask({ sync, productionId, sentence, index, language, attemptId, paused }: {
   sync: EventSyncApi;
   productionId: string;
   sentence: Sentence;
@@ -24,6 +24,7 @@ export function RewriteTask({ sync, productionId, sentence, index, language, att
   /** The studied language, for the optional microphone. */
   language: string;
   attemptId?: string;
+  paused: boolean;
 }) {
   const t = useTranslations("writingFeedback");
   const x = useTranslations("expression");
@@ -35,9 +36,17 @@ export function RewriteTask({ sync, productionId, sentence, index, language, att
   // The dictation fills the field; the learner can still touch it up.
   const recognition = useRecognition(language, { onFinal: (heard) => setText(heard) });
   const listening = recognition.status === "listening";
+  const stopRecognition = recognition.stop;
   const [settled, setSettled] = useState<{ id: string; outcome: Outcome }>();
   const outcome = settled?.id === attemptId ? settled?.outcome : undefined;
   const pending = Boolean(attemptId && !outcome);
+  const draft = text.trim();
+  const tooLong = draft.length > MAX_REWRITE_CHARS;
+  const canSubmit = !paused && !listening && !pending && !submitting && outcome !== "accepted" && draft !== "" && !tooLong;
+
+  useEffect(() => {
+    if (paused && listening) stopRecognition();
+  }, [listening, paused, stopRecognition]);
 
   useEffect(() => {
     if (!attemptId || !pending || !online) return;
@@ -77,11 +86,11 @@ export function RewriteTask({ sync, productionId, sentence, index, language, att
   return (
     <form className="space-y-2 border-t border-line pt-3" onSubmit={async (event) => {
       event.preventDefault();
-      if (!text.trim() || pending || submitting || outcome === "accepted") return;
+      if (!canSubmit) return;
       setSubmitting(true);
       setError(false);
       try {
-        await sync.enqueueRewrite(productionId, index, text.trim());
+        await sync.enqueueRewrite(productionId, index, draft);
         setText("");
       } catch {
         setError(true);
@@ -98,7 +107,7 @@ export function RewriteTask({ sync, productionId, sentence, index, language, att
               dir="auto" lang={language} className="mt-1 min-h-24 w-full rounded-xl border border-line bg-surface p-3 text-[17px]" />
           </label>
           <div className="flex items-center gap-2">
-            <Button type="submit" variant="secondary" className="flex-1" disabled={!text.trim() || submitting}>{t("checkRewrite")}</Button>
+            <Button type="submit" variant="secondary" className="flex-1" disabled={!canSubmit}>{t("checkRewrite")}</Button>
             {recognition.status !== "unavailable" && (
               <button
                 type="button"
@@ -111,6 +120,7 @@ export function RewriteTask({ sync, productionId, sentence, index, language, att
               </button>
             )}
           </div>
+          {tooLong && <p className="text-sm text-muted" role="status">{x("tooLong", { limit: MAX_REWRITE_CHARS })}</p>}
           {listening && <p className="text-sm text-muted" role="status" lang={language} dir="auto">{recognition.transcript}</p>}
           {recognition.status === "error" && recognition.error !== "no-speech" && <p className="text-sm text-muted" role="status">{x(recognition.error === "denied" ? "denied" : "failed")}</p>}
           {privacy.sheet}

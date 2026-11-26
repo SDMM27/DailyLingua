@@ -526,6 +526,8 @@
     "textOnly": "Seul le texte est envoyé, pas l’enregistrement",
     "quota": "{count, plural, one {# correction restante aujourd’hui} other {# corrections restantes aujourd’hui}}",
     "maxReached": "Deux minutes : l’écoute s’est arrêtée.",
+    "tooLong": "Raccourcis ton texte avant de l’envoyer (maximum {limit} caractères).",
+    "transcriptTooLong": "Passe à « Écrire » pour raccourcir ta transcription (maximum {limit} caractères).",
     "denied": "Le micro n’est pas autorisé sur cet appareil. Tu peux écrire à la place.",
     "noSpeech": "Je n’ai rien entendu. Réessaie en parlant près du micro.",
     "failed": "La reconnaissance vocale n’a pas fonctionné. Réessaie, ou écris ton texte.",

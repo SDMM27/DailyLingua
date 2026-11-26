@@ -37,7 +37,7 @@ export function useDictation(language: string) {
   /** What the finished stretches gave, and the time they took. */
   const kept = useRef({ text: "", ms: 0 });
   const heard = useRef("");
-  const stretchStart = useRef(0);
+  const stretch = useRef<{ startedAt: number; stoppedAt: number | null }>({ startedAt: 0, stoppedAt: null });
   const timer = useRef<number | undefined>(undefined);
 
   const stopClock = useCallback(() => {
@@ -57,25 +57,38 @@ export function useDictation(language: string) {
 
   useEffect(() => discard, [discard]);
 
+  const stop = useCallback(() => {
+    const current = recognizer.current;
+    if (!current || stretch.current.stoppedAt !== null) return;
+    stretch.current.stoppedAt = Date.now();
+    stopClock();
+    current.stop();
+  }, [stopClock]);
+
   /** Closes the stretch being heard: its text and its time join the kept ones. */
   const settle = useCallback((text: string, error: RecognitionError | null) => {
     stopClock();
     recognizer.current = null;
-    const ms = Math.min(DICTATION_MAX_MS, kept.current.ms + Math.max(0, Date.now() - stretchStart.current));
+    const { startedAt, stoppedAt } = stretch.current;
+    const ms = Math.min(DICTATION_MAX_MS, kept.current.ms + Math.max(0, (stoppedAt ?? Date.now()) - startedAt));
     kept.current = { text: join(kept.current.text, text), ms };
     heard.current = "";
-    setState((previous) => ({
+    setState({
       status: kept.current.text ? "stopped" : "idle",
       transcript: kept.current.text,
       elapsedMs: ms,
       error: error === "no-speech" && kept.current.text ? null : error,
-      reachedMax: previous.reachedMax,
-    }));
+      reachedMax: ms >= DICTATION_MAX_MS,
+    });
   }, [stopClock]);
 
   const start = useCallback(() => {
-    discard();
-    if (kept.current.ms >= DICTATION_MAX_MS) return;
+    if (recognizer.current) return;
+    if (kept.current.ms >= DICTATION_MAX_MS) {
+      // When there is text, the learner can review it or choose Start over.
+      if (kept.current.text) return;
+      kept.current.ms = 0;
+    }
     const next = createRecognizer(language, { continuous: true });
     if (!next) {
       setState((previous) => ({ ...previous, status: "unavailable" }));
@@ -83,28 +96,21 @@ export function useDictation(language: string) {
     }
     recognizer.current = next;
     heard.current = "";
-    stretchStart.current = Date.now();
+    stretch.current = { startedAt: Date.now(), stoppedAt: null };
     next.onPartial = (text) => {
       heard.current = text;
       setState((previous) => ({ ...previous, status: "listening", transcript: join(kept.current.text, text), error: null }));
     };
     next.onFinal = (text) => settle(text, null);
-    next.onError = (error) => settle("", error);
-    setState((previous) => ({ ...previous, status: "listening", error: null, reachedMax: false }));
-    next.start();
+    next.onError = (error) => settle(heard.current, error);
+    setState((previous) => ({ ...previous, status: "listening", elapsedMs: kept.current.ms, error: null, reachedMax: false }));
     timer.current = window.setInterval(() => {
-      const elapsed = kept.current.ms + Date.now() - stretchStart.current;
+      const elapsed = kept.current.ms + Date.now() - stretch.current.startedAt;
       setState((previous) => ({ ...previous, elapsedMs: Math.min(DICTATION_MAX_MS, elapsed) }));
-      if (elapsed >= DICTATION_MAX_MS) {
-        // Stopping delivers the text through `onFinal`; the flag tells the screen why it stopped.
-        setState((previous) => ({ ...previous, reachedMax: true }));
-        stopClock();
-        recognizer.current?.stop();
-      }
+      if (elapsed >= DICTATION_MAX_MS) stop();
     }, 250);
-  }, [discard, language, settle, stopClock]);
-
-  const stop = useCallback(() => recognizer.current?.stop(), []);
+    next.start();
+  }, [language, settle, stop]);
 
   /** What is on screen right now, the stretch being heard included (nothing is lost on a switch to the keyboard). */
   const snapshot = useCallback(() => join(kept.current.text, heard.current), []);

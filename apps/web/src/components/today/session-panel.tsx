@@ -150,6 +150,7 @@ export function SessionPanel({ packet, initial, sync, accentTolerance, animateSu
               <ExpressionStep
                 text={screen.text}
                 saving={saving}
+                paused={paused}
                 mode={answerMode}
                 suggestSpoken={packet.expression?.suggestSpoken ?? false}
                 quota={packet.quotas.writingFeedback}
@@ -163,7 +164,7 @@ export function SessionPanel({ packet, initial, sync, accentTolerance, animateSu
             {screen.kind === "summary" && (
               <div className={animateSummary && progress.position !== "closed" ? "session-summary-enter space-y-5" : "space-y-5"}>
                 <p>{t(packet.text ? "summaryBody" : screens.some(({ kind }) => kind === "card" || kind === "error") ? "reviewSummaryBody" : "noReviews")}</p>
-                <WritingFeedback sync={sync} sessionId={id} language={language} />
+                <WritingFeedback sync={sync} sessionId={id} language={language} paused={paused} />
                 <Button disabled={saving} onClick={() => {
                   if (progress.position === "closed") onLeave(progress);
                   else void save([{ kind: "ui_event", payload: { name: "bilan_closed", value: { sessionId: id } } }], "closed", null, onLeave);

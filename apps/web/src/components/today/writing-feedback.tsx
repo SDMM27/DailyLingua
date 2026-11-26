@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/button";
 import type { LocalWritingFeedback } from "@/lib/offline/feedback";
 import { RewriteTask } from "./rewrite-task";
 
-export function WritingFeedback({ sync, sessionId, language }: { sync: EventSyncApi; sessionId?: string; language: string }) {
+export function WritingFeedback({ sync, sessionId, language, paused = false }: {
+  sync: EventSyncApi; sessionId?: string; language: string; paused?: boolean;
+}) {
   const t = useTranslations("writingFeedback");
   const x = useTranslations("expression");
   const [task, setTask] = useState<LocalWritingFeedback>();
@@ -88,7 +90,7 @@ export function WritingFeedback({ sync, sessionId, language }: { sync: EventSync
       )}
       {result.sentences.map((sentence, index) => (
         <RewriteTask key={`${task.productionId}:${index}`} sync={sync} productionId={task.productionId}
-          sentence={sentence} index={index} language={language} attemptId={task.attempts?.[index]} />
+          sentence={sentence} index={index} language={language} attemptId={task.attempts?.[index]} paused={paused} />
       ))}
     </section>
   );

@@ -3,7 +3,7 @@
 import { countWords, PRODUCTION_MIN_WORDS } from "@dailylingua/core";
 import { MAX_PRODUCTION_CHARS, type SessionPacket } from "@dailylingua/schemas";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/unit/icons";
 import { DICTATION_MAX_MS, DICTATION_TARGET_MS, useDictation } from "@/lib/speech/use-dictation";
@@ -92,9 +92,10 @@ function TimerMic({ listening, elapsedMs, label, onPress }: { listening: boolean
  * The expression step of the session: Write (a field) or Say (continuous recognition, a live transcript, no keyboard).
  * Moving to Write carries the transcript into the field and the production becomes a written one.
  */
-export function ExpressionStep({ text, saving, mode, suggestSpoken, quota, onMode, onSubmit }: {
+export function ExpressionStep({ text, saving, paused, mode, suggestSpoken, quota, onMode, onSubmit }: {
   text: Text;
   saving: boolean;
+  paused: boolean;
   /** The choice of the learner this session, or null before they made one. */
   mode: AnswerMode | null;
   suggestSpoken: boolean;
@@ -106,11 +107,16 @@ export function ExpressionStep({ text, saving, mode, suggestSpoken, quota, onMod
   const x = useTranslations("expression");
   const supported = useSpeechSupported();
   const dictation = useDictation(text.language);
+  const stopDictation = dictation.stop;
   const privacy = useSpeechPrivacy();
   const [value, setValue] = useState("");
   const [start] = useState(Date.now);
   const current: AnswerMode = supported ? (mode ?? (suggestSpoken ? "say" : "write")) : "write";
   const minimum = PRODUCTION_MIN_WORDS[text.levelBand];
+
+  useEffect(() => {
+    if (paused) stopDictation();
+  }, [paused, stopDictation]);
 
   function change(next: AnswerMode) {
     if (next === current) return;
@@ -126,10 +132,13 @@ export function ExpressionStep({ text, saving, mode, suggestSpoken, quota, onMod
 
   if (current === "write") {
     const words = countWords(text.language, value);
+    const draft = value.trim();
+    const tooLong = draft.length > MAX_PRODUCTION_CHARS;
+    const canSubmit = !paused && !saving && !tooLong && words >= minimum;
     return (
       <form className="space-y-5" onSubmit={(event) => {
         event.preventDefault();
-        if (!saving && words >= minimum) onSubmit({ text: value.trim(), composeMs: Math.max(0, Date.now() - start) });
+        if (canSubmit) onSubmit({ text: draft, composeMs: Math.max(0, Date.now() - start) });
       }}>
         {switcher}
         <label className="block space-y-3">
@@ -145,7 +154,8 @@ export function ExpressionStep({ text, saving, mode, suggestSpoken, quota, onMod
           />
         </label>
         <p className="text-muted" id="writing-count">{t("wordCount", { words, minimum })}</p>
-        <Button type="submit" disabled={saving || words < minimum}>{t("submitWriting")}</Button>
+        {tooLong && <p className="text-sm text-muted" role="status">{x("tooLong", { limit: MAX_PRODUCTION_CHARS })}</p>}
+        <Button type="submit" disabled={!canSubmit}>{t("submitWriting")}</Button>
       </form>
     );
   }
@@ -153,6 +163,8 @@ export function ExpressionStep({ text, saving, mode, suggestSpoken, quota, onMod
   const listening = dictation.status === "listening";
   const heard = dictation.transcript.trim();
   const words = countWords(text.language, heard);
+  const tooLong = heard.length > MAX_PRODUCTION_CHARS;
+  const canSubmit = !paused && !saving && !tooLong && words >= minimum;
   const review = !listening && heard !== "";
   const failure = dictation.error ?? (dictation.status === "unavailable" ? "failed" : null);
   const left = Math.max(0, quota.limit - quota.used);
@@ -172,6 +184,7 @@ export function ExpressionStep({ text, saving, mode, suggestSpoken, quota, onMod
       )}
       {review && <p className="text-sm text-muted">{x("smoothing")}</p>}
       {review && <p className="text-muted" id="speaking-count">{t("wordCount", { words, minimum })}</p>}
+      {review && tooLong && <p className="text-sm text-muted" role="status">{x("transcriptTooLong", { limit: MAX_PRODUCTION_CHARS })}</p>}
       {dictation.reachedMax && !listening && <p className="text-sm text-muted" role="status">{x("maxReached")}</p>}
       {failure && <p className="text-sm text-muted" role="status">{x(failure === "denied" ? "denied" : failure === "no-speech" ? "noSpeech" : "failed")}</p>}
       {(listening || !review) && (
@@ -184,10 +197,12 @@ export function ExpressionStep({ text, saving, mode, suggestSpoken, quota, onMod
       )}
       {review && (
         <div className="space-y-2">
-          <Button disabled={saving || words < minimum} onClick={() => onSubmit({ text: heard, composeMs: Math.max(0, Date.now() - start), speakingMs: dictation.elapsedMs })}>
+          <Button disabled={!canSubmit} onClick={() => {
+            if (canSubmit) onSubmit({ text: heard, composeMs: Math.max(0, Date.now() - start), speakingMs: dictation.elapsedMs });
+          }}>
             {x("send")}
           </Button>
-          {dictation.elapsedMs < DICTATION_MAX_MS && (
+          {!tooLong && dictation.elapsedMs < DICTATION_MAX_MS && (
             <Button variant="secondary" className="w-full" onClick={() => privacy.ask(dictation.start)}>
               <Icon name="mic" className="size-5" />
               {x("resume")}

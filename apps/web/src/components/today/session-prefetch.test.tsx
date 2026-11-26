@@ -50,7 +50,7 @@ describe("SessionPrefetch", () => {
     vi.stubGlobal("fetch", fetcher);
     render(<SessionPrefetch language="it" />);
     await waitFor(() => expect(put).toHaveBeenCalledTimes(1));
-    expect(fetcher.mock.calls[0]?.[0]).toBe("/api/session/today?language=it");
+    expect(fetcher.mock.calls[0]?.[0]).toBe("/api/session/today?language=it&expression=1");
     expect(createUserPacketStore).toHaveBeenCalledWith("user-1");
     expect((put.mock.calls[0]?.[0] as { session: { id: string } }).session.id).toBe(packet.session.id);
     await waitFor(() => expect(purge).toHaveBeenCalledWith("2026-11-18", true));

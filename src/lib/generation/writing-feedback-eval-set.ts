@@ -17,12 +17,13 @@ export interface EvalCase {
   minCorrections?: number;
   /** The text is the automatic transcript of speech (no punctuation, no capitals): see `transcriptProblems`. */
   inputMode?: "speech_transcript";
-  /** Passages of a transcript with a real error, each of which must be covered by a correction. */
-  mustCorrect?: string[];
+  /** Error and expected corrected form, matched within a possibly longer correction. */
+  mustCorrect?: { original: string; corrected: string }[];
   request: WritingFeedbackRequest;
 }
 
 const normalizeForm = (value: string) => value.normalize("NFC").toLocaleLowerCase().replace(/[\p{P}\s]+/gu, " ").trim();
+const containsForm = (text: string, form: string) => ` ${normalizeForm(text)} `.includes(` ${normalizeForm(form)} `);
 
 /**
  * What is wrong with the corrections of a speech transcript (`j5-pr2-production-orale.md` §4): a real error that was lost,
@@ -30,13 +31,19 @@ const normalizeForm = (value: string) => value.normalize("NFC").toLocaleLowerCas
  */
 export function transcriptProblems(evalCase: EvalCase, corrections: readonly { original: string; corrected: string }[]): string[] {
   if (evalCase.inputMode !== "speech_transcript") return [];
+  const source = evalCase.request.text.normalize("NFC");
+  const copied = corrections.filter(({ original }) => source.includes(original.normalize("NFC")));
+  const uncopied = corrections
+    .filter(({ original }) => !source.includes(original.normalize("NFC")))
+    .map(({ original }) => `passage absent de la transcription : « ${original} »`);
   const lost = (evalCase.mustCorrect ?? [])
-    .filter((passage) => !corrections.some(({ original }) => normalizeForm(original).includes(normalizeForm(passage))))
-    .map((passage) => `faute perdue : « ${passage} »`);
+    .filter((error) => !copied.some(({ original, corrected }) =>
+      containsForm(original, error.original) && containsForm(corrected, error.corrected) && !containsForm(corrected, error.original)))
+    .map(({ original }) => `faute perdue : « ${original} »`);
   const cosmetic = corrections
     .filter(({ original, corrected }) => normalizeForm(original) === normalizeForm(corrected))
     .map(({ original }) => `correction de ponctuation ou de majuscule : « ${original} »`);
-  return [...lost, ...cosmetic];
+  return [...lost, ...cosmetic, ...uncopied];
 }
 
 /** Bands on the mean of the four scores, and the least a fair or weak text must be corrected on. */
@@ -212,7 +219,7 @@ export const EVAL_CASES: EvalCase[] = [
     expected: "fair",
     trap: true,
     inputMode: "speech_transcript",
-    mustCorrect: ["simpatico", "grandi"],
+    mustCorrect: [{ original: "simpatico", corrected: "simpatiche" }, { original: "grandi", corrected: "grande" }],
     request: {
       ...italian, level: "A2", targetLevel: "B1", mode: "spoken", purpose: "conversational",
       task: "Racconta a un amico come hai passato il fine settimana.",
@@ -224,7 +231,7 @@ export const EVAL_CASES: EvalCase[] = [
     expected: "fair",
     trap: true,
     inputMode: "speech_transcript",
-    mustCorrect: ["ho andato", "ho arrivato"],
+    mustCorrect: [{ original: "ho andato", corrected: "sono andato" }, { original: "ho arrivato", corrected: "sono arrivato" }],
     request: {
       ...italian, level: "A2", targetLevel: "B1", mode: "spoken", purpose: "conversational",
       task: "Racconta a un amico che cosa hai fatto ieri.",
@@ -236,7 +243,7 @@ export const EVAL_CASES: EvalCase[] = [
     expected: "fair",
     trap: true,
     inputMode: "speech_transcript",
-    mustCorrect: ["с мой друг", "в московский"],
+    mustCorrect: [{ original: "мой друг", corrected: "моим другом" }, { original: "московский театр", corrected: "московском театре" }],
     request: {
       ...russian, level: "B1", targetLevel: "B2", mode: "spoken", purpose: "conversational",
       task: "Расскажи другу, как ты провёл выходные.",
@@ -248,7 +255,7 @@ export const EVAL_CASES: EvalCase[] = [
     expected: "fair",
     trap: true,
     inputMode: "speech_transcript",
-    mustCorrect: ["в красивый город", "моя брат"],
+    mustCorrect: [{ original: "красивый город", corrected: "красивом городе" }, { original: "моя", corrected: "мой" }],
     request: {
       ...russian, level: "B1", targetLevel: "B2", mode: "spoken", purpose: "conversational",
       task: "Расскажи другу о своей последней поездке летом.",

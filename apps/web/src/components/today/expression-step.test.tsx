@@ -1,12 +1,14 @@
 // @vitest-environment jsdom
 import { loadMessages } from "@dailylingua/i18n";
-import type { SessionPacket } from "@dailylingua/schemas";
-import { render, screen } from "@testing-library/react";
+import { MAX_PRODUCTION_CHARS, MAX_REWRITE_CHARS, type SessionPacket } from "@dailylingua/schemas";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import { act, useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { EventSyncApi } from "@/components/pwa/event-sync-provider";
 import { ExpressionStep, type AnswerMode, type Production } from "./expression-step";
+import { RewriteTask } from "./rewrite-task";
 
 const messages = await loadMessages("fr");
 const text = { language: "it", levelBand: "A1", writingTask: "Descrivi il tuo bar preferito." } as NonNullable<SessionPacket["text"]>;
@@ -16,17 +18,25 @@ const spoken = "il mio bar preferito è vicino alla stazione di solito prendo un
 /** A stand-in for the browser SpeechRecognition; the test plays the part of the speech service. */
 class FakeRecognition {
   static all: FakeRecognition[] = [];
+  static failToStart = false;
   lang = "";
   interimResults = false;
   continuous = false;
   maxAlternatives = 0;
   started = 0;
+  stopped = 0;
   onresult: ((event: { results: unknown[] }) => void) | null = null;
   onerror: ((event: { error: string }) => void) | null = null;
   onend: (() => void) | null = null;
   constructor() { FakeRecognition.all.push(this); }
-  start() { this.started += 1; }
-  stop() { this.onend?.(); }
+  start() {
+    if (FakeRecognition.failToStart) throw new Error("Speech service failed to start");
+    this.started += 1;
+  }
+  stop() {
+    this.stopped += 1;
+    this.onend?.();
+  }
   abort() { /* Nothing is delivered. */ }
   hear(phrase: string) {
     this.onresult?.({ results: [Object.assign([{ transcript: phrase }], { isFinal: false })] });
@@ -35,17 +45,20 @@ class FakeRecognition {
 const last = () => FakeRecognition.all.at(-1)!;
 const scope = window as unknown as Record<string, unknown>;
 
-function Harness({ suggestSpoken, onSubmit, initialMode = null }: { suggestSpoken: boolean; onSubmit(production: Production): void; initialMode?: AnswerMode | null }) {
+function Harness({ suggestSpoken, onSubmit, initialMode = null, paused = false }: {
+  suggestSpoken: boolean; onSubmit(production: Production): void; initialMode?: AnswerMode | null; paused?: boolean;
+}) {
   const [mode, setMode] = useState<AnswerMode | null>(initialMode);
   return (
     <NextIntlClientProvider locale="fr" messages={messages}>
-      <ExpressionStep text={text} saving={false} mode={mode} suggestSpoken={suggestSpoken} quota={{ used: 1, limit: 3 }} onMode={setMode} onSubmit={onSubmit} />
+      <ExpressionStep text={text} saving={false} paused={paused} mode={mode} suggestSpoken={suggestSpoken} quota={{ used: 1, limit: 3 }} onMode={setMode} onSubmit={onSubmit} />
     </NextIntlClientProvider>
   );
 }
 
 beforeEach(() => {
   FakeRecognition.all = [];
+  FakeRecognition.failToStart = false;
   scope.webkitSpeechRecognition = FakeRecognition;
   // Node ships its own localStorage global, which hides the one of jsdom: a plain one is the same for the code.
   const store = new Map<string, string>([["dailylingua-speech-privacy", "1"]]);
@@ -140,11 +153,95 @@ describe("ExpressionStep", () => {
     expect(screen.queryByRole("button", { name: "Continuer à parler" })).toBeNull();
   });
 
+  it("stops the microphone on pause and shows the transcript on return", async () => {
+    const onSubmit = vi.fn();
+    const { rerender } = render(<Harness suggestSpoken onSubmit={onSubmit} />);
+    await userEvent.click(screen.getByRole("button", { name: "Commencer à parler" }));
+    act(() => last().hear(spoken));
+    rerender(<Harness suggestSpoken onSubmit={onSubmit} paused />);
+    expect(last().stopped).toBe(1);
+    rerender(<Harness suggestSpoken onSubmit={onSubmit} />);
+    expect(screen.getByText(spoken)).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Arrêter" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Continuer à parler" })).toBeTruthy();
+  });
+
+  it("lets a long transcript be shortened in Write before it can be sent", async () => {
+    const transcript = spoken.repeat(Math.ceil(MAX_PRODUCTION_CHARS / spoken.length) + 1);
+    const onSubmit = vi.fn();
+    render(<Harness suggestSpoken onSubmit={onSubmit} />);
+    await userEvent.click(screen.getByRole("button", { name: "Commencer à parler" }));
+    act(() => last().hear(transcript));
+    await userEvent.click(screen.getByRole("button", { name: "Arrêter" }));
+    expect((screen.getByRole("button", { name: "Envoyer pour correction" }) as HTMLButtonElement).disabled).toBe(true);
+    await userEvent.click(screen.getByRole("button", { name: "Écrire" }));
+    const field = screen.getByRole<HTMLTextAreaElement>("textbox");
+    expect(field.value).toBe(transcript);
+    const submit = screen.getByRole<HTMLButtonElement>("button", { name: "Enregistrer mon texte" });
+    expect(submit.disabled).toBe(true);
+    fireEvent.submit(field.form!);
+    expect(onSubmit).not.toHaveBeenCalled();
+    fireEvent.change(field, { target: { value: spoken } });
+    await userEvent.click(submit);
+    expect(onSubmit).toHaveBeenCalledWith({ text: spoken, composeMs: expect.any(Number) });
+  });
+
+  it("leaves no running clock when the speech service throws on start", () => {
+    vi.useFakeTimers();
+    FakeRecognition.failToStart = true;
+    render(<Harness suggestSpoken onSubmit={vi.fn()} />);
+    const count = vi.getTimerCount();
+    act(() => { screen.getByRole("button", { name: "Commencer à parler" }).click(); });
+    expect(vi.getTimerCount()).toBe(count);
+    expect(screen.getByRole("button", { name: "Commencer à parler" })).toBeTruthy();
+  });
+
+  it("allows a fresh two minutes after a timeout without a transcript", () => {
+    vi.useFakeTimers();
+    render(<Harness suggestSpoken onSubmit={vi.fn()} />);
+    act(() => { screen.getByRole("button", { name: "Commencer à parler" }).click(); });
+    act(() => { vi.advanceTimersByTime(120_000); });
+    expect(last().stopped).toBe(1);
+    act(() => { screen.getByRole("button", { name: "Commencer à parler" }).click(); });
+    expect(FakeRecognition.all).toHaveLength(2);
+    act(() => { vi.advanceTimersByTime(1_000); });
+    expect(last()).toMatchObject({ started: 1, stopped: 0 });
+  });
+
   it("says the microphone is refused and leaves the way to Write open", async () => {
     render(<Harness suggestSpoken onSubmit={vi.fn()} />);
     await userEvent.click(screen.getByRole("button", { name: "Commencer à parler" }));
     act(() => last().onerror?.({ error: "not-allowed" }));
     expect(screen.getByText(/Le micro n.est pas autorisé/)).toBeTruthy();
     expect((screen.getByRole("button", { name: "Écrire" }) as HTMLButtonElement).disabled).toBe(false);
+  });
+});
+
+describe("RewriteTask", () => {
+  it("keeps the dictated draft on pause and accepts it only after shortening", async () => {
+    const transcript = "a".repeat(MAX_REWRITE_CHARS + 1);
+    const enqueueRewrite = vi.fn().mockResolvedValue(undefined);
+    const sync = { enqueueRewrite } as unknown as EventSyncApi;
+    const task = (paused: boolean) => (
+      <NextIntlClientProvider locale="fr" messages={messages}>
+        <RewriteTask sync={sync} productionId="production" sentence={{ text: "Prima frase.", nativeText: null, errors: [] }}
+          index={0} language="it" paused={paused} />
+      </NextIntlClientProvider>
+    );
+    const { rerender } = render(task(false));
+    await userEvent.click(screen.getByRole("button", { name: "Dicter la phrase 1" }));
+    act(() => last().hear(transcript));
+    rerender(task(true));
+    expect(last().stopped).toBe(1);
+    rerender(task(false));
+    const field = screen.getByRole<HTMLTextAreaElement>("textbox");
+    expect(field.value).toBe(transcript);
+    const submit = screen.getByRole<HTMLButtonElement>("button", { name: "Vérifier ma réécriture" });
+    expect(submit.disabled).toBe(true);
+    fireEvent.submit(field.form!);
+    expect(enqueueRewrite).not.toHaveBeenCalled();
+    fireEvent.change(field, { target: { value: "Prima frase." } });
+    await userEvent.click(submit);
+    expect(enqueueRewrite).toHaveBeenCalledWith("production", 0, "Prima frase.");
   });
 });
