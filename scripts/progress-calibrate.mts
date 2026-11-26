@@ -26,8 +26,8 @@ if (!sample.success) {
   console.error("Paires de calibrage invalides. Vérifie le format décrit dans la fiche du jalon 6.");
   for (const issue of sample.error.issues) {
     const [index, ...fields] = issue.path;
-    const location = index === undefined ? "Racine" : `Entrée ${index}`;
-    const problem = issue.code === "custom" ? issue.message : `Format invalide (${fields.join(".") || "valeur"})`;
+    const location = index === undefined ? "Racine" : `Entrée ${String(index)}`;
+    const problem = issue.code === "custom" ? issue.message : `Format invalide (${fields.map(String).join(".") || "valeur"})`;
     console.error(`${location} : ${problem}`);
   }
   process.exit(1);
