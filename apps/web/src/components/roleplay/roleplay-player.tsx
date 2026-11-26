@@ -96,7 +96,6 @@ export function RoleplayPlayer({ userId, language, locale, xpVisible, backHref }
     };
     const checkReceipt = async () => {
       try {
-        await sync.flushNow();
         // Read the ledger only after delivery. An accepted event can still earn zero XP.
         if (await sync.eventDelivery(finishedId) !== "queued") {
           const state = await requestRoleplay(userId, stateUrl, { signal: controller.signal });
@@ -117,7 +116,8 @@ export function RoleplayPlayer({ userId, language, locale, xpVisible, backHref }
   function apply(result: RoleplayResponse) {
     if (result.status === "ready" || result.status === "game_over" || result.status === "active_exists") {
       setGame(result.game);
-      if (result.status === "ready" && result.reply && voice.auto && result.game.language === (game?.language ?? language)) voice.speak(result.reply.text);
+      if (result.status === "ready" && result.game.status === "active" && result.reply && voice.auto &&
+        result.game.language === (game?.language ?? language)) voice.speak(result.reply.text);
     }
     if (result.status !== "ready" && result.status !== "state" && result.status !== "active_exists") setFailure(result);
   }
