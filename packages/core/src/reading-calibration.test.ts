@@ -34,6 +34,11 @@ describe("reading calibration", () => {
     })));
   });
 
+  it("compares timestamp offsets by instant", () => {
+    const assessment = { ...sample.assessment, assessedAt: "2026-11-20T09:00:00.200-01:00" };
+    expect(readingCalibrationSampleSchema.safeParse([{ ...sample, assessment }]).success).toBe(true);
+  });
+
   it("rejects duplicates, language mismatches, invalid scores and observations from after the assessment", () => {
     expect(readingCalibrationSampleSchema.safeParse([sample, sample]).success).toBe(false);
     for (const change of [

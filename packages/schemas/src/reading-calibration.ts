@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isoInstantSchema } from "./common";
 
 export const readingCalibrationLanguageSchema = z.enum(["it", "ru"]);
 const band = z.object({
@@ -11,12 +12,12 @@ export const readingCalibrationSampleSchema = z.array(z.object({
   observation: z.object({
     version: z.literal(1),
     language: readingCalibrationLanguageSchema,
-    observedAt: z.iso.datetime(),
+    observedAt: isoInstantSchema,
     reading: z.object({ bands: z.array(band) }),
   }),
   assessment: z.object({
     language: readingCalibrationLanguageSchema,
-    assessedAt: z.iso.datetime(),
+    assessedAt: isoInstantSchema,
     readingValue: z.number().min(0).max(7),
   }),
 })).superRefine((entries, ctx) => {
