@@ -751,5 +751,31 @@
     "doneTitle": "Échauffement terminé",
     "doneBody": "Tu peux repasser le test maintenant, ou revoir l’unité d’abord.",
     "go": "Revoir maintenant"
+  },
+  "progress": {
+    "title": "Mes progrès",
+    "languages": "Langue étudiée",
+    "studyDays": "Jours d’étude",
+    "allLanguages": "Toutes langues confondues",
+    "studied": "Étude",
+    "noStudy": "Sans activité",
+    "skills": "Compétences",
+    "skill": "Compétence",
+    "level": "Niveau",
+    "origin": "Origine",
+    "reading": "Lire",
+    "listening": "Écouter",
+    "writing": "Écrire",
+    "speaking": "Parler",
+    "unmeasured": "Non mesuré",
+    "goals": "Acquis validés",
+    "noGoals": "Tes acquis apparaîtront ici après la validation d’une unité.",
+    "source": {
+      "legacy": "Repris de l’ancienne app",
+      "declared": "Déclaré",
+      "placement": "Test de niveau",
+      "assessment": "Bilan",
+      "estimated": "Estimé"
+    }
   }
 }

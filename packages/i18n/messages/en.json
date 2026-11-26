@@ -751,5 +751,31 @@
     "doneTitle": "Warm-up done",
     "doneBody": "You can retake the test now, or go back over the unit first.",
     "go": "Review now"
+  },
+  "progress": {
+    "title": "My progress",
+    "languages": "Study language",
+    "studyDays": "Study days",
+    "allLanguages": "Across all languages",
+    "studied": "Studied",
+    "noStudy": "No activity",
+    "skills": "Skills",
+    "skill": "Skill",
+    "level": "Level",
+    "origin": "Source",
+    "reading": "Reading",
+    "listening": "Listening",
+    "writing": "Writing",
+    "speaking": "Speaking",
+    "unmeasured": "Not measured",
+    "goals": "Confirmed outcomes",
+    "noGoals": "Your learning outcomes will appear here when you pass a unit.",
+    "source": {
+      "legacy": "From the previous app",
+      "declared": "Self-reported",
+      "placement": "Placement test",
+      "assessment": "Assessment",
+      "estimated": "Estimated"
+    }
   }
 }
