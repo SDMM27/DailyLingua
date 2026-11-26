@@ -212,10 +212,11 @@ export const EVAL_CASES: EvalCase[] = [
     expected: "fair",
     trap: true,
     inputMode: "speech_transcript",
-    mustCorrect: ["le mie amiche sono simpatico", "una casa molto grande"],
+    mustCorrect: ["simpatico", "grandi"],
     request: {
-      ...italian, level: "A2", mode: "spoken",
-      text: "il fine settimana scorso sono andata al mare con le mie amiche sono simpatico e abbiamo mangiato in una casa molto grande ma il mare era freddo e noi non abbiamo fatto il bagno",
+      ...italian, level: "A2", targetLevel: "B1", mode: "spoken", purpose: "conversational",
+      task: "Racconta a un amico come hai passato il fine settimana.",
+      text: "il fine settimana scorso sono andata al mare con le mie amiche sono simpatico e abbiamo mangiato in una casa molto grandi ma il mare era freddo e noi non abbiamo fatto il bagno",
     },
   },
   {
@@ -225,7 +226,8 @@ export const EVAL_CASES: EvalCase[] = [
     inputMode: "speech_transcript",
     mustCorrect: ["ho andato", "ho arrivato"],
     request: {
-      ...italian, level: "A2", mode: "spoken",
+      ...italian, level: "A2", targetLevel: "B1", mode: "spoken", purpose: "conversational",
+      task: "Racconta a un amico che cosa hai fatto ieri.",
       text: "ieri ho andato al lavoro in bicicletta e ho arrivato tardi perche pioveva molto poi ho mangiato un panino con i miei colleghi e la sera sono tornato a casa stanco",
     },
   },
@@ -236,7 +238,8 @@ export const EVAL_CASES: EvalCase[] = [
     inputMode: "speech_transcript",
     mustCorrect: ["с мой друг", "в московский"],
     request: {
-      ...russian, level: "B1", targetLevel: "B2", mode: "spoken",
+      ...russian, level: "B1", targetLevel: "B2", mode: "spoken", purpose: "conversational",
+      task: "Расскажи другу, как ты провёл выходные.",
       text: "в субботу я ходил в театр с мой друг мы смотрели спектакль в московский театр и потом долго гуляли по городу было очень холодно но нам было весело",
     },
   },
@@ -247,7 +250,8 @@ export const EVAL_CASES: EvalCase[] = [
     inputMode: "speech_transcript",
     mustCorrect: ["в красивый город", "моя брат"],
     request: {
-      ...russian, level: "B1", targetLevel: "B2", mode: "spoken",
+      ...russian, level: "B1", targetLevel: "B2", mode: "spoken", purpose: "conversational",
+      task: "Расскажи другу о своей последней поездке летом.",
       text: "летом мы жили в красивый город на юге россии там работает моя брат он врач мы много плавали и ели свежие фрукты я хочу поехать туда ещё раз",
     },
   },

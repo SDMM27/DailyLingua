@@ -28,8 +28,7 @@ Complète [j5-oral.md](j5-oral.md) (décisions 1, 2, 5, 8) et s'appuie sur l'int
 
 - Vitest : schéma de l'événement (avec et sans `mode`), ingestion `spoken` (mode écrit, `too_short` sous 15 s), filtre de `writing-feedback`, construction du message avec `inputMode`, `suggestSpoken`.
 - e2e WebKit 390 px avec `SpeechRecognition` simulée : passer en « Dire », dicter, envoyer, correction affichée (IA simulée comme dans les e2e existants), réécriture au micro ; repli sans reconnaissance (sélecteur absent).
-- **Évaluation du prompt** (`feedback:eval`, payante, manuelle) : à lancer par le propriétaire avant fusion, avec 4 transcriptions orales ajoutées au jeu d'évaluation (2 italiennes, 2 russes, dont des fautes d'accord et d'auxiliaire). Critère : aucune faute réelle perdue par rapport au même texte tapé, aucune correction de ponctuation.
-  - Limite constatée à l'implémentation : `feedback:eval` (`scripts/writing-feedback-eval.mts`) appelle l'ancien correcteur (`src/lib/generation/`), dont `mode: "spoken"` désigne un script à dire à voix haute, non une transcription ; il n'utilise pas `inputMode` ni le nouveau prompt de `packages/ai`. Les 4 cas ajoutés (`inputMode: "speech_transcript"`, `mustCorrect`, contrôle `transcriptProblems`) doivent être adaptés pour passer par le nouveau prompt avant l'exécution payante.
+- **Évaluation du prompt** (payante, manuelle). Avant fusion, lancer `npm run feedback:eval -- --transcripts` avec les quatre transcriptions de test (deux italiennes et deux russes). La commande emploie le prompt et le schéma de sortie de la nouvelle app, puis affiche les jetons utilisés et le coût estimé. Chaque faute indiquée dans le jeu d’essai doit être couverte par une correction et les corrections de ponctuation ou de majuscules seules échouent.
 
 ## 5. Lots
 
