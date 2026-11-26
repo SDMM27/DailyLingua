@@ -52,7 +52,7 @@ La mesure de rétention existante est figée avant la bascule, pour comparer ava
 | M2 | Local, **sur une copie de la production** | Sauvegarde de la production restaurée en local ; migration ; rapport de contrôle | Voir §6 ; **demande d'accord pour faire la sauvegarde** |
 | M3 | Production, schéma `app` seulement | Création du schéma et migration à blanc, l'ancienne app continuant de servir | **Accord explicite** ; rapport de contrôle identique à M2 |
 | M4 | Préversion | La nouvelle app est ouverte à des volontaires sur une adresse distincte. Leurs données sont migrées ; un marqueur `migrated_at` dans leur profil redirige l'ancienne app vers la nouvelle pour éviter une double écriture | Aucun écart signalé pendant deux semaines |
-| M5 | Bascule | Fenêtre courte : ancienne app en lecture seule, dernière migration incrémentale, changement de domaine | **Accord explicite** ; contrôles §6 verts |
+| M5 | Bascule | Fenêtre courte : ancienne app en lecture seule, dernière migration incrémentale, changement de domaine | **Accord explicite** après les contrôles des données (§6) et la recette des usages et de l'affichage sur PC (§6.1) |
 | M6 | Après | L'ancienne app reste accessible en lecture seule 30 jours ; `public` est conservé 90 jours puis archivé (export) | **Accord explicite** avant toute suppression |
 
 ## 6. Contrôles de non-perte
@@ -65,6 +65,22 @@ Un script `migration:verify` compare, pour chaque utilisateur :
 - l'absence de ligne `public` sans entrée dans `legacy_map`.
 
 Tout écart bloque le passage à l'étape suivante. Le rapport est joint à la demande de validation.
+
+### 6.1 Usages de l'ancienne application et affichage sur PC
+
+**Usages.** Tester la préversion avec un compte repris de l'ancienne application et un compte neuf. Pour chaque parcours, relever le point d'entrée visible, l'action réalisable et le résultat. Compléter cet inventaire en parcourant les menus de l'ancienne application. Chaque usage retenu comme essentiel doit être réalisable avant M5.
+
+| Usage | Action à vérifier dans la préversion |
+|---|---|
+| Grammaire et alphabet | Retrouver les fiches et les exercices pour les langues et niveaux déjà couverts. |
+| Vocabulaire | Retrouver ses mots et ses listes, ajouter ou modifier un mot et lancer une révision. |
+| Historique et productions | Retrouver une activité passée, rouvrir une production et consulter sa correction. |
+| Niveau et bilan | Lancer le test refondu, retrouver ses résultats repris et ouvrir le bilan. |
+| Lecture et sources | Trouver un texte, l'ouvrir et retrouver sa source. |
+
+**Affichage sur PC.** Vérifier la navigation et ces parcours à 1280 et 1440 px, puis la régression mobile à 390 px. Sur PC, les écrans principaux exploitent l'espace pour la navigation et les listes. Le lecteur conserve une longueur de ligne confortable. Les entrées essentielles restent visibles, utilisables au clavier et accessibles sans défilement horizontal. Vérifier le vocabulaire, l'historique, le lecteur et le tableau de progrès, ainsi que les transitions entre ces écrans.
+
+Consigner les résultats et joindre des captures PC et mobile au rapport de bascule. Un usage essentiel sans accès fonctionnel ou une interface principale encore confinée à la largeur mobile bloque M5.
 
 ## 7. Retour arrière
 

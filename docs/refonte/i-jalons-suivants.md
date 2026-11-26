@@ -55,6 +55,8 @@ Quêtes quotidiennes et hebdomadaires ; badges d'étapes réelles ; ligues en op
 Migration sur une copie de la production, puis en production sur accord ; bascule ; ancienne app en lecture seule 30 jours ; suivi des indicateurs à trois mois. Ensuite : squelette Expo sur les paquets partagés.
 **Livrable** : tous les utilisateurs sont sur la nouvelle app, sans perte. **Dépend de** : tout.
 
+**Deux conditions avant la bascule générale.** La nouvelle application couvre les usages essentiels de l'ancienne et offre une navigation adaptée au bureau. Les écrans de progression du jalon 6 alimentent cette validation. La [grille de recette de la bascule](f-plan-de-migration.md#61-usages-de-lancienne-application-et-affichage-sur-pc) précise les parcours à vérifier sur la préversion.
+
 ## En continu
 
 - **Contenus** : relecture des banques de test et des dossiers du bilan (suite de la phase X0), traduction des fiches curées vers l'anglais, unités débutant des autres langues — en sessions Claude Code, hors budget.
