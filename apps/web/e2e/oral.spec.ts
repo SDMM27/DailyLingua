@@ -67,7 +67,7 @@ test.describe("À voix haute", () => {
       await expect(page.getByRole("navigation", { name: "Navigation" })).toBeHidden();
       await expectNoHorizontalOverflow(page);
       await expectNoAxeViolations(page);
-      await page.getByRole("button", { name: "Commencer" }).click();
+      await page.getByRole("button", { name: "Commencer", exact: true }).click();
 
       let repeated = 0;
       let dictated = 0;
@@ -165,7 +165,8 @@ test.describe("À voix haute", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await signUpAndInstall(page, email);
     await page.getByRole("link", { name: "Ouvrir", exact: true }).click();
-    await page.getByRole("button", { name: "Commencer" }).click();
+    await expect(page).toHaveURL(/\/oral$/);
+    await page.getByRole("button", { name: "Commencer", exact: true }).click();
     await page.getByRole("button", { name: "Écouter la réponse" }).click();
     await page.getByRole("button", { name: "Pas encore" }).click();
 
