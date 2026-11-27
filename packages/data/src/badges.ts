@@ -24,8 +24,8 @@ export interface BadgeLanguageFacts {
   roleplays: number;
 }
 
-/** Estimates that come from a test or from practice: a declared or legacy level proves nothing, so it earns no badge. */
-const PROVEN_SOURCES = ["placement", "assessment", "estimated"];
+/** Estimates proven by an assessment or by practice. A declared, legacy or placement level earns no badge: the placement test is deliberately generous and is taken on day one, so it marks no level crossed. */
+const PROVEN_SOURCES = ["assessment", "estimated"];
 /** Stability (days) from which a card counts as a known word. */
 const KNOWN_STABILITY_DAYS = 21;
 
