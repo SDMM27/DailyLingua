@@ -141,6 +141,11 @@ describe("game settings", () => {
       haptics: false,
       notifications: { enabled: false, time: "19:00", weeklySummary: true },
       answerTolerance: { accents: "lenient" },
+      quests: { enabled: true },
+      immersionXp: { enabled: true },
+      badges: { enabled: true },
+      league: { enabled: false },
+      friends: { enabled: false },
     });
     expect(resolveGameSettings({ ring: { tier: 30 } }, 10).ring).toEqual({ enabled: true, tier: 30 });
     expect(resolveGameSettings({}, 10).ring.tier).toBe(10);

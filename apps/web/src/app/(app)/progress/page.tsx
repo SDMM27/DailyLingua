@@ -1,8 +1,10 @@
-import { addDays, languageDisplayName, learningDay, valueToLevel } from "@dailylingua/core";
-import { getImmersionOverview, getProgressOverview } from "@dailylingua/data";
+import { addDays, immersionCloseThrough, languageDisplayName, learningDay, oldestEditableImmersionDay, resolveGameSettings, valueToLevel } from "@dailylingua/core";
+import { getImmersionOverview, getProgressOverview, listImmersionClosed } from "@dailylingua/data";
+import { gameSettingsSchema } from "@dailylingua/schemas";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { QuestList } from "@/components/quests/quest-list";
 import { ImmersionSection } from "@/components/progress/immersion-section";
 import { getProgressLanguages } from "@/lib/progress-languages";
 import { getRequestClient, getSessionProfile, getSessionUser } from "@/lib/session";
@@ -28,9 +30,11 @@ export default async function ProgressPage({ searchParams }: PageProps<"/progres
   const today = learningDay(new Date(), profile.timeZone);
   const dates = Array.from({ length: 7 }, (_, index) => addDays(today, index - 6));
   const client = await getRequestClient();
-  const [overview, immersion] = await Promise.all([
+  const game = resolveGameSettings(gameSettingsSchema.safeParse(profile.gameSettings).data);
+  const [overview, immersion, closed] = await Promise.all([
     getProgressOverview(client, user.id, language, addDays(today, -6), today),
     getImmersionOverview(client, user.id, language, addDays(today, -6), today),
+    listImmersionClosed(client, user.id, addDays(today, -6), immersionCloseThrough(today)),
   ]);
   const passed = new Set(overview.passedUnits.map((unit) => unit.unitId));
   const units = visibleUnitsFor(language).filter((unit) => passed.has(unit.id) && unit.canDo.length > 0);
@@ -76,8 +80,11 @@ export default async function ProgressPage({ searchParams }: PageProps<"/progres
           </ul>
         </section>
 
-        <ImmersionSection userId={user.id} language={language} today={today} oldestDay={addDays(today, -30)}
-          appMinutes={immersion.appMinutes} declaredMinutes={immersion.declaredMinutes} entries={immersion.entries} />
+        <ImmersionSection userId={user.id} language={language} today={today} oldestDay={oldestEditableImmersionDay(today)}
+          appMinutes={immersion.appMinutes} declaredMinutes={immersion.declaredMinutes} entries={immersion.entries}
+          xpEnabled={game.immersionXp.enabled} closedXp={closed.reduce((sum, day) => sum + day.xp, 0)} />
+
+        {game.quests.enabled && <div className="md:col-start-1 md:row-start-4"><QuestList userId={user.id} period="week" /></div>}
 
         <section className="md:col-start-2 md:row-span-3 md:row-start-1" aria-labelledby="progress-skills">
           <h2 id="progress-skills" className="mb-3 font-display text-2xl font-semibold">{t("skills")}</h2>

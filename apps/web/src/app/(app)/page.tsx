@@ -11,6 +11,7 @@ import { OralCard } from "@/components/today/oral-card";
 import { UnitCard } from "@/components/today/unit-card";
 import { WarmupCard } from "@/components/today/warmup-card";
 import { TodaySession } from "@/components/today/today-session";
+import { QuestList } from "@/components/quests/quest-list";
 import { refreshLegacyDataIfStale } from "@/lib/auth/claim-legacy";
 import { dailyGoalXp } from "@/lib/goal";
 import { gradedTextGenerationEnabled } from "@/lib/graded-text/server";
@@ -75,6 +76,7 @@ export default async function TodayPage() {
       animateSummary={settings.celebrations === "full"}
       prepareText={gradedTextGenerationEnabled()}
       goal={settings.ring.enabled && <GoalRing current={progress.xp} target={dailyGoalXp(settings.ring.tier)} showValue={settings.xpVisible} />}
+      quests={settings.quests.enabled && <QuestList userId={user.id} period="day" />}
       unitCard={(todo || warmups.length > 0) && (
         <>
           <WarmupCard warmups={warmups} language={enrollment.language} locale={locale} />

@@ -16,7 +16,7 @@ import { SessionPanel } from "./session-panel";
 import { SessionPrefetch } from "./session-prefetch";
 import { WritingFeedback } from "./writing-feedback";
 
-export function TodaySession({ language, timeZone, languageName, children, goal, detail, unitCard, oralCard, roleplayAvailable, accentTolerance, animateSummary, prepareText }: {
+export function TodaySession({ language, timeZone, languageName, children, goal, detail, quests, unitCard, oralCard, roleplayAvailable, accentTolerance, animateSummary, prepareText }: {
   language: string;
   timeZone: string;
   languageName: string;
@@ -24,6 +24,7 @@ export function TodaySession({ language, timeZone, languageName, children, goal,
   goal: ReactNode;
   detail: ReactNode;
   /** The way into the beginner path, shown under the session of the day. */
+  quests?: ReactNode;
   unitCard?: ReactNode;
   /** « À voix haute », under the way into the path, when the language has sentences to say. */
   oralCard?: ReactNode;
@@ -156,6 +157,7 @@ export function TodaySession({ language, timeZone, languageName, children, goal,
             ) : <p className="text-muted" role="status">{common("loading")}</p>}
             {saveError && <FormMessage kind="error">{t("saveError")}</FormMessage>}
           </article>
+          {quests}
           {unitCard}
           {oralCard}
           {roleplayAvailable && finished && online && (

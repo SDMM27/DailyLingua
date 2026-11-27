@@ -11,6 +11,11 @@ export interface ResolvedGameSettings {
   haptics: boolean;
   notifications: { enabled: boolean; time: string; weeklySummary: boolean };
   answerTolerance: { accents: "strict" | "lenient" };
+  quests: { enabled: boolean };
+  immersionXp: { enabled: boolean };
+  badges: { enabled: boolean };
+  league: { enabled: boolean };
+  friends: { enabled: boolean };
 }
 
 export const DEFAULT_WEEKLY_TARGET = 4;
@@ -37,6 +42,11 @@ export function resolveGameSettings(stored: GameSettings | null | undefined, ses
     haptics: s.haptics ?? false,
     notifications: { enabled: s.notifications?.enabled ?? false, time: s.notifications?.time ?? "19:00", weeklySummary: s.notifications?.weeklySummary ?? true },
     answerTolerance: { accents: s.answerTolerance?.accents ?? "lenient" },
+    quests: { enabled: s.quests?.enabled ?? true },
+    immersionXp: { enabled: s.immersionXp?.enabled ?? true },
+    badges: { enabled: s.badges?.enabled ?? true },
+    league: { enabled: s.league?.enabled ?? false },
+    friends: { enabled: s.friends?.enabled ?? false },
   };
 }
 

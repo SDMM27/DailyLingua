@@ -3,7 +3,7 @@
 import { immersionKinds, type ImmersionKind } from "@dailylingua/schemas";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useId, useState, useTransition, type FormEvent } from "react";
+import { useEffect, useId, useState, useTransition, type FormEvent } from "react";
 import { ChoiceList } from "@/components/onboarding/choice-list";
 import { Button } from "@/components/ui/button";
 import { CONTROL_CLASS, FormMessage } from "@/components/ui/field";
@@ -22,7 +22,7 @@ type Editing = { id: string | null; day: string; minutes: string; kind: Immersio
  * "Immersion" block of the progress page: the week's learning time (in the app and, apart, declared by the
  * learner), a simple form to declare time outside the app, and the week's entries to edit or delete.
  */
-export function ImmersionSection({ userId, language, today, oldestDay, appMinutes, declaredMinutes, entries }: {
+export function ImmersionSection({ userId, language, today, oldestDay, appMinutes, declaredMinutes, entries, xpEnabled, closedXp }: {
   userId: string;
   language: string;
   today: string;
@@ -30,6 +30,10 @@ export function ImmersionSection({ userId, language, today, oldestDay, appMinute
   appMinutes: number;
   declaredMinutes: number;
   entries: ImmersionItem[];
+  /** The immersion XP switch is on. */
+  xpEnabled: boolean;
+  /** XP of the closed days of the week shown. */
+  closedXp: number;
 }) {
   const t = useTranslations("progress.immersion");
   const locale = useLocale();
@@ -39,6 +43,14 @@ export function ImmersionSection({ userId, language, today, oldestDay, appMinute
   const [confirming, setConfirming] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
   const [pending, startTransition] = useTransition();
+
+  // Closing the days that are due happens on the server when this is asked; the XP of the week is then read again.
+  useEffect(() => {
+    fetch("/api/quests", { headers: { [ACCOUNT_HEADER]: userId } })
+      .then((response) => (response.ok ? response.json() as Promise<{ closedImmersionDays?: number }> : null))
+      .then((body) => { if (body && (body.closedImmersionDays ?? 0) > 0) router.refresh(); })
+      .catch(() => undefined);
+  }, [userId, router]);
 
   const duration = (total: number) => {
     const hours = Math.floor(total / 60);
@@ -93,7 +105,9 @@ export function ImmersionSection({ userId, language, today, oldestDay, appMinute
         {t("summaryLabel")} <span className="font-semibold">{t("inApp", { duration: duration(appMinutes) })}</span>
         {" · "}
         <span className="text-muted">{t("declared", { duration: duration(declaredMinutes) })}</span>
+        {xpEnabled && closedXp > 0 && <span className="font-semibold"> · {t("xpEarned", { xp: closedXp })}</span>}
       </p>
+      {xpEnabled && <p className="mt-1 text-sm text-muted">{t("xpPending")}</p>}
 
       {editing ? (
         <form onSubmit={submit} className="mt-5 space-y-5" aria-labelledby={`${formId}-title`}>
@@ -132,7 +146,9 @@ export function ImmersionSection({ userId, language, today, oldestDay, appMinute
           {entries.map((entry) => (
             <li key={entry.id} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 py-2">
               <span>{describe(entry)}</span>
-              {confirming === entry.id ? (
+              {entry.day < oldestDay ? (
+                <span className="text-sm text-muted">{t("dayClosed")}</span>
+              ) : confirming === entry.id ? (
                 <span className="flex flex-wrap items-center gap-2">
                   <span className="text-sm">{t("confirmDelete")}</span>
                   <Button variant="ghost" disabled={pending} aria-label={t("confirmDeleteEntry", { entry: describe(entry) })}

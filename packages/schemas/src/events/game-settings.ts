@@ -37,6 +37,12 @@ export const gameSettingsSchema = z.strictObject({
     .strictObject({ enabled: z.boolean().optional(), time: timeOfDaySchema.optional(), weeklySummary: z.boolean().optional() })
     .optional(),
   answerTolerance: z.strictObject({ accents: z.enum(["strict", "lenient"]).optional() }).optional(),
+  /** Social mechanics of milestone 7: one switch each (`j7-social.md`, common principles). */
+  quests: z.strictObject({ enabled: z.boolean().optional() }).optional(),
+  immersionXp: z.strictObject({ enabled: z.boolean().optional() }).optional(),
+  badges: z.strictObject({ enabled: z.boolean().optional() }).optional(),
+  league: z.strictObject({ enabled: z.boolean().optional() }).optional(),
+  friends: z.strictObject({ enabled: z.boolean().optional() }).optional(),
 });
 export type GameSettings = z.infer<typeof gameSettingsSchema>;
 
@@ -57,6 +63,11 @@ export const gameSettingKeys = [
   "notifications.time",
   "notifications.weeklySummary",
   "answerTolerance.accents",
+  "quests.enabled",
+  "immersionXp.enabled",
+  "badges.enabled",
+  "league.enabled",
+  "friends.enabled",
 ] as const;
 export type GameSettingKey = (typeof gameSettingKeys)[number];
 

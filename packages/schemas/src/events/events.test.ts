@@ -199,6 +199,11 @@ describe("gameSettingsSchema", () => {
       haptics: false,
       notifications: { enabled: true, time: "19:00", weeklySummary: true },
       answerTolerance: { accents: "strict" },
+      quests: { enabled: true },
+      immersionXp: { enabled: true },
+      badges: { enabled: true },
+      league: { enabled: false },
+      friends: { enabled: false },
     };
     expect(gameSettingsSchema.safeParse(full).success).toBe(true);
     expect(gameSettingsSchema.safeParse({}).success).toBe(true);

@@ -12,6 +12,7 @@ interface Row { id: string; userId: string; language: string; day: string; minut
 let signedIn: { id: string } | null = { id: USER };
 let enrolled = ["ru", "it"];
 let rows: Row[] = [];
+let recorded: string[] = [];
 
 vi.mock("@/lib/supabase/server", () => ({
   createSupabaseServerClient: async () => ({ auth: { getUser: async () => ({ data: { user: signedIn } }) } }),
@@ -19,6 +20,7 @@ vi.mock("@/lib/supabase/server", () => ({
 // The data functions are exercised by the data package; here they are an in-memory table with the same contract.
 vi.mock("@dailylingua/data", () => ({
   getProfile: async () => ({ timeZone: "Europe/Paris" }),
+  isImmersionDayRecorded: async (_: unknown, __: string, day: string) => recorded.includes(day),
   listEnrollments: async () => enrolled.map((language) => ({ language })),
   countImmersionOnDay: async (_: unknown, userId: string, day: string) => rows.filter((row) => row.userId === userId && row.day === day).length,
   getImmersion: async (_: unknown, userId: string, id: string) => rows.find((row) => row.id === id && row.userId === userId) ?? null,
@@ -59,6 +61,7 @@ beforeEach(() => {
   vi.setSystemTime(NOW);
   signedIn = { id: USER };
   enrolled = ["ru", "it"];
+  recorded = [];
   rows = [row(MINE, USER), row(THEIRS, OTHER)];
   vi.spyOn(console, "error").mockImplementation(() => undefined);
 });
@@ -84,11 +87,18 @@ describe("POST /api/immersion", () => {
     expect(rows).toHaveLength(2);
   });
 
-  it("refuses a language the account is not enrolled in, a future day and a day more than 30 days back", async () => {
+  it("refuses a language the account is not enrolled in and a future day", async () => {
     expect((await createEntry(request("POST", { ...entry, language: "de" }))).status).toBe(400);
     expect((await createEntry(request("POST", { ...entry, day: "2026-11-28" }))).status).toBe(400);
-    expect((await createEntry(request("POST", { ...entry, day: "2026-10-27" }))).status).toBe(400);
-    expect((await createEntry(request("POST", { ...entry, day: "2026-10-28" }))).status).toBe(201);
+  });
+
+  it("answers 409 day_closed from the 4th day back, or for a day already settled", async () => {
+    expect((await createEntry(request("POST", { ...entry, day: "2026-11-24" }))).status).toBe(201);
+    const closed = await createEntry(request("POST", { ...entry, day: "2026-11-23" }));
+    expect(closed.status).toBe(409);
+    expect(await closed.json()).toEqual({ error: "day_closed" });
+    recorded = ["2026-11-25"];
+    expect((await createEntry(request("POST", { ...entry, day: "2026-11-25" }))).status).toBe(409);
   });
 
   it("answers 429 from the 51st entry of a day", async () => {
@@ -119,6 +129,14 @@ describe("PATCH /api/immersion/[id]", () => {
     expect((await updateEntry(request("PATCH", { ...entry, day: "2026-11-28" }), MINE)).status).toBe(400);
   });
 
+  it("answers 409 for a closed entry or a move to a closed day, and changes nothing", async () => {
+    rows = [row(MINE, USER, "2026-11-20")];
+    expect((await updateEntry(request("PATCH", { ...entry, minutes: 55 }), MINE)).status).toBe(409);
+    rows = [row(MINE, USER)];
+    expect((await updateEntry(request("PATCH", { ...entry, day: "2026-11-20" }), MINE)).status).toBe(409);
+    expect(rows[0]!.minutes).toBe(10);
+  });
+
   it("answers 429 when moving the entry to a day that already holds 50", async () => {
     rows = [row(MINE, USER), ...Array.from({ length: 50 }, (_, index) => row(`id-${index}`, USER, "2026-11-25"))];
     expect((await updateEntry(request("PATCH", { ...entry, day: "2026-11-25" }), MINE)).status).toBe(429);
@@ -131,6 +149,12 @@ describe("DELETE /api/immersion/[id]", () => {
     expect((await deleteEntry(request("DELETE"), THEIRS)).status).toBe(404);
     expect((await deleteEntry(request("DELETE"), MINE)).status).toBe(204);
     expect(rows.map((candidate) => candidate.id)).toEqual([THEIRS]);
+  });
+
+  it("answers 409 for an entry of a closed day and keeps it", async () => {
+    rows = [row(MINE, USER, "2026-11-20")];
+    expect((await deleteEntry(request("DELETE"), MINE)).status).toBe(409);
+    expect(rows).toHaveLength(1);
   });
 
   it("refuses another origin and a signed-out visitor", async () => {

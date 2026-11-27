@@ -3,6 +3,7 @@ import { createExpressionAi } from "@/lib/expression/ai-server";
 import { createEventsHandler } from "@/lib/ingest/events-route";
 import { createIngestStore, ingestEvents } from "@/lib/ingest/ingest-events";
 import { createRewriteChecks } from "@/lib/ingest/rewrite-checks";
+import { refreshGameState } from "@/lib/quests/refresh";
 import { getSessionUser } from "@/lib/session";
 import { getSupabaseServiceClient } from "@/lib/supabase/service";
 
@@ -18,11 +19,14 @@ export const maxDuration = 60;
 export const POST = createEventsHandler({
   getUser: getSessionUser,
   claimRate: (userId, count, limit) => claimEventRate(getSupabaseServiceClient(), userId, count, limit),
-  ingest: ({ userId, events, now, isGuest }) => {
+  ingest: async ({ userId, events, now, isGuest }) => {
     const service = getSupabaseServiceClient();
     const ai = isGuest ? null : createExpressionAi(service);
     const checkRewrites = ai ? createRewriteChecks(createRewriteCheckStore(service), ai) : undefined;
-    return ingestEvents({ store: createIngestStore(service, checkRewrites), userId, events, now });
+    const result = await ingestEvents({ store: createIngestStore(service, checkRewrites), userId, events, now });
+    // Quests and immersion days are settled lazily, after the ingestion: best effort, a failure is logged and never fails it.
+    await refreshGameState(service, userId, now).catch((error: unknown) => console.error("Settling the quests failed", error));
+    return result;
   },
   now: () => new Date(),
 });
