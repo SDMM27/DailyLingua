@@ -932,6 +932,7 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
+            drift_report: { Args: { p_from: string; p_through: string }; Returns: Json };
             social_set_pseudonym: { Args: { p_pseudonym: string }; Returns: string };
             league_join: { Args: Record<PropertyKey, never>; Returns: string };
             league_leave: { Args: Record<PropertyKey, never>; Returns: undefined };
