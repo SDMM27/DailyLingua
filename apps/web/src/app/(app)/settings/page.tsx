@@ -29,7 +29,7 @@ export default async function SettingsPage() {
   const profile = await getSessionProfile();
   if (!profile) redirect("/welcome");
 
-  const [locale, t, ta] = await Promise.all([getLocale(), getTranslations("settings"), getTranslations("auth.signOut")]);
+  const [locale, t, ta, ts] = await Promise.all([getLocale(), getTranslations("settings"), getTranslations("auth.signOut"), getTranslations("social")]);
   const game = resolveGameSettings(gameSettingsSchema.safeParse(profile.gameSettings).data);
   const nativeOptions = nativeLanguageOptions(locale);
 
@@ -66,6 +66,14 @@ export default async function SettingsPage() {
           <h2 id="settings-game" className="meta">{t("game.title")}</h2>
           <GamePreferences xpVisible={game.xpVisible} streakEnabled={game.streak.enabled} celebrations={game.celebrations === "full"}
             quests={game.quests.enabled} immersionXp={game.immersionXp.enabled} />
+        </section>
+
+        <section aria-labelledby="settings-social" className="space-y-3">
+          <h2 id="settings-social" className="meta">{ts("title")}</h2>
+          <Link href="/social" className="flex min-h-11 flex-col justify-center rounded-xl border border-line bg-surface px-4 py-3">
+            <span className="font-semibold">{ts("entry")}</span>
+            <span className="text-sm text-muted">{ts("entryHint")}</span>
+          </Link>
         </section>
 
         <section aria-labelledby="settings-data" className="space-y-3">

@@ -327,6 +327,104 @@ isOneToOne: false
       referencedColumns: ["code"]
     }
                   ]
+                },"social_profile": {
+                  Row: {
+                    "created_at": string,"pseudonym": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"pseudonym": string,"user_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"pseudonym"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+
+                  ]
+                },"league_membership": {
+                  Row: {
+                    "joined_at": string,"left_at": string | null,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "joined_at"?: string,"left_at"?: string | null,"user_id": string
+                  }
+                  Update: {
+                    "joined_at"?: string,"left_at"?: string | null,"user_id"?: string
+                  }
+                  Relationships: [
+
+                  ]
+                },"friend_invite": {
+                  Row: {
+                    "code": string,"created_at": string,"expires_at": string,"inviter": string,"used_at": string | null,"used_by": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "code": string,"created_at"?: string,"expires_at"?: string,"inviter": string,"used_at"?: string | null,"used_by"?: string | null
+                  }
+                  Update: {
+                    "code"?: string,"created_at"?: string,"expires_at"?: string,"inviter"?: string,"used_at"?: string | null,"used_by"?: string | null
+                  }
+                  Relationships: [
+
+                  ]
+                },"friendship": {
+                  Row: {
+                    "created_at": string,"user_a": string,"user_b": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"user_a": string,"user_b": string
+                  }
+                  Update: {
+                    "created_at"?: string,"user_a"?: string,"user_b"?: string
+                  }
+                  Relationships: [
+
+                  ]
+                },"coop_challenge": {
+                  Row: {
+                    "created_at": string,"created_by": string,"id": string,"week_start": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"created_by": string,"id"?: string,"week_start": string
+                  }
+                  Update: {
+                    "created_at"?: string,"created_by"?: string,"id"?: string,"week_start"?: string
+                  }
+                  Relationships: [
+
+                  ]
+                },"coop_member": {
+                  Row: {
+                    "challenge_id": string,"invited_at": string,"joined_at": string | null,"left_at": string | null,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "challenge_id": string,"invited_at"?: string,"joined_at"?: string | null,"left_at"?: string | null,"user_id": string
+                  }
+                  Update: {
+                    "challenge_id"?: string,"invited_at"?: string,"joined_at"?: string | null,"left_at"?: string | null,"user_id"?: string
+                  }
+                  Relationships: [
+
+                  ]
+                },"social_attempt": {
+                  Row: {
+                    "at": string,"id": number,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "at"?: string,"id"?: never,"user_id": string
+                  }
+                  Update: {
+                    "at"?: string,"id"?: never,"user_id"?: string
+                  }
+                  Relationships: [
+
+                  ]
                 },"immersion_close": {
                   Row: {
                     "closed_at": string,"day": string,"minutes": number,"user_id": string,"xp": number
@@ -834,6 +932,18 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
+            social_set_pseudonym: { Args: { p_pseudonym: string }; Returns: string };
+            league_join: { Args: Record<PropertyKey, never>; Returns: string };
+            league_leave: { Args: Record<PropertyKey, never>; Returns: undefined };
+            league_week_summary: { Args: Record<PropertyKey, never>; Returns: Json };
+            friend_invite_create: { Args: Record<PropertyKey, never>; Returns: Json };
+            friend_invite_accept: { Args: { p_code: string }; Returns: string };
+            friend_remove: { Args: { p_pseudonym: string }; Returns: boolean };
+            friends_overview: { Args: Record<PropertyKey, never>; Returns: { pseudonym: string; language: string | null; week_xp: number; streak: number | null }[] };
+            coop_create: { Args: { p_pseudonyms: string[] }; Returns: Json };
+            coop_join: { Args: { p_challenge: string }; Returns: string };
+            coop_leave: { Args: { p_challenge: string }; Returns: undefined };
+            coop_overview: { Args: Record<PropertyKey, never>; Returns: Json };
             award_badges: { Args: { p_user: string; p_awards: Json }; Returns: number };
             close_immersion_days: { Args: { p_user: string; p_through: string }; Returns: number };
             complete_quest: { Args: { p_assignment: string; p_quest_id: string }; Returns: boolean };
