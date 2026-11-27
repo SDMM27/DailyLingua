@@ -4,12 +4,14 @@
  */
 import { parseArgs } from "node:util";
 import { createClient } from "@supabase/supabase-js";
+import { addDays, formatDriftReport } from "@dailylingua/core";
 import type { AppDatabase } from "@dailylingua/data";
+import { driftReportSchema } from "@dailylingua/schemas";
 import { z } from "zod";
 
-const { values } = parseArgs({ options: { month: { type: "string" }, help: { type: "boolean" } } });
+const { values } = parseArgs({ options: { month: { type: "string" }, drift: { type: "boolean" }, from: { type: "string" }, through: { type: "string" }, help: { type: "boolean" } } });
 if (values.help) {
-  console.log("npm run metrics:report -- [--month AAAA-MM]");
+  console.log("npm run metrics:report -- [--month AAAA-MM] [--drift [--from AAAA-MM-JJ] [--through AAAA-MM-JJ]]");
   process.exit(0);
 }
 
@@ -59,3 +61,17 @@ console.table(rows.map(([label, { count, total }]) => {
 console.log(`Apprenants actifs : ${stats.activeLearners}`);
 console.log(`Coût IA total : ${usd.format(stats.costUsd)}`);
 console.log(`Coût par apprenant actif : ${stats.activeLearners ? usd.format(stats.costUsd / stats.activeLearners) : "—"}`);
+
+if (values.drift) {
+  // Window of the drift section: the 28 days up to today (UTC) unless given.
+  const day = /^\d{4}-\d{2}-\d{2}$/;
+  const through = values.through ?? new Date().toISOString().slice(0, 10);
+  const from = values.from ?? addDays(through, -27);
+  if (!day.test(through) || !day.test(from) || from > through) exit("Fenêtre invalide. Format attendu AAAA-MM-JJ, --from avant --through.");
+  const drift = await client.schema("app").rpc("drift_report", { p_from: from, p_through: through });
+  if (drift.error) exit(`Lecture des dérives impossible (${drift.error.code || "erreur"}).`);
+  const parsed = driftReportSchema.safeParse(drift.data);
+  if (!parsed.success) exit("Le rapport des dérives a renvoyé des données illisibles.");
+  console.log("");
+  for (const line of formatDriftReport(parsed.data)) console.log(line);
+}
