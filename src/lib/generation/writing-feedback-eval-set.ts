@@ -15,7 +15,35 @@ export interface EvalCase {
   trap?: boolean;
   /** Overrides the band's least number of corrections. */
   minCorrections?: number;
+  /** The text is the automatic transcript of speech (no punctuation, no capitals): see `transcriptProblems`. */
+  inputMode?: "speech_transcript";
+  /** Error and expected corrected form, matched within a possibly longer correction. */
+  mustCorrect?: { original: string; corrected: string }[];
   request: WritingFeedbackRequest;
+}
+
+const normalizeForm = (value: string) => value.normalize("NFC").toLocaleLowerCase().replace(/[\p{P}\s]+/gu, " ").trim();
+const containsForm = (text: string, form: string) => ` ${normalizeForm(text)} `.includes(` ${normalizeForm(form)} `);
+
+/**
+ * What is wrong with the corrections of a speech transcript (`j5-pr2-production-orale.md` §4): a real error that was lost,
+ * or a correction that only changes punctuation or capitals. Empty when the review is right.
+ */
+export function transcriptProblems(evalCase: EvalCase, corrections: readonly { original: string; corrected: string }[]): string[] {
+  if (evalCase.inputMode !== "speech_transcript") return [];
+  const source = evalCase.request.text.normalize("NFC");
+  const copied = corrections.filter(({ original }) => source.includes(original.normalize("NFC")));
+  const uncopied = corrections
+    .filter(({ original }) => !source.includes(original.normalize("NFC")))
+    .map(({ original }) => `passage absent de la transcription : « ${original} »`);
+  const lost = (evalCase.mustCorrect ?? [])
+    .filter((error) => !copied.some(({ original, corrected }) =>
+      containsForm(original, error.original) && containsForm(corrected, error.corrected) && !containsForm(corrected, error.original)))
+    .map(({ original }) => `faute perdue : « ${original} »`);
+  const cosmetic = corrections
+    .filter(({ original, corrected }) => normalizeForm(original) === normalizeForm(corrected))
+    .map(({ original }) => `correction de ponctuation ou de majuscule : « ${original} »`);
+  return [...lost, ...cosmetic, ...uncopied];
 }
 
 /** Bands on the mean of the four scores, and the least a fair or weak text must be corrected on. */
@@ -183,6 +211,55 @@ export const EVAL_CASES: EvalCase[] = [
     request: {
       ...italian,
       text: "À mon avis, travailler à la maison est plus agréable, parce que je n'ai pas besoin de prendre le train et je suis plus concentré. Mais mes collègues me manquent parfois.",
+    },
+  },
+  // Transcripts of speech (the text of "Say it"): lowercase, no punctuation, with real errors the review must keep.
+  {
+    id: "it-A2-transcript-agreement",
+    expected: "fair",
+    trap: true,
+    inputMode: "speech_transcript",
+    mustCorrect: [{ original: "simpatico", corrected: "simpatiche" }, { original: "grandi", corrected: "grande" }],
+    request: {
+      ...italian, level: "A2", targetLevel: "B1", mode: "spoken", purpose: "conversational",
+      task: "Racconta a un amico come hai passato il fine settimana.",
+      text: "il fine settimana scorso sono andata al mare con le mie amiche che sono simpatico e abbiamo mangiato in una casa molto grandi ma il mare era freddo e noi non abbiamo fatto il bagno",
+    },
+  },
+  {
+    id: "it-A2-transcript-auxiliary",
+    expected: "fair",
+    trap: true,
+    inputMode: "speech_transcript",
+    mustCorrect: [{ original: "ho andato", corrected: "sono andato" }, { original: "ho arrivato", corrected: "sono arrivato" }],
+    request: {
+      ...italian, level: "A2", targetLevel: "B1", mode: "spoken", purpose: "conversational",
+      task: "Racconta a un amico che cosa hai fatto ieri.",
+      text: "ieri ho andato al lavoro in bicicletta e ho arrivato tardi perche pioveva molto poi ho mangiato un panino con i miei colleghi e la sera sono tornato a casa stanco",
+    },
+  },
+  {
+    id: "ru-B1-transcript-case",
+    expected: "fair",
+    trap: true,
+    inputMode: "speech_transcript",
+    mustCorrect: [{ original: "мой друг", corrected: "моим другом" }, { original: "московский театр", corrected: "московском театре" }],
+    request: {
+      ...russian, level: "B1", targetLevel: "B2", mode: "spoken", purpose: "conversational",
+      task: "Расскажи другу, как ты провёл выходные.",
+      text: "в субботу я ходил в театр с мой друг мы смотрели спектакль в московский театр и потом долго гуляли по городу было очень холодно но нам было весело",
+    },
+  },
+  {
+    id: "ru-B1-transcript-agreement",
+    expected: "fair",
+    trap: true,
+    inputMode: "speech_transcript",
+    mustCorrect: [{ original: "красивый город", corrected: "красивом городе" }, { original: "моя", corrected: "мой" }],
+    request: {
+      ...russian, level: "B1", targetLevel: "B2", mode: "spoken", purpose: "conversational",
+      task: "Расскажи другу о своей последней поездке летом.",
+      text: "летом мы жили в красивый город на юге россии там работает моя брат он врач мы много плавали и ели свежие фрукты я хочу поехать туда ещё раз",
     },
   },
 ];

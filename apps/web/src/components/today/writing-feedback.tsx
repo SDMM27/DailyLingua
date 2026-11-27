@@ -8,8 +8,11 @@ import { Button } from "@/components/ui/button";
 import type { LocalWritingFeedback } from "@/lib/offline/feedback";
 import { RewriteTask } from "./rewrite-task";
 
-export function WritingFeedback({ sync, sessionId }: { sync: EventSyncApi; sessionId?: string }) {
+export function WritingFeedback({ sync, sessionId, language, paused = false }: {
+  sync: EventSyncApi; sessionId?: string; language: string; paused?: boolean;
+}) {
   const t = useTranslations("writingFeedback");
+  const x = useTranslations("expression");
   const [task, setTask] = useState<LocalWritingFeedback>();
 
   useEffect(() => {
@@ -50,6 +53,13 @@ export function WritingFeedback({ sync, sessionId }: { sync: EventSyncApi; sessi
   return (
     <section className="space-y-3 rounded-card border border-line bg-surface p-4">
       <h2 className="sd-display text-xl">{t("title")}</h2>
+      {task.spoken && (
+        <div className="space-y-1">
+          <p className="meta">{x("practice")}</p>
+          <p className="text-sm text-muted">{x("understoodTitle")}</p>
+          <p className="whitespace-pre-wrap break-words" lang={language} dir="auto">{task.spoken.transcript}</p>
+        </div>
+      )}
       <p lang={result.explanationLanguage} dir="auto">{result.feedback.strength}</p>
       <details className="space-y-3">
         <summary className="min-h-11 cursor-pointer py-2">{t("details")}</summary>
@@ -80,7 +90,7 @@ export function WritingFeedback({ sync, sessionId }: { sync: EventSyncApi; sessi
       )}
       {result.sentences.map((sentence, index) => (
         <RewriteTask key={`${task.productionId}:${index}`} sync={sync} productionId={task.productionId}
-          sentence={sentence} index={index} attemptId={task.attempts?.[index]} />
+          sentence={sentence} index={index} language={language} attemptId={task.attempts?.[index]} paused={paused} />
       ))}
     </section>
   );

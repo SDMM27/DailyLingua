@@ -1,7 +1,7 @@
 "use client";
 
-import { countWords, FLUENCY_MIN_MS, learningDay, minReadingMs, PRODUCTION_MIN_WORDS, type AccentTolerance, type Graded } from "@dailylingua/core";
-import { MAX_PRODUCTION_CHARS, type SessionPacket } from "@dailylingua/schemas";
+import { FLUENCY_MIN_MS, learningDay, minReadingMs, type AccentTolerance, type Graded } from "@dailylingua/core";
+import type { SessionPacket } from "@dailylingua/schemas";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import type { EventSyncApi } from "@/components/pwa/event-sync-provider";
@@ -10,6 +10,7 @@ import { FormMessage } from "@/components/ui/field";
 import type { LocalSessionProgress } from "@/lib/offline/indexeddb-queue";
 import { useOnlineStatus } from "@/lib/offline/online-status";
 import { readingEvent, sessionScreens, stepNumber, type SessionEvent } from "@/lib/session-packet/session-flow";
+import { ExpressionStep, type AnswerMode } from "./expression-step";
 import { SessionExercise } from "./session-exercise";
 import { WritingFeedback } from "./writing-feedback";
 
@@ -28,6 +29,7 @@ export function SessionPanel({ packet, initial, sync, accentTolerance, animateSu
   const [error, setError] = useState<"saveError" | "dayEnded" | null>(null);
   const [feedback, setFeedback] = useState<(Graded & { explanation?: string; explanationLanguage?: string }) | null>(null);
   const [paused, setPaused] = useState(false);
+  const [answerMode, setAnswerMode] = useState<AnswerMode | null>(null);
   const savingRef = useRef(false);
   const heading = useRef<HTMLHeadingElement>(null);
 
@@ -145,18 +147,24 @@ export function SessionPanel({ packet, initial, sync, accentTolerance, animateSu
               />
             )}
             {screen.kind === "write" && (
-              <WritingTask
+              <ExpressionStep
                 text={screen.text}
                 saving={saving}
-                onSubmit={(text, composeMs) => {
-                  void save([{ kind: "production_submitted", payload: { sessionId: id, productionId: crypto.randomUUID(), text, composeMs } }], following);
+                paused={paused}
+                mode={answerMode}
+                suggestSpoken={packet.expression?.suggestSpoken ?? false}
+                quota={packet.quotas.writingFeedback}
+                onMode={setAnswerMode}
+                onSubmit={({ text, composeMs, speakingMs }) => {
+                  const spoken = speakingMs === undefined ? {} : { mode: "spoken" as const, speakingMs };
+                  void save([{ kind: "production_submitted", payload: { sessionId: id, productionId: crypto.randomUUID(), text, composeMs, ...spoken } }], following);
                 }}
               />
             )}
             {screen.kind === "summary" && (
               <div className={animateSummary && progress.position !== "closed" ? "session-summary-enter space-y-5" : "space-y-5"}>
                 <p>{t(packet.text ? "summaryBody" : screens.some(({ kind }) => kind === "card" || kind === "error") ? "reviewSummaryBody" : "noReviews")}</p>
-                <WritingFeedback sync={sync} sessionId={id} />
+                <WritingFeedback sync={sync} sessionId={id} language={language} paused={paused} />
                 <Button disabled={saving} onClick={() => {
                   if (progress.position === "closed") onLeave(progress);
                   else void save([{ kind: "ui_event", payload: { name: "bilan_closed", value: { sessionId: id } } }], "closed", null, onLeave);
@@ -247,34 +255,5 @@ function TimedReading({ text, reread, wordLimit, startedAt, saving, onStart, onF
         </>
       )}
     </div>
-  );
-}
-
-function WritingTask({ text, saving, onSubmit }: { text: Text; saving: boolean; onSubmit(value: string, composeMs: number): void }) {
-  const t = useTranslations("dailySession");
-  const [value, setValue] = useState("");
-  const [start] = useState(Date.now);
-  const words = countWords(text.language, value);
-  const minimum = PRODUCTION_MIN_WORDS[text.levelBand];
-  return (
-    <form className="space-y-5" onSubmit={(event) => {
-      event.preventDefault();
-      if (!saving && words >= minimum) onSubmit(value.trim(), Math.max(0, Date.now() - start));
-    }}>
-      <label className="block space-y-3">
-        <span className="sd-display block text-2xl" lang={text.language} dir="auto">{text.writingTask}</span>
-        <textarea
-          className="min-h-48 w-full rounded-xl border border-line bg-surface p-3 text-[17px]"
-          value={value}
-          onChange={(event) => setValue(event.target.value)}
-          maxLength={MAX_PRODUCTION_CHARS}
-          lang={text.language}
-          dir="auto"
-          aria-describedby="writing-count"
-        />
-      </label>
-      <p className="text-muted" id="writing-count">{t("wordCount", { words, minimum })}</p>
-      <Button type="submit" disabled={saving || words < minimum}>{t("submitWriting")}</Button>
-    </form>
   );
 }

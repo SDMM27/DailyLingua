@@ -39,7 +39,7 @@ export function SessionPrefetch({ language, timeZone, retry, prepareText = false
       const store = createUserPacketStore(userId);
       try {
         if (!online) throw new Error("offline");
-        const response = await fetch(`/api/session/today?language=${encodeURIComponent(language)}`, {
+        const response = await fetch(`/api/session/today?language=${encodeURIComponent(language)}&expression=1`, {
           method: prepareText ? "POST" : "GET",
           credentials: "same-origin",
           cache: "no-store",

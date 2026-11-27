@@ -67,6 +67,11 @@ export default async function SettingsPage() {
           <GamePreferences xpVisible={game.xpVisible} streakEnabled={game.streak.enabled} celebrations={game.celebrations === "full"} />
         </section>
 
+        <section aria-labelledby="settings-data" className="space-y-3">
+          <h2 id="settings-data" className="meta">{t("data.title")}</h2>
+          <p className="text-sm text-muted">{t("data.voice")}</p>
+        </section>
+
         <section aria-labelledby="settings-feedback" className="space-y-5">
           <h2 id="settings-feedback" className="meta">
             {t("feedback.title")}

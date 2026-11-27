@@ -11,7 +11,9 @@ import { sessionPacketDatabaseName } from "./names";
 
 export interface StoredPacket {
   key: string;
-  packet: SessionPacket;
+  packet: Omit<SessionPacket, "expression">;
+  /** Keep the metadata next to the strict packet for readers from earlier app versions. */
+  expression?: SessionPacket["expression"];
   /** ISO instant the packet was stored. */
   storedAt: string;
 }
@@ -42,13 +44,20 @@ export const packetKey = (language: string, day: DateKey) => `${language}|${day}
 export function createSessionPacketStore(backend: PacketBackend): SessionPacketStore {
   return {
     async put(packet, storedAt) {
-      const checked = sessionPacketSchema.parse(packet);
-      await backend.put({ key: packetKey(checked.session.language, checked.session.day), packet: checked, storedAt: storedAt.toISOString() });
+      const { expression, ...checked } = sessionPacketSchema.parse(packet);
+      await backend.put({
+        key: packetKey(checked.session.language, checked.session.day),
+        packet: checked,
+        ...(expression ? { expression } : {}),
+        storedAt: storedAt.toISOString(),
+      });
     },
     async get(language, day) {
       const entry = (await backend.get(packetKey(language, day))) as Partial<StoredPacket> | undefined;
       const parsed = sessionPacketSchema.safeParse(entry?.packet);
-      return parsed.success ? parsed.data : null;
+      if (!parsed.success) return null;
+      const expression = sessionPacketSchema.shape.expression.safeParse(entry?.expression);
+      return expression.success && expression.data ? { ...parsed.data, expression: expression.data } : parsed.data;
     },
     async purge(today, queueEmpty) {
       const limit = addDays(today, -PACKET_RETENTION_DAYS);

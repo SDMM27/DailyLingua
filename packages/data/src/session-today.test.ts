@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { StoredSessionPlan } from "@dailylingua/schemas";
-import { insertSession, readLastSessionDay, readQuotaUsage, readSessionOfDay, readTextCandidates, readTextWithItems } from "./session-today";
+import { insertSession, readLastSessionDay, readLastSpokenProductionAt, readQuotaUsage, readSessionOfDay, readTextCandidates, readTextWithItems } from "./session-today";
 import { tableFake } from "./table-fake";
 
 const ID = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, "0")}`;
@@ -44,6 +44,24 @@ describe("readLastSessionDay", () => {
       session: [sessionRow(ID(10), "daily", { day: "2026-11-10", status: "completed" }), sessionRow(ID(11), "daily", { day: "2026-11-15", status: "planned" }), sessionRow(ID(12), "daily", { day: "2026-11-12", status: "started" })],
     });
     expect(await readLastSessionDay(client, ME, "it")).toBe("2026-11-12");
+  });
+});
+
+describe("readLastSpokenProductionAt", () => {
+  const production = (id: string, extra: Record<string, unknown>) => ({ id, user_id: ME, language: "it", mode: "spoken", created_at: "2026-11-10T10:00:00+00:00", ...extra });
+
+  it("gives the newest spoken production of the user in the language, else null", async () => {
+    const { client } = tableFake({
+      production: [
+        production(ID(1), {}),
+        production(ID(2), { created_at: "2026-11-15T10:00:00+00:00" }),
+        production(ID(3), { created_at: "2026-11-17T10:00:00+00:00", mode: "writing" }),
+        production(ID(4), { created_at: "2026-11-17T10:00:00+00:00", user_id: OTHER }),
+        production(ID(5), { created_at: "2026-11-17T10:00:00+00:00", language: "ru" }),
+      ],
+    });
+    expect(await readLastSpokenProductionAt(client, ME, "it")).toBe("2026-11-15T10:00:00+00:00");
+    expect(await readLastSpokenProductionAt(client, ME, "es")).toBeNull();
   });
 });
 

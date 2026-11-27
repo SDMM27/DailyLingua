@@ -227,6 +227,10 @@
   },
   "settings": {
     "title": "Réglages",
+    "data": {
+      "title": "Données",
+      "voice": "Quand tu parles pour t’entraîner (« Dire », « À voix haute »), la reconnaissance vocale est faite par le service de ton téléphone (Apple ou Google), pas par Daily Lingua. Nous ne recevons que le texte reconnu, jamais l’enregistrement de ta voix. Ce texte est traité comme un texte écrit : il part en correction et reste dans ton journal."
+    },
     "game": {
       "title": "Jeu",
       "xpVisible": "Afficher l’XP",
@@ -501,6 +505,34 @@
     "close": "Quitter l’unité",
     "goalsDone": "Validée le {date}",
     "warmupNote": "Un court échauffement d’abord, puis le test."
+  },
+  "expression": {
+    "write": "Écrire",
+    "say": "Dire",
+    "mode": "Mode de réponse",
+    "sayHint": "Parle environ une minute, deux au plus. Ton téléphone écrit ce qu’il entend ; la correction porte sur ce texte.",
+    "start": "Commencer à parler",
+    "resume": "Continuer à parler",
+    "stop": "Arrêter",
+    "target": "Cible {target} · {max} au plus",
+    "elapsed": "{elapsed} · cible {target}",
+    "heard": "Ce que ton téléphone comprend",
+    "understoodTitle": "Ce que ton téléphone a compris",
+    "understood": "Ce que ton téléphone a compris · {duration}",
+    "practice": "Entraînement à l’oral",
+    "smoothing": "La reconnaissance peut corriger certaines fautes sans le dire ; ce qu’elle n’a pas entendu ne peut pas être corrigé.",
+    "send": "Envoyer pour correction",
+    "redo": "Recommencer",
+    "textOnly": "Seul le texte est envoyé, pas l’enregistrement",
+    "quota": "{count, plural, one {# correction restante aujourd’hui} other {# corrections restantes aujourd’hui}}",
+    "maxReached": "Deux minutes : l’écoute s’est arrêtée.",
+    "tooLong": "Raccourcis ton texte avant de l’envoyer (maximum {limit} caractères).",
+    "transcriptTooLong": "Passe à « Écrire » pour raccourcir ta transcription (maximum {limit} caractères).",
+    "denied": "Le micro n’est pas autorisé sur cet appareil. Tu peux écrire à la place.",
+    "noSpeech": "Je n’ai rien entendu. Réessaie en parlant près du micro.",
+    "failed": "La reconnaissance vocale n’a pas fonctionné. Réessaie, ou écris ton texte.",
+    "micRewrite": "Dicter la phrase {index}",
+    "micStop": "Arrêter la dictée"
   },
   "oral": {
     "card": {

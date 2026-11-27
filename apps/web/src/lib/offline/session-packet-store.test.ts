@@ -79,6 +79,16 @@ describe("session packet store", () => {
     await createSessionPacketStore(backend).put(packet("2026-11-18"), new Date());
     expect(sessionPacketSchema.safeParse((backend.map.get(packetKey("it", "2026-11-18")) as StoredPacket).packet).success).toBe(true);
   });
+
+  it("restores expression metadata offline without changing the stored packet for earlier clients", async () => {
+    const backend = memoryBackend();
+    const store = createSessionPacketStore(backend);
+    const today = { ...packet("2026-11-18"), expression: { suggestSpoken: true } };
+    await store.put(today, new Date());
+    const entry = backend.map.get(packetKey("it", "2026-11-18")) as StoredPacket;
+    expect(sessionPacketSchema.omit({ expression: true }).safeParse(entry.packet).success).toBe(true);
+    expect(await store.get("it", "2026-11-18")).toEqual(today);
+  });
 });
 
 describe("deleteSessionPacketDatabase", () => {

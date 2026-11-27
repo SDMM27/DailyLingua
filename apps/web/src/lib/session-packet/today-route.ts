@@ -6,6 +6,7 @@ import {
   readIngestState,
   readErrorOfDayRows,
   readLastSessionDay,
+  readLastSpokenProductionAt,
   readPlanningCards,
   readPendingErrorOfDay,
   readProfileAndEnrollments,
@@ -35,7 +36,7 @@ import type { LogFn } from "@/lib/ingest/ingest-events";
 import type { GenerationResult } from "@/lib/graded-text/generate";
 import { isSameOrigin } from "@/lib/ingest/events-route";
 import { ACCOUNT_HEADER } from "@/lib/offline/account";
-import { buildPacket } from "./build-packet";
+import { buildPacket, suggestSpoken } from "./build-packet";
 import { pickTextCandidate, planToday } from "./plan-session";
 
 /**
@@ -54,6 +55,7 @@ export interface TodayStore {
   errorOfDay(userId: string, id: string): Promise<ErrorOfDayRow | null>;
   recentReviews(userId: string, since: string): Promise<{ cardId: string; rating: number; reviewedAt: string }[]>;
   lastSessionDay(userId: string, language: string): Promise<DateKey | null>;
+  lastSpokenProductionAt(userId: string, language: string): Promise<string | null>;
   completedShortSessions(userId: string, language: string): Promise<number>;
   suspendedThrough(userId: string, language: string): Promise<DateKey | null>;
   ingestState(userId: string): Promise<{ seq: number; memo: unknown }>;
@@ -75,6 +77,7 @@ export function createTodayStore(service: AppClient | (() => AppClient)): TodayS
     errorOfDay: async (userId, id) => (await readErrorOfDayRows(client(), userId, { itemIds: [id] }))[0] ?? null,
     recentReviews: (userId, since) => readRecentReviews(client(), userId, since),
     lastSessionDay: (userId, language) => readLastSessionDay(client(), userId, language),
+    lastSpokenProductionAt: (userId, language) => readLastSpokenProductionAt(client(), userId, language),
     completedShortSessions: (userId, language) => countCompletedShortSessions(client(), userId, language),
     suspendedThrough: (userId, language) => readSuspendedThrough(client(), userId, language),
     ingestState: (userId) => readIngestState(client(), userId),
@@ -105,9 +108,12 @@ const REVIEW_LOOKBACK_DAYS = 3;
 class TextPreparing extends Error {}
 
 /** The packet of `userId` for `language` today: the stored session if there is one, else a new one. */
-export async function todayPacket(deps: Pick<TodayRouteDeps, "store" | "newId" | "prepareText">, input: { userId: string; language: string; now: Date; profile: ProfileRow; enrollment: EnrollmentRow; log: LogFn }): Promise<SessionPacket | null> {
+export async function todayPacket(deps: Pick<TodayRouteDeps, "store" | "newId" | "prepareText">, input: {
+  userId: string; language: string; now: Date; profile: ProfileRow; enrollment: EnrollmentRow; log: LogFn;
+  includeExpression: boolean;
+}): Promise<SessionPacket | null> {
   const { store } = deps;
-  const { userId, language, now, profile, enrollment, log } = input;
+  const { userId, language, now, profile, enrollment, log, includeExpression } = input;
   const today = learningDay(now, profile.timeZone);
 
   let session = await store.sessionOfDay(userId, language, today);
@@ -168,11 +174,12 @@ export async function todayPacket(deps: Pick<TodayRouteDeps, "store" | "newId" |
     log("error", "the stored plan of today's session is unreadable", { userId, sessionId: session.id });
     return null;
   }
-  const [cards, textBundle, usage, errorOfDay] = await Promise.all([
+  const [cards, textBundle, usage, errorOfDay, lastSpokenAt] = await Promise.all([
     store.planningCards(userId, language),
     plan.data.reading.textId ? store.textWithItems(plan.data.reading.textId) : Promise.resolve(null),
     store.quotaUsage(userId, today, [AI_PURPOSES.writing_feedback.quotaKind, AI_PURPOSES.rewrite_check.quotaKind]),
     plan.data.wake.errorItemId ? store.errorOfDay(userId, plan.data.wake.errorItemId) : Promise.resolve(null),
+    includeExpression ? store.lastSpokenProductionAt(userId, language) : null,
   ]);
   return buildPacket({
     session,
@@ -184,6 +191,7 @@ export async function todayPacket(deps: Pick<TodayRouteDeps, "store" | "newId" |
       writingFeedback: { used: usage[AI_PURPOSES.writing_feedback.quotaKind] ?? 0, limit: AI_PURPOSES.writing_feedback.dailyLimit },
       rewriteCheck: { used: usage[AI_PURPOSES.rewrite_check.quotaKind] ?? 0, limit: AI_PURPOSES.rewrite_check.dailyLimit },
     },
+    suggestSpoken: includeExpression ? suggestSpoken(lastSpokenAt, today, profile.timeZone) : undefined,
     serverDay: today,
     timeZone: profile.timeZone,
     now,
@@ -204,13 +212,19 @@ export function createTodayHandler(deps: TodayRouteDeps): (request: Request) => 
       await deps.connection?.();
 
       // The language must be an active enrollment of the learner: anything else is "not found", whatever it looks like.
-      const asked = languageCodeSchema.safeParse(new URL(request.url).searchParams.get("language"));
+      const params = new URL(request.url).searchParams;
+      const asked = languageCodeSchema.safeParse(params.get("language"));
       const { profile, enrollments } = await deps.store.profileAndEnrollments(user.id);
       const enrollment = asked.success ? enrollments.find((entry) => entry.language === asked.data) : undefined;
       if (!asked.success || !enrollment) return json({ error: "not_found" }, 404);
 
       const now = deps.now();
-      const packet = await todayPacket({ ...deps, prepareText: canPrepare ? deps.prepareText : undefined }, { userId: user.id, language: asked.data, now, profile, enrollment, log });
+      // Installed clients validate the entire packet strictly; only send the new section when they opt in.
+      const includeExpression = params.get("expression") === "1";
+      const packet = await todayPacket(
+        { ...deps, prepareText: canPrepare ? deps.prepareText : undefined },
+        { userId: user.id, language: asked.data, now, profile, enrollment, log, includeExpression },
+      );
       if (!packet) return json({ error: "unavailable" }, 503);
       const checked = sessionPacketSchema.safeParse(packet);
       if (!checked.success) {

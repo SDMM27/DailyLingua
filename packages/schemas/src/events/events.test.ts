@@ -100,6 +100,22 @@ describe("clientEventSchema", () => {
     expect(clientEventSchema.safeParse(event("review_attempt", { ...review, shownAt: "2026-11-12T10:00:00.000Z" })).success).toBe(false);
   });
 
+  it("accepts a production with or without a mode, and requires the speaking time of a spoken one only", () => {
+    const base = good.production_submitted as Record<string, unknown>;
+    const ok = (payload: Record<string, unknown>) => clientEventSchema.safeParse(event("production_submitted", payload)).success;
+    expect(ok(base)).toBe(true);
+    expect(ok({ ...base, mode: "writing" })).toBe(true);
+    expect(ok({ ...base, mode: "spoken", speakingMs: 61_000 })).toBe(true);
+    expect(ok({ ...base, mode: "spoken", speakingMs: 180_000 })).toBe(true);
+    expect(ok({ ...base, mode: "spoken" })).toBe(false);
+    expect(ok({ ...base, speakingMs: 5000 })).toBe(false);
+    expect(ok({ ...base, mode: "writing", speakingMs: 5000 })).toBe(false);
+    expect(ok({ ...base, mode: "spoken", speakingMs: 180_001 })).toBe(false);
+    expect(ok({ ...base, mode: "spoken", speakingMs: -1 })).toBe(false);
+    expect(ok({ ...base, mode: "speaking", speakingMs: 1000 })).toBe(false);
+    expect(ok({ ...base, mode: "spoken", speakingMs: 1000, score: 4 })).toBe(false);
+  });
+
   it("orders the timestamps of a fluency pass and bounds free text", () => {
     const pass = good.fluency_pass as Record<string, unknown>;
     expect(clientEventSchema.safeParse(event("fluency_pass", { ...pass, startedAt: pass.endedAt })).success).toBe(false);

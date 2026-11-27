@@ -205,6 +205,8 @@ export interface StateProduction {
   creditExpired?: boolean;
   correctionDeferred: boolean;
   initialSimilarity?: number;
+  /** Time spent speaking: set for a spoken production only. */
+  speakingMs?: number;
   feedbackEligible?: boolean;
   /** `client_event_id` of the submission, to name the production in reports. */
   clientEventId: string;

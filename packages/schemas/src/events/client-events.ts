@@ -123,12 +123,24 @@ export const focusAttemptPayloadSchema = z.strictObject({
 export const MAX_PRODUCTION_CHARS = 4000;
 export const MAX_REWRITE_CHARS = 500;
 
+/** Longest dictation of "Say it" (the recognition stops by itself at two minutes). */
+export const MAX_SPEAKING_MS = 180_000;
+
+/**
+ * `mode` is absent for a written production (events queued before spoken productions existed carry none). A `spoken`
+ * one holds the transcript of the device recognition and `speakingMs`, the time spent speaking; never a score.
+ */
 export const productionSubmittedPayloadSchema = z.strictObject({
   ...deviceFields,
   sessionId: z.uuid(),
   productionId: z.uuid(),
   text: z.string().max(MAX_PRODUCTION_CHARS),
   composeMs: z.number().int().min(0),
+  mode: z.enum(["writing", "spoken"]).optional(),
+  speakingMs: z.number().int().min(0).max(MAX_SPEAKING_MS).optional(),
+}).refine((payload) => (payload.mode === "spoken") === (payload.speakingMs !== undefined), {
+  message: "speakingMs goes with the spoken mode, and only with it",
+  path: ["speakingMs"],
 });
 
 export const rewriteSubmittedPayloadSchema = z.strictObject({
