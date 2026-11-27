@@ -1,6 +1,6 @@
-import { addDays, learningDay } from "@dailylingua/core";
+import { isImmersionDayClosed, learningDay } from "@dailylingua/core";
 import {
-  type AppClient, countImmersionOnDay, createImmersion, deleteImmersion, getImmersion, getProfile, listEnrollments, updateImmersion,
+  type AppClient, countImmersionOnDay, createImmersion, deleteImmersion, getImmersion, getProfile, isImmersionDayRecorded, listEnrollments, updateImmersion,
 } from "@dailylingua/data";
 import { immersionEntryInput, type ImmersionEntryInput } from "@dailylingua/schemas";
 import { z } from "zod";
@@ -9,8 +9,6 @@ import { ACCOUNT_HEADER } from "@/lib/offline/account";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const MAX_BODY_BYTES = 4096;
-/** How far back a day can be declared, in days. */
-const MAX_DAYS_BACK = 30;
 /** Entries per account and per day. */
 const MAX_ENTRIES_PER_DAY = 50;
 
@@ -19,6 +17,8 @@ type GetService = () => AppClient;
 
 const idSchema = z.uuid();
 const empty = (status: number) => new Response(null, { status, headers: { "Cache-Control": "no-store" } });
+/** A day closed for good (older than 3 days, or already settled): nothing can be created, changed or deleted on it. */
+const dayClosed = () => Response.json({ error: "day_closed" }, { status: 409, headers: { "Cache-Control": "no-store" } });
 
 /** The signed-in learner whose account header matches the session, with their own client; null otherwise. */
 async function sessionUser(request: Request) {
@@ -42,13 +42,23 @@ async function readEntry(request: Request): Promise<ImmersionEntryInput | Respon
   return parsed.success ? parsed.data : empty(400);
 }
 
-/** 400 when the language is not one of the account's, or the day is in the future or too far back (the profile's time zone). */
-async function checkLanguageAndDay(client: Awaited<ReturnType<typeof createSupabaseServerClient>>, input: ImmersionEntryInput) {
-  const [profile, enrollments] = await Promise.all([getProfile(client), listEnrollments(client)]);
-  if (!profile || !enrollments.some(({ language }) => language === input.language)) return empty(400);
-  const today = learningDay(new Date(), profile.timeZone);
-  if (input.day > today || input.day < addDays(today, -MAX_DAYS_BACK)) return empty(400);
-  return null;
+/** The learning day of the account (its time zone), or null without a profile. */
+async function todayOf(client: Awaited<ReturnType<typeof createSupabaseServerClient>>) {
+  const profile = await getProfile(client);
+  return profile ? learningDay(new Date(), profile.timeZone) : null;
+}
+
+/** 409 when the day is closed: older than the editable window, or recorded in `immersion_close` whatever the time zone says. */
+async function closedDay(service: AppClient, userId: string, day: string, today: string): Promise<Response | null> {
+  return isImmersionDayClosed(day, today) || await isImmersionDayRecorded(service, userId, day) ? dayClosed() : null;
+}
+
+/** 400 when the language is not one of the account's or the day is in the future; 409 when the day is closed (the profile's time zone). */
+async function checkLanguageAndDay(client: Awaited<ReturnType<typeof createSupabaseServerClient>>, service: AppClient, userId: string, input: ImmersionEntryInput) {
+  const [today, enrollments] = await Promise.all([todayOf(client), listEnrollments(client)]);
+  if (!today || !enrollments.some(({ language }) => language === input.language)) return empty(400);
+  if (input.day > today) return empty(400);
+  return closedDay(service, userId, input.day, today);
 }
 
 export async function createEntry(request: Request, getService: GetService): Promise<Response> {
@@ -58,9 +68,9 @@ export async function createEntry(request: Request, getService: GetService): Pro
   try {
     const session = await sessionUser(request);
     if (!session) return empty(401);
-    const invalid = await checkLanguageAndDay(session.client, input);
-    if (invalid) return invalid;
     const service = getService();
+    const invalid = await checkLanguageAndDay(session.client, service, session.user.id, input);
+    if (invalid) return invalid;
     if (await countImmersionOnDay(service, session.user.id, input.day) >= MAX_ENTRIES_PER_DAY) return empty(429);
     const id = await createImmersion(service, session.user.id, input);
     return Response.json({ id }, { status: 201, headers: { "Cache-Control": "no-store" } });
@@ -79,11 +89,15 @@ export async function updateEntry(request: Request, rawId: string, getService: G
   try {
     const session = await sessionUser(request);
     if (!session) return empty(401);
-    const invalid = await checkLanguageAndDay(session.client, input);
-    if (invalid) return invalid;
     const service = getService();
+    const invalid = await checkLanguageAndDay(session.client, service, session.user.id, input);
+    if (invalid) return invalid;
     const current = await getImmersion(service, session.user.id, id.data);
     if (!current) return empty(404);
+    const today = await todayOf(session.client);
+    if (!today) return empty(400);
+    const closed = await closedDay(service, session.user.id, current.day, today);
+    if (closed) return closed;
     if (current.day !== input.day && await countImmersionOnDay(service, session.user.id, input.day) >= MAX_ENTRIES_PER_DAY) return empty(429);
     return await updateImmersion(service, session.user.id, id.data, input) ? empty(204) : empty(404);
   } catch (error) {
@@ -99,7 +113,14 @@ export async function deleteEntry(request: Request, rawId: string, getService: G
   try {
     const session = await sessionUser(request);
     if (!session) return empty(401);
-    return await deleteImmersion(getService(), session.user.id, id.data) ? empty(204) : empty(404);
+    const service = getService();
+    const current = await getImmersion(service, session.user.id, id.data);
+    if (!current) return empty(404);
+    const today = await todayOf(session.client);
+    if (!today) return empty(400);
+    const closed = await closedDay(service, session.user.id, current.day, today);
+    if (closed) return closed;
+    return await deleteImmersion(service, session.user.id, id.data) ? empty(204) : empty(404);
   } catch (error) {
     console.error("Deleting an immersion entry failed", error);
     return empty(503);

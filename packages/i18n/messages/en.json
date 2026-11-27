@@ -165,7 +165,12 @@
     "unsent": "This text couldn’t be sent for feedback.",
     "retry": "Try again",
     "details": "View feedback",
-    "scores": { "grammar": "Grammar", "vocabulary": "Vocabulary", "register": "Register", "coherence": "Coherence" },
+    "scores": {
+      "grammar": "Grammar",
+      "vocabulary": "Vocabulary",
+      "register": "Register",
+      "coherence": "Coherence"
+    },
     "errorOfTheDay": "Review in an upcoming session",
     "rewriteLabel": "Rewrite sentence {index} from memory",
     "checkRewrite": "Check my rewrite",
@@ -235,7 +240,10 @@
       "title": "Game",
       "xpVisible": "Show XP",
       "streakEnabled": "Show streak",
-      "celebrations": "Animate the wrap-up"
+      "celebrations": "Animate the wrap-up",
+      "quests": "Daily and weekly quests",
+      "immersionXp": "Immersion XP",
+      "immersionXpHint": "1 XP per 10 declared minutes, 6 at most a day, counted after 3 days."
     },
     "interfaceLanguage": {
       "label": "Interface language",
@@ -880,7 +888,41 @@
       "deleteEntry": "Delete: {entry}",
       "confirmDeleteEntry": "Confirm deletion: {entry}",
       "empty": "No time declared in the last 7 days.",
-      "failed": "Couldn’t save right now. Please try again."
+      "failed": "Couldn’t save right now. Please try again.",
+      "xpPending": "XP counted after 3 days.",
+      "xpEarned": "+{xp} XP",
+      "closedNote": "These days are closed: they can no longer be changed.",
+      "dayClosed": "This day is closed and can no longer be changed."
+    }
+  },
+  "quests": {
+    "title": "Today’s quests",
+    "weekTitle": "This week’s quests",
+    "progress": "{current} / {target}",
+    "done": "Done",
+    "change": "Swap",
+    "changeLabel": "Swap the quest: {quest}",
+    "failed": "Couldn’t swap the quest right now.",
+    "items": {
+      "read_2": "Read 2 texts to the end",
+      "read_well": "Understand a text at 90% or more",
+      "dictation_5": "Do 5 dictation sentences",
+      "produce_1": "Send a piece of writing",
+      "rewrite_2": "Rewrite 2 corrected sentences",
+      "recall_production_10": "Get 10 production recalls right",
+      "reconquest_3": "Win back 3 cards missed yesterday",
+      "error_of_day": "Rework the error of the day",
+      "fluency_2": "Do 2 fluency passes",
+      "shadowing_10": "Do 10 shadowing sentences",
+      "session_1": "Finish your session",
+      "unit_1": "Finish a unit of the path",
+      "read_5_week": "Read 5 texts this week",
+      "produce_4_week": "Send 4 pieces of writing this week",
+      "roleplay_week": "Play a role-play",
+      "recall_production_40_week": "Get 40 production recalls right",
+      "fluency_4_week": "Do 4 fluency passes",
+      "session_4_days_week": "Finish your session on 4 days this week",
+      "four_volets_week": "Cover all four strands this week"
     }
   }
 }

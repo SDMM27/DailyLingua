@@ -64,7 +64,8 @@ export default async function SettingsPage() {
 
         <section aria-labelledby="settings-game" className="space-y-5">
           <h2 id="settings-game" className="meta">{t("game.title")}</h2>
-          <GamePreferences xpVisible={game.xpVisible} streakEnabled={game.streak.enabled} celebrations={game.celebrations === "full"} />
+          <GamePreferences xpVisible={game.xpVisible} streakEnabled={game.streak.enabled} celebrations={game.celebrations === "full"}
+            quests={game.quests.enabled} immersionXp={game.immersionXp.enabled} />
         </section>
 
         <section aria-labelledby="settings-data" className="space-y-3">

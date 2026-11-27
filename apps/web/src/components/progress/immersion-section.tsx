@@ -22,7 +22,7 @@ type Editing = { id: string | null; day: string; minutes: string; kind: Immersio
  * "Immersion" block of the progress page: the week's learning time (in the app and, apart, declared by the
  * learner), a simple form to declare time outside the app, and the week's entries to edit or delete.
  */
-export function ImmersionSection({ userId, language, today, oldestDay, appMinutes, declaredMinutes, entries }: {
+export function ImmersionSection({ userId, language, today, oldestDay, appMinutes, declaredMinutes, entries, xpEnabled, closedXp }: {
   userId: string;
   language: string;
   today: string;
@@ -30,6 +30,10 @@ export function ImmersionSection({ userId, language, today, oldestDay, appMinute
   appMinutes: number;
   declaredMinutes: number;
   entries: ImmersionItem[];
+  /** The immersion XP switch is on. */
+  xpEnabled: boolean;
+  /** XP of the closed days of the week shown. */
+  closedXp: number;
 }) {
   const t = useTranslations("progress.immersion");
   const locale = useLocale();
@@ -93,7 +97,9 @@ export function ImmersionSection({ userId, language, today, oldestDay, appMinute
         {t("summaryLabel")} <span className="font-semibold">{t("inApp", { duration: duration(appMinutes) })}</span>
         {" · "}
         <span className="text-muted">{t("declared", { duration: duration(declaredMinutes) })}</span>
+        {xpEnabled && closedXp > 0 && <span className="font-semibold"> · {t("xpEarned", { xp: closedXp })}</span>}
       </p>
+      {xpEnabled && <p className="mt-1 text-sm text-muted">{t("xpPending")}</p>}
 
       {editing ? (
         <form onSubmit={submit} className="mt-5 space-y-5" aria-labelledby={`${formId}-title`}>
@@ -132,7 +138,9 @@ export function ImmersionSection({ userId, language, today, oldestDay, appMinute
           {entries.map((entry) => (
             <li key={entry.id} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 py-2">
               <span>{describe(entry)}</span>
-              {confirming === entry.id ? (
+              {entry.day < oldestDay ? (
+                <span className="text-sm text-muted">{t("dayClosed")}</span>
+              ) : confirming === entry.id ? (
                 <span className="flex flex-wrap items-center gap-2">
                   <span className="text-sm">{t("confirmDelete")}</span>
                   <Button variant="ghost" disabled={pending} aria-label={t("confirmDeleteEntry", { entry: describe(entry) })}

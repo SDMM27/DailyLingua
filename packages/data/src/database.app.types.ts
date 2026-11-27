@@ -307,6 +307,34 @@ isOneToOne: false
       referencedColumns: ["code"]
     }
                   ]
+                },"immersion_close": {
+                  Row: {
+                    "closed_at": string,"day": string,"minutes": number,"user_id": string,"xp": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "closed_at"?: string,"day": string,"minutes": number,"user_id": string,"xp": number
+                  }
+                  Update: {
+                    "closed_at"?: string,"day"?: string,"minutes"?: number,"user_id"?: string,"xp"?: number
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"quest_assignment": {
+                  Row: {
+                    "catalog_version": string,"completed_at": string | null,"created_at": string,"id": string,"period": string,"period_start": string,"quest_id": string,"rerolled_from": string | null,"slot": number,"target": number,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "catalog_version": string,"completed_at"?: string | null,"created_at"?: string,"id"?: string,"period": string,"period_start": string,"quest_id": string,"rerolled_from"?: string | null,"slot": number,"target": number,"user_id": string
+                  }
+                  Update: {
+                    "catalog_version"?: string,"completed_at"?: string | null,"created_at"?: string,"id"?: string,"period"?: string,"period_start"?: string,"quest_id"?: string,"rerolled_from"?: string | null,"slot"?: number,"target"?: number,"user_id"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"learning_day": {
                   Row: {
                     "cause": string,"day": string,"first_activity_at": string | null,"time_zone": string,"user_id": string,"validated": boolean,"xp_verified": number
@@ -786,6 +814,9 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
+            close_immersion_days: { Args: { p_user: string; p_through: string }; Returns: number };
+            complete_quest: { Args: { p_assignment: string }; Returns: boolean };
+            reroll_quest: { Args: { p_user: string; p_assignment: string; p_quest_id: string; p_target: number; p_catalog: string }; Returns: boolean };
             read_verified_sentences: { Args: { p_user_id: string; p_correction_ids: string[] }; Returns: { correction_id: string; sentence_index: number }[] };
 "configure_reminder":
 { Args: { p_enabled: boolean; p_time: string; p_weekly_summary: boolean; p_endpoint?: string; p_p256dh?: string; p_auth?: string; p_user_agent?: string; p_reset?: boolean }; Returns: undefined },

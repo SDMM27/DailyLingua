@@ -165,7 +165,12 @@
     "unsent": "Ce texte n’a pas pu partir en correction.",
     "retry": "Réessayer",
     "details": "Voir la correction",
-    "scores": { "grammar": "Grammaire", "vocabulary": "Vocabulaire", "register": "Registre", "coherence": "Cohérence" },
+    "scores": {
+      "grammar": "Grammaire",
+      "vocabulary": "Vocabulaire",
+      "register": "Registre",
+      "coherence": "Cohérence"
+    },
     "errorOfTheDay": "À revoir dans une prochaine séance",
     "rewriteLabel": "Réécris de mémoire la phrase {index}",
     "checkRewrite": "Vérifier ma réécriture",
@@ -235,7 +240,10 @@
       "title": "Jeu",
       "xpVisible": "Afficher l’XP",
       "streakEnabled": "Afficher la série",
-      "celebrations": "Animer le bilan"
+      "celebrations": "Animer le bilan",
+      "quests": "Quêtes du jour et de la semaine",
+      "immersionXp": "XP d’immersion",
+      "immersionXpHint": "1 XP par 10 min déclarées, 6 au plus par jour, comptée au bout de 3 jours."
     },
     "interfaceLanguage": {
       "label": "Langue de l’interface",
@@ -880,7 +888,41 @@
       "deleteEntry": "Supprimer : {entry}",
       "confirmDeleteEntry": "Confirmer la suppression : {entry}",
       "empty": "Aucun temps déclaré ces 7 derniers jours.",
-      "failed": "Impossible d’enregistrer pour le moment. Réessaie."
+      "failed": "Impossible d’enregistrer pour le moment. Réessaie.",
+      "xpPending": "XP comptée au bout de 3 jours.",
+      "xpEarned": "+{xp} XP",
+      "closedNote": "Ces jours sont clos : ils ne se modifient plus.",
+      "dayClosed": "Ce jour est clos, il ne peut plus être modifié."
+    }
+  },
+  "quests": {
+    "title": "Quêtes du jour",
+    "weekTitle": "Quêtes de la semaine",
+    "progress": "{current} / {target}",
+    "done": "Faite",
+    "change": "Changer",
+    "changeLabel": "Changer la quête : {quest}",
+    "failed": "Impossible de changer la quête pour le moment.",
+    "items": {
+      "read_2": "Lis 2 textes jusqu’au bout",
+      "read_well": "Comprends un texte à 90 % ou plus",
+      "dictation_5": "Fais 5 phrases de dictée",
+      "produce_1": "Envoie une production",
+      "rewrite_2": "Réécris 2 phrases corrigées",
+      "recall_production_10": "Réussis 10 rappels en production",
+      "reconquest_3": "Reconquiers 3 cartes ratées hier",
+      "error_of_day": "Retravaille l’erreur du jour",
+      "fluency_2": "Fais 2 passages de fluidité",
+      "shadowing_10": "Fais 10 phrases de shadowing",
+      "session_1": "Termine ta séance",
+      "unit_1": "Termine une unité du parcours",
+      "read_5_week": "Lis 5 textes cette semaine",
+      "produce_4_week": "Envoie 4 productions cette semaine",
+      "roleplay_week": "Fais un jeu de rôle",
+      "recall_production_40_week": "Réussis 40 rappels en production",
+      "fluency_4_week": "Fais 4 passages de fluidité",
+      "session_4_days_week": "Termine ta séance 4 jours cette semaine",
+      "four_volets_week": "Couvre les quatre volets dans la semaine"
     }
   }
 }

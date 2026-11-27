@@ -83,6 +83,8 @@ export async function saveGamePreferences(_previous: SettingsState, formData: Fo
       xpVisible: formData.get("xpVisible") === "on",
       streak: { enabled: formData.get("streakEnabled") === "on" },
       celebrations: formData.get("celebrations") === "on" ? "full" : "reduced",
+      quests: { enabled: formData.get("quests") === "on" },
+      immersionXp: { enabled: formData.get("immersionXp") === "on" },
     });
   } catch (error) {
     console.error("saveGamePreferences failed", error);
