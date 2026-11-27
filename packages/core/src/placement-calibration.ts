@@ -182,6 +182,7 @@ export function projectSkillRange(measures: SkillMeasure[], options: ProjectionO
   const meanT = points.reduce((sum, { t }) => sum + t, 0) / points.length;
   const meanV = points.reduce((sum, { value }) => sum + value, 0) / points.length;
   const variance = points.reduce((sum, { t }) => sum + (t - meanT) ** 2, 0);
+  if (variance === 0) return null;
   const slope = points.reduce((sum, { t, value }) => sum + (t - meanT) * (value - meanV), 0) / variance;
   const trend = (t: number) => meanV + slope * (t - meanT);
   const spread = Math.max(0.5, ...points.map(({ t, value }) => Math.abs(value - trend(t))));
