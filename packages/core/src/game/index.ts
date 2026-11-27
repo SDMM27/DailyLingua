@@ -1,4 +1,5 @@
 export * from "./attribution";
+export * from "./badges";
 export * from "./caps";
 export * from "./filters";
 export * from "./immersion-xp";

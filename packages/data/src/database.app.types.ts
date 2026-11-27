@@ -307,6 +307,26 @@ isOneToOne: false
       referencedColumns: ["code"]
     }
                   ]
+                },"badge_award": {
+                  Row: {
+                    "awarded_at": string,"badge_id": string,"id": string,"language": string | null,"meta": Json,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "awarded_at"?: string,"badge_id": string,"id"?: string,"language"?: string | null,"meta"?: Json,"user_id": string
+                  }
+                  Update: {
+                    "awarded_at"?: string,"badge_id"?: string,"id"?: string,"language"?: string | null,"meta"?: Json,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "badge_award_language_fkey"
+      columns: ["language"]
+isOneToOne: false
+      referencedRelation: "language"
+      referencedColumns: ["code"]
+    }
+                  ]
                 },"immersion_close": {
                   Row: {
                     "closed_at": string,"day": string,"minutes": number,"user_id": string,"xp": number
@@ -814,6 +834,7 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
+            award_badges: { Args: { p_user: string; p_awards: Json }; Returns: number };
             close_immersion_days: { Args: { p_user: string; p_through: string }; Returns: number };
             complete_quest: { Args: { p_assignment: string; p_quest_id: string }; Returns: boolean };
             reroll_quest: { Args: { p_user: string; p_assignment: string; p_quest_id: string; p_target: number; p_catalog: string }; Returns: boolean };

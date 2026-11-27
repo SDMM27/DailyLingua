@@ -23,3 +23,4 @@ export * from "./immersion";
 export * from "./progress-observation";
 export * from "./roleplay";
 export * from "./quests";
+export * from "./badges";

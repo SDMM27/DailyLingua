@@ -924,5 +924,28 @@
       "session_4_days_week": "Termine ta séance 4 jours cette semaine",
       "four_volets_week": "Couvre les quatre volets dans la semaine"
     }
+  },
+  "milestones": {
+    "title": "Étapes",
+    "new": "Nouveau",
+    "none": "Tes premières étapes arrivent avec la pratique.",
+    "names": {
+      "words": "{count} mots connus",
+      "level": "{level} en {skill}",
+      "reading_first_well": "Premier texte compris à 90 %",
+      "reading": "{count} textes compris",
+      "dictation_first_high": "Première dictée à 95 %",
+      "rewrite_50": "50 réécritures",
+      "shadowing_100": "100 phrases de shadowing",
+      "roleplay_first": "Premier jeu de rôle terminé",
+      "practice": "{hours} h de pratique"
+    },
+    "next": {
+      "words": "Prochaine : {target} mots connus — {current} aujourd’hui",
+      "reading": "Prochaine : {target} textes compris — {current} aujourd’hui",
+      "rewrite": "Prochaine : 50 réécritures — {current} aujourd’hui",
+      "shadowing": "Prochaine : 100 phrases de shadowing — {current} aujourd’hui",
+      "practice": "Prochaine : {target} h de pratique — {current} h aujourd’hui"
+    }
   }
 }

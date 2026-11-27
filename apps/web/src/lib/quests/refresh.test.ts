@@ -18,6 +18,11 @@ vi.mock("@dailylingua/data", () => ({
   listQuestAssignments: async () => assignments,
   getFirstXpDay: async () => (lines[0]?.day ?? null),
   listUsedReasons: async () => [],
+  listEnrolledLanguages: async () => ["it"],
+  getBadgeLanguageFacts: async (_: unknown, __: string, language: string) => ({ language, knownWords: 0, skillLevels: {}, textsRead: 0, textsReadWell: 0, dictationsHigh: 0, rewrites: 0, shadowings: 0, roleplays: 0 }),
+  getPracticeHours: async () => 0,
+  listBadgeAwards: async () => [],
+  recordBadges: async () => 0,
   insertQuestAssignments: async (_: unknown, __: string, quests: Omit<Assignment, "id" | "rerolledFrom" | "completedAt">[]) => {
     for (const quest of quests) {
       if (!assignments.some((a) => a.period === quest.period && a.periodStart === quest.periodStart && a.slot === quest.slot)) {
