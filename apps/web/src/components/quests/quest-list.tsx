@@ -14,6 +14,7 @@ import { RerollButton } from "./reroll-button";
 export function QuestList({ userId, period }: { userId: string; period: "day" | "week" }) {
   const t = useTranslations("quests");
   const [overview, setOverview] = useState<QuestOverview | null>(null);
+  const [reload, setReload] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -22,7 +23,7 @@ export function QuestList({ userId, period }: { userId: string; period: "day" | 
       .then((body) => { if (!cancelled) setOverview(body?.quests ?? null); })
       .catch(() => undefined);
     return () => { cancelled = true; };
-  }, [userId]);
+  }, [userId, reload]);
 
   const quests: QuestView[] = overview ? overview[period] : [];
   if (quests.length === 0) return null;
@@ -44,7 +45,7 @@ export function QuestList({ userId, period }: { userId: string; period: "day" | 
                     <span className="sr-only">{t("done")}</span>
                   </>
                 ) : t("progress", { current: quest.progress, target: quest.target })}
-                {rerollable?.id === quest.id && <RerollButton userId={userId} assignmentId={quest.id} quest={label} />}
+                {rerollable?.id === quest.id && <RerollButton userId={userId} assignmentId={quest.id} quest={label} onDone={() => setReload((value) => value + 1)} />}
               </span>
             </li>
           );

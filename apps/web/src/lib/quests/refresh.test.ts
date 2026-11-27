@@ -25,9 +25,9 @@ vi.mock("@dailylingua/data", () => ({
       }
     }
   },
-  completeQuest: async (_: unknown, id: string) => {
+  completeQuest: async (_: unknown, id: string, questId: string) => {
     const row = assignments.find((a) => a.id === id)!;
-    if (row.completedAt) return false;
+    if (row.completedAt || row.questId !== questId) return false;
     row.completedAt = NOW.toISOString();
     completed.push(id);
     return true;

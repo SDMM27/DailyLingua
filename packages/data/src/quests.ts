@@ -85,9 +85,9 @@ export async function getFirstXpDay(client: AppClient, userId: string): Promise<
   return rows[0]?.day ?? null;
 }
 
-/** Marks a quest done and credits it (`app.complete_quest`); true when this call credited it. Service client. */
-export async function completeQuest(client: AppClient, assignmentId: string): Promise<boolean> {
-  const { data, error } = await appSchema(client).rpc("complete_quest", { p_assignment: assignmentId });
+/** Marks a quest done and credits it (`app.complete_quest`, only while the row still holds `questId`); true when this call credited it. Service client. */
+export async function completeQuest(client: AppClient, assignmentId: string, questId: string): Promise<boolean> {
+  const { data, error } = await appSchema(client).rpc("complete_quest", { p_assignment: assignmentId, p_quest_id: questId });
   if (error) throw toDataError(error);
   return data === true;
 }

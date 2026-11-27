@@ -815,7 +815,7 @@ isOneToOne: false
           }
           Functions: {
             close_immersion_days: { Args: { p_user: string; p_through: string }; Returns: number };
-            complete_quest: { Args: { p_assignment: string }; Returns: boolean };
+            complete_quest: { Args: { p_assignment: string; p_quest_id: string }; Returns: boolean };
             reroll_quest: { Args: { p_user: string; p_assignment: string; p_quest_id: string; p_target: number; p_catalog: string }; Returns: boolean };
             read_verified_sentences: { Args: { p_user_id: string; p_correction_ids: string[] }; Returns: { correction_id: string; sentence_index: number }[] };
 "configure_reminder":

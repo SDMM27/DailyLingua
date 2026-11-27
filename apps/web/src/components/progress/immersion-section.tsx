@@ -3,7 +3,7 @@
 import { immersionKinds, type ImmersionKind } from "@dailylingua/schemas";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useId, useState, useTransition, type FormEvent } from "react";
+import { useEffect, useId, useState, useTransition, type FormEvent } from "react";
 import { ChoiceList } from "@/components/onboarding/choice-list";
 import { Button } from "@/components/ui/button";
 import { CONTROL_CLASS, FormMessage } from "@/components/ui/field";
@@ -43,6 +43,14 @@ export function ImmersionSection({ userId, language, today, oldestDay, appMinute
   const [confirming, setConfirming] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
   const [pending, startTransition] = useTransition();
+
+  // Closing the days that are due happens on the server when this is asked; the XP of the week is then read again.
+  useEffect(() => {
+    fetch("/api/quests", { headers: { [ACCOUNT_HEADER]: userId } })
+      .then((response) => (response.ok ? response.json() as Promise<{ closedImmersionDays?: number }> : null))
+      .then((body) => { if (body && (body.closedImmersionDays ?? 0) > 0) router.refresh(); })
+      .catch(() => undefined);
+  }, [userId, router]);
 
   const duration = (total: number) => {
     const hours = Math.floor(total / 60);

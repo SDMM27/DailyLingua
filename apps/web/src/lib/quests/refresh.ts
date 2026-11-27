@@ -95,7 +95,7 @@ export async function refreshGameState(service: AppClient, userId: string, now: 
   const settleable = rows.filter((row) => periodRange(row.period, row.periodStart).through >= addDays(today, -SETTLE_DAYS));
   const toSettle = questsToSettle(settleable, lines);
   if (toSettle.length > 0) {
-    for (const id of toSettle) await completeQuest(service, id);
+    for (const id of toSettle) await completeQuest(service, id, settleable.find((row) => row.id === id)!.questId);
     rows = await listQuestAssignments(service, userId, addDays(monday, -7));
   }
 

@@ -5,7 +5,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(39);
+select plan(41);
 
 insert into auth.users (instance_id, id, aud, role, email) values
   ('00000000-0000-0000-0000-000000000000', 'c0000000-0000-4000-8000-0000000000a1', 'authenticated', 'authenticated', 'u1@test.invalid'),
@@ -33,9 +33,9 @@ select ok(not has_function_privilege('authenticated', 'app.close_immersion_days(
   and not has_function_privilege('anon', 'app.close_immersion_days(uuid, date)', 'execute')
   and has_function_privilege('service_role', 'app.close_immersion_days(uuid, date)', 'execute'),
   'close_immersion_days: service_role only');
-select ok(not has_function_privilege('authenticated', 'app.complete_quest(uuid)', 'execute')
-  and not has_function_privilege('anon', 'app.complete_quest(uuid)', 'execute')
-  and has_function_privilege('service_role', 'app.complete_quest(uuid)', 'execute'),
+select ok(not has_function_privilege('authenticated', 'app.complete_quest(uuid, text)', 'execute')
+  and not has_function_privilege('anon', 'app.complete_quest(uuid, text)', 'execute')
+  and has_function_privilege('service_role', 'app.complete_quest(uuid, text)', 'execute'),
   'complete_quest: service_role only');
 select ok(not has_function_privilege('authenticated', 'app.reroll_quest(uuid, uuid, text, smallint, text)', 'execute')
   and has_function_privilege('service_role', 'app.reroll_quest(uuid, uuid, text, smallint, text)', 'execute'),
@@ -52,7 +52,7 @@ select throws_ok($$insert into app.quest_assignment (user_id, period, period_sta
   values ('c0000000-0000-4000-8000-0000000000a1', 'day', current_date, 1, 'read_2', 2, 'quests.v1')$$, '42501', null, 'a client cannot insert a quest');
 select throws_ok($$update app.quest_assignment set completed_at = now()$$, '42501', null, 'a client cannot complete a quest');
 select throws_ok($$select app.close_immersion_days('c0000000-0000-4000-8000-0000000000a1', current_date - 4)$$, '42501', null, 'a client cannot close days');
-select throws_ok($$select app.complete_quest('c0000000-0000-4000-8000-000000000201')$$, '42501', null, 'a client cannot call complete_quest');
+select throws_ok($$select app.complete_quest('c0000000-0000-4000-8000-000000000201', 'read_2')$$, '42501', null, 'a client cannot call complete_quest');
 select is((select count(*)::int from app.immersion_close), 0, 'nothing is closed yet');
 select throws_ok($$insert into app.immersion_close (user_id, day, minutes, xp) values ('c0000000-0000-4000-8000-0000000000a1', current_date - 8, 30, 3)$$,
   '42501', null, 'a client cannot write a closing');
@@ -84,9 +84,9 @@ select is((select league_eligible or rule_version <> 'j7.1' or language is not n
 select is(app.close_immersion_days('c0000000-0000-4000-8000-0000000000a1', current_date - 4), 0, 'replayed: nothing is closed');
 select is((select sum(amount)::int from app.xp_ledger where reason = 'immersion.declared' and user_id = 'c0000000-0000-4000-8000-0000000000a1'), 8,
   'and nothing is credited twice');
-select throws_ok($$update app.immersion_close set xp = 0$$, '42501', null, 'a closing is append only');
-select throws_ok($$delete from app.immersion_close where user_id = 'c0000000-0000-4000-8000-0000000000a1'$$, '42501', null, 'and cannot be deleted');
 reset role;
+select throws_ok($$update app.immersion_close set xp = 0$$, '42501', 'immersion_close is append-only', 'a closing is append only (the trigger, not a grant)');
+select throws_ok($$delete from app.immersion_close where user_id = 'c0000000-0000-4000-8000-0000000000a1'$$, '42501', null, 'and cannot be deleted');
 
 -- The switch: off, nothing is written, so the days can be credited later ---------------------------------
 
@@ -103,12 +103,15 @@ reset role;
 -- Quests -------------------------------------------------------------------------------------------------
 
 set local role service_role;
-select is(app.complete_quest('c0000000-0000-4000-8000-000000000201'), true, 'a daily quest is completed');
+select is(app.complete_quest('c0000000-0000-4000-8000-000000000201', 'read_2'), true, 'a daily quest is completed');
 select is((select amount::int || reason || day::text from app.xp_ledger where reason = 'quest.daily' and user_id = 'c0000000-0000-4000-8000-0000000000a1'),
   '10quest.daily' || (current_date - 1)::text, 'and credited 10 XP on the day of the quest');
-select is(app.complete_quest('c0000000-0000-4000-8000-000000000201'), false, 'a second call credits nothing');
+select is(app.complete_quest('c0000000-0000-4000-8000-000000000201', 'read_2'), false, 'a second call credits nothing');
+select is(app.complete_quest('c0000000-0000-4000-8000-000000000202', 'read_2'), false, 'a quest id that no longer matches the row credits nothing');
+select throws_ok($$insert into app.quest_assignment (user_id, period, period_start, slot, quest_id, target, catalog_version)
+  values ('c0000000-0000-4000-8000-0000000000a1', 'day', current_date - 1, 3, 'read_2', 2, 'quests.v1')$$, '23505', null, 'a quest id appears once in a period');
 select is((select count(*)::int from app.xp_ledger where reason = 'quest.daily' and user_id = 'c0000000-0000-4000-8000-0000000000a1'), 1, 'one line only');
-select is(app.complete_quest('c0000000-0000-4000-8000-000000000203'), true, 'a weekly quest is completed');
+select is(app.complete_quest('c0000000-0000-4000-8000-000000000203', 'roleplay_week'), true, 'a weekly quest is completed');
 select is((select amount::int from app.xp_ledger where reason = 'quest.weekly' and user_id = 'c0000000-0000-4000-8000-0000000000a1'), 40, 'for 40 XP');
 
 -- Reroll: once a day, never a finished quest or another account's -----------------------------------------

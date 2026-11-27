@@ -39,10 +39,10 @@ describe("rpc wrappers", () => {
   it("pass their arguments and read the boolean answer", async () => {
     const calls: unknown[] = [];
     const { client } = tableFake({}, { rpc: (name, args) => (calls.push([name, args]), { data: true, error: null }) });
-    expect(await completeQuest(client, "a")).toBe(true);
+    expect(await completeQuest(client, "a", "read_2")).toBe(true);
     expect(await rerollQuest(client, USER, "a", "read_2", 2, "quests.v1")).toBe(true);
     expect(calls).toEqual([
-      ["complete_quest", { p_assignment: "a" }],
+      ["complete_quest", { p_assignment: "a", p_quest_id: "read_2" }],
       ["reroll_quest", { p_user: USER, p_assignment: "a", p_quest_id: "read_2", p_target: 2, p_catalog: "quests.v1" }],
     ]);
   });

@@ -1,14 +1,12 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { ACCOUNT_HEADER } from "@/lib/offline/account";
 
-/** "Change" link of one unfinished quest: asks the server for another one (once a day), then refreshes the page. */
-export function RerollButton({ userId, assignmentId, quest }: { userId: string; assignmentId: string; quest: string }) {
+/** "Change" link of one unfinished quest: asks the server for another one (once a day), then asks the list to load again. */
+export function RerollButton({ userId, assignmentId, quest, onDone }: { userId: string; assignmentId: string; quest: string; onDone: () => void }) {
   const t = useTranslations("quests");
-  const router = useRouter();
   const [failed, setFailed] = useState(false);
   const [pending, startTransition] = useTransition();
 
@@ -22,7 +20,7 @@ export function RerollButton({ userId, assignmentId, quest }: { userId: string; 
           body: JSON.stringify({ assignmentId }),
         });
         if (response.ok) {
-          router.refresh();
+          onDone();
           return;
         }
       } catch {
