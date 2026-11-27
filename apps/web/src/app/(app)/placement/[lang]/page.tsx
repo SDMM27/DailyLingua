@@ -6,6 +6,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 import { connection } from "next/server";
 import { PlacementFlow } from "@/components/placement/placement-flow";
+import { placementDoneHref } from "@/lib/placement/done-href";
 import { testStartLevel } from "@/lib/placement/progress";
 import { getRequestClient, getSessionUser } from "@/lib/session";
 
@@ -47,6 +48,7 @@ export default async function PlacementPage({ params }: PageProps<"/placement/[l
       languageName={languageDisplayName(lang, locale)}
       startLevel={testStartLevel(reading ? valueToLevel(reading.levelValue) : null)}
       items={bank.items}
+      doneHref={placementDoneHref(lang, enrollments)}
     />
   );
 }

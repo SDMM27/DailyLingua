@@ -25,7 +25,7 @@ const SKILLS = ["reading", "listening", "writing", "speaking"] as const;
  * then the result the learner keeps or corrects. The engine runs here (`nextPlacementStep`), but the server replays the
  * answers against the bank and computes the estimate itself. Stopping keeps nothing: the test restarts from the start.
  */
-export function PlacementFlow({ userId, language, languageName, startLevel, items }: {
+export function PlacementFlow({ userId, language, languageName, startLevel, items, doneHref }: {
   userId: string;
   language: string;
   languageName: string;
@@ -33,6 +33,8 @@ export function PlacementFlow({ userId, language, languageName, startLevel, item
   startLevel: CefrLevel;
   /** The questions of the language; shuffled once per test, the engine picks which to ask. */
   items: PlacementItem[];
+  /** Where to go once the result is saved. */
+  doneHref: string;
 }) {
   const t = useTranslations("placement");
   const progress = useTranslations("progress");
@@ -84,7 +86,7 @@ export function PlacementFlow({ userId, language, languageName, startLevel, item
         body: JSON.stringify({ language, startLevel, answers, chosenLevel: chosen ?? estimate }),
       });
       if (response.ok) {
-        router.push(`/parcours/${language}`);
+        router.push(doneHref);
         return;
       }
     } catch {

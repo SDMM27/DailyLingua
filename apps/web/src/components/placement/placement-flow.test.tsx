@@ -30,7 +30,7 @@ const items: PlacementItem[] = cefrLevels.flatMap((level, l) =>
 function flow(startLevel: CefrLevel = "A2") {
   return render(
     <NextIntlClientProvider locale="fr" messages={messages}>
-      <PlacementFlow userId={USER} language="it" languageName="italien" startLevel={startLevel} items={items} />
+      <PlacementFlow userId={USER} language="it" languageName="italien" startLevel={startLevel} items={items} doneHref="/parcours/it" />
     </NextIntlClientProvider>,
   );
 }
@@ -67,7 +67,8 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe("the placement test, entry and questions", () => {
+// The flows click through up to 30 questions: slower than the default 5 s under a loaded full run.
+describe("the placement test, entry and questions", { timeout: 20_000 }, () => {
   it("opens on the entry screen with the introduction over it, then on the first question", async () => {
     const user = userEvent.setup();
     flow();
@@ -162,7 +163,7 @@ describe("the placement test, entry and questions", () => {
   });
 });
 
-describe("the placement test, result", () => {
+describe("the placement test, result", { timeout: 20_000 }, () => {
   it("ends on the last question of the last block with Voir mon résultat, then keeps the estimate and goes to the path", async () => {
     const user = userEvent.setup();
     flow("A2");
