@@ -36,9 +36,10 @@ export default async function ProgressPage({ searchParams }: PageProps<"/progres
     getProgressOverview(client, user.id, language, addDays(today, -6), today),
     getImmersionOverview(client, user.id, language, addDays(today, -6), today),
     listImmersionClosed(client, user.id, addDays(today, -6), immersionCloseThrough(today)),
-    game.badges.enabled ? listBadgeAwards(client, user.id) : Promise.resolve([]),
-    game.badges.enabled ? getBadgeLanguageFacts(client, user.id, language) : Promise.resolve(null),
-    game.badges.enabled ? getPracticeHours(client, user.id) : Promise.resolve(0),
+    // A failing badge read hides the section only, never the page.
+    game.badges.enabled ? listBadgeAwards(client, user.id).catch(() => null) : Promise.resolve(null),
+    game.badges.enabled ? getBadgeLanguageFacts(client, user.id, language).catch(() => null) : Promise.resolve(null),
+    game.badges.enabled ? getPracticeHours(client, user.id).catch(() => null) : Promise.resolve(null),
   ]);
   const passed = new Set(overview.passedUnits.map((unit) => unit.unitId));
   const units = visibleUnitsFor(language).filter((unit) => passed.has(unit.id) && unit.canDo.length > 0);
@@ -90,7 +91,7 @@ export default async function ProgressPage({ searchParams }: PageProps<"/progres
 
         {game.quests.enabled && <div className="md:col-start-1 md:row-start-4"><QuestList userId={user.id} period="week" /></div>}
 
-        {badgeFacts && (
+        {badgeFacts && awards && practiceHours !== null && (
           <div className="md:col-start-1 md:row-start-5">
             <MilestonesSection now={new Date()} steps={nextSteps(badgeFacts, practiceHours)}
               earned={awards.filter((badge) => badge.language === language || badge.language === null)} />
