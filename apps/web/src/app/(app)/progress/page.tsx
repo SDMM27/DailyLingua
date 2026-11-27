@@ -1,8 +1,9 @@
 import { addDays, languageDisplayName, learningDay, valueToLevel } from "@dailylingua/core";
-import { getProgressOverview } from "@dailylingua/data";
+import { getImmersionOverview, getProgressOverview } from "@dailylingua/data";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { ImmersionSection } from "@/components/progress/immersion-section";
 import { getProgressLanguages } from "@/lib/progress-languages";
 import { getRequestClient, getSessionProfile, getSessionUser } from "@/lib/session";
 import { visibleUnitsFor } from "@/lib/units/visibility";
@@ -26,7 +27,11 @@ export default async function ProgressPage({ searchParams }: PageProps<"/progres
 
   const today = learningDay(new Date(), profile.timeZone);
   const dates = Array.from({ length: 7 }, (_, index) => addDays(today, index - 6));
-  const overview = await getProgressOverview(await getRequestClient(), user.id, language, addDays(today, -6), today);
+  const client = await getRequestClient();
+  const [overview, immersion] = await Promise.all([
+    getProgressOverview(client, user.id, language, addDays(today, -6), today),
+    getImmersionOverview(client, user.id, language, addDays(today, -6), today),
+  ]);
   const passed = new Set(overview.passedUnits.map((unit) => unit.unitId));
   const units = visibleUnitsFor(language).filter((unit) => passed.has(unit.id) && unit.canDo.length > 0);
   const contentLocale = locale === "fr" ? "fr" : "en";
@@ -71,7 +76,10 @@ export default async function ProgressPage({ searchParams }: PageProps<"/progres
           </ul>
         </section>
 
-        <section className="md:col-start-2 md:row-span-2 md:row-start-1" aria-labelledby="progress-skills">
+        <ImmersionSection userId={user.id} language={language} today={today} oldestDay={addDays(today, -30)}
+          appMinutes={immersion.appMinutes} declaredMinutes={immersion.declaredMinutes} entries={immersion.entries} />
+
+        <section className="md:col-start-2 md:row-span-3 md:row-start-1" aria-labelledby="progress-skills">
           <h2 id="progress-skills" className="mb-3 font-display text-2xl font-semibold">{t("skills")}</h2>
           <table aria-labelledby="progress-skills" className="w-full border-t-2 border-accent text-start text-sm">
             <thead className="sr-only">
@@ -94,7 +102,7 @@ export default async function ProgressPage({ searchParams }: PageProps<"/progres
           </table>
         </section>
 
-        <section className="rounded-xl border border-line bg-surface p-4 md:col-start-1 md:row-start-2" aria-labelledby="progress-goals">
+        <section className="rounded-xl border border-line bg-surface p-4 md:col-start-1 md:row-start-3" aria-labelledby="progress-goals">
           <h2 id="progress-goals" className="font-display text-2xl font-semibold">{t("goals")}</h2>
           {units.length === 0 ? <p className="mt-2 text-sm text-muted">{t("noGoals")}</p> : (
             <ul className="mt-3 space-y-4">

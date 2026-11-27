@@ -1,5 +1,6 @@
 export * from "./common";
 export * from "./events";
+export * from "./immersion";
 export * from "./memory";
 export * from "./oral";
 export * from "./profile";

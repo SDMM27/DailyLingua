@@ -848,6 +848,39 @@
       "placement": "Placement test",
       "assessment": "Assessment",
       "estimated": "Estimated"
+    },
+    "immersion": {
+      "title": "Immersion",
+      "summaryLabel": "Learning time:",
+      "inApp": "{duration} in the app",
+      "declared": "{duration} declared",
+      "durationMinutes": "{minutes} min",
+      "durationHours": "{hours} h",
+      "durationHoursMinutes": "{hours} h {minutes} min",
+      "add": "Add time",
+      "addTitle": "Add time",
+      "editTitle": "Edit entry",
+      "dayLabel": "Date",
+      "minutesLabel": "Minutes",
+      "kindLabel": "Type",
+      "kinds": {
+        "video": "Video",
+        "audio": "Audio",
+        "reading": "Reading",
+        "conversation": "Conversation",
+        "other": "Other"
+      },
+      "save": "Save",
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "delete": "Delete",
+      "confirmDelete": "Delete this entry?",
+      "confirm": "Yes, delete",
+      "editEntry": "Edit: {entry}",
+      "deleteEntry": "Delete: {entry}",
+      "confirmDeleteEntry": "Confirm deletion: {entry}",
+      "empty": "No time declared in the last 7 days.",
+      "failed": "Couldn’t save right now. Please try again."
     }
   }
 }

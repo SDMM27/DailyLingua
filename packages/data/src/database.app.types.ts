@@ -287,6 +287,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"immersion_entry": {
+                  Row: {
+                    "created_at": string,"day": string,"id": string,"kind": string,"language": string,"minutes": number,"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"day": string,"id"?: string,"kind": string,"language": string,"minutes": number,"updated_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"day"?: string,"id"?: string,"kind"?: string,"language"?: string,"minutes"?: number,"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "immersion_entry_language_fkey"
+      columns: ["language"]
+isOneToOne: false
+      referencedRelation: "language"
+      referencedColumns: ["code"]
+    }
+                  ]
                 },"learning_day": {
                   Row: {
                     "cause": string,"day": string,"first_activity_at": string | null,"time_zone": string,"user_id": string,"validated": boolean,"xp_verified": number

@@ -7,6 +7,7 @@ import {
   cefrLevels,
   dateKeySchema,
   enrollmentSchema,
+  immersionEntryInput,
   languageCodeSchema,
   localizedTextSchema,
   profileSchema,
@@ -250,5 +251,21 @@ describe("saveProfileInputSchema", () => {
   it("refuses a missing field and a malformed time", () => {
     expect(saveProfileInputSchema.safeParse({ ...input, timeZone: undefined }).success).toBe(false);
     expect(saveProfileInputSchema.safeParse({ ...input, reminderTime: "7:05" }).success).toBe(false);
+  });
+});
+
+describe("immersionEntryInput", () => {
+  const valid = { language: "it", day: "2026-11-26", minutes: 30, kind: "video" };
+
+  it("accepts a day, 1 to 600 whole minutes and a known kind", () => {
+    expect(immersionEntryInput.safeParse(valid).success).toBe(true);
+    expect(immersionEntryInput.safeParse({ ...valid, minutes: 1 }).success).toBe(true);
+    expect(immersionEntryInput.safeParse({ ...valid, minutes: 600 }).success).toBe(true);
+  });
+
+  it("refuses other minutes, kinds, dates and extra fields", () => {
+    for (const bad of [{ minutes: 0 }, { minutes: 601 }, { minutes: 1.5 }, { kind: "game" }, { day: "26/11/2026" }, { language: "Italian" }, { extra: 1 }]) {
+      expect(immersionEntryInput.safeParse({ ...valid, ...bad }).success).toBe(false);
+    }
   });
 });
