@@ -16,7 +16,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
     : [null, false] as const;
   const screens = (
     <>
-      <div className="lg:pl-56">
+      <div className="lg:ps-56">
         <main className="mx-auto w-full max-w-md px-5 has-[.progress-page]:max-w-6xl pt-[calc(1.25rem+env(safe-area-inset-top))] pb-[calc(6rem+env(safe-area-inset-bottom))] lg:max-w-2xl lg:has-[.progress-page]:max-w-6xl lg:px-8 lg:pt-10 lg:pb-12">
           {children}
         </main>

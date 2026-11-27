@@ -34,7 +34,7 @@ export function TabBar({ pathLanguage = null, hasProgress = false }: { pathLangu
   return (
     <nav
       aria-label={t("label")}
-      className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-bg pb-[env(safe-area-inset-bottom)] lg:inset-y-0 lg:right-auto lg:w-56 lg:border-t-0 lg:border-r lg:pb-0 lg:pt-[calc(1.5rem+env(safe-area-inset-top))]"
+      className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-bg pb-[env(safe-area-inset-bottom)] lg:inset-y-0 lg:end-auto lg:w-56 lg:border-t-0 lg:border-e lg:pb-0 lg:pt-[calc(1.5rem+env(safe-area-inset-top))]"
     >
       <ul className="mx-auto flex max-w-md lg:mx-0 lg:max-w-none lg:flex-col lg:gap-1 lg:px-3">
         {tabs.map(({ href, key, icon }) => {
