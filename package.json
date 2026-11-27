@@ -32,6 +32,7 @@
     "metrics:report": "tsx --env-file-if-exists=.env.local scripts/metrics-report.mts",
     "progress:observe": "tsx --env-file-if-exists=.env.local scripts/progress-observe.mts",
     "progress:calibrate": "tsx scripts/progress-calibrate.mts",
+    "placement:calibrate": "tsx scripts/placement-calibrate.mts",
     "mission:generate": "tsx --env-file-if-exists=.env.local scripts/mission-generate.mts",
     "cron:run": "tsx --env-file-if-exists=.env.local scripts/cron-run.mts",
     "roleplay:eval": "tsx --env-file-if-exists=.env.local scripts/roleplay-eval.mts",
