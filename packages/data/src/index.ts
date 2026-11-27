@@ -19,5 +19,6 @@ export * from "./unit-progress";
 export * from "./unit-warmup";
 export * from "./oral-attempts";
 export * from "./progress-overview";
+export * from "./immersion";
 export * from "./progress-observation";
 export * from "./roleplay";

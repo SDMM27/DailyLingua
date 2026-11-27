@@ -38,6 +38,8 @@ describe("where the service role is used", () => {
     expect(importers).toEqual([
       "app/api/cron/reminders/route.ts",
       "app/api/events/route.ts",
+      "app/api/immersion/[id]/route.ts",
+      "app/api/immersion/route.ts",
       "app/api/production/[id]/feedback/route.ts",
       "app/api/production/[id]/rewrites/route.ts",
       "app/api/reader/cards/route.ts",

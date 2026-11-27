@@ -16,7 +16,7 @@ export interface FakeQuery {
  * In-memory test double of an `AppClient` for the read functions: `from(table)` filters the rows given for that table
  * (`eq` (also on `column->>key`), `neq`, `in` (also on `column->>key`), `is`, `like`, `not(..., "is", ...)`, `gte`, `lte`, `order`, `range`, `limit`, `maybeSingle`, `count`) and
  * records every query, so a test can assert which filters a read used (and which it did not). `upsert` with
- * `ignoreDuplicates` keeps the first row of a conflict. Only for unit tests, never imported by the package itself.
+ * `ignoreDuplicates` keeps the first row of a conflict. `insert`, `update` and `delete` mutate the rows and return the affected ones (an inserted row gets a random `id` unless it has one). Only for unit tests, never imported by the package itself.
  */
 export function tableFake(tables: Record<string, Row[]>, options: { rpc?: (name: string, args: unknown) => { data: unknown; error: { code?: string; message?: string } | null } } = {}) {
   const queries: FakeQuery[] = [];
@@ -33,6 +33,7 @@ export function tableFake(tables: Record<string, Row[]>, options: { rpc?: (name:
     let head = false;
     let counted = false;
     let upsert: { rows: Row[]; onConflict: string[]; ignore: boolean } | null = null;
+    let mutation: { kind: "insert"; rows: Row[] } | { kind: "update"; patch: Row } | { kind: "delete" } | null = null;
 
     const log = (method: string, args: unknown[]) => record.chain.push(`${method}(${args.map((arg) => JSON.stringify(arg)).join(",")})`);
     /** A column, or a JSON path `column->>key` (the text of a key of an object column, as PostgREST reads it). */
@@ -52,6 +53,19 @@ export function tableFake(tables: Record<string, Row[]>, options: { rpc?: (name:
           if (!exists) store[table]!.push({ ...row });
         }
         return { data: null, error: null };
+      }
+      if (mutation?.kind === "insert") {
+        const inserted = mutation.rows.map((row) => ({ id: crypto.randomUUID(), ...row }));
+        (store[table] ??= []).push(...inserted);
+        record.returned = inserted.length;
+        return single ? { data: inserted[0] ?? null, error: null } : { data: inserted, error: null };
+      }
+      if (mutation) {
+        const matching = (store[table] ?? []).filter((row) => tests.every((test) => test(row)));
+        if (mutation.kind === "update") for (const row of matching) Object.assign(row, mutation.patch);
+        else store[table] = (store[table] ?? []).filter((row) => !matching.includes(row));
+        record.returned = matching.length;
+        return single ? { data: matching[0] ?? null, error: null } : { data: matching, error: null };
       }
       let rows = (store[table] ?? []).filter((row) => tests.every((test) => test(row)));
       for (const { column, ascending } of [...orders].reverse()) rows = [...rows].sort((a, b) => (ascending ? 1 : -1) * compare(a[column], b[column]));
@@ -117,6 +131,26 @@ export function tableFake(tables: Record<string, Row[]>, options: { rpc?: (name:
     builder.maybeSingle = () => {
       log("maybeSingle", []);
       single = true;
+      return builder;
+    };
+    builder.single = () => {
+      log("single", []);
+      single = true;
+      return builder;
+    };
+    builder.insert = (value: Row | Row[]) => {
+      log("insert", [value]);
+      mutation = { kind: "insert", rows: Array.isArray(value) ? value : [value] };
+      return builder;
+    };
+    builder.update = (patch: Row) => {
+      log("update", [patch]);
+      mutation = { kind: "update", patch };
+      return builder;
+    };
+    builder.delete = () => {
+      log("delete", []);
+      mutation = { kind: "delete" };
       return builder;
     };
     builder.upsert = (value: Row | Row[], opts: { onConflict: string; ignoreDuplicates?: boolean }) => {

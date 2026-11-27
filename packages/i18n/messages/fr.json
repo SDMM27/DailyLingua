@@ -848,6 +848,39 @@
       "placement": "Test de niveau",
       "assessment": "Bilan",
       "estimated": "Estimé"
+    },
+    "immersion": {
+      "title": "Immersion",
+      "summaryLabel": "Temps d’apprentissage :",
+      "inApp": "{duration} dans l’app",
+      "declared": "{duration} déclarées",
+      "durationMinutes": "{minutes} min",
+      "durationHours": "{hours} h",
+      "durationHoursMinutes": "{hours} h {minutes}",
+      "add": "Ajouter du temps",
+      "addTitle": "Ajouter du temps",
+      "editTitle": "Modifier l’entrée",
+      "dayLabel": "Date",
+      "minutesLabel": "Minutes",
+      "kindLabel": "Type",
+      "kinds": {
+        "video": "Vidéo",
+        "audio": "Audio",
+        "reading": "Lecture",
+        "conversation": "Conversation",
+        "other": "Autre"
+      },
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "confirmDelete": "Supprimer cette entrée ?",
+      "confirm": "Oui, supprimer",
+      "editEntry": "Modifier : {entry}",
+      "deleteEntry": "Supprimer : {entry}",
+      "confirmDeleteEntry": "Confirmer la suppression : {entry}",
+      "empty": "Aucun temps déclaré ces 7 derniers jours.",
+      "failed": "Impossible d’enregistrer pour le moment. Réessaie."
     }
   }
 }
