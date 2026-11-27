@@ -2,7 +2,7 @@
 
 One file per study language: `src/lib/placement/banks/<code>.ts`, exporting
 `export const <code>Bank = { ... } satisfies PlacementBank;` (type from `@/lib/schemas/placement`).
-Check a bank with `npm run placement:check -- <code>` (all banks without argument).
+The banks of Russian and Italian, shared with `apps/web`, live in `packages/content/src/placement/` (`ru.ts`, `it.ts`); the files of `src/lib/placement/banks/` for these two re-export them. Check a bank with `npm run placement:check -- <code>` (all banks without argument).
 
 ## Shape
 

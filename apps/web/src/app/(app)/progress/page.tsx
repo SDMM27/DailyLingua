@@ -1,9 +1,11 @@
+import { placementBankOf } from "@dailylingua/content/placement";
 import { addDays, immersionCloseThrough, languageDisplayName, learningDay, nextSteps, oldestEditableImmersionDay, resolveGameSettings, valueToLevel } from "@dailylingua/core";
-import { getBadgeLanguageFacts, getImmersionOverview, getPracticeHours, getProgressOverview, listBadgeAwards, listImmersionClosed } from "@dailylingua/data";
+import { getBadgeLanguageFacts, getImmersionOverview, getPracticeHours, hasPlacementOnVersion, getProgressOverview, listBadgeAwards, listImmersionClosed } from "@dailylingua/data";
 import { gameSettingsSchema } from "@dailylingua/schemas";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { PlacementEntryCard } from "@/components/placement/placement-entry-card";
 import { MilestonesSection } from "@/components/progress/milestones-section";
 import { QuestList } from "@/components/quests/quest-list";
 import { ImmersionSection } from "@/components/progress/immersion-section";
@@ -32,7 +34,8 @@ export default async function ProgressPage({ searchParams }: PageProps<"/progres
   const dates = Array.from({ length: 7 }, (_, index) => addDays(today, index - 6));
   const client = await getRequestClient();
   const game = resolveGameSettings(gameSettingsSchema.safeParse(profile.gameSettings).data);
-  const [overview, immersion, closed, awards, badgeFacts, practiceHours] = await Promise.all([
+  const placementBank = placementBankOf(language);
+  const [overview, immersion, closed, awards, badgeFacts, practiceHours, placementDone] = await Promise.all([
     getProgressOverview(client, user.id, language, addDays(today, -6), today),
     getImmersionOverview(client, user.id, language, addDays(today, -6), today),
     listImmersionClosed(client, user.id, addDays(today, -6), immersionCloseThrough(today)),
@@ -40,6 +43,8 @@ export default async function ProgressPage({ searchParams }: PageProps<"/progres
     game.badges.enabled ? listBadgeAwards(client, user.id).catch(() => null) : Promise.resolve(null),
     game.badges.enabled ? getBadgeLanguageFacts(client, user.id, language).catch(() => null) : Promise.resolve(null),
     game.badges.enabled ? getPracticeHours(client, user.id).catch(() => null) : Promise.resolve(null),
+    // A failing read hides the card only, never the page.
+    placementBank ? hasPlacementOnVersion(client, user.id, language, placementBank.version).catch(() => true) : Promise.resolve(true),
   ]);
   const passed = new Set(overview.passedUnits.map((unit) => unit.unitId));
   const units = visibleUnitsFor(language).filter((unit) => passed.has(unit.id) && unit.canDo.length > 0);
@@ -63,6 +68,8 @@ export default async function ProgressPage({ searchParams }: PageProps<"/progres
           </nav>
         ) : <p className="font-semibold text-muted">{languageDisplayName(language, locale)}</p>}
       </header>
+
+      {!placementDone && <PlacementEntryCard language={language} languageName={languageDisplayName(language, locale)} />}
 
       <div className="grid gap-6 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:gap-x-10">
         <section className="rounded-xl border border-line bg-surface p-4 md:col-start-1 md:row-start-1" aria-labelledby="progress-days">

@@ -4,6 +4,7 @@ export * from "./events";
 export * from "./immersion";
 export * from "./memory";
 export * from "./oral";
+export * from "./placement";
 export * from "./placement-calibration";
 export * from "./profile";
 export * from "./reading-calibration";

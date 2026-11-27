@@ -45,6 +45,21 @@ Export de `app.assessment_result` (tests de placement, russe et italien) après 
 
 ## Hors de cette livraison
 
-- **Porter l’écran du test dans `apps/web`.** C’est un nouvel écran, à maquetter avant implémentation. Le choix du moment (inscription, page Progrès ou les deux) relève du produit.
 - **Enregistrer le résultat du bilan de fin de parcours** dans `assessment_result`, ventilé par compétence, pour mesurer l’écart avec l’estimation continue.
 - **Afficher une projection** sur la page Progrès, une fois le garde-fou franchi par des données réelles.
+
+## Écran du test dans `apps/web` (maquette B, retenue le 2026-11-28)
+
+Le test est porté dans la nouvelle app pour le russe et l’italien. Il suit la maquette B « Cartes et repères » : progression par bloc, réponses en tuiles A à D, introduction en feuille, échelle A1 à C2 au résultat et, à partir de 900 px, colonne des niveaux visités.
+
+| Sujet | Règle |
+|---|---|
+| Moteur | Celui de l’ancienne app, sans changement de règles : blocs de cinq questions d’un même niveau, réussis à trois bonnes réponses, départ au niveau déclaré, 30 questions au plus. Il passe dans `packages/core`, sans dépendance à Next.js ni React. Le calibrage reste en observation : la sélection suit les niveaux éditoriaux (« calibrage insuffisant »). |
+| Banques | Une seule source pour le russe et l’italien, partagée par l’ancienne app, le script de calibrage et `apps/web`. Les autres langues ne proposent pas le test. |
+| Points d’entrée | Page Progrès, pour la langue active, tant qu’aucun test terminé n’existe pour la version courante de la banque. Proposition après l’inscription, avec « Plus tard » qui mène à Aujourd’hui. |
+| Arrêt | « Arrêter » demande confirmation et ne produit aucun résultat. Rien n’est enregistré, et le test reprend du début. |
+| Enregistrement | Le serveur rejoue les réponses et calcule seul l’estimation et la confiance. Il ajoute une ligne `assessment_result` (`kind = 'placement'`), avec une charge au format lu par `placement:calibrate` : `status`, `bank_version`, `start_level`, `estimated_level`, `confidence`, `chosen_level` et `answers`. Il met à jour **Lire** dans `skill_estimate` (`source = 'placement'`) avec le niveau gardé par l’apprenant. L’incertitude vaut 0,5, 0,75 ou 1 selon que la confiance est haute, moyenne ou faible. Les autres compétences ne changent pas. L’écriture passe par le rôle de service, filtrée sur l’utilisateur de la session, comme le journal d’immersion. Aucune migration n’est nécessaire. |
+| Résultat | Il présente le niveau estimé, la confiance, **Lire** mesuré et les trois autres compétences « Non mesuré » par ce test. L’apprenant peut garder l’estimation ou toucher un autre niveau de l’échelle. Il arrive ensuite sur le parcours de la langue. |
+| Langue | Interface en français et en anglais. Questions dans la langue cible, avec `lang`. Couleur d’accent tirée de `languageStyle()`. |
+
+**Recette.** Couvrir un compte neuf, l’abandon en cours de test, le choix d’un autre niveau, une réponse falsifiée refusée par le serveur et l’isolation entre deux comptes. Vérifier le russe et l’italien, en clair et en sombre, à 390 et 1280 px, au clavier.

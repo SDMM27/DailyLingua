@@ -9,6 +9,7 @@ export * from "./memory/legacy-leitner";
 export * from "./memory/queue";
 export * from "./oral";
 export * from "./offline";
+export * from "./placement";
 export * from "./placement-calibration";
 export * from "./reader/coverage";
 export * from "./reading-calibration";

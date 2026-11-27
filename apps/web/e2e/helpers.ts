@@ -100,8 +100,8 @@ async function choose(page: Page, name: string | RegExp) {
   await page.locator("label").filter({ has: page.getByRole("radio", { name }) }).click();
 }
 
-/** Creates an account through the interface and completes the installation (Italian, A0, 15 minutes); ends on Today, in French. */
-export async function signUpAndInstall(page: Page, email: string, knownLanguage?: string) {
+/** Creates an account through the interface and completes the installation (Italian, A0, 15 minutes); ends on the offer of the placement test. */
+export async function signUpAndInstallToPlacementOffer(page: Page, email: string, knownLanguage?: string) {
   await page.goto("/sign-up");
   await page.getByLabel("Adresse e-mail").fill(email);
   await page.getByLabel("Mot de passe").fill(TEST_PASSWORD);
@@ -118,5 +118,12 @@ export async function signUpAndInstall(page: Page, email: string, knownLanguage?
   await choose(page, /Je débute/);
   await page.getByRole("button", { name: "Continuer" }).click();
   await page.getByRole("button", { name: "Commencer" }).click();
+  await expect(page).toHaveURL(/\/placement\/it\/bienvenue$/);
+}
+
+/** Creates an account through the interface and completes the installation (Italian, A0, 15 minutes), declines the placement test; ends on Today, in French. */
+export async function signUpAndInstall(page: Page, email: string, knownLanguage?: string) {
+  await signUpAndInstallToPlacementOffer(page, email, knownLanguage);
+  await page.getByRole("link", { name: "Plus tard, je commence par une leçon" }).click();
   await expect(page).toHaveURL(/\/$/);
 }

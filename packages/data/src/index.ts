@@ -20,6 +20,7 @@ export * from "./unit-warmup";
 export * from "./oral-attempts";
 export * from "./progress-overview";
 export * from "./immersion";
+export * from "./placement";
 export * from "./progress-observation";
 export * from "./roleplay";
 export * from "./quests";
