@@ -1,9 +1,9 @@
 import {
-  QUEST_CATALOG_VERSION, QUEST_USAGE_REASONS, addDays, chooseQuests, diffInDays, immersionCloseThrough, learningDay, periodRange, questById, questProgress,
+  QUEST_CATALOG_VERSION, QUEST_USAGE_REASONS, addDays, awardBadges, chooseQuests, diffInDays, immersionCloseThrough, learningDay, periodRange, questById, questProgress,
   questsToSettle, resolveGameSettings, weekStart, type QuestChoiceInput, type QuestLine, type QuestPeriod,
 } from "@dailylingua/core";
 import {
-  closeImmersionDays, completeQuest, getFirstXpDay, getGameContext, insertQuestAssignments, listQuestAssignments, listQuestLedgerLines, listUsedReasons,
+  closeImmersionDays, getBadgeLanguageFacts, getPracticeHours, listBadgeAwards, listEnrolledLanguages, recordBadges, completeQuest, getFirstXpDay, getGameContext, insertQuestAssignments, listQuestAssignments, listQuestLedgerLines, listUsedReasons,
   type AppClient, type QuestAssignmentRow,
 } from "@dailylingua/data";
 import { gameSettingsSchema } from "@dailylingua/schemas";
@@ -33,6 +33,8 @@ export interface QuestOverview {
 export interface RefreshResult {
   quests: QuestOverview | null;
   closedImmersionDays: number;
+  /** Badges awarded by this call. */
+  newBadges: number;
 }
 
 /** The facts of the quest choice that do not depend on the period: the usage of oral functions and the age of the account. */
@@ -58,13 +60,18 @@ const view = (row: QuestAssignmentRow, lines: readonly QuestLine[]): QuestView =
  */
 export async function refreshGameState(service: AppClient, userId: string, now: Date): Promise<RefreshResult> {
   const context = await getGameContext(service, userId);
-  if (!context) return { quests: null, closedImmersionDays: 0 };
+  if (!context) return { quests: null, closedImmersionDays: 0, newBadges: 0 };
   const settings = resolveGameSettings(gameSettingsSchema.safeParse(context.gameSettings).data);
   const today = learningDay(now, context.timeZone);
 
   // The function itself writes nothing when the immersion XP switch is off.
   const closedImmersionDays = await closeImmersionDays(service, userId, immersionCloseThrough(today));
-  if (!settings.quests.enabled) return { quests: null, closedImmersionDays };
+  // Badges are computed whatever the badges switch says (the switch only hides them), so turning it back on loses nothing.
+  const newBadges = await awardMilestones(service, userId).catch((error: unknown) => {
+    console.error("Awarding the badges failed", error);
+    return 0;
+  });
+  if (!settings.quests.enabled) return { quests: null, closedImmersionDays, newBadges };
 
   const monday = weekStart(today);
   const historyFrom = addDays(today, -HISTORY_DAYS);
@@ -107,5 +114,18 @@ export async function refreshGameState(service: AppClient, userId: string, now: 
       canReroll: todays.every((row) => row.rerolledFrom === null) && todays.some((row) => row.completedAt === null),
     },
     closedImmersionDays,
+    newBadges,
   };
+}
+
+/** Measures the facts of the learner and records the badges they earn that are not held yet; the number of new badges. */
+async function awardMilestones(service: AppClient, userId: string): Promise<number> {
+  const languages = await listEnrolledLanguages(service, userId);
+  const [perLanguage, practiceHours, held] = await Promise.all([
+    Promise.all(languages.map((language) => getBadgeLanguageFacts(service, userId, language))),
+    getPracticeHours(service, userId),
+    listBadgeAwards(service, userId),
+  ]);
+  const awards = awardBadges({ languages: perLanguage, practiceHours }, held.map((badge) => ({ badgeId: badge.badgeId, language: badge.language })));
+  return recordBadges(service, userId, awards);
 }

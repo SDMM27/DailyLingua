@@ -924,5 +924,28 @@
       "session_4_days_week": "Finish your session on 4 days this week",
       "four_volets_week": "Cover all four strands this week"
     }
+  },
+  "milestones": {
+    "title": "Milestones",
+    "new": "New",
+    "none": "Your first milestones arrive with practice.",
+    "names": {
+      "words": "{count} known words",
+      "level": "{level} in {skill}",
+      "reading_first_well": "First text understood at 90%",
+      "reading": "{count} texts understood",
+      "dictation_first_high": "First dictation at 95%",
+      "rewrite_50": "50 rewrites",
+      "shadowing_100": "100 shadowing sentences",
+      "roleplay_first": "First role-play finished",
+      "practice": "{hours} h of practice"
+    },
+    "next": {
+      "words": "Next: {target} known words — {current} today",
+      "reading": "Next: {target} texts understood — {current} today",
+      "rewrite": "Next: 50 rewrites — {current} today",
+      "shadowing": "Next: 100 shadowing sentences — {current} today",
+      "practice": "Next: {target} h of practice — {current} h today"
+    }
   }
 }

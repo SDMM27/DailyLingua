@@ -47,8 +47,8 @@ export function ImmersionSection({ userId, language, today, oldestDay, appMinute
   // Closing the days that are due happens on the server when this is asked; the XP of the week is then read again.
   useEffect(() => {
     fetch("/api/quests", { headers: { [ACCOUNT_HEADER]: userId } })
-      .then((response) => (response.ok ? response.json() as Promise<{ closedImmersionDays?: number }> : null))
-      .then((body) => { if (body && (body.closedImmersionDays ?? 0) > 0) router.refresh(); })
+      .then((response) => (response.ok ? response.json() as Promise<{ closedImmersionDays?: number; newBadges?: number }> : null))
+      .then((body) => { if (body && ((body.closedImmersionDays ?? 0) > 0 || (body.newBadges ?? 0) > 0)) router.refresh(); })
       .catch(() => undefined);
   }, [userId, router]);
 

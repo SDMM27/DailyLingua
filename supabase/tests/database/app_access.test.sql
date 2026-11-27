@@ -51,8 +51,8 @@ select 'test', 'm', id from auth.users where id::text like 'c0000000-0000-4000-8
 
 select is((select count(*)::int from pg_tables where schemaname = 'app' and not rowsecurity), 0,
   'row level security is enabled on every table of app');
-select is((select count(*)::int from pg_tables where schemaname = 'app'), 47,
-  'app has its 47 tables');
+select is((select count(*)::int from pg_tables where schemaname = 'app'), 48,
+  'app has its 48 tables');
 select is(
   (select count(*)::int from pg_proc p join pg_namespace n on n.oid = p.pronamespace
    where n.nspname = 'app' and not exists (
