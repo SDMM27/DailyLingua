@@ -223,7 +223,7 @@ export const EVAL_CASES: EvalCase[] = [
     request: {
       ...italian, level: "A2", targetLevel: "B1", mode: "spoken", purpose: "conversational",
       task: "Racconta a un amico come hai passato il fine settimana.",
-      text: "il fine settimana scorso sono andata al mare con le mie amiche sono simpatico e abbiamo mangiato in una casa molto grandi ma il mare era freddo e noi non abbiamo fatto il bagno",
+      text: "il fine settimana scorso sono andata al mare con le mie amiche che sono simpatico e abbiamo mangiato in una casa molto grandi ma il mare era freddo e noi non abbiamo fatto il bagno",
     },
   },
   {
