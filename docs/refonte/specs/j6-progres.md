@@ -81,6 +81,37 @@ Le journal de rappel existant ne conserve pas séparément la preuve que la cart
 
 Les supports au texte identique après normalisation des espaces et d’Unicode sont regroupés. Une réédition qui change le texte devra être reliée éditorialement à son support avant activation. Des définitions divergentes pour un même lemme sont traitées comme ambiguës. Un identifiant éditorial commun permettrait de confirmer les paraphrases et de distinguer les homographes.
 
+#### Comparer les observations à des bilans indépendants
+
+Pour chaque volontaire, conserver le JSON de `progress:observe` avant son bilan. Utiliser un UUID aléatoire pour l’apparier au bilan, avec une paire au maximum par volontaire et par langue. Le bilan doit fournir une mesure indépendante de la **lecture** sur l’échelle continue de 0 à 7. Conserver aussi les observations qui ne franchissent aucun seuil afin de mesurer la couverture.
+
+```sh
+npm run --silent progress:calibrate -- paires.json
+```
+
+Le fichier contient un tableau d’objets au format ci-dessous. Le champ `observation` accepte le rapport entier. L’exemple ne montre que les champs nécessaires au calcul.
+
+```json
+[
+  {
+    "participant": "00000000-0000-4000-8000-000000000001",
+    "observation": {
+      "version": 1,
+      "language": "it",
+      "observedAt": "2026-11-20T10:00:00Z",
+      "reading": { "bands": [{ "level": "B1", "meetsThreshold": true }] }
+    },
+    "assessment": {
+      "language": "it",
+      "assessedAt": "2026-11-21T10:00:00Z",
+      "readingValue": 3.25
+    }
+  }
+]
+```
+
+Le rapport donne, pour chaque langue, le nombre de paires exploitables, le nombre d’observations sans résultat, l’erreur absolue moyenne et le nombre de comparaisons à un demi-niveau ou moins. Pour la comparaison, une bande d’observation est représentée par son milieu (B1 = 3,5). Si plusieurs bandes franchissent le seuil, le calcul retient la plus élevée. Le seuil d’observation, la taille du pilote et la couverture par niveau restent à examiner avant d’utiliser ces résultats pour choisir une règle de promotion.
+
 ## 6.3 — Test adaptatif, bilan et immersion
 
 Calibrer les items de placement par compétence et vérifier leur couverture par langue avant d’activer l’adaptation. Conserver le résultat du bilan comme mesure distincte et mesurer son écart avec l’estimation continue selon les indicateurs du projet. Les langues peu couvertes peuvent afficher des compétences non mesurées. Présenter une projection en fourchette lorsque l’historique offre assez de mesures comparables.
