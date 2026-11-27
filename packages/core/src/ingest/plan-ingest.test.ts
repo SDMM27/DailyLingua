@@ -26,7 +26,7 @@ describe("planIngest: reviews", () => {
     expect(payload.reviews[0]).toMatchObject({ card_id: uuid(31), rating: 3, mode: "recognition", reviewed_at: iso("09:00:10") });
     expect(payload.reviews[0]?.card.reps).toBe(4);
     expect(payload.xp).toEqual([
-      expect.objectContaining({ reason: "review.recognition", amount: 1, day: TODAY, language: "it", rule_version: "j5.1", league_eligible: true, source: { kind: "review", client_event_id: payload.reviews[0]?.client_event_id } }),
+      expect.objectContaining({ reason: "review.recognition", amount: 1, day: TODAY, language: "it", rule_version: "j5.2", league_eligible: true, source: { kind: "review", client_event_id: payload.reviews[0]?.client_event_id } }),
     ]);
     expect(payload.xp[0]?.meta).toMatchObject({ occurredDay: TODAY, late: false, long: false, diminished: false, volet: "study" });
     expect(payload.learning_days).toEqual([expect.objectContaining({ day: TODAY, xp_verified: 1, validated: false, cause: "none", time_zone: "Europe/Paris" })]);
@@ -626,7 +626,7 @@ describe("planIngest: units", () => {
       answer: { value: "a", try: 1, unitId: UNIT_ID, unitVersion: UNIT_VERSION, lesson: "l1", itemId: "q1" },
     })]);
     expect(payload.attempts[0]?.exercise_ref).toMatch(/^[0-9a-f-]{36}$/);
-    expect(payload.xp).toEqual([expect.objectContaining({ reason: "focus.first_try", amount: 2, rule_version: "j5.1", source: { kind: "attempt", client_event_id: payload.attempts[0]?.client_event_id } })]);
+    expect(payload.xp).toEqual([expect.objectContaining({ reason: "focus.first_try", amount: 2, rule_version: "j5.2", source: { kind: "attempt", client_event_id: payload.attempts[0]?.client_event_id } })]);
     expect(payload.unit_progress).toEqual([{ unit_id: UNIT_ID, language: "it", version: UNIT_VERSION, steps: {}, best_score: null, test_attempts: 0, passed_at: null, passed_version: null }]);
   });
 

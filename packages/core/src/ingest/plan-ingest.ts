@@ -50,6 +50,7 @@ import {
   reviewBonusDifficulty,
   reviewBonusReconquest,
   reviewOutcome,
+  roleplayCompleted,
   rewriteSentence,
   sessionComplete,
   shadowingSentence,
@@ -69,7 +70,7 @@ import { isErrorWorkable } from "../session/adapt";
 import { PLAN_STEPS, WAKE_LIMITS, type PlanStep } from "../session/plan";
 import { gradeUnitItem, gradeUnitTest, stepValidated } from "../units";
 import { deterministicUuid, fingerprint } from "./hash";
-import type { IngestReport, IngestState, PlanIngestResult, RawEvent, StateCard, StateDay, StateItem, StateProduction, StateSession, StateUnitProgress } from "./types";
+import type { IngestReport, IngestState, PlanIngestResult, RawEvent, StateCard, StateDay, StateItem, StateProduction, StateRoleplay, StateSession, StateUnitProgress } from "./types";
 
 const DAY_MS = 86_400_000;
 const MAX_ANSWER_MS = 600_000;
@@ -253,6 +254,10 @@ class Ingestion {
       const refusal = this.unitRefusal(event);
       if (refusal !== null) return this.no(event, refusal);
     }
+    if (event.kind === "roleplay_completed") {
+      const game = this.roleplayOf(event.payload.roleplayId);
+      if (game?.status !== "finished") return this.no(event, "unknown_roleplay");
+    }
     if (event.kind === "oral_attempt") {
       const refusal = this.oralRefusal(event);
       if (refusal !== null) return this.no(event, refusal);
@@ -430,6 +435,8 @@ class Ingestion {
         return this.onUnitTest(event, at);
       case "oral_attempt":
         return this.onOral(event, at);
+      case "roleplay_completed":
+        return this.onRoleplay(event, at);
     }
   }
 
@@ -1083,6 +1090,37 @@ class Ingestion {
       duration_ms: Math.min(Math.max(0, p.activity === "dictation" ? typingMs : speakingMs), MAX_ANSWER_MS),
       occurred_at: event.occurredAt,
     });
+  }
+
+  // --------------------------------------------------------------- roleplay
+
+  private roleplayOf(roleplayId: string): StateRoleplay | undefined {
+    return Object.hasOwn(this.s.roleplays, roleplayId) ? this.s.roleplays[roleplayId] : undefined;
+  }
+
+  /**
+   * A finished role play: `roleplay.completed` (15 XP, output, once a learning day) when the game the server holds has
+   * at least 3 learner turns, the words of its level and the target language detected. Once per game, ever (`paid`).
+   * Nothing of the game comes from the client but its id; the game of another account is `unknown_roleplay`.
+   */
+  private onRoleplay(event: Extract<Parsed, { kind: "roleplay_completed" }>, at: Attributed): void {
+    const game = this.roleplayOf(event.payload.roleplayId) as StateRoleplay;
+    if (game.paid) return this.zero(event.clientEventId, "already_earned");
+    const level = (Object.hasOwn(PRODUCTION_MIN_WORDS, game.level) ? game.level : "B1") as keyof typeof PRODUCTION_MIN_WORDS;
+    const outcome = roleplayCompleted({
+      turns: game.learnerTurns.length,
+      words: game.learnerTurns.reduce((sum, text) => sum + countWords(game.language, text), 0),
+      minWords: PRODUCTION_MIN_WORDS[level],
+      detectedLanguage: game.detectedLanguage,
+      targetLanguage: game.language,
+    });
+    if (outcome.amount === 0) return this.zero(event.clientEventId, outcome.zero);
+    const d = this.day(at.day);
+    const granted = capCount(outcome.amount, { rewardsToday: d.rewards["roleplay.completed"] ?? 0, max: COUNT_CAPS["roleplay.completed"] as number });
+    if (granted.amount === 0) return this.zero(event.clientEventId, granted.zero);
+    d.rewards["roleplay.completed"] = (d.rewards["roleplay.completed"] ?? 0) + 1;
+    game.paid = true;
+    this.emitXp({ rule: "roleplay.completed", amount: granted.amount, source: null, language: game.language, at, ref: game.id });
   }
 
   // ------------------------------------------------------------ settlements

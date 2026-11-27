@@ -14,7 +14,7 @@ export interface FakeQuery {
 
 /**
  * In-memory test double of an `AppClient` for the read functions: `from(table)` filters the rows given for that table
- * (`eq` (also on `column->>key`), `neq`, `in`, `is`, `like`, `not(..., "is", ...)`, `gte`, `lte`, `order`, `range`, `limit`, `maybeSingle`, `count`) and
+ * (`eq` (also on `column->>key`), `neq`, `in` (also on `column->>key`), `is`, `like`, `not(..., "is", ...)`, `gte`, `lte`, `order`, `range`, `limit`, `maybeSingle`, `count`) and
  * records every query, so a test can assert which filters a read used (and which it did not). `upsert` with
  * `ignoreDuplicates` keeps the first row of a conflict. Only for unit tests, never imported by the package itself.
  */
@@ -77,7 +77,7 @@ export function tableFake(tables: Record<string, Row[]>, options: { rpc?: (name:
     };
     add("eq", (column: string, value: unknown) => (row) => valueOf(row, column) === value);
     add("neq", (column: string, value: unknown) => (row) => row[column] !== value);
-    add("in", (column: string, values: unknown[]) => (row) => values.includes(row[column]));
+    add("in", (column: string, values: unknown[]) => (row) => values.includes(valueOf(row, column)));
     add("is", (column: string, value: unknown) => (row) => (row[column] ?? null) === value);
     add("not", (column: string, operator: string, value: unknown) => (row) => operator === "is" ? (row[column] ?? null) !== value : true);
     // `like`: `%` is any run of characters, `_` one character, a backslash makes the next character literal.

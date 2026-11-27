@@ -43,6 +43,7 @@ export function extractRefs(events: readonly unknown[]): IngestRefs {
     clientEventIds: new Set<string>(),
     unitIds: new Set<string>(),
     unitTestIds: new Set<string>(),
+    roleplayIds: new Set<string>(),
   };
   const take = (set: Set<string>, value: unknown) => {
     if (typeof value === "string" && UUID.test(value) && set.size < MAX_REFS) set.add(value);
@@ -60,6 +61,7 @@ export function extractRefs(events: readonly unknown[]): IngestRefs {
     take(sets.deviceIds, payload.deviceId);
     if (typeof payload.unitId === "string" && UNIT_ID_PATTERN.test(payload.unitId) && sets.unitIds.size < MAX_REFS) sets.unitIds.add(payload.unitId);
     if (event.kind === "unit_test_submitted") take(sets.unitTestIds, payload.attemptId);
+    if (event.kind === "roleplay_completed") take(sets.roleplayIds, payload.roleplayId);
   }
   return {
     sessionIds: [...sets.sessionIds],
@@ -71,5 +73,6 @@ export function extractRefs(events: readonly unknown[]): IngestRefs {
     clientEventIds: [...sets.clientEventIds],
     ...(sets.unitIds.size > 0 ? { unitIds: [...sets.unitIds] } : {}),
     ...(sets.unitTestIds.size > 0 ? { unitTestIds: [...sets.unitTestIds] } : {}),
+    ...(sets.roleplayIds.size > 0 ? { roleplayIds: [...sets.roleplayIds] } : {}),
   };
 }

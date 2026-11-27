@@ -2,7 +2,7 @@
 
 import type { AccentTolerance } from "@dailylingua/core";
 import { useRouter } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, type ReactNode } from "react";
 import { useEventSync } from "@/components/pwa/event-sync-provider";
 import { useOnlineStatus } from "@/lib/offline/online-status";
 import type { OralPacket } from "@/lib/oral/select-oral";
@@ -10,7 +10,7 @@ import type { UnitEvent } from "@/lib/units/events";
 import { OralWorkshop } from "./oral-workshop";
 
 /** « À voix haute » wired to the app: the offline event queue, the router and the connection state. */
-export function OralWorkshopPlayer({ packet, languageName, units, locale, tolerance, xpVisible, backHref }: {
+export function OralWorkshopPlayer({ packet, languageName, units, locale, tolerance, xpVisible, backHref, roleplayCard }: {
   packet: OralPacket;
   languageName: string;
   units: string[];
@@ -18,6 +18,7 @@ export function OralWorkshopPlayer({ packet, languageName, units, locale, tolera
   tolerance: AccentTolerance;
   xpVisible: boolean;
   backHref: string;
+  roleplayCard?: ReactNode;
 }) {
   const sync = useEventSync();
   const router = useRouter();
@@ -52,6 +53,7 @@ export function OralWorkshopPlayer({ packet, languageName, units, locale, tolera
       onEvents={onEvents}
       checkDelivery={checkDelivery}
       onLeave={leave}
+      roleplayCard={roleplayCard}
     />
   );
 }
