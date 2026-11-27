@@ -53,6 +53,24 @@ Commencer l’observation avec **4 sur 5**, sur au moins trois jours d’apprent
 
 Le calcul suppose des réponses indépendantes et un seul lot fixé à l’avance. Le hasard calculé par lot ne quantifie pas le risque sur plusieurs lots, ni les erreurs de classement des textes. Tester la cadence de renouvellement et les changements de palier sur des trajectoires longues avant activation. La fiche des [bilans pilotes](../../assessment/pilot-results.md) ne présente encore aucun résultat renseigné. Le jeu de données à constituer doit inclure les deux langues et des estimations prises avant les bilans. Suivre l’écart cible d’un demi-niveau du [plan d’indicateurs](../h-indicateurs.md) et conserver le dernier palier confirmé pendant ce calibrage.
 
+### Répéter les observations sur une même bande
+
+Comparer deux règles sur douze lots successifs de cinq supports, sans réutiliser de support. Chaque lot est réparti sur au moins trois jours d’apprentissage. La première règle confirme la bande après un lot réussi. La deuxième attend deux lots réussis consécutifs. Dans les deux cas, la confirmation acquise est conservée.
+
+| Trajectoire de réussite par support | Après 4 lots, un succès | Après 4 lots, deux consécutifs | Après 12 lots, un succès | Après 12 lots, deux consécutifs |
+|---|---:|---:|---:|---:|
+| Réponses au hasard (15,625 % par support) | 1,039 % | 0,002 % | 3,085 % | 0,007 % |
+| Bande difficile (50 % par support) | 56,42 % | 9,23 % | 91,72 % | 29,08 % |
+| Bande accessible (70 % par support) | 95,05 % | 54,23 % | 99,99 % | 93,17 % |
+| Progression (50 %, 80 %, puis 90 %, quatre lots par palier) | 56,42 % | 9,23 % | > 99,99 % | 99,82 % |
+| Baisse (80 % pendant quatre lots, puis 50 %) | 99,52 % | 82,92 % | 99,91 % | 87,45 % |
+
+Pour reproduire le calcul, la probabilité de réussite du lot est `q = p⁴ × (5 − 4p)` à partir de la probabilité `p` par support. Pour la première règle, la probabilité de rester sans confirmation est le produit des `(1 − q)`. Pour la deuxième, partir de `(a, b) = (1, 0)`. Après chaque lot, mettre à jour les probabilités de rester sans confirmation avec zéro ou un succès consécutif par `(a, b) ← ((a + b) × (1 − q), a × q)`. La probabilité d’avoir confirmé est `1 − a − b`.
+
+Ce calcul suppose des lots indépendants, déjà admissibles et formés pour une seule bande. Cinq supports distincts peuvent donner des résultats corrélés si leurs thèmes, leur difficulté réelle ou les habitudes de l’apprenant se ressemblent. Pour deux lots adjacents, la probabilité de deux succès vaut la probabilité du premier succès multipliée par la probabilité du second sachant le premier. Le hasard ne représente pas le cas d’un apprenant juste sous la bande visée.
+
+Sur les journaux du pilote, rejouer les deux règles par ordre chronologique et apparier les résultats aux bilans de lecture indépendants. Compter les paires de lots admissibles, les cas indéterminés, le taux de réussite du second lot après un premier succès, l’écart au bilan et le délai de confirmation en jours et en supports. Le rapport d’observation actuel conserve le premier lot. Toute comparaison des renouvellements reste au stade du pilote.
+
 ### Preuve de vocabulaire
 
 Le lecteur donne un lemme et ses formes dans les données du texte. Sa carte est actuellement identifiée par texte et position, et sa couverture compare des formes écrites. Le journal `review_log` conserve les rappels par carte. La preuve proposée repose sur une identité résolue côté serveur à partir du contenu curé, par langue et par lemme canonique. Les formes fléchies se rattachent au même lemme. Un rapprochement ambigu reste à résoudre avant de compter une preuve.
