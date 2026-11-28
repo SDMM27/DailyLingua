@@ -1,14 +1,30 @@
 import { describe, expect, it } from "vitest";
-import { buildFlatItems } from "@/lib/placement/testing";
-import { CEFR_LEVELS, type CefrLevel } from "@/lib/schemas/common";
-import { PLACEMENT_MAX_ITEMS } from "@/lib/schemas/placement";
+import { cefrLevels as CEFR_LEVELS, PLACEMENT_MAX_ITEMS, type CefrLevel, type PlacementItem } from "@dailylingua/schemas";
 import {
   nextPlacementStep,
   pickPlacementItem,
+  placementUncertainty,
   replayPlacement,
   shufflePlacementItems,
   type PlacementResponse,
 } from "./placement";
+
+const SKILL_OF_POSITION = ["grammar", "grammar", "grammar", "grammar", "vocabulary", "vocabulary", "vocabulary", "reading", "reading", "reading"] as const;
+
+/** A valid bank of 60 questions, the right answer rotating over 0..3. */
+function buildFlatItems(code = "xx"): PlacementItem[] {
+  return CEFR_LEVELS.flatMap((level, l) =>
+    SKILL_OF_POSITION.map((skill, i) => ({
+      id: `${code}-${level.toLowerCase()}-${i + 1}`,
+      level,
+      skill,
+      ...(skill === "reading" ? { context: `Texte ${level} ${i + 1}` } : {}),
+      prompt: skill === "reading" ? `Question ${level} ${i + 1}` : `${level} ${i + 1} ___`,
+      options: ["a", "b", "c", "d"] as [string, string, string, string],
+      answer: (l * 10 + i) % 4,
+    })),
+  );
+}
 
 /** A block of 5 responses at `level`, the first `right` of them right. */
 const block = (level: CefrLevel, right: number): PlacementResponse[] =>
@@ -154,7 +170,7 @@ describe("shufflePlacementItems", () => {
     expect(shuffled).not.toBe(items);
     expect(shuffled.map((i) => i.id)).not.toEqual(items.map((i) => i.id));
     expect([...shuffled].sort((a, b) => a.id.localeCompare(b.id))).toEqual([...items].sort((a, b) => a.id.localeCompare(b.id)));
-    expect(items[0].id).toBe("xx-a1-1");
+    expect(items[0]?.id).toBe("xx-a1-1");
   });
 });
 
@@ -178,7 +194,7 @@ describe("replayPlacement", () => {
   it("accepts a test drawn in another order, as the client shuffles the bank", () => {
     const shuffled = [...items].reverse();
     const answers = [...answersFor("B1", 4, shuffled), ...answersFor("B2", 1, shuffled)];
-    expect(answers[0].itemId).toBe("xx-b1-4");
+    expect(answers[0]?.itemId).toBe("xx-b1-4");
     expect(replayPlacement(items, "B1", answers)).toEqual({ ok: true, estimate: "B1", confidence: "high" });
   });
 
@@ -189,7 +205,7 @@ describe("replayPlacement", () => {
     // Right level, wrong skill: the block starts with grammar.
     expect(replayPlacement(items, "B1", [{ itemId: "xx-b1-5", choice: 0 }, ...rest])).toMatchObject({ ok: false });
     // The same question twice.
-    expect(replayPlacement(items, "B1", [finished[0], finished[0], ...finished.slice(2)])).toMatchObject({ ok: false });
+    expect(replayPlacement(items, "B1", [finished[0]!, finished[0]!, ...finished.slice(2)])).toMatchObject({ ok: false });
     expect(replayPlacement(items, "B1", [{ itemId: "zz", choice: 0 }])).toMatchObject({ ok: false });
   });
 
@@ -197,7 +213,7 @@ describe("replayPlacement", () => {
     // B2 questions first although the test starts at B1.
     expect(replayPlacement(items, "B1", [...answersFor("B2", 1), ...answersFor("B1", 4)])).toMatchObject({ ok: false });
     // Two questions of a block swapped: vocabulary before grammar.
-    const swapped = [finished[1], finished[0], ...finished.slice(2)];
+    const swapped = [finished[1]!, finished[0]!, ...finished.slice(2)];
     expect(replayPlacement(items, "B1", swapped)).toMatchObject({ ok: false });
   });
 
@@ -213,5 +229,11 @@ describe("replayPlacement", () => {
       ok: false,
       reason: "answers after the end of the test",
     });
+  });
+});
+
+describe("placementUncertainty", () => {
+  it("is 0.5, 0.75 and 1 for a high, medium and low confidence", () => {
+    expect([placementUncertainty("high"), placementUncertainty("medium"), placementUncertainty("low")]).toEqual([0.5, 0.75, 1]);
   });
 });

@@ -1,9 +1,8 @@
 import { readFile } from "node:fs/promises";
 import { calibratePlacementItems, placementCoverage, placementObservations, PLACEMENT_THRESHOLDS } from "@dailylingua/core";
+import { itBank, ruBank } from "@dailylingua/content/placement";
 import { placementResultRowSchema } from "@dailylingua/schemas";
 import { z } from "zod";
-import { itBank } from "../src/lib/placement/banks/it";
-import { ruBank } from "../src/lib/placement/banks/ru";
 
 const [file, ...extra] = process.argv.slice(2);
 const usage = "npm run --silent placement:calibrate -- <export.json>";

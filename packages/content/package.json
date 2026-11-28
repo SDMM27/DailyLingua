@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./placement": "./src/placement/index.ts",
     "./fixtures": "./src/units/__fixtures__/index.ts"
   },
   "scripts": {

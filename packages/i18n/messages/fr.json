@@ -1062,5 +1062,73 @@
       "xp": "{xp} XP",
       "ringCaption": "sur {goal} XP"
     }
+  },
+  "placement": {
+    "start": "Faire le test de niveau",
+    "title": "Où en es-tu en {language} ?",
+    "cardBody": "Environ 10 minutes pour régler tes leçons sur ton niveau.",
+    "header": "{language} · Test de niveau",
+    "intro": {
+      "title": "Test de niveau",
+      "duration": "Environ 10 minutes",
+      "length": "30 questions au plus, souvent moins",
+      "stop": "Tu peux arrêter à tout moment",
+      "unsure": "Un doute ? Choisis « Je ne sais pas » : mieux que deviner",
+      "begin": "Commencer",
+      "notNow": "Pas maintenant"
+    },
+    "welcome": {
+      "eyebrow": "Bienvenue",
+      "title": "Ton compte est prêt.",
+      "body": "Veux-tu mesurer ton niveau de {language} maintenant ? Tes leçons s’adapteront.",
+      "later": "Plus tard, je commence par une leçon"
+    },
+    "question": {
+      "meta": "Question {number} · {skill}",
+      "skills": {
+        "grammar": "Grammaire",
+        "vocabulary": "Vocabulaire",
+        "reading": "Lecture"
+      },
+      "blank": "blanc à compléter",
+      "submit": "Valider",
+      "dontKnow": "Je ne sais pas",
+      "seeResult": "Voir mon résultat",
+      "stop": "Arrêter le test",
+      "stepsLabel": "Progression par blocs de cinq questions"
+    },
+    "stop": {
+      "title": "Arrêter le test ?",
+      "body": "Tes réponses ne seront pas gardées.",
+      "confirm": "Arrêter",
+      "continue": "Continuer"
+    },
+    "rail": {
+      "title": "Niveaux visités",
+      "mastered": "Acquis",
+      "current": "En cours"
+    },
+    "result": {
+      "meta": "Résultat · {language}",
+      "estimated": "Niveau estimé",
+      "confidence": {
+        "low": "Confiance faible",
+        "medium": "Confiance moyenne",
+        "high": "Confiance élevée"
+      },
+      "summary": {
+        "low": "Confiance faible : {count, plural, one {# question seulement} other {# questions seulement}}, ton niveau reste à confirmer.",
+        "medium": "Confiance moyenne, sur {count, plural, one {# question} other {# questions}}.",
+        "high": "Confiance élevée, sur {count, plural, one {# question} other {# questions}}."
+      },
+      "scale": "Choisir un autre niveau",
+      "estimate": "Estimation du test : {level}",
+      "keep": "Garder {level}",
+      "choose": "Choisir {level}",
+      "saving": "Enregistrement…",
+      "error": "Impossible d’enregistrer ton niveau pour le moment. Réessaie.",
+      "measured": "{level} · mesuré",
+      "readingNote": "Ce test mesure la lecture."
+    }
   }
 }

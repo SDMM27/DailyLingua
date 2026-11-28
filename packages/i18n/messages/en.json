@@ -1062,5 +1062,73 @@
       "xp": "{xp} XP",
       "ringCaption": "of {goal} XP"
     }
+  },
+  "placement": {
+    "start": "Take the placement test",
+    "title": "How is your {language}?",
+    "cardBody": "About 10 minutes to set your lessons to your level.",
+    "header": "{language} · Placement test",
+    "intro": {
+      "title": "Placement test",
+      "duration": "About 10 minutes",
+      "length": "Up to 30 questions, often fewer",
+      "stop": "You can stop any time",
+      "unsure": "Unsure? Pick \"I don’t know\": better than guessing",
+      "begin": "Start",
+      "notNow": "Not now"
+    },
+    "welcome": {
+      "eyebrow": "Welcome",
+      "title": "Your account is ready.",
+      "body": "Want to measure your {language} level now? Your lessons will adapt.",
+      "later": "Later, I’ll start with a lesson"
+    },
+    "question": {
+      "meta": "Question {number} · {skill}",
+      "skills": {
+        "grammar": "Grammar",
+        "vocabulary": "Vocabulary",
+        "reading": "Reading"
+      },
+      "blank": "blank to fill",
+      "submit": "Submit",
+      "dontKnow": "I don’t know",
+      "seeResult": "See my result",
+      "stop": "Stop the test",
+      "stepsLabel": "Progress in blocks of five questions"
+    },
+    "stop": {
+      "title": "Stop the test?",
+      "body": "Your answers won’t be kept.",
+      "confirm": "Stop",
+      "continue": "Continue"
+    },
+    "rail": {
+      "title": "Levels visited",
+      "mastered": "Mastered",
+      "current": "In progress"
+    },
+    "result": {
+      "meta": "Result · {language}",
+      "estimated": "Estimated level",
+      "confidence": {
+        "low": "Low confidence",
+        "medium": "Medium confidence",
+        "high": "High confidence"
+      },
+      "summary": {
+        "low": "Low confidence: only {count, plural, one {# question} other {# questions}}, your level still needs confirming.",
+        "medium": "Medium confidence, over {count, plural, one {# question} other {# questions}}.",
+        "high": "High confidence, over {count, plural, one {# question} other {# questions}}."
+      },
+      "scale": "Choose another level",
+      "estimate": "Test estimate: {level}",
+      "keep": "Keep {level}",
+      "choose": "Choose {level}",
+      "saving": "Saving…",
+      "error": "Couldn’t save your level right now. Try again.",
+      "measured": "{level} · measured",
+      "readingNote": "This test measures reading."
+    }
   }
 }

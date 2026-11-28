@@ -60,6 +60,8 @@ export function collectErrors(page: Page, isOffline = () => false) {
   page.on("pageerror", (error) => {
     // WebKit reports a link prefetch (`?_rsc=`) cancelled by a full page load (page.goto) this way.
     if (error.message.includes("_rsc=") && error.message.includes("access control checks")) return;
+    // And for the quests read of the progress page (caught by the page), cancelled when the test leaves it at once.
+    if (error.message.includes("/api/quests") && error.message.includes("access control checks")) return;
     // Same for the service worker registration, started on the first page and interrupted when the
     // test navigates away at once; the next page registers it again.
     if (error.message.includes("serwist/sw.js") && /load failed|access control checks/i.test(error.message)) return;
@@ -100,8 +102,8 @@ async function choose(page: Page, name: string | RegExp) {
   await page.locator("label").filter({ has: page.getByRole("radio", { name }) }).click();
 }
 
-/** Creates an account through the interface and completes the installation (Italian, A0, 15 minutes); ends on Today, in French. */
-export async function signUpAndInstall(page: Page, email: string, knownLanguage?: string) {
+/** Creates an account through the interface and completes the installation (Italian, 15 minutes) at the given starting level. */
+async function signUpAndCompleteInstallation(page: Page, email: string, level: RegExp, knownLanguage?: string) {
   await page.goto("/sign-up");
   await page.getByLabel("Adresse e-mail").fill(email);
   await page.getByLabel("Mot de passe").fill(TEST_PASSWORD);
@@ -115,8 +117,19 @@ export async function signUpAndInstall(page: Page, email: string, knownLanguage?
     await page.getByRole("checkbox", { name: knownLanguage, exact: true }).check();
   }
   await page.getByRole("button", { name: "Continuer" }).click();
-  await choose(page, /Je débute/);
+  await choose(page, level);
   await page.getByRole("button", { name: "Continuer" }).click();
   await page.getByRole("button", { name: "Commencer" }).click();
+}
+
+/** Creates an account through the interface and completes the installation (Italian, A0, 15 minutes); ends on Today, in French. */
+export async function signUpAndInstall(page: Page, email: string, knownLanguage?: string) {
+  await signUpAndCompleteInstallation(page, email, /Je débute/, knownLanguage);
   await expect(page).toHaveURL(/\/$/);
+}
+
+/** The same installation at A1, where a learner already knows some Italian: ends on the offer of the placement test. */
+export async function signUpAndInstallToPlacementOffer(page: Page, email: string, knownLanguage?: string) {
+  await signUpAndCompleteInstallation(page, email, /Je comprends l’essentiel du quotidien/, knownLanguage);
+  await expect(page).toHaveURL(/\/placement\/it\/bienvenue$/);
 }

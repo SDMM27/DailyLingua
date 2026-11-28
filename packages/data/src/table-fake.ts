@@ -16,7 +16,7 @@ export interface FakeQuery {
  * In-memory test double of an `AppClient` for the read functions: `from(table)` filters the rows given for that table
  * (`eq` (also on `column->>key`), `neq`, `in` (also on `column->>key`), `is`, `like`, `not(..., "is", ...)`, `gte`, `lte`, `order`, `range`, `limit`, `maybeSingle`, `count`) and
  * records every query, so a test can assert which filters a read used (and which it did not). `upsert` with
- * `ignoreDuplicates` keeps the first row of a conflict. `insert`, `update` and `delete` mutate the rows and return the affected ones (an inserted row gets a random `id` unless it has one). Only for unit tests, never imported by the package itself.
+ * `ignoreDuplicates` keeps the first row of a conflict, otherwise it overwrites it. `insert`, `update` and `delete` mutate the rows and return the affected ones (an inserted row gets a random `id` unless it has one). Only for unit tests, never imported by the package itself.
  */
 export function tableFake(tables: Record<string, Row[]>, options: { rpc?: (name: string, args: unknown) => { data: unknown; error: { code?: string; message?: string } | null } } = {}) {
   const queries: FakeQuery[] = [];
@@ -49,8 +49,9 @@ export function tableFake(tables: Record<string, Row[]>, options: { rpc?: (name:
     function run() {
       if (upsert) {
         for (const row of upsert.rows) {
-          const exists = (store[table] ??= []).some((other) => upsert!.onConflict.every((column) => other[column] === row[column]));
-          if (!exists) store[table]!.push({ ...row });
+          const existing = (store[table] ??= []).find((other) => upsert!.onConflict.every((column) => other[column] === row[column]));
+          if (!existing) store[table]!.push({ ...row });
+          else if (!upsert.ignore) Object.assign(existing, row);
         }
         return { data: null, error: null };
       }

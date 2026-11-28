@@ -51,21 +51,29 @@ describe("completeOnboarding", () => {
     await expect(completeOnboarding(valid)).rejects.toThrow("NEXT_REDIRECT /sign-in");
   });
 
-  it("saves the profile then the plan with the current interface language, then goes to Today", async () => {
-    await expect(completeOnboarding(valid)).rejects.toThrow("NEXT_REDIRECT /");
+  it("saves the profile then the plan with the current interface language, then offers the placement test of a language that has one", async () => {
+    await expect(completeOnboarding({ ...valid, startLevel: "A2" })).rejects.toThrow("NEXT_REDIRECT /placement/it/bienvenue");
     expect(saveProfile).toHaveBeenCalledWith(expect.anything(), {
       nativeLanguage: "fr",
       uiLanguage: "fr",
       timeZone: "Europe/Paris",
       reminderTime: null,
     });
-    expect(saveEnrollments).toHaveBeenCalledWith(expect.anything(), [{ language: "it", dailyMinutes: 15, startLevel: "A0" }]);
+    expect(saveEnrollments).toHaveBeenCalledWith(expect.anything(), [{ language: "it", dailyMinutes: 15, startLevel: "A2" }]);
     expect(saveKnownLanguages).not.toHaveBeenCalled();
   });
 
   it("saves the optional languages before completing the learning plan", async () => {
-    await expect(completeOnboarding({ ...valid, knownLanguages: ["es", "eu"] })).rejects.toThrow("NEXT_REDIRECT /");
+    await expect(completeOnboarding({ ...valid, knownLanguages: ["es", "eu"] })).rejects.toThrow(/^NEXT_REDIRECT \/$/);
     expect(saveKnownLanguages).toHaveBeenCalledWith(expect.anything(), ["es", "eu"]);
+  });
+
+  it("goes to Today for a beginner: there is no level to place", async () => {
+    await expect(completeOnboarding(valid)).rejects.toThrow(/^NEXT_REDIRECT \/$/);
+  });
+
+  it("goes to Today for a language without a placement test", async () => {
+    await expect(completeOnboarding({ ...valid, targetLanguage: "es" })).rejects.toThrow(/^NEXT_REDIRECT \/$/);
   });
 
   it("turns a data error into a message key", async () => {
