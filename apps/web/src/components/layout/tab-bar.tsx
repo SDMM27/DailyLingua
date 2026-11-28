@@ -17,7 +17,8 @@ const TABS = [
 ] as const;
 
 /**
- * Bottom navigation of the signed-in screens, clear of the home indicator. `pathLanguage` is the language of the beginner
+ * Navigation of the signed-in screens: a bottom bar clear of the home indicator on a phone, a left side bar from
+ * 1024 px (desktop), so the screens can use the width. `pathLanguage` is the language of the beginner
  * path when the learner has one: the « Parcours » tab then comes second; the Progress tab is available to pilot learners.
  */
 export function TabBar({ pathLanguage = null, hasProgress = false }: { pathLanguage?: string | null; hasProgress?: boolean }) {
@@ -33,17 +34,17 @@ export function TabBar({ pathLanguage = null, hasProgress = false }: { pathLangu
   return (
     <nav
       aria-label={t("label")}
-      className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-bg pb-[env(safe-area-inset-bottom)]"
+      className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-bg pb-[env(safe-area-inset-bottom)] lg:inset-y-0 lg:end-auto lg:w-56 lg:border-t-0 lg:border-e lg:pb-0 lg:pt-[calc(1.5rem+env(safe-area-inset-top))]"
     >
-      <ul className="mx-auto flex max-w-md">
+      <ul className="mx-auto flex max-w-md lg:mx-0 lg:max-w-none lg:flex-col lg:gap-1 lg:px-3">
         {tabs.map(({ href, key, icon }) => {
           const current = href === "/" ? pathname === "/" : pathname.startsWith(key === "path" ? "/parcours" : href);
           return (
-            <li key={href} className="flex-1">
+            <li key={href} className="flex-1 lg:flex-none">
               <Link
                 href={href}
                 aria-current={current ? "page" : undefined}
-                className={`flex min-h-14 flex-col items-center justify-center gap-1 text-xs font-semibold ${current ? "text-accent-strong" : "text-muted"}`}
+                className={`flex min-h-14 flex-col items-center justify-center gap-1 text-xs font-semibold lg:min-h-11 lg:flex-row lg:justify-start lg:gap-3 lg:rounded-lg lg:px-3 lg:text-sm ${current ? "text-accent-strong lg:bg-surface" : "text-muted lg:hover:bg-surface"}`}
               >
                 <svg
                   viewBox="0 0 24 24"
