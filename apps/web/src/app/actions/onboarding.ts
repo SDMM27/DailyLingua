@@ -14,7 +14,7 @@ export type OnboardingResult = { error: SaveErrorKey };
 /**
  * Saves what the installation collected: the profile (mother tongue, current interface language,
  * browser time zone), then the learning plan (one language, every day). Goes to Today on success, or to the offer of the
- * placement test for a language that has one.
+ * placement test when the learner is not a beginner in a language that has one.
  * Returns an error key to translate; the input is validated here, never trusted from the client.
  */
 export async function completeOnboarding(input: unknown): Promise<OnboardingResult> {
@@ -43,5 +43,7 @@ export async function completeOnboarding(input: unknown): Promise<OnboardingResu
     return { error: saveErrorKey(error) };
   }
   await rememberLocale(uiLanguage);
-  redirect(isPlacementLanguage(value.targetLanguage) ? `/placement/${value.targetLanguage}/bienvenue` : "/");
+  // A beginner has no level to place: the offer is for a learner who already knows some of the language.
+  const offer = isPlacementLanguage(value.targetLanguage) && value.startLevel !== "A0";
+  redirect(offer ? `/placement/${value.targetLanguage}/bienvenue` : "/");
 }

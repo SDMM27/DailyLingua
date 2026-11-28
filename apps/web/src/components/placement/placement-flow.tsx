@@ -101,7 +101,9 @@ export function PlacementFlow({ userId, language, languageName, startLevel, item
   if (phase === "result" && step.kind === "done") {
     const selectedLevel = chosen ?? step.estimate;
     return (
+      // A key per screen: each one opens at the top of its scrolling zone.
       <PlacementShell
+        key="result"
         style={style}
         narrow
         header={<span className="meta py-3">{t("result.meta", { language: languageName })}</span>}
@@ -124,6 +126,7 @@ export function PlacementFlow({ userId, language, languageName, startLevel, item
     return (
       <>
         <PlacementShell
+          key={current.id}
           style={style}
           header={(
             <>

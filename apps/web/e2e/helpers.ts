@@ -100,8 +100,8 @@ async function choose(page: Page, name: string | RegExp) {
   await page.locator("label").filter({ has: page.getByRole("radio", { name }) }).click();
 }
 
-/** Creates an account through the interface and completes the installation (Italian, A0, 15 minutes); ends on the offer of the placement test. */
-export async function signUpAndInstallToPlacementOffer(page: Page, email: string, knownLanguage?: string) {
+/** Creates an account through the interface and completes the installation (Italian, 15 minutes) at the given starting level. */
+async function signUpAndCompleteInstallation(page: Page, email: string, level: RegExp, knownLanguage?: string) {
   await page.goto("/sign-up");
   await page.getByLabel("Adresse e-mail").fill(email);
   await page.getByLabel("Mot de passe").fill(TEST_PASSWORD);
@@ -115,15 +115,19 @@ export async function signUpAndInstallToPlacementOffer(page: Page, email: string
     await page.getByRole("checkbox", { name: knownLanguage, exact: true }).check();
   }
   await page.getByRole("button", { name: "Continuer" }).click();
-  await choose(page, /Je débute/);
+  await choose(page, level);
   await page.getByRole("button", { name: "Continuer" }).click();
   await page.getByRole("button", { name: "Commencer" }).click();
-  await expect(page).toHaveURL(/\/placement\/it\/bienvenue$/);
 }
 
-/** Creates an account through the interface and completes the installation (Italian, A0, 15 minutes), declines the placement test; ends on Today, in French. */
+/** Creates an account through the interface and completes the installation (Italian, A0, 15 minutes); ends on Today, in French. */
 export async function signUpAndInstall(page: Page, email: string, knownLanguage?: string) {
-  await signUpAndInstallToPlacementOffer(page, email, knownLanguage);
-  await page.getByRole("link", { name: "Plus tard, je commence par une leçon" }).click();
+  await signUpAndCompleteInstallation(page, email, /Je débute/, knownLanguage);
   await expect(page).toHaveURL(/\/$/);
+}
+
+/** The same installation at A1, where a learner already knows some Italian: ends on the offer of the placement test. */
+export async function signUpAndInstallToPlacementOffer(page: Page, email: string, knownLanguage?: string) {
+  await signUpAndCompleteInstallation(page, email, /Je comprends l’essentiel du quotidien/, knownLanguage);
+  await expect(page).toHaveURL(/\/placement\/it\/bienvenue$/);
 }
